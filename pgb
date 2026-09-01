@@ -29,6 +29,7 @@
 #   pgb build [--] CMD...      run a build with the portable toolchain injected
 #   pgb cc-dir                 print the wrapper directory, for hand-driving
 #   pgb verify BIN             inspect a binary AND run it across the matrix
+#   pgb nix SUBCOMMAND         use nixpkgs as the planner: plan, fetch, build
 #
 # OPTIONS (build)
 #   --embed-cacert             find the host's TLS trust store wherever it is,
@@ -122,7 +123,7 @@ ENGINE=""
 # ⚠ $PGB_SELF is bind-mounted into the build environment and into every target
 # rootfs at the same absolute path, so these resolve inside as well as outside.
 # ---------------------------------------------------------------------------
-for _lib in common wrappers env build verify; do
+for _lib in common wrappers env build verify nix; do
   _libf="$PGB_SELF/tool/lib/$_lib.sh"
   [ -r "$_libf" ] || { printf 'pgb: missing library %s\n' "$_libf" >&2; exit 2; }
   . "$_libf"
@@ -163,6 +164,7 @@ case "${CMD:-}" in
   shell)          cmd_shell ;;
   cc-dir)         build_runtime >/dev/null; make_wrappers; printf '\n' ;;
   verify)         cmd_verify "$@" ;;
+  nix)            cmd_nix "$@" ;;
   __inner-build)  inner_build "$@" ;;
   __inner-shell)  inner_build "${SHELL:-/bin/sh}" ;;
   ""|help)        usage ;;
