@@ -59,6 +59,19 @@ def dep_names_of(env, key):
     return out
 
 
+def full_store(p):
+    """⛔ `nix derivation show` KEYS BY BASENAME, and every nix command that
+    takes a derivation wants an absolute store path. Emitting the basename put
+    unusable paths in every plan: `nix derivation show
+    bi27b...-ncurses-6.6.drv` resolves it against the CURRENT DIRECTORY and
+    reports "No such file or directory", so the recursive dependency build
+    failed on every dependency and reported each one as unbuildable.
+    """
+    if not p:
+        return p
+    return p if p.startswith("/") else "/nix/store/" + p
+
+
 def main(argv):
     attr = argv[1] if len(argv) > 1 else "?"
     drvpath = argv[2] if len(argv) > 2 else ""
@@ -93,7 +106,28 @@ def main(argv):
     if isinstance(sattrs, dict) and sattrs:
         env = dict(sattrs)
 
-    # ⭐ INDEX THE FIXED-OUTPUT DERIVATIONS: those are the fetchurl calls, and
+    # ⭐ INDEX EVERY DERIVATION BY THE OUTPUTS IT PRODUCES. The recursive
+    # document already contains the whole graph, so an output path can be
+    # mapped back to the derivation that makes it WITHOUT the local store
+    # holding anything.
+    #
+    # ⛔ THIS REPLACED `nix-store -q --deriver` AS THE PRIMARY ROUTE BECAUSE
+    # THAT ROUTE ANSWERS `unknown-deriver` FOR A PATH THAT IS NOT REALISED,
+    # which is every dependency of a package nobody has built here. Measured:
+    # all five of htop's buildInputs came back with no derivation, so the
+    # dependency graph -- the entire point of using nixpkgs as the planner --
+    # was empty on the first package that needed one.
+    #
+    # ⚠ The document writes output paths as BASENAMES and buildInputs as full
+    # /nix/store paths. Matching without normalising finds nothing, silently.
+    out_index = {}
+    for path, d in drvs.items():
+        for oname, o in (d.get("outputs") or {}).items():
+            op = o.get("path")
+            if op:
+                out_index[os.path.basename(op)] = full_store(path)
+
+    # INDEX THE FIXED-OUTPUT DERIVATIONS TOO: those are the fetchurl calls, and
     # they are the only place the UPSTREAM URL and its hash exist. Everything
     # else in the graph is built from them.
     by_name = {}
@@ -105,7 +139,7 @@ def main(argv):
             continue
         e = d.get("env", {})
         urls = split_ws(e.get("urls")) or split_ws(e.get("url"))
-        rec = {"drv": path, "outputHash": h, "urls": urls}
+        rec = {"drv": full_store(path), "outputHash": h, "urls": urls}
         by_name.setdefault(d.get("name") or e.get("name") or "", []).append(rec)
 
     def resolve(store_path):
@@ -122,11 +156,11 @@ def main(argv):
         rec = {"store": store_path, "urls": [], "outputHash": ""}
         base = os.path.basename(store_path)
         name = base.split("-", 1)[1] if "-" in base else base
-        drv = ""
-        if nixpfx:
+        drv = out_index.get(base, "")
+        if not drv and nixpfx:
             drv = sh([os.path.join(nixpfx, "nix-store"), "-q", "--deriver", store_path])
-        if drv and drv in drvs:
-            d = drvs[drv]
+        if drv and os.path.basename(drv) in drvs:
+            d = drvs[os.path.basename(drv)]
             e = d.get("env", {})
             rec["urls"] = split_ws(e.get("urls")) or split_ws(e.get("url"))
             rec["outputHash"] = (
@@ -145,6 +179,37 @@ def main(argv):
 
     def dep_names(key):
         return dep_names_of(env, key)
+
+    def dep_records(key):
+        """⭐ THE DEPENDENCY GRAPH, WITH ENOUGH TO ACT ON IT.
+
+        A name is not actionable: `ncurses-6.6-dev` is not a nixpkgs attribute
+        and guessing the attribute from a store-path name gets it wrong on
+        anything with a version suffix, a multiple output, or a rename. The
+        DERIVATION is actionable -- it can be planned recursively exactly like
+        the top-level one -- so each record carries it.
+
+        ⚠ `nix-store -q --deriver` needs the path present or substitutable. A
+        record whose drv could not be resolved is kept with an empty drv
+        rather than dropped, because a dependency this tool cannot plan is
+        something the caller has to be told about, not something to hide.
+        """
+        out = []
+        for p in split_ws(env.get(key)):
+            b = os.path.basename(p)
+            drv = out_index.get(b, "")
+            if not drv and nixpfx:
+                drv = sh([os.path.join(nixpfx, "nix-store"), "-q", "--deriver", p])
+                if drv.startswith("unknown"):
+                    drv = ""
+            out.append(
+                {
+                    "name": b.split("-", 1)[1] if "-" in b else b,
+                    "out": p,
+                    "drv": drv,
+                }
+            )
+        return out
 
     # ⭐ nixpkgs ALREADY KNOWS WHAT BUILD SYSTEM THIS IS, and says so by which
     # setup hooks it puts in nativeBuildInputs. Reading them off is free and it
@@ -176,7 +241,7 @@ def main(argv):
         "attr": attr,
         "pname": env.get("pname") or env.get("name") or attr,
         "version": env.get("version", ""),
-        "drv": drvpath,
+        "drv": full_store(drvpath),
         "system": top.get("system", ""),
         "src": resolve(src) if src else {},
         "patches": [resolve(p) for p in split_ws(env.get("patches"))],
@@ -185,6 +250,7 @@ def main(argv):
         "mesonFlags": split_ws(env.get("mesonFlags")),
         "makeFlags": split_ws(env.get("makeFlags")),
         "buildInputs": dep_names("buildInputs"),
+        "deps": dep_records("buildInputs") + dep_records("propagatedBuildInputs"),
         "nativeBuildInputs": dep_names("nativeBuildInputs"),
         "propagatedBuildInputs": dep_names("propagatedBuildInputs"),
         "outputs": split_ws(env.get("outputs")) or ["out"],
