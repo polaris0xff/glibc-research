@@ -10,34 +10,47 @@ it is tracked, so it survives the machine going away, which is the failure it
 exists for.
 
 ⛔ **Refresh it whenever "in flight" changes** — a rewrite of five lines.
-⚠ It was written at the END of the session of 2026-09-01, not the start. That
-is the wrong time and is recorded as the debt it is: had that session died, it
-would have handed over nothing.
+⭐ **Written at the START of the session of 2026-09-01b**, which is the debt the
+previous session recorded against itself and this one pays.
 
-    LAST WRITTEN   2026-09-01T13:50Z
-    TREE           clean, everything pushed to main
-    CHECKS         sh TODO/check.sh green; CI run 19 green, 15 jobs
+    LAST WRITTEN   2026-09-01T (session 2026-09-01b, start)
+    TREE           clean at 86c40c8
+    CHECKS         not yet re-run this session
+    BRANCH         claude/glibc-research-session-17ku6v  (see note below)
 
 ---
 
 | | |
 |---|---|
-| **the task** | Work through the foundational TODO entries in an order where doing one makes the next possible, verifying every claim rather than trusting the record. |
-| **the resume point** | `TODO/PROGRESS.md` "Work order". The head of it is **T-002** — a project that dlopens its own plugins at scale, which is also what T-030 now needs. |
-| **in flight** | ⚠ **Nothing is half-written.** Every entry touched is either closed with its evidence or open with the blocker named. Two need an operator decision before an agent may proceed — see below. |
-| **the state of the tree** | Clean. Working tree has no uncommitted changes; `main` is pushed; no `ephemeral-*` branches. |
+| **the task** | Two operator rulings received at session start (below), then the work order from the top: T-002, T-017, T-003, T-012 (split first). Foundations before breadth. |
+| **the resume point** | `TODO/PROGRESS.md` "Work order". |
+| **in flight** | Machine bootstrap: `pgb env create` + `fetch-rootfs.sh`. **This machine started with 0 of 11 rootfs present and no static libiconv** — nothing in the bed is cached between sessions. |
+| **the state of the tree** | Clean. No `ephemeral-*` branches. |
 | **the paste** | `Read ./docs/AGENTS.md in full & follow.` |
 
-## ⛔ Two things an agent must not decide alone
+## ⛔ Two operator rulings, received at the start of this session
 
-1. **T-030's acceptance was disproved and a replacement is proposed, not
-   adopted.** Its `Prove` named CPython, and `experiments/72-` showed the
-   subject that acceptance needs cannot be built. The corrected acceptance is
-   written in the entry and is **the operator's to accept or change**.
-2. **`REQUIREMENTS.md` part 2 is still not met**, and `--wrap-dlopen` narrowed
-   the gap without closing it. `PROGRESS.md` "Open questions" states it.
+Both questions were the ones the previous session left in `PROGRESS.md`
+"Open questions". They are now **answered** and are no longer open.
 
-## What was in flight and is now not
+1. **T-030's corrected acceptance is ACCEPTED as proposed.** The entry closes
+   on "`--wrap-dlopen` builds a project whose plugin loading is **not**
+   configurable at build time, with its plugin directory emptied and the
+   functionality intact, on 11 of 11" — not on rebuilding CPython.
+2. **`REQUIREMENTS.md` part 2 is REPLACED with the per-part claim**, and the
+   operator's reason is recorded with it: ⭐ *"anylinux is a bundle, our primary
+   goal is still a static glibc binary that has none of the issues."* The
+   head-to-head against a bundle is a category comparison, not the bar.
 
-Nothing. The last unit of work — `poc/60-leveldb`, the first C++ and first
-CMake POC — closed with `pass=12 fail=0 skip=0` and CI green afterwards.
+## ⚠ Branch note — `RULES.md` says `main`, the harness says otherwise
+
+`TODO/RULES.md` §Git says "work on `main`". On this remote host, `main` is
+**three commits of file uploads** and every commit of real work lives on
+`claude/glibc-research-session-17ku6v`, which the harness designates and
+forbids leaving. So the working branch *is* the trunk here. ⛔ Do not read
+`RULES.md` as licence to push to `main`; the rule's intent — one trunk, no
+accumulating agent branches — is served by continuing on the designated one.
+
+## What is in flight
+
+Bootstrap only. Nothing half-written in the tree.

@@ -1,0 +1,438 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch-x86_64:
+    name: Fetch x86_64
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Corpus cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: corpus
+          key: corpus-x86_64-${{ hashFiles('tst/corpus_x86_64.json', 'build.py') }}
+          restore-keys: corpus-x86_64-
+
+      - name: Fetch
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" fetch
+          rm -rf corpus
+          cp -a .build/tst/packages corpus
+
+  fetch-aarch64:
+    name: Fetch aarch64
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Corpus cache
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: corpus
+          key: corpus-aarch64-${{ hashFiles('tst/corpus_aarch64.json', 'build.py') }}
+          restore-keys: corpus-aarch64-
+
+      - name: Fetch
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" fetch
+          rm -rf corpus
+          cp -a .build/tst/packages corpus
+
+  alpine-musl:
+    name: Alpine / musl
+    needs: fetch-x86_64
+    runs-on: ubuntu-latest
+    container: alpine:latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Install dependencies
+        run: apk add --no-cache build-base gcompat gdb git libarchive-tools mesa-vulkan-swrast python3
+
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Corpus cache
+        uses: actions/cache/restore@v4
+        with:
+          path: corpus
+          key: corpus-x86_64-${{ hashFiles('tst/corpus_x86_64.json', 'build.py') }}
+          restore-keys: corpus-x86_64-
+
+      - name: Build
+        env:
+          CC: gcc
+          CXX: g++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus"
+
+      - name: Test
+        env:
+          CC: gcc
+          CXX: g++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" test
+
+      - name: Corpus
+        env:
+          CC: gcc
+          CXX: g++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" corpus
+
+      - name: Vulkan
+        env:
+          CC: gcc
+          CXX: g++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" vulkan_test
+
+  fedora-gcc:
+    name: Fedora / GCC
+    needs: fetch-x86_64
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Install dependencies
+        run: dnf install -y bsdtar gcc gcc-c++ git glibc-static libstdc++-static mesa-vulkan-drivers python3
+
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Corpus cache
+        uses: actions/cache/restore@v4
+        with:
+          path: corpus
+          key: corpus-x86_64-${{ hashFiles('tst/corpus_x86_64.json', 'build.py') }}
+          restore-keys: corpus-x86_64-
+
+      - name: Bridge
+        env:
+          CC: gcc
+          CXX: g++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" pthread_test
+
+      - name: Corpus
+        env:
+          CC: gcc
+          CXX: g++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" corpus
+
+      - name: Vulkan
+        env:
+          CC: gcc
+          CXX: g++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" vulkan_test
+
+  ubuntu-arm:
+    name: Ubuntu / arm64
+    needs: fetch-aarch64
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang g++ gdb libarchive-tools mesa-vulkan-drivers python3
+
+      - name: Corpus cache
+        uses: actions/cache/restore@v4
+        with:
+          path: corpus
+          key: corpus-aarch64-${{ hashFiles('tst/corpus_aarch64.json', 'build.py') }}
+          restore-keys: corpus-aarch64-
+
+      - name: Bridge
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" pthread_test
+
+      - name: Test
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          sudo sysctl -qw kernel.apparmor_restrict_unprivileged_userns=0 || true
+          ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" test
+
+      - name: Secure
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" secure_test
+
+      - name: Corpus
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" corpus
+
+      - name: Vulkan
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" vulkan_test
+
+  ubuntu-clang:
+    name: Ubuntu / Clang
+    needs: fetch-x86_64
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang g++ gdb libarchive-tools mesa-vulkan-drivers python3
+
+      - name: Corpus cache
+        uses: actions/cache/restore@v4
+        with:
+          path: corpus
+          key: corpus-x86_64-${{ hashFiles('tst/corpus_x86_64.json', 'build.py') }}
+          restore-keys: corpus-x86_64-
+
+      - name: Bridge
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" pthread_test
+
+      - name: Vulkan
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" vulkan_test
+
+      - name: Corpus
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" corpus
+
+      - name: ABI diff
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" abi_diff
+
+      - name: Secure
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" secure_test
+
+      - name: Rootfs
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          sudo sysctl -qw kernel.apparmor_restrict_unprivileged_userns=0 || true
+          ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" rootfs_smoke
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          use_oidc: true
+          files: .build/tst/coverage.info
+          disable_search: true
+          fail_ci_if_error: true
+          name: corpus-abi
+          verbose: true
+
+  ubuntu-qemu:
+    name: Ubuntu / qemu boot
+    needs: fetch-x86_64
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang g++ libarchive-tools python3 qemu-system-x86
+          sudo install -m 644 "$(readlink -f /boot/vmlinuz)" "$RUNNER_TEMP/vmlinuz"
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Corpus cache
+        uses: actions/cache/restore@v4
+        with:
+          path: corpus
+          key: corpus-x86_64-${{ hashFiles('tst/corpus_x86_64.json', 'build.py') }}
+          restore-keys: corpus-x86_64-
+
+      - name: Boot
+        env:
+          CC: clang
+          CXX: clang++
+          DLFCN_KERNEL: ${{ runner.temp }}/vmlinuz
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" qemu_smoke
+
+  nixos-lavapipe:
+    name: NixOS / lavapipe
+    needs: fetch-x86_64
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang g++ libarchive-tools python3
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Corpus cache
+        uses: actions/cache/restore@v4
+        with:
+          path: corpus
+          key: corpus-x86_64-${{ hashFiles('tst/corpus_x86_64.json', 'build.py') }}
+          restore-keys: corpus-x86_64-
+
+      # The NixOS driver layout: the libraries stay in the store with their
+      # RUNPATH closure, the ICD manifests appear under
+      # /run/opengl-driver/share, and no FHS path carries any manifest.
+      - name: Lay out the NixOS driver tree
+        run: |
+          store="$(nix build --no-link --print-out-paths nixpkgs#mesa | head -1)"
+          test -n "$(find "$store/share/vulkan/icd.d" -name 'lvp_icd*.json' -print -quit)"
+          sudo mkdir -p /run/opengl-driver
+          sudo ln -s "$store/share" /run/opengl-driver/share
+          sudo rm -rf /usr/share/vulkan /usr/local/share/vulkan /etc/vulkan
+
+      - name: Corpus
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" corpus
+
+      - name: Vulkan
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" vulkan
+          env -u XDG_DATA_DIRS -u XDG_CONFIG_DIRS -u VK_DRIVER_FILES -u VK_ICD_FILENAMES ./vulkan nixos.png
+          echo "9abbdcc0f3290f075f404ece8b4fd2966c46e97e5f8e5733221632891b9d1648  nixos.png" | sha256sum -c
+
+  termux-bionic-x86_64:
+    name: Termux / bionic (x86_64)
+    needs: fetch-x86_64
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang g++ gdb libarchive-tools python3
+
+      - name: Corpus cache
+        uses: actions/cache/restore@v4
+        with:
+          path: corpus
+          key: corpus-x86_64-${{ hashFiles('tst/corpus_x86_64.json', 'build.py') }}
+          restore-keys: corpus-x86_64-
+
+      # Termux's mesa hardcodes its prefix as the temporary directory.
+      - name: Provide the Termux temp directory
+        run: sudo mkdir -p -m 1777 /data/data/com.termux/files/usr/tmp
+
+      - name: Bionic
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" bionic_test
+
+      - name: Corpus
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" corpus
+
+  termux-bionic-aarch64:
+    name: Termux / bionic (aarch64)
+    needs: fetch-aarch64
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang g++ gdb libarchive-tools python3
+
+      - name: Corpus cache
+        uses: actions/cache/restore@v4
+        with:
+          path: corpus
+          key: corpus-aarch64-${{ hashFiles('tst/corpus_aarch64.json', 'build.py') }}
+          restore-keys: corpus-aarch64-
+
+      # Termux's mesa hardcodes its prefix as the temporary directory.
+      - name: Provide the Termux temp directory
+        run: sudo mkdir -p -m 1777 /data/data/com.termux/files/usr/tmp
+
+      - name: Bionic
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" bionic_test
+
+      - name: Corpus
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 -Duse_corpus="$GITHUB_WORKSPACE/corpus" corpus

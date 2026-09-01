@@ -1,0 +1,109 @@
+name: Release
+
+# The release button: builds the static vulkan demo for both architectures,
+# validates each by rendering through the host's lavapipe, then publishes the
+# next numeric tag with the stripped binaries attached.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build / ${{ matrix.machine }}
+    strategy:
+      matrix:
+        include:
+          - machine: x86_64
+            runner: ubuntu-latest
+          - machine: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes clang g++ libarchive-tools mesa-vulkan-drivers python3
+
+      # The released binary is exactly the one the test just rendered with:
+      # vulkan_test drives it against the host's lavapipe and checks the
+      # image, then the cached build publishes the same output.
+      - name: Test
+        env:
+          CC: clang
+          CXX: clang++
+        run: ./build -j12 vulkan_test
+
+      - name: Stage
+        env:
+          CC: clang
+          CXX: clang++
+        run: |
+          ./build -j12 vulkan
+          cp -L vulkan "vulkan-${{ matrix.machine }}"
+          strip "vulkan-${{ matrix.machine }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: vulkan-${{ matrix.machine }}
+          path: vulkan-${{ matrix.machine }}
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+
+  release:
+    name: Publish
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Download artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          merge-multiple: true
+
+      - name: Publish next release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          tag="$({
+            gh release list \
+              --repo "$GITHUB_REPOSITORY" \
+              --limit 1000 \
+              --json tagName \
+              --jq '.[].tagName'
+          } | awk '/^[1-9][0-9]*$/ { if ($1 + 0 > max) max = $1 + 0 } END { print max + 1 }')"
+
+          if git rev-parse --verify --quiet "refs/tags/$tag^{commit}" >/dev/null; then
+            test "$(git rev-parse "refs/tags/$tag^{commit}")" = "$GITHUB_SHA"
+          else
+            git config user.name "solo release bot"
+            git config user.email "noreply@github.com"
+            git tag --annotate "$tag" "$GITHUB_SHA" --message "solo release $tag"
+            git push origin "refs/tags/$tag"
+          fi
+
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "$tag" \
+            --generate-notes \
+            --notes "The static demo: a musl-linked executable that loads the host's unmodified glibc Vulkan stack and renders an image with it. Download, \`chmod +x\`, run: \`./vulkan-x86_64 out.png\` (needs any Vulkan driver, e.g. mesa-vulkan-drivers)." \
+            vulkan-x86_64 vulkan-aarch64

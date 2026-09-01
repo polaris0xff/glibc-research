@@ -1,0 +1,5 @@
+demand: top 1000 library packages by popcon vote, 1317 unique imports, 1274 served natively, 0 through stubs, 0 absent from the inventory
+
+stub-resolved (would abort or fault if called), by demand weight:
+
+absent from the inventory (load would fail), by demand weight:

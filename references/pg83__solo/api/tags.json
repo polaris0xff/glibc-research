@@ -1,0 +1,92 @@
+[
+ {
+  "name": "9",
+  "zipball_url": "https://api.github.com/repos/pg83/solo/zipball/refs/tags/9",
+  "tarball_url": "https://api.github.com/repos/pg83/solo/tarball/refs/tags/9",
+  "commit": {
+   "sha": "7ccf8914d251d5616624c80988f7d6d28e1fb823",
+   "url": "https://api.github.com/repos/pg83/solo/commits/7ccf8914d251d5616624c80988f7d6d28e1fb823"
+  },
+  "node_id": "REF_kwDOT4bW5KtyZWZzL3RhZ3MvOQ"
+ },
+ {
+  "name": "8",
+  "zipball_url": "https://api.github.com/repos/pg83/solo/zipball/refs/tags/8",
+  "tarball_url": "https://api.github.com/repos/pg83/solo/tarball/refs/tags/8",
+  "commit": {
+   "sha": "8bca5be079dec5ce708dbb89e358df7c49c7a4b8",
+   "url": "https://api.github.com/repos/pg83/solo/commits/8bca5be079dec5ce708dbb89e358df7c49c7a4b8"
+  },
+  "node_id": "REF_kwDOT4bW5KtyZWZzL3RhZ3MvOA"
+ },
+ {
+  "name": "7",
+  "zipball_url": "https://api.github.com/repos/pg83/solo/zipball/refs/tags/7",
+  "tarball_url": "https://api.github.com/repos/pg83/solo/tarball/refs/tags/7",
+  "commit": {
+   "sha": "7ca925d98c61c4305726a2a09a95ec307605db3a",
+   "url": "https://api.github.com/repos/pg83/solo/commits/7ca925d98c61c4305726a2a09a95ec307605db3a"
+  },
+  "node_id": "REF_kwDOT4bW5KtyZWZzL3RhZ3MvNw"
+ },
+ {
+  "name": "6",
+  "zipball_url": "https://api.github.com/repos/pg83/solo/zipball/refs/tags/6",
+  "tarball_url": "https://api.github.com/repos/pg83/solo/tarball/refs/tags/6",
+  "commit": {
+   "sha": "1972ce613f6c5d602eb6f265a806ffe38106170d",
+   "url": "https://api.github.com/repos/pg83/solo/commits/1972ce613f6c5d602eb6f265a806ffe38106170d"
+  },
+  "node_id": "REF_kwDOT4bW5KtyZWZzL3RhZ3MvNg"
+ },
+ {
+  "name": "5",
+  "zipball_url": "https://api.github.com/repos/pg83/solo/zipball/refs/tags/5",
+  "tarball_url": "https://api.github.com/repos/pg83/solo/tarball/refs/tags/5",
+  "commit": {
+   "sha": "4e58bf7ecaee142e6a3e9ce5b9058196b8579b64",
+   "url": "https://api.github.com/repos/pg83/solo/commits/4e58bf7ecaee142e6a3e9ce5b9058196b8579b64"
+  },
+  "node_id": "REF_kwDOT4bW5KtyZWZzL3RhZ3MvNQ"
+ },
+ {
+  "name": "4",
+  "zipball_url": "https://api.github.com/repos/pg83/solo/zipball/refs/tags/4",
+  "tarball_url": "https://api.github.com/repos/pg83/solo/tarball/refs/tags/4",
+  "commit": {
+   "sha": "4e58bf7ecaee142e6a3e9ce5b9058196b8579b64",
+   "url": "https://api.github.com/repos/pg83/solo/commits/4e58bf7ecaee142e6a3e9ce5b9058196b8579b64"
+  },
+  "node_id": "REF_kwDOT4bW5KtyZWZzL3RhZ3MvNA"
+ },
+ {
+  "name": "3",
+  "zipball_url": "https://api.github.com/repos/pg83/solo/zipball/refs/tags/3",
+  "tarball_url": "https://api.github.com/repos/pg83/solo/tarball/refs/tags/3",
+  "commit": {
+   "sha": "f75b96236609d8aa7072daf495c07b20b98c216e",
+   "url": "https://api.github.com/repos/pg83/solo/commits/f75b96236609d8aa7072daf495c07b20b98c216e"
+  },
+  "node_id": "REF_kwDOT4bW5KtyZWZzL3RhZ3MvMw"
+ },
+ {
+  "name": "2",
+  "zipball_url": "https://api.github.com/repos/pg83/solo/zipball/refs/tags/2",
+  "tarball_url": "https://api.github.com/repos/pg83/solo/tarball/refs/tags/2",
+  "commit": {
+   "sha": "3873981fcb13111bd76c155d701b31c68843980e",
+   "url": "https://api.github.com/repos/pg83/solo/commits/3873981fcb13111bd76c155d701b31c68843980e"
+  },
+  "node_id": "REF_kwDOT4bW5KtyZWZzL3RhZ3MvMg"
+ },
+ {
+  "name": "1",
+  "zipball_url": "https://api.github.com/repos/pg83/solo/zipball/refs/tags/1",
+  "tarball_url": "https://api.github.com/repos/pg83/solo/tarball/refs/tags/1",
+  "commit": {
+   "sha": "643ec0946aacec35486371fcd5fd2a59700013a3",
+   "url": "https://api.github.com/repos/pg83/solo/commits/643ec0946aacec35486371fcd5fd2a59700013a3"
+  },
+  "node_id": "REF_kwDOT4bW5KtyZWZzL3RhZ3MvMQ"
+ }
+]
