@@ -583,7 +583,12 @@ NIX_DEP_DEPTH="${NIX_DEP_DEPTH:-2}"
 #                          dlopen-based plugin host; docs/limitations.md §1
 #   bison, flex, pkg-config, hooks
 #                          build-time tools, already in the environment
-NIX_DEP_SKIP="${NIX_DEP_SKIP:-glibc gcc binutils systemd systemd-minimal systemd-minimal-libs dbus udev bison flex pkg-config perl python3 hook stdenv bash coreutils}"
+# ⚠ TEST-ONLY DEPENDENCIES ARE SKIPPED BY DEFAULT, and they are not a
+# convenience: nix lists `doctest`, `rapidcheck` and `gtest` as buildInputs of
+# every component, they are needed only by `-Dtests=enabled`, and doctest's own
+# CMake config looks for MPI and fails without it. Building a test framework to
+# NOT run tests is time spent to make a build fail. `NIX_DEP_SKIP=` empties it.
+NIX_DEP_SKIP="${NIX_DEP_SKIP:-glibc gcc binutils systemd systemd-minimal systemd-minimal-libs dbus udev bison flex pkg-config perl python3 hook stdenv bash coreutils doctest rapidcheck gtest gbenchmark catch2}"
 
 nix_dep_skipped() {   # name -> 0 if it should be skipped
   for _s in $NIX_DEP_SKIP; do
@@ -912,10 +917,10 @@ nix_try_build() {   # srcdir flags log hooks [install]
 
   case " $_hk " in
     *" cmake "*)
-      _cmd="cmake -S . -B _pgbbuild -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$NIX_PREFIX -DCMAKE_PREFIX_PATH=$NIX_PREFIX && cmake --build _pgbbuild -j $_j"
+      _cmd="cd \"\$(pgb_build_root CMakeLists.txt)\" && cmake -S . -B _pgbbuild -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$NIX_PREFIX -DCMAKE_PREFIX_PATH=$NIX_PREFIX && cmake --build _pgbbuild -j $_j"
       [ -n "$_in" ] && _cmd="$_cmd && cmake --install _pgbbuild" ;;
     *" meson "*)
-      _cmd="meson setup _pgbbuild --default-library=static --prefer-static --prefix=$NIX_PREFIX && ninja -C _pgbbuild"
+      _cmd="cd \"\$(pgb_build_root meson.build)\" && meson setup _pgbbuild --default-library=static --prefer-static --prefix=$NIX_PREFIX && ninja -C _pgbbuild"
       [ -n "$_in" ] && _cmd="$_cmd && ninja -C _pgbbuild install" ;;
     *)
       # ⛔ NOT EVERY PACKAGE HAS A ./configure, AND THE FALL-THROUGH USED TO
@@ -945,13 +950,66 @@ nix_try_build() {   # srcdir flags log hooks [install]
       # libraries carry the same shape, and without this branch openssl fell
       # into the plain-make path, failed, and took libevent -- and therefore
       # tmux -- down with it.
-      _cmd="if [ -x ./configure ]; then ./configure --prefix=$NIX_PREFIX --disable-shared --enable-static $_fl && make -j $_j $_instcmd;
+      # ⛔ BOOST IS NOT A ONE-PACKAGE QUIRK EITHER. `bootstrap.sh` + `b2` is
+      # Boost.Build, and a tree using it has NO configure and NO Makefile, so
+      # the plain-make branch reported "No targets specified and no makefile
+      # found" -- an accurate description of the tree and a useless one about
+      # the build. Measured on boost-1.89.0, which is a REQUIRED dependency of
+      # nix and therefore blocked T-060 entirely.
+      # ⚠ `link=static runtime-link=static` is the b2 spelling of
+      # --disable-shared; `--with-libraries` is left to the plan.
+      #
+      # ⛔ AND `./configure PREFIX=...` IS A THIRD SHAPE. `oconfigure` -- used
+      # by lowdown, which nix needs for its manual -- takes KEY=VALUE and
+      # rejects `--prefix`, printing its own key list instead of an error.
+      _cmd="cd \"\$(pgb_build_root configure Makefile Makefile.in bootstrap.sh CMakeLists.txt)\" &&
+            if [ -x ./bootstrap.sh ] && { [ -f ./Jamroot ] || [ -f ./bootstrap.jam ] || [ -f ./boost-build.jam ]; }; then
+              ./bootstrap.sh --prefix=$NIX_PREFIX --without-libraries=python &&
+              ./b2 -j $_j link=static runtime-link=static threading=multi variant=release --prefix=$NIX_PREFIX ${_in:+install};
+            elif [ -x ./configure ] && grep -q oconfigure ./configure 2>/dev/null; then
+              ./configure PREFIX=$NIX_PREFIX $_fl && make -j $_j $_instcmd;
+            elif [ -x ./configure ]; then ./configure --prefix=$NIX_PREFIX --disable-shared --enable-static $_fl && make -j $_j $_instcmd;
             elif [ -x ./config ] && [ -f ./Configure ]; then ./config no-shared no-tests --prefix=$NIX_PREFIX --openssldir=$NIX_PREFIX/ssl && make -j $_j $_instcmd;
             else $_mk$_mki; fi" ;;
   esac
 
-  sh "$PGB_SELF/pgb" build --bind "$_t:$_t" --bind "$NIX_PREFIX:$NIX_PREFIX" -- sh -c "
-    cd '$_t' && export $_envset && $_pre $_cmd
+  # ⛔ THE BUILD FILE IS NOT ALWAYS AT THE TOP OF THE TARBALL, and assuming it
+  # is cost four of nix's dependencies. Measured on this machine:
+  #
+  #   zstd        CMakeLists.txt is in build/cmake/     -> "does not appear to
+  #   libblake3   CMakeLists.txt is in c/                  contain CMakeLists.txt"
+  #   icu4c       configure is in icu4c/source/         -> "No targets specified
+  #                                                        and no makefile found"
+  #
+  # nixpkgs handles this with `sourceRoot`; pgb finds it instead, taking the
+  # SHALLOWEST match so a contrib/ or example/ copy cannot win, and printing
+  # what it chose so a wrong choice is visible rather than mysterious.
+  # ⚠ Defined INSIDE the build shell because an autoreconf hook can create
+  # `configure` after this function is composed.
+  _root_fn='pgb_build_root() {
+  for _w in "$@"; do
+    [ -f "./$_w" ] && { printf %s .; return 0; }
+  done
+  for _w in "$@"; do
+    _c=$(find . -mindepth 2 -maxdepth 4 -name "$_w" -not -path "*/_pgbbuild/*" 2>/dev/null \
+         | awk "{ n = gsub(/\//, \"/\"); print n, \$0 }" | sort -n -k1,1 | head -1 | cut -d" " -f2-)
+    if [ -n "$_c" ]; then
+      echo "pgb: build root is $(dirname "$_c") (found $_w there, not at the top)" >&2
+      dirname "$_c"; return 0
+    fi
+  done
+  printf %s .
+}'
+  # ⛔ THE ENGINE HAS TO TRAVEL WITH THE CALL. `pgb --engine chroot nix deps`
+  # ran every inner `pgb build` through `pick_engine`, which prefers docker the
+  # moment dockerd is up -- so the engine the operator named was used for
+  # nothing, and a chroot environment rebuilt with a new tool was ignored in
+  # favour of a stale docker one. What it printed was
+  # "pip packages MISSING from the environment: meson==1.9.1" about an
+  # environment that has it. Same defect class as T-017, one layer in.
+  sh "$PGB_SELF/pgb" ${ENGINE:+--engine "$ENGINE"} build --bind "$_t:$_t" --bind "$NIX_PREFIX:$NIX_PREFIX" -- sh -c "
+    cd '$_t' && export $_envset && $_root_fn
+    $_pre $_cmd
   " > "$_lg" 2>&1
 }
 

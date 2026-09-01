@@ -48,8 +48,15 @@ env_root() { printf '%s/%s' "$PGB_ROOTFS_DIR" "$PGB_ENV_NAME"; }
 # Packages are sorted, so reordering PGB_ENV_PACKAGES is not a difference.
 env_stamp() {
   _pk=$(printf '%s\n' $PGB_ENV_PACKAGES | LC_ALL=C sort -u | tr '\n' ' ' | sed 's/  */ /g; s/^ //; s/ $//')
-  printf '%s@%s iconv=%s packages=[%s]' \
-    "$PGB_ENV_IMAGE" "$PGB_ENV_DIGEST" "$USE_ICONV" "$_pk"
+  # ⛔ THE PIP SET IS PART OF THE STAMP. It installs build TOOLS -- meson, at a
+  # pinned version -- and an environment holding meson 1.0.1 is not the same
+  # environment as one holding 1.9.1: nix's meson.build says
+  # `meson_version: >= 1.1` and refuses the first. Leaving it out of the stamp
+  # would let an old environment be silently reused for a build that needs the
+  # new one, which is T-017's defect class exactly.
+  _pp=$(printf '%s\n' ${PGB_ENV_PIP:-} | LC_ALL=C sort -u | tr '\n' ' ' | sed 's/  */ /g; s/^ //; s/ $//')
+  printf '%s@%s iconv=%s packages=[%s] pip=[%s]' \
+    "$PGB_ENV_IMAGE" "$PGB_ENV_DIGEST" "$USE_ICONV" "$_pk" "$_pp"
 }
 
 # What the environment an engine actually holds was built from, or empty when
@@ -72,8 +79,10 @@ env_stamp_of() {  # engine -> the stamp, or nothing
       _d=$(sed -n 's/^digest: //p'   "$_r/.pgb-env" | head -1)
       _p=$(sed -n 's/^packages: //p' "$_r/.pgb-env" | head -1)
       _ic=0; [ -f "$_r$PGB_LIBICONV_PREFIX/lib/libiconv.a" ] && _ic=1
+      _pi=$(sed -n 's/^pip: //p' "$_r/.pgb-env" | head -1)
       _p=$(printf '%s\n' $_p | LC_ALL=C sort -u | tr '\n' ' ' | sed 's/  */ /g; s/^ //; s/ $//')
-      printf '%s@%s iconv=%s packages=[%s]' "$_i" "$_d" "$_ic" "$_p"
+      _pi=$(printf '%s\n' $_pi | LC_ALL=C sort -u | tr '\n' ' ' | sed 's/  */ /g; s/^ //; s/ $//')
+      printf '%s@%s iconv=%s packages=[%s] pip=[%s]' "$_i" "$_d" "$_ic" "$_p" "$_pi"
       ;;
     docker|podman)
       "$1" image inspect --format '{{index .Config.Labels "org.pgb.stamp"}}' \
@@ -132,8 +141,17 @@ env_require_current() {  # engine
     _notes="$_notes     iconv    this build links static libiconv and the environment has none
 "
   fi
-  _wp=$(printf '%s' "$_want" | sed -n 's/.*packages=\[\(.*\)\]$/\1/p' | tr ' ' '\n' | LC_ALL=C sort -u)
-  _gp=$(printf '%s' "$_got"  | sed -n 's/.*packages=\[\(.*\)\]$/\1/p' | tr ' ' '\n' | LC_ALL=C sort -u)
+  # ⛔ `[\(.*\)\]$` IS GREEDY AND THE STAMP NOW HAS TWO BRACKETED FIELDS.
+  # With `packages=[a b] pip=[c]` that pattern captures `a b] pip=[c`, so the
+  # package set gained two words that are not packages and LOST none -- and
+  # `pgb build` refused a freshly created environment with
+  # "packages MISSING from the environment: gperf pip=[meson==1.9.1". Measured
+  # within a minute of adding the pip field. `[^]]*` is bounded by the first
+  # closing bracket, which is what a field parser has to be.
+  _wp=$(printf '%s' "$_want" | sed -n 's/.*packages=\[\([^]]*\)\].*/\1/p' | tr ' ' '\n' | LC_ALL=C sort -u)
+  _gp=$(printf '%s' "$_got"  | sed -n 's/.*packages=\[\([^]]*\)\].*/\1/p' | tr ' ' '\n' | LC_ALL=C sort -u)
+  _wpp=$(printf '%s' "$_want" | sed -n 's/.*pip=\[\([^]]*\)\].*/\1/p' | tr ' ' '\n' | LC_ALL=C sort -u)
+  _gpp=$(printf '%s' "$_got"  | sed -n 's/.*pip=\[\([^]]*\)\].*/\1/p' | tr ' ' '\n' | LC_ALL=C sort -u)
   # ⛔ NOT `grep -vxF -e "$other"`: when the other side is EMPTY that is the
   # empty pattern, which matches every line, so `-v` drops everything and a
   # completely different package set reports NO difference at all. The failure
@@ -150,6 +168,16 @@ EOF
   if [ -n "$_add" ]; then
     _fatal=1
     _notes="$_notes     packages MISSING from the environment: $_add
+"
+  fi
+  # The pip set, by the same rule: a wanted entry the environment does not have
+  # is fatal (meson 1.9.1 against Debian's 1.0.1 is the case this exists for),
+  # an extra one is a note.
+  _padd=$(_pkg_only_in_first "$_wpp" "$_gpp" | sed 's/ *$//')
+  _prem=$(_pkg_only_in_first "$_gpp" "$_wpp" | sed 's/ *$//')
+  if [ -n "$_padd" ]; then
+    _fatal=1
+    _notes="$_notes     pip packages MISSING from the environment: $_padd
 "
   fi
 
@@ -227,6 +255,12 @@ env_create() {
         "export DEBIAN_FRONTEND=noninteractive; apt-get update -qq && \
          apt-get install -y -qq --no-install-recommends $PGB_ENV_PACKAGES" \
         >"$r.install.log" 2>&1 || { tail -20 "$r.install.log" >&2; die "package install failed"; }
+      if [ -n "${PGB_ENV_PIP:-}" ]; then
+        say "installing (pip): $PGB_ENV_PIP"
+        sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /bin/sh -c \
+          "python3 -m pip install --break-system-packages --no-cache-dir -q $PGB_ENV_PIP" \
+          >>"$r.install.log" 2>&1 || { tail -20 "$r.install.log" >&2; die "pip install failed"; }
+      fi
       # libiconv must be built by the ENVIRONMENT's compiler against the
       # ENVIRONMENT's glibc. An archive built on the host would link fine and
       # then carry the host's ABI assumptions into the pinned build.
@@ -246,6 +280,7 @@ env_create() {
         printf 'image: %s\n' "$PGB_ENV_IMAGE"
         printf 'digest: %s\n' "$PGB_ENV_DIGEST"
         printf 'packages: %s\n' "$PGB_ENV_PACKAGES"
+        printf 'pip: %s\n' "${PGB_ENV_PIP:-}"
         printf 'created: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
         printf 'gcc: %s\n' "$(sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /usr/bin/gcc --version 2>/dev/null | head -1)"
         printf 'glibc: %s\n' "$(sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /bin/sh -c 'ldd --version' 2>/dev/null | head -1)"
@@ -267,6 +302,20 @@ env_create() {
       # and the update-ca-certificates run are emitted ONLY when there is
       # something to copy, so the image is byte-identical to the old one on a
       # machine that does not terminate TLS.
+      # The pip step, mirrored from the chroot arm so the two engines cannot
+      # drift. ⛔ Empty when PGB_ENV_PIP is empty, so an environment built with
+      # no pip packages produces a byte-identical Dockerfile to before.
+      # ⛔ AND IT GOES AFTER THE TRUST ANCHOR, not before. pip talks HTTPS to
+      # pypi.org, and in an environment whose egress is a TLS-terminating
+      # proxy that means it needs the anchor the `COPY ca/...` step installs.
+      # Placed above it, the image build died with
+      # "certificate verify failed: self-signed certificate in certificate
+      # chain" five retries deep -- a message about pypi that is really about
+      # the order of two lines in a Dockerfile. The chroot arm did not show it
+      # because a chroot inherits the caller's SSL_CERT_FILE.
+      _pipstep=""
+      [ -n "${PGB_ENV_PIP:-}" ] && \
+        _pipstep="RUN python3 -m pip install --break-system-packages --no-cache-dir ${PGB_ENV_PIP}"
       _ca=$(ca_anchor); _castep=""
       if [ -n "$_ca" ]; then
         cp "$_ca" "$d/ca/pgb-proxy-ca.crt" 2>/dev/null || die "cannot read CA anchor $_ca"
@@ -290,6 +339,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \\
       ${PGB_ENV_PACKAGES} curl ca-certificates && rm -rf /var/lib/apt/lists/*
 ${_castep}
+${_pipstep}
 COPY runtime /opt/pgb/runtime
 COPY build-libiconv.sh /opt/pgb/build-libiconv.sh
 RUN sh /opt/pgb/build-libiconv.sh
