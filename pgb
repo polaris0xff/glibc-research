@@ -64,7 +64,7 @@ PGB_ENV_IMAGE="${PGB_ENV_IMAGE:-debian:12}"
 PGB_ENV_DIGEST="${PGB_ENV_DIGEST:-sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929}"
 PGB_ENV_NAME="${PGB_ENV_NAME:-pgb-env-debian12}"
 PGB_ENV_PACKAGES="${PGB_ENV_PACKAGES:-gcc g++ make libc6-dev binutils pkg-config file \
-xz-utils bzip2 patch perl ca-certificates curl}"
+xz-utils bzip2 patch perl ca-certificates curl zlib1g-dev libffi-dev}"
 
 # ⛔ OPTIONS CROSS THE ENGINE BOUNDARY THROUGH THE ENVIRONMENT, NOT THE ARGV.
 #
@@ -605,7 +605,7 @@ cmd_verify() {
   list="$PGB_SELF/scripts/common/rootfs-images.txt"
   [ -f "$list" ] || die "missing $list" 2
   any=0
-  printf '    %-20s %-6s %-8s %s\n' ENVIRONMENT LIBC RESULT 'HOST OBJECTS IT LOADED'
+  printf '    %-20s %-6s %-8s %-26s %s\n' ENVIRONMENT LIBC RESULT 'HOST .so LOADED' 'HOST DATA READ'
   while read -r ref name libc digest; do
     case "$ref" in ''|\#*) continue ;; esac
     root="$PGB_ROOTFS_DIR/$name"
@@ -625,14 +625,21 @@ cmd_verify() {
       *) res="exit$st"; rc=1 ;;
     esac
     libs=$(trace_host_objects "$root" "/$base" "$@")
-    printf '    %-20s %-6s %-8s %s\n' "$name" "$libc" "$res" "${libs:-none}"
+    data=$(trace_host_data "$root" "/$base" "$@")
+    printf '    %-20s %-6s %-8s %-26s %s\n' "$name" "$libc" "$res" "${libs:-none}" "${data:-none}"
+    # ⛔ ONLY A HOST SHARED OBJECT IS A FAILURE. Reading host data is not:
+    # glibc still opens /etc/nsswitch.conf under the NSS override, and a
+    # program that honours the host's locale when the host has one is correct.
+    # The property that matters is INDEPENDENCE -- working whether or not the
+    # data is there -- and the musl rows, which have none of it, are what
+    # demonstrate that.
     [ -n "$libs" ] && rc=1
     rm -f "$root/$base"
   done < "$list"
   [ "$any" = 1 ] || { say "    nothing to run against. sh scripts/common/fetch-rootfs.sh"; return 2; }
   say ""
   if [ "$rc" = 0 ]; then
-    say "  VERDICT: ran on every fetched environment and loaded no host object."
+    say "  VERDICT: ran on every fetched environment and loaded no host shared object."
   else
     say "  VERDICT: NOT portable as built. A non-zero exit or a host object"
     say "           above is a real failure, not a labelling quibble."
@@ -651,7 +658,24 @@ trace_host_objects() {
     { pid = $1 }
     $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }
     seen && pid == target && /open(at)?\(/ && !/ENOENT|= -1/ { print }
-  ' "$t" | grep -oE '"[^"]*\.so[^"]*"|"[^"]*gconv[^"]*"' | tr -d '"' | sort -u | tr '\n' ' '
+  ' "$t" | grep -oE '"[^"]*\.so[^"]*"' | tr -d '"' | sort -u | tr '\n' ' '
+  rm -f "$t"
+}
+
+# Host DATA the binary read. Reported for information, never a failure.
+trace_host_data() { # rootfs in-root-binary [args...]
+  root="$1"; inner="$2"; shift 2
+  command -v strace >/dev/null 2>&1 || { printf ''; return; }
+  t=$(mktemp) || { printf ''; return; }
+  strace -f -e trace=openat,open,execve -o "$t" \
+    sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "$inner" "$@" >/dev/null 2>&1
+  awk -v want="$inner" '
+    { pid = $1 }
+    $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }
+    seen && pid == target && /open(at)?\(/ && !/ENOENT|= -1/ { print }
+  ' "$t" | grep -oE '"[^"]*gconv[^"]*"|"/usr/lib/locale[^"]*"|"/etc/nsswitch.conf"|"[^"]*terminfo[^"]*"' \
+    | tr -d '"' | sed 's|/usr/lib/locale/.*|/usr/lib/locale/*|; s|.*gconv.*|gconv-cfg|; s|.*terminfo.*|terminfo|' \
+    | sort -u | tr '\n' ' '
   rm -f "$t"
 }
 

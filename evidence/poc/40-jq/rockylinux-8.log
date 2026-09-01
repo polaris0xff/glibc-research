@@ -1,0 +1,15 @@
+  ok   identity                       {"a":1}
+  ok   arithmetic                     {"s":5}
+  ok   utf8-roundtrip                 café naïve
+  ok   u-escape                       é
+  ok   surrogate-pair                 5
+  ok   codepoint-length               4
+  ok   ascii-escape                   "caf\u00e9"
+  ok   utf8-passthrough               "café"
+  ok   regex-match                    true
+  ok   regex-capture                  2024,05
+  ok   base64                         Y2Fmw6k=
+  ok   base64d                        café
+  ok   sort                           [1,2,3]
+  ok   group                          [2,1]
+  ok   bignum                         100000000000000000000

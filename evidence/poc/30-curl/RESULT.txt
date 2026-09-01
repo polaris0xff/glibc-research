@@ -6,7 +6,7 @@ version       : 8.11.0
 sha256        : 264537d90e58d2b09dddc50944baf3c38e7089151c8986715e2aaeaaf2b8118f
 normal build  : ./configure --with-openssl && make
 stresses      : getaddrinfo/NSS, DNS, TLS, CA bundle data, 3-package dependency chain
-date (UTC)    : 2026-09-01T06:13:20Z
+date (UTC)    : 2026-09-01T06:34:51Z
 evidence      : /home/user/glibc-research/evidence/poc/30-curl
 ---------------------------------------------------------------
         dependencies: OpenSSL 3.0.15 and zlib 1.3.1, both built static in the same environment
@@ -20,28 +20,28 @@ evidence      : /home/user/glibc-research/evidence/poc/30-curl
     pgb runtime linked     yes
 
   functional test across the pinned matrix:
-    ENVIRONMENT          LIBC   RESULT     HOST OBJECTS LOADED
-    alpine-3.22          musl   ok         none
+    ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
+    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
   ok    alpine-3.22: functional test                 = ok
-    alpine-3.20          musl   ok         none
+    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
   ok    alpine-3.20: functional test                 = ok
-    alpine-3.10          musl   ok         none
+    alpine-3.10          musl   ok         none                         none
   ok    alpine-3.10: functional test                 = ok
-    voidlinux-musl       musl   ok         none
+    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
   ok    voidlinux-musl: functional test              = ok
-    debian-11            glibc  ok         none
+    debian-11            glibc  ok         none                         /etc/nsswitch.conf 
   ok    debian-11: functional test                   = ok
-    debian-12            glibc  ok         none
+    debian-12            glibc  ok         none                         /etc/nsswitch.conf 
   ok    debian-12: functional test                   = ok
-    ubuntu-20.04         glibc  ok         none
+    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf 
   ok    ubuntu-20.04: functional test                = ok
-    rockylinux-8         glibc  ok         none
+    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf 
   ok    rockylinux-8: functional test                = ok
-    opensuse-leap-15.6   glibc  ok         none
+    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf 
   ok    opensuse-leap-15.6: functional test          = ok
-    fedora-42            glibc  ok         none
+    fedora-42            glibc  ok         none                         /etc/nsswitch.conf 
   ok    fedora-42: functional test                   = ok
-    archlinux-latest     glibc  ok         none
+    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf 
   ok    archlinux-latest: functional test            = ok
 
   OBSERVATION -- TLS trust: does the host have a CA bundle where curl looks (measured, not asserted):

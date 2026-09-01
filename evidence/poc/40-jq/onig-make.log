@@ -1,0 +1,223 @@
+Making all in src
+make[1]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/src'
+make  all-am
+make[2]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/src'
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT regparse.lo -MD -MP -MF .deps/regparse.Tpo -c -o regparse.lo regparse.c
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT regcomp.lo -MD -MP -MF .deps/regcomp.Tpo -c -o regcomp.lo regcomp.c
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT regexec.lo -MD -MP -MF .deps/regexec.Tpo -c -o regexec.lo regexec.c
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT regenc.lo -MD -MP -MF .deps/regenc.Tpo -c -o regenc.lo regenc.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT regexec.lo -MD -MP -MF .deps/regexec.Tpo -c regexec.c -o regexec.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT regparse.lo -MD -MP -MF .deps/regparse.Tpo -c regparse.c -o regparse.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT regenc.lo -MD -MP -MF .deps/regenc.Tpo -c regenc.c -o regenc.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT regcomp.lo -MD -MP -MF .deps/regcomp.Tpo -c regcomp.c -o regcomp.o
+mv -f .deps/regenc.Tpo .deps/regenc.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT regerror.lo -MD -MP -MF .deps/regerror.Tpo -c -o regerror.lo regerror.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT regerror.lo -MD -MP -MF .deps/regerror.Tpo -c regerror.c -o regerror.o
+mv -f .deps/regerror.Tpo .deps/regerror.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT regext.lo -MD -MP -MF .deps/regext.Tpo -c -o regext.lo regext.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT regext.lo -MD -MP -MF .deps/regext.Tpo -c regext.c -o regext.o
+mv -f .deps/regext.Tpo .deps/regext.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT regsyntax.lo -MD -MP -MF .deps/regsyntax.Tpo -c -o regsyntax.lo regsyntax.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT regsyntax.lo -MD -MP -MF .deps/regsyntax.Tpo -c regsyntax.c -o regsyntax.o
+mv -f .deps/regsyntax.Tpo .deps/regsyntax.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT regtrav.lo -MD -MP -MF .deps/regtrav.Tpo -c -o regtrav.lo regtrav.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT regtrav.lo -MD -MP -MF .deps/regtrav.Tpo -c regtrav.c -o regtrav.o
+mv -f .deps/regtrav.Tpo .deps/regtrav.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT regversion.lo -MD -MP -MF .deps/regversion.Tpo -c -o regversion.lo regversion.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT regversion.lo -MD -MP -MF .deps/regversion.Tpo -c regversion.c -o regversion.o
+mv -f .deps/regversion.Tpo .deps/regversion.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT st.lo -MD -MP -MF .deps/st.Tpo -c -o st.lo st.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT st.lo -MD -MP -MF .deps/st.Tpo -c st.c -o st.o
+mv -f .deps/st.Tpo .deps/st.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT reggnu.lo -MD -MP -MF .deps/reggnu.Tpo -c -o reggnu.lo reggnu.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT reggnu.lo -MD -MP -MF .deps/reggnu.Tpo -c reggnu.c -o reggnu.o
+mv -f .deps/reggnu.Tpo .deps/reggnu.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT unicode.lo -MD -MP -MF .deps/unicode.Tpo -c -o unicode.lo unicode.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT unicode.lo -MD -MP -MF .deps/unicode.Tpo -c unicode.c -o unicode.o
+mv -f .deps/regcomp.Tpo .deps/regcomp.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT unicode_unfold_key.lo -MD -MP -MF .deps/unicode_unfold_key.Tpo -c -o unicode_unfold_key.lo unicode_unfold_key.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT unicode_unfold_key.lo -MD -MP -MF .deps/unicode_unfold_key.Tpo -c unicode_unfold_key.c -o unicode_unfold_key.o
+mv -f .deps/unicode_unfold_key.Tpo .deps/unicode_unfold_key.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT unicode_fold1_key.lo -MD -MP -MF .deps/unicode_fold1_key.Tpo -c -o unicode_fold1_key.lo unicode_fold1_key.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT unicode_fold1_key.lo -MD -MP -MF .deps/unicode_fold1_key.Tpo -c unicode_fold1_key.c -o unicode_fold1_key.o
+mv -f .deps/regexec.Tpo .deps/regexec.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT unicode_fold2_key.lo -MD -MP -MF .deps/unicode_fold2_key.Tpo -c -o unicode_fold2_key.lo unicode_fold2_key.c
+mv -f .deps/unicode.Tpo .deps/unicode.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT unicode_fold3_key.lo -MD -MP -MF .deps/unicode_fold3_key.Tpo -c -o unicode_fold3_key.lo unicode_fold3_key.c
+mv -f .deps/unicode_fold1_key.Tpo .deps/unicode_fold1_key.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT ascii.lo -MD -MP -MF .deps/ascii.Tpo -c -o ascii.lo ascii.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT unicode_fold2_key.lo -MD -MP -MF .deps/unicode_fold2_key.Tpo -c unicode_fold2_key.c -o unicode_fold2_key.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT unicode_fold3_key.lo -MD -MP -MF .deps/unicode_fold3_key.Tpo -c unicode_fold3_key.c -o unicode_fold3_key.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT ascii.lo -MD -MP -MF .deps/ascii.Tpo -c ascii.c -o ascii.o
+mv -f .deps/unicode_fold2_key.Tpo .deps/unicode_fold2_key.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT utf8.lo -MD -MP -MF .deps/utf8.Tpo -c -o utf8.lo utf8.c
+mv -f .deps/unicode_fold3_key.Tpo .deps/unicode_fold3_key.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT utf16_be.lo -MD -MP -MF .deps/utf16_be.Tpo -c -o utf16_be.lo utf16_be.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT utf8.lo -MD -MP -MF .deps/utf8.Tpo -c utf8.c -o utf8.o
+mv -f .deps/ascii.Tpo .deps/ascii.Plo
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT utf16_be.lo -MD -MP -MF .deps/utf16_be.Tpo -c utf16_be.c -o utf16_be.o
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT utf16_le.lo -MD -MP -MF .deps/utf16_le.Tpo -c -o utf16_le.lo utf16_le.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT utf16_le.lo -MD -MP -MF .deps/utf16_le.Tpo -c utf16_le.c -o utf16_le.o
+mv -f .deps/utf8.Tpo .deps/utf8.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT utf32_be.lo -MD -MP -MF .deps/utf32_be.Tpo -c -o utf32_be.lo utf32_be.c
+mv -f .deps/utf16_be.Tpo .deps/utf16_be.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT utf32_le.lo -MD -MP -MF .deps/utf32_le.Tpo -c -o utf32_le.lo utf32_le.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT utf32_be.lo -MD -MP -MF .deps/utf32_be.Tpo -c utf32_be.c -o utf32_be.o
+mv -f .deps/utf16_le.Tpo .deps/utf16_le.Plo
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT utf32_le.lo -MD -MP -MF .deps/utf32_le.Tpo -c utf32_le.c -o utf32_le.o
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT euc_jp.lo -MD -MP -MF .deps/euc_jp.Tpo -c -o euc_jp.lo euc_jp.c
+mv -f .deps/utf32_be.Tpo .deps/utf32_be.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT euc_jp_prop.lo -MD -MP -MF .deps/euc_jp_prop.Tpo -c -o euc_jp_prop.lo euc_jp_prop.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT euc_jp.lo -MD -MP -MF .deps/euc_jp.Tpo -c euc_jp.c -o euc_jp.o
+mv -f .deps/utf32_le.Tpo .deps/utf32_le.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT sjis.lo -MD -MP -MF .deps/sjis.Tpo -c -o sjis.lo sjis.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT euc_jp_prop.lo -MD -MP -MF .deps/euc_jp_prop.Tpo -c euc_jp_prop.c -o euc_jp_prop.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT sjis.lo -MD -MP -MF .deps/sjis.Tpo -c sjis.c -o sjis.o
+mv -f .deps/euc_jp_prop.Tpo .deps/euc_jp_prop.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT sjis_prop.lo -MD -MP -MF .deps/sjis_prop.Tpo -c -o sjis_prop.lo sjis_prop.c
+mv -f .deps/euc_jp.Tpo .deps/euc_jp.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_1.lo -MD -MP -MF .deps/iso8859_1.Tpo -c -o iso8859_1.lo iso8859_1.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT sjis_prop.lo -MD -MP -MF .deps/sjis_prop.Tpo -c sjis_prop.c -o sjis_prop.o
+mv -f .deps/sjis.Tpo .deps/sjis.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_2.lo -MD -MP -MF .deps/iso8859_2.Tpo -c -o iso8859_2.lo iso8859_2.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_1.lo -MD -MP -MF .deps/iso8859_1.Tpo -c iso8859_1.c -o iso8859_1.o
+mv -f .deps/sjis_prop.Tpo .deps/sjis_prop.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_3.lo -MD -MP -MF .deps/iso8859_3.Tpo -c -o iso8859_3.lo iso8859_3.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_2.lo -MD -MP -MF .deps/iso8859_2.Tpo -c iso8859_2.c -o iso8859_2.o
+mv -f .deps/iso8859_1.Tpo .deps/iso8859_1.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_4.lo -MD -MP -MF .deps/iso8859_4.Tpo -c -o iso8859_4.lo iso8859_4.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_3.lo -MD -MP -MF .deps/iso8859_3.Tpo -c iso8859_3.c -o iso8859_3.o
+mv -f .deps/iso8859_2.Tpo .deps/iso8859_2.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_5.lo -MD -MP -MF .deps/iso8859_5.Tpo -c -o iso8859_5.lo iso8859_5.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_4.lo -MD -MP -MF .deps/iso8859_4.Tpo -c iso8859_4.c -o iso8859_4.o
+mv -f .deps/iso8859_3.Tpo .deps/iso8859_3.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_6.lo -MD -MP -MF .deps/iso8859_6.Tpo -c -o iso8859_6.lo iso8859_6.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_5.lo -MD -MP -MF .deps/iso8859_5.Tpo -c iso8859_5.c -o iso8859_5.o
+mv -f .deps/iso8859_4.Tpo .deps/iso8859_4.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_7.lo -MD -MP -MF .deps/iso8859_7.Tpo -c -o iso8859_7.lo iso8859_7.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_6.lo -MD -MP -MF .deps/iso8859_6.Tpo -c iso8859_6.c -o iso8859_6.o
+mv -f .deps/iso8859_5.Tpo .deps/iso8859_5.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_8.lo -MD -MP -MF .deps/iso8859_8.Tpo -c -o iso8859_8.lo iso8859_8.c
+mv -f .deps/iso8859_6.Tpo .deps/iso8859_6.Plo
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_7.lo -MD -MP -MF .deps/iso8859_7.Tpo -c iso8859_7.c -o iso8859_7.o
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_9.lo -MD -MP -MF .deps/iso8859_9.Tpo -c -o iso8859_9.lo iso8859_9.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_8.lo -MD -MP -MF .deps/iso8859_8.Tpo -c iso8859_8.c -o iso8859_8.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_9.lo -MD -MP -MF .deps/iso8859_9.Tpo -c iso8859_9.c -o iso8859_9.o
+mv -f .deps/iso8859_7.Tpo .deps/iso8859_7.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_10.lo -MD -MP -MF .deps/iso8859_10.Tpo -c -o iso8859_10.lo iso8859_10.c
+mv -f .deps/iso8859_8.Tpo .deps/iso8859_8.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_11.lo -MD -MP -MF .deps/iso8859_11.Tpo -c -o iso8859_11.lo iso8859_11.c
+mv -f .deps/regparse.Tpo .deps/regparse.Plo
+mv -f .deps/iso8859_9.Tpo .deps/iso8859_9.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_13.lo -MD -MP -MF .deps/iso8859_13.Tpo -c -o iso8859_13.lo iso8859_13.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_10.lo -MD -MP -MF .deps/iso8859_10.Tpo -c iso8859_10.c -o iso8859_10.o
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_14.lo -MD -MP -MF .deps/iso8859_14.Tpo -c -o iso8859_14.lo iso8859_14.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_11.lo -MD -MP -MF .deps/iso8859_11.Tpo -c iso8859_11.c -o iso8859_11.o
+mv -f .deps/iso8859_11.Tpo .deps/iso8859_11.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_15.lo -MD -MP -MF .deps/iso8859_15.Tpo -c -o iso8859_15.lo iso8859_15.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_14.lo -MD -MP -MF .deps/iso8859_14.Tpo -c iso8859_14.c -o iso8859_14.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_13.lo -MD -MP -MF .deps/iso8859_13.Tpo -c iso8859_13.c -o iso8859_13.o
+mv -f .deps/iso8859_10.Tpo .deps/iso8859_10.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT iso8859_16.lo -MD -MP -MF .deps/iso8859_16.Tpo -c -o iso8859_16.lo iso8859_16.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_15.lo -MD -MP -MF .deps/iso8859_15.Tpo -c iso8859_15.c -o iso8859_15.o
+mv -f .deps/iso8859_13.Tpo .deps/iso8859_13.Plo
+mv -f .deps/iso8859_14.Tpo .deps/iso8859_14.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT euc_tw.lo -MD -MP -MF .deps/euc_tw.Tpo -c -o euc_tw.lo euc_tw.c
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT euc_kr.lo -MD -MP -MF .deps/euc_kr.Tpo -c -o euc_kr.lo euc_kr.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT iso8859_16.lo -MD -MP -MF .deps/iso8859_16.Tpo -c iso8859_16.c -o iso8859_16.o
+mv -f .deps/iso8859_15.Tpo .deps/iso8859_15.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT big5.lo -MD -MP -MF .deps/big5.Tpo -c -o big5.lo big5.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT euc_tw.lo -MD -MP -MF .deps/euc_tw.Tpo -c euc_tw.c -o euc_tw.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT euc_kr.lo -MD -MP -MF .deps/euc_kr.Tpo -c euc_kr.c -o euc_kr.o
+mv -f .deps/iso8859_16.Tpo .deps/iso8859_16.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT gb18030.lo -MD -MP -MF .deps/gb18030.Tpo -c -o gb18030.lo gb18030.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT big5.lo -MD -MP -MF .deps/big5.Tpo -c big5.c -o big5.o
+mv -f .deps/euc_tw.Tpo .deps/euc_tw.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT koi8_r.lo -MD -MP -MF .deps/koi8_r.Tpo -c -o koi8_r.lo koi8_r.c
+mv -f .deps/euc_kr.Tpo .deps/euc_kr.Plo
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT gb18030.lo -MD -MP -MF .deps/gb18030.Tpo -c gb18030.c -o gb18030.o
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT cp1251.lo -MD -MP -MF .deps/cp1251.Tpo -c -o cp1251.lo cp1251.c
+mv -f .deps/big5.Tpo .deps/big5.Plo
+/bin/bash ../libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I..  -Wall   -g -O2 -MT onig_init.lo -MD -MP -MF .deps/onig_init.Tpo -c -o onig_init.lo onig_init.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT koi8_r.lo -MD -MP -MF .deps/koi8_r.Tpo -c koi8_r.c -o koi8_r.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT cp1251.lo -MD -MP -MF .deps/cp1251.Tpo -c cp1251.c -o cp1251.o
+mv -f .deps/cp1251.Tpo .deps/cp1251.Plo
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I.. -Wall -g -O2 -MT onig_init.lo -MD -MP -MF .deps/onig_init.Tpo -c onig_init.c -o onig_init.o
+mv -f .deps/koi8_r.Tpo .deps/koi8_r.Plo
+mv -f .deps/gb18030.Tpo .deps/gb18030.Plo
+mv -f .deps/onig_init.Tpo .deps/onig_init.Plo
+/bin/bash ../libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc -Wall   -g -O2  -version-info 9:0:4   -o libonig.la -rpath /var/tmp/pgb-poc/prefix-jq/lib regparse.lo regcomp.lo regexec.lo regenc.lo regerror.lo regext.lo regsyntax.lo regtrav.lo regversion.lo st.lo reggnu.lo  unicode.lo unicode_unfold_key.lo unicode_fold1_key.lo unicode_fold2_key.lo unicode_fold3_key.lo ascii.lo utf8.lo utf16_be.lo utf16_le.lo utf32_be.lo utf32_le.lo euc_jp.lo euc_jp_prop.lo sjis.lo sjis_prop.lo iso8859_1.lo iso8859_2.lo iso8859_3.lo iso8859_4.lo iso8859_5.lo iso8859_6.lo iso8859_7.lo iso8859_8.lo iso8859_9.lo iso8859_10.lo iso8859_11.lo iso8859_13.lo iso8859_14.lo iso8859_15.lo iso8859_16.lo euc_tw.lo euc_kr.lo big5.lo gb18030.lo koi8_r.lo cp1251.lo onig_init.lo  
+libtool: link: ar cr .libs/libonig.a  regparse.o regcomp.o regexec.o regenc.o regerror.o regext.o regsyntax.o regtrav.o regversion.o st.o reggnu.o unicode.o unicode_unfold_key.o unicode_fold1_key.o unicode_fold2_key.o unicode_fold3_key.o ascii.o utf8.o utf16_be.o utf16_le.o utf32_be.o utf32_le.o euc_jp.o euc_jp_prop.o sjis.o sjis_prop.o iso8859_1.o iso8859_2.o iso8859_3.o iso8859_4.o iso8859_5.o iso8859_6.o iso8859_7.o iso8859_8.o iso8859_9.o iso8859_10.o iso8859_11.o iso8859_13.o iso8859_14.o iso8859_15.o iso8859_16.o euc_tw.o euc_kr.o big5.o gb18030.o koi8_r.o cp1251.o onig_init.o
+libtool: link: ranlib .libs/libonig.a
+libtool: link: ( cd ".libs" && rm -f "libonig.la" && ln -s "../libonig.la" "libonig.la" )
+make[2]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/src'
+make[1]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/src'
+Making all in test
+make[1]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/test'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/test'
+Making all in sample
+make[1]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/sample'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/sample'
+make[1]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9'
+sed -e 's,[@]datadir[@],/var/tmp/pgb-poc/prefix-jq/share,g' -e 's,[@]datarootdir[@],/var/tmp/pgb-poc/prefix-jq/share,g' -e 's,[@]PACKAGE_VERSION[@],6.9.9,g' -e 's,[@]prefix[@],/var/tmp/pgb-poc/prefix-jq,g' -e 's,[@]exec_prefix[@],/var/tmp/pgb-poc/prefix-jq,g' -e 's,[@]libdir[@],/var/tmp/pgb-poc/prefix-jq/lib,g' -e 's,[@]includedir[@],/var/tmp/pgb-poc/prefix-jq/include,g' < ./oniguruma.pc.in > oniguruma.pc
+make[1]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9'
+Making install in src
+make[1]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/src'
+make[2]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/src'
+ /usr/bin/mkdir -p '/var/tmp/pgb-poc/prefix-jq/lib'
+ /bin/bash ../libtool   --mode=install /usr/bin/install -c   libonig.la '/var/tmp/pgb-poc/prefix-jq/lib'
+libtool: install: /usr/bin/install -c .libs/libonig.lai /var/tmp/pgb-poc/prefix-jq/lib/libonig.la
+libtool: install: /usr/bin/install -c .libs/libonig.a /var/tmp/pgb-poc/prefix-jq/lib/libonig.a
+libtool: install: chmod 644 /var/tmp/pgb-poc/prefix-jq/lib/libonig.a
+libtool: install: ranlib /var/tmp/pgb-poc/prefix-jq/lib/libonig.a
+libtool: finish: PATH="/root/.local/state/pgb/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin" ldconfig -n /var/tmp/pgb-poc/prefix-jq/lib
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /var/tmp/pgb-poc/prefix-jq/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the '-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the 'LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the 'LD_RUN_PATH' environment variable
+     during linking
+   - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /usr/bin/mkdir -p '/var/tmp/pgb-poc/prefix-jq/include'
+ /usr/bin/install -c -m 644 oniguruma.h oniggnu.h '/var/tmp/pgb-poc/prefix-jq/include'
+make  install-data-hook
+make[3]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/src'
+make[3]: Nothing to be done for 'install-data-hook'.
+make[3]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/src'
+make[2]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/src'
+make[1]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/src'
+Making install in test
+make[1]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/test'
+make[2]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/test'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/test'
+make[1]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/test'
+Making install in sample
+make[1]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/sample'
+make[2]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9/sample'
+make[2]: Nothing to be done for 'install-exec-am'.
+make[2]: Nothing to be done for 'install-data-am'.
+make[2]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/sample'
+make[1]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9/sample'
+make[1]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9'
+make[2]: Entering directory '/var/tmp/pgb-poc/onig-6.9.9'
+ /usr/bin/mkdir -p '/var/tmp/pgb-poc/prefix-jq/bin'
+ /usr/bin/install -c onig-config '/var/tmp/pgb-poc/prefix-jq/bin'
+ /usr/bin/mkdir -p '/var/tmp/pgb-poc/prefix-jq/lib/pkgconfig'
+ /usr/bin/install -c -m 644 oniguruma.pc '/var/tmp/pgb-poc/prefix-jq/lib/pkgconfig'
+make[2]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9'
+make[1]: Leaving directory '/var/tmp/pgb-poc/onig-6.9.9'

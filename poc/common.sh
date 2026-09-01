@@ -90,18 +90,24 @@ poc_matrix() { # binary-path  [extra files to copy: src:dst ...]
   _bin="$1"; shift
   _base=$(basename "$_bin")
   printf '\n  functional test across the pinned matrix:\n'
-  printf '    %-20s %-6s %-10s %s\n' ENVIRONMENT LIBC RESULT 'HOST OBJECTS LOADED'
+  printf '    %-20s %-6s %-10s %-28s %s\n' ENVIRONMENT LIBC RESULT 'HOST .so LOADED' 'HOST DATA READ'
   while read -r ref name libc digest; do
     case "$ref" in ''|\#*) continue ;; esac
     _r="$ROOTFS_DIR/$name"
     [ -d "$_r" ] || { poc_skip "$name" "not fetched"; continue; }
 
     cp "$_bin" "$_r/$_base" || { poc_check "$name: copy" failed ok; continue; }
-    for extra in "$@"; do
-      _s=${extra%%:*}; _d=${extra#*:}
-      mkdir -p "$_r$(dirname "$_d")" 2>/dev/null
-      cp -a "$_s" "$_r$_d" 2>/dev/null
-    done
+    poc_stage_extras "$_r" "$@"
+    # ⛔ THE TEST BED IS SHARED AND MUST COME BACK UNCHANGED. A functional
+    # test that needs a resolvable name writes it into the target's
+    # /etc/hosts; without a restore those writes ACCUMULATE across runs. Found
+    # by inspection after the curl POC left six identical lines in
+    # debian-12's /etc/hosts, which is exactly the kind of drift that makes a
+    # later result depend on how many times an earlier POC was run.
+    _hosts_bak=""
+    if [ -f "$_r/etc/hosts" ]; then
+      _hosts_bak=$(mktemp); cp "$_r/etc/hosts" "$_hosts_bak"
+    fi
 
     # The POC's own test script, written into the target and run there.
     poc_functional_test > "$_r/pgb-poc-test.sh"
@@ -114,12 +120,51 @@ poc_matrix() { # binary-path  [extra files to copy: src:dst ...]
       *) _res="exit$_st" ;;
     esac
     _libs=$(poc_trace "$_r" "/$_base" pgb-poc-test.sh)
-    printf '    %-20s %-6s %-10s %s\n' "$name" "$libc" "$_res" "${_libs:-none}"
+    _data=$(poc_trace_data "$_r" "/$_base" pgb-poc-test.sh)
+    printf '    %-20s %-6s %-10s %-28s %s\n' "$name" "$libc" "$_res" "${_libs:-none}" "${_data:-none}"
     poc_check "$name: functional test" "$_res" ok
-    [ -n "$_libs" ] && poc_check "$name: host objects loaded" "$_libs" none
+    # ⛔ ONLY THE SHARED-OBJECT COLUMN IS ASSERTED, and the reason is a
+    # correction. Loading a host .so is the two-libc failure this whole
+    # project is about. READING host data is not the same thing and must not
+    # be treated as one: glibc still opens /etc/nsswitch.conf under the NSS
+    # override, and a program that finds and honours the host's locale is
+    # behaving correctly, not leaking.
+    #
+    # What matters is INDEPENDENCE, not abstinence -- the program must work
+    # whether or not the data is there. The matrix proves that directly: the
+    # four musl environments have no glibc locale data, no gconv tree and (on
+    # Alpine) no terminfo, and the same binary passes there. Asserting "reads
+    # no host data" would have failed CPython for correctly reading the
+    # C.utf8 locale Debian provides.
+    [ -n "$_libs" ] && poc_check "$name: host shared objects loaded" "$_libs" none
 
+    [ -n "$_hosts_bak" ] && { cp "$_hosts_bak" "$_r/etc/hosts"; rm -f "$_hosts_bak"; }
+    poc_unstage_extras "$_r" "$@"
     rm -f "$_r/$_base" "$_r/pgb-poc-test.sh"
   done < "$REPO_ROOT/scripts/common/rootfs-images.txt"
+}
+
+# ⛔ REPLACE, NEVER MERGE. `cp -a SRC DST` where DST already exists copies
+# SRC *into* DST, so a second run nests the tree one level deeper and the
+# paths the program expects stop resolving. Measured: Rocky 8 reported
+# "No module named 'json'" while Fedora's copy of the same tree had grown from
+# 103 MiB to 192 MiB -- two stacked copies, one of them unreachable.
+poc_stage_extras() { # rootfs [src:dst ...]
+  _sr="$1"; shift
+  for extra in "$@"; do
+    _s=${extra%%:*}; _d=${extra#*:}
+    rm -rf "${_sr:?}$_d"
+    mkdir -p "$_sr$(dirname "$_d")" 2>/dev/null
+    cp -a "$_s" "$_sr$_d" 2>/dev/null
+  done
+}
+poc_unstage_extras() { # rootfs [src:dst ...]
+  _sr="$1"; shift
+  for extra in "$@"; do
+    _d=${extra#*:}
+    case "$_d" in /|/etc|/usr|/lib|/bin|"") continue ;; esac
+    rm -rf "${_sr:?}$_d"
+  done
 }
 
 # ---------------------------------------------------------------------------
@@ -147,16 +192,13 @@ poc_observe() {  # binary-path label [extra files: src:dst ...]
     _r="$ROOTFS_DIR/$name"
     [ -d "$_r" ] || continue
     cp "$_bin" "$_r/$_base" 2>/dev/null || continue
-    for extra in "$@"; do
-      _s=${extra%%:*}; _d=${extra#*:}
-      mkdir -p "$_r$(dirname "$_d")" 2>/dev/null
-      cp -a "$_s" "$_r$_d" 2>/dev/null
-    done
+    poc_stage_extras "$_r" "$@"
     poc_observation_probe > "$_r/pgb-poc-probe.sh"
     _out=$(sh "$REPO_ROOT/scripts/common/rootfs-run.sh" "$_r" -- /bin/sh /pgb-poc-probe.sh 2>&1 | tail -1)
     _libs=$(poc_trace "$_r" "/$_base" pgb-poc-probe.sh)
     printf '    %-20s %-6s %-10s %s\n' "$name" "$libc" "${_out:-<none>}" "${_libs:-none}"
     printf '%s\n' "$name: $_out | $_libs" >> "$POC_OUT/observation.txt"
+    poc_unstage_extras "$_r" "$@"
     rm -f "$_r/$_base" "$_r/pgb-poc-probe.sh"
   done < "$REPO_ROOT/scripts/common/rootfs-images.txt"
 }
@@ -172,7 +214,25 @@ poc_trace() { # rootfs in-root-binary script-name
     { pid = $1 }
     $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }
     seen && pid == target && /open(at)?\(/ && !/ENOENT|= -1/ { print }
-  ' "$_t" | grep -oE '"[^"]*\.so[^"]*"|"[^"]*gconv[^"]*"' | tr -d '"' | sort -u | tr '\n' ' '
+  ' "$_t" | grep -oE '"[^"]*\.so[^"]*"' | tr -d '"' | sort -u | tr '\n' ' '
+  rm -f "$_t"
+}
+
+# Host DATA the binary read: glibc locale files, gconv configuration,
+# nsswitch.conf, terminfo. Reported, never asserted -- see poc_matrix.
+poc_trace_data() { # rootfs in-root-binary script-name
+  command -v strace >/dev/null 2>&1 || { printf ''; return; }
+  _t=$(mktemp) || { printf ''; return; }
+  strace -f -e trace=openat,open,execve -o "$_t" \
+    sh "$REPO_ROOT/scripts/common/rootfs-run.sh" "$1" -- /bin/sh "/${3:-pgb-poc-test.sh}" \
+    >/dev/null 2>&1
+  awk -v want="$2" '
+    { pid = $1 }
+    $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }
+    seen && pid == target && /open(at)?\(/ && !/ENOENT|= -1/ { print }
+  ' "$_t" | grep -oE '"[^"]*gconv[^"]*"|"/usr/lib/locale[^"]*"|"/etc/nsswitch.conf"|"[^"]*terminfo[^"]*"' \
+    | tr -d '"' | sed 's|/usr/lib/locale/.*|/usr/lib/locale/*|; s|.*gconv.*|gconv-cfg|; s|.*terminfo.*|terminfo|' \
+    | sort -u | tr '\n' ' '
   rm -f "$_t"
 }
 

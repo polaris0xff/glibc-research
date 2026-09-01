@@ -6,7 +6,7 @@ version       : 5.3.1
 sha256        : fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e
 normal build  : ./configure && make
 stresses      : locale (LC_CTYPE, LC_NUMERIC), iconv, dlopen extension API
-date (UTC)    : 2026-09-01T06:00:59Z
+date (UTC)    : 2026-09-01T06:34:37Z
 evidence      : /home/user/glibc-research/evidence/poc/10-gawk
 ---------------------------------------------------------------
   ok    built                                        = yes
@@ -19,28 +19,28 @@ evidence      : /home/user/glibc-research/evidence/poc/10-gawk
     pgb runtime linked     yes
 
   functional test across the pinned matrix:
-    ENVIRONMENT          LIBC   RESULT     HOST OBJECTS LOADED
-    alpine-3.22          musl   ok         none
+    ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
+    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
   ok    alpine-3.22: functional test                 = ok
-    alpine-3.20          musl   ok         none
+    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
   ok    alpine-3.20: functional test                 = ok
-    alpine-3.10          musl   ok         none
+    alpine-3.10          musl   ok         none                         none
   ok    alpine-3.10: functional test                 = ok
-    voidlinux-musl       musl   ok         none
+    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
   ok    voidlinux-musl: functional test              = ok
-    debian-11            glibc  ok         none
+    debian-11            glibc  ok         none                         /etc/nsswitch.conf 
   ok    debian-11: functional test                   = ok
-    debian-12            glibc  ok         none
+    debian-12            glibc  ok         none                         /etc/nsswitch.conf 
   ok    debian-12: functional test                   = ok
-    ubuntu-20.04         glibc  ok         none
+    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf 
   ok    ubuntu-20.04: functional test                = ok
-    rockylinux-8         glibc  ok         none
+    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf 
   ok    rockylinux-8: functional test                = ok
-    opensuse-leap-15.6   glibc  ok         none
+    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf 
   ok    opensuse-leap-15.6: functional test          = ok
-    fedora-42            glibc  ok         none
+    fedora-42            glibc  ok         none                         /etc/nsswitch.conf 
   ok    fedora-42: functional test                   = ok
-    archlinux-latest     glibc  ok         none
+    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf 
   ok    archlinux-latest: functional test            = ok
 
   OBSERVATION -- gawk -l filefuncs: a static binary asked to dlopen a real extension (measured, not asserted):

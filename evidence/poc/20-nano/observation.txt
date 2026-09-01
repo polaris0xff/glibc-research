@@ -53,3 +53,14 @@ rockylinux-8: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 |
 opensuse-leap-15.6: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 | 
 fedora-42: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 | 
 archlinux-latest: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 | 
+alpine-3.22: host-terminfo-tree=no setupterm(xterm-256color)=FAIL rc=-1 err=-1 | 
+alpine-3.20: host-terminfo-tree=no setupterm(xterm-256color)=FAIL rc=-1 err=-1 | 
+alpine-3.10: host-terminfo-tree=no setupterm(xterm-256color)=FAIL rc=-1 err=-1 | 
+voidlinux-musl: host-terminfo-tree=yes setupterm(xterm-256color)=FAIL rc=-1 err=0 | 
+debian-11: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 | 
+debian-12: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 | 
+ubuntu-20.04: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 | 
+rockylinux-8: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 | 
+opensuse-leap-15.6: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 | 
+fedora-42: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 | 
+archlinux-latest: host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 | 

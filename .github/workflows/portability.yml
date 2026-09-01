@@ -1,0 +1,158 @@
+# Portability CI.
+#
+# ⛔ THIS MUST NOT DEGENERATE INTO "the tool compiles". The objective is a
+# binary that RUNS on distributions it was not built on, so every job here
+# ends by executing something on a foreign distribution and asserting what it
+# did there.
+#
+# ⚠ THE LOCAL TEST BED DOES NOT WORK HERE, AND THAT IS THE MAIN DESIGN
+# CONSTRAINT. scripts/common/rootfs-run.sh is `unshare --mount` + `chroot`,
+# which needs root and CAP_SYS_ADMIN; a GitHub runner gives neither to the job
+# shell. So CI uses containers for the same purpose. That is not a workaround
+# bolted on: it is also how the docker/podman engines in `pgb`, marked
+# UNTESTED in docs/AGENTS.md, finally get exercised.
+#
+# The build container is pinned by DIGEST, not by tag, for the reason
+# scripts/common/rootfs-images.txt states: a tag measures a different thing
+# each week and says so nowhere.
+
+name: portability
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # glibc 2.36. At or above 2.34 the `files` and `dns` NSS services are
+  # implemented inside libc, which is what leaves the NSS override with
+  # nothing to dlopen. This is the same pin as pgb's own default.
+  BUILD_IMAGE: debian@sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Build the probes ONCE, in the pinned environment, and hand them to every
+  #    other job as artefacts. Rebuilding per target would test eleven
+  #    different binaries and prove nothing about portability.
+  # ---------------------------------------------------------------------------
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: debian@sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the toolchain
+        run: |
+          set -eux
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends \
+            gcc g++ make libc6-dev binutils pkg-config file \
+            curl ca-certificates xz-utils
+
+      - name: Record the environment
+        run: |
+          set -eux
+          cc --version | head -1
+          ldd --version | head -1
+          # ⛔ The whole design rests on this symbol being public and present
+          # in the STATIC archive. Fail here rather than three jobs later.
+          nm -A "$(cc -print-file-name=libc.a)" | grep -w 'T __nss_configure_lookup'
+
+      - name: Build GNU libiconv (static)
+        run: sh scripts/build-libiconv.sh
+
+      - name: Build the probes with pgb
+        run: |
+          set -eux
+          mkdir -p out
+          # --engine host: we are ALREADY inside the pinned image, so pgb must
+          # not try to create another environment. The image is the control.
+          sh pgb --engine host build -- sh -c '
+            $CC -O2 -o out/probe-portable ci/probe.c
+          '
+          # The control arm: same source, plain gcc -static, none of pgb's
+          # mechanisms. Without it a green matrix says nothing about whether
+          # pgb was needed.
+          cc -static -O2 -o out/probe-plain ci/probe.c
+          file out/probe-portable
+          readelf -d out/probe-portable | grep -c NEEDED || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: probes
+          path: out/
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
+  # 2. THE POINT OF THE WHOLE FILE. Run the binary on distributions it was not
+  #    built on, including musl ones, and assert what it does there.
+  # ---------------------------------------------------------------------------
+  run-matrix:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: alpine-3.22,   image: 'alpine:3.22',       libc: musl  }
+          - { name: alpine-3.20,   image: 'alpine:3.20',       libc: musl  }
+          - { name: alpine-3.10,   image: 'alpine:3.10',       libc: musl  }
+          - { name: voidlinux,     image: 'voidlinux/voidlinux-musl:latest', libc: musl }
+          - { name: debian-11,     image: 'debian:11',         libc: glibc }
+          - { name: debian-12,     image: 'debian:12',         libc: glibc }
+          - { name: ubuntu-2004,   image: 'ubuntu:20.04',      libc: glibc }
+          - { name: rocky-8,       image: 'rockylinux:8',      libc: glibc }
+          - { name: opensuse-15,   image: 'opensuse/leap:15.6', libc: glibc }
+          - { name: fedora-42,     image: 'fedora:42',         libc: glibc }
+          - { name: arch,          image: 'archlinux:latest',  libc: glibc }
+    container:
+      image: ${{ matrix.image }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: probes, path: out }
+
+      - name: Run the portable binary
+        run: |
+          chmod +x out/probe-portable
+          ./out/probe-portable
+        # ⛔ No `continue-on-error`. A non-zero exit here is the failure this
+        # project exists to prevent, and it must fail the build.
+
+      - name: Run the plain -static control, and record what it did
+        # ⚠ continue-on-error IS CORRECT HERE AND ONLY HERE. The control is
+        # EXPECTED to die on some of these -- that is the finding. Its exit
+        # status is recorded, never asserted.
+        continue-on-error: true
+        run: |
+          chmod +x out/probe-plain
+          ./out/probe-plain; echo "plain -static exit=$? on ${{ matrix.name }} (${{ matrix.libc }})"
+
+  # ---------------------------------------------------------------------------
+  # 3. The experiments, where the runner can host them.
+  #
+  # ⚠ Experiments 20 and 30 need the chroot bed and therefore root +
+  # CAP_SYS_ADMIN. A container job runs as root but the runner does not grant
+  # CAP_SYS_ADMIN, so `unshare --mount` fails. Experiment 10 detects exactly
+  # that and reports it as a SKIP rather than a pass, which is why it is safe
+  # to run here: it will say what it could not do.
+  # ---------------------------------------------------------------------------
+  probe-host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install prerequisites
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq strace
+      - name: Selftests, which need nothing privileged
+        run: |
+          set -eux
+          sh scripts/common/oci-pull.sh --selftest
+          sh scripts/common/mine-repo.sh --selftest
+      - name: Host probe (expected to report an incomplete bed here)
+        continue-on-error: true
+        run: sh experiments/10-probe-the-host.sh
