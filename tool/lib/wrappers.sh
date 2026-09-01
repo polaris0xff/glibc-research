@@ -480,22 +480,79 @@ compile_flags() {
   printf -- '-fno-plt'
 }
 
+# ⛔ THE WRAPPER DIRECTORY IS KEYED ON THE OPTIONS, NOT ON THE INVOCATION.
+#
+# T-058. $PGB_STATE is bind-mounted INTO the build environment
+# (tool/lib/build.sh), so one directory named `bin` is the directory EVERY
+# concurrent `pgb build` executes its compiler out of -- and the wrappers embed
+# $CF and $LF, which depend on --embed-terminfo, --embed-cacert,
+# --embed-locale, --no-iconv and --wrap-dlopen. Two builds with different
+# options therefore shared one set of flags, last writer wins, and NEITHER
+# BUILD REPORTED ANYTHING: the loser silently linked a runtime it did not ask
+# for, or lost one it did.
+#
+# ⭐ Content-addressing rather than one directory per pid, and the choice is
+# what answers the entry's two open questions:
+#   - `pgb cc-dir` prints a directory that is STABLE for a given set of
+#     options, so a caller can hand-drive out of it and re-derive the same
+#     name tomorrow;
+#   - nobody has to remove a directory when a build is killed, because a
+#     killed build leaves behind a directory the NEXT build with the same
+#     options reuses byte-for-byte. Per-pid names would accumulate one
+#     directory per crash and need a reaper that must not run while somebody
+#     else's build is live -- which is the defect this entry is about,
+#     rebuilt one layer out.
+# Two concurrent builds with the SAME options still share a directory; that is
+# safe by construction, because what they would write into it is identical.
+# ⛔ RESOLVE THE COMPILER PAST OUR OWN WRAPPERS, NOT WITH `command -v` ALONE.
+# Once the wrapper directory is option-keyed there can be more than one of
+# them, and `inner_build` puts one on PATH. A plain `command -v cc` inside a
+# build that already has wrappers on PATH resolves to a WRAPPER, and wrapping
+# it again gives a wrapper that appends pgb's flags twice. The old code
+# guarded only against the directory it was about to write.
+real_compiler() {
+  _want=$1
+  IFS=:
+  for _d in $PATH; do
+    [ -n "$_d" ] || _d=.
+    case "$_d" in "$PGB_STATE"/*|"$PGB_STATE") continue ;; esac
+    if [ -x "$_d/$_want" ] && [ ! -d "$_d/$_want" ]; then
+      unset IFS; printf '%s' "$_d/$_want"; return 0
+    fi
+  done
+  unset IFS; return 1
+}
+
+wrapper_dir() {
+  # ⚠ THE ESCAPE HATCH IS FOR THE CONTROL, AND IT EXISTS SO THE FIX CAN BE
+  # MEASURED. `experiments/87-` runs the same two concurrent builds with
+  # PGB_T058_SHARED_WRAPPERS=1 to reproduce the single shared directory, and
+  # asserts that the control DISAGREES with the fixed run. Without a way back
+  # to the old behaviour, "both binaries came out right" is equally consistent
+  # with the race simply not having fired. Nothing in pgb sets this.
+  if [ -n "${PGB_T058_SHARED_WRAPPERS:-}" ]; then
+    printf '%s/bin' "$PGB_STATE"; return 0
+  fi
+  # cksum, not sha256sum: it is POSIX and it is already the key mechanism in
+  # runtime_dir() above. The key is over the wrappers' own inputs -- if two
+  # option sets produce the same flags they SHOULD share a directory.
+  _k=$({ compile_flags; printf '\n'; link_flags; printf '\n'; link_flags cxx
+         printf '\n%s\n%s\n' "${ARCH_BASELINE:-$(default_baseline)}" \
+                             "${WRAP_DLOPEN:+dl}"
+         for _r in cc gcc c++ g++ cpp; do
+           real_compiler "$_r" 2>/dev/null; printf '\n'
+         done; } | cksum | cut -d' ' -f1)
+  printf '%s/bin-%s' "$PGB_STATE" "${_k:-unknown}"
+}
+
 make_wrappers() {
   # ⛔ NO `rm -rf` HERE, AND THE REASON IS A RACE THAT COSTS A LONG BUILD.
-  # $PGB_STATE is bind-mounted INTO the build environment (tool/lib/build.sh),
-  # so this directory is the same one a running `pgb build` is executing its
-  # compiler out of. Wiping and recreating it takes the wrappers away from
-  # that build between two compiler invocations, and what it reports is
-  # `cc: not found` from inside somebody else's ninja. Each wrapper is now
-  # written to a temporary name and renamed into place, which is atomic and
+  # Even inside one option-keyed directory, wiping and recreating takes the
+  # wrappers away from a build between two compiler invocations, and what it
+  # reports is `cc: not found` from inside somebody else's ninja. Each wrapper
+  # is written to a temporary name and renamed into place, which is atomic and
   # leaves an already-exec'd wrapper untouched.
-  #
-  # ⚠ THIS DOES NOT MAKE CONCURRENT `pgb build`s SAFE, and TODO T-058 carries
-  # what is left: two builds with DIFFERENT options (say one with
-  # --embed-terminfo and one without) still share one wrapper directory, so
-  # the second one's flags become the first one's too. Do not run them
-  # concurrently until that entry is closed.
-  wd="$PGB_STATE/bin"; mkdir -p "$wd" || die "cannot create $wd" 2
+  wd=$(wrapper_dir); mkdir -p "$wd" || die "cannot create $wd" 2
   cf=$(compile_flags)
   bl="${ARCH_BASELINE:-$(default_baseline)}"
   for pair in "cc:cc" "gcc:gcc" "c++:c++" "g++:g++" "cpp:cpp"; do
@@ -506,9 +563,8 @@ make_wrappers() {
     # ⛔ SET ONLY WHEN --wrap-dlopen IS IN PLAY, so a build without it produces
     # a byte-identical wrapper to before this existed.
     pgbdl=""; [ -n "${WRAP_DLOPEN:-}" ] && pgbdl=1
-    realpath_=$(command -v "$real" 2>/dev/null) || realpath_=""
+    realpath_=$(real_compiler "$real" 2>/dev/null) || realpath_=""
     [ -n "$realpath_" ] || continue
-    case "$realpath_" in "$wd"/*) continue ;; esac
     cat > "$wd/.tmp.$name.$$" <<EOF
 #!/bin/sh
 # pgb compiler wrapper -- generated, readable on purpose.

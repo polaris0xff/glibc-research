@@ -190,9 +190,12 @@ experiment's process from another's.** Two runs touching the same rootfs kill
 each other's subjects, and what that produces is not an error: it is a row
 that says `SIG9` or `timeout` in a table that otherwise looks fine.
 
-**And `pgb build` is not concurrency-safe** — `TODO/toolchain.md` T-058. Two
-builds share one wrapper directory and one set of option-dependent flags, so
-the second one's `--embed-terminfo` silently becomes the first one's too.
+⭐ **`pgb build` IS concurrency-safe now — T-058 is CLOSED**, and
+`experiments/87-` carries both halves: the fix (a wrapper directory keyed on
+the options themselves) and a control that reproduces the old behaviour and
+shows the two builds agreeing on one option set in **5 of 5** attempts.
+⚠ **The bed rule above still binds.** Two `pgb build`s may overlap; two things
+touching the same rootfs may not.
 
 ⭐ **What CAN overlap**, and it is worth using: a `pgb build` and anything that
 does not touch the bed or the wrappers. `tool/nix-appimage.sh` is closure

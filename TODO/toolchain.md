@@ -696,9 +696,9 @@ have settled what these tools actually need to do.
 
 **Source** found while running `poc/90-qt` and `poc/20-nano` on the same
 machine, 2026-09-01d.
-**Category** toolchain · **Priority** P1 · **Effort** S · **Status** open
+**Category** toolchain · **Priority** P1 · **Effort** S · **Status** done
 
-**Problem.** `make_wrappers` writes one directory, `$PGB_STATE/bin`, and
+**Problem.** `make_wrappers` wrote one directory, `$PGB_STATE/bin`, and
 `tool/lib/build.sh` bind-mounts `$PGB_STATE` **into** the build environment
 (`--bind "$PGB_STATE:$PGB_STATE"`, lines 87 and 141). So the compiler a
 running build is executing out of is a directory the next `pgb build` rewrites.
@@ -732,4 +732,50 @@ directory when the build is killed rather than finished.
 
 **Prove.** Two `pgb build`s started together, one `--embed-terminfo` and one
 plain, both completing, and the binaries checked for the terminfo constructor:
-present in exactly one. Today that assertion fails whichever way the race goes.
+present in exactly one.
+
+## ⭐ CLOSED — `experiments/87-concurrent-build-options.sh`, 8 assertions, 0 fail
+
+**The fix is content-addressing, not a directory per invocation**, and the
+choice is what answers this entry's two open questions. `wrapper_dir()` keys
+the directory on the wrappers' own inputs — `compile_flags`, both
+`link_flags` variants, the baseline, whether `--wrap-dlopen` is in play, and
+the resolved real compilers — with `cksum`, the same mechanism `runtime_dir()`
+already used:
+
+    cc-dir plain            /root/.local/state/pgb/bin-2110419477
+    cc-dir --embed-terminfo /root/.local/state/pgb/bin-4185406337
+
+- `pgb cc-dir` prints a directory that is **stable** for a given option set, so
+  hand-driving still works and the name can be re-derived tomorrow;
+- **nobody has to remove a directory when a build is killed**, because the next
+  build with the same options reuses it byte-for-byte. A per-pid name would
+  accumulate one directory per crash and need a reaper that must not run while
+  somebody else's build is live — which is this defect rebuilt one layer out.
+
+⛔ **A second, smaller defect had to be fixed for the first fix to be safe.**
+`make_wrappers` resolved the real compiler with `command -v` and skipped only
+the directory it was *about to write*. With more than one wrapper directory in
+existence and `inner_build` putting one on `PATH`, that resolves to a
+**wrapper**, and wrapping it again appends pgb's flags twice. `real_compiler()`
+now walks `PATH` skipping anything under `$PGB_STATE`.
+
+| arm | what | result |
+|---|---|---|
+| 1 | the fix, chroot engine, two concurrent builds | `--embed-terminfo` binary has **2** `pgb_terminfo` symbols, the plain one **0** |
+| 2 | ⭐ **the control**: `PGB_T058_SHARED_WRAPPERS=1` puts the single shared `bin` back, five attempts | **the two builds agree on one option set in 5 of 5** — `0/0`, `2/2`, `0/0`, `0/0`, `2/2` |
+| 3 | ⭐ **the scope**: the same control under docker | `2` and `0` — the container boundary isolates them |
+
+⭐ **Arm 2 is the entry.** A run where both binaries carry the terminfo runtime
+is a build that got an option it never asked for; a run where neither does is a
+build that lost one it did. **Neither build reported anything either way.**
+
+⛔ **And arm 3 is why the first run of the experiment could not reproduce the
+defect at all.** `cmd_build`'s docker branch passes `-e PGB_STATE=...` but does
+**not** bind-mount it, so each container gets a private, empty state directory
+inside its own ephemeral filesystem. The defect was therefore **chroot-only**,
+and an experiment run under the engine `pick_engine` chooses by default passes
+for the wrong reason. ⚠ The other consequence of that isolation is a cost, not
+a safety property: **every docker build recompiles the pgb runtime objects from
+scratch**, because the cache `runtime_dir()` maintains never survives the
+container. Not fixed here; it is a performance entry, not a correctness one.
