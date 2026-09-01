@@ -6,14 +6,14 @@ version       : 8.2
 sha256        : d5ad07dd862facae03051c54c6535e54c7ed7407318783fcad1ad2d7076fffeb
 normal build  : ./configure && make (against the distro's libncursesw)
 stresses      : terminfo data, ncurses static dependency, iconv, locale, multibyte
-date (UTC)    : 2026-09-01T06:34:44Z
+date (UTC)    : 2026-09-01T18:48:14Z
 evidence      : /home/user/glibc-research/evidence/poc/20-nano
 ---------------------------------------------------------------
         dependency: ncurses 6.5, built static in the same environment
   ok    built                                        = yes
 
   the binary:
-    size                   2547024 bytes
+    size                   2605112 bytes
     file                   ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, BuildID
     PT_INTERP              absent
     DT_NEEDED              0
@@ -21,13 +21,13 @@ evidence      : /home/user/glibc-research/evidence/poc/20-nano
 
   functional test across the pinned matrix:
     ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
-    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
+    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf terminfo 
   ok    alpine-3.22: functional test                 = ok
-    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
+    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf terminfo 
   ok    alpine-3.20: functional test                 = ok
-    alpine-3.10          musl   ok         none                         none
+    alpine-3.10          musl   ok         none                         terminfo 
   ok    alpine-3.10: functional test                 = ok
-    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
+    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf terminfo 
   ok    voidlinux-musl: functional test              = ok
     debian-11            glibc  ok         none                         /etc/nsswitch.conf 
   ok    debian-11: functional test                   = ok
@@ -46,10 +46,10 @@ evidence      : /home/user/glibc-research/evidence/poc/20-nano
 
   OBSERVATION -- terminfo: setupterm() against the host database (measured, not asserted):
     ENVIRONMENT          LIBC   OUTCOME    HOST OBJECTS PULLED IN
-    alpine-3.22          musl   host-terminfo-tree=no setupterm(xterm-256color)=FAIL rc=-1 err=-1 none
-    alpine-3.20          musl   host-terminfo-tree=no setupterm(xterm-256color)=FAIL rc=-1 err=-1 none
-    alpine-3.10          musl   host-terminfo-tree=no setupterm(xterm-256color)=FAIL rc=-1 err=-1 none
-    voidlinux-musl       musl   host-terminfo-tree=yes setupterm(xterm-256color)=FAIL rc=-1 err=0 none
+    alpine-3.22          musl   host-terminfo-tree=no setupterm(xterm-256color)=OK cols=80 none
+    alpine-3.20          musl   host-terminfo-tree=no setupterm(xterm-256color)=OK cols=80 none
+    alpine-3.10          musl   host-terminfo-tree=no setupterm(xterm-256color)=OK cols=80 none
+    voidlinux-musl       musl   host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 none
     debian-11            glibc  host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 none
     debian-12            glibc  host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 none
     ubuntu-20.04         glibc  host-terminfo-tree=yes setupterm(xterm-256color)=OK cols=80 none

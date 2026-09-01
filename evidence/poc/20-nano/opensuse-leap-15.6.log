@@ -1,5 +1,6 @@
   ok   version                        GNU nano, version 8.2
   ok   help                           57
+  ok   terminfo-setupterm             setupterm(xterm-256color)
   ok   terminfo-xterm                 started under TERM=xterm
   ok   terminfo-dumb                  started under TERM=dumb
   ok   feature-list                   feature list present

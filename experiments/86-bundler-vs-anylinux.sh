@@ -97,10 +97,14 @@ trap 'reap_all' EXIT INT TERM
 # arm P -- one command from a package name
 # ---------------------------------------------------------------------------
 printf -- '-- arm P: our bundler, one command --------------------------------\n'
-P_IMG="${PGB_APPIMAGE_CACHE:-/var/tmp/pgb-appimage}/$APP-pgb/$APP-pgb-x86_64.AppImage"
+# ⛔ NO `--name`. It names the PROGRAM inside the closure's bin/, not the
+# artefact, and asking for one that is not there is now refused outright
+# (tool/nix-appimage.sh, and the selftest that keeps it refused). The artefact
+# name comes from --out; the work directory is separated by its own cache.
+P_IMG="${PGB_APPIMAGE_CACHE:-/var/tmp/pgb-appimage}/$APP/$APP-pgb-x86_64.AppImage"
 if [ ! -s "$P_IMG" ]; then
-  exp_note "sh tool/nix-appimage.sh $APP"
-  sh "$BUNDLER" "$APP" --out "$P_IMG" --name "$APP-pgb" >"$B/build-P.log" 2>&1 || true
+  exp_note "sh tool/nix-appimage.sh $APP     <- the whole of arm P"
+  sh "$BUNDLER" "$APP" --out "$P_IMG" >"$B/build-P.log" 2>&1 || true
 fi
 exp_check "arm P built from the package name alone" \
   "$([ -s "$P_IMG" ] && echo yes || echo no)" yes

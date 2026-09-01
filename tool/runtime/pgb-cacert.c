@@ -65,6 +65,18 @@
 
 #define _GNU_SOURCE
 #include <fcntl.h>
+#include <stdio.h>      /* ⛔ snprintf. Missing here until 2026-09-01d, which
+                         * made every --embed-cacert build print
+                         *   warning: implicit declaration of function
+                         *   'snprintf' [-Wimplicit-function-declaration]
+                         * and compile a call whose return type C only assumes.
+                         * ⚠ pgb-locale.c carries the SAME include with the
+                         * SAME note, because the same mistake was made and
+                         * fixed there first -- and then repeated in this file.
+                         * It is a warning under gcc 12 and an ERROR under C23,
+                         * so it is a build that stops working on a newer
+                         * compiler rather than a build that is merely untidy.
+                         */
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>

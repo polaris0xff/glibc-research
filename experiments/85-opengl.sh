@@ -167,8 +167,19 @@ SH
   printf '%s' "$_st"
 }
 
-field() {  # file label -> the value after the label, or empty
-  sed -n "s/^$2[[:space:]]*:[[:space:]]*//p" "$1" 2>/dev/null | head -1
+# ⛔ SCOPED TO THE SURFACELESS SECTION, NOT THE FIRST MATCH IN THE FILE.
+# `eglinfo` enumerates EVERY platform it was built for -- GBM, Wayland, X11,
+# surfaceless -- and prints a section per platform. On this bed the first three
+# print `eglinfo: eglInitialize failed` because there is no display and no DRM
+# device, so a first-match read happens to land on the surfaceless section and
+# happens to be right. On a machine where GBM initialised it would silently
+# start reporting a different platform's vendor under the same column heading.
+field() {  # file label -> the value under "Surfaceless platform:", or empty
+  awk -v lab="$2" '
+    /^Surfaceless platform:/ { insec = 1; next }
+    insec && /^[A-Za-z].*platform:/ { insec = 0 }
+    insec && index($0, lab ": ") == 1 { print substr($0, length(lab) + 3); exit }
+  ' "$1" 2>/dev/null | sed 's/[[:space:]]*$//'
 }
 
 # ---------------------------------------------------------------------------
@@ -177,7 +188,18 @@ field() {  # file label -> the value after the label, or empty
 printf -- '\n-- eglinfo on the eleven, one row per environment -----------------\n'
 printf '  %-19s %-6s | %-8s %-14s %-9s | %-8s %s\n' \
   ENVIRONMENT LIBC 'A:exit' 'A:EGL vendor' 'A:driver' 'B:exit' 'B:EGL vendor'
-A_RUNS=0; A_MESA=0; A_CLEAN=0; B_MESA=0; ENVS=0
+A_MESA=0; A_DRV=0; A_CLEAN=0; A_SAME=0; B_MESA=0; ENVS=0
+# ⛔ EXIT STATUS IS NOT THE MEASUREMENT HERE, and pretending it was would have
+# failed this experiment on a correct result. `eglinfo` walks EVERY platform
+# it was built for and returns the number that failed to initialise, so on a
+# machine with no display and no DRM node it exits 3 -- GBM, Wayland and X11 --
+# with surfaceless working perfectly. ⭐ The build host produces exactly 3
+# too, so the honest assertion is that every target AGREES WITH THE BUILD
+# HOST, and that is what A_SAME counts. HOST_EXIT is measured, not assumed.
+EGL_PLATFORM=surfaceless "$A_IMG" >"$B/out.HOST.A" 2>&1
+HOST_EXIT=$?
+HOST_VEND=$(field "$B/out.HOST.A" 'EGL vendor string')
+exp_note "the build host, same artefact: exit $HOST_EXIT, vendor '${HOST_VEND:-<none>}'"
 while read -r ref name libc digest; do
   case "$ref" in ''|\#*) continue ;; esac
   root=$(exp_rootfs "$name") || root=""
@@ -210,9 +232,10 @@ while read -r ref name libc digest; do
   case "$bst" in 0) bres=ok ;; 124) bres=timeout ;;
     13[0-9]|1[4-6][0-9]) bres="SIG$((bst-128))" ;; *) bres="exit$bst" ;; esac
 
-  [ "$ares" = ok ] && A_RUNS=$((A_RUNS + 1))
   [ "$avend" = "Mesa Project" ] && A_MESA=$((A_MESA + 1))
+  [ -n "$adrv" ] && A_DRV=$((A_DRV + 1))
   [ "$anh" = 0 ] && A_CLEAN=$((A_CLEAN + 1))
+  [ "$ast" = "$HOST_EXIT" ] && A_SAME=$((A_SAME + 1))
   [ -n "$bvend" ] && B_MESA=$((B_MESA + 1))
 
   printf '  %-19s %-6s | %-8s %-14s %-9s | %-8s %s\n' \
@@ -233,12 +256,21 @@ while read -r ref name libc digest; do
 done < "$REPO_DIR/scripts/common/rootfs-images.txt"
 [ "$ENVS" -gt 0 ] || { exp_note "no environments fetched"; exit 2; }
 
-printf '\n'
-exp_check "arm A ran on every environment"              "$A_RUNS"  "$ENVS"
-exp_check "arm A reported Mesa on every environment"    "$A_MESA"  "$ENVS"
-exp_check "arm A loaded no host shared object"          "$A_CLEAN" "$ENVS"
+printf '\n  ⚠ A:exit is eglinfo'"'"'s own convention -- the NUMBER OF PLATFORMS\n'
+printf '    THAT FAILED to initialise. %s here, on every row and on the build\n' "$HOST_EXIT"
+printf '    host: GBM, Wayland and X11, none of which exists in a rootfs with\n'
+printf '    no display and no DRM node. Surfaceless is the one that can work\n'
+printf '    and it is the one the vendor and driver columns read.\n\n'
+exp_check "arm A: surfaceless EGL reports Mesa on every environment" "$A_MESA"  "$ENVS"
+exp_check "arm A: a driver is named on every environment"            "$A_DRV"   "$ENVS"
+exp_check "arm A: every target agrees with the build host's exit"    "$A_SAME"  "$ENVS"
+exp_check "arm A loaded no host shared object"                       "$A_CLEAN" "$ENVS"
 # ⛔ THE CONTROL. If this is not zero, the bundle is not what produced the
 # vendor string above and every conclusion in T-052 has to be re-read.
+# ⭐ Measured: arm B's EGL CLIENT EXTENSIONS STRING IS EMPTY and it reports one
+# "Default display platform: eglInitialize failed". libglvnd with no vendor
+# does not know the surfaceless platform extension exists, so it cannot even
+# enumerate the platform that works in arm A.
 exp_check "arm B (no bundled mesa) reported NO vendor anywhere" "$B_MESA" 0
 
 # ---------------------------------------------------------------------------
