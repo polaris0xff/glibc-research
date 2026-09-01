@@ -1,0 +1,5 @@
+== alpine-3.22 (musl) arm P
+   status  : ok
+   startup : cold 14605 ms, best-of-5 warm 14564 ms
+   objects : host=0 bundled=6
+   host .so: 

@@ -51,8 +51,10 @@ four small C runtime pieces. Output is an ordinary statically linked
 executable. No launcher, no AppDir, no loader, nothing beside it.
 
 **The answer reached: yes, for programs that do not need to load host
-plugins.** Five real projects prove it; §7 has the open problems and the route
-to each.
+plugins.** ⭐ **Nine real projects prove it, and the largest is Qt 6** — a
+static Qt 6.11.1 widget program runs on 11 of 11 with zero host shared
+objects, which is the rung `poc/80-mlt` named as untried and nobody had
+attempted. §7 has the open problems and the route to each.
 
 ⛔ **`pgb` is a TOOLCHAIN, not a delivery format**, and comparing it to one
 gets the next step wrong. AppImage, Flatpak, snap and onelf answer *how does
@@ -287,9 +289,20 @@ experiment; none has been shown to be unreachable.
    the machine's own hostname via `libnss_myhostname` and the pgb binary does
    not.
 3. **Five host *data* dependencies exist and static linking touches none of
-   them.** gconv ✅ solved (static libiconv), locale ✅ solved (opt-in),
-   **terminfo ⛔ unsolved**, **CA bundle ⛔ unsolved**, a runtime's own library
-   tree ⚠ shipped (CPython's 98 MiB stdlib).
+   them.** ⭐ **Four are now solved and the fifth is shipped rather than
+   solved**: gconv ✅ (static libiconv), locale ✅ (opt-in `--embed-locale`),
+   terminfo ✅ (opt-in `--embed-terminfo`, `setupterm(xterm-256color)` on 11 of
+   11 including three Alpines with no terminfo tree), CA bundle ✅ (opt-in
+   `--embed-cacert`, curl verifying real TLS on 11 of 11 with the harness's own
+   CA variables unset), a runtime's own library tree ⚠ shipped (CPython's
+   98 MiB stdlib). `TODO` T-032, closed on `poc/20-nano` and `poc/30-curl`.
+   ⭐ **The finding that shaped both opt-in mechanisms**: most failures were
+   never *"this machine has no certificates"* — the data was there on a path
+   the binary had never been told about. So the first layer is to **look**, and
+   the embedded copy is a fallback. ⛔ That order is a **security** property and
+   is asserted as one: a binary preferring its own stale snapshot over a store
+   an administrator maintains would be a regression wearing a portability
+   fix's clothes.
 4. **`-static` resolves what dynamic linking defers**, so an
    incompletely-static optional dependency fails the link (CPython's `nis` via
    `libtirpc`/GSSAPI).
@@ -336,12 +349,14 @@ one kernel is not "works on Linux".
 | `pgb` podman engine | **UNTESTED** — podman is absent here. The code path is shared with docker except the binary name |
 | `pgb verify --engine` | **COMPLETE for chroot and docker**, and green on a runner in [run 14](https://github.com/polaris0xff/glibc-research/actions/runs/33512788793). Both arms agree on all 11 rows for both asserted columns; criterion 2 under docker is measured by `tool/runtime/pgb-trace.c`, a `ptrace` open-tracer carried into the container. ⚠ `unmeasured`, never `none`, when it cannot attach. podman untested |
 | NSS / iconv / locale mechanisms | **COMPLETE** — 11 of 11 each |
-| POCs 10 gawk, 20 nano, 30 curl, 40 jq, 50 CPython, 60 LevelDB, 70 SQLite, 80 MLT | **COMPLETE** — all 11 environments each |
+| POCs 10 gawk, 20 nano, 30 curl, 40 jq, 50 CPython, 60 LevelDB, 70 SQLite, 80 MLT, **90 Qt 6** | **COMPLETE** — all 11 environments each |
 | CI workflow | ⭐ **GREEN**, 15 jobs, [run 14](https://github.com/polaris0xff/glibc-research/actions/runs/33512788793) — and it now asserts §3 criterion 2, not just exit status, through `pgb verify --engine docker`. ⚠ It was not unrun before: it ran 10 times and was red 10 times, and the two red rows never executed a binary — GitHub's Node.js cannot start in a musl container. `history/corrections.md` C8. ⭐ Run 13 caught a real defect, the first time this workflow has found one rather than reported one |
 | ⭐ `pgb nix` (plan / fetch / build) | **WORKING** — nixpkgs is the planner, `pgb` builds static glibc. bash, gawk, jq, sqlite3, htop and tmux built from nixpkgs plans; bash and htop verified 11 of 11 with zero host objects. A dependency walk builds `buildInputs` into a shared static prefix; an adaptation loop drops the flags whose libraries could not be built, one per round, each recorded. `docs/research/nix.md` |
 | ⭐ `tool/nix-appimage.sh` | **WORKING for the mesa case** — uruntime + dwarfs + sharun rather than nix-appimage's squashfs + bwrap, with the nixpkgs **closure** replacing sharun's ldd-and-strace library discovery. galculator reaches GTK on musl; mesa-demos reports `EGL vendor: Mesa Project`, `driver: swrast` with no GPU and no host GL. ⛔ NVIDIA cannot be bundled, nothing is debloated, and nothing has been compared to a hand-built AppImage. `TODO` T-052, T-057 |
+| `experiments/85-opengl.sh` | **COMPLETE** — ⭐ the bundled GL stack on all eleven: `EGL vendor string: Mesa Project`, `driver: swrast`, **11 of 11, zero host shared objects**, against a `--no-gl` control that produces no vendor anywhere. The GL stack is **95 MiB** of the 163 MB bundle. ⛔ No GPU is present, so every row is software rasterisation and NVIDIA is untouched — `TODO` T-059 |
+| `experiments/86-bundler-vs-anylinux.sh` | our one-command bundle against a hand-built Anylinux AppImage — size, startup and host-object columns for the same application |
 | aarch64 | **UNTESTED** |
-| host `dlopen`, terminfo, CA bundle | **KNOWN LIMITATION** — §7 |
+| host `dlopen` | **KNOWN LIMITATION** — §7. ⭐ terminfo and the CA bundle are no longer on this row: both are solved opt-in mechanisms, 11 of 11 each |
 
 **POCs**, all stock tarballs, stock `./configure`, **no source patches**:
 
@@ -354,6 +369,7 @@ one kernel is not "works on Linux".
 | 50 | CPython 3.12.7 | 49 extension modules linked **in**, `lib-dynload` empty, NSS via `socket`/`pwd` |
 | 60 | LevelDB 1.23 + a C++ subject | ⭐ the first **C++** and first **CMake** POC: static init order, exception unwinding across a static link, RTTI/typeid across TUs, iostreams. Found that no C++ program linked at all — libstdc++ calls `iconv` and `-lstdc++` is scanned after `-lpgbruntime` |
 | 80 | **ffmpeg 7.1 + MLT 7.30.0 — kdenlive's ENGINE** | ⭐ the operator's challenge, taken seriously. A **105 MB static `melt`** with eight `dlopen`'d modules and the whole of ffmpeg compiled in, rendering a real MP4 on 11 of 11. ⛔ Found two failures worth having: MLT hard-codes `add_library(mlt SHARED)`, so `-static` cannot consume it and the answer is a link line rather than a patch; and its `avformat` module cannot be built as a shared object against a static ffmpeg while **the same objects link into a static executable perfectly**. Stops at Qt/KF6, said so |
+| 90 | **Qt 6.11.1 (qtbase), static** | ⭐ **the rung nobody had attempted.** `-static -force-bundled-libs`, offscreen QPA, 11 of 11 with zero host objects. Its plugins come out as **static archives** — `qoffscreen`, `qminimal`, `qjpeg`, `qico`, `qgif` — so `Q_IMPORT_PLUGIN` puts them in the link and `dlopen` is never called. ⛔ Found that pgb's own `-march=x86-64` was overriding every project's per-file ISA selection: `history/corrections.md` C15 |
 | 70 | SQLite 3.47.0 + **15** of its own `ext/misc` extensions | ⭐ **an OPEN plugin ABI with no way to link a plugin in.** `.load` calls `dlopen()` on a path the *user* names and derives the entry point from the filename, so there is no `Setup.local` equivalent. Fifteen plugins, **plugin directory created empty**, 11 of 11. Found that all 16 extensions define `sqlite3_api` and any two collided at link time — fixed with per-plugin symbol namespacing |
 
 ## 10. Overhead
@@ -523,12 +539,13 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
      comparable is not worth shipping, and emitting an anylinux AppImage is a
      legitimate answer.
 
-4. **`--embed-terminfo`.** The mechanism is already proven by `--embed-locale`
-   and ncurses reads `TERMINFO` from the environment, so it is the same shape.
-   Decide first whether a *glibc* portability tool should own a terminal
-   database — §7.3 argues both ways.
-5. **A CA-bundle answer.** Same shape again (`SSL_CERT_FILE`). One compiled-in
-   path works on 5 of 11.
+5. ✅ **`--embed-terminfo` and `--embed-cacert` are DONE**, `TODO` T-032, and
+   this item is kept only so the next reader does not re-plan them. Both are
+   opt-in, both are proven on 11 of 11 by `poc/20-nano` and `poc/30-curl`, and
+   both **look for the host's data first** — which is a security property for
+   the CA case and is asserted as one against an independent oracle. What is
+   still open in this family is the fifth data dependency: a runtime's own
+   library tree, which is shipped rather than solved (CPython's 98 MiB stdlib).
 6. **Second machine, second kernel.** Every number here is one machine.
 7. **Sweep depth.** `allyourcodebase/pipewire` was fetched and never read;
    sharun, userland-execve-rust, ppkg and elftool were read at README/file-list
