@@ -230,6 +230,7 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 | [`limitations.md`](limitations.md) | what it cannot do, each with a reproduction |
 | [`comparison.md`](comparison.md) | approaches table; dashes where nothing was measured |
 | [`research/prior-art.md`](research/prior-art.md) | the reference sweep, verdicts, provenance |
+| [`design/tiers.md`](design/tiers.md) | ⛔ **design only, nothing built.** The tiered-output plan for covering the host-plugin class, and what "universal" can honestly mean |
 | [`history/corrections.md`](history/corrections.md) | ⚠ claims measured wrong, instrument defects, refused approaches. **Read on demand, not to orient.** |
 
 ## 12. Provenance
@@ -269,8 +270,9 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
    Nothing has been run. Expect IFUNC and CPU-baseline questions that x86_64
    did not raise.
 3. **A second output mode, for the host-plugin class — the one thing that
-   would make this universal rather than broad.** `experiments/50-` has already
-   done the feasibility work and the answer is precise:
+   would broaden this beyond its current class.** Full plan and the honest
+   limits of the idea: [`design/tiers.md`](design/tiers.md). `experiments/50-`
+   has already done the feasibility work and the answer is precise:
 
    - ⛔ **Do not port cross-libc-dlopen into the static output.** Measured: no
      effect on any of 11. The failure class it fixes does not occur here.
