@@ -199,11 +199,39 @@ case "$CMD" in
   attr)
     [ -n "$ARG" ] || die "attr needs an attribute path, e.g. jq" 2
     _at=$(attrs_file) || exit 1
-    _row=$(awk -F'\t' -v a="$ARG" '$1 == a { print; exit }' "$_at")
-    [ -n "$_row" ] || die "no attribute '$ARG' in the $CHANNEL index" 1
+    # ⭐ THREE MATCHES, IN ORDER, AND THE ANSWER SAYS WHICH ONE HIT AND HOW
+    # MANY CANDIDATES THERE WERE. The attribute path is tried first, then
+    # `pname`, then the derivation NAME.
+    #
+    # ⛔ AND A TIE IS BROKEN BY DEPTH, BECAUSE THE FIRST ROW IS THE WRONG
+    # ANSWER. Matching `sed` on pname alone returns `freebsd.sed` -- a real
+    # package, for the wrong operating system's userland, indistinguishable
+    # from a correct answer once it is one line of output. A top-level
+    # attribute beats a nested one, and a shorter path beats a longer one.
+    #
+    # ⛔ Only rows for the system asked for are eligible: the file has a row
+    # per system and a pname match would otherwise hand back a darwin build,
+    # which is the defect that started this whole route.
+    _row=$(awk -F'\t' -v a="$ARG" -v sys="$SYSTEM" '
+      function depth(p,  n) { n = gsub(/\./, ".", p); return n }
+      $5 != sys && $5 != "" { next }
+      { rank = 0
+        if ($1 == a)      rank = 3
+        else if ($3 == a) rank = 2
+        else if ($2 == a) rank = 1
+        else next
+        d = depth($1)
+        if (rank > brank || (rank == brank && (d < bdepth || (d == bdepth && length($1) < length(brow_attr))))) {
+          brank = rank; bdepth = d; brow = $0; brow_attr = $1
+        }
+        cand[rank]++
+      }
+      END { if (brank) { printf "%s\t%d\t%d\n", brow, brank, cand[brank] } }' "$_at")
+    [ -n "$_row" ] || die "no attribute, pname or name '$ARG' for $SYSTEM in the $CHANNEL index" 1
     printf '%s\n' "$_row" | awk -F'\t' '{
-      printf "Attr: %s\nName: %s\nPname: %s\nVersion: %s\nSystem: %s\nOutputName: %s\nOutputs: %s\n",
-             $1,$2,$3,$4,$5,$6,$7 }'
+      how = ($8 == 3 ? "attr" : ($8 == 2 ? "pname" : "name"))
+      printf "Attr: %s\nName: %s\nPname: %s\nVersion: %s\nSystem: %s\nOutputName: %s\nOutputs: %s\nMatched: %s\nCandidates: %s\n",
+             $1,$2,$3,$4,$5,$6,$7,how,$9 }'
     ;;
 
   drv)
@@ -213,12 +241,37 @@ case "$CMD" in
     # 3%/1%/47%; this route has no such ceiling because it is an index of
     # builds rather than a field somebody happened to upload.
     [ -n "$ARG" ] || die "drv needs an attribute path, e.g. jq" 2
+    # ⭐ THE NAME THE CALLER TYPED IS NOT ALWAYS THE ATTRIBUTE. hydra's jobs
+    # are named by ATTRIBUTE, so `grep` has no job and `gnugrep` does. The
+    # attribute index knows the mapping; when it does not have the name at
+    # all, the caller's own string is tried unchanged so a jobset attribute
+    # that never reached a channel still works.
+    _attr=$(sh "$0" attr "$ARG" --channel "$CHANNEL" --system "$SYSTEM" 2>/dev/null \
+            | sed -n 's/^Attr: //p')
+    _how=$(sh "$0" attr "$ARG" --channel "$CHANNEL" --system "$SYSTEM" 2>/dev/null \
+           | sed -n 's/^Matched: //p')
+    [ -n "$_attr" ] || _attr="$ARG"
+    # ⚠ A MATCH THAT WAS NOT AN EXACT ATTRIBUTE IS SAID OUT LOUD. `sed`
+    # resolves through `pname` to `freebsd.sed`, which is a real package for
+    # the wrong userland and reads exactly like a correct answer otherwise.
+    if [ "$_attr" != "$ARG" ]; then
+      note "nix-fetch: $ARG -> attribute $_attr (matched by ${_how:-?})"
+    fi
+    ARG="$_attr"
     _hj="$CACHE/hydra/$(printf '%s' "$JOBSET/$ARG.$SYSTEM" | tr '/' '_').json"
     mkdir -p "$CACHE/hydra"
     if [ ! -s "$_hj" ]; then
       _hu="https://hydra.nixos.org/job/$JOBSET/$ARG.$SYSTEM/latest-finished"
-      curl -sSfL -m 120 -H 'Accept: application/json' "$_hu" -o "$_hj.part" \
-        || { rm -f "$_hj.part"; die "hydra has no finished build for $ARG.$SYSTEM in $JOBSET" 1; }
+      # ⛔ THE ERROR MUST NAME THE FAILURE IT HAD, NOT THE ONE IT EXPECTED.
+      # This said "hydra has no finished build" for a TLS failure (an
+      # unreadable CA bundle inside a chroot), which sends the reader to look
+      # for a package that is plainly there.
+      if ! curl -sSfL -m 120 -H 'Accept: application/json' "$_hu" -o "$_hj.part" \
+             2>"$CACHE/hydra/.curl.err"; then
+        rm -f "$_hj.part"
+        sed 's/^/  /' "$CACHE/hydra/.curl.err" >&2 2>/dev/null || true
+        die "could not reach $_hu (see the curl error above)" 1
+      fi
       mv "$_hj.part" "$_hj"
     fi
     python3 "$IDX_PY" hydra "$_hj" --system "$SYSTEM" || exit 1

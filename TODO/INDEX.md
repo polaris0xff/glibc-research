@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 32  OPEN 16  DONE 16
+    TOTAL 33  OPEN 16  DONE 17
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 0 | 0 | 0 |
-| P1 | a documented capability does not work, or a flag does nothing | 24 | 8 | 16 |
+| P1 | a documented capability does not work, or a flag does nothing | 25 | 8 | 17 |
 | P2 | worth doing; nothing is wrong without it | 8 | 8 | 0 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -39,7 +39,7 @@ pretending to be one.
 | T-033 | P1 | L | open | runtime | Route D: compile an ELF loader in, resolve against our own static glibc |
 | T-040 | P1 | S | done | ci | Run CI once |
 | T-041 | P2 | M | open | ci | aarch64 |
-| T-050 | P1 | M | ⚠partly | toolchain | Plan a nixpkgs package with NO nix, from the `.drv` in the cache |
+| T-050 | P1 | M | done | toolchain | Plan a nixpkgs package with NO nix, from the `.drv` in the cache |
 | T-051 | P1 | M | open | toolchain | Enough nix for a host with no root, no docker and no nix |
 | T-052 | P1 | M | done | research | The libGL problem, and whether a bundle can claim "universal" |
 | T-053 | P2 | S | open | research | patchelf and patsh: use them, or say why not |
@@ -49,6 +49,7 @@ pretending to be one.
 | T-057 | P1 | L | ⚠started | research | The bundler: a maintained nix-appimage descendant on the Anylinux mechanisms |
 | T-058 | P1 | S | done | toolchain | Two `pgb build`s at once share one wrapper directory |
 | T-059 | P1 | M | open | research | GL on real hardware, and the NVIDIA case |
+| T-060 | P1 | L | open | toolchain | ⭐ Static-glibc nix: no root, no docker, no nix |
 
 ## The argument behind the ordering
 

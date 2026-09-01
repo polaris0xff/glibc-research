@@ -25,7 +25,14 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
 ## In flight
 
-    nothing yet -- session just started, bootstrap running detached
+    T-058 CLOSED   experiments/87-, 8 assertions, the control reproduces the
+                   old behaviour 5 of 5. pgb build is concurrency-safe now.
+    T-050 CLOSED   experiments/88-, 25 assertions. hydra's job API is the
+                   name->derivation index; 19 of 20 against Deriver's 9 of 20,
+                   drvpaths byte-identical to nix-instantiate's.
+    T-051 step 1   jq planned, fetched AND BUILT at uid 12000 with no nix and
+                   no /nix. What is left is a host with NO COMPILER = T-060.
+    T-060 NEXT     ⭐ static-glibc nix, three rungs. This is the flagship.
 
 ## ⛔ Machine notes a fresh session cannot infer
 

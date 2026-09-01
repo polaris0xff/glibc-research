@@ -613,15 +613,26 @@ PY
 }
 
 nix_build_dep() {   # drv shortname depth
-  _bd_pfx=$(nix_prefix) || { warn "no nix, so a dependency cannot be planned"; return 1; }
   _bd_plan="$PGB_STATE/plans/dep-$2.json"
   mkdir -p "$PGB_STATE/plans"
   if [ ! -s "$_bd_plan" ]; then
-    "$_bd_pfx/nix" derivation show "$1" --recursive 2>/dev/null \
-      | python3 "$PGB_SELF/tool/nix-plan.py" "$2" "$1" --nix-prefix "$_bd_pfx" \
-      > "$_bd_plan.part" 2>/dev/null || {
-        rm -f "$_bd_plan.part"; warn "could not plan $2 from $1"; return 1; }
-    mv "$_bd_plan.part" "$_bd_plan"
+    # ⭐ THE DEPENDENCY'S OWN .drv IS ALREADY IN THE PARENT'S PLAN, so planning
+    # it needs no evaluation and therefore no nix. This used to open with
+    # `nix_prefix() || warn "no nix, so a dependency cannot be planned"`, which
+    # made the whole nix-free route stop at the first package with a real
+    # dependency -- measured on jq, whose oniguruma could not be planned
+    # inside a rootfs with no nix even though the parent plan named its
+    # derivation path.
+    if ! nix_plan_from_drv "$1" "$2" "$_bd_plan"; then
+      # The evaluated route stays as the fallback for a .drv the cache does
+      # not have -- anything built locally, or garbage-collected.
+      _bd_pfx=$(nix_prefix) || { warn "could not plan $2 from $1 without nix, and there is no nix"; return 1; }
+      "$_bd_pfx/nix" derivation show "$1" --recursive 2>/dev/null \
+        | python3 "$PGB_SELF/tool/nix-plan.py" "$2" "$1" --nix-prefix "$_bd_pfx" \
+        > "$_bd_plan.part" 2>/dev/null || {
+          rm -f "$_bd_plan.part"; warn "could not plan $2 from $1"; return 1; }
+      mv "$_bd_plan.part" "$_bd_plan"
+    fi
   fi
 
   # ⚠ DEPTH FIRST: a dependency's own dependencies go in before it does, or it

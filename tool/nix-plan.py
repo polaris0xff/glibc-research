@@ -33,6 +33,51 @@ def sh(cmd):
         return ""
 
 
+def norm_hash(h):
+    """⛔ ONE ENCODING FOR ONE HASH, because two routes produced two.
+
+    A raw `.drv` writes a fixed-output hash as lowercase hex; `nix derivation
+    show` writes the SAME hash as SRI (`sha256-<base64>`); nix-base32 turns up
+    in narinfos. Left alone, a plan built without nix and a plan built by
+    evaluation differ in exactly one field -- `src.outputHash` -- and the
+    difference reads like a disagreement about the source when the bytes are
+    identical. Measured on jq 1.8.2:
+
+        71b8d6e8f5fe81f6...  ==  sha256-cbjW6PX+gfbG0NEQ44kiUfbOdu0JWr0xXibm4Rk6868=
+
+    Anything this does not recognise is returned unchanged, so an unexpected
+    encoding stays visible instead of becoming an empty string.
+    """
+    import base64
+    import binascii
+
+    if not isinstance(h, str) or not h:
+        return h
+    v = h
+    for pfx in ("sha256:", "sha256-", "sha512:", "sha512-", "sha1:", "sha1-",
+                "md5:", "md5-"):
+        if v.startswith(pfx):
+            v = v[len(pfx):]
+            break
+    low = v.lower()
+    if len(low) in (32, 40, 64, 128) and all(c in "0123456789abcdef" for c in low):
+        return low
+    # nix-base32: 52 characters for a sha256, alphabet without e/o/u/t.
+    NIX32 = "0123456789abcdfghijklmnpqrsvwxyz"
+    if len(v) == 52 and all(c in NIX32 for c in v):
+        n = 0
+        for c in reversed(v):
+            n = n * 32 + NIX32.index(c)
+        return "%064x" % (n & ((1 << 256) - 1))
+    try:
+        raw = base64.b64decode(v + "=" * (-len(v) % 4), validate=True)
+        if len(raw) in (16, 20, 32, 64):
+            return binascii.hexlify(raw).decode()
+    except Exception:
+        pass
+    return h
+
+
 def split_ws(s):
     """Normalise a derivation attribute to a list of strings.
 
@@ -156,7 +201,7 @@ def main(argv):
         if not h:
             continue
         urls = split_ws(e.get("urls")) or split_ws(e.get("url"))
-        rec = {"drv": full_store(path), "outputHash": h, "urls": urls}
+        rec = {"drv": full_store(path), "outputHash": norm_hash(h), "urls": urls}
         by_name.setdefault(d.get("name") or e.get("name") or "", []).append(rec)
 
     def resolve(store_path):
@@ -180,7 +225,7 @@ def main(argv):
             d = drvs[os.path.basename(drv)]
             e = env_of(d)
             rec["urls"] = split_ws(e.get("urls")) or split_ws(e.get("url"))
-            rec["outputHash"] = (
+            rec["outputHash"] = norm_hash(
                 d.get("outputs", {}).get("out", {}).get("hash")
                 or e.get("outputHash")
                 or ""
@@ -191,7 +236,7 @@ def main(argv):
             for u in c["urls"]:
                 if u not in rec["urls"]:
                     rec["urls"].append(u)
-            rec["outputHash"] = rec["outputHash"] or c["outputHash"]
+            rec["outputHash"] = rec["outputHash"] or norm_hash(c["outputHash"])
         return rec
 
     def dep_names(key):

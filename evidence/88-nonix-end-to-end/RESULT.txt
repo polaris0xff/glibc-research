@@ -1,0 +1,21 @@
+88 - plan, fetch and BUILD a nixpkgs package with no nix, no root
+
+arm 1, name -> derivation over 83-'s own twenty packages:
+  hydra route          19 resolved, 1 not
+  narinfo Deriver route 9 resolved, 11 not
+
+arm 2, the control: drvpath against a local nix-instantiate
+  identical: 4   differing: 0
+
+arm 3, no-nix plan vs evaluated plan, field by field: 19/19
+
+arm 4, the platform defect:
+  store paths named nix-2.35.2 in one index: 3
+  attr jq -> System x86_64-linux, OutputName bin
+  attr bash -> Name bash-interactive-5.3p15
+
+arm 5, inside a host with a toolchain and neither nix nor root:
+  uid=12000 nix-on-path=no /nix=absent build-rc=0
+  binary: /var/tmp/pgb-exp88/home/jqbuild/out/jq
+
+conditions: 2026-09-01T22:08:51Z, Linux 6.18.44-fc-v22

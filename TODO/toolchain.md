@@ -620,7 +620,7 @@ Same class as T-014: a documented capability quietly doing something else.
 **Source** ⭐ **operator, session of 2026-09-01c**, quoted because the question
 is the finding: *"I think the downloaded nix store files themselves contain
 \*.drv files? so we don't actually need nix installed no?"*
-**Category** toolchain · **Priority** P1 · **Effort** M · **Status** ⚠partly
+**Category** toolchain · **Priority** P1 · **Effort** M · **Status** done
 
 **They are right, and it is measured.** A narinfo names its own producer
 (`Deriver: <hash>-<name>.drv`), that `.drv` is **itself a store path in the
@@ -650,6 +650,85 @@ and falls back to evaluation.
 sample, a plan built by both routes for the same package **compared field by
 field**, and the no-nix route driven with nix removed from `PATH`.
 
+## ⭐ CLOSED — `experiments/88-nonix-end-to-end.sh`, 25 assertions, 0 fail
+
+⛔ **The fallback is built, and it is not an evaluator.** The three items above
+are answered by an index nobody in this tree had looked for: **hydra built the
+channel**, so it holds the derivation for every job it ran.
+
+    hydra.nixos.org/job/<project>/<jobset>/<attr>.<system>/latest-finished
+      -> drvpath, system, and every output's store path
+
+That is an index of **builds** rather than a field somebody happened to upload
+beside a NAR, so `Deriver:` availability does not bound it. Measured on
+**83-'s own twenty packages, with 83-'s own predicate** (the narinfo names a
+Deriver **and** that `.drv` is fetchable), so the two numbers compare:
+
+| route | resolved | not |
+|---|---|---|
+| ⭐ **hydra** | **19** | 1 |
+| narinfo `Deriver:` | 9 | 11 |
+
+⭐ **And the one miss is not a gap in the route**: there is no `grep` attribute
+in nixpkgs, there is `gnugrep`. Asserted both ways, so "19 of 20" cannot be
+read as a 5% failure rate.
+
+⭐ **The control that makes it evidence.** An index can be confidently wrong.
+For `jq`, `gawk`, `zlib` and `openssl` the drvpath hydra returns is
+**byte-identical** to the one a local `nix-instantiate` computes — same 32-character
+hash — so the index is naming the derivation an evaluator *would* compute, not
+a similar one. And the two routes' **plans agree on 19 of 19 comparable
+fields**.
+
+### ⭐ Item 2 is answered by a second index: `packages.json.br`
+
+It sits beside `store-paths.xz` in the same pinned release directory, is served
+with `Content-Encoding: br` so `curl --compressed` decodes it with **no brotli
+library on the host**, and carries per attribute:
+
+| | |
+|---|---|
+| `Name` | `bash` → **`bash-interactive-5.3p15`**, which `docs/research/nix.md` finding 3b says no name match can know |
+| `OutputName` | `jq` → **`bin`**, which is the case `tool/nix-appimage.sh` got wrong once |
+| `System` | **x86_64-linux**, which is the defect below |
+| `Pname` | so `sed` can reach an attribute at all |
+
+### ⛔ THE DEFECT THIS FOUND, AND IT HAD BEEN THERE FROM THE START
+
+**`store-paths.xz` is every system the channel built.** Resolving `nix-2.35.2`
+by name in this tree returned an **aarch64-darwin** build — fetched, signature
+verified, NarHash checked, and a **Mach-O arm64 executable**. Nothing in the
+route could tell. What gave it away was its closure: 57 paths **with no glibc
+in it**, and two Apple-only libraries (`libiconv-115.100.1`, `libresolv-96`).
+The index has **three** store paths named `nix-2.35.2`.
+
+⭐ Every route that can know the system now states it, and a system nobody
+builds is **refused** rather than answered with whatever sorted first. A match
+that was not an exact attribute says so too: `sed` reaches **`freebsd.sed`**
+through `pname` — a real package for the wrong userland — and the answer
+carries `Matched: pname` rather than passing it off as an attribute.
+
+### ⛔ Two more defects, each of which produced a plausible result
+
+- **The streaming reader for `packages.json` dropped a whole chunk on every
+  refill**: 103,571 attributes of 149,812, a **31% loss that looks exactly like
+  an index**. Caught by comparing against `json.load`'s count on the same file.
+  The selftest now runs the walk at four chunk sizes against that control.
+- **`nix-plan.py` read dependency derivations out of `env` and ignored
+  `structuredAttrs`**, so `src.urls` was **empty for every package on BOTH
+  routes** and the upstream-URL fetch fallback — the one that still works when
+  a path was never uploaded or has been garbage-collected — had never once been
+  exercised.
+- **`src.outputHash` came out in two encodings**, hex from the raw `.drv` and
+  SRI from `nix derivation show`, so the two routes' plans differed in exactly
+  one field and it read like a disagreement about the source when the bytes
+  were identical. Normalised to hex.
+
+**Item 3** — the fallback chain covered by one test — is `experiments/88-`
+itself: arm 1 exercises hydra, arm 1's Deriver column exercises the channel
+index, arm 3 exercises evaluation, and `PGB_NIX_NO_HYDRA=1` and
+`PGB_NIX_FORCE_EVAL=1` select the lower rungs.
+
 ## T-051 — Enough nix for a host with no root, no docker and no nix
 
 **Source** operator, 2026-09-01c: *"find the least invasive way to 'install'
@@ -677,6 +756,49 @@ container form of the same and needs a container.
 
 ⛔ **Not `curl | sh` as root.** That is what this environment did once, on the
 operator's explicit authorisation, and it is not the shape the entry is for.
+
+## ⭐ STEP 1 IS DONE AND IT WENT FURTHER THAN THE ENTRY EXPECTED
+
+`experiments/88-nonix-end-to-end.sh` arm 5, **8 assertions, 0 fail**. A rootfs
+with a C toolchain and nothing else — and jq **planned, fetched, its
+dependency planned and built, and itself built**, inside it:
+
+    uid=12000            not root
+    nix on PATH          no
+    /nix                 absent
+    a C compiler         yes
+    build exit status    0
+    the binary           4,129,368 B, no PT_INTERP, and `.a[1]` on
+                         {"a":["x","é中"]} answers é中
+
+⛔ **One defect had to be fixed for the dependency to build**, and it is the
+one that would have stopped this entry at the first real package.
+`nix_build_dep` opened with `nix_prefix() || warn "no nix, so a dependency
+cannot be planned"` — so the nix-free route reached exactly as far as a package
+with no dependencies. **The dependency's own `.drv` is already in the parent's
+plan**, so planning it needs no evaluation: `nix_plan_from_drv` now serves it
+and the evaluated route is the fallback. jq's oniguruma is planned from
+5 derivations fetched over HTTPS and built into the shared prefix, with no nix
+anywhere.
+
+⚠ **What arm 5 does NOT show, stated rather than implied:**
+
+- **The chroot is the harness, not the claim.** It is how a host with no `nix`
+  and no `/nix` is produced on a machine that has both. Everything asserted is
+  about what the process inside could see and do, and it drops to uid 12000
+  before `pgb` is reached.
+- ⛔ **The host still needs a C toolchain.** `pgb` is a build tool; the rootfs
+  used is `pgb-env-debian12`, which has gcc and the static libiconv. A host
+  with *no compiler* is not served by this and is what step 2 (a carried,
+  relocatable toolchain) is for.
+- **This environment's CA bundle lives under `/root`**, which uid 12000 cannot
+  read; a readable copy travels in with the harness. The first run failed on
+  exactly that and `nix-fetch` reported it as *"hydra has no finished build for
+  jq"* — an error naming the failure it expected instead of the one it had.
+  Fixed: curl's own message is printed.
+
+**What is left on this entry** is steps 2 and 3 — a host with **no compiler**
+— which is `T-060`, the static-glibc nix.
 
 ## T-056 — Port the python helpers to Rust
 
@@ -779,3 +901,54 @@ for the wrong reason. ⚠ The other consequence of that isolation is a cost, not
 a safety property: **every docker build recompiles the pgb runtime objects from
 scratch**, because the cache `runtime_dir()` maintains never survives the
 container. Not fixed here; it is a performance entry, not a correctness one.
+
+## T-060 — ⭐ STATIC-GLIBC nix: the entry that makes "no root, no docker, no nix" true
+
+**Source** ⭐ **operator, session of 2026-09-01e**, quoted because the framing
+is the entry: *"nixpkgs' pkgsStatic is musl and this project is the glibc half.
+Produce a static-glibc nix toolchain path end to end: pgb builds nix's own
+dependency closure static, or carries enough of one to plan and fetch on a host
+with nothing. `nixie-dev/nixie` is the shape the operator named. This is the
+entry that makes 'no root, no docker, no nix' true rather than aspirational."*
+**Category** toolchain · **Priority** P1 · **Effort** L · **Status** open
+
+**Why it exists, given T-050 closed.** `experiments/88-` arm 5 plans, fetches
+and builds a nixpkgs package on a host with **no nix and no root** — and it
+still needs **a C toolchain on that host**. Two cases are left:
+
+1. a host with no compiler at all;
+2. the cases the index route cannot reach by construction — an override, an
+   overlay, a `pkgsStatic.*` attribute, anything hydra never built — which need
+   **evaluation**, and evaluation needs a nix binary.
+
+⛔ **And nixpkgs has no static-glibc nix to fetch.** `pkgsStatic` is musl,
+measured (`docs/research/nix.md` finding 1), and this project is the glibc half.
+
+**The three rungs, and each is recorded whether it is reached or not** — the
+shape `poc/90-qt` used:
+
+| rung | what |
+|---|---|
+| 1 | nix's dependency closure built **static-glibc by pgb** — how far the dependency walk gets, dependency by dependency, with what stopped each one it could not |
+| 2 | nix itself linked against them: a `nix-instantiate` with no `PT_INTERP` |
+| 3 | that binary evaluating a nixpkgs attribute **inside a rootfs with no nix, no `/nix` and no root**, on the eleven |
+
+⚠ **The honest risks, named now.** nixpkgs builds nix as **eight component
+derivations** (`nix-util`, `nix-store`, `nix-expr`, `nix-fetchers`,
+`nix-flake`, `nix-main`, `nix-cmd`, `nix-cli`) under meson, not one autotools
+tree; its closure carries **boost, libgit2, libarchive, lowdown, editline,
+sqlite, curl+openssl, libsodium, brotli, toml11 and the AWS CRT**, and the AWS
+half is optional while boost is not. Any one of those can refuse `-static` the
+way MLT's `add_library(mlt SHARED)` did.
+
+⭐ **A cheaper second reading of the same goal, which the operator allowed:**
+*"or carries enough of one"*. `scripts/common/nix-fetch.sh` already fetches
+nix's own closure from `cache.nixos.org` with no nix and no root — 57 store
+paths, 142 MB, signature and NarHash checked — and `experiments/80-` arm 5
+already showed that a nixpkgs binary handed **the loader fetched beside it**
+runs in a rootfs with no `/nix`. That is a relocatable nix without a single
+line of C, and it is the fallback rung if the static build stops.
+
+**Prove.** `evidence/89-static-nix/RESULT.txt`: the rung reached, with the
+error and the file it came from for the rung that stopped — plus, for any rung
+reached, `nix-instantiate` naming a derivation inside a rootfs that has no nix.
