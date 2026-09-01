@@ -1,0 +1,60 @@
+===============================================================
+80 - reaching nixpkgs with no nix, and what comes back
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-01T16:29:35Z
+host kernel  : Linux 6.18.44-fc-v22
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/80-nix-without-nix
+--------------------------------------------------------------
+
+        oracle: nix (Determinate Nix 3.22.2) 2.35.2
+
+-- arm 1: resolve a package name with no nix -------------------
+  ok    the channel redirect names a revision          = yes
+        channel revision: 26.11pre1063758.e8be7818e19a
+  ok    the index answers a name query                 = yes
+        store paths matching 'bash' in this channel: 251
+
+-- arm 2: verification, and what happens when it should fail ---
+  ok    a real narinfo verifies (offline fixture)      = yes
+  ok    a narinfo with one field changed is refused    = refused
+  ok    the same narinfo under a flipped key is refused = refused
+
+-- arm 3: the dependency closure -------------------------------
+  ok    a closure comes back over plain HTTPS          = yes
+        closure size: 5 paths
+        /nix/store/9ipfvwnqp1q8ijnmi5sxvlx9r8w34lw3-bash-5.3p15
+        /nix/store/n51dhmdbik1kfrsm62j5knavmigwrl1a-glibc-2.42-84
+        /nix/store/nga9d6m9iplygw3iqghk2g840nz7b0gy-libidn2-2.3.8
+        /nix/store/ssvq1r0xd8f7paf6zqgpfql1a4drwhy2-xgcc-15.3.0-libgcc
+        /nix/store/yh8rykx8wakl1ccn8rc351f6r2wbg4cn-libunistring-1.4.2
+  ok    our closure == nix-store -qR                   = same
+
+-- arm 4: the fetch ---------------------------------------------
+  ok    the closure fetches, hashes checked            = ok
+  ok    bin/bash landed                                = yes
+  ok    our extraction == nix's own /nix/store tree    = identical
+
+-- arm 5: running what came back --------------------------------
+        PT_INTERP: /nix/store/n51dhmdbik1kfrsm62j5knavmigwrl1a-glibc-2.42-84/lib/ld-linux-x86-64.so.2
+  ok    the fetched binary's loader is an absolute store path = nix-store-absolute
+  ok    in a rootfs with no /nix, it does not run      = refused(127)
+        rootfs: /var/lib/pgb-rootfs/pgb-env-debian12
+  ok    control: the runner itself works there         = 0
+  ok    it runs when given the loader we fetched beside it = yes
+        output: RAN-5.3.15(1)-release
+
+-- arm 6: what nixpkgs static actually is ------------------------
+  ok    nixpkgs pkgsStatic.stdenv.hostPlatform.libc    = musl
+  ok    and the ordinary package set is                = glibc
+        written: /home/user/glibc-research/evidence/80-nix-without-nix/RESULT.txt
+
+-- result ----------------------------------------------------
+pass=16 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

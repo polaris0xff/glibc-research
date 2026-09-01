@@ -1,0 +1,24 @@
+experiment 80 - reaching nixpkgs with no nix
+date            : 2026-09-01T16:29:40Z
+channel         : nixpkgs-unstable
+revision        : 26.11pre1063758.e8be7818e19a
+subject         : /nix/store/9ipfvwnqp1q8ijnmi5sxvlx9r8w34lw3-bash-5.3p15
+closure         : 5 paths, fetched and hash-checked over HTTPS
+oracle          : nix (Determinate Nix 3.22.2) 2.35.2
+
+Q1 can a nixpkgs package be resolved and fetched with no nix?
+   YES for anything the channel built. Three HTTPS endpoints:
+   store-paths.xz (an index, and its redirect is a pin), <hash>.narinfo
+   (signed metadata), and the NAR. Signature and NarHash both checked.
+   NO for anything it did not: there is no evaluator here.
+
+Q2 what does a fetched nixpkgs binary do?
+   PT_INTERP = /nix/store/n51dhmdbik1kfrsm62j5knavmigwrl1a-glibc-2.42-84/lib/ld-linux-x86-64.so.2
+   It is bound to an absolute /nix/store path and runs only where that
+   store exists, or when handed its own loader: yes
+   ⛔ That is why every nix bundler ends up shipping a store.
+
+arm 6: nixpkgs pkgsStatic is MUSL, not static glibc.
+   The soarpkgs recipe this project was pointed at builds
+   pkgsStatic.bash, so its output is a musl binary. pgb answers the
+   glibc half, and experiments/61- has what the difference costs.
