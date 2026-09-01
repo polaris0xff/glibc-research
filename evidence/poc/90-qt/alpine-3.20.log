@@ -1,0 +1,14 @@
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, but has failed to switch to one.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+  QPA platform plugin                      ok    offscreen
+  UTF-8 round trip                         ok    5 utf16 units, 13 bytes
+  QLocale(de_DE) formats 1234.5            ok    1.234,5
+  QLocale::system() answers                ok    C
+  QPainter fills a QImage                  ok    64x48
+  QWidget::grab renders the widget         ok    120x90
+  QFile write and read back                ok    /tmp/pgb-qtprobe.txt
+  Latin-1 QStringConverter round trip      ok    4 bytes
+  QTimer drives QApplication::exec         ok    0
+QTPROBE OK (0 failed)

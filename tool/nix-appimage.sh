@@ -107,9 +107,30 @@ need() {   # url dest -- fetch once, keep
 # script into shared/bin produces an AppImage that runs a shell which then
 # tries to exec an absolute /nix/store path that is not there.
 # ---------------------------------------------------------------------------
+# ⛔ THE FALLBACK BELOW SHIPPED THE WRONG PROGRAM ONCE, SILENTLY.
+# `--name eglinfo-nogl` was passed to get a second, differently-named artefact
+# out of mesa-demos. mesa-demos has no `eglinfo-nogl`, so `head -1` of bin/
+# picked `quadstrip-flat` -- an OpenGL demo needing a window -- and the run
+# printed `entry .../bin/quadstrip-flat` in the middle of eleven other lines
+# and packed it. The experiment would then have compared eglinfo against a
+# program that is not eglinfo.
+#
+# ⭐ The fallback stays, because a package whose binary is not named after the
+# attribute is ordinary, but the two cases are now separated: a name the
+# CALLER asked for is a requirement and is refused when it is not there; a
+# name pgb DERIVED from the store path is a guess and says so when it misses.
 resolve_entry() {   # storedir progname -> prints the ELF to run
   _re_bin="$1/bin/$2"
-  [ -e "$_re_bin" ] || _re_bin=$(find "$1/bin" -maxdepth 1 -type f 2>/dev/null | head -1)
+  if [ ! -e "$_re_bin" ]; then
+    if [ -n "${NAME:-}" ]; then
+      warn "⛔ --name '$2' names no program in $(basename "$1")/bin. What is there:"
+      find "$1/bin" -maxdepth 1 -type f -exec basename {} \; 2>/dev/null \
+        | sort | sed 's/^/             /' >&2
+      return 1
+    fi
+    _re_bin=$(find "$1/bin" -maxdepth 1 -type f 2>/dev/null | head -1)
+    [ -n "$_re_bin" ] && warn "⚠ bin/$2 does not exist; falling back to bin/$(basename "$_re_bin")"
+  fi
   [ -n "$_re_bin" ] && [ -e "$_re_bin" ] || return 1
   _re_hops=0
   while [ "$_re_hops" -lt 5 ]; do
@@ -155,6 +176,26 @@ selftest() {
   else
     printf '  ok    a wrapper pointing nowhere is refused\n'
   fi
+
+  # ⛔ THE CASE THAT SHIPPED THE WRONG PROGRAM. Two binaries, neither named
+  # what was asked for. With --name it must REFUSE; without it, it may fall
+  # back -- and the two must not be the same answer.
+  rm -f "$_t/pkg/bin/prog"
+  printf '\177ELF one' > "$_t/pkg/bin/aardvark"; chmod +x "$_t/pkg/bin/aardvark"
+  printf '\177ELF two' > "$_t/pkg/bin/zebra";    chmod +x "$_t/pkg/bin/zebra"
+  NAME=nosuchprog
+  if resolve_entry "$_t/pkg" nosuchprog >/dev/null 2>&1; then
+    printf '  FAIL  --name naming no program was accepted\n'; _bad=1
+  else
+    printf '  ok    --name naming no program is refused, not substituted\n'
+  fi
+  NAME=""
+  if [ -n "$(resolve_entry "$_t/pkg" nosuchprog 2>/dev/null)" ]; then
+    printf '  ok    a DERIVED name that misses still falls back\n'
+  else
+    printf '  FAIL  a derived name that misses should fall back\n'; _bad=1
+  fi
+
   rm -rf "$_t"
   printf 'nix-appimage --selftest: %s\n' \
     "$([ "$_bad" = 0 ] && echo 'all checks pass.' || echo 'FAILURES above.')"

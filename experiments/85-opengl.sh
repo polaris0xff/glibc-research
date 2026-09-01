@@ -81,17 +81,28 @@ trap 'reap_all' EXIT INT TERM
 # The two artefacts
 # ---------------------------------------------------------------------------
 printf -- '-- the two bundles -----------------------------------------------\n'
-A_IMG="$CACHE/eglinfo/eglinfo-x86_64.AppImage"
-B_IMG="$CACHE/eglinfo-nogl/eglinfo-nogl-x86_64.AppImage"
+# ⛔ BOTH ARMS ARE `--name eglinfo`, AND THE SECOND ONE GETS ITS OWN CACHE
+# DIRECTORY RATHER THAN ITS OWN NAME. The first version of this file asked for
+# `--name eglinfo-nogl` so the two artefacts would not collide under
+# $PGB_APPIMAGE_CACHE -- and mesa-demos has no binary called `eglinfo-nogl`, so
+# the bundler fell back to the first thing in bin/ and packed `quadstrip-flat`.
+# The control arm would have been a different program. tool/nix-appimage.sh now
+# refuses that (and has a selftest for it); the collision is avoided the
+# correct way, by moving the cache.
+A_CACHE="$CACHE"
+B_CACHE="${PGB_APPIMAGE_CACHE_NOGL:-${CACHE}-nogl}"
+A_IMG="$A_CACHE/eglinfo/eglinfo-x86_64.AppImage"
+B_IMG="$B_CACHE/eglinfo/eglinfo-nogl-x86_64.AppImage"
 
 if [ ! -s "$A_IMG" ]; then
-  exp_note "building arm A (bundled mesa) -- several minutes, ~300 MB of closure"
-  sh "$BUNDLER" mesa-demos --out "$A_IMG" --name eglinfo >"$B/build-A.log" 2>&1 || true
+  exp_note "building arm A (bundled mesa) -- several minutes, ~400 MB of closure"
+  PGB_APPIMAGE_CACHE="$A_CACHE" sh "$BUNDLER" mesa-demos \
+    --out "$A_IMG" --name eglinfo >"$B/build-A.log" 2>&1 || true
 fi
 if [ ! -s "$B_IMG" ]; then
   exp_note "building arm B (--no-gl control)"
-  sh "$BUNDLER" mesa-demos --no-gl --out "$B_IMG" --name eglinfo-nogl \
-    >"$B/build-B.log" 2>&1 || true
+  PGB_APPIMAGE_CACHE="$B_CACHE" sh "$BUNDLER" mesa-demos --no-gl \
+    --out "$B_IMG" --name eglinfo >"$B/build-B.log" 2>&1 || true
 fi
 [ -s "$A_IMG" ] || { exp_note "arm A did not build; see $B/build-A.log"; exit 2; }
 [ -s "$B_IMG" ] || { exp_note "arm B did not build; see $B/build-B.log"; exit 2; }

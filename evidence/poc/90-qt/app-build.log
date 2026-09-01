@@ -1,0 +1,47 @@
+-- The CXX compiler identification is GNU 12.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /root/.local/state/pgb/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE  
+-- Using Qt bundled ZLIB.
+-- Found WrapZLIB: TRUE (found version "6.11.1") 
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE  
+-- Looking for backtrace
+-- Looking for backtrace - found
+-- backtrace facility detected in default set of libraries
+-- Found Backtrace: /usr/include  
+-- Using Qt bundled PCRE2.
+-- Found WrapPCRE2: TRUE (found version "6.11.1") 
+-- Performing Test HAVE_GETTIME
+-- Performing Test HAVE_GETTIME - Success
+-- Performing Test HAVE_SHM_OPEN_SHM_UNLINK
+-- Performing Test HAVE_SHM_OPEN_SHM_UNLINK - Success
+-- Found WrapRt: TRUE  
+-- Using Qt bundled PNG.
+-- Found WrapPNG: TRUE (found version "6.11.1") 
+-- Using Qt bundled Harfbuzz.
+-- Found WrapHarfbuzz: TRUE (found version "6.11.1") 
+-- Using Qt bundled Freetype.
+-- Found WrapFreetype: TRUE (found version "6.11.1") 
+-- Using Qt bundled Jpeg.
+-- Found WrapJpeg: TRUE (found version "6.11.1") 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /var/tmp/pgb-poc/90-qt/app/build
+[ 50%] Building CXX object CMakeFiles/qtprobe.dir/main.cpp.o
+[100%] Linking CXX executable qtprobe
+/usr/bin/ld: /var/tmp/pgb-poc/90-qt/inst/lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0x9e1): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/90-qt/inst/lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1c8): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/90-qt/inst/lib/libQt6Widgets.a(qfiledialog.cpp.o): in function `qt_tildeExpansion(QString const&)':
+qfiledialog.cpp:(.text._Z17qt_tildeExpansionRK7QString+0x1a6): warning: Using 'getpwnam_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/90-qt/inst/lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xcc): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[100%] Built target qtprobe

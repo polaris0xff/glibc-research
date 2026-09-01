@@ -336,6 +336,57 @@ under `--wrap-dlopen`, then KF6, then kdenlive.
 rung that stopped it with the error and the file it came from — the shape
 `evidence/72-static-host-plugin-abi/CPYTHON-FAILURE.txt` already uses.
 
+## ⭐ RUNG 1 IS CLOSED: a static Qt 6 widget program runs on 11 of 11
+
+`evidence/poc/90-qt/RESULT.txt`, 2026-09-01d. **19 assertions, 0 failures,
+0 skips.** ⛔ The entry stays **open** — rungs 2, 3 and 4 are untouched — but
+"Qt/KF6 are impossible then" is now answered with a binary rather than an
+argument.
+
+| | |
+|---|---|
+| source | `pgb nix plan/fetch qt6.qtbase` → `qtbase-everywhere-src-6.11.1.tar.xz` from cache.nixos.org, signature and NarHash checked. **Stock tarball; none of nixpkgs' eleven patches applied** — every one of them is about finding things on disk at run time, which a static build with compiled-in plugins does not do |
+| configure | stock `./configure -static -release -force-bundled-libs -qpa offscreen -default-qpa offscreen`, plus the features that would reach outside the tarball turned off (xcb, egl, opengl, dbus, glib, icu, openssl, cups, fontconfig, libudev, network, sql, testlib, printsupport) |
+| built | `libQt6Core.a` 23.0 MB, `libQt6Gui.a` 19.6 MB, `libQt6Widgets.a` 22.3 MB, and ⭐ **NOT ONE SHARED OBJECT** anywhere under the prefix |
+| plugins | **five static plugin archives**: `libqoffscreen.a`, `libqminimal.a`, `libqjpeg.a`, `libqico.a`, `libqgif.a`. `qt_add_executable` emits the `Q_IMPORT_PLUGIN` translation unit, so the QPA plugin is in the link and `dlopen` is never called |
+| the binary | 28,123,352 bytes, no `PT_INTERP`, 0 `DT_NEEDED`, pgb runtime linked |
+| matrix | **11 of 11 pass, host shared objects loaded: none, on every row** |
+
+⭐ **The functional test is not `--version`.** Inside every target: the QPA
+plugin resolves to `offscreen` from its own compiled-in default; a UTF-8 round
+trip over CJK plus an astral-plane codepoint; `QLocale(de_DE)` formatting
+1234.5 as `1.234,5` out of Qt's compiled-in CLDR; `QPainter` filling a
+`QImage` with the pixel read back; `QWidget::grab()` rendering a 120×90 widget
+and the pixel read back; `QFile` write and read; a Latin-1 `QStringConverter`
+round trip; and `QTimer` driving `QApplication::exec()` to a clean return.
+
+⭐ **And the negative control.** Asking for a QPA plugin that is **not**
+compiled in (`QT_QPA_PLATFORM=xcb`, `QT_DEBUG_PLUGINS=1`) aborts on all
+eleven — and **pulls in no host shared object on any of them**. A static Qt
+does not fall back to the host's plugin directory, which is the property that
+makes the "no host objects" row above mean something.
+
+⚠ **Two observations worth carrying to rung 2.** Qt prints
+`Detected locale "C" ... Qt depends on a UTF-8 locale, but has failed to
+switch to one` on the four musl rows and switches to `C.UTF-8` on the glibc
+ones — the same locale gap `--embed-locale` exists for, arriving from Qt's
+side. Nothing failed because of it, because Qt's internals are UTF-8
+regardless, but a Qt application that formats user-facing text would want the
+flag. And `getpwuid_r` produced the usual static-glibc link warning, which is
+exactly what `pgb-nssfix.c` answers.
+
+⛔ **One pgb defect had to be fixed before configure would even run**, and it
+was not a Qt problem: `docs/history/corrections.md` C15. pgb appended its
+`-march=x86-64` **after** the caller's argv, so Qt's `-march=cannonlake`
+intrinsics probe was silently downgraded and configure stopped with
+*"x86 intrinsics support missing. Check your compiler settings."* ⭐ Building
+above the current class is what found it, which is what `TODO/INDEX.md`'s
+ordering argument says POCs are for.
+
+**What is left on this entry**, unchanged and untouched:
+rung 2 a Qt program against a real display (xcb, and its plugin under
+`--wrap-dlopen`); rung 3 KDE Frameworks 6; rung 4 kdenlive.
+
 ## T-055 — If static will not reach it, a kdenlive bundle that BEATS the field
 
 **Source** operator, 2026-09-01c: *"if impossible, pivot to

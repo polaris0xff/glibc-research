@@ -1,0 +1,11 @@
+alpine-3.22: xcb-requested:exit134 | 
+alpine-3.20: xcb-requested:exit134 | 
+alpine-3.10: xcb-requested:exit134 | 
+voidlinux-musl: xcb-requested:exit134 | 
+debian-11: xcb-requested:exit134 | 
+debian-12: xcb-requested:exit134 | 
+ubuntu-20.04: xcb-requested:exit134 | 
+rockylinux-8: xcb-requested:exit134 | 
+opensuse-leap-15.6: xcb-requested:exit134 | 
+fedora-42: xcb-requested:exit134 | 
+archlinux-latest: xcb-requested:exit134 | 

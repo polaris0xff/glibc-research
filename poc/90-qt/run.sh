@@ -190,17 +190,37 @@ if [ ! -f "$INST/lib/libQt6Widgets.a" ]; then
 fi
 poc_check "qtbase builds through pgb" \
   "$([ -f "$INST/lib/libQt6Widgets.a" ] && echo ok || echo failed)" ok
+# ⭐ Qt's own configuration summary, kept as evidence. It is the artefact that
+# says what was actually enabled, as opposed to what the flags above asked
+# for, and it survives a resumed run where build.log does not: the log is
+# truncated on every run (poc/common.sh's rule -- a stale log describing a
+# previous binary is worse than none) and a run that rebuilds nothing writes
+# nothing into it.
+[ -f "$BLD/config.summary" ] && cp "$BLD/config.summary" "$POC_OUT/config.summary"
 for a in Core Gui Widgets; do
   [ -f "$INST/lib/libQt6$a.a" ] && \
     poc_note "libQt6$a.a $(wc -c < "$INST/lib/libQt6$a.a") bytes"
 done
-# ⛔ THE PROPERTY THAT MATTERS AT THIS RUNG: no shared object came out. A Qt
-# that built .so files would mean -static was not honoured, and the link
+# ⛔ THE PROPERTY THAT MATTERS AT THIS RUNG: no shared object came out AT ALL.
+# A Qt that built .so files would mean -static was not honoured, and the link
 # below would have succeeded against them without anybody noticing.
-poc_check "qtbase produced NO shared libraries" \
-  "$(find "$INST" -name 'libQt6*.so*' 2>/dev/null | wc -l)" 0
+# ⚠ Not `libQt6*.so*`: Qt's PLUGINS are named libq*.so, so a check scoped to
+# the modules would have passed on a Qt whose plugins were still shared --
+# which is the half this POC is actually about.
+poc_check "qtbase produced NO shared object anywhere" \
+  "$(find "$INST" -name '*.so' -o -name '*.so.*' 2>/dev/null | wc -l)" 0
+# ⚠ Located by search, not by a guessed path. The first version of this check
+# looked in lib/qt6/plugins/ -- which is nixpkgs' INSTALL_PLUGINSDIR override,
+# not Qt's own default -- and reported a FAILURE for a plugin that was built
+# correctly and sitting in plugins/platforms/. An instrument defect, and it
+# would have been read as "static Qt has no QPA plugin".
+QPA_A=$(find "$INST" -name 'libqoffscreen.a' 2>/dev/null | head -1)
 poc_check "the offscreen QPA plugin is a static archive" \
-  "$([ -f "$INST/lib/qt6/plugins/platforms/libqoffscreen.a" ] && echo ok || echo failed)" ok
+  "$([ -n "$QPA_A" ] && echo ok || echo failed)" ok
+[ -n "$QPA_A" ] && poc_note "${QPA_A#"$INST"/} $(wc -c < "$QPA_A") bytes"
+# ⭐ And it is not alone: Qt's image-format plugins came out as archives too,
+# which is the same class -- an application's own plugins, linked in.
+poc_note "static plugin archives built: $(find "$INST" -path '*plugins*' -name '*.a' 2>/dev/null | wc -l) ($(find "$INST" -path '*plugins*' -name '*.a' -exec basename {} \; 2>/dev/null | tr '\n' ' '))"
 
 # ---------------------------------------------------------------------------
 # 3. the probe: a real Qt Widgets program
