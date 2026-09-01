@@ -43,13 +43,24 @@ Bundled: **galculator** (GTK3, reaches GTK on musl) and **mesa-demos**
 
 ```sh
 sh scripts/common/bootstrap.sh --detach   # FIRST LINE. ~10 min, in parallel
+sh scripts/common/bootstrap.sh --check    # when it is done
 ```
 
 ⭐ **Then read while it runs — that is what `--detach` is for.** Serially this
 setup is ~25 minutes of watching (nix ~7, `pgb env create` ~8,
 `fetch-rootfs.sh` ~10); nothing in it depends on anything else in it.
-`sh scripts/common/bootstrap.sh --check` says when it is ready, and re-running
-repeats only what failed.
+Re-running repeats only what failed.
+
+⛔ **It also starts dockerd and builds the docker environment together**,
+because `pick_engine` prefers docker the moment the daemon is up and a daemon
+with no docker environment makes every `pgb build` refuse. Verified: dockerd
+up in 12s, the environment in 1m37, then a build succeeded through it.
+`--no-docker` if you want the chroot engine and nothing else.
+
+⚠ **Tested cold here: the bed path, the docker-env path, the idempotent path,
+the not-ready path and `--selftest`. NOT tested cold: the nix branch** —
+uninstalling nix to test it would have destroyed the store this session's
+measurements came from.
 
 1. **`TODO/PROGRESS.md`** — the operator's three goals, quoted, and ⛔ **THE
    STOP CONDITION: four required POCs, and this session ends when they are
