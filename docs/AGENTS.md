@@ -14,9 +14,10 @@ significant overhead — and ship the tool that does it.
 ⛔ **Before you decide what to work on, read
 [`REQUIREMENTS.md`](REQUIREMENTS.md).** It carries the operator's binding
 acceptance bar — *works everywhere, or strictly better than every existing
-format and technique* — which this project **does not yet meet**, and it tracks
-which half of that bar each piece of work discharges. It is not satisfied by
-anything on this page.
+format and technique* — which this project **does not meet**, and it tracks
+which half of that bar each piece of work discharges. ⚠ Not "does not yet":
+half of that bar has now been **measured false**, not merely left undone, and
+the page says which half and by how much.
 
 The tool is [`../pgb`](../pgb) (portable glibc build): a POSIX-sh driver plus
 three small C runtime pieces. Output is an ordinary statically linked
@@ -137,6 +138,15 @@ sh pgb verify ./yourprogram          # run it on all 11
 Requires root + `CAP_SYS_ADMIN` (the bed is `unshare --mount` + `chroot`),
 `curl`, `python3`, `strace`, a C toolchain. First POC run builds OpenSSL and
 CPython; budget ~30 minutes.
+
+⚠ **`experiments/60-` needs more than the others**, and skips the arms it
+cannot build rather than failing: `cargo` plus `musl-gcc` and the
+`x86_64-unknown-linux-musl` rust target (onelf builds its runtime stub as
+static musl), `mksquashfs` (snap), and `flatpak` with
+`org.freedesktop.Platform//24.08` already installed. It also fetches
+`appimagetool`, pinned by sha256 in the script. Budget ~30 minutes for the run
+itself — the AppImage arm times out under `strace -f` on every row by design;
+the script explains why.
 
 ## 7. Limits — measured, not guessed
 
