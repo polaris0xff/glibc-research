@@ -7,7 +7,7 @@
 ## T-030 — `--wrap-dlopen` against a compiled-in table
 
 **Source** `docs/research/prior-art.md`, `allyourcodebase/pipewire`.
-**Category** runtime · **Priority** P1 · **Effort** M · **Status** open
+**Category** runtime · **Priority** P1 · **Effort** M · **Status** ✅ done
 
 **Problem.** A program loading its own plugins is servable only by hand today
 (POC 50). The generic mechanism is not built.
@@ -23,12 +23,11 @@ the build produced; wrap at the final link as `pgb-iconv.c` does.
 **Prove.** POC 50's CPython rebuilt with `--wrap-dlopen` instead of hand-written
 `Modules/Setup.local`, passing the same matrix.
 
-### Progress — the mechanism is built and measured; the acceptance is not met
+### Progress — the mechanism, built and measured
 
-⛔ **This entry stays OPEN.** The mechanism works and is proved on a purpose-
-built subject, but the **Prove** above names CPython and CPython has not been
-rebuilt. Per `RULES.md`, an entry closes on its own acceptance command and not
-on a nearby one.
+⚠ **This section was written while the entry was still open**, before the
+operator ruled on the corrected acceptance. It is kept because it is what the
+mechanism was proved on first: a purpose-built subject, not a real project.
 
 **Landed:**
 
@@ -124,6 +123,30 @@ a static-modules mechanism: rebuilding it on `--wrap-dlopen` would demonstrate
 the two routes agreeing, not the mechanism reaching something that was out of
 reach. **T-002 names the right kind of subject** and this entry should take
 its subject from there.
+
+### ✅ Closed with `poc/70-sqlite-extensions/` — the corrected acceptance, met
+
+⭐ **One build served this entry and T-002**, which is what the previous
+session's work order predicted. `evidence/poc/70-sqlite-extensions/RESULT.txt`,
+`pass=20 fail=0 skip=0`.
+
+SQLite satisfies "not configurable at build time" strictly: `.load` calls
+`dlopen()` on a path the user names and derives the entry point from the
+filename, and there is no configure switch that links an extension in while
+keeping `.load` working. **Fifteen** extensions, the plugin directory created
+**empty** on every target:
+
+```
+  11 of 11   functional test ok, values asserted, 3 negative assertions
+  11 of 11   host shared objects loaded: none
+```
+
+⛔ **And the mechanism did not survive the scale unchanged.** Every SQLite
+extension defines a non-static `sqlite3_api`, so any two collided at link
+time; two of them define the same entry point by upstream design. Fixed with
+per-plugin symbol namespacing (`objcopy --redefine-syms`) — the full account
+is in T-002, and the collision is kept as a live check rather than written up
+and deleted.
 
 ## T-031 — Port cross-libc-dlopen's full rewrite, not one function
 

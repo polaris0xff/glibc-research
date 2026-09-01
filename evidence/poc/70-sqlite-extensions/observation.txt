@@ -1,0 +1,11 @@
+alpine-3.22: refused: Error: libc.so.6: cannot open shared object fi | /pgb-ext/series.so 
+alpine-3.20: refused: Error: libc.so.6: cannot open shared object fi | /pgb-ext/series.so 
+alpine-3.10: refused: Error: libc.so.6: cannot open shared object fi | /pgb-ext/series.so 
+voidlinux-musl: refused: Error: libc.so.6: cannot open shared object fi | /pgb-ext/series.so 
+debian-11: SIG6 | /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/series.so 
+debian-12: loaded and worked | /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/series.so 
+ubuntu-20.04: SIG6 | /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/series.so 
+rockylinux-8: SIG6 | /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
+opensuse-leap-15.6: SIG8 | /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
+fedora-42: SIG8 | /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
+archlinux-latest: loaded and worked | /pgb-ext/series.so /usr/lib/ld-linux-x86-64.so.2 /usr/lib/libc.so.6 

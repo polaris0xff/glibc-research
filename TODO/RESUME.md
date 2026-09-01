@@ -13,9 +13,9 @@ exists for.
 ⭐ **Written at the START of the session of 2026-09-01b**, which is the debt the
 previous session recorded against itself and this one pays.
 
-    LAST WRITTEN   2026-09-01T (session 2026-09-01b, start)
-    TREE           clean at 86c40c8
-    CHECKS         not yet re-run this session
+    LAST WRITTEN   2026-09-01b, after T-002/T-030 closed
+    TREE           dirty: POC 70 + the record, about to commit
+    CHECKS         sh TODO/check.sh green; poc 70 pass=20 fail=0 skip=0
     BRANCH         claude/glibc-research-session-17ku6v  (see note below)
 
 ---
@@ -24,7 +24,7 @@ previous session recorded against itself and this one pays.
 |---|---|
 | **the task** | Two operator rulings received at session start (below), then the work order from the top: T-002, T-017, T-003, T-012 (split first). Foundations before breadth. |
 | **the resume point** | `TODO/PROGRESS.md` "Work order". |
-| **in flight** | Machine bootstrap: `pgb env create` + `fetch-rootfs.sh`. **This machine started with 0 of 11 rootfs present and no static libiconv** — nothing in the bed is cached between sessions. |
+| **in flight** | Nothing. Next: **T-003** (a project that FAILS, above the current class — the entry names GTK or Qt, and the operator named kdenlive as the challenge), then T-032. |
 | **the state of the tree** | Clean. No `ephemeral-*` branches. |
 | **the paste** | `Read ./docs/AGENTS.md in full & follow.` |
 
@@ -53,4 +53,28 @@ accumulating agent branches — is served by continuing on the designated one.
 
 ## What is in flight
 
-Bootstrap only. Nothing half-written in the tree.
+Nothing half-written.
+
+## Done this session, with evidence
+
+- `experiments/73-host-dso-abi-demand.sh` + `docs/research/solo.md` — the
+  `pg83/solo` sweep and the measurement that opened **route D** (T-033).
+- **T-018 closed**: `-Wl,--eh-frame-hdr` on every link; `PT_GNU_EH_FRAME`
+  0 → 1, 11 of 11 unchanged.
+- **T-017 closed**: environments carry a stamp; a mismatched engine is refused
+  with the difference named. Six cases measured, both engines.
+- **T-019 closed** (opened this session): the docker engine dropped every
+  build option at the container boundary. Byte-identical engines now hold
+  **with** options too.
+- **T-002 and T-030 closed by one build**: `poc/70-sqlite-extensions`, fifteen
+  SQLite extensions out of an **empty** directory, 11 of 11, zero host
+  objects, against a control that pulls the host loader in on 2 of 11.
+- Both operator rulings written into `REQUIREMENTS.md`, `TODO/runtime.md`
+  T-030, and `corrections.md` C13/C14.
+
+## ⚠ What this machine does NOT have cached
+
+**0 of 11 rootfs and no static libiconv at session start.** A fresh session
+pays `sh pgb env create` + `sh scripts/common/fetch-rootfs.sh` (~1.5 GiB)
+before anything can be built or verified. `dockerd` is not running, so
+`pick_engine` returns `chroot`.

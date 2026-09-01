@@ -118,9 +118,31 @@ cmd_doctor() {
   chk "__nss_configure_lookup in libc.a" \
       "$([ -f "$LIBC_A" ] && nm -A "$LIBC_A" 2>/dev/null | grep -q 'T __nss_configure_lookup' && echo yes || echo no)" \
       "the NSS fix needs a glibc libc.a"
-  chk "GNU libiconv (static)" \
-      "$([ -f "$PGB_LIBICONV_PREFIX/lib/libiconv.a" ] && echo yes || echo no)" \
-      "run scripts/build-libiconv.sh"
+  # ⛔ THE ROWS ABOVE DESCRIBE THIS MACHINE, AND THAT IS ONLY THE RIGHT ANSWER
+  # FOR THE `host` ENGINE. libiconv is built INSIDE the build environment by
+  # `pgb env create`, because it has to be compiled by the environment's own
+  # compiler against the environment's own glibc. Probing the host path while
+  # the chosen engine is chroot reported
+  #
+  #     MISS  GNU libiconv (static)   run scripts/build-libiconv.sh
+  #
+  # on a machine where `pgb build` worked perfectly and the archive was sitting
+  # in the chroot at $r/opt/pgb-libiconv/lib/libiconv.a. Measured on a freshly
+  # bootstrapped machine, session of 2026-09-01b. ⚠ A MISS for something that
+  # is not missing where it is used sends the reader to fix a working tool.
+  _doc_eng=$(pick_engine)
+  if [ "$_doc_eng" = chroot ] && [ -d "$(env_root)" ]; then
+    chk "GNU libiconv (static), in the chroot environment" \
+        "$([ -f "$(env_root)$PGB_LIBICONV_PREFIX/lib/libiconv.a" ] && echo yes || echo no)" \
+        "run: pgb env create"
+  elif [ "$_doc_eng" = docker ] || [ "$_doc_eng" = podman ]; then
+    printf '  --    %-32s %s\n' "GNU libiconv (static)" \
+           "inside the $_doc_eng image; pgb build checks it"
+  else
+    chk "GNU libiconv (static), on this machine" \
+        "$([ -f "$PGB_LIBICONV_PREFIX/lib/libiconv.a" ] && echo yes || echo no)" \
+        "run scripts/build-libiconv.sh"
+  fi
   say ""
   say "  build environment engines:"
   for e in docker podman; do

@@ -1,5 +1,5 @@
 experiment 71 - --wrap-dlopen against a compiled-in table
-date (UTC)   : 2026-09-01T12:24:24Z
+date (UTC)   : 2026-09-01T15:05:31Z
 host kernel  : Linux 6.18.44-fc-v22
 cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
 

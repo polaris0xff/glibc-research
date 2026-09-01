@@ -19,6 +19,15 @@
 # ---------------------------------------------------------------------------
 # build / shell
 # ---------------------------------------------------------------------------
+# ⛔ ONE LIST, because the two places that use it drifted and the drift was
+# invisible. `export_options` sets these for the re-entry, and the docker and
+# podman branches of `cmd_build`/`cmd_shell` have to hand them across a
+# CONTAINER boundary, which -- unlike chroot -- does not inherit the caller's
+# environment. Deriving both from this variable is what stops one of them
+# being extended and the other not.
+PGB_OPT_VARS="PGB_OPT_VERBOSE PGB_OPT_EMBED_LOCALE PGB_OPT_USE_ICONV \
+PGB_OPT_BASELINE PGB_OPT_BINDS PGB_OPT_WRAP_DLOPEN PGB_STATE PGB_LIBICONV_PREFIX"
+
 export_options() {
   export PGB_OPT_VERBOSE="$VERBOSE" PGB_OPT_EMBED_LOCALE="$EMBED_LOCALE" \
          PGB_OPT_USE_ICONV="$USE_ICONV" PGB_OPT_BASELINE="$ARCH_BASELINE" \
@@ -26,14 +35,42 @@ export_options() {
          PGB_STATE="$PGB_STATE" PGB_LIBICONV_PREFIX="$PGB_LIBICONV_PREFIX"
 }
 
+# -- ⛔ THE DEFECT THIS EXISTS TO FIX ---------------------------------------
+#
+# `chroot` inherits the caller's environment; a CONTAINER does not. The docker
+# and podman branches passed exactly `-e PGB_INNER=1`, so every PGB_OPT_* was
+# dropped at the boundary and EVERY BUILD OPTION SILENTLY DID NOTHING under
+# those engines: --wrap-dlopen, --embed-locale, --no-iconv, --arch-baseline,
+# and -v. Measured, same source, same command, engine the only variable:
+#
+#   chroot   __wrap_dlopen=1  pgb_dlopen_libs=1  size=2,453,656
+#   docker   __wrap_dlopen=0  pgb_dlopen_libs=0  size=2,444,440
+#
+# ⚠ AND IT HID BEHIND A REAL RESULT. The two engines were measured
+# BYTE-IDENTICAL and that measurement stands -- it was taken on a build with
+# NO OPTIONS, which is the one case where dropping them all changes nothing.
+#
+# ⭐ `-e NAME` without `=VALUE` takes the value from the caller's environment,
+# so a value containing spaces -- which PGB_OPT_WRAP_DLOPEN always has with
+# more than one plugin -- cannot be torn apart by word splitting on the way.
+# ⛔ Do NOT rewrite this as `-e NAME=$VALUE`; that is the same class of defect
+# as the flattened argv this file already carries a warning about.
+opt_env_args() {
+  for _v in $PGB_OPT_VARS; do printf -- '-e %s ' "$_v"; done
+}
+
 cmd_build() {
   [ $# -gt 0 ] || die "pgb build needs a command, e.g. pgb build -- make" 2
   export_options
   eng=$(pick_engine)
+  # ⛔ BEFORE anything is bind-mounted or any container starts. T-017: the two
+  # engines keep independent environments, `pick_engine` may return a different
+  # one than `pgb env create` built for, and the old failure was the missing
+  # tool's own message from inside somebody else's build system.
+  env_require_current "$eng"
   case "$eng" in
     chroot)
       r=$(env_root)
-      [ -d "$r" ] || die "no build environment. run: pgb env create" 2
       wrk=$(pwd)
       bindargs=""
       for b in $EXTRA_BINDS; do
@@ -50,8 +87,6 @@ cmd_build() {
       inner_build "$@"
       ;;
     docker|podman)
-      $eng image inspect "pgb-env:$PGB_VERSION" >/dev/null 2>&1 || \
-        die "no build environment image. run: pgb env create" 2
       wrk=$(pwd)
       dockerbinds=""
       for b in $EXTRA_BINDS; do
@@ -70,8 +105,9 @@ cmd_build() {
       # -- was torn into separate words. Measured: the container printed
       # `sh: 0: Illegal option -O` and produced no output file. The chroot
       # branch above never had this because it passes "$@" through.
+      # shellcheck disable=SC2046  # opt_env_args emits separate -e arguments
       exec $eng run --rm -v "$wrk:$wrk" -v "$PGB_SELF:$PGB_SELF" $dockerbinds $caargs -w "$wrk" \
-        -e PGB_INNER=1 "pgb-env:$PGB_VERSION" \
+        -e PGB_INNER=1 $(opt_env_args) "pgb-env:$PGB_VERSION" \
         /bin/sh -c 'PGB_INNER=1 "$0" __inner-build "$@"' "$PGB_SELF/pgb" "$@"
       ;;
   esac
@@ -100,6 +136,25 @@ cmd_shell() {
            --bind "$wrk:$wrk" --bind "$PGB_SELF:$PGB_SELF" \
            --bind "$PGB_STATE:$PGB_STATE" --workdir "$wrk" \
            -- /bin/sh -c 'PGB_INNER=1 "$0" __inner-shell' "$PGB_SELF/pgb"
+      ;;
+    docker|podman)
+      # ⛔ THIS BRANCH DID NOT EXIST, and `pgb shell` fell through to
+      # `inner_build` on the HOST. `pgb help` says "an interactive shell
+      # inside it" -- inside the build environment -- and under the docker
+      # engine it handed the caller a shell on this machine with the wrappers
+      # on PATH, which is a different thing wearing the same name. Same defect
+      # class as T-014: a documented capability quietly doing something else.
+      env_require_current "$eng"
+      export_options
+      wrk=$(pwd)
+      dockerbinds=""
+      for b in $EXTRA_BINDS; do
+        dockerbinds="$dockerbinds -v $(abs_bindspec "$b")"
+      done
+      # shellcheck disable=SC2046  # opt_env_args emits separate -e arguments
+      exec $eng run --rm -it -v "$wrk:$wrk" -v "$PGB_SELF:$PGB_SELF" $dockerbinds -w "$wrk" \
+        -e PGB_INNER=1 $(opt_env_args) "pgb-env:$PGB_VERSION" \
+        /bin/sh -c 'PGB_INNER=1 "$0" __inner-shell' "$PGB_SELF/pgb"
       ;;
     *) inner_build "${SHELL:-/bin/sh}" ;;
   esac

@@ -1,0 +1,77 @@
+===============================================================
+POC 70-sqlite-extensions -- a program with an OPEN plugin ABI and no way to link a plugin in
+===============================================================
+upstream      : https://www.sqlite.org/2024/sqlite-autoconf-3470000.tar.gz
+version       : SQLite 3.47.0 + 15 extensions from sqlite/sqlite ext/misc @ version-3.47.0
+sha256        : 83eb21a6f6a649f506df8bd3aab85a08f7556ceed5dbd8dea743ea003fc3a957
+normal build  : cc shell.c sqlite3.c -ldl -lm; each extension: cc -shared -fPIC ext.c
+stresses      : dlopen by user-supplied path, dlsym by derived name, 15 plugins in one link, per-plugin symbol namespaces
+date (UTC)    : 2026-09-01T15:26:24Z
+evidence      : /home/user/glibc-research/evidence/poc/70-sqlite-extensions
+---------------------------------------------------------------
+-- fetching ---------------------------------------------------
+  ok    extension sources fetched and verified       = 16
+
+-- building ---------------------------------------------------
+  ok    extensions built (object and shared object)  = 15
+  ok    wrapped binary exists                        = yes
+        control  2443224 bytes
+        wrapped  2542776 bytes, 15 plugins compiled in
+
+-- inspection -------------------------------------------------
+  ok    PT_INTERP absent                             = 0
+  ok    DT_NEEDED entries                            = 0
+  ok    per-plugin sqlite3_api instances in the binary = 15
+  ok    unnamespaced sqlite3_api in the binary       = 0
+
+-- the matrix: fifteen plugins, empty plugin directory ---------
+
+  functional test across the pinned matrix:
+    ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
+    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.22: functional test                 = ok
+    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.20: functional test                 = ok
+    alpine-3.10          musl   ok         none                         none
+  ok    alpine-3.10: functional test                 = ok
+    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
+  ok    voidlinux-musl: functional test              = ok
+    debian-11            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    debian-11: functional test                   = ok
+    debian-12            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    debian-12: functional test                   = ok
+    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf 
+  ok    ubuntu-20.04: functional test                = ok
+    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf 
+  ok    rockylinux-8: functional test                = ok
+    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf 
+  ok    opensuse-leap-15.6: functional test          = ok
+    fedora-42            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    fedora-42: functional test                   = ok
+    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf 
+  ok    archlinux-latest: functional test            = ok
+
+  OBSERVATION -- no --wrap-dlopen, the fifteen real .so files present (measured, not asserted):
+    ENVIRONMENT          LIBC   OUTCOME    HOST OBJECTS PULLED IN
+    alpine-3.22          musl   refused: Error: libc.so.6: cannot open shared object fi /pgb-ext/series.so 
+    alpine-3.20          musl   refused: Error: libc.so.6: cannot open shared object fi /pgb-ext/series.so 
+    alpine-3.10          musl   refused: Error: libc.so.6: cannot open shared object fi /pgb-ext/series.so 
+    voidlinux-musl       musl   refused: Error: libc.so.6: cannot open shared object fi /pgb-ext/series.so 
+    debian-11            glibc  SIG6       /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/series.so 
+    debian-12            glibc  loaded and worked /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/series.so 
+    ubuntu-20.04         glibc  SIG6       /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/series.so 
+    rockylinux-8         glibc  SIG6       /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
+    opensuse-leap-15.6   glibc  SIG8       /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
+    fedora-42            glibc  SIG8       /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
+    archlinux-latest     glibc  loaded and worked /pgb-ext/series.so /usr/lib/ld-linux-x86-64.so.2 /usr/lib/libc.so.6 
+
+-- the collision this POC found, still checked -----------------
+        sqlite derives an entry point from the filename keeping only letters,
+        so base64.c and base85.c both define sqlite3_base_init, and every
+        extension defines sqlite3_api. Two plugins in one link collide.
+  ok    raw link of base64.o + base85.o              = collides
+  ok    the same two through --wrap-dlopen           = linked
+
+---------------------------------------------------------------
+pass=20 fail=0 skip=0
+VERDICT: 70-sqlite-extensions builds and works across the matrix.

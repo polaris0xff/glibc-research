@@ -4,8 +4,8 @@
 and the entries.
 
     STATE     2026-09-01b, in progress
-    COUNTS    21 entries, 13 open, 8 done
-    BASELINE  pgb: 11/11 run, 11/11 no host object, six POCs
+    COUNTS    22 entries, 10 open, 12 done
+    BASELINE  pgb: 11/11 run, 11/11 no host object, SEVEN POCs
               CI: GREEN, 15 jobs, and it asserts criterion 2
               chroot and docker engines produce BYTE-IDENTICAL binaries
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
@@ -73,6 +73,41 @@ here: `docs/REQUIREMENTS.md`, `TODO/runtime.md` T-030,
 - **T-033 opened** with route D, its four sub-parts, and ⛔ its unknowns named
   rather than hidden: symbol availability is not a working `dlopen`, and TLS is
   the one place "we are glibc, so it is simpler" is not obviously true.
+- **T-017 done.** `env create` and `pgb build` can pick different engines, and
+  ⚠ **merely starting `dockerd` changes which environment every command uses**
+  — reproduced here before anything was written. `env create` now stamps what
+  an environment was built from (a file for chroot, an image **label** for
+  docker) and `pgb build` refuses with the difference **named** instead of
+  failing inside somebody else's makefile. Six cases measured, including one
+  the first version got wrong: `--no-iconv` is a *build* option and must not be
+  refused against an environment that happens to have libiconv.
+- ⭐ **T-002 and T-030 done, by one build**, exactly as the previous session's
+  work order predicted. `poc/70-sqlite-extensions`: SQLite with **fifteen** of
+  its own `ext/misc` extensions, **plugin directory created empty**, 11 of 11
+  with zero host shared objects and values asserted rather than exit status.
+  SQLite is the strict subject T-030's corrected acceptance asks for — `.load`
+  calls `dlopen()` on a path the user names and there is no configure switch
+  that links an extension in.
+  ⭐ **And the control is what makes it mean something:** the same program
+  without `--wrap-dlopen`, with the fifteen real `.so` files present, "loaded
+  and worked" on **2 of 11** — and both of those pulled in the host
+  `ld-linux-x86-64.so.2` and `libc.so.6`. The rest took SIGABRT, SIGFPE, or
+  refused.
+- ⛔ **Building at scale broke the mechanism, which is what T-002 is for.**
+  Every SQLite extension defines a non-static `sqlite3_api`, so **any two
+  collided at link time**; two of them define the same entry point by upstream
+  design. Fixed by giving each plugin the namespace the loader would have
+  given it — `objcopy --redefine-syms` to a per-plugin prefix, table mapping
+  the original name to the renamed one. That is `RTLD_LOCAL` at link time, and
+  the collision is kept as a live check.
+- ⛔ **T-019: every build option silently did nothing under docker or podman.**
+  A container does not inherit the caller's environment and the branch passed
+  only `-e PGB_INNER=1`, so `--wrap-dlopen`, `--embed-locale`, `--no-iconv`,
+  `--arch-baseline` and `-v` were dropped at the boundary. ⚠ **It hid behind a
+  real result**: T-010's byte-identical measurement was taken on a build with
+  no options, the one case where dropping them all changes nothing. Fixed, and
+  the two engines are now byte-identical **with** options. `pgb shell` had no
+  docker branch at all and handed the caller a **host** shell; fixed with it.
 
 ⭐ **Three defects were found in this session's own instrument, and every one
 had already produced a plausible result**: `libm.a` on Debian 12 is a GNU ld
@@ -89,21 +124,19 @@ Nothing half-written. See `RESUME.md`.
 
 ## Work order
 
-    T-017                      env create / pick_engine mismatch -- S, and it
-                               bites every build on a machine with dockerd
-    T-002 + T-030              one build serves both: a project that dlopens
-                               its own plugins, plugin directory emptied
     T-003                      a project that FAILS, above the current class
-    T-012                      pgb build <spec> -- split it first, it is XL
-    T-032                      the CA bundle and terminfo: two of the three
+    T-032                      the CA bundle and terminfo -- two of the three
                                open rows of REQUIREMENTS part 2
+    T-012                      pgb build <spec> -- split it first, it is XL
     T-033                      route D, and it is L -- read solo.md first
     T-041                      aarch64
+    then P2 by category
 
-⭐ **Why T-017 moved to the head.** It is S, and it is the only open entry that
-makes *other* work fail confusingly: `pick_engine` prefers docker, so merely
-starting `dockerd` silently changes which environment every subsequent build
-uses. Everything below it is a build.
+⭐ **Only THREE P1 entries are open**, and one of them (T-012) is the project
+itself. T-032 is promoted above it because the operator's framing names the
+gaps it closes: *"no networking/iconv/gconv/nss/locale/**cert**/etc issues"*.
+The CA bundle and terminfo are two of the three open rows of `REQUIREMENTS.md`
+part 2 and both have a proven mechanism waiting rather than an unknown.
 
 ## Open questions for the operator
 

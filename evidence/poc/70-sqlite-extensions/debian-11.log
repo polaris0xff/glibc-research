@@ -1,0 +1,19 @@
+  ok   series generate_series(1,5)
+  ok   rot13
+  ok   uuid is 36 chars
+  ok   sha1
+  ok   decimal add
+  ok   ieee754 from mantissa/exponent
+  ok   regexp
+  ok   base64 round trip
+  ok   uint collation orders numerically
+  ok   csv virtual table
+  ok   totype
+  ok   zorder
+  ok   shathree
+  ok   spellfix editdist3
+  ok   carray registers
+  ok   an absent plugin is refused
+  ok   a plugin outside the table is refused
+  ok   sqlite still works
+PASSED: 0 failure(s)

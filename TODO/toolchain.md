@@ -457,7 +457,7 @@ headers, or an exception cannot cross the boundary in either direction.
 ## T-017 — `env create` builds one engine's environment; `pick_engine` may choose another
 
 **Source** found running `poc/60-leveldb` (T-001), session of 2026-09-01.
-**Category** toolchain · **Priority** P1 · **Effort** S · **Status** open
+**Category** toolchain · **Priority** P1 · **Effort** S · **Status** ✅ done
 
 **Problem.** ⛔ **The two engines have independent environments and nothing
 compares them.** `pgb env create` builds an environment for whichever engine
@@ -494,3 +494,123 @@ environment alone is ~1 GiB. The fix is that a stale one is *detected*.
 **Prove.** With a chroot environment created and the docker image absent or
 built from a different `PGB_ENV_PACKAGES`, `sh pgb build -- true` names the
 difference and exits 2, rather than failing inside the build.
+
+### Closed with
+
+⭐ **The premise was reproduced first, on this machine, before anything was
+written.** `pgb doctor` reported `chosen engine: chroot`; one `dockerd` later
+the same command reported `chosen engine: docker`, with no other change.
+
+`env_stamp()` writes one canonical line — image, digest, iconv, sorted package
+set — and `env_stamp_of()` reads it back from wherever the engine keeps it:
+`.pgb-env-stamp` for chroot, an `org.pgb.stamp` **image label** for
+docker/podman. ⭐ One function produces it and one consumes it, which is what
+stops the two arms drifting, and that is how the defect arrived.
+`env_require_current()` runs in `cmd_build` and `cmd_shell` **before** any
+mount or container starts.
+
+⚠ **An environment built before the stamp existed is reconstructed, not
+refused**: `.pgb-env` already records the image, the digest and the package
+set, and the archive's presence answers `iconv`. Exercised here — the chroot
+environment on this machine has no `.pgb-env-stamp` and still passes.
+
+**Six cases, measured:**
+
+| case | result |
+|---|---|
+| docker chosen, no docker image, chroot env present | **refuses**, and names chroot as an engine that does have one |
+| settings name a package the environment lacks | **refuses**: `packages MISSING from the environment: libpq-dev` |
+| a different image digest | **refuses**, and says the build would *succeed* against a glibc the pin does not describe |
+| **`--no-iconv` against an environment that HAS libiconv** | **passes** |
+| settings name **fewer** packages than the environment has | **passes** |
+| everything current | **passes**, `pgb build -- true` exits 0 |
+
+⛔ **Row four is a defect this entry introduced and then removed.** The first
+version compared every field for equality, so `--no-iconv` — a *build* option,
+not an environment property — was refused against a perfectly good
+environment. ⭐ A difference is not automatically a problem, and each field now
+carries the rule it actually has: image differs at all → fatal; a wanted
+package missing → fatal, an extra one → a note; `iconv` wanted 1 and have 0 →
+fatal, the other direction → nothing.
+
+⭐ **And the docker arm was proved end to end**, not argued: an image built
+with a deliberately reduced `PGB_ENV_PACKAGES` is refused with
+
+```
+packages MISSING from the environment: autoconf automake bzip2 cmake file
+libffi-dev libtool meson ninja-build patch perl xz-utils zlib1g-dev
+```
+
+and the control confirms the refusal is not a false positive —
+`docker run --entrypoint /bin/sh <that image> -c 'cmake --version'` prints
+`/bin/sh: 1: cmake: not found`, **the exact message this entry was opened
+with**.
+
+⚠ **A second, smaller defect of the same shape was fixed with it.**
+`pgb doctor` probed `$PGB_LIBICONV_PREFIX/lib/libiconv.a` **on the host** and
+printed `MISS GNU libiconv (static)` while the chosen engine was `chroot` and
+the archive was sitting in the chroot. A MISS for something that is not
+missing where it is used sends the reader to fix a working tool. It now
+reports the state of the **chosen** engine.
+
+⚠ **What this does NOT do**, stated: it does not compare the environment's
+*contents*, only what it was built from. An environment somebody edited by
+hand still passes.
+
+## T-019 — the docker engine drops every build option at the container boundary
+
+**Source** found while building `poc/70-sqlite-extensions` (T-002), session of
+2026-09-01b.
+**Category** toolchain · **Priority** P1 · **Effort** S · **Status** ✅ done
+
+**Problem.** ⛔ **Every documented build option silently did nothing under the
+docker and podman engines.** `chroot` inherits the caller's environment; a
+container does not, and the docker branch of `cmd_build` passed exactly
+`-e PGB_INNER=1`. So the whole `PGB_OPT_*` handoff — `--wrap-dlopen`,
+`--embed-locale`, `--no-iconv`, `--arch-baseline`, `-v` — was dropped at the
+boundary. No warning, no error, exit 0, and a binary that simply did not have
+the mechanism the caller asked for.
+
+**Premise.** ⭐ **Measured, same source, same command, engine the only
+variable:**
+
+```
+  chroot   __wrap_dlopen=1  pgb_dlopen_libs=1  size=2,453,656
+  docker   __wrap_dlopen=0  pgb_dlopen_libs=0  size=2,444,440
+```
+
+⚠ **AND IT HID BEHIND A REAL RESULT.** T-010 measured the two engines as
+producing **byte-identical** binaries and that measurement stands — it was
+taken on a build with **no options**, which is the one case where dropping
+them all changes nothing. ⛔ A green cross-check that only exercises the
+default path certifies the default path.
+
+⚠ **How it surfaced**: `poc/70-sqlite-extensions` linked fifteen plugins with
+`--wrap-dlopen` and the resulting binary contained no `__wrap_dlopen` at all.
+It read like a defect in the plugin table.
+
+**Approach.** One list, `PGB_OPT_VARS`, that `export_options` and the
+container branches both derive from, so extending one and not the other is not
+possible. `-e NAME` without `=VALUE`, so a value containing spaces — which
+`PGB_OPT_WRAP_DLOPEN` always has with more than one plugin — cannot be torn
+apart by word splitting.
+
+**Prove.** The same `--wrap-dlopen` build under both engines produces binaries
+with the wrapper present, and the two are byte-identical.
+
+**Closed with.** `tool/lib/build.sh`:
+
+```
+  chroot   __wrap_dlopen=1  pgb_dlopen_libs=1  namespaced=2  size=2,453,656
+  docker   __wrap_dlopen=1  pgb_dlopen_libs=1  namespaced=2  size=2,453,656
+  cmp: BYTE-IDENTICAL
+```
+
+⭐ **So the byte-identical property now holds WITH options too**, which is a
+stronger statement than the one T-010 could make.
+
+⚠ **A second defect of the same shape, found and fixed in the same place.**
+`cmd_shell` had **no docker branch at all** and fell through to `inner_build`
+on the **host**, so `pgb shell` — documented as "an interactive shell inside
+it" — handed the caller a shell on this machine with the wrappers on `PATH`.
+Same class as T-014: a documented capability quietly doing something else.

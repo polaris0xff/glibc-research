@@ -235,11 +235,14 @@ experiment; none has been shown to be unreachable.
    which `allyourcodebase/pipewire` already does; or carry a loader.
    **The class served today is: programs that do not need host plugins.**
    ⭐ **A program loading its *own* plugins is now served by a mechanism rather
-   than by hand.** `--wrap-dlopen` generates a symbol table with `nm` from the
-   objects the build produced and answers `dlopen`/`dlsym`/`dlclose`/`dlerror`
-   out of it — 11 of 11, zero host shared objects, `experiments/71-`. POC 50
-   still does it the hand way through CPython's own `Modules/Setup.local`;
-   rebuilding it on the generic mechanism is the open half of `TODO` T-030.
+   than by hand, and it is proved on a real project.** `--wrap-dlopen`
+   generates a symbol table with `nm` from the objects the build produced,
+   gives each plugin its own symbol namespace with `objcopy --redefine-syms`,
+   and answers `dlopen`/`dlsym`/`dlclose`/`dlerror` out of it — 11 of 11, zero
+   host shared objects, `experiments/71-`. ⭐ **POC 70 runs SQLite with fifteen
+   of its own extensions out of an EMPTY directory** on all eleven, against a
+   control that loads the host loader and libc on the two rows where it works
+   at all. `TODO` T-002 and T-030, both closed.
 2. **NSS beyond `files`/`dns` is gone**: no LDAP, SSSD, NIS, mDNS,
    systemd-resolved. Measured cost: on Fedora 42 a plain static binary resolves
    the machine's own hostname via `libnss_myhostname` and the pgb binary does
@@ -294,7 +297,7 @@ one kernel is not "works on Linux".
 | `pgb` podman engine | **UNTESTED** — podman is absent here. The code path is shared with docker except the binary name |
 | `pgb verify --engine` | **COMPLETE for chroot and docker**, and green on a runner in [run 14](https://github.com/polaris0xff/glibc-research/actions/runs/33512788793). Both arms agree on all 11 rows for both asserted columns; criterion 2 under docker is measured by `tool/runtime/pgb-trace.c`, a `ptrace` open-tracer carried into the container. ⚠ `unmeasured`, never `none`, when it cannot attach. podman untested |
 | NSS / iconv / locale mechanisms | **COMPLETE** — 11 of 11 each |
-| POCs 10 gawk, 20 nano, 30 curl, 40 jq, 50 CPython, 60 LevelDB | **COMPLETE** — all 11 environments each |
+| POCs 10 gawk, 20 nano, 30 curl, 40 jq, 50 CPython, 60 LevelDB, 70 SQLite | **COMPLETE** — all 11 environments each |
 | CI workflow | ⭐ **GREEN**, 15 jobs, [run 14](https://github.com/polaris0xff/glibc-research/actions/runs/33512788793) — and it now asserts §3 criterion 2, not just exit status, through `pgb verify --engine docker`. ⚠ It was not unrun before: it ran 10 times and was red 10 times, and the two red rows never executed a binary — GitHub's Node.js cannot start in a musl container. `history/corrections.md` C8. ⭐ Run 13 caught a real defect, the first time this workflow has found one rather than reported one |
 | aarch64 | **UNTESTED** |
 | host `dlopen`, terminfo, CA bundle | **KNOWN LIMITATION** — §7 |
@@ -309,6 +312,7 @@ one kernel is not "works on Linux".
 | 40 | jq 1.7.1 + oniguruma 6.9.9 | Unicode round trip, surrogate pairs, optional-dep detection |
 | 50 | CPython 3.12.7 | 49 extension modules linked **in**, `lib-dynload` empty, NSS via `socket`/`pwd` |
 | 60 | LevelDB 1.23 + a C++ subject | ⭐ the first **C++** and first **CMake** POC: static init order, exception unwinding across a static link, RTTI/typeid across TUs, iostreams. Found that no C++ program linked at all — libstdc++ calls `iconv` and `-lstdc++` is scanned after `-lpgbruntime` |
+| 70 | SQLite 3.47.0 + **15** of its own `ext/misc` extensions | ⭐ **an OPEN plugin ABI with no way to link a plugin in.** `.load` calls `dlopen()` on a path the *user* names and derives the entry point from the filename, so there is no `Setup.local` equivalent. Fifteen plugins, **plugin directory created empty**, 11 of 11. Found that all 16 extensions define `sqlite3_api` and any two collided at link time — fixed with per-plugin symbol namespacing |
 
 ## 10. Overhead
 

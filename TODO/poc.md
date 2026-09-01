@@ -74,7 +74,7 @@ program that never calls `iconv` is **1,008,152 bytes** and a C++ one is
 
 ## T-002 — Build something that dlopens its own plugins at scale
 
-**Source** operator · **Category** poc · **Priority** P1 · **Effort** M · **Status** open
+**Source** operator · **Category** poc · **Priority** P1 · **Effort** M · **Status** ✅ done
 
 **Problem.** POC 50 links CPython's 49 extension modules in by hand, using
 CPython's own `Modules/Setup.local` mechanism. Nothing generalises that.
@@ -88,6 +88,76 @@ This is the entry that most likely produces T-010 (`--wrap-dlopen`).
 
 **Prove.** `sh poc/<n>-<name>/run.sh` exits 0, and `evidence/.../RESULT.txt`
 shows an empty plugin directory with the functionality still working.
+
+**Closed with** `poc/70-sqlite-extensions/`, `pass=20 fail=0 skip=0`,
+`evidence/poc/70-sqlite-extensions/RESULT.txt`.
+
+⭐ **SQLite is the right subject and the reason is structural.** Its
+loadable-extension interface is an OPEN ABI: `.load ./series` calls `dlopen()`
+on a path the *user* names, derives an entry point from the FILENAME, and
+calls it. There is no configure switch and no `Setup.local` equivalent — to
+link an extension in and keep `.load` working you would have to edit
+`sqlite3.c`. Measured rather than assumed: `sqlite3LoadExtension()` calls
+`sqlite3OsDlOpen()` with **no stat and no access check**, and retries with
+`.so` appended when the first call returns NULL, so both paths through the
+wrapper are exercised on every load.
+
+**Fifteen extensions, plugin directory created EMPTY on every target:**
+
+```
+  11 of 11 environments   functional test ok
+  11 of 11 environments   host shared objects loaded: none
+  18 assertions per environment, 3 of them NEGATIVE
+```
+
+⭐ **And the control says what that is worth.** The same sqlite3, built by
+`pgb` without `--wrap-dlopen`, with the fifteen **real** `.so` files staged
+in — observed, never asserted:
+
+| | |
+|---|---|
+| loaded and worked | **2 of 11** (Debian 12, Arch) — and both pulled in the host `ld-linux-x86-64.so.2` **and** `libc.so.6` |
+| SIGABRT | Debian 11, Ubuntu 20.04, Rocky 8 |
+| SIGFPE | openSUSE Leap, Fedora 42 |
+| refused, `libc.so.6: cannot open shared object file` | all 4 musl |
+
+That is `docs/limitations.md` §1 reproduced on a second program, and the two
+rows that "work" are the two-libc state the whole project exists to prevent.
+
+### ⛔ What building at scale found, which one plugin never would
+
+`--wrap-dlopen` puts the plugin objects in **one** executable, and SQLite's
+extension ABI requires every extension to define a file-scope, non-static
+`const sqlite3_api_routines *sqlite3_api` (`SQLITE_EXTENSION_INIT1`). **All
+sixteen** of sqlite's `ext/misc` extensions define it, so **any two collided
+at link time and the build stopped**:
+
+```
+ld: uuid.o:(.bss+0x0): multiple definition of `sqlite3_api';
+    series.o:(.bss+0x0): first defined here
+```
+
+⛔ And worse than one ABI's habit: sqlite derives the entry point from the
+filename keeping only *alphabetic* characters, so `base64.c` and `base85.c`
+both define `sqlite3_base_init` **on purpose**. Two plugins colliding on their
+entry point is a thing upstreams deliberately do.
+
+⭐ **Fixed by giving each plugin the namespace the loader would have given
+it**: `tool/lib/wrappers.sh` renames every symbol a plugin object defines with
+`objcopy --redefine-syms` to a per-plugin prefix, and the generated table maps
+the ORIGINAL name to the renamed one. `dlsym` still answers
+`sqlite3_series_init`; nothing else in the link can see it. That is
+`RTLD_LOCAL`, reproduced at link time. Checked on the artefact, not trusted:
+15 `pgb_dl<N>_sqlite3_api` symbols in the binary and **0** unnamespaced ones,
+and the POC keeps the raw collision as a live check that still fails.
+
+⚠ **One extension was dropped, with the control that says why.**
+`ext/misc/percentile.c` segfaulted on all eleven — which reads exactly like a
+defect in `--wrap-dlopen`. It is not: it segfaults **at load time**, before
+any query runs, in an ordinary dynamically linked sqlite3 built from the same
+amalgamation loading a real `.so` through the real `dlopen`, in two different
+build configurations. Replaced with `csv`. ⭐ Without that control this POC
+would have reported eleven segfaults against the mechanism under test.
 
 ## T-003 — Build a project that fails, and write down why
 

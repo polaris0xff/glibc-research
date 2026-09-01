@@ -76,6 +76,44 @@ build_runtime() {
 #           ending in foo.so.
 #   OBJECT  any .o or .a the build produced. Its DEFINED, EXTERNAL symbols
 #           become the plugin's dlsym table.
+#
+# -- ⛔ WHY EVERY PLUGIN'S SYMBOLS ARE RENAMED, AND WHAT FOUND IT ------------
+#
+# A real dlopen gives each object its own namespace: two plugins may both
+# define `foo` and neither sees the other's. This mechanism does the opposite
+# by construction -- it puts the plugin objects in ONE executable -- so
+# without help the second plugin does not fail at run time, it fails at LINK
+# time and the whole build stops.
+#
+# ⭐ MEASURED, AND IT IS NOT AN EDGE CASE. SQLite's loadable-extension ABI
+# requires every extension to carry `SQLITE_EXTENSION_INIT1`, which declares a
+# file-scope, NON-static `const sqlite3_api_routines *sqlite3_api`. All 16 of
+# the extensions in sqlite's own ext/misc define it, so ANY TWO of them
+# collide:
+#
+#   ld: uuid.o:(.bss+0x0): multiple definition of `sqlite3_api';
+#       series.o:(.bss+0x0): first defined here
+#
+# ⛔ And it is worse than one ABI's habit: sqlite derives an extension's entry
+# point from its FILENAME, keeping only alphabetic characters, so base64.c and
+# base85.c both define `sqlite3_base_init` ON PURPOSE. Two plugins colliding
+# on their entry point is a thing upstreams deliberately do.
+#
+# ⭐ THE FIX IS THE NAMESPACE THE LOADER WOULD HAVE GIVEN THEM. Every symbol a
+# plugin object DEFINES is renamed to a per-plugin prefix with
+# `objcopy --redefine-syms`, and the table maps the ORIGINAL name to the
+# renamed one. dlsym still answers `sqlite3_series_init`; nothing else in the
+# link can see it. That is RTLD_LOCAL, reproduced at link time.
+#
+# ⚠ Only DEFINED symbols are renamed. A plugin's calls back into the host
+# program are UNDEFINED references and are untouched, so they still bind.
+#
+# ⚠ THE BEHAVIOUR CHANGE, STATED: a plugin's symbols are no longer visible to
+# the rest of the executable under their own names. That is what a separate
+# .so loaded RTLD_LOCAL already does, so this makes the mechanism agree with
+# what it is imitating -- but a program that called a plugin function
+# DIRECTLY, without dlsym, would now fail to link. Nothing does: an object
+# reached by dlopen is by definition reached by name.
 build_dlopen_table() {
   rd="$1"; CCB="$2"
   gen="$rd/pgb-dlopen-table.c"
@@ -95,7 +133,9 @@ build_dlopen_table() {
     syms=""
     for o in $objlist; do
       [ -f "$o" ] || die "--wrap-dlopen: no such object: $o" 2
-      objs="$objs $o"
+      # ⛔ NOT added to $objs here. The link gets the NAMESPACED copy made
+      # below, never the original -- linking both would reintroduce exactly
+      # the duplicate-symbol collision the renaming exists to remove.
       # ⛔ DEFINED AND EXTERNAL ONLY. Without --defined-only the table would
       # carry the plugin's own UNDEFINED references -- every libc function it
       # calls -- and generating `extern void X; ... &X` for those makes the
@@ -113,12 +153,37 @@ build_dlopen_table() {
     syms=$(printf '%s\n' $syms | sort -u)
     [ -n "$syms" ] || die "--wrap-dlopen: $name has no defined external symbols in:$objlist" 1
 
+    # ⭐ The namespace. Every defined symbol gets a per-plugin prefix, so two
+    # plugins that both define `sqlite3_api` -- which every SQLite extension
+    # does -- stop colliding. See the block above this function for what
+    # found this and why the answer is renaming rather than localising:
+    # localising would make the symbol unaddressable from the generated
+    # table, which is the one translation unit that must still reach it.
+    command -v objcopy >/dev/null 2>&1 || \
+      die "--wrap-dlopen needs objcopy (binutils) to namespace plugin symbols" 2
+    pfx="pgb_dl${idx}_"
+    map="$rd/pgb-dlopen-renames-$idx.txt"
+    : > "$map"
     for sym in $syms; do
-      printf 'extern char %s[];\n' "$sym" >> "$gen"
+      printf '%s %s%s\n' "$sym" "$pfx" "$sym" >> "$map"
+    done
+    nobjs=""
+    ni=0
+    for o in $objlist; do
+      no="$rd/pgb-dl-$idx-$ni-$(basename "$o")"
+      objcopy --redefine-syms="$map" "$o" "$no" \
+        || die "--wrap-dlopen: could not namespace $o" 1
+      nobjs="$nobjs $no"
+      ni=$((ni+1))
+    done
+    objs="$objs $nobjs"
+
+    for sym in $syms; do
+      printf 'extern char %s%s[];\n' "$pfx" "$sym" >> "$gen"
     done
     printf '\nstatic const struct pgb_dl_sym pgb_dl_syms_%s[] = {\n' "$idx" >> "$gen"
     for sym in $syms; do
-      printf '    { "%s", (void *)%s },\n' "$sym" "$sym" >> "$gen"
+      printf '    { "%s", (void *)%s%s },\n' "$sym" "$pfx" "$sym" >> "$gen"
     done
     printf '    { NULL, NULL }\n};\n\n' >> "$gen"
     entries="$entries $idx:$name"
