@@ -241,7 +241,7 @@ the executable's own unwind tables are discoverable through program headers.
 
 ## T-032 — `--embed-terminfo` and a CA-bundle answer
 
-**Source** `docs/limitations.md` §3 · **Category** runtime · **Priority** P1 · **Effort** S · **Status** open
+**Source** `docs/limitations.md` §3 · **Category** runtime · **Priority** P1 · **Effort** S · **Status** ✅ done
 
 ⚠ **PROMOTED to P1**: the operator's framing of the goal names both —
 *"no networking/iconv/gconv/nss/locale/**cert**/etc issues"* — and they are two
@@ -254,13 +254,45 @@ proved.
 **Prove.** POC 20's `setupterm()` probe passing on all 11, and POC 30's curl
 verifying TLS on all 11 with the harness's own CA variables unset.
 
-### ⛔ BOTH MECHANISMS ARE BUILT AND MEASURED; THE ACCEPTANCE IS NOT MET
+### ✅ CLOSED 2026-09-01d — both POCs run to completion, 11 of 11 each
 
-⛔ **This entry stays OPEN.** `RULES.md`: an entry closes on its own acceptance
-command and not on a nearby one. The `Prove` above names POC 20 and POC 30,
-both POCs have been wired to the new flags, and **neither has been run to
-completion** — the session ended during POC 20's ncurses build. What is
-measured below is the mechanism on its own, by two new experiments.
+⭐ **The acceptance is the two POC runs and they are done.** Only the runs were
+owed; the mechanisms had landed in the previous session.
+
+**POC 20 — `--embed-terminfo`.** `evidence/poc/20-nano/RESULT.txt`, nano 8.2 on
+ncurses 6.5. **12 assertions, 0 failures.** The `setupterm()` check is *inside*
+the functional test, not beside it, and it runs with `TERMINFO` and
+`TERMINFO_DIRS` unset so the harness cannot answer for the host:
+
+```
+alpine 3.22 / 3.20 / 3.10   host-terminfo-tree=no    setupterm(xterm-256color)=OK
+the other eight             host-terminfo-tree=yes   setupterm(xterm-256color)=OK
+```
+
+**POC 30 — `--embed-cacert`.** `evidence/poc/30-curl/RESULT.txt`, curl 8.11.0 on
+OpenSSL 3.0.15 and zlib 1.3.1. **12 assertions, 0 failures.** Step 8,
+`https-verify-host`, verifies a real TLS handshake **with the harness's own
+`CURL_CA_BUNDLE`, `SSL_CERT_FILE`, `SSL_CERT_DIR` and `CURL_CA_PATH` unset**,
+on all eleven. The old *"trust store missing on host"* branch is a failure now,
+not an `ok`.
+
+Host shared objects loaded: **none, on every row of both**.
+
+⚠ **One instrument note, and it is the rule this session added to
+`RULES.md`.** POC 30's first run reported `voidlinux-musl: SIG9`. Nothing was
+wrong with the binary: `experiments/85-` was reaping the same rootfs at the
+same moment, and its reaper kills by `/proc/PID/root` and cannot tell one
+run's process from another's. Re-run serialised, it passes. ⛔ **A row that
+says SIG9 in an otherwise clean table is what concurrency on the shared bed
+looks like** — it does not announce itself.
+
+⛔ **And one real defect found by the re-run**: `tool/runtime/pgb-cacert.c` was
+missing `<stdio.h>`, so every `--embed-cacert` build printed
+`implicit declaration of function 'snprintf'` and compiled a call whose return
+type C only assumes. `pgb-locale.c` carries the same include with a note
+saying the same mistake was made and fixed *there* first. A warning under
+gcc 12 and an **error** under C23. The other five runtime pieces were checked
+and are clean.
 
 **Landed:**
 
@@ -296,15 +328,8 @@ maintains would be a security regression wearing a portability fix's clothes.
 `74-` checks, against an independent oracle rather than the shim's own answer,
 that nothing was written on any host that has a store.
 
-**What is left, exactly:**
-
-1. run `poc/20-nano` (now carrying `POC_PGB_FLAGS=--embed-terminfo`, with the
-   `setupterm()` probe moved from an observation to an **assertion** staged
-   into `poc_matrix`) to completion, 11 of 11;
-2. run `poc/30-curl` (now carrying `POC_PGB_FLAGS=--embed-cacert`, with a new
-   step 8 that verifies TLS with the harness's own CA variables unset, and
-   with the old *"trust store missing on host"* branch turned from `ok` into a
-   **failure** — it was rightly `ok` while no mechanism existed).
+**What was left, and is now done:** the two POC runs above. Both POCs already
+carried their flags and their new assertions; only the runs were owed.
 
 ⚠ **One confound to watch when running POC 30**: this development environment
 routes HTTPS through a proxy that exports its own `CURL_CA_BUNDLE` and

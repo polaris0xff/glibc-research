@@ -1,0 +1,29 @@
+===============================================================
+86 - our bundler against a hand-built Anylinux AppImage
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-01T18:57:07Z
+host kernel  : Linux 6.18.44-fc-v22
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/86-bundler-vs-anylinux
+--------------------------------------------------------------
+
+-- arm P: our bundler, one command --------------------------------
+  ok    arm P built from the package name alone        = yes
+
+-- arm A: the hand-built Anylinux route ---------------------------
+  ok    anylinux toolchain staged at its pinned digests = yes
+  ok    arm A built by the hand-built route            = yes
+
+-- size ----------------------------------------------------------
+  ARTEFACT                            BYTES  NOTE
+  P  ours (nixpkgs closure)        12230824  ? store paths, nothing debloated
+  A  hand-built (Arch)              4006946  68 libraries deployed
+     ratio P/A                        3.05x  ⛔ ours is bigger and T-057 item 1 is why: no debloating at all
+
+-- the eleven: does it run, what did it load, how fast does it start --
+  ENVIRONMENT         LIBC   | P:res    P:h   P:cold   P:warm   | A:res    A:h   A:cold   A:warm  

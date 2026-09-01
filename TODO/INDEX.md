@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 32  OPEN 18  DONE 14
+    TOTAL 32  OPEN 17  DONE 15
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 0 | 0 | 0 |
-| P1 | a documented capability does not work, or a flag does nothing | 24 | 10 | 14 |
+| P1 | a documented capability does not work, or a flag does nothing | 24 | 9 | 15 |
 | P2 | worth doing; nothing is wrong without it | 8 | 8 | 0 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -35,7 +35,7 @@ pretending to be one.
 | T-022 | P2 | M | open | research | Spike a nixpkgs front end for the planner |
 | T-030 | P1 | M | done | runtime | `--wrap-dlopen` against a compiled-in table |
 | T-031 | P2 | L | open | runtime | Port cross-libc-dlopen's full rewrite, not one function |
-| T-032 | P1 | S | open | runtime | `--embed-terminfo` and a CA-bundle answer |
+| T-032 | P1 | S | done | runtime | `--embed-terminfo` and a CA-bundle answer |
 | T-033 | P1 | L | open | runtime | Route D: compile an ELF loader in, resolve against our own static glibc |
 | T-040 | P1 | S | done | ci | Run CI once |
 | T-041 | P2 | M | open | ci | aarch64 |
