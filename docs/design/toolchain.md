@@ -142,9 +142,69 @@ command line; `ppkg`'s `core/wrappers/` are compiler wrappers in C solving the
 same problem `pgb`'s shell wrappers solve. The brief's instruction is to reuse
 and patch before reinventing, and it applies here.
 
-⛔ **This is a decision to confirm, not a decision already taken.** It is
-recorded here so the reasoning is visible and so the next agent does not
-re-derive it — but "keep it in shell" is the kind of choice that gets harder to
-revisit the longer it stands. If the planner turns out to need more than the
-split above can carry, changing language is a legitimate outcome and the
-constraint that decides it is the first row of the table above.
+## ⭐ The ruling, and the measurement that changed its reasoning
+
+⛔ **The constraint this page rested on is measured FALSE.** The paragraph
+above says `sh` is chosen because "whatever the driver is written in has to
+exist in that environment", and that Python, Rust and Go "do not". T-011
+flagged that as an untested assumption. `experiments/70-carried-helper.sh`
+tested it: the same helper — open a file on whatever filesystem it landed on,
+parse it, report — built five ways and **carried into** the eleven pinned
+target rootfs plus the pinned build environment.
+
+| arm | ran on |
+|---|---|
+| `sh` (the incumbent) | **12 of 12** |
+| `c-pgb` (positive control) | **12 of 12** |
+| `c-plain-static` | 12 of 12 |
+| **`rust-gnu-static`** (`+crt-static`) | **12 of 12** |
+| **`rust-musl-static`** | **12 of 12** |
+
+⭐ **A carried-in Rust helper is exactly as available as `sh` is**, on every
+environment this project targets and inside the build environment `pgb build`
+re-enters. Nothing had to be installed anywhere. ⚠ **Not installing it is the
+whole point** — the constraint was never really "does the language exist
+there", it was "can something be *put* there", and this project's entire
+output is the answer to that.
+
+⚠ **What experiment 70 does NOT show.** It measures whether a helper
+**executes**, not whether it is correct on every libc path. Its subject only
+opens and parses a file — which is why the plain `gcc -static` arm also scores
+12 of 12, where `ci/probe.c` fails on 11 of 11. A helper that resolved a
+hostname or converted an encoding would need `pgb`'s mechanisms like anything
+else. The result is about availability and nothing more.
+
+### The decision, re-argued on what survives
+
+⭐ **The driver stays POSIX `sh` — but not for the reason above, and the door
+this page had closed is measured open.**
+
+Two of the three original arguments survive intact and neither is about
+availability. Most of what the driver does is orchestrating other programs —
+`git`, `curl`, `tar`, `chroot`, `gcc`, `ld` — which is what a shell is for;
+and the brief requires the tool not be a black box, which a shell script
+readable by the person debugging it at the moment they are debugging it
+satisfies better than a compiled binary. What is left of the third argument is
+much smaller than it looked: a Rust helper costs a Rust toolchain **on the
+build host**, and a ~4 MB artefact to carry, rather than costing anything on
+the target. That is a real cost and a modest one.
+
+⛔ **So "the alternative loses on bootstrap" is withdrawn as written**, and
+with it any reading of this page that says the planner cannot be written in a
+real language. It can. `experiments/70-` is the evidence, and the honest
+statement of the split is now:
+
+| runs | language | why |
+|---|---|---|
+| the **driver** — orchestration, re-entry, the engine boundary | POSIX `sh` | it is what the work is, and it stays readable while being debugged |
+| the **planner** — dependency graphs, ELF analysis, package metadata | a real language, **carried in** as a static binary | the work needs data structures, and ⭐ availability is no longer an argument against it |
+
+⚠ **One circularity to name before anyone builds it.** A carried-in planner
+has to be built before it can be carried, and if it is built by `pgb` then
+`pgb` needs it to build itself. The escape is ordinary — build the helper with
+a plain static toolchain first, and use `pgb` only to make it portable — but
+it is a bootstrap step somebody has to write down, and this is that sentence.
+
+⛔ **This ruling replaces "a decision to confirm".** It is confirmed, its
+stated reason is corrected, and the measurement that corrected it is in the
+tree. `TODO/toolchain.md` T-011.

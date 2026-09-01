@@ -1,0 +1,175 @@
+# The benchmark matrix.
+#
+# ⭐ EVERY CELL HERE EXISTS TO ANSWER A STATED QUESTION. The full cross product
+# of the dimensions this project tracks is roughly 700 cells; almost all of them
+# would burn CI time and produce a column nobody can interpret. So the matrix is
+# a small set of named suites, each varying ONE thing against a common control,
+# and each carrying the question it answers.
+#
+# `alloc-bench plan --suite <id>` expands one. `--suite all` expands every
+# suite and de-duplicates the overlap.
+#
+# ⛔ A cell that cannot be built is NOT dropped. It is emitted with status
+# `unsupported` and the reason from allocators/allocators.toml, and the report
+# prints it. A configuration that silently vanishes from a matrix is
+# indistinguishable from one nobody thought of.
+
+schema_version = 1
+
+# `*` in `allocators` means every allocator in allocators.toml, `system`
+# included. The `system` row is always emitted with the `baseline` mechanism
+# whatever a suite asks for, because there is nothing to integrate.
+
+# ---------------------------------------------------------------------------
+[[suite]]
+id = "smoke"
+why = """
+The pull-request check. One distribution, one architecture, one profile, three
+allocators: enough to prove the pipeline end to end -- image, allocator build,
+patch, link, identity, correctness gate, measurement, validation, report -- in
+minutes rather than hours. It is NOT enough to rank anything, and the report
+says so when this is the only suite present.
+"""
+distros      = ["alpine"]
+arches       = ["x86_64"]
+allocators   = ["system", "mimalloc", "jemalloc"]
+integrations = ["rust-global"]
+profiles     = ["static-pie"]
+toolchains   = ["distro"]
+corpus       = "smoke"
+repeat       = 5
+
+# ---------------------------------------------------------------------------
+[[suite]]
+id = "core"
+why = """
+The headline question: for a statically linked container binary on musl, which
+allocator is fastest, and by how much against the distribution's own?
+
+One profile (static-pie-lto, the configuration a container image would actually
+ship), one mechanism (rust-global, the one every allocator with a C API
+supports), both architectures. Allocators that cannot do rust-global appear as
+unsupported rows with their reason.
+"""
+distros      = ["alpine"]
+arches       = ["x86_64", "aarch64"]
+allocators   = ["*"]
+integrations = ["rust-global"]
+profiles     = ["static-pie-lto"]
+toolchains   = ["distro"]
+corpus       = "standard"
+repeat       = 12
+
+# ---------------------------------------------------------------------------
+[[suite]]
+id = "profiles"
+why = """
+Does the build profile change the answer? Specifically: does LTO, or position
+independence, cost or buy enough to change which allocator wins, and what does
+static-PIE cost against plain static for the ASLR it buys?
+
+Held constant: distribution, mechanism, toolchain. Varied: the profile. Four
+allocators rather than all eight, because the question is about profiles and
+each extra allocator multiplies the cell count by one without sharpening it.
+"""
+distros      = ["alpine"]
+arches       = ["x86_64", "aarch64"]
+allocators   = ["system", "mimalloc", "jemalloc", "snmalloc"]
+integrations = ["rust-global"]
+profiles     = ["static", "static-pie", "static-lto", "static-pie-lto"]
+toolchains   = ["distro"]
+corpus       = "standard"
+repeat       = 10
+
+# ---------------------------------------------------------------------------
+[[suite]]
+id = "mechanisms"
+why = """
+Is 'link the allocator into the application' the same experiment as 'replace the
+distribution's allocator'? The project asserts they are not, and this suite is
+the evidence: the same allocator, the same profile, reached three different ways.
+
+libc-surgery is the only one of the three that changes what a plain
+`cargo build` in that image produces, which is the practical question for
+anyone shipping a container image.
+
+⭐ Debian is in this suite on purpose, and every replacement cell on it is
+expected to come out `unsupported`. That row IS the finding: statically
+replacing glibc's allocator does not work, the reason is concrete, and a
+reader who assumes it does needs to see it stated rather than inferred from an
+absence.
+"""
+distros      = ["alpine", "debian"]
+arches       = ["x86_64", "aarch64"]
+allocators   = ["system", "mimalloc", "jemalloc", "snmalloc", "rpmalloc", "hardened_malloc"]
+integrations = ["rust-global", "libc-surgery", "link-override"]
+profiles     = ["static-pie"]
+toolchains   = ["distro"]
+corpus       = "standard"
+repeat       = 10
+
+# ---------------------------------------------------------------------------
+[[suite]]
+id = "distros"
+why = """
+How much of the answer is the libc? Alpine is musl; Debian and Arch are glibc
+with different versions and different build defaults. glibc's allocator is much
+better than musl's, so the gap an alternative allocator closes should be far
+smaller here -- and that expectation is exactly what needs measuring rather
+than asserting.
+
+⚠ Arch publishes no aarch64 image (see images/arch.Dockerfile). On that
+architecture the distribution is Arch Linux ARM and is labelled `archlinuxarm`.
+"""
+distros      = ["alpine", "debian", "archlinux"]
+arches       = ["x86_64", "aarch64"]
+allocators   = ["system", "mimalloc", "jemalloc"]
+integrations = ["rust-global"]
+profiles     = ["static-pie", "dynamic"]
+toolchains   = ["distro"]
+corpus       = "standard"
+repeat       = 10
+
+# ---------------------------------------------------------------------------
+[[suite]]
+id = "toolchain-control"
+why = """
+The control for the `distros` suite. If Alpine, Debian and Arch each build the
+allocator with their own gcc, a difference between them is a difference between
+three compilers as much as between two libcs. Rebuilding the same cells with
+one pinned `zig cc` removes the compiler from the comparison.
+
+⚠ A difference that SURVIVES this control is attributable to the distribution.
+A difference that disappears was the compiler, and the `distros` table must be
+read with that in mind.
+"""
+distros      = ["alpine", "debian", "archlinux"]
+arches       = ["x86_64"]
+allocators   = ["system", "mimalloc"]
+integrations = ["rust-global"]
+profiles     = ["static-pie"]
+toolchains   = ["zig"]
+corpus       = "standard"
+repeat       = 10
+
+# ---------------------------------------------------------------------------
+[[suite]]
+id = "preload"
+why = """
+The dynamic counterpart, and the only mechanism Mesh and Google tcmalloc
+support. It answers a different practical question from the rest of the matrix:
+can an existing image's allocator be swapped at run time, with no rebuild of
+anything?
+
+⛔ These numbers are NOT comparable with the static rows: a dynamically linked
+binary going through the PLT is a different binary. The report keeps them in a
+separate table for that reason.
+"""
+distros      = ["alpine", "debian"]
+arches       = ["x86_64", "aarch64"]
+allocators   = ["system", "mimalloc", "jemalloc", "snmalloc", "mesh", "tcmalloc"]
+integrations = ["preload"]
+profiles     = ["dynamic"]
+toolchains   = ["distro"]
+corpus       = "standard"
+repeat       = 10

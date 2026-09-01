@@ -41,13 +41,14 @@ on the distribution.
 
 ## What `pgb` does
 
-Three mechanisms, none of which changes a line of application source:
+Four mechanisms, none of which changes a line of application source:
 
 | | |
 |---|---|
 | **NSS** | a constructor calls `__nss_configure_lookup()` — a public `GLIBC_2.2.5` symbol that is in `libc.a` — pinning every database to services glibc ≥ 2.34 implements *inside* libc. The host's nsswitch.conf then names nothing that can be loaded. |
 | **iconv** | `-Wl,--wrap` redirects the three public iconv entry points to statically linked GNU libiconv. It acts at the final link, so it catches calls from any object, including archives built long before this tool existed. |
 | **locale** | opt-in `--embed-locale`: C.UTF-8 embedded, written out only if the host cannot answer a UTF-8 `setlocale`. |
+| **own plugins** | opt-in `--wrap-dlopen`: `dlopen`, `dlsym`, `dlclose` and `dlerror` answered from a table `pgb` generates with `nm` from the objects your build produced. A program loading its *own* plugins never needed a loader — the code is already in the link and `dlopen` is only doing a name lookup. Nothing is mapped, so no second libc can enter. ⚠ Not for **host** plugins; see the limitations. |
 
 Delivery is compiler wrappers on `PATH`. autotools, CMake, meson and plain
 make pick them up without knowing `pgb` exists. `sh pgb explain` prints every

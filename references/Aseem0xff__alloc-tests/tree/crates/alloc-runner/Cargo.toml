@@ -1,0 +1,22 @@
+[package]
+name = "alloc-runner"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "In-container instrument: corpus generation, ELF allocator identification, correctness gate, and external measurement."
+
+[[bin]]
+name = "alloc-runner"
+path = "src/main.rs"
+
+[dependencies]
+libc = "0.2"
+
+# ⚠ No [profile.release] here: Cargo ignores profiles in a non-root package and
+# warns. The workspace root sets it for every crate, which is what this project
+# wants anyway -- the instrument must be built the same way every time.
+#
+# The runner is copied into every benchmark image and must not perturb what it
+# measures. It is built with the host's default allocator, never with a
+# candidate allocator; see docs/methodology.md.

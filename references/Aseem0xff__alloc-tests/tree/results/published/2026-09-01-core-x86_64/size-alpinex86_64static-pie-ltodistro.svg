@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="810" height="252" viewBox="0 0 810 252" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="16" y="26" font-size="15" font-weight="600" fill="#1b1f24">Binary size — alpine / x86_64 / static-pie-lto / distro</text>
+<text x="16" y="45" font-size="11" fill="#5b636d">unstripped, with symbols retained so the identity oracle can read the binary</text>
+<text x="250" y="79.7" font-size="11" fill="#1b1f24" text-anchor="end">snmalloc / rust-global</text>
+<rect x="260" y="67.0" width="240.8" height="15" rx="2" fill="#3b7dd8"/>
+<text x="506.8" y="79.7" font-size="10.5" fill="#5b636d">7.17 MiB</text>
+<text x="250" y="105.7" font-size="11" fill="#1b1f24" text-anchor="end">mimalloc / rust-global</text>
+<rect x="260" y="93.0" width="230.1" height="15" rx="2" fill="#3b7dd8"/>
+<text x="496.1" y="105.7" font-size="10.5" fill="#5b636d">6.85 MiB</text>
+<text x="250" y="131.7" font-size="11" fill="#1b1f24" text-anchor="end">rpmalloc / rust-global</text>
+<rect x="260" y="119.0" width="234.4" height="15" rx="2" fill="#3b7dd8"/>
+<text x="500.4" y="131.7" font-size="10.5" fill="#5b636d">6.98 MiB</text>
+<text x="250" y="157.7" font-size="11" fill="#1b1f24" text-anchor="end">jemalloc / rust-global</text>
+<rect x="260" y="145.0" width="425.9" height="15" rx="2" fill="#3b7dd8"/>
+<text x="691.9" y="157.7" font-size="10.5" fill="#5b636d">12.67 MiB</text>
+<text x="250" y="183.7" font-size="11" fill="#1b1f24" text-anchor="end">system (control)</text>
+<rect x="260" y="171.0" width="222.8" height="15" rx="2" fill="#8a8f98"/>
+<text x="488.8" y="183.7" font-size="10.5" fill="#5b636d">6.63 MiB</text>
+<text x="250" y="209.7" font-size="11" fill="#1b1f24" text-anchor="end">hardened_malloc / rust-global</text>
+<rect x="260" y="197.0" width="223.0" height="15" rx="2" fill="#3b7dd8"/>
+<text x="489.0" y="209.7" font-size="10.5" fill="#5b636d">6.64 MiB</text>
+<text x="16" y="240.0" font-size="10" fill="#5b636d">⚠ These binaries keep .symtab on purpose; a shipped build would strip and be smaller.</text></svg>

@@ -1,0 +1,6 @@
+  ok   static initialisation ran before main
+  ok   exception thrown, unwound and caught
+  ok   RTTI: dynamic_cast<Derived*> succeeded
+  ok   RTTI: typeid names Derived
+  ok   leveldb round trip: k -> v-42
+PASSED: 0 failure(s)

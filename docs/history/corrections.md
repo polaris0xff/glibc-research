@@ -154,7 +154,232 @@ separates them is shape, not portability or performance. ⚠ **The general
 lesson is the one worth carrying:** an experiment that picks its metric from
 what is easy to measure will confirm whatever that metric favours. Choose the
 axis from the brief, not from the instrument.
+## C8 — "The CI workflow has never run"
 
+**Claimed** by `docs/AGENTS.md` §9 ("**WRITTEN, NEVER RUN** — no push has
+happened from a runner yet"), by §13 item 2, and by `TODO/ci.md` T-040, which
+called a green portable arm "a prediction, not a result".
+
+**Disproved by** the GitHub Actions API. The workflow had run **ten times** by
+the time it was read, on every push from run 1 (`79bbfa33`) to run 10
+(`b77e0333`), and **all ten were red**. ⛔ Three tracked files asserted the
+opposite of an observable fact about this repository, and one of them was the
+first file a new session is told to read.
+
+**What the ten runs actually contain**, which is the part the wrong claim cost:
+
+| | |
+|---|---|
+| `build` job | ✅ green every time. `pgb --engine host build` produced a static probe, `readelf -d` counted 0 `NEEDED`. |
+| matrix, 9 of 11 rows | ✅ green. `probe-portable` printed `PASSED: 0 failure(s)` on Alpine 3.22/3.20, Debian 11/12, Ubuntu 20.04, Rocky 8, openSUSE Leap, Fedora 42 and Arch. |
+| the control, on Arch | ⛔ `Segmentation fault (core dumped)`, exit 139 — the positive control the local bed also reports, reproduced on somebody else's machine. |
+| matrix, 2 of 11 rows | ⛔ red, and **the probe never ran on either**. |
+
+⭐ **The two red rows are not a portability result. They are GitHub's Node.js
+failing to start in a musl container**, before `actions/download-artifact` had
+fetched anything:
+
+```
+voidlinux    exec /__e/node24/bin/node: no such file or directory
+alpine-3.10  Error relocating /__e/node24_alpine/bin/node:
+               pthread_getname_np: symbol not found
+               secure_getenv: symbol not found
+```
+
+A job using `container:` has the runner inject its own Node to execute every
+JavaScript action. That Node is dynamically linked, and the runner picks the
+glibc build unless `/etc/os-release` says `ID=alpine` — so Void Linux gets a
+glibc binary with no loader to run it, and Alpine 3.10's musl 1.1.22 predates
+both symbols the alpine build needs.
+
+⭐ **This is the project's own thesis, observed on the CI provider**, and it is
+worth more than the green rows: a dynamically linked helper cannot be shipped
+to an environment somebody else chose. `pgb`'s answer — run the helper where
+its libc is, send a static binary into the target — is what the fix does.
+
+**A second defect the same read found:** the matrix rows were **hand-written
+tags** (`alpine:3.22`, `archlinux:latest`) while the local bed pins the same
+eleven environments by manifest digest in
+`scripts/common/rootfs-images.txt`. ⛔ CI and the local bed were two different
+test beds reporting as one, and `archlinux:latest` is a rolling tag — the
+exact hazard that file's own header warns about. Consistent with that, CI's
+Arch row killed the plain control with **SIGSEGV** where the pinned local Arch
+kills it with **SIGFPE**: the same experiment, a different Arch.
+
+**A third:** the workflow's header claimed it was "how the docker/podman
+engines in `pgb`, marked UNTESTED in docs/AGENTS.md, finally get exercised".
+It never invoked either. The build job forces `--engine host`, and the matrix
+used GitHub's `container:` feature rather than `pgb`. ⚠ And `pgb verify`
+has no engine dispatch at all — `cmd_verify` calls `rootfs-run.sh` directly
+and ignores `--engine` — so on a runner, which has no `CAP_SYS_ADMIN`, the
+tool's own verification command could not run. Carried as `TODO` T-014.
+
+**Now:** every job runs on the host and enters targets with
+`docker run --entrypoint`, so the only process inside a target image is the
+probe. The matrix is **generated** from `scripts/common/rootfs-images.txt`
+and asserts it parsed eleven rows, so the two beds cannot drift again. The
+build job asserts the two arms are different binaries — `pgb-runtime` present
+in one and absent in the other — because every other assertion in the file is
+made against the pgb arm, and a silently no-op `pgb` would otherwise produce
+a green run. `TODO/ci.md` T-040.
+
+
+## C9 — "the docker/podman engines are untested"
+
+**Claimed** by `docs/AGENTS.md` §9: "**UNTESTED** — no daemon here; code
+exists, never run. CI is where it first runs."
+
+⚠ **The premise under it was wrong, not just the status.** The machine has
+`docker` 29.3.1; it has no *init*, so nothing had started `dockerd`. Starting
+it directly is one line, and the reference this session vendored says so and
+says why probing with `docker --version` instead of `docker info` is what hides
+it — `references/Aseem0xff__alloc-tests/tree/docs/containers.md` @ `efc84ab5`.
+⭐ `pgb doctor` was already probing correctly with `info`, and reported
+`docker  present but no daemon` truthfully all along. Nobody tried the next
+step.
+
+```sh
+dockerd >/tmp/dockerd.log 2>&1 &
+for i in $(seq 1 30); do docker info >/dev/null 2>&1 && break; sleep 1; done
+```
+
+**Running it found three defects in the first ten minutes**, each of which
+`UNTESTED` had been carrying:
+
+| | defect | how it presented |
+|---|---|---|
+| ⛔ **P0** | `cmd_build`'s docker branch ended `/bin/sh -c "$PGB_SELF/pgb __inner-build $*"`. `$*` joins argv with spaces and the inner `sh -c` re-splits it, so any single argument containing spaces is torn into words | `pgb build -- sh -c '$CC -O2 -o out/x x.c'` printed `sh: 0: Illegal option -O`, wrote **no output file**, and **exited 0**. A build that produced nothing reported success. The chroot branch never had this: it passes `"$@"` |
+| ⛔ **P1** | the docker and podman engines carried no TLS trust anchor, where `scripts/common/rootfs-run.sh` replicates one into the chroot and explains why | the first `pgb --engine docker env create` died at `RUN sh /opt/pgb/build-libiconv.sh` with **exit 60** — curl's "unable to get local issuer certificate". `apt-get` had just succeeded in the same image because Debian's sources are `http`, so it reads as "libiconv is broken" |
+| ⛔ **P1** | `--bind` passed its argument to `-v` unresolved | `docker run -v relbind:/mnt` does not mount `./relbind`. It creates an **empty named volume** called `relbind`, mounts that, and exits 0. Reproduced on docker 29.3.1 |
+
+**Now:** argv is passed as argv, the anchor named by the caller's own
+environment is carried in (and **only** that file — verification is never
+disabled), and every bind source is made absolute for every engine.
+`abs_bindspec()` and `ca_anchor()` in `../../pgb` carry the reasoning.
+
+**Measured after the fixes**, and this is the part that makes the engine a
+result rather than a claim: `pgb --engine docker env create` builds
+`pgb-env:0.1.0`, and a binary built through it carries
+`GCC: (Debian 12.2.0-14+deb12u1)` in `.comment` where a host build on this
+machine carries `GCC: (Ubuntu 13.3.0-6ubuntu2~24.04.1)`. ⭐ The engine really
+does build in the pinned environment rather than on the host, which is the
+property `env create` exists for and which had never been checked for this
+engine.
+
+⚠ **What this does not change.** The chroot bed stays the test bed. Both
+instruments were run against the same eleven digest-pinned environments in
+this session and returned the same verdict — 11 of 11 correct, zero host
+shared objects — so docker adds no portability signal chroot did not already
+have, and every committed number was measured through chroot. What docker
+adds is the two things chroot cannot reach: **these engines**, which chroot
+cannot exercise by construction, and **CI parity**, because a runner has no
+`CAP_SYS_ADMIN` and must use containers.
+
+## C10 — "the chroot bed and a `docker run` of the same digest are the same environment"
+
+**Claimed** implicitly, by deriving both `pgb verify` arms from the same
+`scripts/common/rootfs-images.txt` and describing them as the same eleven
+environments.
+
+**Disproved by** running both arms on the same binary and reading the one cell
+that differed. On Arch the docker arm reported the binary reading
+`/usr/lib/locale/*` and the chroot arm did not.
+
+⛔ **An OCI image is a filesystem PLUS a configuration, and `oci-pull.sh`
+unpacks only the filesystem.** The `archlinux` image's config carries
+`Env: LANG=C.UTF-8`, which `docker run` applies and a chroot unpack does not:
+
+```
+$ docker run --rm --entrypoint /usr/bin/env archlinux@sha256:818793c8… | grep LANG
+LANG=C.UTF-8
+$ grep -c 'LANG' scripts/common/rootfs-run.sh
+0
+```
+
+So the binary takes a different `setlocale` path under the two beds. Same
+digest, same files, different environment.
+
+⚠ **What this does and does not invalidate.** It changes nothing about any
+committed result: the difference appears only in the **host data** column,
+which `docs/AGENTS.md` §3 states is reported and never asserted, and the two
+arms agree on all eleven rows for both asserted columns — criterion 1 and
+criterion 2. ⭐ It is recorded because the *claim* was too strong, not because
+a number was wrong.
+
+**Now:** the two beds are described as sharing a filesystem rather than an
+environment, and `TODO` T-015 carries applying the image config's `Env` in
+`oci-pull.sh` so they can be made to agree deliberately rather than by luck.
+
+## C11 — "the docker arm and the untraced run report the same thing"
+
+**Claimed** by T-014's acceptance, which asked only that the RESULT column
+match between the chroot and docker arms — and it does, on the binary that
+matters.
+
+**Disproved, for the CONTROL binary, by** running it both ways twice each.
+`docs/methodology/experiments.md` says to "check whether observing changed the
+answer", and here it did:
+
+| | untraced ×2 | traced ×2 |
+|---|---|---|
+| debian-11 | **SIG11** | **SIG6** |
+| ubuntu-20.04 | **SIG11** | **SIG6** |
+| debian-12 | SIG8 | SIG8 |
+
+⭐ **Under `ptrace` the plain `gcc -static` control reaches `abort()`;
+untraced it segfaults first.** Both are the same finding — the binary dies —
+and no verdict moves, because criterion 1 fails either way and the portable
+binary is `ok` on all eleven under both. ⚠ But a document that quotes a
+specific **signal** is quoting an instrument as well as a binary, and
+`docs/AGENTS.md` §2 does exactly that.
+
+⛔ **Do not "fix" this by picking whichever signal reads better.** The
+observer is real, it is reproducible, and the honest form is to say which
+instrument produced a signal when one is quoted.
+
+**Now:** §2's signals are the chroot bed's, and say so. The traced numbers are
+`pgb verify --engine docker`'s and say so. ⭐ **The reason to keep both** is
+that the disagreement is itself information: it is what found the
+syscall-entry defect below, and what would find the next one.
+
+## C12 — "a C++ build should work unchanged"
+
+**Claimed** by `TODO/poc.md` T-001's premise, and marked as read rather than
+measured: "⚠ Read, not measured: `pgb`'s wrappers pass `-shared` through
+untouched and inject only at executable links, so a C++ build *should* work
+unchanged. No C++ project has been built."
+
+**Disproved by** building one. ⛔ **No C++ program linked at all**, and the
+reason is nothing to do with `-shared`:
+
+```
+undefined reference to `__wrap_iconv_open'
+... in .text._ZSt24__narrow_multibyte_charsPKcP15__locale_struct
+```
+
+libstdc++ calls `iconv` itself. `--wrap` rewrites those references to
+`__wrap_iconv*` exactly as it does the application's — and the wrappers append
+`pgb`'s flags to the **end** of the user's argv, after which the compiler
+driver appends its own libraries. `gcc -###`: `-lpgbruntime` at 178,
+`"-lstdc++"` at 180. An archive is scanned where it appears, so by the time
+libstdc++ introduces those references the archive holding them is behind the
+linker.
+
+⚠ **It was invisible for five POCs** because all five are C, and C programs
+that do not call `iconv` never introduce the reference.
+
+**Now:** `-Wl,-u,__wrap_iconv_open` and friends for the **C++ drivers only**,
+the same forcing technique already used for `pgb_runtime_anchor`. ⚠ The cost
+is that a C++ program links the iconv shim whether or not it calls `iconv`;
+the C property §10 measures is kept, re-measured after the change at
+**1,008,152 bytes** for C and **2,160,440** for C++.
+
+⭐ **The general lesson, which is not about C++:** every POC in the tree was an
+autotools tarball, and that looked like a preference. It was a **constraint** —
+the pinned environment contained no cmake, meson or autoconf (T-016), so
+nothing else could be built. A status table full of green rows was describing
+one build system's worth of evidence and reading as four. ⛔ When every
+subject in a corpus shares a property, check whether that is a choice.
 ---
 
 ## Instrument defects that corrupted a reading
@@ -175,8 +400,12 @@ axis from the brief, not from the instrument.
 | `pkill -f` to reap the artefact's leftovers | the pattern also appears in the **measuring shell's own command line** (`rootfs-run.sh … -- /pgb-vs-arm`), so the reaper killed the experiment | `pkill -x` against the process **name**, which only the artefact has |
 | `poc_observe` **appending** to `observation.txt` | never truncated, so a second run of a POC left the file holding both runs back to back — 22 rows for an 11-environment matrix, the older half describing a binary that no longer existed. Found when re-running POC 10 to verify the `.so` fix above | `: > "$POC_OUT/observation.txt"` at the top of `poc_observe` |
 | reaping test processes **by name** | an AppImage's uruntime leaves a DWARFS FUSE daemon running by design — a mount that outlives the program is what mount mode *is* — and its `comm` is `memfd:dwarfs`, not the artefact's. `pkill -x <artefact>` therefore reaped nothing: a full pass of `experiments/62-` left **22 daemons alive**, one per AppImage invocation, and the operator had to kill them by hand. ⛔ The experiment reported success while leaking | match on `/proc/PID/root`, which is the chroot a process is actually in, so every straggler of a cell is caught whatever it is called and nothing outside the bed can match. Plus an `EXIT`/`INT`/`TERM` trap, and a closing `exp_check` that **fails the experiment** if anything is still running in the bed |
+| `poc_functional_test` **undefined** | `poc_functional_test > script` writes an **empty file** when the POC does not define the function. `sh` on an empty script exits 0, so every row read `ok`, `poc_check` passed, and the trace of that empty script found no objects: ⛔ **eleven green rows having executed nothing at all.** Found by writing a POC that omitted it. ⚠ All five existing POCs define it, so no committed result was affected — the harness could have certified a bad POC and had not yet | `poc_matrix` refuses and counts a failure when the function is undefined — `poc/common.sh` |
+| `poc_observation_probe` **undefined** | the same shape one function along: the probe failed per environment with "not found", and every row printed OUTCOME `<none>` and HOST OBJECTS `none` — indistinguishable, in the committed table, from eleven environments measured and found clean | `poc_observe` prints `NOT MEASURED`, says that is not the same as observing nothing, and counts a skip |
 | counting objects opened **before** the last `execve` | `execve` replaces the address space, so those are not mapped in the running program. An AppImage `AppRun` is a shell script, so one pid runs `AppImage → AppRun → /bin/sh → payload`, and on a distribution whose `/bin/sh` is dynamic the shell's libc, readline and ncurses were charged to the payload. The anylinux arm was reported as "payload clean 4 of 11" when the program itself had none of them mapped | clear the accumulated set at each successful `execve` in **payload** mode; never clear it in **tree** mode, because "what did the machine load in total" is a different and also real question |
 | matching a fork as **one** trace line | strace interleaves: `vfork( <unfinished ...>` then `<... vfork resumed>) = 1234`. The child pid appears only on the second line, which does not contain `vfork(`. Requiring both `vfork(` and a trailing `= N` matched neither line, so every interleaved fork child was dropped from the followed set. ⛔ An anylinux AppImage that ran and passed was recorded as opening **no objects at all** — not one, bundled or host — which is impossible for a program that executed | match `NAME(` **or** `<... NAME resumed>`, and take the pid from whichever line carries `= N` — `classify_trace` in `experiments/60-` and `62-` |
+| reporting an open at syscall **entry** | the path is readable there but the RESULT is not, so every path the program merely PROBED FOR was counted as opened. Measured: the docker arm reported `/etc/nsswitch.conf` read on alpine-3.10, where that file does not exist. ⛔ On the criterion-2 column that is a **false positive**, not a cosmetic difference: glibc probes several paths for a shared object and takes the first that answers, so a binary that loaded nothing would have been failed for the ones that did not | stop at entry AND exit, hold the path from the entry stop, and report only when the exit stop shows a return >= 0 — `pgb-trace.c` |
+| pairing ptrace entry/exit stops with a **bare toggle** | `execve` under `PTRACE_TRACEME` delivers an extra `SIGTRAP` stop that is indistinguishable from a syscall stop, so the toggle flipped one time too many at the very first syscall and every argument was then read at the exit stop and every result at the entry stop, for the whole run. ⛔ `/bin/true`, which unmistakably loads `libc.so.6`, was reported as opening **nothing at all** — the failure mode that reads as a clean binary | `PTRACE_O_TRACESYSGOOD`, so a syscall stop is `SIGTRAP\|0x80` and nothing else is, and the toggle cannot drift — `pgb-trace.c` |
 
 ---
 

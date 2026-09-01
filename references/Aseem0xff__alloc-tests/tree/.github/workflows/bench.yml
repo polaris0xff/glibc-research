@@ -1,0 +1,253 @@
+# The benchmark itself.
+#
+# ⚠ WHY THIS IS NOT ON EVERY PUSH. A run of the `core` suite on both
+# architectures builds eight allocators, eight ripgreps and takes hundreds of
+# timed samples. On a shared runner it is also the only place the numbers mean
+# anything, so it is deliberately scheduled and manual rather than reflexive.
+#
+# ⛔ EACH ARCHITECTURE RUNS ON ITS OWN NATIVE RUNNER. Emulated timings are not
+# comparable with native ones -- user-mode emulation changes the instruction mix
+# and the memory behaviour, so an allocator comparison under it measures the
+# emulator too. `alloc-bench` refuses to rank an emulated run, and this workflow
+# does not ask it to.
+# ⛔ REGISTRATION GOTCHA, diagnosed and FIXED on 2026-09-01. A workflow with no
+# `push` trigger is not registered by GitHub merely by existing on the default
+# branch. Across two pushes this file was present, valid YAML, and scored ZERO
+# errors against GitHub's own workflow schema, yet it did not appear in
+# `GET /actions/workflows` and `POST .../workflows/bench.yml/dispatches`
+# returned 404. `ci.yml`, which has `push`, registered on the first push.
+#
+# ⭐ WHAT FIXED IT: a push that MODIFIES THIS FILE. Adding this very comment
+# registered the workflow (id 347273098) and dispatch worked immediately after.
+# The trigger list did not change; the file did.
+#
+# ⚠ So if this workflow ever stops being dispatchable, the file is probably not
+# the problem -- do not start editing its `on:` block on a guess. Check
+# `GET /actions/workflows` first, then push a whitespace change to this file.
+name: bench
+
+on:
+  schedule:
+    # Weekly. Frequent enough to notice an upstream regression, rare enough not
+    # to spend a runner-week producing numbers nobody reads.
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: "Suite to run (smoke, core, profiles, mechanisms, distros, toolchain-control, preload, all)"
+        required: false
+        default: "core"
+        type: string
+      repeat:
+        description: "Repetitions per workload (blank = the suite's own value)"
+        required: false
+        default: ""
+        type: string
+      arches:
+        description: "Architectures"
+        required: false
+        default: "both"
+        type: choice
+        options: ["both", "x86_64", "aarch64"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bench-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  bench:
+    name: ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          # GitHub's public arm64 runner. ⚠ If this label is unavailable to a
+          # fork, that architecture's job fails to schedule rather than silently
+          # running on x86_64 and being labelled aarch64. See docs/ci.md for the
+          # emulation fallback, which is explicitly marked in its results.
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    steps:
+      - name: Skip architectures not requested
+        id: gate
+        run: |
+          want='${{ github.event.inputs.arches || 'both' }}'
+          if [ "$want" = both ] || [ "$want" = '${{ matrix.arch }}' ]; then
+            echo "run=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=no" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v5
+        if: steps.gate.outputs.run == 'yes'
+
+      - name: Install the pinned Rust toolchain
+        if: steps.gate.outputs.run == 'yes'
+        run: |
+          set -euo pipefail
+          . toolchains/pins.env
+          rustup toolchain install "$RUST_VERSION" --profile minimal
+          rustup default "$RUST_VERSION"
+          rustc --version
+
+      - name: Build the orchestrator
+        if: steps.gate.outputs.run == 'yes'
+        run: cargo build --release -p alloc-bench
+
+      # The conditions are recorded before anything is measured, because a
+      # number without them cannot be compared with anything later.
+      - name: Record the conditions
+        if: steps.gate.outputs.run == 'yes'
+        run: |
+          {
+            echo "=== runner ==="; uname -a
+            echo "=== cpu ==="; lscpu 2>/dev/null || cat /proc/cpuinfo | head -30
+            echo "=== memory ==="; free -m 2>/dev/null || cat /proc/meminfo | head -5
+            echo "=== disk ==="; df -h /
+            echo "=== docker ==="; docker version
+            echo "=== governor ==="
+            cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor 2>/dev/null \
+              || echo "no cpufreq governor exposed (usual on a cloud runner)"
+          } | tee conditions.txt
+
+      - name: Free disk space
+        if: steps.gate.outputs.run == 'yes'
+        run: |
+          # Several images plus eight allocator source trees plus a 65 MB corpus
+          # does not fit beside the runner's preinstalled toolchains. A run that
+          # dies on ENOSPC half way through leaves a dataset that looks partial
+          # rather than failed.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+                      /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" || true
+          df -h /
+
+      # ⭐ Does the chosen suite have ANY cell for this architecture?
+      #
+      # Not every suite covers both: `smoke` is deliberately x86_64-only. Asking
+      # for it on aarch64 used to reach `alloc-bench run`, which correctly
+      # refuses to write an empty dataset and exits 2 -- so the job went red
+      # with "the filters selected no cells" for a configuration that was doing
+      # exactly what it was told. ⚠ A red job that means "nothing to do here" is
+      # worse than useless: it trains the reader to ignore red.
+      #
+      # `plan` distinguishes the two cases for us. A misspelled --arch is an
+      # ERROR (exit 2) and still fails this step; an architecture this suite
+      # simply does not cover is an empty plan, and is reported as a skip.
+      - name: Does this suite cover this architecture?
+        if: steps.gate.outputs.run == 'yes'
+        id: cells
+        run: |
+          set -euo pipefail
+          n=$(./target/release/alloc-bench plan \
+                --suite '${{ github.event.inputs.suite || 'core' }}' \
+                --arch '${{ matrix.arch }}' \
+              | python3 -c 'import json,sys; print(len(json.load(sys.stdin)))')
+          echo "n=$n" >> "$GITHUB_OUTPUT"
+          if [ "$n" -eq 0 ]; then
+            echo "any=no" >> "$GITHUB_OUTPUT"
+            echo "suite '${{ github.event.inputs.suite || 'core' }}' has no ${{ matrix.arch }} cells; nothing to measure here" \
+              >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "any=yes" >> "$GITHUB_OUTPUT"
+          fi
+          echo "$n cell(s) for ${{ matrix.arch }}"
+
+      - name: doctor
+        if: steps.gate.outputs.run == 'yes' && steps.cells.outputs.any == 'yes'
+        run: ./target/release/alloc-bench doctor
+
+      - name: Run the benchmark
+        if: steps.gate.outputs.run == 'yes' && steps.cells.outputs.any == 'yes'
+        id: run
+        run: |
+          set -o pipefail
+          extra=""
+          if [ -n '${{ github.event.inputs.repeat }}' ]; then
+            extra="--repeat ${{ github.event.inputs.repeat }}"
+          fi
+          # ⚠ NOT --strict. A cell that fails to build is a RESULT this project
+          # publishes, not a reason to throw the run away. The dataset validator
+          # decides whether the numbers are trustworthy, and its exit status is
+          # what this step reports.
+          ./target/release/alloc-bench run \
+            --suite '${{ github.event.inputs.suite || 'core' }}' \
+            --arch '${{ matrix.arch }}' \
+            $extra \
+            --out "$GITHUB_WORKSPACE/results/ci-${{ matrix.arch }}" \
+            2>&1 | tee run.log
+
+      - name: Re-validate the dataset independently
+        if: steps.gate.outputs.run == 'yes' && steps.cells.outputs.any == 'yes' && always()
+        run: |
+          # ⭐ Run separately from `run` so the gate is visible as its own step
+          # and so a report can be re-checked later from the artifact alone.
+          ./target/release/alloc-bench validate \
+            --run "$GITHUB_WORKSPACE/results/ci-${{ matrix.arch }}" \
+            | tee validation.txt
+
+      - name: Upload the evidence
+        if: steps.gate.outputs.run == 'yes' && steps.cells.outputs.any == 'yes' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-${{ matrix.arch }}-${{ github.run_id }}
+          path: |
+            results/ci-${{ matrix.arch }}
+            conditions.txt
+            run.log
+            validation.txt
+          retention-days: 90
+
+      - name: Job summary
+        if: steps.gate.outputs.run == 'yes' && steps.cells.outputs.any == 'yes' && always()
+        run: |
+          d="results/ci-${{ matrix.arch }}"
+          {
+            echo "# ${{ matrix.arch }}"
+            echo
+            if [ -f "$d/report.md" ]; then
+              # The "what this does not establish" section comes FIRST in the
+              # report, and it comes first here too.
+              sed -n '/^## What this run does not establish/,/^## Conditions/p' "$d/report.md"
+              sed -n '/^## Rankings/,/^## Every workload/p' "$d/report.md"
+              echo
+              echo "<details><summary>Configurations that could not exist</summary>"
+              echo
+              sed -n '/^## Configurations that could not exist/,/^## Configurations that failed/p' "$d/report.md"
+              echo
+              echo "</details>"
+            else
+              echo "No report was produced. See the uploaded evidence."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # Both architectures in one place, so a reader does not have to open two
+  # artifacts to see whether an ordering holds across them.
+  combine:
+    name: combined summary
+    needs: bench
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Combine
+        run: |
+          python3 scripts/report/combine.py artifacts >> "$GITHUB_STEP_SUMMARY" || {
+            echo "combine failed; the per-architecture artifacts are still complete" >> "$GITHUB_STEP_SUMMARY"
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bench-combined-${{ github.run_id }}
+          path: artifacts
+          retention-days: 90

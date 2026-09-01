@@ -1,0 +1,42 @@
+=== conditions ===
+date          2026-09-01T04:25:19Z
+host          Linux 6.18.44-fc-v22 x86_64
+ripgrep       15.2.0  e89fff89ac9af12e8d4ce9d5fd07beb408ca730f
+source        /tmp/alloc-tests-30/ripgrep
+
+=== does the source declare a #[global_allocator]? ===
+files declaring one: 1
+crates/core/main.rs-35-//
+crates/core/main.rs-36-// Moreover, we only do this on 64-bit systems since jemalloc doesn't support
+crates/core/main.rs-37-// i686.
+crates/core/main.rs-38-#[cfg(all(target_env = "musl", target_pointer_width = "64"))]
+crates/core/main.rs:39:#[global_allocator]
+crates/core/main.rs-40-static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
+crates/core/main.rs-41-
+
+=== does it depend on a third-party allocator crate? ===
+61-textwrap = { version = "0.16.0", default-features = false }
+62-
+63:[target.'cfg(all(target_env = "musl", target_pointer_width = "64"))'.dependencies.tikv-jemallocator]
+
+=== what this means ===
+⛔ ripgrep SELECTS A THIRD-PARTY ALLOCATOR on musl targets.
+
+An unmodified `cargo build --target x86_64-unknown-linux-musl` therefore does
+NOT produce a system-allocator binary. Publishing that as "the Alpine system
+allocator baseline" would put a third-party allocator in the control group.
+
+This project removes the declaration, and the dependency, from EVERY cell
+including the baseline, and then asserts the resulting count:
+  crates/alloc-runner/src/patchrg.rs
+The result is checked again against the built binary by `alloc-runner identify`,
+which requires the baseline to contain musl's allocator and no candidate.
+
+exit 1 is the expected outcome today. A future ripgrep that dropped this would
+make this script exit 0, and the patch step could then be reconsidered --
+which is the result you want and cannot get from prose.
+
+=== what this probe cannot tell you ===
+- whether the declaration is REACHED on a given target. It is behind a
+  cfg; this script reports the declaration, and the ELF check in
+  `alloc-runner identify` is what confirms the built binary.

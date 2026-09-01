@@ -1,0 +1,21 @@
+[package]
+name = "alloc-bench"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Host orchestrator: resolves allocator versions, builds images, runs the matrix, validates the dataset, ranks and reports."
+
+[[bin]]
+name = "alloc-bench"
+path = "src/main.rs"
+
+[dependencies]
+# Only three, all pure Rust. HTTP is done by shelling out to `curl` rather than
+# by linking a TLS stack: curl is already a documented prerequisite, it honours
+# the proxy configuration a restricted network needs, and a vendored TLS
+# implementation would be the largest dependency in the tree by an order of
+# magnitude.
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"

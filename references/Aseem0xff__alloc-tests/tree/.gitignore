@@ -1,0 +1,16 @@
+# Rust build output
+/target/
+/crates/*/target/
+
+# Local run output. Results are published as CI artifacts, not committed,
+# except for the curated snapshots under results/published/ (see docs/results.md).
+/results/local/
+/reports/local/
+
+# Working directories used by the container build cache
+/.cache/
+/work/
+
+*.swp
+.DS_Store
+images/extra-ca/*.crt

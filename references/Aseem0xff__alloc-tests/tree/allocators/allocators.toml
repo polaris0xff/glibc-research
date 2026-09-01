@@ -1,0 +1,228 @@
+# allocators.toml -- the allocator registry.
+#
+# This file holds POLICY: where an allocator comes from, what it can and cannot
+# do, and which integration mechanisms apply to it. It does NOT hold the
+# resolved revision.
+#
+# The resolved revision lives in `allocators.lock.json`, written by
+#   alloc-bench update
+# and committed. That split is what lets the project track "latest" without
+# letting "latest" become an unreproducible floating dependency: the lock file
+# names an exact commit, and every result carries the lock entry that built it.
+#
+# `track` decides what `alloc-bench update` resolves:
+#   latest-release  the newest non-draft, non-prerelease GitHub release
+#   latest-any      the newest release including prereleases
+#   branch          the head of `branch`, for upstreams that publish no release
+#
+# `integrations` lists the mechanisms this allocator supports. They are defined
+# in docs/allocator-integration.md. An allocator absent from a mechanism's list
+# is not silently skipped: `alloc-bench plan` emits the cell with status
+# `unsupported` and the reason from `unsupported_notes`, and the report prints
+# it. A configuration that cannot exist is evidence, and it gets published.
+
+schema_version = 1
+
+# ---------------------------------------------------------------------------
+
+[[allocator]]
+id            = "system"
+name          = "system (distribution default)"
+kind          = "builtin"
+license       = "n/a -- supplied by the distribution"
+integrations  = ["baseline"]
+summary       = """
+The allocator the target image already ships: musl's mallocng on Alpine,
+glibc's ptmalloc2 on Debian and Arch. This is the control. Every other row in
+every table is a ratio against it, measured on the same host in the same run.
+"""
+
+# ---------------------------------------------------------------------------
+
+[[allocator]]
+id            = "mimalloc"
+name          = "mimalloc"
+repo          = "https://github.com/microsoft/mimalloc"
+license       = "MIT"
+track         = "latest-release"
+branch        = "dev"
+build         = "cmake"
+prefix        = "mi_"
+integrations  = ["rust-global", "libc-surgery", "link-override", "preload"]
+summary       = """
+Microsoft's allocator. Builds cleanly with CMake against musl and glibc on both
+architectures, ships both a prefixed API (mi_malloc) and a full malloc override
+in one archive, and is the allocator the libc-surgery technique was first
+demonstrated with (references/haskell-wasm__rust-alpine-mimalloc).
+"""
+
+# ---------------------------------------------------------------------------
+
+[[allocator]]
+id            = "jemalloc"
+name          = "jemalloc"
+repo          = "https://github.com/jemalloc/jemalloc"
+license       = "BSD-2-Clause"
+track         = "latest-release"
+branch        = "dev"
+build         = "autotools"
+prefix        = "je_"
+integrations  = ["rust-global", "libc-surgery", "link-override", "preload"]
+summary       = """
+The allocator ripgrep itself selects on musl. Note that this makes jemalloc the
+DEFAULT for an unmodified `cargo build` of ripgrep on a musl target -- see
+docs/methodology.md, "The baseline trap". Configured here with
+--with-jemalloc-prefix so the prefixed and override builds are separable.
+"""
+
+# ---------------------------------------------------------------------------
+
+[[allocator]]
+id            = "snmalloc"
+name          = "snmalloc"
+repo          = "https://github.com/microsoft/snmalloc"
+license       = "MIT"
+track         = "latest-release"
+branch        = "main"
+build         = "cmake"
+prefix        = "sn_"
+integrations  = ["rust-global", "libc-surgery", "link-override", "preload"]
+summary       = """
+Microsoft Research's message-passing allocator. C++20 (C++17 with
+SNMALLOC_USE_CXX17). Its CMake exposes SNMALLOC_STATIC_LIBRARY_PREFIX, default
+`sn_`; setting it empty produces the override build, so both mechanisms come
+from one source tree with one flag between them.
+"""
+[allocator.build_notes]
+alpine = """
+Needs -DSNMALLOC_CLEANUP=CXX11_DESTRUCTORS on musl. Without it the shim builds
+and then misbehaves at thread teardown. Recorded in
+references/daanx__mimalloc-bench tree/build-bench-env.sh at commit
+3ad2732048312b0cc472b60302ff120f02ee9558.
+"""
+
+# ---------------------------------------------------------------------------
+
+[[allocator]]
+id            = "rpmalloc"
+name          = "rpmalloc"
+repo          = "https://github.com/mjansson/rpmalloc"
+license       = "MIT OR Unlicense"
+track         = "latest-release"
+branch        = "develop"
+build         = "direct-cc"
+prefix        = "rp"
+integrations  = ["rust-global", "libc-surgery", "link-override", "preload"]
+summary       = """
+Small, plain-C, lock-free allocator. Built here by compiling rpmalloc.c
+directly rather than through its ninja generator: the generator also builds C++
+test binaries, which is the failure in upstream mimalloc-bench issue 256, and
+none of those targets are wanted.
+"""
+[allocator.integration_notes]
+rust-global = """
+rpmalloc requires explicit initialisation: rpmalloc_initialize() once per
+process and rpmalloc_thread_initialize() on every thread before first use. No
+other allocator here needs this. The shim handles it with a
+std::sync::Once plus a thread-local guard; see
+crates/rgalloc-shim/src/backend/rpmalloc.rs.
+"""
+
+# ---------------------------------------------------------------------------
+
+[[allocator]]
+id            = "hardened_malloc"
+name          = "hardened_malloc"
+repo          = "https://github.com/GrapheneOS/hardened_malloc"
+license       = "MIT"
+track         = "latest-release"
+branch        = "main"
+build         = "direct-cc"
+prefix        = "h_"
+variants      = ["default", "light"]
+integrations  = ["rust-global", "libc-surgery", "link-override", "preload"]
+summary       = """
+GrapheneOS's security-hardened allocator. It is included to be measured, not to
+win: it spends performance on slab canaries, guard slabs, quarantines, slot
+randomisation and zero-on-free. Reporting it as "slow" without naming what it
+bought would be the wrong reading -- see docs/methodology.md, "Hardening is not
+a defect".
+"""
+[allocator.build_notes]
+all = """
+Upstream ships a shared-object Makefile. This project compiles the same sources
+with the same -D flags and archives them with `ar`, because the static archive
+it needs is not a target upstream builds. The flag set is derived from
+config/<variant>.mk at the pinned commit and recorded in the build metadata.
+"""
+
+# ---------------------------------------------------------------------------
+
+[[allocator]]
+id            = "mesh"
+name          = "Mesh"
+repo          = "https://github.com/plasma-umass/mesh"
+license       = "Apache-2.0"
+track         = "branch"
+branch        = "master"
+build         = "cmake"
+integrations  = ["preload"]
+summary       = """
+The compacting allocator from PLASMA @ UMass. Publishes no git tag at all, so
+it is tracked by branch head and pinned by commit in the lock file.
+"""
+[allocator.unsupported_notes]
+rust-global = """
+Mesh exports no prefixed C allocation API. Its published interface is the
+malloc/free override itself, so there is no symbol for a #[global_allocator]
+shim to call that is distinguishable from libc's. Verified against the pinned
+commit: no mesh_malloc / mz_malloc equivalent exists in its headers.
+"""
+libc-surgery = """
+Mesh's build produces a shared object and its runtime depends on interposing
+mmap and on pthread_atfork handlers registered at load time. There is no static
+archive target, and the fork handling is not reachable from an archive spliced
+into libc.a. Measured, not assumed: see experiments/40-allocator-build-matrix.sh.
+"""
+link-override = """
+Same cause as libc-surgery: no static archive target upstream.
+"""
+
+# ---------------------------------------------------------------------------
+
+[[allocator]]
+id            = "tcmalloc"
+name          = "tcmalloc (Google)"
+repo          = "https://github.com/google/tcmalloc"
+license       = "Apache-2.0"
+track         = "branch"
+branch        = "master"
+build         = "bazel"
+bazel_version = "8.6.0"
+integrations  = ["preload"]
+summary       = """
+Google's current tcmalloc, which is a different project from gperftools'
+tcmalloc. Bazel-only, depends on Abseil, and publishes neither releases nor
+tags, so it is tracked by branch head and pinned by commit.
+"""
+[allocator.build_notes]
+all = """
+Bazel is pinned to 8.6.0 through bazelisk. Bazel 9 breaks this build; recorded
+in upstream mimalloc-bench issue 258 and independently confirmed by
+experiments/40-allocator-build-matrix.sh.
+"""
+[allocator.unsupported_notes]
+rust-global = """
+tcmalloc exports no prefixed C allocation API. Its supported interface is the
+operator-new/malloc replacement plus tcmalloc::MallocExtension (C++), so there
+is no C symbol for a #[global_allocator] shim to bind to.
+"""
+libc-surgery = """
+Upstream does not build a self-contained static archive: the Bazel `tcmalloc`
+target is a C++ library whose link closure pulls in Abseil and libstdc++.
+Splicing that into libc.a would put a C++ runtime dependency inside every C
+program's libc. Additionally upstream states musl is not a supported platform.
+"""
+link-override = """
+Same cause as libc-surgery.
+"""

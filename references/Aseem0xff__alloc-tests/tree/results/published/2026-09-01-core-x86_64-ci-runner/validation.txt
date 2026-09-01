@@ -1,0 +1,8 @@
+warn  noisy                      alpine-x86_64-hardened_malloc-rust-global-static-pie-lto-distro workload startup has a relative MAD of 7.7%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host
+warn  noisy                      alpine-x86_64-jemalloc-rust-global-static-pie-lto-distro workload startup has a relative MAD of 15.2%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host
+warn  noisy                      alpine-x86_64-mimalloc-rust-global-static-pie-lto-distro workload startup has a relative MAD of 14.4%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host
+warn  noisy                      alpine-x86_64-rpmalloc-rust-global-static-pie-lto-distro workload startup has a relative MAD of 22.9%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host
+warn  noisy                      alpine-x86_64-snmalloc-rust-global-static-pie-lto-distro workload nomatch has a relative MAD of 5.7%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host
+warn  noisy                      alpine-x86_64-snmalloc-rust-global-static-pie-lto-distro workload startup has a relative MAD of 8.0%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host
+
+0 error(s), 6 warning(s) over 8 result(s).

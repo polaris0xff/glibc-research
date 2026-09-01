@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="810" height="174" viewBox="0 0 810 174" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="16" y="26" font-size="15" font-weight="600" fill="#1b1f24">Peak resident set relative to the control — alpine / x86_64 / static-pie / distro</text>
+<text x="16" y="45" font-size="11" fill="#5b636d">workload `literal`; ru_maxrss from wait4, median of the run's samples; lower is less memory</text>
+<line x1="382.7" y1="52.0" x2="382.7" y2="140.0" stroke="#d8dce1" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="382.7" y="48.0" font-size="10" fill="#5b636d" text-anchor="middle">control</text>
+<text x="250" y="79.7" font-size="11" fill="#1b1f24" text-anchor="end">mimalloc / libc-surgery</text>
+<rect x="260" y="67.0" width="425.3" height="15" rx="2" fill="#d1495b"/>
+<text x="691.3" y="79.7" font-size="10.5" fill="#5b636d">3.466x  (15.8 MiB)</text>
+<text x="250" y="105.7" font-size="11" fill="#1b1f24" text-anchor="end">mimalloc / rust-global</text>
+<rect x="260" y="93.0" width="425.9" height="15" rx="2" fill="#d1495b"/>
+<text x="691.9" y="105.7" font-size="10.5" fill="#5b636d">3.471x  (15.9 MiB)</text>
+<text x="250" y="131.7" font-size="11" fill="#1b1f24" text-anchor="end">system (control)</text>
+<rect x="260" y="119.0" width="122.7" height="15" rx="2" fill="#8a8f98"/>
+<text x="388.7" y="131.7" font-size="10.5" fill="#5b636d">1.000x  (4.6 MiB)</text>
+<text x="16" y="162.0" font-size="10" fill="#5b636d">Peak RSS is what sets a container's memory limit. It is not the allocator's own idea of heap size.</text></svg>

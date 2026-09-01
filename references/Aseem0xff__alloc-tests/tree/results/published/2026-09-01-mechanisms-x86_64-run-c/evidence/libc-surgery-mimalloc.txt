@@ -1,0 +1,60 @@
+  Downloaded crossbeam-utils v0.8.22
+  Downloaded aho-corasick v1.1.4
+  Downloaded zmij v1.0.23
+  Downloaded same-file v1.0.6
+  Downloaded serde_json v1.0.150
+  Downloaded memmap2 v0.9.11
+  Downloaded log v0.4.33
+  Downloaded regex-syntax v0.8.11
+  Downloaded serde_core v1.0.228
+  Downloaded memchr v2.8.3
+  Downloaded lexopt v0.3.2
+  Downloaded itoa v1.0.18
+  Downloaded encoding_rs_io v0.1.7
+  Downloaded serde v1.0.228
+  Downloaded anyhow v1.0.103
+  Downloaded bstr v1.13.0
+  Downloaded walkdir v2.5.0
+  Downloaded textwrap v0.16.2
+  Downloaded termcolor v1.4.1
+  Downloaded crossbeam-epoch v0.9.20
+  Downloaded crossbeam-deque v0.8.7
+  Downloaded cfg-if v1.0.4
+  Downloaded regex-automata v0.4.15
+  Downloaded libc v0.2.186
+  Downloaded encoding_rs v0.8.35
+   Compiling memchr v2.8.3
+   Compiling regex-syntax v0.8.11
+   Compiling libc v0.2.186
+   Compiling log v0.4.33
+   Compiling serde_core v1.0.228
+   Compiling crossbeam-utils v0.8.22
+   Compiling aho-corasick v1.1.4
+   Compiling zmij v1.0.23
+   Compiling cfg-if v1.0.4
+   Compiling encoding_rs v0.8.35
+   Compiling grep-matcher v0.1.9 (/work/ripgrep-alpine-x86_64-mimalloc-libc-surgery-static-pie-distro/crates/matcher)
+   Compiling regex-automata v0.4.15
+   Compiling crossbeam-epoch v0.9.20
+   Compiling serde v1.0.228
+   Compiling serde_json v1.0.150
+   Compiling encoding_rs_io v0.1.7
+   Compiling memmap2 v0.9.11
+   Compiling itoa v1.0.18
+   Compiling termcolor v1.4.1
+   Compiling crossbeam-deque v0.8.7
+   Compiling same-file v1.0.6
+   Compiling anyhow v1.0.103
+   Compiling walkdir v2.5.0
+   Compiling ripgrep v15.2.0 (/work/ripgrep-alpine-x86_64-mimalloc-libc-surgery-static-pie-distro)
+   Compiling bstr v1.13.0
+   Compiling globset v0.4.19 (/work/ripgrep-alpine-x86_64-mimalloc-libc-surgery-static-pie-distro/crates/globset)
+   Compiling grep-searcher v0.1.17 (/work/ripgrep-alpine-x86_64-mimalloc-libc-surgery-static-pie-distro/crates/searcher)
+   Compiling grep-printer v0.3.1 (/work/ripgrep-alpine-x86_64-mimalloc-libc-surgery-static-pie-distro/crates/printer)
+   Compiling grep-cli v0.1.12 (/work/ripgrep-alpine-x86_64-mimalloc-libc-surgery-static-pie-distro/crates/cli)
+   Compiling grep-regex v0.1.14 (/work/ripgrep-alpine-x86_64-mimalloc-libc-surgery-static-pie-distro/crates/regex)
+   Compiling ignore v0.4.29 (/work/ripgrep-alpine-x86_64-mimalloc-libc-surgery-static-pie-distro/crates/ignore)
+   Compiling grep v0.4.1 (/work/ripgrep-alpine-x86_64-mimalloc-libc-surgery-static-pie-distro/crates/grep)
+   Compiling textwrap v0.16.2
+   Compiling lexopt v0.3.2
+    Finished `release` profile [optimized] target(s) in 46.23s

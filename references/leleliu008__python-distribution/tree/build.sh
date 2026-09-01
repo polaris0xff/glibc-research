@@ -1,0 +1,1300 @@
+#!/bin/sh
+
+# Copyright (c) 2024-2026 刘富频
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+
+set -e
+
+# If IFS is not set, the default value will be <space><tab><newline>
+# https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_05_03
+unset IFS
+
+
+COLOR_RED='\033[0;31m'
+COLOR_GREEN='\033[0;32m'
+COLOR_YELLOW='\033[0;33m'
+COLOR_BLUE='\033[0;94m'
+COLOR_PURPLE='\033[0;35m'
+COLOR_OFF='\033[0m'
+
+print() {
+    printf '%b' "$*"
+}
+
+echo() {
+    printf '%b\n' "$*"
+}
+
+note() {
+    printf '%b\n' "${COLOR_YELLOW}🔔  $*${COLOR_OFF}" >&2
+}
+
+warn() {
+    printf '%b\n' "${COLOR_YELLOW}🔥  $*${COLOR_OFF}" >&2
+}
+
+success() {
+    printf '%b\n' "${COLOR_GREEN}[✔] $*${COLOR_OFF}" >&2
+}
+
+error() {
+    printf '%b\n' "${COLOR_RED}💔  $ARG0: $*${COLOR_OFF}" >&2
+}
+
+abort() {
+    EXIT_STATUS_CODE="$1"
+    shift
+    printf '%b\n' "${COLOR_RED}💔  $ARG0: $*${COLOR_OFF}" >&2
+    exit "$EXIT_STATUS_CODE"
+}
+
+run() {
+    echo "${COLOR_PURPLE}==>${COLOR_OFF} ${COLOR_GREEN}$@${COLOR_OFF}"
+    eval "$@"
+}
+
+isInteger() {
+    case "${1#[+-]}" in
+        (*[!0123456789]*) return 1 ;;
+        ('')              return 1 ;;
+        (*)               return 0 ;;
+    esac
+}
+
+# wfetch <URL> [--uri=<URL-MIRROR>] [--sha256=<SHA256>] [-o <OUTPUT-PATH>] [--no-buffer]
+#
+# If -o <OUTPUT-PATH> option is unspecified, the result will be written to <PWD>/$(basename <URL>).
+#
+# If <OUTPUT-PATH> is . .. ./ ../ or ends with slash(/), then it will be treated as a directory, otherwise, it will be treated as a filepath.
+#
+# If <OUTPUT-PATH> is -, then it will be treated as /dev/stdout.
+#
+# If <OUTPUT-PATH> is treated as a directory, then it will be expanded to <OUTPUT-PATH>/$(basename <URL>)
+#
+wfetch() {
+    unset FETCH_UTS
+    unset FETCH_SHA
+
+    unset FETCH_URL
+    unset FETCH_URI
+
+    unset FETCH_PATH
+
+    unset FETCH_OUTPUT_DIR
+    unset FETCH_OUTPUT_FILEPATH
+    unset FETCH_OUTPUT_FILENAME
+
+    unset FETCH_BUFFER_FILEPATH
+
+    unset FETCH_SHA256_EXPECTED
+
+    unset NOT_BUFFER
+
+    [ -z "$1" ] && abort 1 "wfetch <URL> [OPTION]... , <URL> must be non-empty."
+
+    if [ -z "$URL_TRANSFORM" ] ; then
+        FETCH_URL="$1"
+    else
+        FETCH_URL="$("$URL_TRANSFORM" "$1")" || return 1
+    fi
+
+    shift
+
+    while [ -n "$1" ]
+    do
+        case $1 in
+            --uri=*)
+                FETCH_URI="${1#*=}"
+                ;;
+            --sha256=*)
+                FETCH_SHA256_EXPECTED="${1#*=}"
+                ;;
+            -o) shift
+                if [ -z "$1" ] ; then
+                    abort 1 "wfetch <URL> -o <PATH> , <PATH> must be non-empty."
+                else
+                    FETCH_PATH="$1"
+                fi
+                ;;
+            --no-buffer)
+                NOT_BUFFER=1
+                ;;
+            *)  abort 1 "wfetch <URL> [--uri=<URL-MIRROR>] [--sha256=<SHA256>] [-o <PATH>] [-q] , unrecognized option: $1"
+        esac
+        shift
+    done
+
+    if [ -z "$FETCH_URI" ] ; then
+        # remove query params
+        FETCH_URI="${FETCH_URL%%'?'*}"
+        FETCH_URI="https://fossies.org/linux/misc/${FETCH_URI##*/}"
+    else
+        if [ -n "$URL_TRANSFORM" ] ; then
+            FETCH_URI="$("$URL_TRANSFORM" "$FETCH_URI")" || return 1
+        fi
+    fi
+
+    case $FETCH_PATH in
+        -)  FETCH_BUFFER_FILEPATH='-' ;;
+        .|'')
+            FETCH_OUTPUT_DIR='.'
+            FETCH_OUTPUT_FILEPATH="$FETCH_OUTPUT_DIR/${FETCH_URL##*/}"
+            ;;
+        ..)
+            FETCH_OUTPUT_DIR='..'
+            FETCH_OUTPUT_FILEPATH="$FETCH_OUTPUT_DIR/${FETCH_URL##*/}"
+            ;;
+        */)
+            FETCH_OUTPUT_DIR="${FETCH_PATH%/}"
+            FETCH_OUTPUT_FILEPATH="$FETCH_OUTPUT_DIR/${FETCH_URL##*/}"
+            ;;
+        *)
+            FETCH_OUTPUT_DIR="$(dirname "$FETCH_PATH")"
+            FETCH_OUTPUT_FILEPATH="$FETCH_PATH"
+    esac
+
+    if [ -n "$FETCH_OUTPUT_FILEPATH" ] ; then
+        if [ -f "$FETCH_OUTPUT_FILEPATH" ] ; then
+            if [ -n "$FETCH_SHA256_EXPECTED" ] ; then
+                if [ "$(sha256sum "$FETCH_OUTPUT_FILEPATH" | cut -d ' ' -f1)" = "$FETCH_SHA256_EXPECTED" ] ; then
+                    success "$FETCH_OUTPUT_FILEPATH already have been fetched."
+                    return 0
+                fi
+            fi
+        fi
+
+        if [ "$NOT_BUFFER" = 1 ] ; then
+            FETCH_BUFFER_FILEPATH="$FETCH_OUTPUT_FILEPATH"
+        else
+            FETCH_UTS="$(date +%s)"
+
+            FETCH_SHA="$(printf '%s\n' "$FETCH_URL:$$:$FETCH_UTS" | sha256sum | cut -d ' ' -f1)"
+
+            FETCH_BUFFER_FILEPATH="$FETCH_OUTPUT_DIR/$FETCH_SHA.tmp"
+        fi
+    fi
+
+    for FETCH_TOOL in curl wget http lynx aria2c axel
+    do
+        if command -v "$FETCH_TOOL" > /dev/null ; then
+            break
+        else
+            unset FETCH_TOOL
+        fi
+    done
+
+    if [ -z "$FETCH_TOOL" ] ; then
+        abort 1 "no fetch tool found, please install one of curl wget http lynx aria2c axel, then try again."
+    fi
+
+    if [                -n "$FETCH_OUTPUT_DIR" ] ; then
+        if [ !          -d "$FETCH_OUTPUT_DIR" ] ; then
+            run install -d "$FETCH_OUTPUT_DIR" || return 1
+        fi
+    fi
+
+    case $FETCH_TOOL in
+        curl)
+            CURL_OPTIONS="--fail --retry 20 --retry-delay 30 --location"
+
+            if [ "$DUMP_HTTP" = 1 ] ; then
+                CURL_OPTIONS="$CURL_OPTIONS --verbose"
+            fi
+
+            if [ -n "$SSL_CERT_FILE" ] ; then
+                CURL_OPTIONS="$CURL_OPTIONS --cacert $SSL_CERT_FILE"
+            fi
+
+            run "curl $CURL_OPTIONS -o '$FETCH_BUFFER_FILEPATH' '$FETCH_URL'" ||
+            run "curl $CURL_OPTIONS -o '$FETCH_BUFFER_FILEPATH' '$FETCH_URI'"
+            ;;
+        wget)
+            run "wget --timeout=60 -O '$FETCH_BUFFER_FILEPATH' '$FETCH_URL'" ||
+            run "wget --timeout=60 -O '$FETCH_BUFFER_FILEPATH' '$FETCH_URI'"
+            ;;
+        http)
+            run "http --timeout=60 -o '$FETCH_BUFFER_FILEPATH' '$FETCH_URL'" ||
+            run "http --timeout=60 -o '$FETCH_BUFFER_FILEPATH' '$FETCH_URI'"
+            ;;
+        lynx)
+            run "lynx -source '$FETCH_URL' > '$FETCH_BUFFER_FILEPATH'" ||
+            run "lynx -source '$FETCH_URI' > '$FETCH_BUFFER_FILEPATH'"
+            ;;
+        aria2c)
+            run "aria2c -d '$FETCH_OUTPUT_DIR' -o '$FETCH_OUTPUT_FILENAME' '$FETCH_URL'" ||
+            run "aria2c -d '$FETCH_OUTPUT_DIR' -o '$FETCH_OUTPUT_FILENAME' '$FETCH_URI'"
+            ;;
+        axel)
+            run "axel -o '$FETCH_BUFFER_FILEPATH' '$FETCH_URL'" ||
+            run "axel -o '$FETCH_BUFFER_FILEPATH' '$FETCH_URI'"
+            ;;
+        *)  abort 1 "wfetch() unimplementation: $FETCH_TOOL"
+            ;;
+    esac
+
+    [ $? -eq 0 ] || return 1
+
+    if [ -n "$FETCH_OUTPUT_FILEPATH" ] ; then
+        if [ -n "$FETCH_SHA256_EXPECTED" ] ; then
+            FETCH_SHA256_ACTUAL="$(sha256sum "$FETCH_BUFFER_FILEPATH" | cut -d ' ' -f1)"
+
+            if [ "$FETCH_SHA256_ACTUAL" != "$FETCH_SHA256_EXPECTED" ] ; then
+                abort 1 "sha256sum mismatch.\n    expect : $FETCH_SHA256_EXPECTED\n    actual : $FETCH_SHA256_ACTUAL\n"
+            fi
+        fi
+
+        if [ "$NOT_BUFFER" != 1 ] ; then
+            run mv "$FETCH_BUFFER_FILEPATH" "$FETCH_OUTPUT_FILEPATH"
+        fi
+    fi
+}
+
+filetype_from_url() {
+    # remove query params
+    URL="${1%%'?'*}"
+
+    FNAME="${URL##*/}"
+
+    case $FNAME in
+        *.tar.gz|*.tgz)
+            printf '%s\n' '.tgz'
+            ;;
+        *.tar.lz|*.tlz)
+            printf '%s\n' '.tlz'
+            ;;
+        *.tar.xz|*.txz)
+            printf '%s\n' '.txz'
+            ;;
+        *.tar.bz2|*.tbz2)
+            printf '%s\n' '.tbz2'
+            ;;
+        *.*)printf '%s\n' ".${FNAME##*.}"
+    esac
+}
+
+inspect_install_arguments() {
+    unset PROFILE
+
+    unset LOG_LEVEL
+
+    unset BUILD_NJOBS
+
+    unset ENABLE_LTO
+
+    unset KEEP_SESSION_DIR
+
+    unset EXPORT_COMPILE_COMMANDS_JSON
+
+    unset CREATE_FULLY_STATICALLY_LINKED_EXECUTABLE
+
+    unset SPECIFIED_PACKAGE_LIST
+
+    unset SESSION_DIR
+    unset DOWNLOAD_DIR
+    unset PACKAGE_INSTALL_DIR
+
+    unset DUMP_ENV
+    unset DUMP_HTTP
+
+    unset VERBOSE_GMAKE
+
+    unset DEBUG_CC
+    unset DEBUG_LD
+
+    PYTHON_EDITION="$1"
+
+    case $PYTHON_EDITION in
+        3.1[0-4])
+            ;;
+        3.9);;
+        *)  abort 1 "unsupported python edition: $PYTHON_EDITION"
+    esac
+
+    shift
+
+    while [ -n "$1" ]
+    do
+        case $1 in
+            -x) set -x ;;
+            -q) LOG_LEVEL=0 ;;
+            -v) LOG_LEVEL=2
+
+                DUMP_ENV=1
+                DUMP_HTTP=1
+
+                VERBOSE_GMAKE=1
+                ;;
+            -vv)LOG_LEVEL=3
+
+                DUMP_ENV=1
+                DUMP_HTTP=1
+
+                VERBOSE_GMAKE=1
+
+                DEBUG_CC=1
+                DEBUG_LD=1
+                ;;
+            -v-env)
+                DUMP_ENV=1
+                ;;
+            -v-http)
+                DUMP_HTTP=1
+                ;;
+            -v-gmake)
+                VERBOSE_GMAKE=1
+                ;;
+            -v-cc)
+                DEBUG_CC=1
+                ;;
+            -v-ld)
+                DEBUG_LD=1
+                ;;
+            --profile=*)
+                PROFILE="${1#*=}"
+                ;;
+            --session-dir=*)
+                SESSION_DIR="${1#*=}"
+
+                case $SESSION_DIR in
+                    /*) ;;
+                    *)  SESSION_DIR="$PWD/$SESSION_DIR"
+                esac
+                ;;
+            --download-dir=*)
+                DOWNLOAD_DIR="${1#*=}"
+
+                case $DOWNLOAD_DIR in
+                    /*) ;;
+                    *)  DOWNLOAD_DIR="$PWD/$DOWNLOAD_DIR"
+                esac
+                ;;
+            --prefix=*)
+                PACKAGE_INSTALL_DIR="${1#*=}"
+
+                case $PACKAGE_INSTALL_DIR in
+                    /*) ;;
+                    *)  PACKAGE_INSTALL_DIR="$PWD/$PACKAGE_INSTALL_DIR"
+                esac
+                ;;
+            --static)
+                CREATE_FULLY_STATICALLY_LINKED_EXECUTABLE=1
+                ;;
+            -j) shift
+                isInteger "$1" || abort 1 "-j <N>, <N> must be an integer."
+                BUILD_NJOBS="$1"
+                ;;
+            -K) KEEP_SESSION_DIR=1 ;;
+            -E) EXPORT_COMPILE_COMMANDS_JSON=1 ;;
+
+            -*) abort 1 "unrecognized option: $1"
+                ;;
+            *)  SPECIFIED_PACKAGE_LIST="$SPECIFIED_PACKAGE_LIST $1"
+        esac
+        shift
+    done
+
+    #########################################################################################
+
+    : ${PROFILE:=release}
+    : ${ENABLE_LTO:=1}
+
+    : ${SESSION_DIR:="$HOME/.xbuilder/run/$$"}
+    : ${DOWNLOAD_DIR:="$HOME/.xbuilder/downloads"}
+    : ${PACKAGE_INSTALL_DIR:="$HOME/.xbuilder/installed/python3"}
+
+    #########################################################################################
+
+    AUX_INSTALL_DIR="$SESSION_DIR/auxroot"
+    AUX_INCLUDE_DIR="$AUX_INSTALL_DIR/include"
+    AUX_LIBRARY_DIR="$AUX_INSTALL_DIR/lib"
+
+    #########################################################################################
+
+    NATIVE_PLATFORM_KIND="$(uname -s | tr A-Z a-z)"
+    NATIVE_PLATFORM_ARCH="$(uname -m)"
+
+    #########################################################################################
+
+    if [ -z "$BUILD_NJOBS" ] ; then
+        if [ "$NATIVE_PLATFORM_KIND" = 'darwin' ] ; then
+            NATIVE_PLATFORM_NCPU="$(sysctl -n machdep.cpu.thread_count)"
+        else
+            NATIVE_PLATFORM_NCPU="$(nproc)"
+        fi
+
+        BUILD_NJOBS="$NATIVE_PLATFORM_NCPU"
+    fi
+
+    #########################################################################################
+
+    if [ "$LOG_LEVEL" = 0 ] ; then
+        exec 1>/dev/null
+        exec 2>&1
+    else
+        if [ -z "$LOG_LEVEL" ] ; then
+            LOG_LEVEL=1
+        fi
+    fi
+
+    #########################################################################################
+
+    if [ -z "$TAR" ] ; then
+        TAR="$(command -v bsdtar || command -v gtar || command -v tar)" || abort 1 "none of bsdtar, gtar, tar command was found."
+    fi
+
+    if [ -z "$GMAKE" ] ; then
+        GMAKE="$(command -v gmake || command -v make)" || abort 1 "command not found: gmake"
+    fi
+
+    #########################################################################################
+
+    unset CC_ARGS
+    unset PP_ARGS
+    unset LD_ARGS
+
+    if [ "$NATIVE_PLATFORM_KIND" = 'darwin' ] ; then
+        [ -z "$CC"      ] &&      CC="$(xcrun --sdk macosx --find clang)"
+        [ -z "$CXX"     ] &&     CXX="$(xcrun --sdk macosx --find clang++)"
+        [ -z "$AS"      ] &&      AS="$(xcrun --sdk macosx --find as)"
+        [ -z "$LD"      ] &&      LD="$(xcrun --sdk macosx --find ld)"
+        [ -z "$AR"      ] &&      AR="$(xcrun --sdk macosx --find ar)"
+        [ -z "$RANLIB"  ] &&  RANLIB="$(xcrun --sdk macosx --find ranlib)"
+        [ -z "$SYSROOT" ] && SYSROOT="$(xcrun --sdk macosx --show-sdk-path)"
+
+        [ -z "$MACOSX_DEPLOYMENT_TARGET" ] && MACOSX_DEPLOYMENT_TARGET="$(sw_vers -productVersion)"
+
+        CC_ARGS="-isysroot $SYSROOT -mmacosx-version-min=$MACOSX_DEPLOYMENT_TARGET -arch $NATIVE_PLATFORM_ARCH -Qunused-arguments"
+        PP_ARGS="-isysroot $SYSROOT -Qunused-arguments"
+        LD_ARGS="-isysroot $SYSROOT -mmacosx-version-min=$MACOSX_DEPLOYMENT_TARGET -arch $NATIVE_PLATFORM_ARCH"
+    else
+        [ -z "$CC" ] && {
+             CC="$(command -v cc  || command -v clang   || command -v gcc)" || abort 1 "C Compiler not found."
+        }
+
+        [ -z "$CXX" ] && {
+            CXX="$(command -v c++ || command -v clang++ || command -v g++)" || abort 1 "C++ Compiler not found."
+        }
+
+        [ -z "$AS" ] && {
+            AS="$(command -v as)" || abort 1 "command not found: as"
+        }
+
+        [ -z "$LD" ] && {
+            LD="$(command -v ld)" || abort 1 "command not found: ld"
+        }
+
+        [ -z "$AR" ] && {
+            AR="$(command -v ar)" || abort 1 "command not found: ar"
+        }
+
+        [ -z "$RANLIB" ] && {
+            RANLIB="$(command -v ranlib)" || abort 1 "command not found: ranlib"
+        }
+
+        CC_ARGS="-fPIC -fno-common"
+
+        # https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
+        LD_ARGS="-Wl,--as-needed"
+    fi
+
+    #########################################################################################
+
+    CPP="$CC -E"
+
+    #########################################################################################
+
+    [ "$DEBUG_CC" = 1 ] && CC_ARGS="$CC_ARGS -v"
+    [ "$DEBUG_LD" = 1 ] && LD_ARGS="$LD_ARGS -Wl,-v"
+
+    case $PROFILE in
+        debug)
+            CC_ARGS="$CC_ARGS -O0 -g"
+            ;;
+        release)
+            CC_ARGS="$CC_ARGS -Os"
+
+            if [ "$ENABLE_LTO" = 1 ] ; then
+                LD_ARGS="$LD_ARGS -flto"
+            fi
+
+            if [ "$NATIVE_PLATFORM_KIND" = darwin ] ; then
+                LD_ARGS="$LD_ARGS -Wl,-S"
+            else
+                LD_ARGS="$LD_ARGS -Wl,-s"
+            fi
+    esac
+
+    case $NATIVE_PLATFORM_KIND in
+         netbsd) LD_ARGS="$LD_ARGS -lpthread" ;;
+        openbsd) LD_ARGS="$LD_ARGS -lpthread" ;;
+    esac
+
+    #########################################################################################
+
+    CC_ARGS="-I$AUX_INCLUDE_DIR $CC_ARGS"
+    PP_ARGS="-I$AUX_INCLUDE_DIR $PP_ARGS"
+    LD_ARGS="-L$AUX_LIBRARY_DIR $LD_ARGS"
+
+    PATH="$AUX_INSTALL_DIR/bin:$PATH"
+
+    #########################################################################################
+
+      CFLAGS="$CC_ARGS   $CFLAGS"
+    CXXFLAGS="$CC_ARGS $CXXFLAGS"
+    CPPFLAGS="$PP_ARGS $CPPFLAGS"
+     LDFLAGS="$LD_ARGS  $LDFLAGS"
+
+    #########################################################################################
+
+    for TOOL in CC CXX CPP AS AR RANLIB LD SYSROOT CFLAGS CXXFLAGS CPPFLAGS LDFLAGS
+    do
+        export "${TOOL}"
+    done
+
+    #########################################################################################
+
+    unset LIBS
+
+    # autoreconf --help
+
+    unset AUTOCONF
+    unset AUTOHEADER
+    unset AUTOM4TE
+    unset AUTOMAKE
+    unset AUTOPOINT
+    unset ACLOCAL
+    unset GTKDOCIZE
+    unset INTLTOOLIZE
+    unset LIBTOOLIZE
+    unset M4
+    unset MAKE
+
+    # https://stackoverflow.com/questions/18476490/what-is-purpose-of-target-arch-variable-in-makefiles
+    unset TARGET_ARCH
+
+    # https://keith.github.io/xcode-man-pages/xcrun.1.html
+    unset SDKROOT
+}
+
+configure() {
+    run cd "$SESSION_DIR"
+
+    if [ -f config/config.sub ] && [ -f config/config.guess ] ; then
+        CONFIG_FILE_DIR="$SESSION_DIR/config"
+    else
+        if [    -d config.git ] ; then
+            rm -rf config.git
+        fi
+
+        if run git clone --depth 1 https://git.savannah.gnu.org/git/config.git ; then
+            CONFIG_FILE_DIR="$SESSION_DIR/config"
+        else
+            if  run curl -L -o _config.sub   "'https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'" &&
+                sh _config.sub x86_64-pc-linux &&
+                run curl -L -o _config.guess "'https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD'" &&
+                sh _config.guess > /dev/null ; then
+                run chmod +x _config.guess
+                run chmod +x _config.sub
+                run mv _config.guess config.guess
+                run mv _config.sub   config.sub
+                CONFIG_FILE_DIR="$SESSION_DIR"
+            elif run curl -L -o _config.sub   'https://git.savannah.gnu.org/cgit/config.git/plain/config.sub' &&
+                sh _config.sub x86_64-pc-linux &&
+                run curl -L -o _config.guess 'https://git.savannah.gnu.org/cgit/config.git/plain/config.guess' &&
+                sh _config.guess > /dev/null ; then
+                run chmod +x _config.guess
+                run chmod +x _config.sub
+                run mv _config.guess config.guess
+                run mv _config.sub   config.sub
+                CONFIG_FILE_DIR="$SESSION_DIR"
+            else
+                CONFIG_FILE_DIR="$NDKPKG_CORE_DIR"
+            fi
+        fi
+    fi
+
+    run cd -
+
+    find -type f -name config.sub   -exec cp -vf "$CONFIG_FILE_DIR/config.sub"   {} \;
+    find -type f -name config.guess -exec cp -vf "$CONFIG_FILE_DIR/config.guess" {} \;
+
+    run ./configure "--prefix=$PACKAGE_INSTALL_DIR" "$@"
+
+    if [ -n  "$PACKAGE_CONFIGURED" ] ; then
+        eval "$PACKAGE_CONFIGURED"
+    fi
+
+    run "$GMAKE" "--jobs=$BUILD_NJOBS"
+    run "$GMAKE" install
+}
+
+install_the_given_package() {
+    [ -z "$1" ] && abort 1 "install_the_given_package <PACKAGE-NAME> , <PACKAGE-NAME> is unspecified."
+
+    unset PACKAGE_SRC_URL
+    unset PACKAGE_SRC_URI
+    unset PACKAGE_SRC_SHA
+
+    unset PACKAGE_DEP_LIB
+    unset PACKAGE_DEP_AUX
+
+    unset PACKAGE_DOPATCH
+    unset PACKAGE_INSTALL
+    unset PACKAGE_DOTWEAK
+    unset PACKAGE_CONFIGURED
+
+    package_info_$1
+
+    #########################################################################################
+
+    for PACKAGE_DEPENDENCY in $PACKAGE_DEP_LIB $PACKAGE_DEP_AUX
+    do
+        (install_the_given_package "$PACKAGE_DEPENDENCY")
+    done
+
+    #########################################################################################
+
+    printf '\n%b\n' "${COLOR_PURPLE}=>> $ARG0: install package : $1${COLOR_OFF}"
+
+    #########################################################################################
+
+    if [ "$1" != python3 ] ; then
+        PACKAGE_INSTALL_DIR="$AUX_INSTALL_DIR"
+    fi
+
+    #########################################################################################
+
+    if [ -f "$PACKAGE_INSTALL_DIR/$1.yml" ] ; then
+        note "package '$1' already has been installed, skipped."
+        return 0
+    fi
+
+    #########################################################################################
+
+    PACKAGE_SRC_FILETYPE="$(filetype_from_url "$PACKAGE_SRC_URL")"
+    PACKAGE_SRC_FILENAME="$PACKAGE_SRC_SHA$PACKAGE_SRC_FILETYPE"
+    PACKAGE_SRC_FILEPATH="$DOWNLOAD_DIR/$PACKAGE_SRC_FILENAME"
+
+    #########################################################################################
+
+    wfetch "$PACKAGE_SRC_URL" --uri="$PACKAGE_SRC_URI" --sha256="$PACKAGE_SRC_SHA" -o "$PACKAGE_SRC_FILEPATH"
+
+    #########################################################################################
+
+    PACKAGE_WORKING_DIR="$SESSION_DIR/$1"
+
+    #########################################################################################
+
+    run install -d "$PACKAGE_WORKING_DIR/src"
+    run cd         "$PACKAGE_WORKING_DIR/src"
+
+    #########################################################################################
+
+    run "$TAR" xf "$PACKAGE_SRC_FILEPATH" --strip-components=1 --no-same-owner
+
+    #########################################################################################
+
+    if [ -n  "$PACKAGE_DOPATCH" ] ; then
+        eval "$PACKAGE_DOPATCH"
+    fi
+
+    #########################################################################################
+
+    if [ "$DUMP_ENV" = 1 ] ; then
+        run export -p
+    fi
+
+    #########################################################################################
+
+    if [ -n  "$PACKAGE_INSTALL" ] ; then
+        eval "$PACKAGE_INSTALL"
+    else
+        abort 1 "PACKAGE_INSTALL variable is not set for package '$1'"
+    fi
+
+    #########################################################################################
+
+    run cd "$PACKAGE_INSTALL_DIR"
+
+    #########################################################################################
+
+    if [ -n  "$PACKAGE_DOTWEAK" ] ; then
+        eval "$PACKAGE_DOTWEAK"
+    fi
+
+    #########################################################################################
+
+    run cd "$PACKAGE_INSTALL_DIR"
+
+    #########################################################################################
+
+    PACKAGE_INSTALL_UTS="$(date +%s)"
+
+    cat > "$1.yml" <<EOF
+src-url: $PACKAGE_SRC_URL
+src-uri: $PACKAGE_SRC_URI
+src-sha: $PACKAGE_SRC_SHA
+dep-lib: $PACKAGE_DEP_LIB
+dep-aux: $PACKAGE_DEP_AUX
+install: $PACKAGE_INSTALL
+builtat: $PACKAGE_INSTALL_UTS
+EOF
+
+    cat > toolchain.txt <<EOF
+     CC='$CC'
+    CXX='$CXX'
+     AS='$AS'
+     LD='$LD'
+     AR='$AR'
+ RANLIB='$RANLIB'
+SYSROOT='$SYSROOT'
+PROFILE='$PROFILE'
+ CFLAGS='$CFLAGS'
+LDFLAGS='$LDFLAGS'
+EOF
+}
+
+package_info_libz() {
+    PACKAGE_SRC_URL='https://distfiles.macports.org/zlib/zlib-1.3.2.tar.xz'
+    PACKAGE_SRC_SHA='d7a0654783a4da529d1bb793b7ad9c3318020af77667bcae35f95d0e42a792f3'
+    PACKAGE_INSTALL='configure --static'
+}
+
+package_info_libbz2() {
+    PACKAGE_SRC_URL='https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz'
+    PACKAGE_SRC_SHA='ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269'
+    PACKAGE_INSTALL='
+    for f in blocksort.c huffman.c crctable.c randtable.c compress.c decompress.c bzlib.c
+    do
+        o="${f%.c}.o"
+        run "$CC" -c "$CFLAGS" "$CPPFLAGS" -D_FILE_OFFSET_BITS=64 -o "$o" "$f"
+    done
+
+    run "$AR" crs libbz2.a *.o
+
+    run install -d     "$PACKAGE_INSTALL_DIR/include/"
+    run install -d     "$PACKAGE_INSTALL_DIR/lib/"
+    run cp -L bzlib.h  "$PACKAGE_INSTALL_DIR/include/"
+    run cp -L libbz2.a "$PACKAGE_INSTALL_DIR/lib/"
+    '
+}
+
+package_info_libexpat() {
+    PACKAGE_SRC_URL='https://github.com/libexpat/libexpat/releases/download/R_2_7_4/expat-2.7.4.tar.lz'
+    PACKAGE_SRC_SHA='882bb3c124cdfd6d594818276f3ea851b780473a722385150a5793277635fcae'
+    PACKAGE_INSTALL='configure --disable-dependency-tracking --enable-static --disable-shared --without-xmlwf --without-tests --without-examples --without-docbook'
+}
+
+package_info_liblzma() {
+    PACKAGE_SRC_URL='https://github.com/tukaani-project/xz/releases/download/v5.8.3/xz-5.8.3.tar.gz'
+    PACKAGE_SRC_SHA='3d3a1b973af218114f4f889bbaa2f4c037deaae0c8e815eec381c3d546b974a0'
+    PACKAGE_INSTALL='configure --disable-dependency-tracking --enable-static --disable-shared --disable-nls --enable-largefile --disable-xz --disable-xzdec --disable-lzmadec --disable-lzmainfo --disable-lzma-links --disable-scripts --disable-doc'
+}
+
+package_info_libgdbm() {
+    PACKAGE_SRC_URL='https://ftp.gnu.org/gnu/gdbm/gdbm-1.26.tar.gz'
+    PACKAGE_SRC_SHA='6a24504a14de4a744103dcb936be976df6fbe88ccff26065e54c1c47946f4a5e'
+    PACKAGE_INSTALL='configure --disable-dependency-tracking --enable-static --disable-shared --disable-nls --enable-largefile --enable-libgdbm-compat --without-readline'
+    PACKAGE_DOTWEAK='run ln -s ndbm.h include/gdbm-ndbm.h'
+}
+
+package_info_libsqlite3() {
+    PACKAGE_SRC_URL='https://sqlite.org/2026/sqlite-autoconf-3510200.tar.gz'
+    PACKAGE_SRC_SHA='fbd89f866b1403bb66a143065440089dd76100f2238314d92274a082d4f2b7bb'
+    PACKAGE_DEP_LIB='libz'
+    PACKAGE_INSTALL='configure --disable-dependency-tracking --enable-static --disable-shared --enable-largefile --disable-editline --disable-readline'
+}
+
+package_info_libffi() {
+    PACKAGE_SRC_URL='https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz'
+    PACKAGE_SRC_SHA='f3a3082a23b37c293a4fcd1053147b371f2ff91fa7ea1b2a52e335676bac82dc'
+    PACKAGE_INSTALL='configure --disable-dependency-tracking --enable-static --disable-shared --disable-docs --disable-symvers'
+}
+
+package_info_libiconv() {
+    PACKAGE_SRC_URL='https://ftp.gnu.org/gnu/libiconv/libiconv-1.19.tar.gz'
+    PACKAGE_SRC_SHA='88dd96a8c0464eca144fc791ae60cd31cd8ee78321e67397e25fc095c4a19aa6'
+    PACKAGE_INSTALL='configure --disable-dependency-tracking --enable-static --disable-shared --enable-extra-encodings'
+}
+
+package_info_libintl() {
+    PACKAGE_SRC_URL='https://ftp.gnu.org/gnu/gettext/gettext-0.26.tar.gz'
+    PACKAGE_SRC_SHA='39acf4b0371e9b110b60005562aace5b3631fed9b1bb9ecccfc7f56e58bb1d7f'
+    PACKAGE_DEP_LIB='libiconv'
+    PACKAGE_INSTALL='run cd gettext-runtime && configure --disable-dependency-tracking --enable-static --disable-shared --disable-libasprintf --disable-nls --disable-csharp --disable-java --enable-c++ --enable-nls --with-included-gettext --with-libiconv-prefix="$AUX_INSTALL_DIR"'
+}
+
+package_info_libtirpc() {
+    PACKAGE_SRC_URL='https://downloads.sourceforge.net/project/libtirpc/libtirpc/1.3.5/libtirpc-1.3.5.tar.bz2'
+    PACKAGE_SRC_SHA='9b31370e5a38d3391bf37edfa22498e28fe2142467ae6be7a17c9068ec0bf12f'
+    PACKAGE_DEP_LIB='libz'
+    PACKAGE_INSTALL='configure --disable-dependency-tracking --enable-static --disable-shared --enable-ipv6 --disable-gssapi'
+    PACKAGE_DOPATCH='wfetch "https://raw.githubusercontent.com/leleliu008/sys-queue.h/v1/sys-queue.h" -o "$AUX_INCLUDE_DIR/sys/queue.h"'
+}
+
+package_info_libnsl() {
+    PACKAGE_SRC_URL='https://github.com/thkukuk/libnsl/releases/download/v2.0.1/libnsl-2.0.1.tar.xz'
+    PACKAGE_SRC_SHA='5c9e470b232a7acd3433491ac5221b4832f0c71318618dc6aa04dd05ffcd8fd9'
+    PACKAGE_DEP_LIB='libtirpc libintl'
+    PACKAGE_DOPATCH='export CPPFLAGS="$CPPFLAGS -I$AUX_INCLUDE_DIR/tirpc"'
+    PACKAGE_INSTALL='configure --disable-dependency-tracking --enable-static --disable-shared'
+}
+
+package_info_libopenssl() {
+    PACKAGE_SRC_URL='https://github.com/openssl/openssl/releases/download/openssl-3.6.3/openssl-3.6.3.tar.gz'
+    PACKAGE_SRC_SHA='243a86649cf6f23eeb6a2ff2456e09e5d77dd9018a54d3d96b0c6bdd6ba6c7f1'
+    PACKAGE_DEP_AUX='perl'
+    PACKAGE_DOPATCH='
+    case $NATIVE_PLATFORM_ARCH in
+        armv7l) gsed -i "s|armv7-a|armv7-a+fp|g" util/perl/OpenSSL/config.pm
+    esac'
+    PACKAGE_INSTALL='run ./config "--prefix=$PACKAGE_INSTALL_DIR" no-shared no-tests no-ssl3 no-ssl3-method no-zlib --libdir=lib --openssldir=etc/ssl && run "$GMAKE" build_libs "--jobs=$BUILD_NJOBS" && run "$GMAKE" install_dev'
+    # https://github.com/openssl/openssl/blob/master/INSTALL.md
+}
+
+package_info_libncurses() {
+    PACKAGE_SRC_URL='https://ftp.gnu.org/gnu/ncurses/ncurses-6.6.tar.gz'
+    PACKAGE_SRC_SHA='355b4cbbed880b0381a04c46617b7656e362585d52e9cf84a67e2009b749ff11'
+    PACKAGE_DOPATCH='
+unset TERMINFO
+export LDCONFIG=true'
+    PACKAGE_INSTALL='configure \
+        --with-pkg-config-libdir="$PACKAGE_INSTALL_DIR/lib/pkgconfig" \
+        --without-ada \
+        --without-tests \
+        --without-debug \
+        --without-shared \
+        --without-valgrind \
+        --enable-const \
+        --enable-widec \
+        --enable-termcap \
+        --enable-warnings \
+        --enable-pc-files \
+        --enable-ext-mouse \
+        --enable-ext-colors \
+        --disable-stripping \
+        --disable-assertions \
+        --disable-gnat-projects \
+        --disable-echo'
+    PACKAGE_DOTWEAK='
+for f in curses.h ncurses.h form.h menu.h panel.h term.h termcap.h
+do
+    ln -s "ncursesw/$f" "include/$f"
+done
+
+for item in libncurses libpanel libmenu libform
+do
+    ln -s "${item}w.a" "lib/${item}.a"
+done
+
+ln -s libncurses.a    lib/libtermcap.a
+ln -s libncurses++w.a lib/libncurses++.a
+
+ln -s ncursesw.pc lib/pkgconfig/ncurses.pc'
+}
+
+package_info_libedit() {
+    PACKAGE_SRC_URL='https://thrysoee.dk/editline/libedit-20260512-3.1.tar.gz'
+    PACKAGE_SRC_SHA='432d5e7ea8b0116dd39f2eca7bc11d0eed77faa6b77ea526ace89907c23ea4a0'
+    PACKAGE_DEP_LIB='libncurses'
+    PACKAGE_INSTALL='configure --disable-dependency-tracking --enable-static --disable-shared --disable-examples'
+    PACKAGE_DOTWEAK='run ln -s libedit.a lib/libreadline.a'
+}
+
+package_info_libuuid() {
+    PACKAGE_SRC_URL='https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.42/util-linux-2.42.2.tar.xz'
+    PACKAGE_SRC_SHA='03a05d3adf9602ef128f2da05b84b3205ce60c351e5737c0370f74000679ce8a'
+    PACKAGE_DEP_AUX='automake libtool'
+    PACKAGE_INSTALL='configure \
+        --without-python \
+        --without-systemd \
+        --enable-widechar \
+        --enable-libuuid \
+        --enable-static \
+        --disable-shared \
+        --disable-all-programs \
+        --disable-bash-completion \
+        --disable-use-tty-group \
+        --disable-chfn-chsh \
+        --disable-login \
+        --disable-su \
+        --disable-runuser \
+        --disable-makeinstall-chown \
+        --disable-makeinstall-setuid'
+
+    if [ "$NATIVE_PLATFORM_KIND" = darwin ] ; then
+        PACKAGE_DOPATCH='
+        wfetch 'https://github.com/util-linux/util-linux/commit/9445f477cfcfb3615ffde8f93b1b98c809ee4eca.patch?full_index=1' -o patch.diff
+        patch -p1 < patch.diff
+        '
+    fi
+
+    PACKAGE_DOTWEAK='run ln -s uuid/uuid.h include/uuid.h'
+}
+
+package_info_perl() {
+    PACKAGE_SRC_URL='https://www.cpan.org/src/5.0/perl-5.42.2.tar.xz'
+    PACKAGE_SRC_SHA='0a585eeb9e363c0f80482ddb3571625250c2c86aeb408853e8ea50805cfb14bb'
+    PACKAGE_INSTALL='run ./Configure "-Dprefix=$PACKAGE_INSTALL_DIR" -Dman1dir=none -Dman3dir=none -des -Dmake=gmake -Duselargefiles -Duseshrplib -Dusethreads -Dusenm=false -Dusedl=true && run "$GMAKE" "--jobs=$BUILD_NJOBS" && run "$GMAKE" install'
+}
+
+package_info_autoconf() {
+    PACKAGE_SRC_URL='https://ftp.gnu.org/gnu/autoconf/autoconf-2.73.tar.gz'
+    PACKAGE_SRC_SHA='259ddfa3bddc799cfb81489cc0f17dfdf1bd6d1505dda53c0f45ff60d6a4f9a7'
+    PACKAGE_DEP_AUX='perl gm4'
+    PACKAGE_INSTALL='configure'
+}
+
+package_info_automake() {
+    PACKAGE_SRC_URL='https://ftp.gnu.org/gnu/automake/automake-1.18.1.tar.xz'
+    PACKAGE_SRC_SHA='168aa363278351b89af56684448f525a5bce5079d0b6842bd910fdd3f1646887'
+    PACKAGE_DEP_AUX='autoconf'
+    PACKAGE_INSTALL='configure'
+}
+
+package_info_libtool() {
+    PACKAGE_SRC_URL='https://ftp.gnu.org/gnu/libtool/libtool-2.5.4.tar.xz'
+    PACKAGE_SRC_SHA='f81f5860666b0bc7d84baddefa60d1cb9fa6fceb2398cc3baca6afaa60266675'
+    PACKAGE_INSTALL='configure --disable-ltdl-install'
+    PACKAGE_DEP_AUX='gm4'
+    PACKAGE_DOTWEAK='
+run ln -s libtool    bin/glibtool
+run ln -s libtoolize bin/glibtoolize
+'
+}
+
+package_info_gm4() {
+    PACKAGE_SRC_URL='https://ftp.gnu.org/gnu/m4/m4-1.4.21.tar.xz'
+    PACKAGE_SRC_SHA='f25c6ab51548a73a75558742fb031e0625d6485fe5f9155949d6486a2408ab66'
+    PACKAGE_INSTALL='configure'
+}
+
+package_info_libxcrypt() {
+    PACKAGE_SRC_URL='https://github.com/besser82/libxcrypt/releases/download/v4.5.2/libxcrypt-4.5.2.tar.xz'
+    PACKAGE_SRC_SHA='71513a31c01a428bccd5367a32fd95f115d6dac50fb5b60c779d5c7942aec071'
+    PACKAGE_DEP_AUX='perl'
+    PACKAGE_DOPATCH='export LDFLAGS="-static $LDFLAGS"'
+    PACKAGE_INSTALL='configure --disable-dependency-tracking --enable-obsolete-api=glibc --disable-xcrypt-compat-files --disable-failure-tokens --disable-valgrind'
+}
+
+package_info_python3() {
+    case $PYTHON_EDITION in
+        3.9)
+            PACKAGE_SRC_URL='https://www.python.org/ftp/python/3.9.25/Python-3.9.25.tgz'
+            PACKAGE_SRC_SHA='00e07d7c0f2f0cc002432d1ee84d2a40dae404a99303e3f97701c10966c91834'
+            ;;
+        3.10)
+            PACKAGE_SRC_URL='https://www.python.org/ftp/python/3.10.21/Python-3.10.21.tgz'
+            PACKAGE_SRC_SHA='f276987f06270ae6c1fb4da620bd105edf78c31368c2f7e85e6c1d51c560b04b'
+            ;;
+        3.11)
+            PACKAGE_SRC_URL='https://www.python.org/ftp/python/3.11.16/Python-3.11.16.tgz'
+            PACKAGE_SRC_SHA='6c0bd76ab0ec7d94ed400b1497f01ac6c7751c8822615ee0855a3eb2d893ea76'
+            ;;
+        3.12)
+            PACKAGE_SRC_URL='https://www.python.org/ftp/python/3.12.14/Python-3.12.14.tgz'
+            PACKAGE_SRC_SHA='6c6df908d2c3fd24e6d76869e92542abd0f33aec9dfc18df8875f89660286d43'
+            ;;
+        3.13)
+            PACKAGE_SRC_URL='https://www.python.org/ftp/python/3.13.15/Python-3.13.15.tgz'
+            PACKAGE_SRC_SHA='c28d9d213c09b5b5ab2c29812950e12f746999e099b82894231be954b26baed9'
+            ;;
+        3.14)
+            PACKAGE_SRC_URL='https://www.python.org/ftp/python/3.14.7/Python-3.14.7.tgz'
+            PACKAGE_SRC_SHA='62859805f6fdf25e2bcbf3fa3217801e1996887ca33e6a2af80674bdfa2dbe07'
+            ;;
+        *)  abort 1 "unsupported python edition: $PYTHON_EDITION"
+    esac
+
+    PACKAGE_DEP_LIB='libz libbz2 liblzma libgdbm libexpat libsqlite3 libffi libopenssl'
+
+    case $NATIVE_PLATFORM_KIND in
+        darwin) PACKAGE_DEP_LIB="$PACKAGE_DEP_LIB libuuid libedit" ;;
+         linux) PACKAGE_DEP_LIB="$PACKAGE_DEP_LIB libuuid libnsl libxcrypt libedit" ;;
+             *) PACKAGE_DEP_LIB="$PACKAGE_DEP_LIB libedit" ;;
+    esac
+
+    PACKAGE_INSTALL='configure --with-system-expat --with-system-ffi --with-readline=editline --with-openssl=$PACKAGE_INSTALL_DIR --with-ensurepip=yes --with-lto --enable-ipv6 --enable-static --disable-shared --enable-largefile --disable-option-checking --disable-nls --disable-debug --enable-loadable-sqlite-extensions --disable-profiling py_cv_module__tkinter=disabled'
+
+    PACKAGE_DOPATCH='
+unset PYTHONHOME
+unset PYTHONPATH
+
+export MODULE_BUILDTYPE=static
+
+export CPPFLAGS="$CPPFLAGS -I$AUX_INCLUDE_DIR/tirpc"
+
+export ZLIB_CFLAGS="-I$AUX_INCLUDE_DIR"
+export ZLIB_LIBS="-L$AUX_LIBRARY_DIR -lz"
+
+export BZIP2_CFLAGS="-I$AUX_INCLUDE_DIR"
+export BZIP2_LIBS="-L$AUX_LIBRARY_DIR -lbz2"
+
+export LIBLZMA_CFLAGS="-I$AUX_INCLUDE_DIR"
+export LIBLZMA_LIBS="-L$AUX_LIBRARY_DIR -llzma"
+
+export LIBSQLITE3_CFLAGS="-I$AUX_INCLUDE_DIR"
+export LIBSQLITE3_LIBS="-L$AUX_LIBRARY_DIR -lsqlite3"
+
+case $NATIVE_PLATFORM_KIND in
+    darwin)
+        export LIBUUID_CFLAGS="-I$AUX_INCLUDE_DIR"
+        export LIBUUID_LIBS="-L$AUX_LIBRARY_DIR -luuid"
+
+        unset  LIBCRYPT_CFLAGS
+        unset  LIBCRYPT_LIBS
+
+        unset  LIBNSL_CFLAGS
+        unset  LIBNSL_LIBS
+
+        LDFLAGS2="$LDFLAGS"
+        LDFLAGS=
+
+        # https://github.com/python/cpython/issues/68731
+        for flag in $LDFLAGS2
+        do
+            case $flag in
+                -flto)  ;;
+                *)      LDFLAGS="$LDFLAGS $flag"
+            esac
+        done
+        ;;
+     linux)
+        export LIBCRYPT_CFLAGS="-I$AUX_INCLUDE_DIR"
+        export LIBCRYPT_LIBS="-L$AUX_LIBRARY_DIR -lcrypt"
+
+        export LIBUUID_CFLAGS="-I$AUX_INCLUDE_DIR"
+        export LIBUUID_LIBS="-L$AUX_LIBRARY_DIR -luuid"
+
+        export LIBNSL_CFLAGS="-I$AUX_INCLUDE_DIR"
+        export LIBNSL_LIBS="-L$AUX_LIBRARY_DIR -lnsl -ltirpc"
+        ;;
+    dragonfly)
+        export LIBCRYPT_CFLAGS="-I$AUX_INCLUDE_DIR"
+        export LIBCRYPT_LIBS="-L$AUX_LIBRARY_DIR -lcrypt"
+
+        unset  LIBUUID_CFLAGS
+        unset  LIBUUID_LIBS
+
+        unset  LIBNSL_CFLAGS
+        unset  LIBNSL_LIBS
+
+        # python-3.13
+        gsed -i "s|int clk_id = PyLong_AsInt|long clk_id = PyLong_AsLong|" Modules/timemodule.c
+        ;;
+    netbsd)
+        export LIBCRYPT_CFLAGS="-I$AUX_INCLUDE_DIR"
+        export LIBCRYPT_LIBS="-L$AUX_LIBRARY_DIR -lcrypt"
+
+        unset  LIBUUID_CFLAGS
+        unset  LIBUUID_LIBS
+
+        unset  LIBNSL_CFLAGS
+        unset  LIBNSL_LIBS
+        ;;
+    *)  unset  LIBCRYPT_CFLAGS
+        unset  LIBCRYPT_LIBS
+
+        unset  LIBUUID_CFLAGS
+        unset  LIBUUID_LIBS
+
+        unset  LIBNSL_CFLAGS
+        unset  LIBNSL_LIBS
+esac
+
+export LIBEDIT_CFLAGS="-I$AUX_INCLUDE_DIR"
+export LIBEDIT_LIBS="-L$AUX_LIBRARY_DIR -ledit -lncurses"
+
+export LIBFFI_CFLAGS="-I$AUX_INCLUDE_DIR"
+export LIBFFI_LIBS="-L$AUX_LIBRARY_DIR -lffi"
+
+export GDBM_CFLAGS="-I$AUX_INCLUDE_DIR"
+export GDBM_LIBS="-L$AUX_LIBRARY_DIR -lgdbm_compat -lgdbm"
+
+export OPENSSL_INCLUDES="-I$AUX_INCLUDE_DIR"
+export OPENSSL_LDFLAGS="-L$AUX_LIBRARY_DIR"
+export OPENSSL_LIBS="-lssl -lcrypto -lpthread -ldl"
+
+unset LIBMPDEC_CFLAGS
+unset LIBMPDEC_LIBS
+
+unset TCLTK_CFLAGS
+unset TCLTK_LIBS
+
+unset X11_CFLAGS
+unset X11_LIBS
+
+export LIBS=-lm'
+
+    PACKAGE_CONFIGURED='
+gsed -i -e "s|#@MODULE_.*_TRUE@||" -e "/^_testinternalcapi/d" -e "/^_dbm/s|$| -DUSE_GDBM_COMPAT -lgdbm_compat -lgdbm|" -e "/^_ctypes/s|$| -lffi|" -e "/^readline/s|$| -ledit -lncurses|" Modules/Setup.stdlib
+
+run cp Modules/Setup.stdlib Modules/Setup.local
+
+case $NATIVE_PLATFORM_KIND in
+    linux) gsed -i "/^_locale/s|$| -lintl -liconv|" Modules/Setup.bootstrap
+esac
+'
+}
+
+
+help() {
+    printf '%b\n' "\
+${COLOR_GREEN}A self-contained and relocatable CPython distribution builder${COLOR_OFF}
+
+${COLOR_GREEN}$ARG0 --help${COLOR_OFF}
+${COLOR_GREEN}$ARG0 -h${COLOR_OFF}
+    show help of this command.
+
+${COLOR_GREEN}$ARG0 config${COLOR_OFF}
+    show config.
+
+${COLOR_GREEN}$ARG0 install <PYTHON-EDITION> [OPTIONS]${COLOR_OFF}
+    Influential environment variables: TAR, GMAKE, CC, CXX, AS, LD, AR, RANLIB, CFLAGS, CXXFLAGS, CPPFLAGS, LDFLAGS
+
+    PYTHON-EDITION: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+
+    OPTIONS:
+        ${COLOR_BLUE}--prefix=<DIR>${COLOR_OFF}
+            specify where to be installed into.
+
+        ${COLOR_BLUE}--session-dir=<DIR>${COLOR_OFF}
+            specify the session directory.
+
+        ${COLOR_BLUE}--download-dir=<DIR>${COLOR_OFF}
+            specify the download directory.
+
+        ${COLOR_BLUE}--profile=<debug|release>${COLOR_OFF}
+            specify the build profile.
+
+            debug:
+                  CFLAGS: -O0 -g
+                CXXFLAGS: -O0 -g
+
+            release:
+                  CFLAGS: -Os
+                CXXFLAGS: -Os
+                CPPFLAGS: -DNDEBUG
+                 LDFLAGS: -flto -Wl,-s
+
+        ${COLOR_BLUE}-j <N>${COLOR_OFF}
+            specify the number of jobs you can run in parallel.
+
+        ${COLOR_BLUE}-E${COLOR_OFF}
+            export compile_commands.json
+
+        ${COLOR_BLUE}-K${COLOR_OFF}
+            keep the session directory even if this packages are successfully installed.
+
+        ${COLOR_BLUE}-x${COLOR_OFF}
+            debug current running shell.
+
+        ${COLOR_BLUE}-q${COLOR_OFF}
+            silent mode. no any messages will be output to terminal.
+
+        ${COLOR_BLUE}-v${COLOR_OFF}
+            verbose mode. many messages will be output to terminal.
+
+            This option is equivalent to -v-* options all are supplied.
+
+        ${COLOR_BLUE}-vv${COLOR_OFF}
+            very verbose mode. many many messages will be output to terminal.
+
+            This option is equivalent to -v-* options all are supplied.
+
+        ${COLOR_BLUE}-v-env${COLOR_OFF}
+            show all environment variables before starting to build.
+
+        ${COLOR_BLUE}-v-http${COLOR_OFF}
+            show http request/response.
+
+        ${COLOR_BLUE}-v-gmake${COLOR_OFF}
+            pass V=1 argument to gmake command.
+
+        ${COLOR_BLUE}-v-cc${COLOR_OFF}
+            pass -v argument to the C/C++ compiler.
+
+        ${COLOR_BLUE}-v-ld${COLOR_OFF}
+            pass -v argument to the linker.
+"
+}
+
+show_config() {
+    unset PACKAGE_SRC_URL
+    unset PACKAGE_SRC_URI
+    unset PACKAGE_SRC_SHA
+
+    unset PACKAGE_DEP_LIB
+    unset PACKAGE_DEP_AUX
+
+    unset PACKAGE_DOPATCH
+    unset PACKAGE_INSTALL
+    unset PACKAGE_DOTWEAK
+
+    package_info_$1
+
+    cat <<EOF
+$1:
+    src-url: $PACKAGE_SRC_URL
+    src-sha: $PACKAGE_SRC_SHA
+
+EOF
+
+    for DEP_PKG_NAME in $PACKAGE_DEP_LIB
+    do
+        (show_config "$DEP_PKG_NAME")
+    done
+}
+
+ARG0="$0"
+
+case $1 in
+    ''|--help|-h)
+        help
+        ;;
+    version)
+        shift
+        [ -z "$1" ] && abort 1 '$ARG0 version <PYTHON-EDITION>, <PYTHON-EDITION> is unspecified. It can be 3.14, 3.13, 3.12, 3.11, 3.10, 3.9'
+        PYTHON_EDITION="$1"
+
+        unset PACKAGE_SRC_URL
+
+        package_info_python3
+
+        PACKAGE_SRC_FILENAME="${PACKAGE_SRC_URL##*/}"
+        PACKAGE_SRC_FILENAME_PREFIX="${PACKAGE_SRC_FILENAME%.tgz}"
+        PACKAGE_VERSION="${PACKAGE_SRC_FILENAME_PREFIX##*-}"
+
+        printf '%s\n' "$PACKAGE_VERSION"
+        ;;
+    config)
+        shift
+        [ -z "$1" ] && abort 1 '$ARG0 config <PYTHON-EDITION>, <PYTHON-EDITION> is unspecified. It can be 3.14, 3.13, 3.12, 3.11, 3.10, 3.9'
+        PYTHON_EDITION="$1"
+        show_config python3
+        ;;
+    install)
+        shift
+
+        inspect_install_arguments "$@"
+
+        install_the_given_package python3
+
+        if [ "$KEEP_SESSION_DIR" != 1 ] ; then
+            rm -rf "$SESSION_DIR"
+        fi
+        ;;
+    *)  abort 1 "unrecognized argument: $1"
+esac

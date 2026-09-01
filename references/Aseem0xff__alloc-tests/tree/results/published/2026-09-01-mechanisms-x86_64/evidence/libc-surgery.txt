@@ -1,0 +1,5 @@
+surgery: /usr/lib/libc.a
+surgery:   displacing 13 member(s): aligned_alloc.lo calloc.lo donate.lo free.lo libc_calloc.lo lite_malloc.lo malloc.lo malloc_usable_size.lo memalign.lo posix_memalign.lo realloc.lo reallocarray.lo valloc.lo
+surgery: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a
+surgery:   displacing 13 member(s): aligned_alloc.lo calloc.lo donate.lo free.lo libc_calloc.lo lite_malloc.lo malloc.lo malloc_usable_size.lo memalign.lo posix_memalign.lo realloc.lo reallocarray.lo valloc.lo
+surgery: patched 2 libc.a copy/copies and verified each

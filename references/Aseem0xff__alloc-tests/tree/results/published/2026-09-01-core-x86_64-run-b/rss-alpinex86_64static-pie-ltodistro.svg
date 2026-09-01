@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="810" height="252" viewBox="0 0 810 252" font-family="ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="16" y="26" font-size="15" font-weight="600" fill="#1b1f24">Peak resident set relative to the control — alpine / x86_64 / static-pie-lto / distro</text>
+<text x="16" y="45" font-size="11" fill="#5b636d">workload `literal`; ru_maxrss from wait4, median of the run's samples; lower is less memory</text>
+<line x1="380.4" y1="52.0" x2="380.4" y2="218.0" stroke="#d8dce1" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="380.4" y="48.0" font-size="10" fill="#5b636d" text-anchor="middle">control</text>
+<text x="250" y="79.7" font-size="11" fill="#1b1f24" text-anchor="end">snmalloc / rust-global</text>
+<rect x="260" y="67.0" width="190.6" height="15" rx="2" fill="#d1495b"/>
+<text x="456.6" y="79.7" font-size="10.5" fill="#5b636d">1.583x  (7.1 MiB)</text>
+<text x="250" y="105.7" font-size="11" fill="#1b1f24" text-anchor="end">mimalloc / rust-global</text>
+<rect x="260" y="93.0" width="425.9" height="15" rx="2" fill="#d1495b"/>
+<text x="691.9" y="105.7" font-size="10.5" fill="#5b636d">3.538x  (15.9 MiB)</text>
+<text x="250" y="131.7" font-size="11" fill="#1b1f24" text-anchor="end">jemalloc / rust-global</text>
+<rect x="260" y="119.0" width="203.8" height="15" rx="2" fill="#d1495b"/>
+<text x="469.8" y="131.7" font-size="10.5" fill="#5b636d">1.693x  (7.6 MiB)</text>
+<text x="250" y="157.7" font-size="11" fill="#1b1f24" text-anchor="end">rpmalloc / rust-global</text>
+<rect x="260" y="145.0" width="135.4" height="15" rx="2" fill="#d1495b"/>
+<text x="401.4" y="157.7" font-size="10.5" fill="#5b636d">1.125x  (5.1 MiB)</text>
+<text x="250" y="183.7" font-size="11" fill="#1b1f24" text-anchor="end">hardened_malloc / rust-global</text>
+<rect x="260" y="171.0" width="352.6" height="15" rx="2" fill="#d1495b"/>
+<text x="618.6" y="183.7" font-size="10.5" fill="#5b636d">2.929x  (13.2 MiB)</text>
+<text x="250" y="209.7" font-size="11" fill="#1b1f24" text-anchor="end">system (control)</text>
+<rect x="260" y="197.0" width="120.4" height="15" rx="2" fill="#8a8f98"/>
+<text x="386.4" y="209.7" font-size="10.5" fill="#5b636d">1.000x  (4.5 MiB)</text>
+<text x="16" y="240.0" font-size="10" fill="#5b636d">Peak RSS is what sets a container's memory limit. It is not the allocator's own idea of heap size.</text></svg>

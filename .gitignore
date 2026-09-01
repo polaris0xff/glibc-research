@@ -25,6 +25,7 @@ evidence/poc/*/curl
 evidence/poc/*/jq
 evidence/poc/*/python3
 evidence/poc/*/terminfo-probe
+evidence/poc/*/cppapp
 evidence/poc/*/*-make.log
 evidence/poc/*/*-configure.log
 evidence/poc/*/*-install.log
@@ -32,6 +33,8 @@ evidence/poc/*/make.log
 evidence/poc/*/configure.log
 evidence/poc/*/install.log
 evidence/poc/*/probe-build.log
+evidence/poc/*/cmake.log
+evidence/poc/*/link.log
 
 # Root filesystems live outside the tree by default ($PGB_ROOTFS_DIR).
 /rootfs/

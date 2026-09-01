@@ -30,6 +30,25 @@ delete is the check working; find out why before overriding it.
 ⭐ **Leave no `ephemeral-*` branch behind.** `git branch --list 'ephemeral-*'`
 should be empty at the end of a session.
 
+## ⛔ `RESUME.md` is written at the START, not the end
+
+⭐ **It is a dead man's switch.** Everything else in the session protocol is
+written at the end, which is exactly the moment an interrupted session never
+reaches. [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md)
+specifies it and what it carries: the task, the resume point, what is in
+flight, the state of the tree, and a prompt a fresh session can be pasted.
+
+⚠ **This project TRACKS it** — `sessions.md` leaves that to the project. Here
+it is committed, so it survives the machine going away, which is the failure
+it exists for.
+
+⛔ **Refresh it whenever the answer to "what is in flight" changes**, which is
+usually several times a session. It is five lines and it costs nothing next to
+losing the session.
+
+⚠ **The session of 2026-09-01 wrote it at the END**, which is the wrong time,
+and the file says so. Had that session died it would have handed over nothing.
+
 ## The record is part of the change
 
 ⛔ **`PROGRESS.md`, `INDEX.md` and the entry are edited in the same commit as
@@ -47,6 +66,81 @@ sh TODO/check.sh
 ⛔ **Nothing closes as "won't fix", "upstream's problem" or "out of scope".**
 A blocked entry stays open with the blocker named and what would unblock it.
 See `../docs/methodology/work-todo.md`.
+
+## Fetching: the two routes, and they are not optional
+
+⛔ **These are the routes. Reaching for `api.github.com` or `github.com`
+directly is the thing that keeps failing, and the failure never says so
+plainly** — it arrives as a 403 or a 401 that reads like the resource is
+missing or private.
+
+**1. Every read-only GitHub API path goes through
+`https://api.gh.pkgforge.dev/<GH_API_PATH>`.**
+
+```sh
+curl -sS "https://api.gh.pkgforge.dev/repos/OWNER/REPO/actions/runs/12345"
+```
+
+⚠ **Except GraphQL and anything needing authentication**, which the proxy is
+not and cannot be. Discussions are GraphQL only, which is why every
+`references/*/PROVENANCE.md` in this tree records them as **not fetched**.
+
+⭐ **Prefer the `gh` CLI over the proxy when it is present AND authenticated**
+— it is the authenticated route, so it reaches what the proxy cannot. Check
+both, not just the first:
+
+```sh
+command -v gh >/dev/null && gh auth status >/dev/null 2>&1 && use_gh=1
+```
+
+⚠ `gh` is **absent** in the environment these rules were written in, and the
+harness's own GitHub MCP tools are the authenticated route there. Do not
+assume either is available; probe.
+
+**2. Every other fetch goes through
+`https://api.rv.pkgforge.dev/<ORIGINAL_URL>`** — the whole original URL,
+**scheme included** — **unless the source works directly.** Try it plain
+first; switch the moment it 401s or 403s.
+
+```sh
+curl -fsSL "https://api.rv.pkgforge.dev/https://example.com/some/file.md"
+```
+
+⭐ **Verified 2026-09-01**, three URLs, all HTTP 200 and byte-identical to the
+direct fetch where the direct fetch worked:
+
+```
+200  api.rv.pkgforge.dev/https://raw.githubusercontent.com/Azathothas/TEMPLATE/<pin>/docs/methodology/experiments.md
+200  api.rv.pkgforge.dev/https://github.com/Azathothas/TEMPLATE/raw/<pin>/docs/methodology/experiments.md
+200  api.rv.pkgforge.dev/https://example.com/
+```
+
+⚠ **The scheme is part of the path.** `api.rv.pkgforge.dev/raw.githubusercontent.com/…`
+without it returned **500**.
+
+⚠ **The proxy is faithful, so it returns the origin's 404 too.** A URL that
+404s through it 404s directly; checked twice, both routes, on a branch that
+had been deleted between one fetch and the next. ⛔ Do not read a 404 from it
+as a proxy defect and go hunting for another route.
+
+**What this costs when it is skipped**, both measured in this repository:
+
+- `docs/methodology/PROVENANCE.md` records that
+  `github.com/.../raw/...` **returns 403 through this environment's proxy**
+  and that `raw.githubusercontent.com` and `api.rv.pkgforge.dev` both work.
+  A later session hit that same 403 and re-derived the workaround by hand,
+  because it was recorded in a provenance file rather than in the rules. This
+  section is that fix.
+- `scripts/common/mine-repo.sh` already uses `api.gh.pkgforge.dev`, with a
+  reachability control and a measured note about the proxy at its head. That
+  is the reference implementation; ⛔ **do not write a second fetcher** —
+  `../docs/AGENTS.md` §14.
+
+⭐ **And keep what you fetched.** The branch this session read
+`references/Aseem0xff__alloc-tests/tree/docs/containers.md` from was **gone
+within the hour** — 404 on both routes. The mined copy at a pinned commit is
+what survived, which is `../docs/methodology/references.md`'s "keep the tree"
+rule paying for itself the same day.
 
 ## Evidence
 

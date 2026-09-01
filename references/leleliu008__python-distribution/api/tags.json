@@ -1,0 +1,72 @@
+[
+ {
+  "name": "2024.11.08",
+  "zipball_url": "https://api.github.com/repos/leleliu008/python-distribution/zipball/refs/tags/2024.11.08",
+  "tarball_url": "https://api.github.com/repos/leleliu008/python-distribution/tarball/refs/tags/2024.11.08",
+  "commit": {
+   "sha": "c0fe175cd1e1e52b2009d380011ee7e1f076f493",
+   "url": "https://api.github.com/repos/leleliu008/python-distribution/commits/c0fe175cd1e1e52b2009d380011ee7e1f076f493"
+  },
+  "node_id": "REF_kwDOM_3wZbRyZWZzL3RhZ3MvMjAyNC4xMS4wOA"
+ },
+ {
+  "name": "2024.10.27",
+  "zipball_url": "https://api.github.com/repos/leleliu008/python-distribution/zipball/refs/tags/2024.10.27",
+  "tarball_url": "https://api.github.com/repos/leleliu008/python-distribution/tarball/refs/tags/2024.10.27",
+  "commit": {
+   "sha": "7b4512ed9166813b7f8ffaa80fa7672f48da0873",
+   "url": "https://api.github.com/repos/leleliu008/python-distribution/commits/7b4512ed9166813b7f8ffaa80fa7672f48da0873"
+  },
+  "node_id": "REF_kwDOM_3wZbRyZWZzL3RhZ3MvMjAyNC4xMC4yNw"
+ },
+ {
+  "name": "2024.10.25",
+  "zipball_url": "https://api.github.com/repos/leleliu008/python-distribution/zipball/refs/tags/2024.10.25",
+  "tarball_url": "https://api.github.com/repos/leleliu008/python-distribution/tarball/refs/tags/2024.10.25",
+  "commit": {
+   "sha": "d5cc32f3a44449e2ae35dd239815e9078f3d88a1",
+   "url": "https://api.github.com/repos/leleliu008/python-distribution/commits/d5cc32f3a44449e2ae35dd239815e9078f3d88a1"
+  },
+  "node_id": "REF_kwDOM_3wZbRyZWZzL3RhZ3MvMjAyNC4xMC4yNQ"
+ },
+ {
+  "name": "2024.10.17",
+  "zipball_url": "https://api.github.com/repos/leleliu008/python-distribution/zipball/refs/tags/2024.10.17",
+  "tarball_url": "https://api.github.com/repos/leleliu008/python-distribution/tarball/refs/tags/2024.10.17",
+  "commit": {
+   "sha": "ea03f7ae0097aba4976a5d4a0a6f916b387adb33",
+   "url": "https://api.github.com/repos/leleliu008/python-distribution/commits/ea03f7ae0097aba4976a5d4a0a6f916b387adb33"
+  },
+  "node_id": "REF_kwDOM_3wZbRyZWZzL3RhZ3MvMjAyNC4xMC4xNw"
+ },
+ {
+  "name": "3.13.2",
+  "zipball_url": "https://api.github.com/repos/leleliu008/python-distribution/zipball/refs/tags/3.13.2",
+  "tarball_url": "https://api.github.com/repos/leleliu008/python-distribution/tarball/refs/tags/3.13.2",
+  "commit": {
+   "sha": "52bc95a83d303989cd372bf3905886a11f787f24",
+   "url": "https://api.github.com/repos/leleliu008/python-distribution/commits/52bc95a83d303989cd372bf3905886a11f787f24"
+  },
+  "node_id": "REF_kwDOM_3wZbByZWZzL3RhZ3MvMy4xMy4y"
+ },
+ {
+  "name": "3.12.9",
+  "zipball_url": "https://api.github.com/repos/leleliu008/python-distribution/zipball/refs/tags/3.12.9",
+  "tarball_url": "https://api.github.com/repos/leleliu008/python-distribution/tarball/refs/tags/3.12.9",
+  "commit": {
+   "sha": "52bc95a83d303989cd372bf3905886a11f787f24",
+   "url": "https://api.github.com/repos/leleliu008/python-distribution/commits/52bc95a83d303989cd372bf3905886a11f787f24"
+  },
+  "node_id": "REF_kwDOM_3wZbByZWZzL3RhZ3MvMy4xMi45"
+ },
+ {
+  "name": "3.11.11",
+  "zipball_url": "https://api.github.com/repos/leleliu008/python-distribution/zipball/refs/tags/3.11.11",
+  "tarball_url": "https://api.github.com/repos/leleliu008/python-distribution/tarball/refs/tags/3.11.11",
+  "commit": {
+   "sha": "7db0cbc7eb32286fe1e61fb5029b88d350791280",
+   "url": "https://api.github.com/repos/leleliu008/python-distribution/commits/7db0cbc7eb32286fe1e61fb5029b88d350791280"
+  },
+  "node_id": "REF_kwDOM_3wZbFyZWZzL3RhZ3MvMy4xMS4xMQ"
+ }
+]

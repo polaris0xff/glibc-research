@@ -1,0 +1,104 @@
+{
+  "composite_formula": "composite = 0.60 x (time / baseline_time) + 0.30 x (peak_rss / baseline_peak_rss) + 0.10 x (binary_bytes / baseline_binary_bytes); lower is better, 1.000 is the control",
+  "findings": [
+    {
+      "cell": "alpine-x86_64-mimalloc-libc-surgery-static-pie-distro",
+      "check": "noisy",
+      "message": "workload regex has a relative MAD of 6.0%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-mimalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload files has a relative MAD of 9.2%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-system-baseline-static-pie-distro",
+      "check": "noisy",
+      "message": "workload nomatch has a relative MAD of 5.0%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-mimalloc-link-override-static-pie-distro",
+      "check": "cell-failed",
+      "message": "outcome build_failed: ripgrep build failed (rc=1); tail:           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o): in function `_mi_os_alloc_aligned':           os.c:(.text+0x1793): undefined reference to `__stack_chk_fail'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o): in function `_mi_os_alloc_aligned_at_offset':           os.c:(.text+0x1970): undefined reference to `__stack_chk_fail'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o):os.c:(.text+0x1c76): more undefined references to `__stack_chk_fail' follow           collect2: error: ld returned 1 exit status              = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified   = note: use the `-l` flag to specify native libraries to link   = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)  error: could not compile `ripgrep` (bin \"rg\") due to 1 previous error",
+      "severity": "info"
+    }
+  ],
+  "groups": [
+    {
+      "group": "alpine / x86_64 / static-pie / distro",
+      "rows": [
+        {
+          "allocator": "mimalloc",
+          "arch": "x86_64",
+          "cell_id": "alpine-x86_64-mimalloc-libc-surgery-static-pie-distro",
+          "composite": 1.4088183586651049,
+          "distro": "alpine",
+          "integration": "libc-surgery",
+          "is_baseline": false,
+          "profile": "static-pie",
+          "rel_mad": 0.027325387,
+          "rel_rss": 3.4666381522668948,
+          "rel_size": 1.0272685219000317,
+          "rel_time": 0.4435001013250558,
+          "rss_kb": 16210.0,
+          "size_bytes": 8776144,
+          "startup_s": 0.001801102,
+          "time_s": 0.028025952,
+          "toolchain": "distro"
+        },
+        {
+          "allocator": "mimalloc",
+          "arch": "x86_64",
+          "cell_id": "alpine-x86_64-mimalloc-rust-global-static-pie-distro",
+          "composite": 1.4440558788494646,
+          "distro": "alpine",
+          "integration": "rust-global",
+          "is_baseline": false,
+          "profile": "static-pie",
+          "rel_mad": 0.023750436,
+          "rel_rss": 3.46792130025663,
+          "rel_size": 1.0284278086483916,
+          "rel_time": 0.5013945131793942,
+          "rss_kb": 16216.0,
+          "size_bytes": 8786048,
+          "startup_s": 0.001817306,
+          "time_s": 0.031684454,
+          "toolchain": "distro"
+        },
+        {
+          "allocator": "system",
+          "arch": "x86_64",
+          "cell_id": "alpine-x86_64-system-baseline-static-pie-distro",
+          "composite": 0.9999999999999999,
+          "distro": "alpine",
+          "integration": "baseline",
+          "is_baseline": true,
+          "profile": "static-pie",
+          "rel_mad": 0.018523508,
+          "rel_rss": 1.0,
+          "rel_size": 1.0,
+          "rel_time": 1.0,
+          "rss_kb": 4676.0,
+          "size_bytes": 8543184,
+          "startup_s": 0.00150738,
+          "time_s": 0.063192662,
+          "toolchain": "distro"
+        }
+      ]
+    }
+  ],
+  "primary_workload": "literal",
+  "run_id": "20260901-041434",
+  "verdicts": [
+    {
+      "group": "alpine / x86_64 / static-pie / distro",
+      "margin_pct": 13.053979397381402,
+      "note": "mimalloc is 13.1% faster than the next row, which is outside the run's spread of 2.7%",
+      "winner": "mimalloc (libc-surgery)",
+      "within_noise": false
+    }
+  ]
+}

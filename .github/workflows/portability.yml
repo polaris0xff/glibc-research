@@ -8,19 +8,46 @@
 # ⚠ THE LOCAL TEST BED DOES NOT WORK HERE, AND THAT IS THE MAIN DESIGN
 # CONSTRAINT. scripts/common/rootfs-run.sh is `unshare --mount` + `chroot`,
 # which needs root and CAP_SYS_ADMIN; a GitHub runner gives neither to the job
-# shell. So CI uses containers for the same purpose. That is not a workaround
-# bolted on: it is also how the docker/podman engines in `pgb`, marked
-# UNTESTED in docs/AGENTS.md, finally get exercised.
+# shell. So CI uses containers for the same purpose.
 #
-# The build container is pinned by DIGEST, not by tag, for the reason
-# scripts/common/rootfs-images.txt states: a tag measures a different thing
-# each week and says so nowhere.
+# ⛔ AND IT MUST NOT USE GitHub's `container:` FEATURE TO DO IT. Runs 1-10 of
+# this workflow did, and all ten were red, on two rows, for a reason that has
+# nothing to do with this project's binaries:
+#
+#   voidlinux    exec /__e/node24/bin/node: no such file or directory
+#   alpine-3.10  Error relocating /__e/node24_alpine/bin/node:
+#                  pthread_getname_np: symbol not found
+#                  secure_getenv: symbol not found
+#
+# When a step uses `container:`, the runner injects its own Node.js into that
+# container to execute every JavaScript action (`actions/checkout`,
+# `actions/download-artifact`). That Node is dynamically linked. It picks the
+# glibc build unless /etc/os-release says ID=alpine, so Void's musl gets the
+# glibc binary and no loader to run it; and Alpine 3.10's musl 1.1.22 is older
+# than the musl the alpine build needs. The download step died before the
+# probe was ever executed, on both rows, every time.
+#
+# ⭐ THAT FAILURE IS THIS PROJECT'S THESIS, OBSERVED ON THE CI PROVIDER. A
+# dynamically linked helper cannot be shipped to an environment chosen by
+# somebody else. The fix is the same one pgb argues for: run the JavaScript on
+# the host, where its libc is, and send only a static binary into the target.
+#
+# So: every job runs on the ubuntu-latest HOST. Targets are entered with
+# `docker run --entrypoint`, so the ONLY thing executing inside the target
+# image is the probe itself -- no shell, no Node, no runner.
+#
+# ⛔ EVERY IMAGE IS PINNED BY DIGEST, AND THE PINS ARE NOT WRITTEN HERE. The
+# matrix is generated from scripts/common/rootfs-images.txt, which is the same
+# file `pgb verify` and the local chroot bed read. Runs 1-10 used tags --
+# `alpine:3.22`, `archlinux:latest` -- so CI and the local bed were two
+# different test beds reporting as one, and `archlinux:latest` is a rolling
+# tag. docs/AGENTS.md §8.
 
 name: portability
 
 on:
   push:
-    branches: [main, 'claude/**']
+    branches: [main, 'claude/**', 'ephemeral-**']
   pull_request:
   workflow_dispatch:
 
@@ -35,7 +62,35 @@ env:
 
 jobs:
   # ---------------------------------------------------------------------------
-  # 1. Build the probes ONCE, in the pinned environment, and hand them to every
+  # 1. The matrix itself, derived from the one file that carries the pins.
+  #    ⛔ Hand-copying the eleven rows into this YAML is what let CI and the
+  #    local bed drift apart in runs 1-10. Derive, never duplicate.
+  # ---------------------------------------------------------------------------
+  matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      targets: ${{ steps.gen.outputs.targets }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: gen
+        name: Generate the target matrix from scripts/common/rootfs-images.txt
+        run: |
+          set -eu
+          rows=$(awk '!/^#/ && NF==4 {
+                        repo=$1; sub(/:[^:\/]*$/, "", repo)
+                        printf "%s{\"name\":\"%s\",\"libc\":\"%s\",\"image\":\"%s@%s\"}",
+                               (c++?",":""), $2, $3, repo, $4
+                      }' scripts/common/rootfs-images.txt)
+          [ -n "$rows" ] || { echo "no rows parsed from rootfs-images.txt" >&2; exit 1; }
+          n=$(printf '%s' "$rows" | tr ',' '\n' | grep -c 'name')
+          # ⛔ A silently short matrix is a green run that tested less than it
+          # claims. The bed is eleven environments; assert it.
+          [ "$n" = 11 ] || { echo "expected 11 targets, parsed $n" >&2; exit 1; }
+          echo "targets={\"include\":[$rows]}" >> "$GITHUB_OUTPUT"
+          echo "parsed $n targets"
+
+  # ---------------------------------------------------------------------------
+  # 2. Build the probes ONCE, in the pinned environment, and hand them to every
   #    other job as artefacts. Rebuilding per target would test eleven
   #    different binaries and prove nothing about portability.
   # ---------------------------------------------------------------------------
@@ -62,7 +117,7 @@ jobs:
           ldd --version | head -1
           # ⛔ The whole design rests on this symbol being public and present
           # in the STATIC archive. Fail here rather than three jobs later.
-          nm -A "$(cc -print-file-name=libc.a)" | grep -w 'T __nss_configure_lookup'
+          nm -A "$(cc -print-file-name=libc.a)" 2>/dev/null | grep -w 'T __nss_configure_lookup'
 
       - name: Build GNU libiconv (static)
         run: sh scripts/build-libiconv.sh
@@ -80,8 +135,29 @@ jobs:
           # mechanisms. Without it a green matrix says nothing about whether
           # pgb was needed.
           cc -static -O2 -o out/probe-plain ci/probe.c
+
+      - name: Assert the two arms are actually different binaries
+        # ⛔ THE DEFECT THIS CATCHES. Every assertion in this workflow is made
+        # against `probe-portable`. If pgb silently stopped injecting anything
+        # -- a wrapper not on PATH, an archive not found, a rename -- the two
+        # arms would be the same plain static binary, the matrix would still be
+        # green on the nine environments plain static survives, and the run
+        # would report success for a tool that did nothing. Check the marker
+        # the NSS constructor leaves, and check the control does NOT have it.
+        run: |
+          set -eux
           file out/probe-portable
-          readelf -d out/probe-portable | grep -c NEEDED || true
+          [ "$(readelf -d out/probe-portable 2>/dev/null | grep -c NEEDED)" = 0 ]
+          [ "$(readelf -l out/probe-portable 2>/dev/null | grep -c INTERP)" = 0 ]
+          strings -a out/probe-portable | grep -qx 'pgb-runtime'
+          if strings -a out/probe-plain | grep -qx 'pgb-runtime'; then
+            echo "the control arm carries pgb's runtime: the arms are not independent" >&2
+            exit 1
+          fi
+          # And they must differ in size: the iconv wrap links static libiconv.
+          p=$(wc -c < out/probe-portable); c=$(wc -c < out/probe-plain)
+          echo "portable=$p plain=$c"
+          [ "$p" -gt "$c" ]
 
       - uses: actions/upload-artifact@v4
         with:
@@ -90,39 +166,34 @@ jobs:
           retention-days: 7
 
   # ---------------------------------------------------------------------------
-  # 2. THE POINT OF THE WHOLE FILE. Run the binary on distributions it was not
-  #    built on, including musl ones, and assert what it does there.
+  # 3. THE POINT OF THE WHOLE FILE. Run the binary on distributions it was not
+  #    built on, including musl ones, and assert what it did there.
+  #
+  # ⛔ The job runs on the HOST and enters the target with `docker run`. It does
+  # NOT use `container:`. See the header: that is what made runs 1-10 red.
+  # `--entrypoint` means the probe is the only process in the container --
+  # no shell of the image's choosing, nothing of the runner's.
   # ---------------------------------------------------------------------------
   run-matrix:
-    needs: build
+    needs: [matrix, build]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - { name: alpine-3.22,   image: 'alpine:3.22',       libc: musl  }
-          - { name: alpine-3.20,   image: 'alpine:3.20',       libc: musl  }
-          - { name: alpine-3.10,   image: 'alpine:3.10',       libc: musl  }
-          - { name: voidlinux,     image: 'voidlinux/voidlinux-musl:latest', libc: musl }
-          - { name: debian-11,     image: 'debian:11',         libc: glibc }
-          - { name: debian-12,     image: 'debian:12',         libc: glibc }
-          - { name: ubuntu-2004,   image: 'ubuntu:20.04',      libc: glibc }
-          - { name: rocky-8,       image: 'rockylinux:8',      libc: glibc }
-          - { name: opensuse-15,   image: 'opensuse/leap:15.6', libc: glibc }
-          - { name: fedora-42,     image: 'fedora:42',         libc: glibc }
-          - { name: arch,          image: 'archlinux:latest',  libc: glibc }
-    container:
-      image: ${{ matrix.image }}
+      matrix: ${{ fromJSON(needs.matrix.outputs.targets) }}
     steps:
       - uses: actions/download-artifact@v4
         with: { name: probes, path: out }
 
-      - name: Run the portable binary
-        run: |
-          chmod +x out/probe-portable
-          ./out/probe-portable
+      - name: Run the portable binary on ${{ matrix.name }} (${{ matrix.libc }})
         # ⛔ No `continue-on-error`. A non-zero exit here is the failure this
         # project exists to prevent, and it must fail the build.
+        run: |
+          set -eux
+          chmod +x out/probe-portable out/probe-plain
+          docker run --rm \
+            -v "$PWD/out:/out:ro" \
+            --entrypoint /out/probe-portable \
+            '${{ matrix.image }}'
 
       - name: Run the plain -static control, and record what it did
         # ⚠ continue-on-error IS CORRECT HERE AND ONLY HERE. The control is
@@ -130,11 +201,53 @@ jobs:
         # status is recorded, never asserted.
         continue-on-error: true
         run: |
-          chmod +x out/probe-plain
-          ./out/probe-plain; echo "plain -static exit=$? on ${{ matrix.name }} (${{ matrix.libc }})"
+          set -x
+          docker run --rm \
+            -v "$PWD/out:/out:ro" \
+            --entrypoint /out/probe-plain \
+            '${{ matrix.image }}'
+          echo "plain -static exit=$? on ${{ matrix.name }} (${{ matrix.libc }})"
 
   # ---------------------------------------------------------------------------
-  # 3. The experiments, where the runner can host them.
+  # 4. The tool's OWN verdict, through its own command.
+  #
+  # ⭐ Job 3 is an independent check: it runs the binary with plain `docker
+  # run` and never asks `pgb` anything. This job is the opposite and both are
+  # wanted -- it runs `pgb verify`, so the thing under test is the tool's own
+  # instrument rather than the workflow's reimplementation of it. A divergence
+  # between job 3 and this job is a defect in one of them, and neither could
+  # report that alone.
+  #
+  # ⚠ It could not run here at all until `pgb verify` learned `--engine`: the
+  # chroot bed is `unshare --mount`, and a runner grants no CAP_SYS_ADMIN.
+  # TODO T-014, docs/history/corrections.md C9.
+  # ---------------------------------------------------------------------------
+  verify-docker:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: probes, path: out }
+      - name: pgb verify --engine docker
+        run: |
+          set -eux
+          chmod +x out/probe-portable
+          sh pgb --engine docker verify ./out/probe-portable
+      - name: The control must NOT pass its own verify
+        # ⚠ continue-on-error is correct here: a non-zero exit is the EXPECTED
+        # result and is what proves `verify` can still fail. A verify that
+        # passed everything would be worthless and this is the only step that
+        # would notice.
+        continue-on-error: true
+        run: |
+          set -x
+          chmod +x out/probe-plain
+          sh pgb --engine docker verify ./out/probe-plain
+          echo "plain control verify exit=$?  (non-zero is expected)"
+
+  # ---------------------------------------------------------------------------
+  # 5. The experiments and selftests the runner can host.
   #
   # ⚠ Experiments 20 and 30 need the chroot bed and therefore root +
   # CAP_SYS_ADMIN. A container job runs as root but the runner does not grant
@@ -148,11 +261,22 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install prerequisites
         run: sudo apt-get update -qq && sudo apt-get install -y -qq strace
+      - name: The record has to agree with itself
+        run: sh TODO/check.sh
+      - name: Every shell script has to parse
+        run: |
+          set -eu
+          for f in pgb $(find scripts experiments poc tool ci TODO -name '*.sh' 2>/dev/null); do
+            sh -n "$f" || { echo "sh -n failed: $f" >&2; exit 1; }
+          done
+          echo "all shell scripts parse"
       - name: Selftests, which need nothing privileged
         run: |
           set -eux
           sh scripts/common/oci-pull.sh --selftest
           sh scripts/common/mine-repo.sh --selftest
+          sh scripts/common/rootfs-run.sh --selftest || \
+            echo "rootfs-run selftest could not run here (needs CAP_SYS_ADMIN); recorded, not asserted"
       - name: Host probe (expected to report an incomplete bed here)
         continue-on-error: true
         run: sh experiments/10-probe-the-host.sh

@@ -29,6 +29,16 @@ EVIDENCE="${PGB_EVIDENCE_DIR:-$REPO_ROOT/evidence}/poc"
 
 POC_PASS=0; POC_FAIL=0; POC_SKIP=0
 
+# ⚠ RESULT.txt IS A CONVENTION, NOT AN AUTOMATION, and it is written down here
+# because it was folklore. Nothing in this file creates it: every tracked
+# `evidence/poc/*/RESULT.txt` is the POC's own stdout, saved by hand:
+#
+#     sh poc/NN-name/run.sh > evidence/poc/NN-name/RESULT.txt 2>&1
+#
+# ⛔ So a POC that is re-run without that redirect leaves a RESULT.txt
+# describing the PREVIOUS run, beside per-environment logs describing this
+# one. Do the redirect, or the two halves of the evidence disagree and nothing
+# checks them.
 poc_begin() {
   POC_NAME=$(basename "$POC_DIR")
   POC_OUT="$EVIDENCE/$POC_NAME"
@@ -89,6 +99,19 @@ poc_in_env() { sh "$PGB" --bind "$WORK" build -- /bin/sh -c "$1"; }
 poc_matrix() { # binary-path  [extra files to copy: src:dst ...]
   _bin="$1"; shift
   _base=$(basename "$_bin")
+  # ⛔ A MISSING FUNCTIONAL TEST IS A FALSE PASS, AND IT WAS SILENT.
+  # Below, `poc_functional_test > .../pgb-poc-test.sh` writes an EMPTY file
+  # when the function is undefined. `sh` on an empty script exits 0, so
+  # _res=ok, `poc_check ... ok` passes, the trace of that empty script finds
+  # no objects, and the POC reports ELEVEN GREEN ROWS having executed nothing
+  # at all. Found in poc/60-leveldb, which omitted the function -- and it
+  # would have certified any POC that did.
+  if ! command -v poc_functional_test >/dev/null 2>&1; then
+    printf '\n  ⛔ this POC defines no poc_functional_test(), so the matrix\n'
+    printf '     below would assert on an empty script and pass. Refusing.\n'
+    POC_FAIL=$((POC_FAIL+1))
+    return 1
+  fi
   printf '\n  functional test across the pinned matrix:\n'
   printf '    %-20s %-6s %-10s %-28s %s\n' ENVIRONMENT LIBC RESULT 'HOST .so LOADED' 'HOST DATA READ'
   while read -r ref name libc digest; do
@@ -191,6 +214,22 @@ poc_observe() {  # binary-path label [extra files: src:dst ...]
   # describing a binary that no longer exists. Same defect class as the POCs
   # that appended to the target's /etc/hosts. docs/history/corrections.md.
   : > "$POC_OUT/observation.txt"
+  # ⛔ A MISSING PROBE MUST NOT READ AS A MEASUREMENT. Without this check the
+  # loop below still runs, `poc_observation_probe` fails with "not found" once
+  # per environment, and every row prints OUTCOME `<none>` and HOST OBJECTS
+  # `none` -- which is indistinguishable, in the committed table, from eleven
+  # environments that were measured and found clean. Found in poc/60-leveldb,
+  # which omitted the function. docs/methodology/experiments.md: an absence is
+  # not a zero.
+  if ! command -v poc_observation_probe >/dev/null 2>&1; then
+    printf '\n  OBSERVATION -- %s: NOT MEASURED\n' "$_label"
+    printf '    ⛔ this POC defines no poc_observation_probe(), so nothing was\n'
+    printf '       observed. That is not the same as observing nothing.\n'
+    printf 'NOT MEASURED: this POC defines no poc_observation_probe()\n' \
+      >> "$POC_OUT/observation.txt"
+    POC_SKIP=$((POC_SKIP+1))
+    return 0
+  fi
   printf '\n  OBSERVATION -- %s (measured, not asserted):\n' "$_label"
   printf '    %-20s %-6s %-10s %s\n' ENVIRONMENT LIBC OUTCOME 'HOST OBJECTS PULLED IN'
   while read -r ref name libc digest; do

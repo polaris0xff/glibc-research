@@ -1,0 +1,58 @@
+=== conditions ===
+date          2026-09-01T04:32:28Z
+host          Linux 6.18.44-fc-v22 x86_64
+runtime       docker
+image         alloc-tests/alpine-x86_64:local
+mimalloc      18b08671c9302247bfb682286e6bf3cc1773f801
+
+=== BEFORE: who defines malloc in /usr/lib/libc.a? ===
+calloc.lo
+free.lo
+lite_malloc.lo
+realloc.lo
+members defining an allocation symbol: 4
+
+=== how much of the prior art's hard-coded delete list still exists? ===
+present in this musl: 13    absent:0
+
+=== build mimalloc in override mode ===
+built /opt/mi/lib/liballocbench.a (407588 bytes, mode=override pic=1 libc=musl arch=x86_64)
+
+=== the surgery ===
+surgery: /usr/lib/libc.a
+surgery:   displacing 13 member(s): aligned_alloc.lo calloc.lo donate.lo free.lo libc_calloc.lo lite_malloc.lo malloc.lo malloc_usable_size.lo memalign.lo posix_memalign.lo realloc.lo reallocarray.lo valloc.lo
+{"archive":"/tmp/tmp.ffRwIehGrQ/libc.a","symbol":"malloc","expect_providers":1,"found_providers":1,"members":["alloc.c.o"],"ok":true}
+{"archive":"/tmp/tmp.ffRwIehGrQ/libc.a","symbol":"free","expect_providers":1,"found_providers":1,"members":["alloc.c.o"],"ok":true}
+surgery: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a
+surgery:   displacing 13 member(s): aligned_alloc.lo calloc.lo donate.lo free.lo libc_calloc.lo lite_malloc.lo malloc.lo malloc_usable_size.lo memalign.lo posix_memalign.lo realloc.lo reallocarray.lo valloc.lo
+{"archive":"/tmp/tmp.aSY22zr5Le/libc.a","symbol":"malloc","expect_providers":1,"found_providers":1,"members":["alloc.c.o"],"ok":true}
+{"archive":"/tmp/tmp.aSY22zr5Le/libc.a","symbol":"free","expect_providers":1,"found_providers":1,"members":["alloc.c.o"],"ok":true}
+surgery: patched 2 libc.a copy/copies and verified each
+
+=== AFTER: exactly one definition of each? ===
+  ok    malloc defined exactly once
+  ok    free defined exactly once
+  ok    calloc defined exactly once
+  ok    realloc defined exactly once
+
+=== and the definition comes from the allocator, not from musl ===
+  provider: alloc.c.o
+  ok    no musl .lo object provides malloc
+
+=== what this means ===
+The surgery displaced the libc allocator: after the splice exactly one archive
+member defines each of malloc, free, calloc and realloc, and none of them is a
+musl object.
+
+⭐ Note the drift line above. Where the prior art's hard-coded delete list names
+objects that no longer exist in this musl, a build using that list would delete
+fewer members than it intended -- and every name it fails to match leaves a
+second definition behind. That is why scripts/build/libc-surgery.sh DERIVES the
+list from the archive and then asserts the outcome.
+
+=== what this probe cannot tell you ===
+- whether a BINARY built in the patched image really routes every
+  allocation through the new allocator. That is what
+  `alloc-runner identify --replacement` checks, on the linked ELF.
+- anything about glibc. Statically replacing glibc's allocator is not
+  supported; see docs/allocator-integration.md.

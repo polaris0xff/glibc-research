@@ -1,0 +1,62 @@
+===============================================================
+POC 60-leveldb -- the first C++ POC, and the first CMake one
+===============================================================
+upstream      : https://api.rv.pkgforge.dev/https://github.com/google/leveldb/archive/refs/tags/1.23.tar.gz
+version       : 1.23
+sha256        : 9a37f8a6174f09bd622bc723b55881dc541cd50747cbd08831c2a82d620f6d76
+normal build  : cmake -S . -B build && cmake --build build
+stresses      : C++ static init, exceptions, RTTI, iostreams/locale, CMake, a static C++ dependency
+date (UTC)    : 2026-09-01T13:42:29Z
+evidence      : /home/user/glibc-research/evidence/poc/60-leveldb
+---------------------------------------------------------------
+  ok    built                                        = yes
+
+  the binary:
+    size                   3919464 bytes
+    file                   ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, BuildID
+    PT_INTERP              absent
+    DT_NEEDED              0
+    pgb runtime linked     yes
+
+  functional test across the pinned matrix:
+    ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
+    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.22: functional test                 = ok
+    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.20: functional test                 = ok
+    alpine-3.10          musl   ok         none                         none
+  ok    alpine-3.10: functional test                 = ok
+    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
+  ok    voidlinux-musl: functional test              = ok
+    debian-11            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    debian-11: functional test                   = ok
+    debian-12            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    debian-12: functional test                   = ok
+    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf 
+  ok    ubuntu-20.04: functional test                = ok
+    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf 
+  ok    rockylinux-8: functional test                = ok
+    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf 
+  ok    opensuse-leap-15.6: functional test          = ok
+    fedora-42            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    fedora-42: functional test                   = ok
+    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf 
+  ok    archlinux-latest: functional test            = ok
+
+  OBSERVATION -- what a C++ static binary opens (measured, not asserted):
+    ENVIRONMENT          LIBC   OUTCOME    HOST OBJECTS PULLED IN
+    alpine-3.22          musl   exit=0     none
+    alpine-3.20          musl   exit=0     none
+    alpine-3.10          musl   exit=0     none
+    voidlinux-musl       musl   exit=0     none
+    debian-11            glibc  exit=0     none
+    debian-12            glibc  exit=0     none
+    ubuntu-20.04         glibc  exit=0     none
+    rockylinux-8         glibc  exit=0     none
+    opensuse-leap-15.6   glibc  exit=0     none
+    fedora-42            glibc  exit=0     none
+    archlinux-latest     glibc  exit=0     none
+
+---------------------------------------------------------------
+pass=12 fail=0 skip=0
+VERDICT: 60-leveldb builds and works across the matrix.

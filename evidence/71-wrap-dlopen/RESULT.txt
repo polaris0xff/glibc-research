@@ -1,0 +1,17 @@
+experiment 71 - --wrap-dlopen against a compiled-in table
+date (UTC)   : 2026-09-01T12:24:24Z
+host kernel  : Linux 6.18.44-fc-v22
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+
+TARGET                 LIBC   PLAIN      WRAPPED    HOST .so LOADED BY WRAPPED
+alpine-3.22            musl   exit1      ok         none
+alpine-3.20            musl   exit1      ok         none
+alpine-3.10            musl   exit1      ok         none
+voidlinux-musl         musl   exit1      ok         none
+debian-11              glibc  exit1      ok         none
+debian-12              glibc  exit1      ok         none
+ubuntu-20.04           glibc  exit1      ok         none
+rockylinux-8           glibc  exit1      ok         none
+opensuse-leap-15.6     glibc  exit1      ok         none
+fedora-42              glibc  exit1      ok         none
+archlinux-latest       glibc  exit1      ok         none

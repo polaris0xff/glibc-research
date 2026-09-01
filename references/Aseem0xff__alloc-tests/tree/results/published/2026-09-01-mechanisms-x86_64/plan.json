@@ -1,0 +1,62 @@
+[
+  {
+    "id": "alpine-x86_64-mimalloc-libc-surgery-static-pie-distro",
+    "suite": "mechanisms",
+    "distro": "alpine",
+    "arch": "x86_64",
+    "libc": "musl",
+    "allocator": "mimalloc",
+    "integration": "libc-surgery",
+    "profile": "static-pie",
+    "toolchain": "distro",
+    "corpus": "standard",
+    "repeat": 6,
+    "status": "planned",
+    "reason": null
+  },
+  {
+    "id": "alpine-x86_64-mimalloc-link-override-static-pie-distro",
+    "suite": "mechanisms",
+    "distro": "alpine",
+    "arch": "x86_64",
+    "libc": "musl",
+    "allocator": "mimalloc",
+    "integration": "link-override",
+    "profile": "static-pie",
+    "toolchain": "distro",
+    "corpus": "standard",
+    "repeat": 6,
+    "status": "planned",
+    "reason": null
+  },
+  {
+    "id": "alpine-x86_64-mimalloc-rust-global-static-pie-distro",
+    "suite": "mechanisms",
+    "distro": "alpine",
+    "arch": "x86_64",
+    "libc": "musl",
+    "allocator": "mimalloc",
+    "integration": "rust-global",
+    "profile": "static-pie",
+    "toolchain": "distro",
+    "corpus": "standard",
+    "repeat": 6,
+    "status": "planned",
+    "reason": null
+  },
+  {
+    "id": "alpine-x86_64-system-baseline-static-pie-distro",
+    "suite": "mechanisms",
+    "distro": "alpine",
+    "arch": "x86_64",
+    "libc": "musl",
+    "allocator": "system",
+    "integration": "baseline",
+    "profile": "static-pie",
+    "toolchain": "distro",
+    "corpus": "standard",
+    "repeat": 6,
+    "status": "planned",
+    "reason": null
+  }
+]

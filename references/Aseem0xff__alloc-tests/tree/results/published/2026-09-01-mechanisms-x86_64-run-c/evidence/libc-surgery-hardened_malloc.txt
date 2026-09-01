@@ -1,0 +1,60 @@
+  Downloaded itoa v1.0.18
+  Downloaded encoding_rs_io v0.1.7
+  Downloaded crossbeam-deque v0.8.7
+  Downloaded aho-corasick v1.1.4
+  Downloaded serde_core v1.0.228
+  Downloaded regex-automata v0.4.15
+  Downloaded encoding_rs v0.8.35
+  Downloaded crossbeam-utils v0.8.22
+  Downloaded same-file v1.0.6
+  Downloaded lexopt v0.3.2
+  Downloaded libc v0.2.186
+  Downloaded crossbeam-epoch v0.9.20
+   Compiling memchr v2.8.3
+   Compiling regex-syntax v0.8.11
+   Compiling libc v0.2.186
+   Compiling log v0.4.33
+   Compiling serde_core v1.0.228
+error: linking with `cc` failed: exit status: 1
+  |
+  = note:  "cc" "-m64" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/rcrt1.o" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crti.o" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtbeginS.o" "/work/ripgrep-alpine-x86_64-hardened_malloc-libc-surgery-static-pie-distro/target/release/build/libc-f242ed75786000ea/rustcyfykt8/symbols.o" "<4 object files omitted>" "-Wl,--as-needed" "-Wl,-Bstatic" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/{libstd-*,libpanic_unwind-*,libobject-*,libmemchr-*,libaddr2line-*,libgimli-*,libcfg_if-*,librustc_demangle-*,libstd_detect-*,libhashbrown-*,librustc_std_workspace_alloc-*,libminiz_oxide-*,libadler2-*,libunwind-*}.rlib" "-lunwind" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/liblibc-*.rlib" "-lc" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/{librustc_std_workspace_core-*,liballoc-*,libcore-*,libcompiler_builtins-*}.rlib" "-L" "/work/ripgrep-alpine-x86_64-hardened_malloc-libc-surgery-static-pie-distro/target/release/build/libc-f242ed75786000ea/rustcyfykt8/raw-dylibs" "-Wl,-Bdynamic" "-Wl,--eh-frame-hdr" "-Wl,-z,noexecstack" "-nostartfiles" "-L" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained" "-L" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib" "-o" "/work/ripgrep-alpine-x86_64-hardened_malloc-libc-surgery-static-pie-distro/target/release/build/libc-f242ed75786000ea/build_script_build-f242ed75786000ea" "-Wl,--gc-sections" "-static-pie" "-Wl,-z,relro,-z,now" "-nodefaultlibs" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtendS.o" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtn.o"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a(pthread_atfork.lo): in function `pthread_atfork':
+          /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/thread/pthread_atfork.c:42:(.text.pthread_atfork+0x19): undefined reference to `__libc_malloc'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a(posix_spawn_file_actions_destroy.lo): in function `posix_spawn_file_actions_destroy':
+          /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/process/posix_spawn_file_actions_destroy.c:10:(.text.posix_spawn_file_actions_destroy+0xe): undefined reference to `__libc_free'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a(posix_spawn_file_actions_adddup2.lo): in function `posix_spawn_file_actions_adddup2':
+          /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/process/posix_spawn_file_actions_adddup2.c:9:(.text.posix_spawn_file_actions_adddup2+0x1e): undefined reference to `__libc_malloc'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a(posix_spawn_file_actions_addchdir.lo): in function `posix_spawn_file_actions_addchdir_np':
+          /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/process/posix_spawn_file_actions_addchdir.c:9:(.text.posix_spawn_file_actions_addchdir_np+0x17): undefined reference to `__libc_malloc'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /work/ripgrep-alpine-x86_64-hardened_malloc-libc-surgery-static-pie-distro/target/release/build/libc-f242ed75786000ea/build_script_build-f242ed75786000ea: hidden symbol `__libc_malloc' isn't defined
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: final link failed: bad value
+          collect2: error: ld returned 1 exit status
+          
+  = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified
+  = note: use the `-l` flag to specify native libraries to link
+  = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)
+
+error: could not compile `libc` (build script) due to 1 previous error
+warning: build failed, waiting for other jobs to finish...
+error: linking with `cc` failed: exit status: 1
+  |
+  = note:  "cc" "-m64" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/rcrt1.o" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crti.o" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtbeginS.o" "/work/ripgrep-alpine-x86_64-hardened_malloc-libc-surgery-static-pie-distro/target/release/build/serde_core-22d39d6fc58a6cae/rustcFTKXOd/symbols.o" "<3 object files omitted>" "-Wl,--as-needed" "-Wl,-Bstatic" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/{libstd-*,libpanic_unwind-*,libobject-*,libmemchr-*,libaddr2line-*,libgimli-*,libcfg_if-*,librustc_demangle-*,libstd_detect-*,libhashbrown-*,librustc_std_workspace_alloc-*,libminiz_oxide-*,libadler2-*,libunwind-*}.rlib" "-lunwind" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/liblibc-*.rlib" "-lc" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/{librustc_std_workspace_core-*,liballoc-*,libcore-*,libcompiler_builtins-*}.rlib" "-L" "/work/ripgrep-alpine-x86_64-hardened_malloc-libc-surgery-static-pie-distro/target/release/build/serde_core-22d39d6fc58a6cae/rustcFTKXOd/raw-dylibs" "-Wl,-Bdynamic" "-Wl,--eh-frame-hdr" "-Wl,-z,noexecstack" "-nostartfiles" "-L" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained" "-L" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib" "-o" "/work/ripgrep-alpine-x86_64-hardened_malloc-libc-surgery-static-pie-distro/target/release/build/serde_core-22d39d6fc58a6cae/build_script_build-22d39d6fc58a6cae" "-Wl,--gc-sections" "-static-pie" "-Wl,-z,relro,-z,now" "-nodefaultlibs" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtendS.o" "<sysroot>/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/crtn.o"
+  = note: some arguments are omitted. use `--verbose` to show all linker arguments
+  = note: /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a(pthread_atfork.lo): in function `pthread_atfork':
+          /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/thread/pthread_atfork.c:42:(.text.pthread_atfork+0x19): undefined reference to `__libc_malloc'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a(posix_spawn_file_actions_destroy.lo): in function `posix_spawn_file_actions_destroy':
+          /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/process/posix_spawn_file_actions_destroy.c:10:(.text.posix_spawn_file_actions_destroy+0xe): undefined reference to `__libc_free'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a(posix_spawn_file_actions_adddup2.lo): in function `posix_spawn_file_actions_adddup2':
+          /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/process/posix_spawn_file_actions_adddup2.c:9:(.text.posix_spawn_file_actions_adddup2+0x1e): undefined reference to `__libc_malloc'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a(posix_spawn_file_actions_addchdir.lo): in function `posix_spawn_file_actions_addchdir_np':
+          /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/process/posix_spawn_file_actions_addchdir.c:9:(.text.posix_spawn_file_actions_addchdir_np+0x17): undefined reference to `__libc_malloc'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /work/ripgrep-alpine-x86_64-hardened_malloc-libc-surgery-static-pie-distro/target/release/build/serde_core-22d39d6fc58a6cae/build_script_build-22d39d6fc58a6cae: hidden symbol `__libc_malloc' isn't defined
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: final link failed: bad value
+          collect2: error: ld returned 1 exit status
+          
+  = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified
+  = note: use the `-l` flag to specify native libraries to link
+  = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)
+
+error: could not compile `serde_core` (build script) due to 1 previous error

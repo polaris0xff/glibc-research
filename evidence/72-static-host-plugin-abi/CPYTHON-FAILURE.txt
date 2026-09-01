@@ -1,0 +1,22 @@
+# CPython 3.12.7, static interpreter + SHARED stdlib modules: the build that fails
+# Kept because it is the real-world case experiments/72- reduces to one second.
+# Reproduce: ./configure --disable-shared --with-ensurepip=no \
+#              py_cv_module_nis=n/a --disable-test-modules  && make
+
+== the failure ==
+  File "/tmp/claude-0/-home-user-glibc-research/ad6b7f63-c12d-5c4f-a71b-df31376d8df3/scratchpad/cpy/Python-3.12.7/./Tools/build/check_extension_modules.py", line 25, in <module>
+    import pathlib
+  File "/tmp/claude-0/-home-user-glibc-research/ad6b7f63-c12d-5c4f-a71b-df31376d8df3/scratchpad/cpy/Python-3.12.7/Lib/pathlib.py", line 20, in <module>
+    from urllib.parse import quote_from_bytes as urlquote_from_bytes
+  File "/tmp/claude-0/-home-user-glibc-research/ad6b7f63-c12d-5c4f-a71b-df31376d8df3/scratchpad/cpy/Python-3.12.7/Lib/urllib/parse.py", line 36, in <module>
+    import math
+ImportError: /tmp/claude-0/-home-user-glibc-research/ad6b7f63-c12d-5c4f-a71b-df31376d8df3/scratchpad/cpy/Python-3.12.7/build/lib.linux-x86_64-3.12/math.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyLong_AsLongLongAndOverflow
+make: *** [Makefile:1125: checksharedmods] Error 1
+
+== the interpreter it had already produced ==
+file:    ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically l
+PT_INTERP entries: 0
+DT_NEEDED entries: 0
+dynamic symbols:   0
+math.so undefined Py* symbols: 63
+does the interpreter define the missing symbol at all (static table)? 1

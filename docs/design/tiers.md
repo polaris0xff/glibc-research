@@ -22,6 +22,36 @@ evidence says you must.
 | **2** | bundled-glibc **dynamic** binary + directory, with `cross-libc-dlopen` preloaded | programs that must load **host** plugins | not one file; carries a loader; ⛔ **and gconv, unless the tier-1 iconv wrap comes with it** | ⛔ design only |
 | **3** | tier 2 collapsed to one file via a memfd bootstrap | same as tier 2, single-file | not a plain ELF any more | ⛔ design only |
 
+## ⭐ Tier 2 has a minimal reference implementation, and it is 60 lines of C
+
+`references/leleliu008__python-distribution/tree/linux-portable.sh` @
+`987e937a`. Read, not run. The shape:
+
+- `foo` is renamed `foo.bin`; a generated `foo.c` is compiled `gcc -static`
+  and takes its place, so **what the user runs is an ordinary static ELF**;
+- it reads `/proc/self/exe`, derives `<self>.bin` and the `lib/` beside it,
+  and **`execv`s the bundled loader** with `--library-path <lib> --argv0
+  <self> <real>`;
+- system shared libraries are copied into `lib/` with an `$ORIGIN` RPATH;
+- on musl, `ld-musl-<arch>.so.1` is symlinked to `libc.musl-<arch>.so.1`,
+  because there the loader and libc are one file under the libc's name.
+
+⛔ **Two details this page did not have, and both are cheap to get wrong:**
+
+- ⭐ **`--argv0` is not optional.** Without it the program sees the loader's
+  path in `argv[0]`. CPython derives `sys.executable` from that, so an
+  interpreter bundled without it cannot find itself.
+- ⭐ **Pass the library path to the loader, never through
+  `LD_LIBRARY_PATH`.** As a loader argument it applies to this one process; as
+  an environment variable it is inherited by every child, including host
+  programs the bundle later runs.
+
+⚠ **And it closes off one axis.** [`toolchain.md`](toolchain.md) lists "no
+shell in the delivery path" among the things a `pgb` bundle would have to be
+better at. This implementation already has no shell in it, so that is not a
+differentiator — what is left of that list is **shape** (one file, nothing
+written) and **size**.
+
 ## Why tier 2 has to exist, and why it is not a patch to tier 1
 
 `experiments/50-host-plugin-feasibility.sh` measured this rather than assuming

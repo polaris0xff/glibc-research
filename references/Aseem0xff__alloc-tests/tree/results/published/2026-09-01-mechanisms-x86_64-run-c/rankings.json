@@ -1,0 +1,348 @@
+{
+  "composite_formula": "composite = 0.60 x (time / baseline_time) + 0.30 x (peak_rss / baseline_peak_rss) + 0.10 x (binary_bytes / baseline_binary_bytes); lower is better, 1.000 is the control",
+  "findings": [
+    {
+      "cell": "alpine-x86_64-hardened_malloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload json has a relative MAD of 5.2%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-hardened_malloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload nomatch has a relative MAD of 5.7%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-jemalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload json has a relative MAD of 6.0%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-jemalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload nomatch has a relative MAD of 7.4%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-jemalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload regex has a relative MAD of 7.2%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-jemalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload startup has a relative MAD of 19.8%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-mimalloc-libc-surgery-static-pie-distro",
+      "check": "noisy",
+      "message": "workload files has a relative MAD of 6.9%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-mimalloc-libc-surgery-static-pie-distro",
+      "check": "noisy",
+      "message": "workload json has a relative MAD of 5.9%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-mimalloc-libc-surgery-static-pie-distro",
+      "check": "noisy",
+      "message": "workload nomatch has a relative MAD of 7.2%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-mimalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload files has a relative MAD of 6.9%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-mimalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload nomatch has a relative MAD of 6.2%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-mimalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload startup has a relative MAD of 14.5%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-rpmalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload literal-j1 has a relative MAD of 15.6%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-rpmalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload nomatch has a relative MAD of 6.7%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-rpmalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload startup has a relative MAD of 15.0%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-snmalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload files has a relative MAD of 7.2%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-snmalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload json has a relative MAD of 8.2%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-snmalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload literal-j1 has a relative MAD of 16.1%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-snmalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload nomatch has a relative MAD of 7.8%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-snmalloc-rust-global-static-pie-distro",
+      "check": "noisy",
+      "message": "workload startup has a relative MAD of 8.1%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-system-baseline-static-pie-distro",
+      "check": "noisy",
+      "message": "workload files has a relative MAD of 6.9%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-system-baseline-static-pie-distro",
+      "check": "noisy",
+      "message": "workload json has a relative MAD of 7.5%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-system-baseline-static-pie-distro",
+      "check": "noisy",
+      "message": "workload literal-j1 has a relative MAD of 18.1%, above the 5% threshold; differences smaller than that cannot be attributed to the allocator on this host",
+      "severity": "warn"
+    },
+    {
+      "cell": "alpine-x86_64-hardened_malloc-libc-surgery-static-pie-distro",
+      "check": "cell-failed",
+      "message": "outcome build_failed: ripgrep build failed (rc=1); tail:           /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/process/posix_spawn_file_actions_adddup2.c:9:(.text.posix_spawn_file_actions_adddup2+0x1e): undefined reference to `__libc_malloc'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a(posix_spawn_file_actions_addchdir.lo): in function `posix_spawn_file_actions_addchdir_np':           /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/process/posix_spawn_file_actions_addchdir.c:9:(.text.posix_spawn_file_actions_addchdir_np+0x17): undefined reference to `__libc_malloc'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /work/ripgrep-alpine-x86_64-hardened_malloc-libc-surgery-static-pie-distro/target/release/build/serde_core-22d39d6fc58a6cae/build_script_build-22d39d6fc58a6cae: hidden symbol `__libc_malloc' isn't defined           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: final link failed: bad value           collect2: error: ld returned 1 exit status              = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified   = note: use the `-l` flag to specify native libraries to link   = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)  error: could not compile `serde_core` (build script) due to 1 previous error",
+      "severity": "info"
+    },
+    {
+      "cell": "alpine-x86_64-hardened_malloc-link-override-static-pie-distro",
+      "check": "cell-failed",
+      "message": "outcome build_failed: ripgrep build failed (rc=1); tail:           random.c:(.text+0x345): undefined reference to `__stack_chk_fail'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/hardened_malloc-1d7fc7ffe0f8068a32ab2ba33df7515e7bad3f5f-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(random.o): in function `get_random_u64':           random.c:(.text+0x495): undefined reference to `__stack_chk_fail'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/hardened_malloc-1d7fc7ffe0f8068a32ab2ba33df7515e7bad3f5f-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(chacha.o): in function `chacha_keystream_bytes':           chacha.c:(.text+0x556): undefined reference to `__stack_chk_fail'           collect2: error: ld returned 1 exit status              = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified   = note: use the `-l` flag to specify native libraries to link   = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)  error: could not compile `ripgrep` (bin \"rg\") due to 1 previous error",
+      "severity": "info"
+    },
+    {
+      "cell": "alpine-x86_64-jemalloc-libc-surgery-static-pie-distro",
+      "check": "cell-failed",
+      "message": "outcome build_failed: ripgrep build failed (rc=1); tail:           /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/ldso/dlerror.c:53:(.text.__dl_vseterr+0x3b): undefined reference to `__libc_free'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/ldso/dlerror.c:61:(.text.__dl_vseterr+0x70): undefined reference to `__libc_free'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/ldso/dlerror.c:65:(.text.__dl_vseterr+0x9c): undefined reference to `__libc_malloc'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /work/ripgrep-alpine-x86_64-jemalloc-libc-surgery-static-pie-distro/target/release/build/serde_core-22d39d6fc58a6cae/build_script_build-22d39d6fc58a6cae: hidden symbol `__libc_calloc' isn't defined           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: final link failed: bad value           collect2: error: ld returned 1 exit status              = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified   = note: use the `-l` flag to specify native libraries to link   = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)  error: could not compile `serde_core` (build script) due to 1 previous error",
+      "severity": "info"
+    },
+    {
+      "cell": "alpine-x86_64-jemalloc-link-override-static-pie-distro",
+      "check": "cell-failed",
+      "message": "outcome build_failed: ripgrep build failed (rc=1); tail:           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/src/jemalloc-81034ce1f1373e37dc865038e1bc8eeecf559ce8/include/jemalloc/internal/mutex.h:282:(.text+0x6ea): undefined reference to `pthread_mutex_unlock'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/jemalloc-81034ce1f1373e37dc865038e1bc8eeecf559ce8-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(thread_event_registry.pic.o): in function `je_te_register_user_handler':           /cache/src/jemalloc-81034ce1f1373e37dc865038e1bc8eeecf559ce8/src/thread_event_registry.c:238:(.text+0x8a2): undefined reference to `__stack_chk_fail'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/jemalloc-81034ce1f1373e37dc865038e1bc8eeecf559ce8-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(util.pic.o): in function `je_multi_setting_parse_next':           /cache/src/jemalloc-81034ce1f1373e37dc865038e1bc8eeecf559ce8/src/util.c:48:(.text+0x103): undefined reference to `__stack_chk_fail'           collect2: error: ld returned 1 exit status              = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified   = note: use the `-l` flag to specify native libraries to link   = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)  error: could not compile `ripgrep` (bin \"rg\") due to 1 previous error",
+      "severity": "info"
+    },
+    {
+      "cell": "alpine-x86_64-mimalloc-link-override-static-pie-distro",
+      "check": "cell-failed",
+      "message": "outcome build_failed: ripgrep build failed (rc=1); tail:           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o): in function `_mi_os_alloc_aligned':           os.c:(.text+0x1793): undefined reference to `__stack_chk_fail'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o): in function `_mi_os_alloc_aligned_at_offset':           os.c:(.text+0x1970): undefined reference to `__stack_chk_fail'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o):os.c:(.text+0x1c76): more undefined references to `__stack_chk_fail' follow           collect2: error: ld returned 1 exit status              = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified   = note: use the `-l` flag to specify native libraries to link   = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)  error: could not compile `ripgrep` (bin \"rg\") due to 1 previous error",
+      "severity": "info"
+    },
+    {
+      "cell": "alpine-x86_64-rpmalloc-libc-surgery-static-pie-distro",
+      "check": "cell-failed",
+      "message": "outcome build_failed: allocator build failed (rc=1):   355 | void free(void* ptr) RPALIAS(rpfree)       |      ^~~~ /cache/src/rpmalloc-beef233c176b235587c0145f765e4316e5ca60d1/rpmalloc/malloc.c:301:6: error: '_ZdaPv' aliased to undefined symbol 'rpfree'   301 | void _ZdaPv(void* p) RPALIAS(rpfree)       |      ^~~~~~",
+      "severity": "info"
+    },
+    {
+      "cell": "alpine-x86_64-rpmalloc-link-override-static-pie-distro",
+      "check": "cell-failed",
+      "message": "outcome build_failed: allocator build failed (rc=1):   355 | void free(void* ptr) RPALIAS(rpfree)       |      ^~~~ /cache/src/rpmalloc-beef233c176b235587c0145f765e4316e5ca60d1/rpmalloc/malloc.c:301:6: error: '_ZdaPv' aliased to undefined symbol 'rpfree'   301 | void _ZdaPv(void* p) RPALIAS(rpfree)       |      ^~~~~~",
+      "severity": "info"
+    },
+    {
+      "cell": "alpine-x86_64-snmalloc-libc-surgery-static-pie-distro",
+      "check": "cell-failed",
+      "message": "outcome build_failed: ripgrep build failed (rc=1); tail:           /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/process/posix_spawn_file_actions_adddup2.c:9:(.text.posix_spawn_file_actions_adddup2+0x1e): undefined reference to `__libc_malloc'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /usr/local/rustup/toolchains/1.96.0-x86_64-unknown-linux-musl/lib/rustlib/x86_64-unknown-linux-musl/lib/self-contained/libc.a(posix_spawn_file_actions_addchdir.lo): in function `posix_spawn_file_actions_addchdir_np':           /build/musl-cross-make/build/local/x86_64-linux-musl/obj_musl/../src_musl/src/process/posix_spawn_file_actions_addchdir.c:9:(.text.posix_spawn_file_actions_addchdir_np+0x17): undefined reference to `__libc_malloc'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /work/ripgrep-alpine-x86_64-snmalloc-libc-surgery-static-pie-distro/target/release/build/serde_core-22d39d6fc58a6cae/build_script_build-22d39d6fc58a6cae: hidden symbol `__libc_malloc' isn't defined           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: final link failed: bad value           collect2: error: ld returned 1 exit status              = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified   = note: use the `-l` flag to specify native libraries to link   = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)  error: could not compile `serde_core` (build script) due to 1 previous error",
+      "severity": "info"
+    },
+    {
+      "cell": "alpine-x86_64-snmalloc-link-override-static-pie-distro",
+      "check": "cell-failed",
+      "message": "outcome build_failed: ripgrep build failed (rc=1); tail:           malloc.cc:(.text.posix_memalign+0x0): multiple definition of `posix_memalign'; /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../lib/libc.a(posix_memalign.lo):/home/buildozer/aports/main/musl/src/musl-1.2.6/src/malloc/posix_memalign.c:6: first defined here           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/snmalloc-526c55bdffa17aae20a9a3d24fe68a7a3b8d9894-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(malloc.cc.o): in function `calloc':           malloc.cc:(.text.calloc+0x0): multiple definition of `calloc'; /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../lib/libc.a(calloc.lo):/home/buildozer/aports/main/musl/src/musl-1.2.6/src/malloc/calloc.c:34: first defined here           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/snmalloc-526c55bdffa17aae20a9a3d24fe68a7a3b8d9894-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(malloc.cc.o): undefined reference to symbol '__stack_chk_fail'           /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /lib/libc.musl-x86_64.so.1: error adding symbols: DSO missing from command line           collect2: error: ld returned 1 exit status              = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified   = note: use the `-l` flag to specify native libraries to link   = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)  error: could not compile `ripgrep` (bin \"rg\") due to 1 previous error",
+      "severity": "info"
+    }
+  ],
+  "groups": [
+    {
+      "group": "alpine / x86_64 / static-pie / distro",
+      "rows": [
+        {
+          "allocator": "mimalloc",
+          "arch": "x86_64",
+          "cell_id": "alpine-x86_64-mimalloc-libc-surgery-static-pie-distro",
+          "composite": 1.4561112245369137,
+          "distro": "alpine",
+          "integration": "libc-surgery",
+          "is_baseline": false,
+          "profile": "static-pie",
+          "rel_mad": 0.033252193,
+          "rel_rss": 3.46535500427716,
+          "rel_size": 1.0272685219000317,
+          "rel_time": 0.5229631184396045,
+          "rss_kb": 16204.0,
+          "size_bytes": 8776144,
+          "startup_s": 0.001714051,
+          "time_s": 0.024820966,
+          "toolchain": "distro"
+        },
+        {
+          "allocator": "jemalloc",
+          "arch": "x86_64",
+          "cell_id": "alpine-x86_64-jemalloc-rust-global-static-pie-distro",
+          "composite": 1.021721978930873,
+          "distro": "alpine",
+          "integration": "rust-global",
+          "is_baseline": false,
+          "profile": "static-pie",
+          "rel_mad": 0.036874913,
+          "rel_rss": 1.6432848588537212,
+          "rel_size": 1.7422253810757207,
+          "rel_time": 0.5908566386119741,
+          "rss_kb": 7684.0,
+          "size_bytes": 14884152,
+          "startup_s": 0.00136328,
+          "time_s": 0.02804334,
+          "toolchain": "distro"
+        },
+        {
+          "allocator": "mimalloc",
+          "arch": "x86_64",
+          "cell_id": "alpine-x86_64-mimalloc-rust-global-static-pie-distro",
+          "composite": 1.5016780134551986,
+          "distro": "alpine",
+          "integration": "rust-global",
+          "is_baseline": false,
+          "profile": "static-pie",
+          "rel_mad": 0.042800826,
+          "rel_rss": 3.4696321642429426,
+          "rel_size": 1.0284278086483916,
+          "rel_time": 0.5965759721957946,
+          "rss_kb": 16224.0,
+          "size_bytes": 8786048,
+          "startup_s": 0.001365392,
+          "time_s": 0.028314792,
+          "toolchain": "distro"
+        },
+        {
+          "allocator": "snmalloc",
+          "arch": "x86_64",
+          "cell_id": "alpine-x86_64-snmalloc-rust-global-static-pie-distro",
+          "composite": 0.9276518154469939,
+          "distro": "alpine",
+          "integration": "rust-global",
+          "is_baseline": false,
+          "profile": "static-pie",
+          "rel_mad": 0.03922807,
+          "rel_rss": 1.5201026518391787,
+          "rel_size": 1.0680767264289286,
+          "rel_time": 0.6080222454205794,
+          "rss_kb": 7108.0,
+          "size_bytes": 9124776,
+          "startup_s": 0.001479471,
+          "time_s": 0.028858057,
+          "toolchain": "distro"
+        },
+        {
+          "allocator": "rpmalloc",
+          "arch": "x86_64",
+          "cell_id": "alpine-x86_64-rpmalloc-rust-global-static-pie-distro",
+          "composite": 0.7894759705382939,
+          "distro": "alpine",
+          "integration": "rust-global",
+          "is_baseline": false,
+          "profile": "static-pie",
+          "rel_mad": 0.015863483,
+          "rel_rss": 1.0684345594525235,
+          "rel_size": 1.011414947869553,
+          "rel_time": 0.6130068465259692,
+          "rss_kb": 4996.0,
+          "size_bytes": 8640704,
+          "startup_s": 0.001062264,
+          "time_s": 0.029094637,
+          "toolchain": "distro"
+        },
+        {
+          "allocator": "hardened_malloc",
+          "arch": "x86_64",
+          "cell_id": "alpine-x86_64-hardened_malloc-rust-global-static-pie-distro",
+          "composite": 1.5333147506477844,
+          "distro": "alpine",
+          "integration": "rust-global",
+          "is_baseline": false,
+          "profile": "static-pie",
+          "rel_mad": 0.031708149,
+          "rel_rss": 2.8751069289991444,
+          "rel_size": 1.0025938806889796,
+          "rel_time": 0.9508721397985717,
+          "rss_kb": 13444.0,
+          "size_bytes": 8565344,
+          "startup_s": 0.003120757,
+          "time_s": 0.045130458,
+          "toolchain": "distro"
+        },
+        {
+          "allocator": "system",
+          "arch": "x86_64",
+          "cell_id": "alpine-x86_64-system-baseline-static-pie-distro",
+          "composite": 0.9999999999999999,
+          "distro": "alpine",
+          "integration": "baseline",
+          "is_baseline": true,
+          "profile": "static-pie",
+          "rel_mad": 0.032163278,
+          "rel_rss": 1.0,
+          "rel_size": 1.0,
+          "rel_time": 1.0,
+          "rss_kb": 4676.0,
+          "size_bytes": 8543184,
+          "startup_s": 0.001508333,
+          "time_s": 0.047462173,
+          "toolchain": "distro"
+        }
+      ]
+    }
+  ],
+  "primary_workload": "literal",
+  "run_id": "20260901-112518",
+  "verdicts": [
+    {
+      "group": "alpine / x86_64 / static-pie / distro",
+      "margin_pct": 12.982468127952796,
+      "note": "mimalloc is 13.0% faster than the next row, which is outside the run's spread of 3.7%",
+      "winner": "mimalloc (libc-surgery)",
+      "within_noise": false
+    }
+  ]
+}

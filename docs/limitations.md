@@ -6,6 +6,56 @@ removed, it says how.
 
 ---
 
+## 0. A static program cannot host a shared plugin that calls back into it
+
+⛔ **Structural, measured, and prior to everything in §1.** A statically
+linked executable has an **empty dynamic symbol table**. A shared object
+loaded into it therefore cannot resolve any reference back to the host
+program — there is nothing for the loader to look in. `-rdynamic` is the flag
+that exports a host's symbols to its plugins, and it works by populating
+`.dynsym`; a `-static` link has no `.dynsym` to populate.
+
+⚠ **This is not §1.** §1 is about glibc's loader failing when a static binary
+borrows the host's `ld.so`. This is about symbol resolution having nowhere to
+look **even if that loader worked perfectly**.
+
+**Reproduce**, one second:
+
+```sh
+sh experiments/72-static-host-plugin-abi.sh
+```
+
+| arm | `.dynsym` | outcome |
+|---|---|---|
+| dynamic host, `-rdynamic` (positive control) | 11 | plugin loads and calls back |
+| static host | **0** | `dlopen: undefined symbol: host_api_add` |
+| static host + `--wrap-dlopen` | 0 | plugin loads and calls back |
+
+**Found by** trying to build CPython 3.12.7 with a static interpreter and
+shared stdlib modules — the subject `TODO` T-030's acceptance asked for. It
+fails at `checksharedmods` with
+`undefined symbol: PyLong_AsLongLongAndOverflow`, and the interpreter defines
+that symbol; it is simply not in a table a loader consults.
+
+⭐ **The consequence is the useful part.** For a plugin that calls into its
+host, linking it in is **not a workaround for `dlopen`** — it is the only
+thing that can work, and `--wrap-dlopen` is what makes the program's existing
+`dlopen` calls find it. It also explains why CPython's own
+`Modules/Setup.local` has the shape it does: the two routes converge by
+necessity.
+
+⭐ **Corroborated independently.** `leleliu008/python-distribution`, a
+self-contained relocatable CPython, sets CPython's own
+`MODULE_BUILDTYPE=static` with `--enable-static --disable-shared`
+(`references/leleliu008__python-distribution/tree/build.sh:1029,1035` @
+`987e937a`) — every stdlib module linked into the interpreter. It does not
+attempt a static interpreter with shared modules either. ⚠ Agreement from an
+independent implementation is not proof; the proof is `experiments/72-`.
+
+⚠ **A plugin that does NOT call back** — one reached only through a vtable
+handed to it, or one that only exports data — is not affected by this, and
+`experiments/50-`'s findings are what govern there instead.
+
 ## 1. `dlopen` of a host shared object is host-dependent, and success is worse than failure
 
 **The measurement.** POC 10 builds gawk with its extension API enabled and

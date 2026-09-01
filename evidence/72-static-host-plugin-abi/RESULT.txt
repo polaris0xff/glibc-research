@@ -1,0 +1,9 @@
+experiment 72 - can a static program host a shared plugin that calls back?
+date (UTC)   : 2026-09-01T13:27:37Z
+host kernel  : Linux 6.18.44-fc-v22
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+
+ARM              DYNSYM   OUTCOME
+dynamic-host     11       PASSED plugin_run() = 42, and it called back into the host
+static-host      0        FAIL dlopen: ./libplug.so: undefined symbol: host_api_add
+static+wrap      0        PASSED plugin_run() = 42, and it called back into the host

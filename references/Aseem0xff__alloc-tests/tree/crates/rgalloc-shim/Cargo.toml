@@ -1,0 +1,23 @@
+[package]
+name = "rgalloc-shim"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "A #[global_allocator] backed by a chosen allocator's prefixed C API. One feature per allocator."
+build = "build.rs"
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+# No default. A build that forgets to pick one gets the `system` backend, which
+# is the honest outcome, and `identify` will then report the binary as the
+# baseline rather than as whatever the plan claimed.
+default = []
+system = []
+mimalloc = []
+jemalloc = []
+snmalloc = []
+rpmalloc = []
+hardened_malloc = []

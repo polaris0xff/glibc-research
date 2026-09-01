@@ -1,0 +1,180 @@
+# Fast checks. Everything here runs on every push and pull request and is
+# expected to finish in minutes.
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # The instrument checks itself before anything is allowed to use it.
+  instrument:
+    name: instrument selftest
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install the pinned Rust toolchain
+        run: |
+          set -euo pipefail
+          . toolchains/pins.env
+          rustup toolchain install "$RUST_VERSION" --profile minimal --component rustfmt,clippy
+          rustup default "$RUST_VERSION"
+          rustc --version
+
+      - name: Build
+        run: cargo build --release --workspace
+
+      # ⛔ These are not "unit tests we happen to have". The shim decides the
+      # alignment of every allocation in every benchmarked binary; a bug here
+      # would surface as an allocator "crashing" and be written down as that
+      # allocator's fault.
+      - name: Allocator shim correctness
+        run: cargo test --release -p rgalloc-shim
+
+      # The measurement instrument proves it can see a failure as a failure, a
+      # signal as a signal, and a timeout as a kill -- before it is trusted to
+      # report a number.
+      - name: alloc-runner selftest
+        run: ./target/release/alloc-runner selftest
+
+      # The vendored mining script carries its own offline selftest. A broken
+      # re-vendor is caught here rather than discovered during a sweep.
+      - name: Vendored mine-repo.sh selftest
+        run: sh scripts/vendor/mine-repo.sh --selftest
+
+      - name: Formatting and lints
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --workspace --all-targets -- -D warnings
+
+  # ---------------------------------------------------------------------------
+  # The configuration must expand and be internally consistent.
+  configuration:
+    name: matrix and manifest
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install the pinned Rust toolchain
+        run: |
+          set -euo pipefail
+          . toolchains/pins.env
+          rustup toolchain install "$RUST_VERSION" --profile minimal
+          rustup default "$RUST_VERSION"
+      - run: cargo build --release -p alloc-bench
+
+      - name: Every suite expands
+        run: |
+          set -euo pipefail
+          ./target/release/alloc-bench plan --suite all > /tmp/plan.json
+          python3 - <<'PY'
+          import json, sys
+          cells = json.load(open('/tmp/plan.json'))
+          print(f"{len(cells)} cells")
+          bad = [c for c in cells if c['status'] == 'unsupported' and not (c.get('reason') or '').strip()]
+          if bad:
+              # ⛔ An unsupported cell with no reason is the exact failure this
+              # project exists to prevent: a configuration that vanishes and
+              # looks like one nobody thought of.
+              print("unsupported cells with no recorded reason:", [c['id'] for c in bad])
+              sys.exit(1)
+          ids = [c['id'] for c in cells]
+          if len(ids) != len(set(ids)):
+              print("duplicate cell ids in the plan"); sys.exit(1)
+          PY
+
+      # The lock file is the difference between "benchmark current upstream" and
+      # "benchmark an unreproducible moving target". It has to parse and cover
+      # every allocator the manifest declares.
+      - name: The lock file covers the manifest
+        run: |
+          python3 - <<'PY'
+          import json, sys, re
+          lock = json.load(open('allocators/allocators.lock.json'))
+          toml = open('allocators/allocators.toml').read()
+          ids = re.findall(r'^id\s*=\s*"([^"]+)"', toml, re.M)
+          missing = [i for i in ids if i != 'system' and i not in lock['entries']]
+          if missing:
+              print("allocators with no pinned revision:", missing)
+              print("run: alloc-bench update --write")
+              sys.exit(1)
+          for name, e in lock['entries'].items():
+              if not re.fullmatch(r'[0-9a-f]{40}', e['commit']):
+                  print(f"{name}: commit is not a full sha: {e['commit']}"); sys.exit(1)
+          print(f"{len(lock['entries'])} pinned revisions, all full SHAs")
+          PY
+
+      - name: Shell scripts parse
+        run: |
+          set -euo pipefail
+          rc=0
+          for f in $(find scripts allocators experiments -name '*.sh' 2>/dev/null); do
+            sh -n "$f" || { echo "syntax error: $f"; rc=1; }
+          done
+          exit $rc
+
+      - name: shellcheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          # `info` findings are style; anything worse fails.
+          find scripts allocators experiments -name '*.sh' -print0 \
+            | xargs -0 shellcheck -S warning -e SC1091
+
+  # ---------------------------------------------------------------------------
+  # ⭐ The whole pipeline, end to end, on the smallest corpus. This is what
+  # stops a change from breaking the benchmark without anyone noticing until the
+  # nightly run.
+  smoke:
+    name: end-to-end smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install the pinned Rust toolchain
+        run: |
+          set -euo pipefail
+          . toolchains/pins.env
+          rustup toolchain install "$RUST_VERSION" --profile minimal
+          rustup default "$RUST_VERSION"
+      - run: cargo build --release -p alloc-bench
+
+      - run: ./target/release/alloc-bench doctor
+
+      - name: Run the smoke suite
+        run: |
+          ./target/release/alloc-bench run \
+            --suite smoke --arch x86_64 --repeat 5 \
+            --out "$GITHUB_WORKSPACE/results/ci-smoke" --strict
+
+      # ⚠ The evidence is uploaded whether the run passed or not. A failed run's
+      # logs and identity documents are exactly what makes the failure
+      # diagnosable, and dropping them is how a CI failure becomes a mystery.
+      - name: Upload the evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-evidence
+          path: results/ci-smoke
+          retention-days: 14
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Smoke run"
+            echo
+            sed -n '/^## Rankings/,/^## Every workload/p' results/ci-smoke/report.md 2>/dev/null | head -40
+            echo
+            echo "⚠ The smoke suite uses a corpus small enough that a single search takes"
+            echo "milliseconds. It proves the pipeline works. It does NOT rank anything."
+          } >> "$GITHUB_STEP_SUMMARY" || true

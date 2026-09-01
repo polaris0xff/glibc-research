@@ -1,0 +1,11 @@
+alpine-3.22: exit=0 | 
+alpine-3.20: exit=0 | 
+alpine-3.10: exit=0 | 
+voidlinux-musl: exit=0 | 
+debian-11: exit=0 | 
+debian-12: exit=0 | 
+ubuntu-20.04: exit=0 | 
+rockylinux-8: exit=0 | 
+opensuse-leap-15.6: exit=0 | 
+fedora-42: exit=0 | 
+archlinux-latest: exit=0 | 

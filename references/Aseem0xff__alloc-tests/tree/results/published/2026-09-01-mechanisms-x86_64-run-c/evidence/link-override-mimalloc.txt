@@ -1,0 +1,80 @@
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(prim.c.o): in function `_mi_prim_clock_now':
+          prim.c:(.text+0xae9): undefined reference to `clock'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: prim.c:(.text+0xb0e): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(prim.c.o): in function `_mi_prim_process_info':
+          prim.c:(.text+0xb42): undefined reference to `getrusage'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: prim.c:(.text+0xbd2): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(prim.c.o): in function `_mi_prim_out_stderr':
+          prim.c:(.text+0xbeb): undefined reference to `fputs'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(prim.c.o): in function `_mi_prim_thread_yield':
+          prim.c:(.text+0xe53): undefined reference to `sleep'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bchunk_xsetNC':
+          bitmap.c:(.text+0x175): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x1d4): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bchunk_popcountNC':
+          bitmap.c:(.text+0x247): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x283): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bbitmap_try_find_and_clear_generic':
+          bitmap.c:(.text+0x7f1): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o):bitmap.c:(.text+0x9a9): more undefined references to `__popcountdi2' follow
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bbitmap_try_find_and_clear_generic':
+          bitmap.c:(.text+0xd48): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bitmap_setN':
+          bitmap.c:(.text+0x1deb): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x1f4b): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x1fb2): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x1fd6): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bitmap_clearN':
+          bitmap.c:(.text+0x2165): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bitmap_popcountN':
+          bitmap.c:(.text+0x2245): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bitmap_try_find_and_claim':
+          bitmap.c:(.text+0x26a5): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x28bf): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bitmap_popcount':
+          bitmap.c:(.text+0x2a58): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bbitmap_try_clearNC':
+          bitmap.c:(.text+0x3b80): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bbitmap_try_find_and_clear':
+          bitmap.c:(.text+0x3eea): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x4030): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x4206): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x423b): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x427b): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x42b5): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(bitmap.c.o): in function `mi_bbitmap_try_find_and_clear8':
+          bitmap.c:(.text+0x439a): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x450b): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x4712): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x476a): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x4792): undefined reference to `__popcountdi2'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: bitmap.c:(.text+0x4825): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(libc.c.o): in function `mi_out_num':
+          libc.c:(.text+0x107): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(libc.c.o): in function `_mi_vsnprintf.part.0':
+          libc.c:(.text+0x9bd): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(libc.c.o): in function `_mi_atomic_once_enter':
+          libc.c:(.text+0xe00): undefined reference to `pthread_mutex_lock'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: libc.c:(.text+0xe29): undefined reference to `pthread_mutex_unlock'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(libc.c.o): in function `_mi_snprintf':
+          libc.c:(.text+0x1085): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(libc.c.o): in function `_mi_atomic_once_release':
+          libc.c:(.text+0xe7d): undefined reference to `pthread_mutex_unlock'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o): in function `mi_os_prim_alloc_at.constprop.0':
+          os.c:(.text+0x1e3): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o): in function `_mi_os_alloc':
+          os.c:(.text+0xf92): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o): in function `_mi_os_commit_ex':
+          os.c:(.text+0x10cb): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o): in function `_mi_os_alloc_aligned':
+          os.c:(.text+0x1793): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o): in function `_mi_os_alloc_aligned_at_offset':
+          os.c:(.text+0x1970): undefined reference to `__stack_chk_fail'
+          /usr/lib/gcc/x86_64-alpine-linux-musl/15.2.0/../../../../x86_64-alpine-linux-musl/bin/ld: /cache/alloc/mimalloc-18b08671c9302247bfb682286e6bf3cc1773f801-override-pic1-musl-x86_64-distro-default/lib/liballocbench.a(os.c.o):os.c:(.text+0x1c76): more undefined references to `__stack_chk_fail' follow
+          collect2: error: ld returned 1 exit status
+          
+  = note: some `extern` functions couldn't be found; some native libraries may need to be installed or have their path specified
+  = note: use the `-l` flag to specify native libraries to link
+  = note: use the `cargo:rustc-link-lib` directive to specify the native libraries to link with Cargo (see https://doc.rust-lang.org/cargo/reference/build-scripts.html#rustc-link-lib)
+
+error: could not compile `ripgrep` (bin "rg") due to 1 previous error

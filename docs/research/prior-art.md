@@ -59,6 +59,7 @@ exists upstream at the commit named there.
 | `a2flo/standalone_musl` | `368cf49f` | tree structure + README | **not a libc to adopt; unweighed prior art for the plugin problem** |
 | `altipla-consulting/distroless-glibc` | `88e4453c` | README + Dockerfile | **anti-pattern exhibit** |
 | `allyourcodebase/pipewire` | `5b4930b8` | `src/wrap/dlfcn.zig` | ⭐ **adopt**: `--wrap` on `dlopen` against a compiled-in table |
+| `leleliu008/python-distribution` | `987e937a` | `build.sh` CPython recipe, `linux-portable.sh` in full | ⭐ **corroborates `limitations.md` §0, and is the smallest tier-2 implementation seen** |
 
 
 
@@ -197,6 +198,62 @@ installed, and several of which differ by path between distributions that all
 ship glibc.
 
 ---
+
+## `leleliu008/python-distribution` @ `987e937a`
+
+⭐ **Read because a CPython claim was about to be published without checking
+whether somebody had already built one**, and it is the second time this
+session that reading first changed what got written.
+
+**It corroborates [`../limitations.md`](../limitations.md) §0 rather than
+contradicting it.** For a self-contained CPython it sets CPython's own
+`MODULE_BUILDTYPE=static` (`build.sh:1035`) with
+`--enable-static --disable-shared` (`:1029`), so **every stdlib module is
+linked into the interpreter**. Nobody there attempts a static interpreter with
+shared modules, which is what §0 says cannot work. ⚠ That is agreement from an
+independent implementation, not proof; §0's proof is
+`experiments/72-static-host-plugin-abi.sh`.
+
+⭐ **`linux-portable.sh` is the interesting half, and it is tier 2 of
+[`../design/tiers.md`](../design/tiers.md) in about sixty lines of C.** For
+each dynamically linked executable in the tree it:
+
+1. renames `foo` to `foo.bin` and generates `foo.c`, compiled with
+   `gcc -static -Os -s -flto` (`:242`) — so **what the user runs is an
+   ordinary static ELF**;
+2. that launcher reads `/proc/self/exe`, derives `<self>.bin` and the bundled
+   `lib/` directory beside it, and **`execv`s the bundled loader directly**
+   (`:174`):
+
+```c
+argv2[0] = dynamicLoaderPath;
+argv2[1] = "--library-path";  argv2[2] = libraryPath;
+argv2[3] = "--argv0";         argv2[4] = selfExecPath;
+argv2[5] = realExePath;
+```
+
+3. copies the needed system shared libraries into `lib/` and adds an
+   `$ORIGIN`-relative RPATH with `patchelf`;
+4. on musl, symlinks `ld-musl-<arch>.so.1` to `libc.musl-<arch>.so.1`, because
+   there the loader and libc are one file under the libc's name (`:306`).
+
+**Three details worth taking, none of which this project had written down:**
+
+| | |
+|---|---|
+| ⭐ **`--argv0`** | without it the program sees the *loader's* path in `argv[0]`. CPython derives `sys.executable` from it, so a bundle that omits this has an interpreter that cannot find itself. A cheap mistake to make and an expensive one to debug. |
+| ⭐ **`execv` the loader, do not set `LD_LIBRARY_PATH`** | the library path is an argument to the loader for this one process. It is not inherited by children and cannot leak into anything the program later runs. |
+| ⚠ **no shell anywhere in the delivery path** | [`../design/toolchain.md`](../design/toolchain.md) names "no shell in the delivery path" as one axis a `pgb` bundle would have to win on. This implementation already meets it, so that axis is **not** available as a differentiator. |
+
+⛔ **What it does not do**, and the reason it is not a rival to tier 1: the
+artefact is a **directory** — launcher, `.bin`, and `lib/` — not one file. It
+answers "how does this reach a machine", which
+[`../design/toolchain.md`](../design/toolchain.md) says is a different
+question from the one `pgb` answers.
+
+⚠ **Depth: read, not run.** `build.sh` and `linux-portable.sh` were read in
+full; nothing here was executed and no artefact was measured. A claim about
+what it *achieves* on the eleven environments would need `experiments/`.
 
 ## What the sweep changed about the plan
 

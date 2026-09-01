@@ -15,7 +15,7 @@ the full map.
 | 1 | **this file** | the state, the mechanisms, the open problems, the rules |
 | 2 | [`../TODO/PROGRESS.md`](../TODO/PROGRESS.md) | ⭐ **what to do next.** The work order and the open questions live here and nowhere else |
 | 3 | [`../TODO/INDEX.md`](../TODO/INDEX.md) | every entry, and the argument behind the ordering |
-| 4 | [`../TODO/RULES.md`](../TODO/RULES.md) | ⛔ how this repository is worked on — git, the record, no deferral |
+| 4 | [`../TODO/RULES.md`](../TODO/RULES.md) | ⛔ how this repository is worked on — git, the fetch routes, the record, no deferral |
 | 5 | [`REQUIREMENTS.md`](REQUIREMENTS.md) | the operator's binding bar, which is **not met** |
 | 6 | [`design/toolchain.md`](design/toolchain.md) | ⭐ what `pgb` is (a toolchain, not a format) and where it is going |
 
@@ -43,7 +43,7 @@ format and technique* — which this project **does not meet**, and it tracks
 what each piece of work does about that.
 
 The tool is [`../pgb`](../pgb) (portable glibc build): a POSIX-sh driver plus
-three small C runtime pieces. Output is an ordinary statically linked
+four small C runtime pieces. Output is an ordinary statically linked
 executable. No launcher, no AppDir, no loader, nothing beside it.
 
 **The answer reached: yes, for programs that do not need to load host
@@ -102,6 +102,7 @@ Measured, plain `gcc -static`, across the 11 pinned environments:
 | | |
 |---|---|
 | host NSS modules loaded | 5 of 11; **SIGFPE on Arch and openSUSE Leap** (openSUSE's via `passwd: compat`, not DNS) |
+| ⚠ which instrument | the signals in this table are the **chroot bed's**. Under `pgb verify --engine docker`, whose tracer uses `ptrace`, Debian 11 and Ubuntu 20.04 report **SIGABRT** where the chroot bed reports **SIGSEGV** — the control reaches `abort()` when traced and segfaults when not. Reproducible, no verdict moves, and `history/corrections.md` C11 says why both are kept |
 | `iconv_open` | **SIGFPE/SIGABRT on Debian 11/12 and Ubuntu 20.04** where the host gconv path matches the build's; 11 of 12 encodings silently unavailable where it does not. **There is no working case.** |
 | `setlocale` UTF-8 | `ANSI_X3.4-1968` on all 4 musl environments |
 
@@ -124,13 +125,15 @@ demonstrate it. Data reads are reported in their own column, never asserted.
 
 ## 4. How it works
 
-Three mechanisms, no application source changed by any of them:
+Four mechanisms, no application source changed by any of them. The first three
+are on by default; the last two are opt-in:
 
 | | mechanism | file |
 |---|---|---|
 | **NSS** | constructor calls `__nss_configure_lookup()` (public `GLIBC_2.2.5`, present in `libc.a`), pinning all 14 databases to services glibc ≥ 2.34 implements inside libc. Passed as a plain object with `-Wl,-u,pgb_runtime_anchor`, because a constructor with no referenced symbol is dropped from an archive. | [`../tool/runtime/pgb-nssfix.c`](../tool/runtime/pgb-nssfix.c) |
 | **iconv** | `-Wl,--wrap=iconv_open,--wrap=iconv,--wrap=iconv_close` onto static GNU libiconv. Acts at the final link, so it catches calls from any object including archives built before this tool existed. Lives in an archive, so a program that never calls `iconv_open` links none of it — 940 KiB vs 2.1 MiB, same source. | [`../tool/runtime/pgb-iconv.c`](../tool/runtime/pgb-iconv.c) |
 | **locale** (opt-in `--embed-locale`) | `-Wl,--wrap=setlocale`; C.UTF-8 embedded, written out only when the host cannot answer a UTF-8 request. The only mechanism that touches the filesystem, hence opt-in. | [`../tool/runtime/pgb-locale.c`](../tool/runtime/pgb-locale.c) |
+| **own plugins** (opt-in `--wrap-dlopen`) | `-Wl,--wrap=dlopen,--wrap=dlsym,--wrap=dlclose,--wrap=dlerror` onto a table `pgb` **generates** with `nm` from the objects the build produced. ⭐ A program loading its *own* plugins never needs a loader — the code is in the link and `dlopen` is only doing a name lookup. Nothing is mapped, so no second libc can enter. 11 of 11, zero host objects, +544 B. ⚠ Not for **host** plugins — §13 item 4. | [`../tool/runtime/pgb-dlopen.c`](../tool/runtime/pgb-dlopen.c) |
 
 **Delivery:** compiler wrappers on `PATH` plus `CC`/`CXX`. autotools, CMake,
 meson and make pick them up unmodified. Each wrapper reads its own argv:
@@ -146,8 +149,13 @@ a host build reads `Ubuntu 13.3.0`.
 ## 5. Repository layout
 
 ```
-pgb                       the tool; its header comment is the manual
-tool/runtime/*.c          the three mechanisms
+pgb                       the tool: the manual, the config, and dispatch
+tool/lib/*.sh             the tool's body. SOURCED, so `pgb build` and
+                          `pgb verify` stay one process across the engine
+                          boundary: common, wrappers, env, build, verify
+tool/runtime/*.c          the four mechanisms, and pgb-trace.c, the
+                          carried-in tracer `pgb verify` uses where strace
+                          cannot follow the subject
 ci/probe.c                the binary CI runs on 11 distributions
 scripts/common/
   oci-pull.sh             OCI image -> rootfs, no daemon      (--selftest)
@@ -160,7 +168,7 @@ experiments/lib.sh        conditions block, assertions, pid-attributed tracing
 experiments/NN-*.sh       numbered; exit 0 matched, 1 did not, 2 could not run
 docs/REQUIREMENTS.md      the operator's acceptance bar, and how far short it is
 docs/methodology/         vendored, pinned; binding on experiments and sweeps
-TODO/                     the work: PROGRESS, INDEX, RULES, per-category entries
+TODO/                     the work: PROGRESS, INDEX, RULES, RESUME, entries
 TODO/check.sh             the gate; run before every commit
 poc/common.sh             the POC contract
 poc/NN-*/run.sh           the five proof-of-concept projects
@@ -217,9 +225,13 @@ experiment; none has been shown to be unreachable.
    `experiments/50-` tried (it drops the foreign-libc dependency edge, which is
    exactly the failure above); `--wrap` on `dlopen` against a compiled-in table,
    which `allyourcodebase/pipewire` already does; or carry a loader.
-   **The class served today is: programs that do not need host plugins.** A
-   program loading its *own* plugins is already fine — build them in, as POC 50
-   does, and §13 item 4 covers automating that.
+   **The class served today is: programs that do not need host plugins.**
+   ⭐ **A program loading its *own* plugins is now served by a mechanism rather
+   than by hand.** `--wrap-dlopen` generates a symbol table with `nm` from the
+   objects the build produced and answers `dlopen`/`dlsym`/`dlclose`/`dlerror`
+   out of it — 11 of 11, zero host shared objects, `experiments/71-`. POC 50
+   still does it the hand way through CPython's own `Modules/Setup.local`;
+   rebuilding it on the generic mechanism is the open half of `TODO` T-030.
 2. **NSS beyond `files`/`dns` is gone**: no LDAP, SSSD, NIS, mDNS,
    systemd-resolved. Measured cost: on Fedora 42 a plain static binary resolves
    the machine's own hostname via `libnss_myhostname` and the pgb binary does
@@ -265,11 +277,16 @@ one kernel is not "works on Linux".
 | `experiments/60-versus-alternatives.sh` | **COMPLETE** — 8 arms head to head, `REQUIREMENTS.md` part 2. ⚠ Its AppImage arm used **vanilla** `appimagetool` and its performance columns were startup and size only; both are corrected by 62- and 61-. `history/corrections.md` C7 |
 | `experiments/61-libc-throughput.sh` | **COMPLETE** — the axis 60- got wrong. glibc vs musl at steady state, and whether the gap travels to a musl host |
 | `experiments/62-anylinux-appimage.sh` | **COMPLETE** — `pgb` against `Anylinux-AppImages`, the AppImage that actually competes |
+| `experiments/70-carried-helper.sh` | **COMPLETE** — settles T-011. A static Rust helper *carried into* all 11 targets plus the build environment runs on **12 of 12**, exactly where `sh` does, so "sh is the only thing guaranteed present" does not bind a carried-in binary |
+| `experiments/71-wrap-dlopen.sh` | **COMPLETE** — `--wrap-dlopen` on 11 of 11 with zero host objects, against a control that fails on 11 of 11. Three of its six assertions are negative |
+| `experiments/72-static-host-plugin-abi.sh` | **COMPLETE** — ⛔ a static executable's dynamic symbol table is **empty**, so a shared plugin can never resolve a call back into its host. Prior to 50-'s loader failures: a perfect loader would still have nowhere to look. Three arms, positive control included |
 | `pgb` chroot engine, host engine | **COMPLETE** |
-| `pgb` docker/podman engines | **UNTESTED** — no daemon here; code exists, never run. CI is where it first runs. |
+| `pgb` docker engine | **COMPLETE** — ⭐ its output is **byte-identical** to the chroot engine's for the same source, and both carry `GCC: (Debian 12.2.0-14+deb12u1)` where a host build on this machine carries `Ubuntu 13.3.0`. The two engines are interchangeable, not merely both working. Passes 11 of 11. Three defects found on first run, one a build that produced nothing and exited 0 — `history/corrections.md` C9 |
+| `pgb` podman engine | **UNTESTED** — podman is absent here. The code path is shared with docker except the binary name |
+| `pgb verify --engine` | **COMPLETE for chroot and docker**, and green on a runner in [run 14](https://github.com/polaris0xff/glibc-research/actions/runs/33512788793). Both arms agree on all 11 rows for both asserted columns; criterion 2 under docker is measured by `tool/runtime/pgb-trace.c`, a `ptrace` open-tracer carried into the container. ⚠ `unmeasured`, never `none`, when it cannot attach. podman untested |
 | NSS / iconv / locale mechanisms | **COMPLETE** — 11 of 11 each |
-| POCs 10 gawk, 20 nano, 30 curl, 40 jq, 50 CPython | **COMPLETE** — all 11 environments each |
-| CI workflow | **WRITTEN, NEVER RUN** — no push has happened from a runner yet |
+| POCs 10 gawk, 20 nano, 30 curl, 40 jq, 50 CPython, 60 LevelDB | **COMPLETE** — all 11 environments each |
+| CI workflow | ⭐ **GREEN**, 15 jobs, [run 14](https://github.com/polaris0xff/glibc-research/actions/runs/33512788793) — and it now asserts §3 criterion 2, not just exit status, through `pgb verify --engine docker`. ⚠ It was not unrun before: it ran 10 times and was red 10 times, and the two red rows never executed a binary — GitHub's Node.js cannot start in a musl container. `history/corrections.md` C8. ⭐ Run 13 caught a real defect, the first time this workflow has found one rather than reported one |
 | aarch64 | **UNTESTED** |
 | host `dlopen`, terminfo, CA bundle | **KNOWN LIMITATION** — §7 |
 
@@ -282,6 +299,7 @@ one kernel is not "works on Linux".
 | 30 | curl 8.11.0 + OpenSSL 3.0.15 + zlib 1.3.1 | `getaddrinfo`/NSS, real DNS, real TLS, CA bundle |
 | 40 | jq 1.7.1 + oniguruma 6.9.9 | Unicode round trip, surrogate pairs, optional-dep detection |
 | 50 | CPython 3.12.7 | 49 extension modules linked **in**, `lib-dynload` empty, NSS via `socket`/`pwd` |
+| 60 | LevelDB 1.23 + a C++ subject | ⭐ the first **C++** and first **CMake** POC: static init order, exception unwinding across a static link, RTTI/typeid across TUs, iostreams. Found that no C++ program linked at all — libstdc++ calls `iconv` and `-lstdc++` is scanned after `-lpgbruntime` |
 
 ## 10. Overhead
 
@@ -320,7 +338,7 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 | [`history/corrections.md`](history/corrections.md) | ⚠ claims measured wrong, instrument defects, evaluated approaches. **Read on demand, not to orient.** ⭐ This is where superseded findings live — keep them out of the pages above |
 | [`research/nix-appimage.md`](research/nix-appimage.md) | ⭐ the sweep of `nix bundle` and friends: why a bundler ends up shipping a container, in the maintainers' own words |
 | [`methodology/`](methodology/) | vendored from `Azathothas/TEMPLATE`, pinned. Binding on experiments, sweeps and vendoring |
-| [`../TODO/`](../TODO/) | ⭐ **the work.** `PROGRESS.md` the record, `INDEX.md` the entries, `RULES.md` how to work, `check.sh` the gate |
+| [`../TODO/`](../TODO/) | ⭐ **the work.** `PROGRESS.md` the record, `INDEX.md` the entries, `RULES.md` how to work, `RESUME.md` what was in flight when the last session stopped, `check.sh` the gate |
 | [`../tmp/START.md`](../tmp/START.md) | the original brief. Read it when a decision turns on what was actually asked for |
 
 ## 12. Provenance
@@ -362,12 +380,15 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
    ⛔ **Split `pgb` into `tool/lib/*.sh` before writing the planner** — it is
    one file near a thousand lines already and the planner is the part that
    grows.
-2. **Run CI.** `.github/workflows/portability.yml` and `ci/probe.c` are written
-   and have **never executed on a runner**. Locally the probe passes on all 11
-   and the plain control fails on all 11, so the workflow should be green on
-   the portable arm — but that is a prediction, not a result. Running it is
-   also the only way the **UNTESTED** docker/podman engines get exercised, and
-   the workflow needs its first push to prove its own YAML.
+2. **Get CI green.** ⚠ It is not unrun — it ran ten times and was red every
+   time, and three tracked files said the opposite. The nine green rows and the
+   segfaulting control are a real result; the two red rows are GitHub's Node.js
+   failing to start in a musl container, which is this project's own thesis
+   observed on the CI provider. `history/corrections.md` C8 has the log lines.
+   The workflow now runs every job on the host, enters targets with
+   `docker run --entrypoint`, and **generates** its matrix from
+   `scripts/common/rootfs-images.txt` so CI and the local bed cannot be two
+   different beds again.
 3. **aarch64.** `oci-pull.sh --arch arm64` and `fetch-rootfs.sh --arch arm64`
    exist and re-resolve by tag, which trades the digest pin away and says so.
    Nothing has been run. Expect IFUNC and CPU-baseline questions that x86_64
@@ -461,6 +482,14 @@ treat it as a format ask the wrong question — see
   merely *moving* the dlopen there.
 - **Do not write a new OCI puller or reference fetcher.** Both exist with
   selftests.
+- ⛔ **Do not fetch from `api.github.com` or `github.com` directly.** Read-only
+  GitHub API paths go through `https://api.gh.pkgforge.dev/<PATH>`; everything
+  else goes through `https://api.rv.pkgforge.dev/<FULL-URL-WITH-SCHEME>` when
+  the source 401s or 403s. `gh` is preferred over the first **when it is
+  present and authenticated** — probe both. GraphQL and authenticated routes
+  are the exception and are why discussions are unfetched everywhere in
+  `references/`. The routes, what is verified about them, and what skipping
+  them has already cost: [`../TODO/RULES.md`](../TODO/RULES.md).
 - **Do not write a new ELF or dependency analyser before checking
   `references/`.** `leleliu008/elftool` is vendored and manipulates ELF files;
   `ppkg/core/wrappers/` are compiler wrappers solving the problem `pgb`'s shell
