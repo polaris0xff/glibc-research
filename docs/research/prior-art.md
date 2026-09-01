@@ -28,7 +28,7 @@ the recommendation will not come back for it.**
 
 ## The corpus
 
-⭐ **Tracked, in this tree, under `references/`.** Twelve repositories, each
+⭐ **Tracked, in this tree, under `references/`.** Thirteen repositories, each
 with metadata, issues and pull requests in both states, comments, review
 comments, releases, tags, and the tree at a captured commit. Re-fetch any of
 them with:
@@ -60,6 +60,7 @@ exists upstream at the commit named there.
 | `altipla-consulting/distroless-glibc` | `88e4453c` | README + Dockerfile | **anti-pattern exhibit** |
 | `allyourcodebase/pipewire` | `5b4930b8` | `src/wrap/dlfcn.zig` | ⭐ **adopt**: `--wrap` on `dlopen` against a compiled-in table |
 | `leleliu008/python-distribution` | `987e937a` | `build.sh` CPython recipe, `linux-portable.sh` in full | ⭐ **corroborates `limitations.md` §0, and is the smallest tier-2 implementation seen** |
+| ⭐ **`pg83/solo`** | `79451211` | four passes; `dlfcn.cpp` and `elf_loader.h` in full, `elf_loader.cpp` at the resolver/provider/TLS sites, `musl_tls.c`, `dev/`, CI; three build attempts, all failed | ⭐ **adopt the mechanism, refuse the implementation.** A `.so` loader compiled INTO a static binary — §13 item 4 **route D**. Its 5,948-line glibc→musl bridge is exactly what a static-glibc host does not need, and `experiments/73-` measures why. Own page: [`solo.md`](solo.md) |
 
 
 

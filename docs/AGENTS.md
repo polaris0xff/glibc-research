@@ -41,6 +41,10 @@ significant overhead — and ship the tool that does it.
 acceptance bar — *works everywhere, or strictly better than every existing
 format and technique* — which this project **does not meet**, and it tracks
 what each piece of work does about that.
+⭐ **Part 2 of that bar was replaced by an operator ruling on 2026-09-01b**: it
+is no longer a comparison against bundles but *a static glibc binary with none
+of the issues*, and the issues are an enumerated list of nine, six closed and
+three open. `history/corrections.md` C13.
 
 The tool is [`../pgb`](../pgb) (portable glibc build): a POSIX-sh driver plus
 four small C runtime pieces. Output is an ordinary statically linked
@@ -173,7 +177,7 @@ TODO/check.sh             the gate; run before every commit
 poc/common.sh             the POC contract
 poc/NN-*/run.sh           the five proof-of-concept projects
 evidence/                 committed RESULT.txt per experiment and POC
-references/               12 upstream trees + trackers, tracked, PROVENANCE.md each
+references/               13 upstream trees + trackers, tracked, PROVENANCE.md each
 .github/workflows/portability.yml
 docs/                     see §11
 tmp/START.md              the original brief
@@ -220,7 +224,11 @@ experiment; none has been shown to be unreachable.
    `elf_machine_rela_relative` assertion, SIGFPE — because a static binary has
    no loader of its own, so `dlopen` borrows the host's `ld.so` and
    `libc.so.6`, and *that pairing* breaks.
-   ⭐ **Three untried routes, in order of cost** — §13 item 4 has the detail:
+   ⭐ **Four routes, none exhausted** — §13 item 4 has the detail, and
+   ⭐ **route D is new and best-evidenced**: compile an ELF loader in and
+   resolve the host object against our own static glibc, which
+   `experiments/73-` measures as 90.8%–97.8% already served with zero
+   unexplained residue. The other three:
    port cross-libc-dlopen's *full* rewrite rather than the one function
    `experiments/50-` tried (it drops the foreign-libc dependency edge, which is
    exactly the failure above); `--wrap` on `dlopen` against a compiled-in table,
@@ -280,6 +288,7 @@ one kernel is not "works on Linux".
 | `experiments/70-carried-helper.sh` | **COMPLETE** — settles T-011. A static Rust helper *carried into* all 11 targets plus the build environment runs on **12 of 12**, exactly where `sh` does, so "sh is the only thing guaranteed present" does not bind a carried-in binary |
 | `experiments/71-wrap-dlopen.sh` | **COMPLETE** — `--wrap-dlopen` on 11 of 11 with zero host objects, against a control that fails on 11 of 11. Three of its six assertions are negative |
 | `experiments/72-static-host-plugin-abi.sh` | **COMPLETE** — ⛔ a static executable's dynamic symbol table is **empty**, so a shared plugin can never resolve a call back into its host. Prior to 50-'s loader failures: a perfect loader would still have nowhere to look. Three arms, positive control included |
+| `experiments/73-host-dso-abi-demand.sh` | **COMPLETE** — ⭐ what §13 item 4 route D turns on. **5,807 host shared objects**, all eleven environments, parsed byte-wise with no binutils inside the target: **90.8%–97.8%** of every `GLIBC_`/`GCC_`-versioned import is already definable by the pinned static glibc, and the unexplained residue is **zero**. Also settles the version-resolution rule in both directions, and found **three defects in its own instrument** first — a linker script read as an archive, a column order read backwards, and a control that measured the one case glibc guards |
 | `pgb` chroot engine, host engine | **COMPLETE** |
 | `pgb` docker engine | **COMPLETE** — ⭐ its output is **byte-identical** to the chroot engine's for the same source, and both carry `GCC: (Debian 12.2.0-14+deb12u1)` where a host build on this machine carries `Ubuntu 13.3.0`. The two engines are interchangeable, not merely both working. Passes 11 of 11. Three defects found on first run, one a build that produced nothing and exited 0 — `history/corrections.md` C9 |
 | `pgb` podman engine | **UNTESTED** — podman is absent here. The code path is shared with docker except the binary name |
@@ -334,6 +343,7 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 | [`limitations.md`](limitations.md) | the open problems, each with a reproduction and a route |
 | [`comparison.md`](comparison.md) | the head-to-head: several ways to ship the same program across the same 11 environments, and what actually separates them |
 | [`research/prior-art.md`](research/prior-art.md) | the reference sweep, verdicts, provenance |
+| [`research/solo.md`](research/solo.md) | ⭐ **the `pg83/solo` sweep, and the route it opened.** A `.so` loader compiled *into* a static binary — §13 item 4 route D — with the measurement that says the symbols are there, the four mechanisms worth taking at file and line, and what must not be ported |
 | [`design/tiers.md`](design/tiers.md) | ⛔ **design only, nothing built.** The tiered-output plan for the host-plugin class, and what "universal" can honestly mean |
 | [`history/corrections.md`](history/corrections.md) | ⚠ claims measured wrong, instrument defects, evaluated approaches. **Read on demand, not to orient.** ⭐ This is where superseded findings live — keep them out of the pages above |
 | [`research/nix-appimage.md`](research/nix-appimage.md) | ⭐ the sweep of `nix bundle` and friends: why a bundler ends up shipping a container, in the maintainers' own words |
@@ -343,7 +353,7 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 
 ## 12. Provenance
 
-- `references/` — 12 upstream trees at captured commits, each with
+- `references/` — 13 upstream trees at captured commits, each with
   `PROVENANCE.md` naming commit, route, and what could not be fetched
   (discussions are GraphQL-only and were **not** fetched for any repository).
   Re-fetch: `sh scripts/common/mine-repo.sh OWNER/REPO --out references`.
@@ -393,9 +403,32 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
    exist and re-resolve by tag, which trades the digest pin away and says so.
    Nothing has been run. Expect IFUNC and CPU-baseline questions that x86_64
    did not raise.
-4. **Reach the host-plugin class.** Three routes, cheapest first. None has been
-   tried to exhaustion and none has been shown to be closed.
+4. **Reach the host-plugin class.** ⭐ **Four** routes now. None has been tried
+   to exhaustion and none has been shown to be closed.
 
+   - ⭐ **Route D — compile an ELF loader IN, and resolve the host object's
+     imports against our own static glibc.** ⭐ **The best-evidenced of the
+     four, and it did not exist before the `pg83/solo` sweep.**
+     [`research/solo.md`](research/solo.md) is the read;
+     `references/pg83__solo/` is the corpus at `79451211`; the mechanism is
+     `lib/elf_loader.cpp` plus `lib/dlfcn.cpp`, MIT.
+     The idea: **do not ask the host loader for anything.** Map the object
+     yourself, walk `DT_NEEDED`, relocate, and bind its imports to a table of
+     the executable's own symbols — the same generated-table mechanism
+     `--wrap-dlopen` already uses, applied to the libc instead of to the
+     application's plugins. Nothing of the host's is mapped, so no second libc
+     enters and the single ordinary ELF survives.
+     ⛔ **solo pays 5,948 lines translating a guest's glibc imports onto musl.
+     A static glibc host has no translation to do**, and
+     `experiments/73-` measures how much of the demand is already met: across
+     **5,807 real host shared objects** in the seven glibc environments,
+     **90.8%–97.8%** of every `GLIBC_`/`GCC_`-versioned import is already
+     definable by the pinned static glibc, with the unexplained residue at
+     **zero** — every remainder falls into a named, measured class.
+     ⚠ **Symbol availability is not a working `dlopen`**, and the honest
+     unknowns are named in `TODO` T-033: the mapper is 2,707 lines and does
+     not get cheaper for being glibc, and TLS is the one place where "we are
+     glibc, so it is simpler" is not obviously true.
    - ⭐ **Route A — `--wrap` on `dlopen`, against a compiled-in table.** The
      cheapest by far, and it is already proven prior art:
      `allyourcodebase/pipewire`'s `src/wrap/dlfcn.zig` exports `__wrap_dlopen`,
@@ -416,7 +449,13 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
      ```
      ⛔ The failures 50- recorded are what happens when a host object drags the
      **host libc** in — exactly what step two removes. The untested steps are
-     the ones aimed at the observed failure. Upstream's `docs/limits.md` also
+     the ones aimed at the observed failure.
+     ⚠ **Weakened by `experiments/73-`'s second control**, and this is measured
+     rather than argued: rebuilding the object *named in a reference's
+     `DT_VERNEED`* without its versions does not bind — glibc's loader
+     **asserts** (`dl-lookup.c:106: check_match`). So the step 50- did port is
+     actively harmful where it bites, not merely a no-op. Steps two and three
+     are untouched by that and the entry keeps them. Upstream's `docs/limits.md` also
      says the static-glibc case is one where `dlopen` *works*, that "the real
      blocker is more likely the preload path", and that all three static cases
      are **unverified upstream**. `CROSS_LIBC_DLOPEN_DRYRUN` makes the whole

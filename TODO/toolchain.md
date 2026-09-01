@@ -395,6 +395,65 @@ C++, static — built through `pgb build` and linked into a C++ subject that
 exercises static initialisation order, exception unwinding across a static
 link, and RTTI across translation units. `poc/60-leveldb/`.
 
+## T-018 — a `pgb` binary has no `PT_GNU_EH_FRAME`
+
+**Source** `pg83/solo` PR #3, read during the sweep in
+`docs/research/solo.md`, session of 2026-09-01b.
+**Category** toolchain · **Priority** P1 · **Effort** S · **Status** ✅ done
+
+**Problem.** ⛔ **GCC suppresses `--eh-frame-hdr` for every `-static` link** —
+`%{!static|static-pie:--eh-frame-hdr}` in `gcc/config/gnu-user.h` — so GNU ld
+leaves the executable with no `.eh_frame_hdr` and no `PT_GNU_EH_FRAME`. An
+unwinder that discovers tables only through that segment finds none, and the
+failure mode is `std::terminate` at the first throw with `catch (...)` in
+`main` never running: silent at build time, fatal at run time.
+
+**Premise.** ⭐ **Measured here before it was believed**, and the measurement
+changed the entry. Three arms on this machine:
+
+```
+  dynamic c++                    PT_GNU_EH_FRAME: 1
+  plain g++ -static              PT_GNU_EH_FRAME: 0
+  pgb build -- c++               PT_GNU_EH_FRAME: 0
+```
+
+⚠ **So it is not a pgb behaviour**, it is GCC's for every static link. And
+⛔ **nothing was broken**: `nm` finds `_Unwind_Find_FDE`, `__register_frame_info`
+and `__EH_FRAME_BEGIN__` in the binary, so `crtbeginT.o`'s registry answers and
+exceptions work. `poc/60-leveldb` throws, catches and asserts on the payload on
+all eleven, and it was passing for that reason and not by luck.
+
+⭐ **The hazard is that the fallback belongs to the GNU runtime, not to the
+format.** solo hit exactly this with static LLVM libunwind and its own CI
+missed it — the one gcc leg did not run the smoke test.
+
+**Approach.** Pass `-Wl,--eh-frame-hdr` on every `pgb` link. A no-op where the
+toolchain already emits the header.
+
+**Prove.** `readelf -lW` on a `pgb`-built binary finds `PT_GNU_EH_FRAME`, a
+C++ throw is still caught, and `pgb verify` is unchanged on all eleven.
+
+**Closed with.** `tool/lib/wrappers.sh`, `link_flags()`. Measured after:
+
+| | before | after | delta |
+|---|---|---|---|
+| `PT_GNU_EH_FRAME` | 0 | **1** | |
+| C++ throw/catch | `caught:thrown` | `caught:thrown` | unchanged |
+| `ci/probe.c` | 2,161,056 | 2,177,568 | **+16,512** |
+| a C++ throw | 2,265,744 | 2,286,344 | **+20,600** |
+| `pgb verify`, 11 rows | 11 ok / 11 none | **11 ok / 11 none** | unchanged |
+
+⚠ **The cost is stated rather than hidden and it is not small.**
+`.eh_frame_hdr` is a binary-search table over every FDE in the link — 16,004
+bytes of section on a static glibc binary. ⭐ The size property
+`docs/AGENTS.md` §10 rests on survives: a C program that never calls `iconv`
+is **952,536** bytes with the flag, still under 1 MiB against 2.1 MiB for one
+that does.
+
+⭐ **And it is a prerequisite for `TODO` T-033.** A loader compiled into the
+binary needs the executable's own unwind tables discoverable through program
+headers, or an exception cannot cross the boundary in either direction.
+
 ## T-017 — `env create` builds one engine's environment; `pick_engine` may choose another
 
 **Source** found running `poc/60-leveldb` (T-001), session of 2026-09-01.

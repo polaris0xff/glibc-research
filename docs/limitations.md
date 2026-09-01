@@ -115,6 +115,43 @@ versioning is not involved, so neutralising version tags cannot help.
 the musl rows the object it loaded was musl-linked. Whether those libraries are
 *usable* is untested, and the two-libc hazard in §1 applies regardless.
 
+⛔ **And version-stripping is now measured to be worse than a no-op where it
+bites.** `experiments/73-`'s second control rebuilds the very object named in a
+reference's `DT_VERNEED` without its version definitions, and glibc's loader
+does not fall back — it **asserts**:
+
+```
+no version information available (required by ./main)
+Inconsistency detected by ld.so: dl-lookup.c: 106: check_match:
+    Assertion `version->filename == NULL || ! _dl_name_match_p (version->filename, map)' failed!
+```
+
+⭐ **glibc treats a named provider that lost its versions as a bug in that
+library, not as a compatibility case.** The compatibility rule is real, and it
+applies only when the definition comes from a *different* object than the one
+the verneed entry names — which 73-'s first control confirms, and which is
+exactly where a compiled-in provider table sits. That distinction is what makes
+§1's route D viable and 50-'s arm B a dead end.
+
+### ⭐ Route D: do not use the host loader at all
+
+`docs/research/solo.md`, `TODO` T-033. The diagnosis above says the failure is
+*the pairing* — our static glibc driving a host `ld.so` and a host `libc.so.6`.
+⭐ **Then do not borrow either.** Map the object with a loader compiled into the
+binary and bind its imports to the executable's own symbols. `pg83/solo` does
+this on musl; `experiments/73-` measures what it would cost here:
+
+```
+  5,807 host shared objects, the seven glibc environments
+  90.8% - 97.8% of every GLIBC_/GCC_-versioned import already definable
+  by the pinned static glibc.  Unexplained residue: 0.
+```
+
+⚠ **That is symbol availability, not a working `dlopen`.** T-033 names the
+unknowns — the mapper is 2,707 lines in solo and does not get cheaper for being
+glibc, and TLS is the one place where "we are glibc, so it is simpler" is not
+obviously true.
+
 ⚠ **What arm B does NOT establish.** It ported `cld_strip_versions()` — 7 lines, one function out of
 roughly forty in a 2015-line file. The rewrite it comes from
 (`cross-libc-dlopen.c:1857`) is three coordinated steps, and the two that were

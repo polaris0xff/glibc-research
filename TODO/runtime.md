@@ -104,13 +104,20 @@ can work** for a plugin that calls into its host — and explains why CPython's
 own `Modules/Setup.local` mechanism has the shape it does. The two converge by
 necessity rather than by coincidence.
 
-**The corrected acceptance**, and ⛔ it is a proposal for the operator rather
-than a rewrite an agent may adopt silently, because it changes what the entry
-closes on:
+### ⭐ The corrected acceptance — ACCEPTED by the operator, 2026-09-01b
+
+⛔ **This entry now closes on the text below and NOT on the `Prove` above.**
+The ruling was taken at the start of the session of 2026-09-01b, on the
+question the previous session left open, and it is recorded here rather than
+only in a transcript:
 
 > `--wrap-dlopen` builds a project whose plugin loading is **not**
 > configurable at build time — i.e. one with no `Setup.local` equivalent —
 > with its plugin directory emptied and the functionality intact, on 11 of 11.
+
+⚠ **The original `Prove` keeps its place above** per
+`../docs/methodology/authoring.md`: it is what the entry was opened on, and
+`experiments/72-` is why it moved.
 
 ⚠ CPython is a poor subject for this entry precisely *because* it already has
 a static-modules mechanism: rebuilding it on `--wrap-dlopen` would demonstrate
@@ -136,6 +143,78 @@ no GPU and no Alpine — cheaper than the instrument `50-` built.
 
 **Prove.** `experiments/51-*.sh` re-runs `50-`'s two arms plus a third carrying
 the full rewrite, and the table shows what changed on each of 11.
+
+## T-033 — route D: compile an ELF loader in, resolve against our own static glibc
+
+**Source** `docs/research/solo.md`, the `pg83/solo` sweep, session of
+2026-09-01b. **Category** runtime · **Priority** P1 · **Effort** L · **Status** open
+
+**Problem.** `docs/limitations.md` §1 is the project's one measured, unfixed
+failure and the reason `REQUIREMENTS.md` part 1 is not met: `dlopen` of a
+**host** shared object from a static glibc binary is host-dependent, and
+success is the worse outcome because the host's `ld.so` and `libc.so.6` enter
+the process.
+
+**Premise.** ⭐ **Measured, `experiments/73-`, and it is what makes this entry
+worth opening rather than arguing.** `pg83/solo` (MIT, `79451211`) shows the
+shape: do not use the host loader at all — map the object yourself and resolve
+its imports against a table of the executable's own symbols. solo does it on
+musl and pays 5,948 lines translating the guest's glibc imports onto a musl
+runtime. ⛔ **A static glibc host has no translation to do**, and `73-`
+measures how much of the demand its own libc already meets:
+
+```
+  5,807 host shared objects, the seven glibc environments
+  90.8% - 97.8% of every GLIBC_/GCC_-versioned import already definable
+  class E, the unexplained residue                          = 0
+```
+
+Every remaining symbol falls into a class with a measured reason: the host's
+`ld.so` exports it (a compiled-in loader owns those), a version ceiling, or a
+symbol `libc.so.6` keeps that `libc.a` never had. `docs/research/solo.md` has
+the table and the four mechanisms worth taking, at file and line.
+
+**Approach.** ⚠ **Split before starting; this is not one entry.** In order:
+
+1. **The provider table.** `pgb --wrap-dlopen` already generates one with `nm`
+   (`tool/runtime/pgb-dlopen.h`). This is the same mechanism applied to the
+   **libc** instead of the application's plugins, and taking each address is
+   also what forces the archive members into the link.
+2. **The mapper.** `PT_LOAD` mapping, `DT_NEEDED` walk, relocations, RELRO,
+   initialisers. ⛔ **This does not get cheaper for being glibc**: solo spends
+   2,707 lines on it (`lib/elf_loader.cpp`).
+3. **TLS.** ⛔ **The hard part, and the one place "we are glibc, so it is
+   simpler" is NOT obviously true.** solo donates a `thread_local` pad that
+   musl sizes into every thread and registers guest blocks into
+   `libc.tls_head` (`lib/musl_tls.c`). glibc's equivalent is
+   `_dl_tls_static_surplus`/`__libc_setup_tls`, a different mechanism. Measure
+   this before committing to the rest.
+4. **The compat layer for what `73-` named**: the 20 class-B symbols (mostly
+   the `__isoc23_*` family, which are aliases with C23 `strtol` semantics) and
+   the 49 class-S ones (sunrpc — `libtirpc.a` is in the pinned environment and
+   defines them, measured).
+
+**Prove.** A `pgb` binary loads a **host** shared object, calls into it, the
+plugin calls back into the host program, and `pgb verify` reports **zero host
+shared objects** on all eleven — the last clause being the whole point, since
+`experiments/50-` already has "it loaded" on two environments and that was the
+failure.
+
+**Blockers, named.**
+- ⛔ Symbol availability is not a working `dlopen`. `73-` counts names. IFUNC
+  resolution, the stdio ABI, pthread object sizes and TLS layout are untested.
+- ⚠ `docs/design/tiers.md`'s bar applies: this stays tier 1 — one ordinary ELF,
+  nothing mounted, nothing written — or it is route C wearing a different name.
+
+⭐ **Relation to the other three routes**, `docs/AGENTS.md` §13 item 4:
+route A is built and serves a program's own plugins; route B is **weakened** by
+`73-`'s second control (stripping versions off the object named in
+`DT_VERNEED` makes glibc's loader assert, `dl-lookup.c:106`); route C gives up
+the single ELF. This is the cheapest route that reaches the host-plugin class
+without giving that up.
+
+**Depends on** T-018 (done): a loader cannot unwind across the boundary unless
+the executable's own unwind tables are discoverable through program headers.
 
 ## T-032 — `--embed-terminfo` and a CA-bundle answer
 

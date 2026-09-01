@@ -3,105 +3,122 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log
 and the entries.
 
-    STATE     2026-09-01, session end
-    COUNTS    19 entries, 12 open, 7 done
-    BASELINE  pgb: 11/11 run, 11/11 no host object, five POCs
-              CI: GREEN, 15 jobs, and it now asserts criterion 2
+    STATE     2026-09-01b, in progress
+    COUNTS    21 entries, 13 open, 8 done
+    BASELINE  pgb: 11/11 run, 11/11 no host object, six POCs
+              CI: GREEN, 15 jobs, and it asserts criterion 2
               chroot and docker engines produce BYTE-IDENTICAL binaries
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
               pgb over plain gcc -static, same workloads: 0.99x-1.05x
 
+## ⭐ Two operator rulings, taken at the start of this session
+
+⛔ **Both questions the previous session left in "Open questions" are ANSWERED
+and are no longer open.** They are recorded in the pages they bind, not only
+here: `docs/REQUIREMENTS.md`, `TODO/runtime.md` T-030,
+`docs/history/corrections.md` C13 and C14.
+
+1. **T-030's corrected acceptance is ACCEPTED as proposed.** The entry closes
+   on *a project whose plugin loading is not configurable at build time, with
+   its plugin directory emptied and the functionality intact, on 11 of 11* —
+   not on rebuilding CPython, which `experiments/72-` showed cannot be built.
+2. **`REQUIREMENTS.md` part 2 is REPLACED with the per-part claim**, with the
+   operator's reason recorded verbatim beside it: ⭐ *"anylinux is a bundle,
+   our primary goal is still a static glibc binary that has none of the
+   issues."* Part 2 is now an enumerated list of nine issues a `gcc -static`
+   glibc binary has — **six closed on 11 of 11, three open**, each with an
+   entry. Part 1 is unchanged and still binding.
+
 ## What this session did
 
-⛔ **It started by finding that three tracked files were wrong about
-observable facts**, and `docs/AGENTS.md` — the first file a new session is
-told to read — was one of them.
+- **Bootstrapped from nothing.** ⚠ This machine started with **0 of 11 rootfs
+  present and no static libiconv**: the bed is not cached between sessions and
+  the first hour is `pgb env create` plus `fetch-rootfs.sh`. Baseline
+  reproduced afterwards — `pgb build` + `pgb verify`, 11 ok, 11 none.
+- ⭐ **Swept `pg83/solo` on the operator's instruction, and it opened a fourth
+  route to the host-plugin class.** `docs/research/solo.md`; corpus tracked at
+  `references/pg83__solo/`, commit `79451211`, MIT. solo compiles a `.so`
+  loader **into** a static binary and never asks the host `ld.so` for
+  anything. It does it on musl and pays 5,948 lines translating a guest's
+  glibc imports onto a musl runtime — ⛔ **which is exactly what a static
+  glibc host does not need.**
+- ⭐ **`experiments/73-` measures whether that route is worth taking, before
+  building it.** 5,807 real host shared objects across the seven glibc
+  environments, parsed byte-wise with no binutils inside the target:
+  **90.8%–97.8%** of every `GLIBC_`/`GCC_`-versioned import is already
+  definable by the pinned static glibc, and the **unexplained residue is
+  zero** — every remainder falls into a class decided by the target's own
+  files. Two of those classes were not in the tree before:
+  - **a version CEILING** (20 symbols, `__isoc23_*` and `strlcpy` at
+    `GLIBC_2.38`), which points the opposite way to the floor `AGENTS.md` §14
+    already carries. ⛔ No single pin satisfies both ends.
+  - **a static/shared split** (49 symbols): `libc.so.6` exports `xdr_void`,
+    `__xmknod`, `_sys_siglist` and `__malloc_initialize_hook`, and the *same
+    glibc's* `libc.a` does not contain them. ⭐ The static libc is not a
+    subset-by-version of the shared one; at one version it is a different
+    symbol set, so no choice of pin reaches these.
+- ⭐ **The same experiment settled the version-resolution rule in both
+  directions**, and one half explains an existing result: rebuilding the object
+  *named in a reference's `DT_VERNEED`* without versions makes glibc's loader
+  **assert** (`dl-lookup.c:106`). That is what `experiments/50-` ported one
+  function of. Route B is weakened; T-031 keeps its other two steps.
+- **T-018 done, and it came out of the sweep's tracker rather than its code.**
+  ⛔ GCC suppresses `--eh-frame-hdr` for **every** `-static` link, so a static
+  executable has no `PT_GNU_EH_FRAME`. ⚠ Nothing was broken — GNU libgcc's
+  `crtbeginT.o` registry answers instead, and POC 60 was passing for that
+  reason and not by luck — but the fallback belongs to the GNU runtime, not to
+  the format, and an unwinder that reads only the segment gets
+  `std::terminate` at the first throw. Fixed, +16,512 bytes, 11 of 11
+  unchanged.
+- **T-033 opened** with route D, its four sub-parts, and ⛔ its unknowns named
+  rather than hidden: symbol availability is not a working `dlopen`, and TLS is
+  the one place "we are glibc, so it is simpler" is not obviously true.
 
-- **T-040 done. CI was not unrun; it had run 10 times and been red 10 times.**
-  Nine of eleven rows were green the whole time and nobody had collected the
-  result. The two red rows never executed a binary: GitHub's own dynamically
-  linked Node.js cannot start in a musl container, which is this project's
-  thesis observed on the CI provider. Rebuilt to run every job on the host and
-  enter targets with `docker run --entrypoint`, and to **generate** its matrix
-  from `scripts/common/rootfs-images.txt` — runs 1–10 hand-wrote tags, so CI
-  and the local bed were two different beds reporting as one.
-  `history/corrections.md` C8.
-- **T-010 done. `pgb` split 813 → 141 lines** plus five sourced libraries.
-  Proved by eight commands with byte-identical output and equal exit codes,
-  and by running all three engines, which a byte comparison cannot reach.
-  ⭐ **chroot and docker produce byte-identical binaries** — the engines are
-  interchangeable, not merely both working.
-- **T-011 done, by measurement rather than argument.** The entry's own premise
-  was flagged untested; `experiments/70-` tested it. A carried-in static Rust
-  helper runs on **12 of 12** targets, exactly where `sh` does. The driver
-  stays POSIX `sh`, but "the alternative loses on bootstrap" is **withdrawn**
-  and the planner is no longer blocked from being a real language.
-- **T-014 done.** It was opened this session on finding `pgb verify` ignored
-  `--engine` entirely, so the tool's own verification command could not run on
-  a runner at all. Now green on one, criterion 2 included, via a `ptrace`
-  tracer **carried into** the container — the thing `experiments/70-` had just
-  measured was possible.
-- **T-030's mechanism landed, entry still open.** `--wrap-dlopen` answers a
-  program's own `dlopen`/`dlsym`/`dlclose`/`dlerror` from a table `pgb`
-  generates with `nm`. 11 of 11, zero host objects, +544 bytes. ⛔ Open
-  because its `Prove` names CPython and CPython is not rebuilt yet.
-- **The docker engine was never "untested" for the recorded reason.** This
-  machine has docker and no init; nothing had started `dockerd`. One line did,
-  and the first ten minutes found three defects — including a `pgb build` that
-  produced no output and **exited 0**. `history/corrections.md` C9.
-- **Two new entries from what the work turned up:** T-015 (`oci-pull.sh` drops
-  the image config, so the two beds are not the same environment) and T-014
-  above.
-- **Rules:** the two fetch routes (`api.gh.pkgforge.dev`,
-  `api.rv.pkgforge.dev`) are written down and verified rather than left as
-  folklore in a provenance file. `RULES.md`.
-- **Vendored** `Aseem0xff/alloc-tests` for its container operations. Its
-  `docs/AGENTS.md` and its own 61 MiB nested corpus were deleted, both
-  recorded. ⚠ The branch it was read from was **gone within the hour** — the
-  pinned copy is what survived.
-
-⭐ **Six defects in this tree were found and fixed, and every one of them was
-the kind that reads as success**: a build that produced nothing and exited 0;
-a tracer that reported a clean binary because it had failed to attach; a
-tracer that counted paths merely probed for; a tracer that hung forever on
-exactly the binaries `verify` exists to catch; `die()` printing its exit code
-into its own message; a backtick in an unquoted heredoc executing `nm` during
-`pgb explain`.
+⭐ **Three defects were found in this session's own instrument, and every one
+had already produced a plausible result**: `libm.a` on Debian 12 is a GNU ld
+script rather than an archive, so `nm` returned nothing silently and two dozen
+math functions were reported as undefinable; `rootfs-images.txt` was read with
+its columns in the wrong order, so all eleven rows skipped and "unexplained
+gaps = 0" **passed against nothing**; and the first version of the control
+measured the one case glibc deliberately guards, reporting "no" for a rule that
+does hold where it matters.
 
 ## In progress
 
-⚠ **T-030's CPython arm.** The mechanism is landed and measured; the entry's
-acceptance is POC 50's CPython rebuilt on it. The entry names exactly what is
-left and the two unknowns, neither ruled out.
+Nothing half-written. See `RESUME.md`.
 
 ## Work order
 
-    T-030 (finish)             CPython on --wrap-dlopen; the entry has the plan
-    T-001  T-002  T-003        harder POCs, until something breaks
+    T-017                      env create / pick_engine mismatch -- S, and it
+                               bites every build on a machine with dockerd
+    T-002 + T-030              one build serves both: a project that dlopens
+                               its own plugins, plugin directory emptied
+    T-003                      a project that FAILS, above the current class
     T-012                      pgb build <spec> -- split it first, it is XL
+    T-032                      the CA bundle and terminfo: two of the three
+                               open rows of REQUIREMENTS part 2
+    T-033                      route D, and it is L -- read solo.md first
     T-041                      aarch64
-    then P2 by category
 
-⭐ **T-010 and T-011 are done, so the argument in `INDEX.md` for putting them
-before the POCs is spent.** What replaces it: T-030's remaining arm is the
-cheapest thing that also serves T-002, because "a program that dlopens its own
-plugins at scale" and "CPython on `--wrap-dlopen`" are the same build.
+⭐ **Why T-017 moved to the head.** It is S, and it is the only open entry that
+makes *other* work fail confusingly: `pick_engine` prefers docker, so merely
+starting `dockerd` silently changes which environment every subsequent build
+uses. Everything below it is a build.
 
 ## Open questions for the operator
 
-1. ⛔ **`REQUIREMENTS.md` part 2 is not met and the reason has not changed.**
-   `pgb` is not beaten on portability or throughput by anything measured — it
-   ties the anylinux AppImage — but it does not *beat* it, and it is behind on
-   the class of software each can serve. ⚠ `--wrap-dlopen` narrowed that gap
-   this session and did not close it: it serves a program's **own** plugins,
-   not host plugins. Either `pgb` grows to reach that class, or "strictly
-   better than every existing format" is replaced. ⛔ **That is the operator's
-   call and an agent must not make it.**
-2. **Is a nixpkgs front end (T-022) in scope**, or does depending on nix defeat
+⭐ **None blocking.** The two that were here are ruled on, above.
+
+1. **Is a nixpkgs front end (T-022) in scope**, or does depending on nix defeat
    the point? T-020 argues the graph is worth taking and the store layout is
    not.
-3. **T-015 changes what the bed is.** Applying an image's `Env` would make the
+2. **T-015 changes what the bed is.** Applying an image's `Env` would make the
    chroot bed match `docker run`, and would also change what every
    locale-sensitive result describes. The entry says it lands with those
    experiments re-run or behind a flag; which one is a judgement about how much
    the existing numbers are worth.
+3. ⚠ **`RULES.md` says work on `main`; this host's `main` is three commits of
+   file uploads** and every commit of real work is on
+   `claude/glibc-research-session-17ku6v`, which the harness designates and
+   forbids leaving. The working branch is the trunk here. Worth a ruling on
+   whether `main` should be fast-forwarded to it.

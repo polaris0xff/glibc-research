@@ -407,6 +407,52 @@ subject in a corpus shares a property, check whether that is a choice.
 | reporting an open at syscall **entry** | the path is readable there but the RESULT is not, so every path the program merely PROBED FOR was counted as opened. Measured: the docker arm reported `/etc/nsswitch.conf` read on alpine-3.10, where that file does not exist. ⛔ On the criterion-2 column that is a **false positive**, not a cosmetic difference: glibc probes several paths for a shared object and takes the first that answers, so a binary that loaded nothing would have been failed for the ones that did not | stop at entry AND exit, hold the path from the entry stop, and report only when the exit stop shows a return >= 0 — `pgb-trace.c` |
 | pairing ptrace entry/exit stops with a **bare toggle** | `execve` under `PTRACE_TRACEME` delivers an extra `SIGTRAP` stop that is indistinguishable from a syscall stop, so the toggle flipped one time too many at the very first syscall and every argument was then read at the exit stop and every result at the entry stop, for the whole run. ⛔ `/bin/true`, which unmistakably loads `libc.so.6`, was reported as opening **nothing at all** — the failure mode that reads as a clean binary | `PTRACE_O_TRACESYSGOOD`, so a syscall stop is `SIGTRAP\|0x80` and nothing else is, and the toggle cannot drift — `pgb-trace.c` |
 
+## C13 — "part 2 of the acceptance bar is a comparison against other formats"
+
+**Claimed** by `docs/REQUIREMENTS.md` as written, which discharged the
+operator's directive in two parts and made the second one *"strictly better
+than the alternatives, measured head to head"* against AppImage, Flatpak,
+snap, onelf and static musl.
+
+**Replaced by an operator ruling**, 2026-09-01b, quoted verbatim in
+`REQUIREMENTS.md`:
+
+> *"replace with per part claim, also anylinux is a bundle, our primary goal
+> is still a static glibc binary that has none of the issues"*
+
+⭐ **The reason is a category one, not a scoring one.** `Anylinux-AppImages`
+is a **bundle** — it mounts or extracts a small distribution — and `pgb` is a
+toolchain whose output is one ordinary ELF. `experiments/60-`, `61-` and `62-`
+did the comparison and it stands as measurement: 11/11 for both, a tie on
+throughput, `pgb` ahead on size and shape and behind on reach. ⛔ What changed
+is that the tie no longer decides whether the bar is met.
+
+⚠ **Nothing measured is withdrawn and no number moves.** `comparison.md` is
+unchanged. Part 2 is now the enumerable list of things a static glibc binary
+gets wrong — NSS, gconv, locale, networking, own plugins, C++ unwinding, CA
+bundle, terminfo, host plugins — six closed and three open.
+
+⛔ **This is the one kind of edit `REQUIREMENTS.md` forbids an agent to make
+on its own, and it was not made on its own.** The page says so at the top; the
+ruling is recorded in the page, in `TODO/RESUME.md` and here.
+
+## C14 — "the acceptance for T-030 is CPython rebuilt on --wrap-dlopen"
+
+**Claimed** by T-030's `Prove`, written when the entry was opened.
+
+**Disproved by** `experiments/72-`: a static executable's dynamic symbol table
+is empty, so the subject that acceptance needs — CPython with its modules left
+as `lib-dynload/*.so` — cannot be built at all. The previous session proposed
+a replacement and ⛔ **correctly refused to adopt it**, because it changes what
+the entry closes on.
+
+**Ruled on by the operator**, 2026-09-01b: the replacement is **accepted as
+proposed**. T-030 now closes on a project whose plugin loading is not
+configurable at build time, plugin directory emptied, functionality intact,
+11 of 11. ⚠ The original `Prove` keeps its place in the entry: it is what the
+entry was opened on, and 72- is why it moved.
+
+
 ---
 
 ## Approaches evaluated and refused

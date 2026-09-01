@@ -221,9 +221,50 @@ build_locale_data() {
 # 2.1 MiB for a C program that does not call iconv, and that property is kept.
 # ⚠ In practice most C++ programs pay it anyway: anything that instantiates a
 # locale-aware facet pulls __narrow_multibyte_chars in.
+#
+# -- --eh-frame-hdr, AND WHY IT IS ON EVERY LINK ----------------------------
+#
+# ⛔ GCC SUPPRESSES `--eh-frame-hdr` FOR EVERY `-static` LINK. Its spec reads
+# `%{!static|static-pie:--eh-frame-hdr}` (gcc/config/gnu-user.h), so GNU ld
+# leaves a static executable with NO `.eh_frame_hdr` section and NO
+# `PT_GNU_EH_FRAME` segment. Measured here, and it is not a pgb behaviour --
+# plain `g++ -static` on this machine produces the same:
+#
+#   dynamic c++            PT_GNU_EH_FRAME: 1
+#   g++ -static            PT_GNU_EH_FRAME: 0
+#   pgb build -- c++       PT_GNU_EH_FRAME: 0   (before this flag)
+#
+# ⚠ NOTHING IS BROKEN TODAY AND THAT IS THE POINT. With the GNU toolchain the
+# unwinder never needs the segment: `crtbeginT.o` registers `__EH_FRAME_BEGIN__`
+# through `__register_frame_info`, and `_Unwind_Find_FDE` -- which `nm` finds in
+# the binary -- reads that registry first. Exceptions work. `poc/60-leveldb`
+# throws, catches, and asserts on the payload, and it passes on all eleven.
+#
+# ⛔ THE HAZARD IS THAT THE FALLBACK IS THE GNU RUNTIME'S, NOT THE FORMAT'S. An
+# unwinder that discovers tables ONLY through PT_GNU_EH_FRAME finds nothing, and
+# the failure mode is `std::terminate` at the first throw with `catch (...)` in
+# main never running -- silent at build time, fatal at run time. pg83/solo hit
+# exactly this with static LLVM libunwind (its PR #3, at commit 79451211;
+# docs/research/solo.md), and its own CI missed it because the one leg using
+# gcc did not run the smoke test.
+#
+# ⭐ The flag is a NO-OP where the header is already emitted, and it makes the
+# unwind tables discoverable by anything that walks program headers --
+# backtrace(), profilers, and any loader compiled into the binary later.
+#
+# ⚠ THE COST, MEASURED RATHER THAN GUESSED. `.eh_frame_hdr` is a binary-search
+# table over every FDE in the link, so on a static glibc binary it is not
+# small: 16,004 bytes of section, and on this machine
+#
+#   ci/probe.c    2,161,056 -> 2,177,568   (+16,512)
+#   a C++ throw   2,265,744 -> 2,286,344   (+20,600)
+#
+# ⭐ The size property docs/AGENTS.md §10 rests on is unaffected: a C program
+# that never calls iconv is 952,536 bytes with the flag, still under 1 MiB
+# against the 2.1 MiB of one that does.
 link_flags() {
   rd=$(runtime_dir)
-  printf -- '-static %s -Wl,-u,pgb_runtime_anchor' "$rd/pgb-nssfix.o"
+  printf -- '-static -Wl,--eh-frame-hdr %s -Wl,-u,pgb_runtime_anchor' "$rd/pgb-nssfix.o"
   if [ "$USE_ICONV" = 1 ]; then
     printf -- ' -Wl,--wrap=iconv_open,--wrap=iconv,--wrap=iconv_close'
     [ "${1:-}" = cxx ] && \
@@ -323,6 +364,13 @@ COMPILE FLAGS
 LINK FLAGS
   -static                        no interpreter, no DT_NEEDED, nothing to
                                  resolve on the host
+  -Wl,--eh-frame-hdr             gcc DROPS this for every -static link, so a
+                                 static executable normally has no
+                                 PT_GNU_EH_FRAME. GNU libgcc does not need it
+                                 -- crtbeginT.o registers the frames instead --
+                                 but an unwinder that reads only the segment
+                                 finds nothing, and the failure is
+                                 std::terminate at the first throw. +16 KiB
   <pgb-nssfix.o>                 passed as a plain object, not from an archive
   -Wl,-u,pgb_runtime_anchor      forces it to stay. A constructor with no
                                  referenced symbol is dropped by the linker,
