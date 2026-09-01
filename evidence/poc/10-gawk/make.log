@@ -1,0 +1,291 @@
+make  all-recursive
+make[1]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1'
+Making all in support
+make[2]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1/support'
+depbase=`echo dfa.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT dfa.o -MD -MP -MF $depbase.Tpo -c -o dfa.o dfa.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo getopt.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT getopt.o -MD -MP -MF $depbase.Tpo -c -o getopt.o getopt.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo getopt1.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT getopt1.o -MD -MP -MF $depbase.Tpo -c -o getopt1.o getopt1.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo localeinfo.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT localeinfo.o -MD -MP -MF $depbase.Tpo -c -o localeinfo.o localeinfo.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo random.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT random.o -MD -MP -MF $depbase.Tpo -c -o random.o random.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo regex.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT regex.o -MD -MP -MF $depbase.Tpo -c -o regex.o regex.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo pma.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT pma.o -MD -MP -MF $depbase.Tpo -c -o pma.o pma.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo malloc/dynarray_at_failure.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT malloc/dynarray_at_failure.o -MD -MP -MF $depbase.Tpo -c -o malloc/dynarray_at_failure.o malloc/dynarray_at_failure.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo malloc/dynarray_emplace_enlarge.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT malloc/dynarray_emplace_enlarge.o -MD -MP -MF $depbase.Tpo -c -o malloc/dynarray_emplace_enlarge.o malloc/dynarray_emplace_enlarge.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo malloc/dynarray_finalize.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT malloc/dynarray_finalize.o -MD -MP -MF $depbase.Tpo -c -o malloc/dynarray_finalize.o malloc/dynarray_finalize.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo malloc/dynarray_resize.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT malloc/dynarray_resize.o -MD -MP -MF $depbase.Tpo -c -o malloc/dynarray_resize.o malloc/dynarray_resize.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo malloc/dynarray_resize_clear.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DGAWK -DHAVE_CONFIG_H -I"./.." -I. -I..    -g -O2 -DNDEBUG -DNDEBUG -g -O2 -DNDEBUG -DNDEBUG -MT malloc/dynarray_resize_clear.o -MD -MP -MF $depbase.Tpo -c -o malloc/dynarray_resize_clear.o malloc/dynarray_resize_clear.c &&\
+mv -f $depbase.Tpo $depbase.Po
+rm -f libsupport.a
+ar cru libsupport.a dfa.o getopt.o getopt1.o localeinfo.o random.o regex.o malloc/dynarray_at_failure.o malloc/dynarray_emplace_enlarge.o malloc/dynarray_finalize.o malloc/dynarray_resize.o malloc/dynarray_resize_clear.o pma.o 
+ar: `u' modifier ignored since `D' is the default (see `U')
+ranlib libsupport.a
+make[2]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1/support'
+Making all in .
+make[2]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1'
+depbase=`echo array.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT array.o -MD -MP -MF $depbase.Tpo -c -o array.o array.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo awkgram.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT awkgram.o -MD -MP -MF $depbase.Tpo -c -o awkgram.o awkgram.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo builtin.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT builtin.o -MD -MP -MF $depbase.Tpo -c -o builtin.o builtin.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo cint_array.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT cint_array.o -MD -MP -MF $depbase.Tpo -c -o cint_array.o cint_array.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo command.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT command.o -MD -MP -MF $depbase.Tpo -c -o command.o command.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo debug.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT debug.o -MD -MP -MF $depbase.Tpo -c -o debug.o debug.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo eval.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT eval.o -MD -MP -MF $depbase.Tpo -c -o eval.o eval.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo ext.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT ext.o -MD -MP -MF $depbase.Tpo -c -o ext.o ext.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo field.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT field.o -MD -MP -MF $depbase.Tpo -c -o field.o field.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo floatcomp.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT floatcomp.o -MD -MP -MF $depbase.Tpo -c -o floatcomp.o floatcomp.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo gawkapi.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT gawkapi.o -MD -MP -MF $depbase.Tpo -c -o gawkapi.o gawkapi.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo gawkmisc.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT gawkmisc.o -MD -MP -MF $depbase.Tpo -c -o gawkmisc.o gawkmisc.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo int_array.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT int_array.o -MD -MP -MF $depbase.Tpo -c -o int_array.o int_array.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo io.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT io.o -MD -MP -MF $depbase.Tpo -c -o io.o io.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo main.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT main.o -MD -MP -MF $depbase.Tpo -c -o main.o main.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo mpfr.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT mpfr.o -MD -MP -MF $depbase.Tpo -c -o mpfr.o mpfr.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo msg.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT msg.o -MD -MP -MF $depbase.Tpo -c -o msg.o msg.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo node.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT node.o -MD -MP -MF $depbase.Tpo -c -o node.o node.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo printf.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT printf.o -MD -MP -MF $depbase.Tpo -c -o printf.o printf.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo profile.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT profile.o -MD -MP -MF $depbase.Tpo -c -o profile.o profile.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo re.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT re.o -MD -MP -MF $depbase.Tpo -c -o re.o re.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo replace.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT replace.o -MD -MP -MF $depbase.Tpo -c -o replace.o replace.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo str_array.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT str_array.o -MD -MP -MF $depbase.Tpo -c -o str_array.o str_array.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo symbol.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT symbol.o -MD -MP -MF $depbase.Tpo -c -o symbol.o symbol.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo version.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DDEFPATH='".:/usr/local/share/awk"' -DDEFLIBPATH="\"/usr/local/lib/gawk\"" -DSHLIBEXT="\"so"\" -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='"/usr/local/share/locale"' -I"./support" -I.    -g -O2 -DNDEBUG -g -O2 -DNDEBUG -MT version.o -MD -MP -MF $depbase.Tpo -c -o version.o version.c &&\
+mv -f $depbase.Tpo $depbase.Po
+/root/.local/state/pgb/bin/cc -g -O2 -DNDEBUG -g -O2 -DNDEBUG -no-pie -no-pie -o gawk array.o awkgram.o builtin.o cint_array.o command.o debug.o eval.o ext.o field.o floatcomp.o gawkapi.o gawkmisc.o int_array.o io.o main.o mpfr.o msg.o node.o printf.o profile.o re.o replace.o str_array.o symbol.o version.o support/libsupport.a      -no-pie -lm 
+/usr/bin/ld: ext.o: in function `load_ext':
+/var/tmp/pgb-poc/gawk-5.3.1/ext.c:59: warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: io.o: in function `socketopen':
+/var/tmp/pgb-poc/gawk-5.3.1/io.c:1658: warning: Using 'getaddrinfo' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+make[2]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1'
+Making all in extension
+make[2]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1/extension'
+make  all-recursive
+make[3]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1/extension'
+Making all in po
+make[4]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1/extension/po'
+make[4]: Nothing to be done for 'all'.
+make[4]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1/extension/po'
+make[4]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1/extension'
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT testext.lo -MD -MP -MF .deps/testext.Tpo -c -o testext.lo testext.c
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT filefuncs.lo -MD -MP -MF .deps/filefuncs.Tpo -c -o filefuncs.lo filefuncs.c
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT stack.lo -MD -MP -MF .deps/stack.Tpo -c -o stack.lo stack.c
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT gawkfts.lo -MD -MP -MF .deps/gawkfts.Tpo -c -o gawkfts.lo gawkfts.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT stack.lo -MD -MP -MF .deps/stack.Tpo -c stack.c  -fPIC -DPIC -o .libs/stack.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT filefuncs.lo -MD -MP -MF .deps/filefuncs.Tpo -c filefuncs.c  -fPIC -DPIC -o .libs/filefuncs.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT testext.lo -MD -MP -MF .deps/testext.Tpo -c testext.c  -fPIC -DPIC -o .libs/testext.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT gawkfts.lo -MD -MP -MF .deps/gawkfts.Tpo -c gawkfts.c  -fPIC -DPIC -o .libs/gawkfts.o
+mv -f .deps/stack.Tpo .deps/stack.Plo
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT fnmatch.lo -MD -MP -MF .deps/fnmatch.Tpo -c -o fnmatch.lo fnmatch.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT fnmatch.lo -MD -MP -MF .deps/fnmatch.Tpo -c fnmatch.c  -fPIC -DPIC -o .libs/fnmatch.o
+mv -f .deps/fnmatch.Tpo .deps/fnmatch.Plo
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT fork.lo -MD -MP -MF .deps/fork.Tpo -c -o fork.lo fork.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT fork.lo -MD -MP -MF .deps/fork.Tpo -c fork.c  -fPIC -DPIC -o .libs/fork.o
+mv -f .deps/gawkfts.Tpo .deps/gawkfts.Plo
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT inplace.lo -MD -MP -MF .deps/inplace.Tpo -c -o inplace.lo inplace.c
+mv -f .deps/filefuncs.Tpo .deps/filefuncs.Plo
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT intdiv.lo -MD -MP -MF .deps/intdiv.Tpo -c -o intdiv.lo intdiv.c
+mv -f .deps/fork.Tpo .deps/fork.Plo
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT ordchr.lo -MD -MP -MF .deps/ordchr.Tpo -c -o ordchr.lo ordchr.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT inplace.lo -MD -MP -MF .deps/inplace.Tpo -c inplace.c  -fPIC -DPIC -o .libs/inplace.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT intdiv.lo -MD -MP -MF .deps/intdiv.Tpo -c intdiv.c  -fPIC -DPIC -o .libs/intdiv.o
+mv -f .deps/testext.Tpo .deps/testext.Plo
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT readdir.lo -MD -MP -MF .deps/readdir.Tpo -c -o readdir.lo readdir.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT ordchr.lo -MD -MP -MF .deps/ordchr.Tpo -c ordchr.c  -fPIC -DPIC -o .libs/ordchr.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT readdir.lo -MD -MP -MF .deps/readdir.Tpo -c readdir.c  -fPIC -DPIC -o .libs/readdir.o
+mv -f .deps/inplace.Tpo .deps/inplace.Plo
+mv -f .deps/ordchr.Tpo .deps/ordchr.Plo
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT readfile.lo -MD -MP -MF .deps/readfile.Tpo -c -o readfile.lo readfile.c
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT revoutput.lo -MD -MP -MF .deps/revoutput.Tpo -c -o revoutput.lo revoutput.c
+mv -f .deps/intdiv.Tpo .deps/intdiv.Plo
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT revtwoway.lo -MD -MP -MF .deps/revtwoway.Tpo -c -o revtwoway.lo revtwoway.c
+readdir.c: In function 'dir_get_record':
+readdir.c:221:27: warning: array subscript 1 is above array bounds of 'struct awk_field_info[1]' [-Warray-bounds]
+  221 |         the_dir->fw.fields[1].len = flen-1;
+      |         ~~~~~~~~~~~~~~~~~~^~~
+In file included from readdir.c:65:
+./../gawkapi.h:142:11: note: while referencing 'fields'
+  142 |         } fields[1];            /* actual dimension should be nf */
+      |           ^~~~~~
+readdir.c:225:27: warning: array subscript 2 is above array bounds of 'struct awk_field_info[1]' [-Warray-bounds]
+  225 |         the_dir->fw.fields[2].len = flen-1;
+      |         ~~~~~~~~~~~~~~~~~~^~~
+./../gawkapi.h:142:11: note: while referencing 'fields'
+  142 |         } fields[1];            /* actual dimension should be nf */
+      |           ^~~~~~
+readdir.c: In function 'dir_take_control_of':
+readdir.c:303:27: warning: array subscript 1 is above array bounds of 'struct awk_field_info[1]' [-Warray-bounds]
+  303 |         the_dir->fw.fields[1].skip = 1; /* single '/' separator */
+      |         ~~~~~~~~~~~~~~~~~~^~~
+./../gawkapi.h:142:11: note: while referencing 'fields'
+  142 |         } fields[1];            /* actual dimension should be nf */
+      |           ^~~~~~
+readdir.c:304:27: warning: array subscript 2 is above array bounds of 'struct awk_field_info[1]' [-Warray-bounds]
+  304 |         the_dir->fw.fields[2].skip = 1; /* single '/' separator */
+      |         ~~~~~~~~~~~~~~~~~~^~~
+./../gawkapi.h:142:11: note: while referencing 'fields'
+  142 |         } fields[1];            /* actual dimension should be nf */
+      |           ^~~~~~
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT revoutput.lo -MD -MP -MF .deps/revoutput.Tpo -c revoutput.c  -fPIC -DPIC -o .libs/revoutput.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT readfile.lo -MD -MP -MF .deps/readfile.Tpo -c readfile.c  -fPIC -DPIC -o .libs/readfile.o
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT revtwoway.lo -MD -MP -MF .deps/revtwoway.Tpo -c revtwoway.c  -fPIC -DPIC -o .libs/revtwoway.o
+mv -f .deps/readdir.Tpo .deps/readdir.Plo
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT rwarray.lo -MD -MP -MF .deps/rwarray.Tpo -c -o rwarray.lo rwarray.c
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT rwarray.lo -MD -MP -MF .deps/rwarray.Tpo -c rwarray.c  -fPIC -DPIC -o .libs/rwarray.o
+mv -f .deps/revoutput.Tpo .deps/revoutput.Plo
+/bin/bash ./libtool  --tag=CC   --mode=compile /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I.  -I./..   -g -O2 -Wall -DNDEBUG -MT time.lo -MD -MP -MF .deps/time.Tpo -c -o time.lo time.c
+mv -f .deps/readfile.Tpo .deps/readfile.Plo
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -rpath /foo -no-pie -no-pie -o testext.la  testext.lo   -lm 
+mv -f .deps/revtwoway.Tpo .deps/revtwoway.Plo
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o filefuncs.la -rpath /usr/local/lib/gawk filefuncs.lo stack.lo gawkfts.lo  -lm 
+libtool: compile:  /root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I./.. -g -O2 -Wall -DNDEBUG -MT time.lo -MD -MP -MF .deps/time.Tpo -c time.c  -fPIC -DPIC -o .libs/time.o
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/testext.o   -lm  -g -O2   -Wl,-soname -Wl,testext.so -o .libs/testext.so
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/filefuncs.o .libs/stack.o .libs/gawkfts.o   -lm  -g -O2   -Wl,-soname -Wl,filefuncs.so -o .libs/filefuncs.so
+mv -f .deps/time.Tpo .deps/time.Plo
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o fnmatch.la -rpath /usr/local/lib/gawk fnmatch.lo  -lm 
+libtool: link: ( cd ".libs" && rm -f "testext.la" && ln -s "../testext.la" "testext.la" )
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o fork.la -rpath /usr/local/lib/gawk fork.lo  -lm 
+libtool: link: ( cd ".libs" && rm -f "filefuncs.la" && ln -s "../filefuncs.la" "filefuncs.la" )
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o inplace.la -rpath /usr/local/lib/gawk inplace.lo  -lm 
+mv -f .deps/rwarray.Tpo .deps/rwarray.Plo
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o intdiv.la -rpath /usr/local/lib/gawk intdiv.lo   -lm -lm 
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/fnmatch.o   -lm  -g -O2   -Wl,-soname -Wl,fnmatch.so -o .libs/fnmatch.so
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/fork.o   -lm  -g -O2   -Wl,-soname -Wl,fork.so -o .libs/fork.so
+libtool: link: ( cd ".libs" && rm -f "fnmatch.la" && ln -s "../fnmatch.la" "fnmatch.la" )
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/inplace.o   -lm  -g -O2   -Wl,-soname -Wl,inplace.so -o .libs/inplace.so
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o ordchr.la -rpath /usr/local/lib/gawk ordchr.lo  -lm 
+libtool: link: ( cd ".libs" && rm -f "fork.la" && ln -s "../fork.la" "fork.la" )
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o readdir.la -rpath /usr/local/lib/gawk readdir.lo  -lm 
+libtool: link: ( cd ".libs" && rm -f "inplace.la" && ln -s "../inplace.la" "inplace.la" )
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/intdiv.o   -lm  -g -O2   -Wl,-soname -Wl,intdiv.so -o .libs/intdiv.so
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o readfile.la -rpath /usr/local/lib/gawk readfile.lo  -lm 
+libtool: link: ( cd ".libs" && rm -f "intdiv.la" && ln -s "../intdiv.la" "intdiv.la" )
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o revoutput.la -rpath /usr/local/lib/gawk revoutput.lo  -lm 
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/ordchr.o   -lm  -g -O2   -Wl,-soname -Wl,ordchr.so -o .libs/ordchr.so
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/readdir.o   -lm  -g -O2   -Wl,-soname -Wl,readdir.so -o .libs/readdir.so
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/readfile.o   -lm  -g -O2   -Wl,-soname -Wl,readfile.so -o .libs/readfile.so
+libtool: link: ( cd ".libs" && rm -f "ordchr.la" && ln -s "../ordchr.la" "ordchr.la" )
+libtool: link: ( cd ".libs" && rm -f "readdir.la" && ln -s "../readdir.la" "readdir.la" )
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o revtwoway.la -rpath /usr/local/lib/gawk revtwoway.lo  -lm 
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o rwarray.la -rpath /usr/local/lib/gawk rwarray.lo   -lm 
+libtool: link: ( cd ".libs" && rm -f "readfile.la" && ln -s "../readfile.la" "readfile.la" )
+/bin/bash ./libtool  --tag=CC   --mode=link /root/.local/state/pgb/bin/cc  -g -O2 -Wall -DNDEBUG -module -avoid-version -no-undefined -no-pie -no-pie -o time.la -rpath /usr/local/lib/gawk time.lo  -lm 
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/revoutput.o   -lm  -g -O2   -Wl,-soname -Wl,revoutput.so -o .libs/revoutput.so
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/rwarray.o   -lm  -g -O2   -Wl,-soname -Wl,rwarray.so -o .libs/rwarray.so
+libtool: link: ( cd ".libs" && rm -f "revoutput.la" && ln -s "../revoutput.la" "revoutput.la" )
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/revtwoway.o   -lm  -g -O2   -Wl,-soname -Wl,revtwoway.so -o .libs/revtwoway.so
+libtool: link: /root/.local/state/pgb/bin/cc -shared  -fPIC -DPIC  .libs/time.o   -lm  -g -O2   -Wl,-soname -Wl,time.so -o .libs/time.so
+libtool: link: ( cd ".libs" && rm -f "rwarray.la" && ln -s "../rwarray.la" "rwarray.la" )
+libtool: link: ( cd ".libs" && rm -f "revtwoway.la" && ln -s "../revtwoway.la" "revtwoway.la" )
+libtool: link: ( cd ".libs" && rm -f "time.la" && ln -s "../time.la" "time.la" )
+make[4]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1/extension'
+make[3]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1/extension'
+make[2]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1/extension'
+Making all in extras
+make[2]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1/extras'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1/extras'
+Making all in doc
+make[2]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1/doc'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1/doc'
+Making all in awklib
+make[2]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1/awklib'
+rm -f pwcat.c
+rm -f grcat.c
+sed 's;/usr/local/libexec/awk;/usr/local/libexec/awk;' < ./eg/lib/passwdawk.in > passwd.awk
+sed 's;/usr/local/libexec/awk;/usr/local/libexec/awk;' < ./eg/lib/groupawk.in > group.awk
+ln -s ./eg/lib/pwcat.c .
+ln -s ./eg/lib/grcat.c .
+depbase=`echo pwcat.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I..  -I.. -I.. -I../support   -g -O2 -DNDEBUG -MT pwcat.o -MD -MP -MF $depbase.Tpo -c -o pwcat.o pwcat.c &&\
+mv -f $depbase.Tpo $depbase.Po
+depbase=`echo grcat.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+/root/.local/state/pgb/bin/cc -DHAVE_CONFIG_H -I. -I..  -I.. -I.. -I../support   -g -O2 -DNDEBUG -MT grcat.o -MD -MP -MF $depbase.Tpo -c -o grcat.o grcat.c &&\
+mv -f $depbase.Tpo $depbase.Po
+/root/.local/state/pgb/bin/cc  -g -O2 -DNDEBUG  -no-pie -o pwcat pwcat.o  -lm 
+/root/.local/state/pgb/bin/cc  -g -O2 -DNDEBUG  -no-pie -o grcat grcat.o  -lm 
+/usr/bin/ld: pwcat.o: in function `main':
+/var/tmp/pgb-poc/gawk-5.3.1/awklib/pwcat.c:28: warning: Using 'getpwent' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/gawk-5.3.1/awklib/pwcat.c:39: warning: Using 'endpwent' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: grcat.o: in function `main':
+/var/tmp/pgb-poc/gawk-5.3.1/awklib/grcat.c:32: warning: Using 'getgrent' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/gawk-5.3.1/awklib/grcat.c:46: warning: Using 'endgrent' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+make[2]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1/awklib'
+Making all in po
+make[2]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1/po'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1/po'
+Making all in test
+make[2]: Entering directory '/var/tmp/pgb-poc/gawk-5.3.1/test'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1/test'
+make[1]: Leaving directory '/var/tmp/pgb-poc/gawk-5.3.1'

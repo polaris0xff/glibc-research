@@ -36,6 +36,10 @@
 #                              mechanism that writes to the filesystem
 #   --no-iconv                 do not link GNU libiconv
 #   --arch-baseline LEVEL      x86-64 | x86-64-v2 | x86-64-v3 (default x86-64)
+#   --bind DIR[:DEST]          expose an extra path inside the environment,
+#                              repeatable. Needed when sources, a cache or an
+#                              install prefix live outside the current
+#                              directory
 #   --engine chroot|docker|podman|host
 #   -v, --verbose              print every wrapped command line
 #
@@ -59,7 +63,8 @@ PGB_LIBICONV_PREFIX="${PGB_LIBICONV_PREFIX:-/opt/pgb-libiconv}"
 PGB_ENV_IMAGE="${PGB_ENV_IMAGE:-debian:12}"
 PGB_ENV_DIGEST="${PGB_ENV_DIGEST:-sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929}"
 PGB_ENV_NAME="${PGB_ENV_NAME:-pgb-env-debian12}"
-PGB_ENV_PACKAGES="${PGB_ENV_PACKAGES:-gcc g++ make libc6-dev binutils pkg-config file}"
+PGB_ENV_PACKAGES="${PGB_ENV_PACKAGES:-gcc g++ make libc6-dev binutils pkg-config file \
+xz-utils bzip2 patch perl ca-certificates curl}"
 
 # ⛔ OPTIONS CROSS THE ENGINE BOUNDARY THROUGH THE ENVIRONMENT, NOT THE ARGV.
 #
@@ -75,6 +80,11 @@ VERBOSE="${PGB_OPT_VERBOSE:-0}"
 EMBED_LOCALE="${PGB_OPT_EMBED_LOCALE:-0}"
 USE_ICONV="${PGB_OPT_USE_ICONV:-1}"
 ARCH_BASELINE="${PGB_OPT_BASELINE:-}"
+# Extra paths to expose inside the build environment. A build whose sources,
+# cache or prefix live outside the current directory cannot see them
+# otherwise, and the failure reads as "cd: can't cd to ..." from inside the
+# chroot rather than as a missing mount.
+EXTRA_BINDS="${PGB_OPT_BINDS:-}"
 ENGINE=""
 
 say()  { printf '%s\n' "$*"; }
@@ -497,6 +507,7 @@ EOF
 export_options() {
   export PGB_OPT_VERBOSE="$VERBOSE" PGB_OPT_EMBED_LOCALE="$EMBED_LOCALE" \
          PGB_OPT_USE_ICONV="$USE_ICONV" PGB_OPT_BASELINE="$ARCH_BASELINE" \
+         PGB_OPT_BINDS="$EXTRA_BINDS" \
          PGB_STATE="$PGB_STATE" PGB_LIBICONV_PREFIX="$PGB_LIBICONV_PREFIX"
 }
 
@@ -509,11 +520,16 @@ cmd_build() {
       r=$(env_root)
       [ -d "$r" ] || die "no build environment. run: pgb env create" 2
       wrk=$(pwd)
+      bindargs=""
+      for b in $EXTRA_BINDS; do
+        case "$b" in *:*) : ;; *) b="$b:$b" ;; esac
+        bindargs="$bindargs --bind $b"
+      done
       # ⭐ The source tree is bind-mounted at the SAME path inside, so every
       # absolute path a build system bakes into a Makefile still resolves.
       exec sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" \
            --bind "$wrk:$wrk" --bind "$PGB_SELF:$PGB_SELF" \
-           --bind "$PGB_STATE:$PGB_STATE" --workdir "$wrk" \
+           --bind "$PGB_STATE:$PGB_STATE" $bindargs --workdir "$wrk" \
            -- /bin/sh -c 'PGB_INNER=1 "$0" __inner-build "$@"' "$PGB_SELF/pgb" "$@"
       ;;
     host)
@@ -521,7 +537,12 @@ cmd_build() {
       ;;
     docker|podman)
       wrk=$(pwd)
-      exec $eng run --rm -v "$wrk:$wrk" -v "$PGB_SELF:$PGB_SELF" -w "$wrk" \
+      dockerbinds=""
+      for b in $EXTRA_BINDS; do
+        case "$b" in *:*) : ;; *) b="$b:$b" ;; esac
+        dockerbinds="$dockerbinds -v $b"
+      done
+      exec $eng run --rm -v "$wrk:$wrk" -v "$PGB_SELF:$PGB_SELF" $dockerbinds -w "$wrk" \
         -e PGB_INNER=1 "pgb-env:$PGB_VERSION" \
         /bin/sh -c "$PGB_SELF/pgb __inner-build $*"
       ;;
@@ -644,6 +665,7 @@ while [ $# -gt 0 ]; do
     --embed-locale)   EMBED_LOCALE=1 ;;
     --no-iconv)       USE_ICONV=0 ;;
     --arch-baseline)  shift; ARCH_BASELINE="${1:-}" ;;
+    --bind)           shift; EXTRA_BINDS="$EXTRA_BINDS ${1:-}" ;;
     --engine)         shift; ENGINE="${1:-}" ;;
     -h|--help)        usage; exit 0 ;;
     --version)        say "pgb $PGB_VERSION"; exit 0 ;;
