@@ -103,6 +103,43 @@ exp_run_status() { # rootfs copyspec cmd...
   printf '%s' "$?"
 }
 
+# ---------------------------------------------------------------------------
+# Trace ONE binary inside a rootfs and report only ITS file opens.
+#
+# ⛔ THE DEFECT THIS EXISTS TO CATCH, and it produced a wrong reading here
+# before it was written: `strace -f` over the whole runner also captures the
+# runner's own helpers. rootfs-run.sh copies the artefact in with `cp -a`, and
+# on this host coreutils `cp` is dynamically linked, so the trace filled up
+# with libacl, libattr, libblkid, libmount, libpcre2, libselinux and libc.so.6
+# opens that had NOTHING to do with the binary under test. Read naively that
+# says "the portable binary loaded seven host libraries", which is false.
+#
+# Two defences, both needed:
+#   1. the copy happens FIRST, outside the trace;
+#   2. only lines from the pid that actually execve()'d the target, and only
+#      those AFTER that execve, are reported.
+#
+# Prints one `openat`/`open` line per file the target itself touched.
+exp_trace_opens() {  # rootfs in-root-path tracefile [extra rootfs-run args...]
+  _tr_root="$1"; _tr_bin="$2"; _tr_out="$3"; shift 3
+  strace -f -e trace=openat,open,execve -o "$_tr_out" \
+    sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$_tr_root" "$@" -- "$_tr_bin" \
+    >/dev/null 2>&1
+  awk -v want="$_tr_bin" '
+    { pid = $1 }
+    $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }
+    seen && pid == target && /open(at)?\(/ { print }
+  ' "$_tr_out"
+}
+
+# The same, reduced to the shared objects and gconv/NSS data the target opened.
+exp_trace_libs() {   # rootfs in-root-path tracefile [extra args...]
+  exp_trace_opens "$@" \
+    | grep -vE 'ENOENT|= -1' \
+    | grep -oE '"[^"]*\.so[^"]*"|"[^"]*gconv[^"]*"|"[^"]*/locale[^"]*"' \
+    | tr -d '"' | sort -u
+}
+
 exp_finish() {
   printf '\n'
   printf -- '-- result ----------------------------------------------------\n'

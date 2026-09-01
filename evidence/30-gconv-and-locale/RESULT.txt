@@ -1,0 +1,80 @@
+===============================================================
+30 - gconv and locale: what a static glibc binary loses off a glibc host
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-01T05:41:14Z
+host kernel  : Linux 6.18.44-fc-v22
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/30-gconv-and-locale
+--------------------------------------------------------------
+
+        arm A size: 785480 bytes
+        arm B size: 1937632 bytes
+
+  iconv, 12 encodings, opened/failed and one byte-exact round trip:
+    ENVIRONMENT          LIBC   A plain -static            B +static libiconv
+    alpine-3.22          musl   opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    alpine-3.22: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    alpine-3.20          musl   opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    alpine-3.20: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    alpine-3.10          musl   opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    alpine-3.10: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    voidlinux-musl       musl   opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    voidlinux-musl: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+Aborted
+    debian-11            glibc  <no output>                opened=12 failed=0 roundtrip=1
+  ok    debian-11: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+Floating point exception
+    debian-12            glibc  <no output>                opened=12 failed=0 roundtrip=1
+  ok    debian-12: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+Aborted
+    ubuntu-20.04         glibc  <no output>                opened=12 failed=0 roundtrip=1
+  ok    ubuntu-20.04: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    rockylinux-8         glibc  opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    rockylinux-8: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    opensuse-leap-15.6   glibc  opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    opensuse-leap-15.6: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    fedora-42            glibc  opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    fedora-42: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    archlinux-latest     glibc  opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    archlinux-latest: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+
+  what each arm touches on Alpine 3.22 (musl):
+  ok    A: gconv lookups (the positive control)        = some
+        A tried 3 gconv paths, every one ENOENT -- this is the loss
+  ok    B: files opened by the process at all          = 0
+
+  locale: does setlocale(C.UTF-8) give a UTF-8 codeset?
+    ENVIRONMENT          LIBC   plain -static                      with bundled locale + LOCPATH
+    alpine-3.22          musl   locale=NULL codeset=ANSI_X3.4-1968 locale=C.UTF-8 codeset=UTF-8
+  ok    alpine-3.22: bundled locale yields UTF-8       = yes
+    alpine-3.20          musl   locale=NULL codeset=ANSI_X3.4-1968 locale=C.UTF-8 codeset=UTF-8
+  ok    alpine-3.20: bundled locale yields UTF-8       = yes
+    alpine-3.10          musl   locale=NULL codeset=ANSI_X3.4-1968 locale=C.UTF-8 codeset=UTF-8
+  ok    alpine-3.10: bundled locale yields UTF-8       = yes
+    voidlinux-musl       musl   locale=NULL codeset=ANSI_X3.4-1968 locale=C.UTF-8 codeset=UTF-8
+  ok    voidlinux-musl: bundled locale yields UTF-8    = yes
+    debian-11            glibc  locale=C.UTF-8 codeset=UTF-8       locale=C.UTF-8 codeset=UTF-8
+  ok    debian-11: bundled locale yields UTF-8         = yes
+    debian-12            glibc  locale=C.UTF-8 codeset=UTF-8       locale=C.UTF-8 codeset=UTF-8
+  ok    debian-12: bundled locale yields UTF-8         = yes
+    ubuntu-20.04         glibc  locale=C.UTF-8 codeset=UTF-8       locale=C.UTF-8 codeset=UTF-8
+  ok    ubuntu-20.04: bundled locale yields UTF-8      = yes
+    rockylinux-8         glibc  locale=C.UTF-8 codeset=UTF-8       locale=C.UTF-8 codeset=UTF-8
+  ok    rockylinux-8: bundled locale yields UTF-8      = yes
+    opensuse-leap-15.6   glibc  locale=C.UTF-8 codeset=UTF-8       locale=C.UTF-8 codeset=UTF-8
+  ok    opensuse-leap-15.6: bundled locale yields UTF-8 = yes
+    fedora-42            glibc  locale=C.UTF-8 codeset=UTF-8       locale=C.UTF-8 codeset=UTF-8
+  ok    fedora-42: bundled locale yields UTF-8         = yes
+    archlinux-latest     glibc  locale=C.UTF-8 codeset=UTF-8       locale=C.UTF-8 codeset=UTF-8
+  ok    archlinux-latest: bundled locale yields UTF-8  = yes
+        C.utf8 costs 408 KiB, of which LC_CTYPE is nearly all
+
+-- result ----------------------------------------------------
+pass=24 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------
