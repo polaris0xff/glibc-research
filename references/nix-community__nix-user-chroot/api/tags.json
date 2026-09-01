@@ -1,0 +1,122 @@
+[
+ {
+  "name": "2.1.1",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/2.1.1",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/2.1.1",
+  "commit": {
+   "sha": "987302aef4e3aa267355cfad00027b730bcb389b",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/987302aef4e3aa267355cfad00027b730bcb389b"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8yLjEuMQ=="
+ },
+ {
+  "name": "2.1.0",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/2.1.0",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/2.1.0",
+  "commit": {
+   "sha": "f194ad992e20e1feb7488d13c6f620790241196b",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/f194ad992e20e1feb7488d13c6f620790241196b"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8yLjEuMA=="
+ },
+ {
+  "name": "2.0.0",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/2.0.0",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/2.0.0",
+  "commit": {
+   "sha": "91e5fb1fb617fc0d478c44270094797f1838e575",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/91e5fb1fb617fc0d478c44270094797f1838e575"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8yLjAuMA=="
+ },
+ {
+  "name": "1.2.2",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/1.2.2",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/1.2.2",
+  "commit": {
+   "sha": "d2de5e4eee0c0f99d00dfa7734bed5f58f7f4172",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/d2de5e4eee0c0f99d00dfa7734bed5f58f7f4172"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8xLjIuMg=="
+ },
+ {
+  "name": "1.2.1",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/1.2.1",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/1.2.1",
+  "commit": {
+   "sha": "1716df4b84bf38adf28bd4c5ab01d920b2783d75",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/1716df4b84bf38adf28bd4c5ab01d920b2783d75"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8xLjIuMQ=="
+ },
+ {
+  "name": "1.2.0",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/1.2.0",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/1.2.0",
+  "commit": {
+   "sha": "73af5a6a6ad43bbea12fbb7728247565fdf05bb0",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/73af5a6a6ad43bbea12fbb7728247565fdf05bb0"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8xLjIuMA=="
+ },
+ {
+  "name": "1.1.1",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/1.1.1",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/1.1.1",
+  "commit": {
+   "sha": "4dd5f096b2cc5bf9eb3eec76e64252deac954a90",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/4dd5f096b2cc5bf9eb3eec76e64252deac954a90"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8xLjEuMQ=="
+ },
+ {
+  "name": "1.1.0",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/1.1.0",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/1.1.0",
+  "commit": {
+   "sha": "bbd45f917ac83c58d5ee67849b7840e88c8b4ccc",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/bbd45f917ac83c58d5ee67849b7840e88c8b4ccc"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8xLjEuMA=="
+ },
+ {
+  "name": "1.0.3",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/1.0.3",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/1.0.3",
+  "commit": {
+   "sha": "820a7730ec85f215a70fa10855fa519c894e78a7",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/820a7730ec85f215a70fa10855fa519c894e78a7"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8xLjAuMw=="
+ },
+ {
+  "name": "1.0.2",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/1.0.2",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/1.0.2",
+  "commit": {
+   "sha": "75dd87f8911abbcb6437644c9e199afd39cf116a",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/75dd87f8911abbcb6437644c9e199afd39cf116a"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8xLjAuMg=="
+ },
+ {
+  "name": "1.0.1",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/1.0.1",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/1.0.1",
+  "commit": {
+   "sha": "186348f7329adad5246f0d5dd55a37db5d14ae67",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/186348f7329adad5246f0d5dd55a37db5d14ae67"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8xLjAuMQ=="
+ },
+ {
+  "name": "1.0.0",
+  "zipball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/zipball/refs/tags/1.0.0",
+  "tarball_url": "https://api.github.com/repos/nix-community/nix-user-chroot/tarball/refs/tags/1.0.0",
+  "commit": {
+   "sha": "80216394fa45a7da2432e4587500f8d446752590",
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/commits/80216394fa45a7da2432e4587500f8d446752590"
+  },
+  "node_id": "MDM6UmVmMTcwMDQwMzQ3OnJlZnMvdGFncy8xLjAuMA=="
+ }
+]

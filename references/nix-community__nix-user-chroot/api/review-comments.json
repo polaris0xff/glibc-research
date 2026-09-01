@@ -1,0 +1,1184 @@
+[
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554403272",
+  "pull_request_review_id": 564779020,
+  "id": 554403272,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU1NDQwMzI3Mg==",
+  "diff_hunk": "@@ -0,0 +1,26 @@\n+ENGINE=docker\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    ENGINE=podman\n+fi\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    echo \"No docker or podman in PATH\" >&2\n+    exit 1\n+fi\n+\n+read -d '' script <<EOF\n+cd /app/nix-user-chroot\n+mkdir .nix\n+cargo build\n+\n+run() {\n+    cargo run .nix \"\\$@\"\n+}\n+\n+export -f run\n+exec bash\n+EOF\n+\n+# \"$ENGINE\" run -v .:/app -it rust bash -c \"$script\"\n+\"$ENGINE\" run -v ..:/app -it rust bash -c \"$script\"",
+  "path": "container.sh",
+  "commit_id": "6288562e9d057d0600661b256332cc6b52e488d6",
+  "original_commit_id": "5fe62333de22ae5b6da8024733a34135547bb37f",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "That does not quite work with docker:\r\n\r\n```suggestion\r\n\"$ENGINE\" run -v $PWD:/app -it rust bash -c \"$script\"\r\n```",
+  "created_at": "2021-01-09T11:59:23Z",
+  "updated_at": "2021-01-09T13:41:14Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554403272",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554403272"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554403272"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554403272/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 26,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 26,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554403583",
+  "pull_request_review_id": 564779047,
+  "id": 554403583,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU1NDQwMzU4Mw==",
+  "diff_hunk": "@@ -0,0 +1,26 @@\n+ENGINE=docker\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    ENGINE=podman\n+fi\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    echo \"No docker or podman in PATH\" >&2\n+    exit 1\n+fi\n+\n+read -d '' script <<EOF\n+cd /app/nix-user-chroot",
+  "path": "container.sh",
+  "commit_id": "6288562e9d057d0600661b256332cc6b52e488d6",
+  "original_commit_id": "5fe62333de22ae5b6da8024733a34135547bb37f",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "I would prefer only to bind mount the only the application source code.\r\n\r\n```suggestion\r\ncd /app\r\n```",
+  "created_at": "2021-01-09T11:59:56Z",
+  "updated_at": "2021-01-09T13:41:14Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554403583",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554403583"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554403583"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554403583/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 13,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 13,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554403890",
+  "pull_request_review_id": 564779118,
+  "id": 554403890,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU1NDQwMzg5MA==",
+  "diff_hunk": "@@ -0,0 +1,26 @@\n+ENGINE=docker\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    ENGINE=podman\n+fi\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    echo \"No docker or podman in PATH\" >&2\n+    exit 1\n+fi\n+\n+read -d '' script <<EOF\n+cd /app/nix-user-chroot\n+mkdir .nix\n+cargo build\n+\n+run() {\n+    cargo run .nix \"\\$@\"\n+}\n+\n+export -f run\n+exec bash\n+EOF\n+\n+# \"$ENGINE\" run -v .:/app -it rust bash -c \"$script\"\n+\"$ENGINE\" run -v ..:/app -it rust bash -c \"$script\"",
+  "path": "container.sh",
+  "commit_id": "6288562e9d057d0600661b256332cc6b52e488d6",
+  "original_commit_id": "5fe62333de22ae5b6da8024733a34135547bb37f",
+  "user": {
+   "login": "jD91mZM2",
+   "id": 12830969,
+   "node_id": "MDQ6VXNlcjEyODMwOTY5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/12830969?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/jD91mZM2",
+   "html_url": "https://github.com/jD91mZM2",
+   "followers_url": "https://api.github.com/users/jD91mZM2/followers",
+   "following_url": "https://api.github.com/users/jD91mZM2/following{/other_user}",
+   "gists_url": "https://api.github.com/users/jD91mZM2/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/jD91mZM2/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/jD91mZM2/subscriptions",
+   "organizations_url": "https://api.github.com/users/jD91mZM2/orgs",
+   "repos_url": "https://api.github.com/users/jD91mZM2/repos",
+   "events_url": "https://api.github.com/users/jD91mZM2/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/jD91mZM2/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Hehe, my bad, that was left from when I tried to use rooter so I used the parent directory which contained both :)",
+  "created_at": "2021-01-09T12:00:57Z",
+  "updated_at": "2021-01-09T13:41:14Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554403890",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554403890"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554403890"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554403890/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 26,
+  "side": "RIGHT",
+  "in_reply_to_id": 554403272,
+  "author_association": "MEMBER",
+  "original_position": 26,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554404178",
+  "pull_request_review_id": 564779162,
+  "id": 554404178,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU1NDQwNDE3OA==",
+  "diff_hunk": "@@ -0,0 +1,26 @@\n+ENGINE=docker\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    ENGINE=podman\n+fi\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    echo \"No docker or podman in PATH\" >&2\n+    exit 1\n+fi\n+\n+read -d '' script <<EOF\n+cd /app/nix-user-chroot\n+mkdir .nix\n+cargo build\n+\n+run() {\n+    cargo run .nix \"\\$@\"\n+}\n+\n+export -f run\n+exec bash\n+EOF\n+\n+# \"$ENGINE\" run -v .:/app -it rust bash -c \"$script\"\n+\"$ENGINE\" run -v ..:/app -it rust bash -c \"$script\"",
+  "path": "container.sh",
+  "commit_id": "6288562e9d057d0600661b256332cc6b52e488d6",
+  "original_commit_id": "5fe62333de22ae5b6da8024733a34135547bb37f",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "maybe this one is safer to get the right location.\r\n\r\n```\r\nDIR=\"$( cd \"$( dirname \"${BASH_SOURCE[0]}\" )\" >/dev/null 2>&1 && pwd )\"\r\n```",
+  "created_at": "2021-01-09T12:01:33Z",
+  "updated_at": "2021-01-09T13:41:14Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554404178",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554404178"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554404178"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554404178/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 26,
+  "side": "RIGHT",
+  "in_reply_to_id": 554403272,
+  "author_association": "MEMBER",
+  "original_position": 26,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554404220",
+  "pull_request_review_id": 564779167,
+  "id": 554404220,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU1NDQwNDIyMA==",
+  "diff_hunk": "@@ -0,0 +1,26 @@\n+ENGINE=docker\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    ENGINE=podman\n+fi\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    echo \"No docker or podman in PATH\" >&2\n+    exit 1\n+fi\n+\n+read -d '' script <<EOF\n+cd /app/nix-user-chroot",
+  "path": "container.sh",
+  "commit_id": "6288562e9d057d0600661b256332cc6b52e488d6",
+  "original_commit_id": "5fe62333de22ae5b6da8024733a34135547bb37f",
+  "user": {
+   "login": "jD91mZM2",
+   "id": 12830969,
+   "node_id": "MDQ6VXNlcjEyODMwOTY5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/12830969?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/jD91mZM2",
+   "html_url": "https://github.com/jD91mZM2",
+   "followers_url": "https://api.github.com/users/jD91mZM2/followers",
+   "following_url": "https://api.github.com/users/jD91mZM2/following{/other_user}",
+   "gists_url": "https://api.github.com/users/jD91mZM2/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/jD91mZM2/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/jD91mZM2/subscriptions",
+   "organizations_url": "https://api.github.com/users/jD91mZM2/orgs",
+   "repos_url": "https://api.github.com/users/jD91mZM2/repos",
+   "events_url": "https://api.github.com/users/jD91mZM2/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/jD91mZM2/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Yep, yep, that was leftover",
+  "created_at": "2021-01-09T12:01:38Z",
+  "updated_at": "2021-01-09T13:41:14Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554404220",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554404220"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554404220"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554404220/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 13,
+  "side": "RIGHT",
+  "in_reply_to_id": 554403583,
+  "author_association": "MEMBER",
+  "original_position": 13,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554404826",
+  "pull_request_review_id": 564779234,
+  "id": 554404826,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU1NDQwNDgyNg==",
+  "diff_hunk": "@@ -0,0 +1,26 @@\n+ENGINE=docker\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    ENGINE=podman\n+fi\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    echo \"No docker or podman in PATH\" >&2\n+    exit 1\n+fi\n+\n+read -d '' script <<EOF\n+cd /app/nix-user-chroot\n+mkdir .nix\n+cargo build\n+\n+run() {\n+    cargo run .nix \"\\$@\"\n+}\n+\n+export -f run\n+exec bash\n+EOF\n+\n+# \"$ENGINE\" run -v .:/app -it rust bash -c \"$script\"\n+\"$ENGINE\" run -v ..:/app -it rust bash -c \"$script\"",
+  "path": "container.sh",
+  "commit_id": "6288562e9d057d0600661b256332cc6b52e488d6",
+  "original_commit_id": "5fe62333de22ae5b6da8024733a34135547bb37f",
+  "user": {
+   "login": "jD91mZM2",
+   "id": 12830969,
+   "node_id": "MDQ6VXNlcjEyODMwOTY5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/12830969?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/jD91mZM2",
+   "html_url": "https://github.com/jD91mZM2",
+   "followers_url": "https://api.github.com/users/jD91mZM2/followers",
+   "following_url": "https://api.github.com/users/jD91mZM2/following{/other_user}",
+   "gists_url": "https://api.github.com/users/jD91mZM2/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/jD91mZM2/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/jD91mZM2/subscriptions",
+   "organizations_url": "https://api.github.com/users/jD91mZM2/orgs",
+   "repos_url": "https://api.github.com/users/jD91mZM2/repos",
+   "events_url": "https://api.github.com/users/jD91mZM2/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/jD91mZM2/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Sure, sounds about right",
+  "created_at": "2021-01-09T12:02:54Z",
+  "updated_at": "2021-01-09T13:41:14Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554404826",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554404826"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554404826"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554404826/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 26,
+  "side": "RIGHT",
+  "in_reply_to_id": 554403272,
+  "author_association": "MEMBER",
+  "original_position": 26,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554405404",
+  "pull_request_review_id": 564779304,
+  "id": 554405404,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU1NDQwNTQwNA==",
+  "diff_hunk": "@@ -0,0 +1,26 @@\n+ENGINE=docker\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    ENGINE=podman\n+fi\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    echo \"No docker or podman in PATH\" >&2\n+    exit 1\n+fi\n+\n+read -d '' script <<EOF\n+cd /app/nix-user-chroot\n+mkdir .nix\n+cargo build\n+\n+run() {\n+    cargo run .nix \"\\$@\"\n+}\n+\n+export -f run\n+exec bash\n+EOF\n+\n+# \"$ENGINE\" run -v .:/app -it rust bash -c \"$script\"\n+\"$ENGINE\" run -v ..:/app -it rust bash -c \"$script\"",
+  "path": "container.sh",
+  "commit_id": "6288562e9d057d0600661b256332cc6b52e488d6",
+  "original_commit_id": "5fe62333de22ae5b6da8024733a34135547bb37f",
+  "user": {
+   "login": "jD91mZM2",
+   "id": 12830969,
+   "node_id": "MDQ6VXNlcjEyODMwOTY5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/12830969?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/jD91mZM2",
+   "html_url": "https://github.com/jD91mZM2",
+   "followers_url": "https://api.github.com/users/jD91mZM2/followers",
+   "following_url": "https://api.github.com/users/jD91mZM2/following{/other_user}",
+   "gists_url": "https://api.github.com/users/jD91mZM2/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/jD91mZM2/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/jD91mZM2/subscriptions",
+   "organizations_url": "https://api.github.com/users/jD91mZM2/orgs",
+   "repos_url": "https://api.github.com/users/jD91mZM2/repos",
+   "events_url": "https://api.github.com/users/jD91mZM2/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/jD91mZM2/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "I just added the cd, we don't really need the user's cd elsewhere",
+  "created_at": "2021-01-09T12:04:09Z",
+  "updated_at": "2021-01-09T13:41:14Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554405404",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554405404"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554405404"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554405404/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 26,
+  "side": "RIGHT",
+  "in_reply_to_id": 554403272,
+  "author_association": "MEMBER",
+  "original_position": 26,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554427485",
+  "pull_request_review_id": 564783937,
+  "id": 554427485,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU1NDQyNzQ4NQ==",
+  "diff_hunk": "@@ -0,0 +1,29 @@\n+#!/usr/bin/env bash\n+\n+cd \"$(dirname \"${BASH_SOURCE[0]}\")\"\n+\n+ENGINE=docker\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    ENGINE=podman\n+fi\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    echo \"No docker or podman in PATH\" >&2\n+    exit 1\n+fi",
+  "path": "container.sh",
+  "commit_id": "6288562e9d057d0600661b256332cc6b52e488d6",
+  "original_commit_id": "4ed102752a55f8591fbc7cce57904ef8f013ad7c",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "I think people having podman installed these days, do so because they prefer it over docker:\r\n\r\n```suggestion\r\nif [[ -z $ENGINE ]]; then\r\n  if command -v podman &>/dev/null; then\r\n    ENGINE=podman\r\n  elif command -v docker &>/dev/null; then\r\n    ENGINE=docker\r\n  else\r\n    echo \"No podman or docker in PATH\" >&2\r\n    exit 1\r\n  fi\r\nfi\r\n```",
+  "created_at": "2021-01-09T13:28:14Z",
+  "updated_at": "2021-01-09T13:41:14Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554427485",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554427485"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554427485"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554427485/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": 5,
+  "start_side": "RIGHT",
+  "line": null,
+  "original_line": 14,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 14,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554428127",
+  "pull_request_review_id": 564784330,
+  "id": 554428127,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU1NDQyODEyNw==",
+  "diff_hunk": "@@ -0,0 +1,29 @@\n+#!/usr/bin/env bash\n+\n+cd \"$(dirname \"${BASH_SOURCE[0]}\")\"\n+\n+ENGINE=docker\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    ENGINE=podman\n+fi\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    echo \"No docker or podman in PATH\" >&2\n+    exit 1\n+fi\n+\n+read -d '' script <<EOF\n+cd /app\n+mkdir .nix\n+cargo build\n+\n+run() {\n+    cargo run .nix \"\\$@\"\n+}\n+\n+export -f run\n+exec bash\n+EOF\n+\n+\"$ENGINE\" run -v $PWD:/app -it rust bash -c \"$script\"",
+  "path": "container.sh",
+  "commit_id": "6288562e9d057d0600661b256332cc6b52e488d6",
+  "original_commit_id": "4ed102752a55f8591fbc7cce57904ef8f013ad7c",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "I had to add this:\r\n\r\n```suggestion\r\n\"$ENGINE\" run -v $PWD:/app --privileged -it rust bash -c \"$script\"\r\n```",
+  "created_at": "2021-01-09T13:35:46Z",
+  "updated_at": "2021-01-09T13:41:14Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554428127",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554428127"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554428127"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554428127/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 29,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 29,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554428520",
+  "pull_request_review_id": 564784516,
+  "id": 554428520,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU1NDQyODUyMA==",
+  "diff_hunk": "@@ -0,0 +1,29 @@\n+#!/usr/bin/env bash\n+\n+cd \"$(dirname \"${BASH_SOURCE[0]}\")\"\n+\n+ENGINE=docker\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    ENGINE=podman\n+fi\n+\n+if ! which \"$ENGINE\" &>/dev/null ; then\n+    echo \"No docker or podman in PATH\" >&2\n+    exit 1\n+fi\n+\n+read -d '' script <<EOF\n+cd /app\n+mkdir .nix\n+cargo build\n+\n+run() {\n+    cargo run .nix \"\\$@\"\n+}\n+\n+export -f run\n+exec bash\n+EOF\n+\n+\"$ENGINE\" run -v $PWD:/app -it rust bash -c \"$script\"",
+  "path": "container.sh",
+  "commit_id": "6288562e9d057d0600661b256332cc6b52e488d6",
+  "original_commit_id": "4ed102752a55f8591fbc7cce57904ef8f013ad7c",
+  "user": {
+   "login": "jD91mZM2",
+   "id": 12830969,
+   "node_id": "MDQ6VXNlcjEyODMwOTY5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/12830969?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/jD91mZM2",
+   "html_url": "https://github.com/jD91mZM2",
+   "followers_url": "https://api.github.com/users/jD91mZM2/followers",
+   "following_url": "https://api.github.com/users/jD91mZM2/following{/other_user}",
+   "gists_url": "https://api.github.com/users/jD91mZM2/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/jD91mZM2/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/jD91mZM2/subscriptions",
+   "organizations_url": "https://api.github.com/users/jD91mZM2/orgs",
+   "repos_url": "https://api.github.com/users/jD91mZM2/repos",
+   "events_url": "https://api.github.com/users/jD91mZM2/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/jD91mZM2/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Ah. I'm using podman, which must have done stuff differently because for me it worked without --privileged.",
+  "created_at": "2021-01-09T13:39:34Z",
+  "updated_at": "2021-01-09T13:41:14Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554428520",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554428520"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/23#discussion_r554428520"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/23"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/554428520/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 29,
+  "side": "RIGHT",
+  "in_reply_to_id": 554428127,
+  "author_association": "MEMBER",
+  "original_position": 29,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/597977560",
+  "pull_request_review_id": 616796628,
+  "id": 597977560,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU5Nzk3NzU2MA==",
+  "diff_hunk": "@@ -22,7 +22,7 @@ fn bind_mount(source: &Path, dest: &Path) {\n         Some(source),\n         dest,\n         Some(\"none\"),\n-        MsFlags::MS_BIND | MsFlags::MS_REC,\n+        MsFlags::MS_BIND | MsFlags::MS_REC | MsFlags::MS_PRIVATE,",
+  "path": "src/main.rs",
+  "commit_id": "97806270731c478f829c95cd4a0db39eafd45a4e",
+  "original_commit_id": "97806270731c478f829c95cd4a0db39eafd45a4e",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Mhm. Does this even matter since we clone into a mountnamespace with CLONE_NEWNS?",
+  "created_at": "2021-03-19T21:12:36Z",
+  "updated_at": "2021-03-19T21:12:36Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/36#discussion_r597977560",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/36",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/597977560"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/36#discussion_r597977560"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/36"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/597977560/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 25,
+  "original_line": 25,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 5,
+  "position": 5,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/597977890",
+  "pull_request_review_id": 616797080,
+  "id": 597977890,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU5Nzk3Nzg5MA==",
+  "diff_hunk": "@@ -22,7 +22,7 @@ fn bind_mount(source: &Path, dest: &Path) {\n         Some(source),\n         dest,\n         Some(\"none\"),\n-        MsFlags::MS_BIND | MsFlags::MS_REC,\n+        MsFlags::MS_BIND | MsFlags::MS_REC | MsFlags::MS_PRIVATE,",
+  "path": "src/main.rs",
+  "commit_id": "97806270731c478f829c95cd4a0db39eafd45a4e",
+  "original_commit_id": "97806270731c478f829c95cd4a0db39eafd45a4e",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Or where does this become a problem?",
+  "created_at": "2021-03-19T21:13:25Z",
+  "updated_at": "2021-03-19T21:13:25Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/36#discussion_r597977890",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/36",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/597977890"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/36#discussion_r597977890"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/36"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/597977890/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 25,
+  "original_line": 25,
+  "side": "RIGHT",
+  "in_reply_to_id": 597977560,
+  "author_association": "MEMBER",
+  "original_position": 5,
+  "position": 5,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/599039142",
+  "pull_request_review_id": 617936576,
+  "id": 599039142,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU5OTAzOTE0Mg==",
+  "diff_hunk": "@@ -22,7 +22,7 @@ fn bind_mount(source: &Path, dest: &Path) {\n         Some(source),\n         dest,\n         Some(\"none\"),\n-        MsFlags::MS_BIND | MsFlags::MS_REC,\n+        MsFlags::MS_BIND | MsFlags::MS_REC | MsFlags::MS_PRIVATE,",
+  "path": "src/main.rs",
+  "commit_id": "97806270731c478f829c95cd4a0db39eafd45a4e",
+  "original_commit_id": "97806270731c478f829c95cd4a0db39eafd45a4e",
+  "user": {
+   "login": "smw",
+   "id": 22235,
+   "node_id": "MDQ6VXNlcjIyMjM1",
+   "avatar_url": "https://avatars.githubusercontent.com/u/22235?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/smw",
+   "html_url": "https://github.com/smw",
+   "followers_url": "https://api.github.com/users/smw/followers",
+   "following_url": "https://api.github.com/users/smw/following{/other_user}",
+   "gists_url": "https://api.github.com/users/smw/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/smw/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/smw/subscriptions",
+   "organizations_url": "https://api.github.com/users/smw/orgs",
+   "repos_url": "https://api.github.com/users/smw/repos",
+   "events_url": "https://api.github.com/users/smw/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/smw/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "At least on bionic, if you run `mount` outside of the created namespace, all of the mounts are visible -- which isn't really useful information for administrators of the machine.",
+  "created_at": "2021-03-22T20:07:53Z",
+  "updated_at": "2021-03-22T20:07:53Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/36#discussion_r599039142",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/36",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/599039142"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/36#discussion_r599039142"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/36"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/599039142/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 25,
+  "original_line": 25,
+  "side": "RIGHT",
+  "in_reply_to_id": 597977560,
+  "author_association": "CONTRIBUTOR",
+  "original_position": 5,
+  "position": 5,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999274356",
+  "pull_request_review_id": 4019197028,
+  "id": 2999274356,
+  "node_id": "PRRC_kwDOCiKcG86yxUt0",
+  "diff_hunk": "@@ -160,8 +160,26 @@ impl<'a> RunChroot<'a> {\n         .unwrap_or_else(|err| panic!(\"failed to bind mount {} to /nix: {}\", nixdir.display(), err));\n \n         // chroot\n-        unistd::chroot(self.rootdir)\n-            .unwrap_or_else(|err| panic!(\"chroot({}): {}\", self.rootdir.display(), err));\n+        unistd::pivot_root(self.rootdir, &nix_mount).unwrap_or_else(|err| {\n+            panic!(\n+                \"pivot_root({}, {}): {}\",\n+                self.rootdir.display(),\n+                &nix_mount.display(),\n+                err\n+            )\n+        });\n+\n+        // mount the store and hide the old root",
+  "path": "src/main.rs",
+  "commit_id": "7f5504c6eb76a45744b715db3e0ae07100c695e5",
+  "original_commit_id": "5b6c4f7e2e98aada6f7547cd6af1c3d44f25b600",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Why was this comment capped?",
+  "created_at": "2026-03-27T06:38:44Z",
+  "updated_at": "2026-03-27T06:38:44Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/121#discussion_r2999274356",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/121",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999274356"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/121#discussion_r2999274356"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/121"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999274356/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 172,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 15,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999740595",
+  "pull_request_review_id": 4019729434,
+  "id": 2999740595,
+  "node_id": "PRRC_kwDOCiKcG86yzGiz",
+  "diff_hunk": "@@ -533,8 +533,26 @@ impl<'a> RunChroot<'a> {\n         });\n \n         // chroot\n-        unistd::chroot(self.rootdir)\n-            .unwrap_or_else(|err| panic!(\"chroot({}): {}\", self.rootdir.display(), err));\n+        unistd::pivot_root(self.rootdir, &nix_mount).unwrap_or_else(|err| {\n+            panic!(\n+                \"pivot_root({}, {}): {}\",\n+                self.rootdir.display(),\n+                &nix_mount.display(),\n+                err\n+            )\n+        });\n+\n+        // mount the store and hide the old root\n+        // we fetch nixdir under the old root\n+        // let nix_store = nix_root.join(nixdir);\n+        // mount(\n+        //     Some(&nix_store),\n+        //     \"/nix\",\n+        //     Some(\"none\"),\n+        //     MsFlags::MS_BIND | MsFlags::MS_REC,\n+        //     NONE,\n+        // )\n+        // .unwrap_or_else(|_| panic!(\"failed to bind mount {} to /nix\", nix_store.display()));",
+  "path": "src/main.rs",
+  "commit_id": "7f5504c6eb76a45744b715db3e0ae07100c695e5",
+  "original_commit_id": "7f5504c6eb76a45744b715db3e0ae07100c695e5",
+  "user": {
+   "login": "eveeifyeve",
+   "id": 88671402,
+   "node_id": "MDQ6VXNlcjg4NjcxNDAy",
+   "avatar_url": "https://avatars.githubusercontent.com/u/88671402?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/eveeifyeve",
+   "html_url": "https://github.com/eveeifyeve",
+   "followers_url": "https://api.github.com/users/eveeifyeve/followers",
+   "following_url": "https://api.github.com/users/eveeifyeve/following{/other_user}",
+   "gists_url": "https://api.github.com/users/eveeifyeve/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/eveeifyeve/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/eveeifyeve/subscriptions",
+   "organizations_url": "https://api.github.com/users/eveeifyeve/orgs",
+   "repos_url": "https://api.github.com/users/eveeifyeve/repos",
+   "events_url": "https://api.github.com/users/eveeifyeve/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/eveeifyeve/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "This is a temp comment.",
+  "created_at": "2026-03-27T08:52:16Z",
+  "updated_at": "2026-03-27T08:52:17Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/121#discussion_r2999740595",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/121",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999740595"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/121#discussion_r2999740595"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/121"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999740595/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": 547,
+  "start_side": "RIGHT",
+  "line": null,
+  "original_line": 555,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 25,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999751761",
+  "pull_request_review_id": 4019741328,
+  "id": 2999751761,
+  "node_id": "PRRC_kwDOCiKcG86yzJRR",
+  "diff_hunk": "@@ -160,8 +160,26 @@ impl<'a> RunChroot<'a> {\n         .unwrap_or_else(|err| panic!(\"failed to bind mount {} to /nix: {}\", nixdir.display(), err));\n \n         // chroot\n-        unistd::chroot(self.rootdir)\n-            .unwrap_or_else(|err| panic!(\"chroot({}): {}\", self.rootdir.display(), err));\n+        unistd::pivot_root(self.rootdir, &nix_mount).unwrap_or_else(|err| {\n+            panic!(\n+                \"pivot_root({}, {}): {}\",\n+                self.rootdir.display(),\n+                &nix_mount.display(),\n+                err\n+            )\n+        });\n+\n+        // mount the store and hide the old root",
+  "path": "src/main.rs",
+  "commit_id": "7f5504c6eb76a45744b715db3e0ae07100c695e5",
+  "original_commit_id": "5b6c4f7e2e98aada6f7547cd6af1c3d44f25b600",
+  "user": {
+   "login": "eveeifyeve",
+   "id": 88671402,
+   "node_id": "MDQ6VXNlcjg4NjcxNDAy",
+   "avatar_url": "https://avatars.githubusercontent.com/u/88671402?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/eveeifyeve",
+   "html_url": "https://github.com/eveeifyeve",
+   "followers_url": "https://api.github.com/users/eveeifyeve/followers",
+   "following_url": "https://api.github.com/users/eveeifyeve/following{/other_user}",
+   "gists_url": "https://api.github.com/users/eveeifyeve/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/eveeifyeve/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/eveeifyeve/subscriptions",
+   "organizations_url": "https://api.github.com/users/eveeifyeve/orgs",
+   "repos_url": "https://api.github.com/users/eveeifyeve/repos",
+   "events_url": "https://api.github.com/users/eveeifyeve/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/eveeifyeve/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Idk, fixed.",
+  "created_at": "2026-03-27T08:55:09Z",
+  "updated_at": "2026-03-27T08:55:09Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/121#discussion_r2999751761",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/121",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999751761"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/121#discussion_r2999751761"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/121"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999751761/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 172,
+  "side": "RIGHT",
+  "in_reply_to_id": 2999274356,
+  "author_association": "MEMBER",
+  "original_position": 15,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999868095",
+  "pull_request_review_id": 4019873967,
+  "id": 2999868095,
+  "node_id": "PRRC_kwDOCiKcG86yzlq_",
+  "diff_hunk": "@@ -7,3 +7,7 @@\n \n # Example nix directory\n /.nix/\n+\n+# Direnv\n+.direnv\n+.envrc",
+  "path": ".gitignore",
+  "commit_id": "d89ff485550df4644e90822d3798c41b8b70114e",
+  "original_commit_id": "d89ff485550df4644e90822d3798c41b8b70114e",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "let's just add .envrc instead.",
+  "created_at": "2026-03-27T09:22:17Z",
+  "updated_at": "2026-03-27T09:22:17Z",
+  "html_url": "https://github.com/nix-community/nix-user-chroot/pull/128#discussion_r2999868095",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/128",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999868095"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-user-chroot/pull/128#discussion_r2999868095"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/128"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-user-chroot/pulls/comments/2999868095/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 13,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 7,
+  "position": 1,
+  "subject_type": "line"
+ }
+]

@@ -3,7 +3,7 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log
 and the entries.
 
-    STATE     2026-09-01b, in progress
+    STATE     2026-09-01b, session end
     COUNTS    22 entries, 9 open, 13 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, EIGHT POCs
               CI: GREEN, 15 jobs, and it asserts criterion 2
@@ -148,29 +148,45 @@ does hold where it matters.
 
 Nothing half-written. See `RESUME.md`.
 
+## ⭐ The operator's ruling at session end: nixpkgs is the planner
+
+⛔ **T-022's open question is answered and T-012 is re-shaped.** Quoted in
+`../docs/design/nix-front-end.md`: *"Instead of writing resolvers, parsers,
+dependency checkers etc etc — let's just use nix ... Even if we only took
+their package manifest and files, it already significantly reduces our
+workload."* Two reference shapes at a pinned `pkgforge/soarpkgs` commit
+(static-first and nixappimage), and a list of five projects for using nix
+**without installing it**.
+
+⛔ **NOTHING ON THAT PAGE IS VERIFIED. The mining is the next session's first
+task**, and the six `mine-repo.sh` commands are written out there. The
+operator stopped this session before it began, deliberately.
+
 ## Work order
 
-    T-032                      the CA bundle and terminfo -- two of the three
-                               open rows of REQUIREMENTS part 2
-    T-012                      pgb build <spec> -- split it first, it is XL
+    nix mining                 FIRST: docs/design/nix-front-end.md, six repos
+    T-032 (finish)             two POC runs, both already wired
+    T-022 / T-012              re-scope from what the mining says
     T-033                      route D, and it is L -- read solo.md first
     T-041                      aarch64
     then P2 by category
 
-⭐ **Only THREE P1 entries are open**, and one of them (T-012) is the project
-itself. T-032 is promoted above it because the operator's framing names the
-gaps it closes: *"no networking/iconv/gconv/nss/locale/**cert**/etc issues"*.
-The CA bundle and terminfo are two of the three open rows of `REQUIREMENTS.md`
-part 2 and both have a proven mechanism waiting rather than an unknown.
+⭐ **Only THREE P1 entries are open.** T-032's code is landed and measured and
+only its two POC runs are owed. T-012 and T-022 are now the same work and wait
+on the mining.
 
 ## Open questions for the operator
 
-⭐ **None blocking.** The two that were here are ruled on, above.
+⭐ **None blocking.** Four were ruled on this session: T-030's acceptance,
+`REQUIREMENTS.md` part 2, the nixpkgs front end, and the branch rule.
 
-1. **Is a nixpkgs front end (T-022) in scope**, or does depending on nix defeat
-   the point? T-020 argues the graph is worth taking and the store layout is
-   not.
-2. **T-015 changes what the bed is.** Applying an image's `Env` would make the
+1. **Desktop files, icons and MIME data.** The operator asked for a way to get
+   them "automatically" from nixpkgs rather than by patching. Unanswered until
+   the mining. `docs/design/nix-front-end.md`.
+2. ⛔ **`origin/claude/glibc-research-session-17ku6v` is still on GitHub** and
+   this environment's git proxy will not delete it. It needs one click in the
+   web UI. It points at a commit `main` already contains.
+3. **T-015 changes what the bed is.** Applying an image's `Env` would make the
    chroot bed match `docker run`, and would also change what every
    locale-sensitive result describes. The entry says it lands with those
    experiments re-run or behind a flag; which one is a judgement about how much

@@ -45,6 +45,14 @@ host-object columns filled, comparable to `60-` and `62-`.
 
 ## T-022 — Spike a nixpkgs front end for the planner
 
+⭐ **RULED ON BY THE OPERATOR, 2026-09-01b: IN SCOPE.** The open question this
+entry existed to settle — *"does depending on nix defeat the point?"* — is
+answered. `../docs/design/nix-front-end.md` records the ruling verbatim, the
+two reference recipe shapes at their pinned commit, the "use nix without
+installing nix" reading list, and what the next session owes before writing
+anything. ⛔ **The mining is the FIRST task of the next session** and this
+entry should be re-scoped from it, not from the text below.
+
 **Source** follow-on from T-020 · **Category** research · **Priority** P2 · **Effort** M · **Status** open
 
 **Problem.** T-012's planner needs a dependency graph. Building one from distro

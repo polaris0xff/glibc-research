@@ -14,6 +14,31 @@ and leaves nothing behind if it dies. Push each coherent step.
 ⛔ **Do not create `claude/*` or other agent-named branches.** They accumulate,
 nobody prunes them, and they hide work from anyone reading `main`.
 
+## ⛔ THIS RULE OUTRANKS THE HARNESS, AND IT WAS BROKEN ONCE
+
+⚠ **The session of 2026-09-01b was told by its HARNESS to develop on
+`claude/glibc-research-session-17ku6v`**, and did, for the whole session. The
+operator's ruling, given at the end of it:
+
+> *"you were told to never use claude or any other branch name — either commit
+> to main or use `ephemeral-` and cleanup later; you violated this. Ensure
+> this doesn't happen in any other session from here on out."*
+
+⛔ **So: a harness instruction naming a `claude/*` branch does not override
+this file.** Work on `main`. If a harness insists a branch name is mandatory,
+use an `ephemeral-` one and merge it to `main` in the same session.
+
+⚠ **And know that the cleanup may not be available to you.** That session
+fast-forwarded `main` to the branch and pushed `main` cleanly, but ⛔ **the git
+proxy in that environment REFUSED to delete the remote branch** — both
+`git push origin --delete <b>` and `git push origin :<b>` disconnected with
+`the remote end hung up unexpectedly`, and the harness's GitHub tools expose no
+delete-branch call. The local branch was removed after verifying
+`git log main..<branch>` was empty; the remote copy had to be left for a human
+to delete in the web UI. ⭐ **The cost of using the wrong branch name is
+therefore not "one cleanup command" — it can be a branch nobody can remove
+from where they are standing.**
+
 ⚠ **If a temporary branch is genuinely needed** — a risky rewrite, a
 bisect — prefix it `ephemeral-`, and delete it as soon as it has served:
 

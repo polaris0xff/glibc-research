@@ -9,72 +9,60 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 it is tracked, so it survives the machine going away, which is the failure it
 exists for.
 
-⛔ **Refresh it whenever "in flight" changes** — a rewrite of five lines.
-⭐ **Written at the START of the session of 2026-09-01b**, which is the debt the
-previous session recorded against itself and this one pays.
+⭐ **Written at the START of the session of 2026-09-01b and refreshed three
+times**, which is the debt the previous session recorded against itself.
 
-    LAST WRITTEN   2026-09-01b, after T-002/T-030 closed
-    TREE           dirty: POC 70 + the record, about to commit
-    CHECKS         sh TODO/check.sh green; poc 70 pass=20 fail=0 skip=0
-    BRANCH         claude/glibc-research-session-17ku6v  (see note below)
+    LAST WRITTEN   2026-09-01b, session end
+    TREE           clean, everything committed and pushed to main
+    CHECKS         sh TODO/check.sh green
+    BRANCH         main  (see the branch note below)
 
 ---
 
 | | |
 |---|---|
-| **the task** | Two operator rulings received at session start (below), then the work order from the top: T-002, T-017, T-003, T-012 (split first). Foundations before breadth. |
-| **the resume point** | `TODO/PROGRESS.md` "Work order". |
-| **in flight** | Nothing. Next: **T-003** (a project that FAILS, above the current class — the entry names GTK or Qt, and the operator named kdenlive as the challenge), then T-032. |
-| **the state of the tree** | Clean. No `ephemeral-*` branches. |
+| **the task** | ⭐ **Mine the nix references named in [`../docs/design/nix-front-end.md`](../docs/design/nix-front-end.md), then re-scope T-022 and T-012 from what they say.** The operator ruled that **nixpkgs is the planner** — the six `mine-repo.sh` commands are written out in that page. |
+| **the resume point** | `docs/design/nix-front-end.md` §"What the next session owes", step 1. Then `TODO/PROGRESS.md` "Work order". |
+| **in flight** | ⚠ **T-032's two POC runs.** `poc/20-nano` and `poc/30-curl` are wired to `--embed-terminfo` / `--embed-cacert` and **neither has been run to completion** — the session ended during `poc/20`'s ncurses build. The entry names both steps and the confound to watch for. Nothing is half-*written*. |
+| **the state of the tree** | Clean, pushed. No `ephemeral-*` branches. |
 | **the paste** | `Read ./docs/AGENTS.md in full & follow.` |
 
-## ⛔ Two operator rulings, received at the start of this session
+## ⛔ Start here, in this order
 
-Both questions were the ones the previous session left in `PROGRESS.md`
-"Open questions". They are now **answered** and are no longer open.
+1. **`docs/design/nix-front-end.md`** — the operator's ruling, quoted, plus the
+   six repositories to mine and the questions the mining must answer. ⛔ **The
+   mining is the first task; nothing on that page is verified.**
+   ⚠ `pkgforge/soarpkgs` is already in `references/` — check which commit
+   before re-mining, because the operator's pin
+   `55c774a5e24d9f17af69911a4d70884dfb566626` is what makes it useful (newer
+   commits abandoned the approach).
+2. **Finish T-032** — two POC runs, both already wired. It is the only entry
+   with landed, measured code and an unmet acceptance.
+3. Then the work order in `PROGRESS.md`.
 
-1. **T-030's corrected acceptance is ACCEPTED as proposed.** The entry closes
-   on "`--wrap-dlopen` builds a project whose plugin loading is **not**
-   configurable at build time, with its plugin directory emptied and the
-   functionality intact, on 11 of 11" — not on rebuilding CPython.
-2. **`REQUIREMENTS.md` part 2 is REPLACED with the per-part claim**, and the
-   operator's reason is recorded with it: ⭐ *"anylinux is a bundle, our primary
-   goal is still a static glibc binary that has none of the issues."* The
-   head-to-head against a bundle is a category comparison, not the bar.
+## ⛔ The branch rule, and what breaking it cost
 
-## ⚠ Branch note — `RULES.md` says `main`, the harness says otherwise
+This session was told **by its harness** to develop on
+`claude/glibc-research-session-17ku6v` and did so for its whole length. The
+operator's ruling: never again — `main`, or an `ephemeral-` branch merged in
+the same session. `RULES.md` §Git now says the harness does not override it.
 
-`TODO/RULES.md` §Git says "work on `main`". On this remote host, `main` is
-**three commits of file uploads** and every commit of real work lives on
-`claude/glibc-research-session-17ku6v`, which the harness designates and
-forbids leaving. So the working branch *is* the trunk here. ⛔ Do not read
-`RULES.md` as licence to push to `main`; the rule's intent — one trunk, no
-accumulating agent branches — is served by continuing on the designated one.
-
-## What is in flight
-
-Nothing half-written.
-
-## Done this session, with evidence
-
-- `experiments/73-host-dso-abi-demand.sh` + `docs/research/solo.md` — the
-  `pg83/solo` sweep and the measurement that opened **route D** (T-033).
-- **T-018 closed**: `-Wl,--eh-frame-hdr` on every link; `PT_GNU_EH_FRAME`
-  0 → 1, 11 of 11 unchanged.
-- **T-017 closed**: environments carry a stamp; a mismatched engine is refused
-  with the difference named. Six cases measured, both engines.
-- **T-019 closed** (opened this session): the docker engine dropped every
-  build option at the container boundary. Byte-identical engines now hold
-  **with** options too.
-- **T-002 and T-030 closed by one build**: `poc/70-sqlite-extensions`, fifteen
-  SQLite extensions out of an **empty** directory, 11 of 11, zero host
-  objects, against a control that pulls the host loader in on 2 of 11.
-- Both operator rulings written into `REQUIREMENTS.md`, `TODO/runtime.md`
-  T-030, and `corrections.md` C13/C14.
+⚠ **Cleanup was only half possible.** `main` was fast-forwarded to the work and
+pushed; the local branch was deleted after verifying `git log main..<branch>`
+was empty. ⛔ **The remote branch could NOT be deleted**: this environment's git
+proxy disconnects on both `git push origin --delete <b>` and
+`git push origin :<b>`, and the harness's GitHub tools expose no delete-branch
+call. **`origin/claude/glibc-research-session-17ku6v` is still on GitHub, at a
+commit `main` already contains, and needs one click in the web UI to remove.**
 
 ## ⚠ What this machine does NOT have cached
 
 **0 of 11 rootfs and no static libiconv at session start.** A fresh session
 pays `sh pgb env create` + `sh scripts/common/fetch-rootfs.sh` (~1.5 GiB)
-before anything can be built or verified. `dockerd` is not running, so
-`pick_engine` returns `chroot`.
+before anything can be built or verified. `dockerd` is not running by default;
+starting it changes which engine `pick_engine` returns, which T-017 now
+detects and refuses rather than failing inside a build.
+
+⚠ **`/var/tmp/pgb-poc` holds ~1.5 GiB of built POC artefacts** — including
+ffmpeg, MLT and a 105 MB `melt-static`. POC 80 reuses them and is fast if they
+survive; from scratch it is 30–60 minutes.
