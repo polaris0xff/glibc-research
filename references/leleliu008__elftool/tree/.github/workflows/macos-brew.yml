@@ -1,0 +1,85 @@
+name: build with brew on macOS
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  brew:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-26, macos-15]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@main
+
+      - run: curl -L -o src/elf.h 'https://sourceware.org/git/?p=glibc.git;a=blob_plain;f=elf/elf.h;hb=HEAD'
+
+      - run:  cc -o elftool -Os -flto -Wl,-S -Isrc src/*.c
+
+      - run:  ./elftool
+
+      - run:  ./elftool --help
+      - run:  ./elftool --version
+
+      - run:  ./elftool -h
+      - run:  ./elftool -V
+
+      - run:  curl -LO https://github.com/leleliu008/test/releases/download/2023.10.08/typos-linux-glibc-x86_64
+
+      - run:  ./elftool print-interp typos-linux-glibc-x86_64
+      - run:  ./elftool print-soname typos-linux-glibc-x86_64
+      - run:  ./elftool print-needed typos-linux-glibc-x86_64
+      - run:  ./elftool print-rpath  typos-linux-glibc-x86_64
+
+
+  brew-sanitizer:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-26, macos-15]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - run:  brew update
+      - run:  brew install llvm
+
+      - uses: actions/checkout@main
+
+      - run: curl -L -o src/elf.h 'https://sourceware.org/git/?p=glibc.git;a=blob_plain;f=elf/elf.h;hb=HEAD'
+
+      - id: cc
+        run: printf 'CC=%s\n' "$(brew --prefix llvm)/bin/clang" >> "$GITHUB_OUTPUT"
+
+      - run: ${{ steps.cc.outputs.CC }} -std=gnu99 -O0 -g -fsanitize=undefined -fsanitize=address -fsanitize=leak -o elftool -Isrc src/*.c
+
+      - run:  ./elftool
+
+      - run:  ./elftool --help
+      - run:  ./elftool --version
+
+      - run:  ./elftool -h
+      - run:  ./elftool -V
+
+      - run:  curl -LO https://github.com/leleliu008/test/releases/download/2023.10.08/typos-linux-glibc-x86_64
+
+      - run:  ./elftool print-interp typos-linux-glibc-x86_64
+      - run:  ./elftool print-soname typos-linux-glibc-x86_64
+      - run:  ./elftool print-needed typos-linux-glibc-x86_64
+      - run:  ./elftool print-rpath  typos-linux-glibc-x86_64
+
+      - run: curl -LO https://github.com/leleliu008/ppkg-package-manually-build/releases/download/xxd-9.2.0750-linux-glibc-s390x.release.tar.xz/xxd-9.2.0750-linux-glibc-s390x.release.tar.xz
+
+      - run: tar xf xxd-*.tar.xz --strip-components=1
+
+      - run:  ./elftool print-interp bin/xxd
+      - run:  ./elftool print-soname bin/xxd
+      - run:  ./elftool print-needed bin/xxd
+      - run:  ./elftool print-rpath  bin/xxd

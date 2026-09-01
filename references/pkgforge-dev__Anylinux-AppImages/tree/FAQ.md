@@ -1,0 +1,128 @@
+---
+layout: default
+title: Frequently Asked Questions
+---
+
+# Is it really any linux?
+
+<details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/Cromite-AppImage">Cromite</a> running in NixOS <b>without any FHS-wrapper</b></summary>
+  <img width="1096" height="671" alt="image" src="https://github.com/user-attachments/assets/a7eac601-3a00-428a-9777-c7b4cdb8a2ba" />
+</details>
+
+<details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/Cromite-AppImage">Cromite</a> running in Ubuntu 14.04</summary>
+  <img width="1426" height="873" alt="image" src="https://github.com/user-attachments/assets/d60d31cc-9efa-4d06-9e75-bccff066f2b7" />
+</details>
+
+<details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/wine-AppImage">WINE</a> running foobar2000 in Ubuntu 14.04</summary>
+  <img width="1426" height="873" alt="image" src="https://github.com/user-attachments/assets/8382a2e4-61fb-45c6-bea7-83d7551ee64c" />
+</details>
+
+<details>
+  <summary>Here is <a href="https://github.com/pkgforge-dev/QEMU-AppImage">QEMU</a> running in Ubuntu 12.04</summary>
+  <img width="1025" height="822" alt="image" src="https://github.com/user-attachments/assets/3734afe3-05e3-4d53-9c4a-94b701abc46b" />
+</details>
+
+<details>
+  <summary>Here is <code>aarch64</code> <a href="https://github.com/pkgforge-dev/Trelby-AppImage">Trelby</a> running on <b>32-bit</b> ARM debian 👀</summary>
+  This is possible because this system had a 64bit kernel and CPU. <b>We barely depend on the host userland</b> besides some POSIX utils like <code>sh</code>.
+  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a76e02d2-8b8b-411c-92e0-07aa9c6c75aa" />
+</details>
+
+<details>
+  <summary>Here is <a href="https://git.eden-emu.dev/eden-emu/eden">Eden</a> running in <b>FreeBSD</b> using Vulkan with NVIDIA via Linuxulator 👀</summary>
+  <img width="1193" height="671" alt="image" src="https://github.com/user-attachments/assets/473de2ba-f950-4e3a-9327-d741c70eda6e" />
+</details>
+
+
+# How come this only became possible in 2024?
+
+* For an application to be truly portable we need to ship our own dynamic linker (ld-linux.so).
+* It turns out it is not possible to have a relative dynamic linker with executables.
+* polyfill glibc attempted to [fix this issue](https://github.com/corsix/polyfill-glibc/blob/main/docs/Command_line_options.md#elf-interpreter---print-interpreter---set-interpreter) with an experimental tool that replaces `PT_INTERP` with `PT_LOAD` and has the payload look for the relative dynamic linker but this never got finished.
+* **We can execute the dynamic linker** first and then pass the binary to launch to bypass this limitation, **go-appimage had been doing this since ~2019.**
+* [But that runs into issues with `/proc/self/exe`](https://github.com/probonopd/go-appimage/issues/49).
+* [sharun](https://github.com/VHSgunzo/sharun) had to be made to fix the `/proc/self/exe` issues. And as far as I know, [brioche had been using the same approach before sharun as well](https://brioche.dev/blog/portable-dynamically-linked-packages-on-linux/).
+* Once all the pieces were ready, the next step was changing the way we deploy AppImages and sorting all the bugs that came with that, AppImage was originally made with the idea of relying on the host glibc and a set of libraries that always had to come from the host.
+
+# Why bundle glibc instead of musl?
+
+* Using musl would mean any hardware accelerated application will not work with the proprietary nvidia driver.
+* musl runs into performance issues because the default allocator is not great, this even [affected the type2 AppImage runtime](https://github.com/AppImage/type2-runtime/issues/116).
+* It does not really save space, the libc is a small fraction of the entire AppImage size, the reason distros like alpine linux are small is because they optimize most of their packages for size like [this example](https://gitlab.alpinelinux.org/alpine/aports/-/blob/master/main/icu/data-filter-en.yml) that results in a `libicudata.so` that is **less than 1 MiB** in size while most other distros do not bother to do this optimization and ship a **30 MiB** `libicudata.so`. Many of these optimizations are already used in the [debloated packages repo.](https://github.com/pkgforge-dev/archlinux-pkgs-debloated)
+* With glibc, we are able to dlopen optional libraries on the host **even when those link to musl**. If we used musl the opposite is usually not possible as musl lacks a lot of symbols that libraries expect from glibc. For example here is the Qt6-demo dlopening alpine's GTK3 to use the GTK3 platform theme and look native on the system:
+
+<img width="623" height="547" alt="image" src="https://github.com/user-attachments/assets/2d28ff5f-a46b-4f96-97b4-7f3d457de1e3" />
+
+---
+
+We only use musl where it is very useful, that is when making static binaries.
+
+# Why not statically link everything?
+
+* That is super hard, some libraries are not meant to be statically linked as well and that means a ton of patches are needed.
+* Statically linking everything means **we are not able to dlopen any library from the host**, even optional ones like the example I just gave about dlopening the host GTK from Qt apps to follow the system theme.
+* **It means goodbye to the proprietary nvidia driver.**
+* **It means you are no longer able to use vulkan layers like mangohud or lsfg-vk.**
+* **It means you are forever stuck with the version of MESA that was statically linked.** Remember, you can use the host Mesa if needed by setting `SHARUN_ALLOW_SYS_VKICD=1` and that is something you will want to do if you plan on using the same AppImage for several years in the future.
+* Static linking some dependencies is still desired however, as that reduces the final size of the AppImage, **but a fully static binary is a very bad idea.**
+
+# Why not use [solo](https://github.com/pg83/solo) or [detour](https://github.com/graphitemaster/detour)?
+
+These solutions allow statically linked programs to dlopen host libraries, amazing no? Well that runs into several problems:
+
+* What happens if my application needs OpenGL 4.6 but the host Mesa only supports OpenGL 4.5? [Sadness.](https://github.com/PixelGuys/Cubyz/issues/2975#issuecomment-4315191567)
+* What happens if I end up statically linking LLVM and the host's Mesa links to a different version of LLVM? [More problems.](https://www.gfxstrand.net/faith/blog/2022/01/in-defense-of-nir/)
+* Also it seems none of the solutions implement `dlmopen`, so you are likely to run into a lot of symbol collisions with host libraries depending on what you end up building.
+
+Using the host Mesa you are also going to run into bugs that had already been fixed in Mesa, we used to allow our AppImage to use the host vulkan drivers along with the bundled drivers, [that ended up being a bad idea.](https://codeberg.org/pkgforge-dev/Citron-AppImage/issues/14)
+
+Also you are not forced to use our bundled drivers always, you can always set `USE_HOST_MESA_DRIVERS=1`, this will help if you plan to use the same AppImage several years into the future, but it is not guaranteed to work forever due to glibc symbol nonsense.
+
+We don't run into these problems with Nvidia, because Nvidia releases its proprietary driver linking to super old versions of glibc so you can be certain it will always work.
+
+---
+
+**UPDATE: We now have a similar feature via [cross-libc-dlopen](https://github.com/pkgforge-dev/cross-libc-dlopen)**, enabled via `USE_HOST_DRIVERS_EXPERIMENTAL=1` in `quick-sharun`.
+
+This feature is only going to be used if the applications meets the following conditions:
+
+* The application doesn't depend on a recent version of OpenGL. (A good test is checking if the application works with the `softpipe` driver since that only supports OpenGL 3.3)
+* The application does not have a hard dependency on vulkan. (Most vulkan apps require relative new versions of vulkan (1.2 or newer) which only began to show up in Mesa 20.0 ~Ubuntu 20.04).
+* The application has a fallback software renderer. Who knows what can happen in future, it is likely for example that OpenGL might not be installed by default anymore in the next decade and now we have applications that no longer work.
+
+---
+
+# Why DwarFS instead of SquashFS?
+
+DwarFS is a lot faster than SquashFS while being smaller at the same time.
+
+<img width="631" height="257" alt="Screenshot_2026-04-27_02-09-36" src="https://github.com/user-attachments/assets/4b1096f8-95a2-443d-a9bd-5f0fa7dcffbe" />
+
+---
+DwarFS also offers PGO like optimizations, [which allows us to make small appimages that start instantly.](https://github.com/pkgforge-dev/CollaboraOffice-AppImage/pull/1)
+
+# AppImage has no thumbnail?
+
+Because we use DwarFS instead of SquashFS, you need an AppImage thumbnailer that supports DwarFS:
+
+* [appimage-thumbnailer](https://github.com/kem-a/appimage-thumbnailer)
+* [simple-appimage-thumbnailer](https://github.com/Samueru-sama/simple-appimage-thumbnailer)
+
+# I get `ERROR: Can't find a valid SQUASHFS superblock` in NixOS
+
+Once again this is because we use DwarFS instead of SquashFS, NixOS has something called `appimage-run` which lets you run old type appimages that need an FHS env and some host libraries, `appimage-run` manually mounts the appimage instead of letting it execute itself which results in that error since it expects it to be SquashFS.
+
+**None of this is needed for our appimages, they run directly in NixOS, so all you have to do is disable `appimage-run`.**
+
+# Why is there no `usr` directory in the AppImages?
+
+Because it causes more issues than it solves.
+
+* `/usr` is the typical installation prefix for an application.
+
+* `$APPDIR/usr` makes no sense, it just causes projects to code exceptions for appimage that do something along these lines: `getenv(APPDIR)` + `usr` + `xyz`. Instead we make `APPDIR` the installation prefix directly. **This means we can take any application and patch away the `/usr` prefix for `$APPDIR` and make them portable without the need for projects to support AppImage.** Here are some examples where projects checking for `$APPDIR` just made things worse: [1](https://github.com/kem-a/AppManager/issues/41#issuecomment-3905238762) [2](https://github.com/pkgforge-dev/Anylinux-AppImages/issues/330#issuecomment-3939566890)
+
+* **NOTE:** `$APPDIR/shared` is an internal directory that sharun uses for itself, **you should never copy anything manually there.**

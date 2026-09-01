@@ -1,0 +1,459 @@
+#compdef ppkg
+
+_ppkg_formula_mapping_keys=(
+    'pkgtype'
+    'summary'
+    'version'
+    'license'
+    'web-url'
+    'git-url'
+    'git-sha'
+    'git-ref'
+    'git-nth'
+    'src-url'
+    'src-sha'
+    'fix-url'
+    'fix-sha'
+    'res-url'
+    'res-sha'
+    'dep-pkg'
+    'dep-upp'
+    'dep-pym'
+    'dep-plm'
+    'ppflags'
+    'ccflags'
+    'xxflags'
+    'ldflags'
+    'bscript'
+    'binbstd'
+    'bsystem'
+    'dofetch'
+    'do12345'
+    'dopatch'
+    'prepare'
+    'install'
+    'dotweak'
+    'caveats'
+    'movable'
+    'disable'
+    'developer'
+)
+
+_ppkg_actions=(
+    '-h:show help of this command.'
+    '--help:show help of this command.'
+    'help:show help of this command.'
+    '-V:show version of this command.'
+    '--version:show version of this command.'
+    'version:show version of this command.'
+    'about:show basic information about this software.'
+    'sysinfo:show basic information about your current running operation system.'
+    'gen-url-transform-sample:generate url-transform sample.'
+    'setup:install essential tools.'
+    'integrate:integrate zsh completions.'
+    'upgrade-self:upgrade this software.'
+    'cleanup:cleanup the unused cache.'
+    'update:update all the formula repositories.'
+    'formula-repo-init:create a new empty formula repository.'
+    'formula-repo-add:create a new empty formula repository then sync with server.'
+    'formula-repo-del:delete the given formula repository from your local cache.'
+    'formula-repo-sync:sync the given formula repository.'
+    'formula-repo-conf:change the config of the given formula repository.'
+    'formula-repo-info:show information of the given formula repository.'
+    'formula-repo-list:list all available formula repositories.'
+    'formula-set:change the give mapping of the formula of the given package.'
+    'search:search all available packages whose name matches the given regular expression partten.'
+    'info:show information of the given available package.'
+    'show:show information of the given installed package.'
+    'depends:show packages that are depended by the given package.'
+    'is-available:check if the given package is available.'
+    'is-installed:check if the given package is installed.'
+    'is-outdated:check if the given package is outdated.'
+    'ls-available:list the available packages.'
+    'ls-installed:list the installed packages.'
+    'ls-outdated:list the installed packages which can be upgraded.'
+    'fetch:download resources of the given package to the local cache.'
+    'install:install packages.'
+    'reinstall:reinstall packages.'
+    'uninstall:uninstall packages.'
+    'upgrade:upgrade the outdated packages.'
+    'tree:list the installed files of the given installed package in a tree-like format.'
+    'logs:show logs of the given installed package.'
+    'bundle:bundle the given installed package into a single archive file.'
+    'export:export the given installed package as another package format e.g. .deb, .rpm, .apk, .pkg.tar.xz, .AppImage, etc.'
+    'util:common used utilities.'
+)
+
+function _ppkg_available_packages() {
+    local -a _available_packages
+    _available_packages=($(ppkg ls-available 2>/dev/null))
+    _describe 'available-packages' _available_packages
+}
+
+function _ppkg_installed_packages() {
+    local -a _installed_packages
+    _installed_packages=($(ppkg ls-installed 2>/dev/null))
+    _describe 'installed-packages' _installed_packages
+}
+
+function _ppkg_outdated_packages() {
+    local -a _outdated_packages
+    _outdated_packages=($(ppkg ls-outdated 2>/dev/null))
+    _describe 'outdated-packages' _outdated_packages
+}
+
+function _ppkg_install_target() {
+    local -a platform_names=('linux' 'macos' 'freebsd' 'openbsd' 'netbsd' 'dragonflybsd')
+
+    if [ -z "$PREFIX" ] ; then
+        compadd -S '-' -a -- platform_names
+        return
+    fi
+
+    local -a parts
+    parts=("${(s:-:)PREFIX}")
+
+    case ${#parts} in
+        1)  compadd -S - -a -- platform_names
+            ;;
+        2)  local isValid=0
+
+            for item ($platform_names) {
+                if [ "$item" = "${parts[1]}" ] ; then
+                    isValid=1
+                    break
+                fi
+            }
+
+            [ "$isValid" = 0 ] && return
+
+            local -a versions
+
+            case ${parts[1]} in
+                macos)
+                    versions=('15.4' '15.3' '15.2' '15.1' '15.0' '14.6' '14.5' '14.4' '14.3' '14.2' '14.1' '14.0' '13.5' '13.4' '13.3' '13.2' '13.1' '13.0' '12.4' '12.3' '12.2' '12.0' '11.5' '11.4' '11.3' '11.2' '11.1' '11.0' '10.15' '10.14' '10.13')
+                    ;;
+                linux)
+                    versions=('glibc' 'musl')
+                    ;;
+                freebsd)
+                    versions=('14.2' '14.1' '14.0' '13.5' '13.4' '13.3' '13.2')
+                    ;;
+                openbsd)
+                    versions=('7.7' '7.6' '7.5' '7.4' '7.3' '7.2')
+                    ;;
+                netbsd)
+                    versions=('10.1' '10.0' '9.4' '9.3' '9.2')
+                    ;;
+                dragonflybsd)
+                    versions=('6.4')
+                    ;;
+            esac
+
+            compadd -S - -P "${PREFIX%-*}-" -a -- versions
+            ;;
+        3)  local isValid=0
+
+            for item ($platform_names) {
+                if [ "$item" = "${parts[1]}" ] ; then
+                    isValid=1
+                    break
+                fi
+            }
+
+            [ "$isValid" = 0 ] && return
+
+            local -a archs
+
+            case ${parts[1]} in
+                macos)
+                    archs=('arm64' 'arm64e' 'x86_64')
+                    ;;
+                linux)
+                    archs=('aarch64' 'x86_64' 'riscv64' 'ppc64le' 's390x' 'loongarch64')
+                    ;;
+                *)  archs=('arm64' 'x86_64')
+            esac
+
+            compadd -P "${PREFIX%-*}-" -a -- archs
+            ;;
+    esac
+}
+
+function _ppkg() {
+    local context state state_descr line
+    typeset -A opt_args
+
+    _arguments \
+        '1: :{_describe ppkg_actions _ppkg_actions}' \
+        '*:: :->option'
+
+    case $state in
+        option)
+            case $words[1] in
+                formula-set)
+                    _arguments \
+                        '1:package-name:_ppkg_available_packages' \
+                        '2:key:{_describe keys _ppkg_formula_mapping_keys}' \
+                        '3:value:()'
+                    ;;
+                formula-repo-add)
+                    _arguments \
+                        '1:formula-repo-name:(name)' \
+                        '2:formula-repo-url:(https://)' \
+                        '--branch=-[set the formula repo branch]' \
+                        + '(pin)' \
+                        '--pin[set pinned to 1]' \
+                        '--unpin[set pinned to 0]' \
+                        + '(enable)' \
+                        '--enable[set enabled to 1]' \
+                        '--disable[set enabled to 0]'
+                    ;;
+                formula-repo-init)
+                    _arguments \
+                        '1:formula-repo-name:(name)' \
+                        '2:formula-repo-url:(https://)' \
+                        '--branch=-[set the formula repo branch]' \
+                        + '(pin)' \
+                        '--pin[set pinned to 1]' \
+                        '--unpin[set pinned to 0]' \
+                        + '(enable)' \
+                        '--enable[set enabled to 1]' \
+                        '--disable[set enabled to 0]'
+                    ;;
+                formula-repo-conf)
+                    _arguments \
+                        '1:formula-repo-name:($(ppkg formula-repo-list | sed -n "/^name: /p" | cut -c7-))' \
+                        '--url=-[change the formula repo url]' \
+                        '--branch=-[change the formula repo branch]' \
+                        + '(pin)' \
+                        '--pin[set pinned to yes]' \
+                        '--unpin[set pinned to no]' \
+                        + '(enable)' \
+                        '--enable[set enabled to yes]' \
+                        '--disable[set enabled to no]'
+                    ;;
+                formula-repo-del)
+                    _arguments '1:formula-repo-name:($(ppkg formula-repo-list | sed -n "/^name: /p" | cut -c7-))'
+                    ;;
+                formula-repo-sync)
+                    _arguments '1:formula-repo-name:($(ppkg formula-repo-list | sed -n "/^name: /p" | cut -c7-))'
+                    ;;
+                formula-repo-info)
+                    _arguments '1:formula-repo-name:($(ppkg formula-repo-list | sed -n "/^name: /p" | cut -c7-))'
+                    ;;
+                info)
+                    _arguments \
+                        '1:package-name:_ppkg_available_packages' \
+                        '2:key:(--yaml --json summary version license web-url git-url git-sha git-ref git-nth src-url src-uri src-sha fix-url fix-uri fix-sha res-url res-uri res-sha dep-pkg dep-upp dep-pym dep-plm ppflags ccflags xxflags ldflags bscript binbstd bsystem do12345 dopatch install symlink)' \
+                        '-p[specify target platform name]:platform:(linux macos freebsd openbsd netbsd dragonflybsd)'
+                    ;;
+                show)
+                    _arguments \
+                        '1:package-name:_ppkg_installed_packages' \
+                        '2:key:(--prefix --files --yaml --json summary version license web-url git-url git-sha git-ref git-nth src-url src-uri src-sha fix-url fix-uri fix-sha res-url res-uri res-sha dep-pkg dep-upp dep-pym dep-plm ppflags ccflags xxflags ldflags bscript binbstd bsystem do12345 dopatch install symlink builtat builtat-rfc-3339 builtat-iso-8601 builtat-rfc-3339-utc builtat-iso-8601-utc)'
+                    ;;
+                fetch)
+                    _arguments \
+                        '1:package-name:_ppkg_available_packages' \
+                        '-p[specify target platform name]:platform:(linux macos freebsd openbsd netbsd dragonflybsd)'
+                    ;;
+                depends)
+                    _arguments \
+                        '1:package-name:_ppkg_available_packages' \
+                        '-t[specify output format]:output-type:(d2 dot box svg png)' \
+                        '-o[specify output filepath or directory]:output-path:_files' \
+                        '-p[specify target platform name]:platform:(linux macos freebsd openbsd netbsd dragonflybsd)'
+                    ;;
+                bundle)
+                    _arguments \
+                        '1:package-name:_ppkg_installed_packages' \
+                        ':output-path:_files' \
+                        '--exclude[specify exclude path]:exclude-path:_path_files -/' \
+                        '-K[do not delete the session directory even if exported successfully]' \
+                        '--portable[make it portable]'
+                    ;;
+                export)
+                    _arguments \
+                        '1:package-name:_ppkg_installed_packages' \
+                        ':output-path:_files' \
+                        '--exclude[specify exclude path]:exclude-path:_path_files -/' \
+                        '-K[do not delete the session directory even if exported successfully]'
+                    ;;
+                tree)
+                    _arguments \
+                        '1:package-name:_ppkg_installed_packages' \
+                        '-a[show all files, including hidden ones]' \
+                        '--dirsfirst[list directories before files]' \
+                        '-L[level]:level:(3)'
+                    ;;
+                logs)
+                    _arguments \
+                        '1:package-name:_ppkg_installed_packages'
+                    ;;
+                install)
+                    _arguments \
+                        ':package-name:_ppkg_available_packages' \
+                        '--target=-[specify the target to be built for]:target:_ppkg_install_target' \
+                        '--profile=-[specify build profile]:profile:(debug release)' \
+                        '--static[create fully statically linked executables]' \
+                        '-j[specify the number of jobs you can run in parallel]:jobs:(1 2 3 4 5 6 7 8 9)' \
+                        '-I[specify the formula search directory]:search-dir:_path_files -/' \
+                        '-U[upgrade if possible]' \
+                        '-K[keep the session directory even if successfully installed]' \
+                        '-E[export compile_commands.json]' \
+                        '--disable-ccache[do not use ccache]' \
+                        '-v-env[show all environment variables before starting to build]' \
+                        '-v-http[show http request/response]' \
+                        '-v-formula[show formula content]' \
+                        '-v-toolchain[show C/C++ toolchain information]' \
+                        '-v-go[pass -v argument to go build command]' \
+                        '-v-uppm[pass -v argument to uppm command]' \
+                        '-v-cargo[pass -v argument to cargo command]' \
+                        '-v-meson[pass -v argument to meson command]' \
+                        '-v-ninja[pass -v argument to ninja command]' \
+                        '-v-gmake[pass V=1 argument to gmake command]' \
+                        '-v-xmake[pass -v argument to xmake command]' \
+                        '-v-cmake[pass -DCMAKE_VERBOSE_MAKEFILE argument to cmake command]' \
+                        '-x-sh[set -x to debug current running shell]' \
+                        '-x-cc[pass -v argument to clang command]' \
+                        '-x-ld[pass -Wl,-v argument to linker]' \
+                        '-x-go[pass -x argument to go build command]' \
+                        '-x-cargo[pass -vv argument to cargo command]' \
+                        '-x-gmake[pass --debug argument to gmake command]' \
+                        '-x-cmake[pass -DCMAKE_FIND_DEBUG_MODE=ON argument to cmake command]' \
+                        '-x-xmake[pass -vD argument to xmake command]' \
+                        '-x-pkg-config[export PKG_CONFIG_DEBUG_SPEW=1]' \
+                        + '(verbose_level)' \
+                        '-x[very verbose mode. equivalent to -v-* and -x-* options all are supplied]' \
+                        '-v[verbose mode. equivalent to -v-* options all are supplied]' \
+                        '-q[silent mode.]'
+                    ;;
+                reinstall)
+                    _arguments \
+                        ':package-name:_ppkg_installed_packages' \
+                        '--target=-[specify the target to be built for]:target:_ppkg_install_target' \
+                        '--profile=-[specify build profile]:profile:(debug release)' \
+                        '--static[create fully statically linked executables]' \
+                        '-j[specify the number of jobs you can run in parallel]:jobs:(1 2 3 4 5 6 7 8 9)' \
+                        '-I[specify the formula search directory]:search-dir:_path_files -/' \
+                        '-U[upgrade if possible]' \
+                        '-K[keep the session directory even if successfully installed]' \
+                        '-E[export compile_commands.json]' \
+                        '--disable-ccache[do not use ccache]' \
+                        '-v-env[show all environment variables before starting to build]' \
+                        '-v-http[show http request/response]' \
+                        '-v-formula[show formula content]' \
+                        '-v-toolchain[show C/C++ toolchain information]' \
+                        '-v-go[pass -v argument to go build command]' \
+                        '-v-uppm[pass -v argument to uppm command]' \
+                        '-v-ninja[pass -v argument to ninja command]' \
+                        '-v-meson[pass -v argument to meson command]' \
+                        '-v-cargo[pass -v argument to cargo command]' \
+                        '-v-gmake[pass V=1 argument to gmake command]' \
+                        '-v-xmake[pass -v argument to xmake command]' \
+                        '-v-cmake[pass -DCMAKE_VERBOSE_MAKEFILE argument to cmake command]' \
+                        '-x-sh[set -x to debug current running shell]' \
+                        '-x-go[pass -x argument to go build command]' \
+                        '-x-cc[pass -v argument to clang command]' \
+                        '-x-ld[pass -Wl,-v argument to linker]' \
+                        '-x-cargo[pass -vv argument to cargo command]' \
+                        '-x-gmake[pass --debug argument to gmake command]' \
+                        '-x-cmake[pass -DCMAKE_FIND_DEBUG_MODE=ON argument to cmake command]' \
+                        '-x-xmake[pass -vD argument to xmake command]' \
+                        '-x-pkg-config[export PKG_CONFIG_DEBUG_SPEW=1]' \
+                        + '(verbose_level)' \
+                        '-x[very verbose mode. equivalent to -v-* and -x-* options all are supplied]' \
+                        '-v[verbose mode. equivalent to -v-* options all are supplied]' \
+                        '-q[silent mode.]'
+                    ;;
+                upgrade)
+                    _arguments \
+                        ':package-name:_ppkg_outdated_packages' \
+                        '--target=-[specify the target to be built for]:target:_ppkg_install_target' \
+                        '--profile=-[specify build profile]:profile:(debug release)' \
+                        '--static[create fully statically linked executables]' \
+                        '-j[specify the number of jobs you can run in parallel]:jobs:(1 2 3 4 5 6 7 8 9)' \
+                        '-I[specify the formula search directory]:search-dir:_path_files -/' \
+                        '-U[upgrade if possible]' \
+                        '-K[keep the session directory even if successfully installed]' \
+                        '-E[export compile_commands.json]' \
+                        '--disable-ccache[do not use ccache]' \
+                        '-v-env[show all environment variables before starting to build]' \
+                        '-v-http[show http request/response]' \
+                        '-v-formula[show formula content]' \
+                        '-v-toolchain[show C/C++ toolchain information]' \
+                        '-v-go[pass -v argument to go build command]' \
+                        '-v-uppm[pass -v argument to uppm command]' \
+                        '-v-ninja[pass -v argument to ninja command]' \
+                        '-v-meson[pass -v argument to meson command]' \
+                        '-v-cargo[pass -v argument to cargo command]' \
+                        '-v-gmake[pass V=1 argument to gmake command]' \
+                        '-v-xmake[pass -v argument to xmake command]' \
+                        '-v-cmake[pass -DCMAKE_VERBOSE_MAKEFILE argument to cmake command]' \
+                        '-x-sh[set -x to debug current running shell]' \
+                        '-x-cc[pass -v argument to clang command]' \
+                        '-x-ld[pass -Wl,-v argument to linker]' \
+                        '-x-go[pass -x argument to go build command]' \
+                        '-x-cargo[pass -vv argument to cargo command]' \
+                        '-x-gmake[pass --debug argument to gmake command]' \
+                        '-x-cmake[pass -DCMAKE_FIND_DEBUG_MODE=ON argument to cmake command]' \
+                        '-x-xmake[pass -vD argument to xmake command]' \
+                        '-x-pkg-config[export PKG_CONFIG_DEBUG_SPEW=1]' \
+                        + '(verbose_level)' \
+                        '-x[very verbose mode. equivalent to -v-* and -x-* options all are supplied]' \
+                        '-v[verbose mode. equivalent to -v-* options all are supplied]' \
+                        '-q[silent mode.]'
+                    ;;
+
+
+                uninstall)
+                    _arguments '*:package-name:_ppkg_installed_packages'
+                    ;;
+                ls-available)
+                    _arguments \
+                        '-p[specify target platform name]:platform:(linux macos freebsd openbsd netbsd dragonflybsd)'
+                    ;;
+                ls-installed)
+                    _arguments \
+                        '--target=-[specify target platform]:target:_ppkg_install_target'
+                    ;;
+                ls-outdated)
+                    _arguments \
+                        '--target=-[specify target platform]:target:_ppkg_install_target'
+                    ;;
+                is-available)
+                    _arguments \
+                        '1:package-name:_ppkg_available_packages' \
+                        '-p[specify target platform name]:platform:(linux macos freebsd openbsd netbsd dragonflybsd)'
+                    ;;
+                is-installed)
+                    _arguments '1:package-name:_ppkg_installed_packages'
+                    ;;
+                is-outdated)
+                    _arguments '1:package-name:_ppkg_outdated_packages'
+                    ;;
+                integrate)
+                    _arguments '1:what:(zsh)'
+                    ;;
+                util)
+                    _arguments \
+                        '1: :(wfetch uncompress)' \
+                        '*:: :->util-option'
+
+                    case $state in
+                        util-option)
+                            case $words[1] in
+                                wfetch)
+                                    _arguments \
+                                        '1:what:(https://)' \
+                                        '-v[verbose mode. many messages will be output to terminal]'
+                                    ;;
+                            esac
+                    esac
+
+            esac
+            ;;
+        *);;
+    esac
+}

@@ -1,0 +1,152 @@
+[
+ {
+  "name": "v0.4.0",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.4.0",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.4.0",
+  "commit": {
+   "sha": "88e4453c534c0fcc07ecc403abd4758514feb11a",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/88e4453c534c0fcc07ecc403abd4758514feb11a"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuNC4w"
+ },
+ {
+  "name": "v0.3.10",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.10",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.10",
+  "commit": {
+   "sha": "3cd139d3079bc4c5fa74c53d37fc7fc327366e9b",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/3cd139d3079bc4c5fa74c53d37fc7fc327366e9b"
+  },
+  "node_id": "REF_kwDOJ_lkfLFyZWZzL3RhZ3MvdjAuMy4xMA"
+ },
+ {
+  "name": "v0.3.9",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.9",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.9",
+  "commit": {
+   "sha": "9539f95e0d3b12634c0cfd24c10ceedab0077913",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/9539f95e0d3b12634c0cfd24c10ceedab0077913"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMy45"
+ },
+ {
+  "name": "v0.3.8",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.8",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.8",
+  "commit": {
+   "sha": "9cad18cc4adcf2a2fcd6bc18afb3eba15f743119",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/9cad18cc4adcf2a2fcd6bc18afb3eba15f743119"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMy44"
+ },
+ {
+  "name": "v0.3.7",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.7",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.7",
+  "commit": {
+   "sha": "09efcbb5628320a2bf0c72efe710697342b5a467",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/09efcbb5628320a2bf0c72efe710697342b5a467"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMy43"
+ },
+ {
+  "name": "v0.3.6",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.6",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.6",
+  "commit": {
+   "sha": "42e82c8c5ccf0e9e65d2ddab87d1e649430966da",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/42e82c8c5ccf0e9e65d2ddab87d1e649430966da"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMy42"
+ },
+ {
+  "name": "v0.3.5",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.5",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.5",
+  "commit": {
+   "sha": "c95a2e2de22368a19d382073733e9e25b5b2c460",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/c95a2e2de22368a19d382073733e9e25b5b2c460"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMy41"
+ },
+ {
+  "name": "v0.3.4",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.4",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.4",
+  "commit": {
+   "sha": "ff939d5a7263c6b4d6da127b4488a7dfa63d0326",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/ff939d5a7263c6b4d6da127b4488a7dfa63d0326"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMy40"
+ },
+ {
+  "name": "v0.3.3",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.3",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.3",
+  "commit": {
+   "sha": "b75f233c5b6e89564cc2e8ed59d16ec31f34b6d7",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/b75f233c5b6e89564cc2e8ed59d16ec31f34b6d7"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMy4z"
+ },
+ {
+  "name": "v0.3.2",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.2",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.2",
+  "commit": {
+   "sha": "3027c2b07f6e8334ee3e352211b87a7c848b8988",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/3027c2b07f6e8334ee3e352211b87a7c848b8988"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMy4y"
+ },
+ {
+  "name": "v0.3.1",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.1",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.1",
+  "commit": {
+   "sha": "5e510b80a5eb4589de57c823d1d1fb874ae0b944",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/5e510b80a5eb4589de57c823d1d1fb874ae0b944"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMy4x"
+ },
+ {
+  "name": "v0.3.0",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.3.0",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.3.0",
+  "commit": {
+   "sha": "6f0a881f53f87cb31b7602f412d041b6d0f5ac01",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/6f0a881f53f87cb31b7602f412d041b6d0f5ac01"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMy4w"
+ },
+ {
+  "name": "v0.2.0",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.2.0",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.2.0",
+  "commit": {
+   "sha": "03809823d701ba1af38eb6ba0c6fdeaa2c2183c6",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/03809823d701ba1af38eb6ba0c6fdeaa2c2183c6"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMi4w"
+ },
+ {
+  "name": "v0.1.1",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.1.1",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.1.1",
+  "commit": {
+   "sha": "44eaa054c2c9664994e5eda596f5c7f37321c62b",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/44eaa054c2c9664994e5eda596f5c7f37321c62b"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMS4x"
+ },
+ {
+  "name": "v0.1.0",
+  "zipball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/zipball/refs/tags/v0.1.0",
+  "tarball_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/tarball/refs/tags/v0.1.0",
+  "commit": {
+   "sha": "2f7a131cab8375782791a8172ca087fb82cb41c4",
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/commits/2f7a131cab8375782791a8172ca087fb82cb41c4"
+  },
+  "node_id": "REF_kwDOJ_lkfLByZWZzL3RhZ3MvdjAuMS4w"
+ }
+]

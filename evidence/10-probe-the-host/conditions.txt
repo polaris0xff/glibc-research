@@ -1,0 +1,12 @@
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-01T05:33:30Z
+host kernel  : Linux 6.18.44-fc-v22
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/10-probe-the-host
+--------------------------------------------------------------
+
+rootfs present: 11  missing: 0

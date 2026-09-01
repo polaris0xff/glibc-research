@@ -1,0 +1,100 @@
+name: CentOS Linux
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  centos8:
+    runs-on: ubuntu-latest
+
+    container: centos:8
+
+    steps:
+      - run: sed -i -e 's|#baseurl=|baseurl=|g' -e 's|mirrorlist=|#mirrorlist=|g' -e 's|mirror|vault|g' -e 's|http:|https:|g' /etc/yum.repos.d/CentOS-*.repo
+
+      - run: dnf -y update
+      - run: dnf -y install curl xz
+
+      - uses: actions/checkout@main
+
+      - run:  ./build.sh
+
+      - run:  ./elftool
+
+      - run:  ./elftool --help
+      - run:  ./elftool --version
+
+      - run:  ./elftool -h
+      - run:  ./elftool -V
+
+      - run:  ./elftool print-interp elftool
+      - run:  ./elftool print-soname elftool
+      - run:  ./elftool print-needed elftool
+      - run:  ./elftool print-rpath  elftool
+
+
+  centos7:
+    if: false
+
+    runs-on: ubuntu-latest
+
+    container: centos:7
+
+    steps:
+      - run:  yum -y update
+      - run:  yum -y install curl xz
+
+      - uses: actions/checkout@main
+
+      - run:  ./build.sh
+
+      - run:  ./elftool
+
+      - run:  ./elftool --help
+      - run:  ./elftool --version
+
+      - run:  ./elftool -h
+      - run:  ./elftool -V
+
+      - run:  ./elftool print-interp elftool
+      - run:  ./elftool print-soname elftool
+      - run:  ./elftool print-needed elftool
+      - run:  ./elftool print-rpath  elftool
+
+
+  centos_6_10:
+    if: false
+
+    runs-on: ubuntu-latest
+
+    container: centos:6.10
+
+    steps:
+      - run: |
+          sed -i 's|#baseurl=|baseurl=|g'       /etc/yum.repos.d/CentOS-Base.repo
+          sed -i 's|mirrorlist=|#mirrorlist=|g' /etc/yum.repos.d/CentOS-Base.repo
+          sed -i 's|mirror|vault|g'             /etc/yum.repos.d/CentOS-Base.repo
+          sed -i 's|http:|https:|g'             /etc/yum.repos.d/CentOS-Base.repo
+
+          yum -y update
+          yum -y install curl xz
+
+      - uses: actions/checkout@main
+
+      - run:  ./build.sh
+
+      - run:  ./elftool
+
+      - run:  ./elftool --help
+      - run:  ./elftool --version
+
+      - run:  ./elftool -h
+      - run:  ./elftool -V
+
+      - run:  ./elftool print-interp elftool
+      - run:  ./elftool print-soname elftool
+      - run:  ./elftool print-needed elftool
+      - run:  ./elftool print-rpath  elftool

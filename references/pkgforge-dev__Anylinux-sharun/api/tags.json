@@ -1,0 +1,152 @@
+[
+ {
+  "name": "continuous",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/continuous",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/continuous",
+  "commit": {
+   "sha": "95b77999dadaf3dfd3f5b8fbf6783008b457fb4a",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/95b77999dadaf3dfd3f5b8fbf6783008b457fb4a"
+  },
+  "node_id": "REF_kwDOS5TeObRyZWZzL3RhZ3MvY29udGludW91cw"
+ },
+ {
+  "name": "3.0.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/3.0.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/3.0.0",
+  "commit": {
+   "sha": "325f931dd73f72b7c7ead5aa1541ab8e95722297",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/325f931dd73f72b7c7ead5aa1541ab8e95722297"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMy4wLjA"
+ },
+ {
+  "name": "2.3.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.3.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.3.0",
+  "commit": {
+   "sha": "a91dfd996f8ae67b6d9cc8c7d4872364ce6c50fe",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/a91dfd996f8ae67b6d9cc8c7d4872364ce6c50fe"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4zLjA"
+ },
+ {
+  "name": "2.2.7",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.2.7",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.2.7",
+  "commit": {
+   "sha": "ea27d13072bea41471d7980e87cc02f3ad3abf67",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/ea27d13072bea41471d7980e87cc02f3ad3abf67"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4yLjc"
+ },
+ {
+  "name": "2.2.6",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.2.6",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.2.6",
+  "commit": {
+   "sha": "726d25fa8c2b8468849fe45276d49a3f95e0330e",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/726d25fa8c2b8468849fe45276d49a3f95e0330e"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4yLjY"
+ },
+ {
+  "name": "2.2.5",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.2.5",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.2.5",
+  "commit": {
+   "sha": "f532d68ccd7b3486392802890034e2bc2d52d960",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/f532d68ccd7b3486392802890034e2bc2d52d960"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4yLjU"
+ },
+ {
+  "name": "2.2.4",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.2.4",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.2.4",
+  "commit": {
+   "sha": "9cabfcaf00abee4246b8e0a61f53a7024f6481fe",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/9cabfcaf00abee4246b8e0a61f53a7024f6481fe"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4yLjQ"
+ },
+ {
+  "name": "2.2.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.2.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.2.3",
+  "commit": {
+   "sha": "feaa16375d5766b65750adabe5e89dafd487ca3d",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/feaa16375d5766b65750adabe5e89dafd487ca3d"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4yLjM"
+ },
+ {
+  "name": "2.2.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.2.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.2.2",
+  "commit": {
+   "sha": "c413fbf99c96aa9717969b237aa76069dce8a8f2",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/c413fbf99c96aa9717969b237aa76069dce8a8f2"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4yLjI"
+ },
+ {
+  "name": "2.2.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.2.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.2.1",
+  "commit": {
+   "sha": "0f4821f4956b31ddf4cd98c9304de31a64efddec",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/0f4821f4956b31ddf4cd98c9304de31a64efddec"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4yLjE"
+ },
+ {
+  "name": "2.2.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.2.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.2.0",
+  "commit": {
+   "sha": "c630d5412e28f5937ca186dede1a7960f3a4c611",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/c630d5412e28f5937ca186dede1a7960f3a4c611"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4yLjA"
+ },
+ {
+  "name": "2.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.1.0",
+  "commit": {
+   "sha": "5734bfce0df319fa7f56a7d80e317ad5e7a8070b",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/5734bfce0df319fa7f56a7d80e317ad5e7a8070b"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4xLjA"
+ },
+ {
+  "name": "2.0.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.0.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.0.1",
+  "commit": {
+   "sha": "9d24c29b1e29e18f898004623de066b5521e9eae",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/9d24c29b1e29e18f898004623de066b5521e9eae"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4wLjE"
+ },
+ {
+  "name": "2.0.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/2.0.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/2.0.0",
+  "commit": {
+   "sha": "f5feae3e4ba2f385e8033f5f4a851646cf4550bd",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/f5feae3e4ba2f385e8033f5f4a851646cf4550bd"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMi4wLjA"
+ },
+ {
+  "name": "1.0.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/zipball/refs/tags/1.0.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/tarball/refs/tags/1.0.0",
+  "commit": {
+   "sha": "ad1a3998634efa0eb715f8bd2b3fbc377a22801f",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-sharun/commits/ad1a3998634efa0eb715f8bd2b3fbc377a22801f"
+  },
+  "node_id": "REF_kwDOS5TeOa9yZWZzL3RhZ3MvMS4wLjA"
+ }
+]

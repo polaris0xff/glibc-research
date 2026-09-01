@@ -1,0 +1,88 @@
+name: Get download stats
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Install dependencies
+        run: |
+          sudo apt update && sudo apt install wget
+          wget "https://raw.githubusercontent.com/xonixx/gron.awk/refs/heads/main/gron.awk" -O ./gron.awk
+          chmod +x ./gron.awk
+
+      - name: Get stats
+        run: |
+          LIST="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/README.md"
+          REPOS="$(
+            wget -q "$LIST" -O - \
+            | awk '/APPS_LIST_START/{p=1; next}/APPS_LIST_END/{p=0} p' \
+            | grep -io 'pkgforge-dev/.*AppImage.*)' \
+            | awk -F')' '{print $1}'
+          )"
+
+          cp ./.github/repos.stats /tmp/repos.stats.prev
+
+          set -o pipefail
+          for REPO in $REPOS; do
+              REPO=${REPO##*/}
+              echo "Checking downloads from $REPO"
+              if ! NUM=$(wget --header="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                "https://api.github.com/repos/pkgforge-dev/$REPO/releases?per_page=100" -O - \
+                | ./gron.awk | awk -F'=' '/download_count/ {total += $2} END {print total}'); then
+                  >&2 echo "WARNING, COULD NOT GET STATS FROM $REPO"
+                  continue
+              fi
+              echo "$NUM"
+              echo "=============================="
+          
+              if ! grep -q "^$REPO:" ./.github/repos.stats; then
+                  echo "${REPO}: $NUM" >> ./.github/repos.stats
+              else
+                  sed -i -e "s|^$REPO:.*|${REPO}: $NUM|" ./.github/repos.stats
+              fi
+          done
+          
+          sorted=$(sort -u ./.github/repos.stats)
+          echo "$sorted" > ./.github/repos.stats
+          sort -rnk2 ./.github/repos.stats > ./.github/repos.stats.bytotal
+
+          awk -F': ' '
+          NR==FNR { old[$1] = $2; next }
+          {
+            daily = $2 - old[$1]
+            if (daily < 0) daily = 0
+            print $1 ": " daily
+          }
+          ' /tmp/repos.stats.prev ./.github/repos.stats | sort -rnk2 > ./.github/repos.stats.diff
+
+          TOTAL=$(awk -F':' '{sum += $2} END {print sum}' ./.github/repos.stats)
+
+          echo "Total: $TOTAL"
+          cat << EOF > .github/badge.json
+          {
+            "schemaVersion": 1,
+            "label": "Downloads",
+            "message": "$TOTAL",
+            "color": "blue"
+          }
+          EOF
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ./.github/badge.json ./.github/repos.stats*
+          git commit -m "total-downloads badge auto-commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

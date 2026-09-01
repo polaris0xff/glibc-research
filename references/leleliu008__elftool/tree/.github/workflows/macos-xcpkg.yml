@@ -1,0 +1,41 @@
+name: build with xcpkg on macOS
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  brew:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-26, macos-15]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - run: curl -LO https://github.com/leleliu008/test/releases/download/2023.10.08/xcpkg-0.30.0-macos-15.0-arm64.release.tar.xz
+      - run: /usr/bin/bsdtar xf xcpkg-0.30.0-macos-15.0-arm64.release.tar.xz --strip-components=1
+
+      - run: bin/xcpkg update
+      - run: bin/xcpkg install elftool
+
+      - run: ln -s ~/.xcpkg/installed/*/elftool/bin/elftool .
+
+      - run:  ./elftool
+
+      - run:  ./elftool --help
+      - run:  ./elftool --version
+
+      - run:  ./elftool -h
+      - run:  ./elftool -V
+
+      - run:  curl -LO https://github.com/leleliu008/test/releases/download/2023.10.08/typos-linux-glibc-x86_64
+
+      - run:  ./elftool print-interp typos-linux-glibc-x86_64
+      - run:  ./elftool print-soname typos-linux-glibc-x86_64
+      - run:  ./elftool print-needed typos-linux-glibc-x86_64
+      - run:  ./elftool print-rpath  typos-linux-glibc-x86_64

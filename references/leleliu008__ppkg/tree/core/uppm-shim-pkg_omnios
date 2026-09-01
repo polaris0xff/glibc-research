@@ -1,0 +1,64 @@
+#!/bin/sh
+
+set -ex
+
+_pkg() {
+    if [ "$(id -u)" -eq 0 ] ; then
+             pkg "$@"
+    else
+        sudo pkg "$@"
+    fi
+}
+
+package_name_transform_from_uppm_to_pkg() {
+    case $1 in
+        gm4)      printf '%s\n' 'gnu-m4'    ;;
+        gsed)     printf '%s\n' 'gnu-sed'   ;;
+        grep)     printf '%s\n' 'gnu-grep'  ;;
+        gmake)    printf '%s\n' 'gnu-make'  ;;
+        patch)    printf '%s\n' 'gnu-patch' ;;
+        coreutils)printf '%s\n' 'gnu-coreutils' ;;
+        findutils)printf '%s\n' 'gnu-findutils' ;;
+        diffutils)printf '%s\n' 'gnu-diffutils' ;;
+        gcc)      printf '%s\n' 'gcc14'     ;;
+        golang)   printf '%s\n' 'go-126'    ;;
+        bsdtar)   printf '%s\n' 'libarchive';;
+        yq) ;;
+        *)        printf '%s\n' "$1"
+    esac
+}
+
+main() {
+    case $1 in
+        about)
+            _pkg version
+            ;;
+        update)
+            _pkg refresh
+            ;;
+        install)
+            shift 1
+            for UPPM_PACKAGE_NAME in "$@"
+            do
+                FPKG_PACKAGE_NAME="$(package_name_transform_from_uppm_to_pkg "$UPPM_PACKAGE_NAME")"
+                _pkg install "$FPKG_PACKAGE_NAME"
+            done
+            ;;
+        is-installed)
+            shift 1
+            FPKG_PACKAGE_NAME="$(package_name_transform_from_uppm_to_pkg "$1")"
+            _pkg info "$FPKG_PACKAGE_NAME" 2>/dev/null
+            ;;
+        info)
+            shift 1
+            case $2 in
+                installed-dir)
+                    #printf '%s\n' '/usr/local'
+                    ;;
+            esac
+            ;;
+        *)  _pkg "$@"
+    esac
+}
+
+main "$@"

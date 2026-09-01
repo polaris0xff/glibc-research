@@ -1,0 +1,124 @@
+name: Build Demos
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: [ '**/*.md' ]
+  schedule:
+    - cron: "0 7 1/14 * *"
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    name: "${{ matrix.script }} (${{ matrix.arch }})"
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: vkcube-glxgears-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: vkcube-glxgears-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: vkcube-glxgears-host-drivers-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: vkcube-glxgears-host-drivers-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: gtk3-demo-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: gtk3-demo-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: gtk4-demo-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: gtk4-demo-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: gtk4-demo-host-drivers-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: gtk4-demo-host-drivers-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: gtk2-demo-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: gtk2-demo-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: qt6-dbus-demo-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: qt6-dbus-demo-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: qt6-dbus-demo-host-drivers-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: qt6-dbus-demo-host-drivers-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: sdl-demo-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: sdl-demo-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: bun-demo-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: bun-demo-appimage
+          - arch: x86_64
+            runs-on: ubuntu-24.04
+            script: webkit2gtk4-demo-appimage
+          - arch: aarch64
+            runs-on: ubuntu-24.04-arm
+            script: webkit2gtk4-demo-appimage
+    container: ghcr.io/pkgforge-dev/archlinux:latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Make AppImage
+        run: |
+          sleep 10 # wait 10 seconds since github sometimes uses the file from the previous commit
+          sh ./useful-tools/demo/${{ matrix.script }}.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: AppImage-${{ matrix.arch }}-${{ matrix.script }}
+          path: dist
+
+  release:
+    if: ${{ github.ref_name == 'main' && needs.build.result == 'success' }}
+    needs: [build]
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: AppImage-*
+          merge-multiple: true
+
+      - name: Release Artifacts
+        uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
+        with:
+          name: "demos"
+          tag_name: "demo"
+          prerelease: false
+          draft: false
+          generate_release_notes: false
+          make_latest: true
+          files: |
+            *.AppImage

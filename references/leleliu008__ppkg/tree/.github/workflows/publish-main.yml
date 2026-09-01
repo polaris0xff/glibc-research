@@ -1,0 +1,30 @@
+name: publish ppkg main
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: |
+          RELEASE_VERSION="$(./ppkg --version)"
+
+          install -d bundle.d/bin/ bundle.d/share/zsh/vendor-completions/
+
+          mv  ppkg-zsh-completion _ppkg
+          mv  ppkg bundle.d/bin/
+          mv _ppkg bundle.d/share/zsh/vendor-completions/
+
+          mv bundle.d "ppkg-$RELEASE_VERSION"
+
+          tar cvzf "ppkg-$RELEASE_VERSION.tar.gz" "ppkg-$RELEASE_VERSION"
+
+          gh release create "$RELEASE_VERSION" *.tar.gz --title "$RELEASE_VERSION"

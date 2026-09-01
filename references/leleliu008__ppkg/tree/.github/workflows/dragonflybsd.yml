@@ -1,0 +1,86 @@
+name: DragonFlyBSD
+
+on:
+  push:
+    branches: [ master, dev, tmp ]
+  pull_request:
+    branches: [ master, dev, tmp ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        dragonflybsd-version: ['6.4.2']
+        pm: ['--syspm', '']
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: curl -LO https://github.com/leleliu008/uppm-package-repository-dragonflybsd-6.4-x86_64/releases/download/2023.12.04/curl-8.3.0-dragonflybsd-6.4-x86_64.tar.xz
+      - run: tar xvf curl-8.3.0-dragonflybsd-6.4-x86_64.tar.xz --strip-components=1
+
+      - uses: vmactions/dragonflybsd-vm@v1
+        with:
+          release: "${{ matrix.dragonflybsd-version }}"
+          usesh: true
+          sync: rsync
+          copyback: true
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            run id
+
+            export PATH="$PWD/bin:$PATH"
+
+            #run pkg install -y curl libnghttp2 gcc
+
+            run ./ppkg --help
+            run ./ppkg --version
+
+            run ./ppkg setup ${{ matrix.pm }}
+
+            run ./ppkg about
+
+            run ./ppkg integrate zsh
+
+            run ./ppkg update
+
+            run ./ppkg search lib
+            run ./ppkg search uctags
+
+            run ./ppkg info uctags
+            run ./ppkg info uctags summary
+            run ./ppkg info uctags web-url
+            run ./ppkg info uctags version
+
+            run ./ppkg depends uctags
+
+
+            run ./ppkg install uctags
+
+
+            run ./ppkg tree uctags
+            run ./ppkg bundle uctags .tar.xz
+
+            run ./ppkg formula-repo-list
+
+
+            run ./ppkg ls-available
+            run ./ppkg ls-installed
+            run ./ppkg ls-outdated
+
+            run ./ppkg is-available uctags
+            run ./ppkg is-installed uctags
+            run ./ppkg is-outdated uctags || echo "not outdated"
+
+            run ./ppkg uninstall uctags
+
+            run ./ppkg fetch curl
+
+            run ./ppkg upgrade-self

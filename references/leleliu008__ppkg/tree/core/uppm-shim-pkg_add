@@ -1,0 +1,77 @@
+#!/bin/sh
+
+set -ex
+
+_pkg_add() {
+    if [ "$(id -u)" -eq 0 ] ; then
+             pkg_add "$@"
+    else
+        sudo pkg_add "$@"
+    fi
+}
+
+package_name_transform_from_uppm_to_pkg_add() {
+    case $1 in
+        gm4)      printf '%s\n' 'm4'        ;;
+        grep)     printf '%s\n' 'ggrep'     ;;
+        gtar)     printf '%s\n' 'gtar--'    ;;
+        patch)    printf '%s\n' 'gpatch'    ;;
+        unzip)    printf '%s\n' 'unzip--'   ;;
+        golang)   printf '%s\n' 'go'        ;;
+        bsdtar)   printf '%s\n' 'libarchive';;
+        python3)
+            case $(uname -r) in
+                7.[0-2])
+                    printf '%s\n' 'python%3.10'
+                    ;;
+                7.*)
+                    printf '%s\n' 'python%3.11'
+                    ;;
+            esac
+            ;;
+        pkg-config)
+                  printf '%s\n' 'pkgconf'   ;;
+        autoconf) printf '%s\n' 'autoconf%2.69' ;;
+        automake) printf '%s\n' 'automake%1.16' ;;
+        *)        printf '%s\n' "$1"
+    esac
+}
+
+main() {
+    case $1 in
+        about)
+            ;;
+        update)
+            ;;
+        install)
+            shift 1
+            for UPPM_PACKAGE_NAME in "$@"
+            do
+                PKG_ADD_PACKAGE_NAME="$(package_name_transform_from_uppm_to_pkg_add "$UPPM_PACKAGE_NAME")"
+                _pkg_add "$PKG_ADD_PACKAGE_NAME"
+            done
+            ;;
+        is-installed)
+            shift 1
+            PKG_ADD_PACKAGE_NAME="$(package_name_transform_from_uppm_to_pkg_add "$1")"
+            for item in $(pkg_info | cut -d ' ' -f1)
+            do
+                case $item in
+                    "$PKG_ADD_PACKAGE_NAME-"*) return 0
+                esac
+            done
+            return 1
+            ;;
+        info)
+            shift 1
+            case $2 in
+                installed-dir)
+                    printf '%s\n' '/usr/local'
+                    ;;
+            esac
+            ;;
+        *)  _pkg_add "$@"
+    esac
+}
+
+main "$@"

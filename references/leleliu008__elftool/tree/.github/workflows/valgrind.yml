@@ -1,0 +1,38 @@
+name: valgrind
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  valgrind:
+
+    runs-on: ubuntu-latest
+
+    container: ubuntu:24.04
+
+    env:
+      VALGRIND: valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose --error-exitcode=1
+
+    steps:
+      - run:  apt -y update
+      - run:  apt -y install valgrind
+
+      - uses: actions/checkout@main
+
+      - run:  ./build.sh -o elftool -g
+
+      - run:  $VALGRIND ./elftool
+
+      - run:  $VALGRIND ./elftool --help
+      - run:  $VALGRIND ./elftool --version
+
+      - run:  $VALGRIND ./elftool -h
+      - run:  $VALGRIND ./elftool -V
+
+      - run:  $VALGRIND ./elftool print-interp elftool
+      - run:  $VALGRIND ./elftool print-soname elftool
+      - run:  $VALGRIND ./elftool print-needed elftool
+      - run:  $VALGRIND ./elftool print-rpath  elftool

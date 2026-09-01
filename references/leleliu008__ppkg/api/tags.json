@@ -1,0 +1,122 @@
+[
+ {
+  "name": "ppkg-core-2025.07.18",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2025.07.18",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2025.07.18",
+  "commit": {
+   "sha": "385b93109aa81161c1e3db1dffd68eaddb6d1cd7",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/385b93109aa81161c1e3db1dffd68eaddb6d1cd7"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNS4wNy4xOA=="
+ },
+ {
+  "name": "ppkg-core-2025.07.17",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2025.07.17",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2025.07.17",
+  "commit": {
+   "sha": "ed46fb36fe249a5ed32ea111d893aed1b55179f5",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/ed46fb36fe249a5ed32ea111d893aed1b55179f5"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNS4wNy4xNw=="
+ },
+ {
+  "name": "ppkg-core-2025.07.04",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2025.07.04",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2025.07.04",
+  "commit": {
+   "sha": "29bfdd6c0e4a1bbd20f8f024e51a20c5f36aedbe",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/29bfdd6c0e4a1bbd20f8f024e51a20c5f36aedbe"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNS4wNy4wNA=="
+ },
+ {
+  "name": "ppkg-core-2025.07.03",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2025.07.03",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2025.07.03",
+  "commit": {
+   "sha": "29bfdd6c0e4a1bbd20f8f024e51a20c5f36aedbe",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/29bfdd6c0e4a1bbd20f8f024e51a20c5f36aedbe"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNS4wNy4wMw=="
+ },
+ {
+  "name": "ppkg-core-2025.01.08",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2025.01.08",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2025.01.08",
+  "commit": {
+   "sha": "255260b7ad8d9cc6f050fbd210418984392ac989",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/255260b7ad8d9cc6f050fbd210418984392ac989"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNS4wMS4wOA=="
+ },
+ {
+  "name": "ppkg-core-2025.01.06",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2025.01.06",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2025.01.06",
+  "commit": {
+   "sha": "34cdf4f7d764076715f42394ff32ed8a037c4264",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/34cdf4f7d764076715f42394ff32ed8a037c4264"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNS4wMS4wNg=="
+ },
+ {
+  "name": "ppkg-core-2025.01.05",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2025.01.05",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2025.01.05",
+  "commit": {
+   "sha": "34cdf4f7d764076715f42394ff32ed8a037c4264",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/34cdf4f7d764076715f42394ff32ed8a037c4264"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNS4wMS4wNQ=="
+ },
+ {
+  "name": "ppkg-core-2025.01.04",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2025.01.04",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2025.01.04",
+  "commit": {
+   "sha": "34cdf4f7d764076715f42394ff32ed8a037c4264",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/34cdf4f7d764076715f42394ff32ed8a037c4264"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNS4wMS4wNA=="
+ },
+ {
+  "name": "ppkg-core-2024.10.27",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2024.10.27",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2024.10.27",
+  "commit": {
+   "sha": "cbbc7c747a26486f45d7bbab0709140f705465e4",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/cbbc7c747a26486f45d7bbab0709140f705465e4"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNC4xMC4yNw=="
+ },
+ {
+  "name": "ppkg-core-2024.10.26",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2024.10.26",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2024.10.26",
+  "commit": {
+   "sha": "c0e1eeb81b5330d883b0d805c4178a41493192bc",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/c0e1eeb81b5330d883b0d805c4178a41493192bc"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNC4xMC4yNg=="
+ },
+ {
+  "name": "ppkg-core-2024.08.18",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2024.08.18",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2024.08.18",
+  "commit": {
+   "sha": "e65f837b197afb3a09b3e236b5f345fa0dbce6b0",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/e65f837b197afb3a09b3e236b5f345fa0dbce6b0"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNC4wOC4xOA=="
+ },
+ {
+  "name": "ppkg-core-2024.06.30",
+  "zipball_url": "https://api.github.com/repos/leleliu008/ppkg/zipball/refs/tags/ppkg-core-2024.06.30",
+  "tarball_url": "https://api.github.com/repos/leleliu008/ppkg/tarball/refs/tags/ppkg-core-2024.06.30",
+  "commit": {
+   "sha": "18e8f3262d306a4552e90af785a7bc5f84c6a6ca",
+   "url": "https://api.github.com/repos/leleliu008/ppkg/commits/18e8f3262d306a4552e90af785a7bc5f84c6a6ca"
+  },
+  "node_id": "MDM6UmVmMzY5NDM5ODg3OnJlZnMvdGFncy9wcGtnLWNvcmUtMjAyNC4wNi4zMA=="
+ }
+]

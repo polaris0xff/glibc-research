@@ -1,0 +1,235 @@
+name: publish ppkg core
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  base:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - id:  calculate-release-version
+        run: |
+          RELEASE_VERSION="$(date +%Y.%m.%d)"
+
+          printf 'RELEASE_VERSION=%s\n' "$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      release-version: ${{ steps.calculate-release-version.outputs.RELEASE_VERSION }}
+
+
+  macos:
+    needs: base
+
+    runs-on: macos-26
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-version: ['10.15', '11.0', '12.0', '13.0', '14.0', '15.0', '26.0']
+        target-arch: [x86_64, arm64]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: .github/build-core.sh ${{ needs.base.outputs.release-version }} macos-${{ matrix.target-version }}-${{ matrix.target-arch }}
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ppkg-core-${{ needs.base.outputs.release-version }}-macos-${{ matrix.target-version }}-${{ matrix.target-arch }}.tar.xz
+          path: ppkg-core-${{ needs.base.outputs.release-version }}-macos-${{ matrix.target-version }}-${{ matrix.target-arch }}.tar.xz
+
+
+  linux:
+    needs: base
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-arch: [loongarch64, x86_64, aarch64, riscv64, ppc64le, s390x, armhf]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: curl -LO https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/master/alpine-chroot-install
+      - run: chmod +x alpine-chroot-install
+
+      - run: |
+          sed -i -e '/APK_TOOLS_URI:=/c APK_TOOLS_URI=https://gitlab.alpinelinux.org/api/v4/projects/5/packages/generic/v3.0.7/x86_64/apk.static' \
+                 -e '/APK_TOOLS_SHA256:=/c APK_TOOLS_SHA256=c07bf5356eacc9dd7a8c56bc537f46702f007170287403299d52a04264e74b3c' \
+                 alpine-chroot-install
+
+      - run: sudo ./alpine-chroot-install -d /alpine -a ${{ matrix.target-arch }}
+      - run: /alpine/enter-chroot /bin/sh .github/build-core.sh ${{ needs.base.outputs.release-version }} linux-musl-${{ matrix.target-arch }}
+      - run: /alpine/destroy
+      - run: ls -l
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ppkg-core-${{ needs.base.outputs.release-version }}-linux-${{ matrix.target-arch }}.tar.xz
+          path: ppkg-core-${{ needs.base.outputs.release-version }}-linux-*.tar.xz
+
+
+  dragonflybsd:
+    needs: base
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-version: ['6.4']
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: vmactions/dragonflybsd-vm@v1
+        with:
+          release: "${{ matrix.target-version }}.2"
+          usesh: true
+          sync: rsync
+          copyback: true
+          run: .github/build-core.sh ${{ needs.base.outputs.release-version }} dragonflybsd-${{ matrix.target-version }}-x86_64
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ppkg-core-${{ needs.base.outputs.release-version }}-dragonflybsd-${{ matrix.target-version }}-x86_64.tar.xz
+          path: ppkg-core-${{ needs.base.outputs.release-version }}-dragonflybsd-${{ matrix.target-version }}-x86_64.tar.xz
+
+
+  midnightbsd:
+    needs: base
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-version: ['4.0']
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: cross-platform-actions/action@master
+        with:
+          operating_system: midnightbsd
+          version: "${{ matrix.target-version }}.4"
+          shell: bash
+          run: .github/build-core.sh ${{ needs.base.outputs.release-version }} midnightbsd-${{ matrix.target-version }}-amd64
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ppkg-core-${{ needs.base.outputs.release-version }}-midnightbsd-${{ matrix.target-version }}-amd64.tar.xz
+          path: ppkg-core-${{ needs.base.outputs.release-version }}-midnightbsd-${{ matrix.target-version }}-amd64.tar.xz
+
+
+  freebsd:
+    needs: base
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-version: ['15.1', '15.0', '14.4', '14.3', '14.2', '14.1', '14.0', '13.5', '13.4', '13.3', '13.2']
+        # https://github.com/cross-platform-actions/action?tab=readme-ov-file#freebsd-freebsd
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: cross-platform-actions/action@master
+        with:
+          operating_system: freebsd
+          version: ${{ matrix.target-version }}
+          shell: bash
+          run: .github/build-core.sh ${{ needs.base.outputs.release-version }} freebsd-${{ matrix.target-version }}-amd64
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ppkg-core-${{ needs.base.outputs.release-version }}-freebsd-${{ matrix.target-version }}-amd64.tar.xz
+          path: ppkg-core-${{ needs.base.outputs.release-version }}-freebsd-${{ matrix.target-version }}-amd64.tar.xz
+
+
+  openbsd:
+    needs: base
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        openbsd-version: ['7.9', '7.8', '7.7', '7.6', '7.5', '7.4', '7.3', '7.2']
+        # https://cdn.openbsd.org/pub/OpenBSD/
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: cross-platform-actions/action@master
+        with:
+          operating_system: openbsd
+          version: ${{ matrix.openbsd-version }}
+          shell: bash
+          run: .github/build-core.sh ${{ needs.base.outputs.release-version }} openbsd-${{ matrix.openbsd-version }}-amd64
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ppkg-core-${{ needs.base.outputs.release-version }}-openbsd-${{ matrix.openbsd-version }}-amd64.tar.xz
+          path: ppkg-core-${{ needs.base.outputs.release-version }}-openbsd-${{ matrix.openbsd-version }}-amd64.tar.xz
+
+
+  netbsd:
+    needs: base
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-version: ['11.0', '10.1', '10.0', '9.4', '9.3', '9.2']
+        # https://ftp.netbsd.org/pub/NetBSD/
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: curl -LO https://curl.se/ca/cacert.pem
+
+      - uses: cross-platform-actions/action@master
+        with:
+          operating_system: netbsd
+          version: ${{ matrix.target-version }}
+          shell: bash
+          run: .github/build-core.sh ${{ needs.base.outputs.release-version }} netbsd-${{ matrix.target-version }}-amd64
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ppkg-core-${{ needs.base.outputs.release-version }}-netbsd-${{ matrix.target-version }}-amd64.tar.xz
+          path: ppkg-core-${{ needs.base.outputs.release-version }}-netbsd-${{ matrix.target-version }}-amd64.tar.xz
+
+
+  publish:
+
+    needs: [base, linux, macos, dragonflybsd, midnightbsd, freebsd, openbsd, netbsd]
+
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: '*'
+          path: .
+          merge-multiple: true
+
+      - run: ls -a
+
+      # to avaid: failed to run git: fatal: not a git repository (or any of the parent directories): .git
+      - run: git -c init.defaultBranch=master init
+      - run: git remote add origin ${{ github.repositoryUrl }}
+
+      - run: gh release create ppkg-core-${{ needs.base.outputs.release-version }} ppkg-core-*.tar.xz --title ppkg-core-${{ needs.base.outputs.release-version }}

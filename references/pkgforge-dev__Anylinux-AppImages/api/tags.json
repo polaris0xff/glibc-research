@@ -1,0 +1,12 @@
+[
+ {
+  "name": "demo",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-AppImages/zipball/refs/tags/demo",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-AppImages/tarball/refs/tags/demo",
+  "commit": {
+   "sha": "a69fd877abe96567fae942c6345904c0f850d8d0",
+   "url": "https://api.github.com/repos/pkgforge-dev/Anylinux-AppImages/commits/a69fd877abe96567fae942c6345904c0f850d8d0"
+  },
+  "node_id": "REF_kwDONTkKTK5yZWZzL3RhZ3MvZGVtbw"
+ }
+]

@@ -1,0 +1,33 @@
+# The test bed. One row per target environment, pinned by manifest digest.
+#
+# ⛔ THE DIGEST IS THE POINT. docs/methodology/experiments.md: "an experiment
+# against `latest` measures a different thing each week and says so nowhere."
+# `archlinux:latest` in particular is a rolling tag: the row below is the
+# image every result in docs/ was measured against, and re-pulling the tag
+# without updating this file silently changes what the numbers describe.
+#
+# Columns:  REFERENCE  LOCAL-NAME  LIBC  MANIFEST-DIGEST
+#
+# LIBC is the libc the DISTRIBUTION ships, which is what a portable binary is
+# being tested against. It is not the libc the binary was built with.
+#
+# Fetch them all:      sh scripts/common/fetch-rootfs.sh
+# Fetch one:           sh scripts/common/fetch-rootfs.sh alpine-3.22
+# Where they land:     $PGB_ROOTFS_DIR, default /var/lib/pgb-rootfs
+#
+# arm64 note: every row resolves on arm64 too EXCEPT the digests, which are
+# amd64-specific. Pass --arch arm64 to fetch-rootfs.sh to re-resolve by tag;
+# that trades the pin for the architecture and the script says so on the way
+# out. docs/research/architecture.md records what was and was not run there.
+
+alpine:3.22                      alpine-3.22          musl   sha256:7c8cb692ae09657cbc4a3f3cbd0e8d5a2690ba38386aaaf252dbb060bf5eb2e6
+alpine:3.20                      alpine-3.20          musl   sha256:c64c687cbea9300178b30c95835354e34c4e4febc4badfe27102879de0483b5e
+alpine:3.10                      alpine-3.10          musl   sha256:e515aad2ed234a5072c4d2ef86a1cb77d5bfe4b11aa865d9214875734c4eeb3c
+voidlinux/voidlinux-musl:latest  voidlinux-musl       musl   sha256:d5c970d0015c3aa2559a2b5a87b158839969fbb1941a9ef52cc484a5392554cd
+debian:11                        debian-11            glibc  sha256:c0a2ad73611131275b0e9a2e7544cfe3725f4268d4085d8c6f61fdd55aef7917
+debian:12                        debian-12            glibc  sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929
+ubuntu:20.04                     ubuntu-20.04         glibc  sha256:c664f8f86ed5a386b0a340d981b8f81714e21a8b9c73f658c4bea56aa179d54a
+rockylinux:8                     rockylinux-8         glibc  sha256:2d05a9266523bbf24f33ebc3a9832e4d5fd74b973c220f2204ca802286aa275d
+opensuse/leap:15.6               opensuse-leap-15.6   glibc  sha256:ca2942f9510c3e30fd322017782cdf6c067b2183dd7d56b39d0c697a9808ce2a
+fedora:42                        fedora-42            glibc  sha256:7c63468daf71fdc5bda3699cd483b169bb995b5137265d5ffe8f04e2ce87fbb8
+archlinux:latest                 archlinux-latest     glibc  sha256:818793c894d94534c22f2149154a39ebaee57e4e67321023b0866a1d5722036c

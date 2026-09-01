@@ -1,0 +1,86 @@
+name: Ubuntu
+
+on:
+  push:
+    branches: [ master, dev, tmp ]
+  pull_request:
+    branches: [ master, dev, tmp ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['26.04', 24.04, 22.04]
+
+    container: ubuntu:${{ matrix.version }}
+
+    steps:
+      - run: apt -y update
+      - run: apt -y install curl
+
+      - uses: actions/checkout@v5
+
+      - run: ./ppkg --help
+      - run: ./ppkg --version
+
+      - run: ./ppkg setup
+
+      - run: ./ppkg about
+
+      - run: ./ppkg integrate zsh
+
+      - run: ./ppkg update
+
+      - run: ./ppkg search lib
+      - run: ./ppkg search uctags
+
+      - run: ./ppkg info uctags
+      - run: ./ppkg info uctags summary
+      - run: ./ppkg info uctags web-url
+      - run: ./ppkg info uctags version
+
+      - run: ./ppkg depends uctags
+
+      - run: ./ppkg install uctags
+
+      - run: ./ppkg tree uctags
+
+      - run: ./ppkg bundle uctags .tar.gz
+      - run: ./ppkg bundle uctags .tar.xz
+      - run: ./ppkg bundle uctags .tar.bz2
+      - run: ./ppkg bundle uctags .zip
+
+      - run: ./ppkg export uctags .deb
+      - run: ./ppkg export uctags ~/.deb
+      - run: ./ppkg export uctags a/b.deb
+
+      - run: dpkg -i a/b.deb
+      - run: dpkg -L uctags
+
+      - run: ./ppkg formula-repo-list
+
+      - run: ./ppkg ls-available
+      - run: ./ppkg ls-installed
+      - run: ./ppkg ls-outdated
+
+      - run: ./ppkg is-available uctags
+      - run: ./ppkg is-installed uctags
+      - run: ./ppkg is-outdated  uctags || echo "not outdated"
+
+      - run: ./ppkg show uctags installed-dir
+      - run: ./ppkg show uctags installed-files
+      - run: ./ppkg show uctags builtat
+      - run: ./ppkg show uctags builtat-rfc-3339-utc
+      - run: ./ppkg show uctags builtat-iso-8601-utc
+      - run: ./ppkg show uctags builtat-rfc-3339
+      - run: ./ppkg show uctags builtat-iso-8601
+
+      - run: ./ppkg uninstall uctags
+
+      - run: ./ppkg fetch curl
+
+      - run: ./ppkg upgrade-self

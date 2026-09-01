@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# Demonstration that bundles gtk3 demo app
+
+set -eux
+
+ARCH="$(uname -m)"
+SHARUN="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/quick-sharun.sh"
+EXTRA_PACKAGES="https://raw.githubusercontent.com/${GITHUB_REPOSITORY%/*}/${GITHUB_REPOSITORY#*/}/refs/heads/main/useful-tools/get-debloated-pkgs.sh"
+
+export ICON=/usr/share/icons/hicolor/256x256/apps/gtk3-demo.png
+export DESKTOP=/usr/share/applications/gtk3-demo.desktop
+export OUTPATH=./dist
+export OUTNAME=gtk3-demo-"$ARCH".AppImage
+# gtk3 is not hardware accelerated, but supports GtkGLArea
+# to allow embedding opengl graphics inside gtk3 apps
+# very few apps use this, so lets just rely on the host drivers
+export USE_HOST_DRIVERS_EXPERIMENTAL=1
+
+pacman -Syu --noconfirm \
+	base-devel       \
+	git              \
+	gtk3-demos       \
+	libxcb           \
+	libxcursor       \
+	libxi            \
+	libxkbcommon     \
+	libxkbcommon-x11 \
+	libxrandr        \
+	libxtst          \
+	patchelf         \
+	wget             \
+	xorg-server-xvfb \
+	zsync
+
+echo "Installing debloated packages..."
+echo "---------------------------------------------------------------"
+wget --retry-connrefused --tries=30 "$EXTRA_PACKAGES" -O ./get-debloated-pkgs.sh
+chmod +x ./get-debloated-pkgs.sh
+./get-debloated-pkgs.sh --add-common --prefer-nano
+
+echo "Bundling AppImage..."
+echo "---------------------------------------------------------------"
+wget --retry-connrefused --tries=30 "$SHARUN" -O ./quick-sharun
+chmod +x ./quick-sharun
+./quick-sharun /usr/bin/gtk3-demo*
+
+./quick-sharun --make-appimage
+
+# test the final app
+./quick-sharun --test ./dist/*.AppImage
+

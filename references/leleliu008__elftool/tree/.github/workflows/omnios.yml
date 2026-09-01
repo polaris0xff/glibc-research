@@ -1,0 +1,47 @@
+name: OmniOS
+
+on:
+  push:
+    branches: [ master, dev, tmp ]
+  pull_request:
+    branches: [ master, dev, tmp ]
+
+jobs:
+  omnios:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['r151056', 'r151058']
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: curl -L -o src/elf.h 'https://sourceware.org/git/?p=glibc.git;a=blob_plain;f=elf/elf.h;hb=HEAD'
+
+      - uses: cross-platform-actions/action@master
+        with:
+          operating_system: omnios
+          version: ${{ matrix.version }}
+          shell: bash
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            run ./build.sh
+
+            run ./elftool
+
+            run ./elftool --help
+            run ./elftool --version
+
+            run ./elftool -h
+            run ./elftool -V
+
+            run ./elftool print-interp elftool
+            run ./elftool print-soname elftool
+            run ./elftool print-needed elftool
+            run ./elftool print-rpath  elftool

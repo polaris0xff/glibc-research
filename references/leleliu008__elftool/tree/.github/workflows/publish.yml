@@ -1,0 +1,430 @@
+name: publish elftool
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  check:
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - id:  check-if-has-new-commit
+        run: |
+          cat > QUERY <<EOF
+          {
+            repository(owner: "leleliu008", name: "elftool") {
+                latestRelease {
+                  name
+                }
+            }
+          }
+          EOF
+
+          LATEST_RELEASE_GIT_SHA="$(gh api graphql -f "query=$(cat QUERY)" --jq .data.repository.latestRelease.name | cut -d+ -f2)"
+
+          printf 'LATEST_RELEASE_GIT_SHA=%s\n' "$LATEST_RELEASE_GIT_SHA"
+
+          CURRENT_SOURCE_GIT_SHA='${{ github.sha }}'
+
+          printf 'CURRENT_SOURCE_GIT_SHA=%s\n' "$CURRENT_SOURCE_GIT_SHA"
+
+          if [ "$LATEST_RELEASE_GIT_SHA" = "$CURRENT_SOURCE_GIT_SHA" ] ; then
+              printf 'HAS_NEW_COMMIT=no\n'        >> "$GITHUB_OUTPUT"
+          else
+              printf 'HAS_NEW_COMMIT=yes\n'       >> "$GITHUB_OUTPUT"
+          fi
+
+          printf 'GIT_SHA=%s\n' "$CURRENT_SOURCE_GIT_SHA" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      if-has-new-commit: ${{ steps.check-if-has-new-commit.outputs.HAS_NEW_COMMIT }}
+      git-sha:           ${{ steps.check-if-has-new-commit.outputs.GIT_SHA }}
+
+
+  dragonflybsd:
+    if: needs.check.outputs.if-has-new-commit == 'yes'
+
+    needs: [check]
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['6.4']
+        profile: [debug, release]
+
+    steps:
+      - run: curl -LO https://github.com/leleliu008/elftool-package-repository-dragonflybsd-6.4-x86_64/releases/download/2023.12.04/curl-8.3.0-dragonflybsd-6.4-x86_64.tar.xz
+      - run: tar xvf curl-8.3.0-dragonflybsd-6.4-x86_64.tar.xz --strip-components=1
+      - run: rm -rf include/ lib/ share/
+
+      - uses: vmactions/dragonflybsd-vm@v1
+        with:
+          release: "${{ matrix.version }}.0"
+          usesh: true
+          sync: rsync
+          copyback: true
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            set -e
+
+            export PATH="$PWD/bin:$PATH"
+
+            run curl -LO https://raw.githubusercontent.com/leleliu008/ppkg/master/ppkg
+            run chmod a+x ppkg
+            run ./ppkg setup
+            run ./ppkg update
+            run ./ppkg formula-set elftool git-sha ${{ needs.check.outputs.git-sha }}
+            run ./ppkg install dragonflybsd-${{ matrix.version }}-x86_64/elftool --static --profile=${{ matrix.profile }}
+            run ./ppkg bundle  dragonflybsd-${{ matrix.version }}-x86_64/elftool .tar.xz
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: elftool---dragonflybsd-${{ matrix.version }}-x86_64-${{ matrix.profile }}.tar.xz
+          path: elftool-*-dragonflybsd-${{ matrix.version }}-x86_64.${{ matrix.profile }}.tar.xz
+
+
+  midnightbsd:
+    if: needs.check.outputs.if-has-new-commit == 'yes'
+
+    needs: [check]
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['4.0']
+        profile: [debug, release]
+
+    steps:
+      - uses: cross-platform-actions/action@master
+        with:
+          operating_system: midnightbsd
+          version: "${{ matrix.version }}.4"
+          shell: bash
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            run curl -LO https://raw.githubusercontent.com/leleliu008/ppkg/master/ppkg
+            run chmod a+x ppkg
+            run ./ppkg setup --syspm
+            run ./ppkg update
+            run ./ppkg formula-set elftool git-sha ${{ needs.check.outputs.git-sha }}
+            run ./ppkg install midnightbsd-${{ matrix.version }}-amd64/elftool --static --profile=${{ matrix.profile }}
+            run ./ppkg bundle  midnightbsd-${{ matrix.version }}-amd64/elftool .tar.xz
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: elftool---midnightbsd-${{ matrix.version }}-amd64-${{ matrix.profile }}.tar.xz
+          path: elftool-*-midnightbsd-${{ matrix.version }}-amd64.${{ matrix.profile }}.tar.xz
+
+
+  freebsd:
+    if: needs.check.outputs.if-has-new-commit == 'yes'
+
+    needs: [check]
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['15.1', '15.0', '14.4', '14.3', '14.2', '14.1', '14.0', '13.5', '13.4', '13.3', '13.2']
+        profile: [debug, release]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: cross-platform-actions/action@master
+        with:
+          operating_system: freebsd
+          version: ${{ matrix.version }}
+          shell: bash
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            run sudo pkg install -y curl
+
+            run curl -LO https://raw.githubusercontent.com/leleliu008/ppkg/master/ppkg
+            run chmod a+x ppkg
+
+            run ./ppkg setup --syspm
+            run ./ppkg update
+            run ./ppkg formula-set elftool git-sha ${{ needs.check.outputs.git-sha }}
+            run ./ppkg install freebsd-${{ matrix.version }}-amd64/elftool --static --profile=${{ matrix.profile }}
+            run ./ppkg bundle  freebsd-${{ matrix.version }}-amd64/elftool .tar.xz
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: elftool---freebsd-${{ matrix.version }}-amd64-${{ matrix.profile }}.tar.xz
+          path: elftool-*-freebsd-${{ matrix.version }}-amd64.${{ matrix.profile }}.tar.xz
+
+
+
+  openbsd:
+    if: needs.check.outputs.if-has-new-commit == 'yes'
+
+    needs: [check]
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['7.9', '7.8', '7.7', '7.6', '7.5', '7.4', '7.3', '7.2']
+        profile: [debug, release]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: cross-platform-actions/action@master
+        with:
+          operating_system: openbsd
+          version: ${{ matrix.version }}
+          shell: bash
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            run sudo pkg_add curl
+
+            run curl -LO https://raw.githubusercontent.com/leleliu008/ppkg/master/ppkg
+            run chmod a+x ppkg
+
+            run ./ppkg setup --syspm
+            run ./ppkg update
+            run ./ppkg formula-set elftool git-sha ${{ needs.check.outputs.git-sha }}
+            run ./ppkg install openbsd-${{ matrix.version }}-amd64/elftool --profile=${{ matrix.profile }}
+            run ./ppkg bundle  openbsd-${{ matrix.version }}-amd64/elftool .tar.xz
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: elftool---openbsd-${{ matrix.version }}-amd64-${{ matrix.profile }}.tar.xz
+          path: elftool-*-openbsd-${{ matrix.version }}-amd64.${{ matrix.profile }}.tar.xz
+
+
+
+  netbsd:
+    if: needs.check.outputs.if-has-new-commit == 'yes'
+
+    needs: [check]
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['10.1', '10.0', '9.4', '9.3', '9.2']
+        profile: [debug, release]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: cross-platform-actions/action@master
+        with:
+          operating_system: netbsd
+          version: ${{ matrix.version }}
+          shell: bash
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            run sudo pkgin -y install curl
+
+            run curl -LO -k https://curl.se/ca/cacert.pem
+
+            run export SSL_CERT_FILE="$PWD/cacert.pem"
+
+            run curl -LO https://raw.githubusercontent.com/leleliu008/ppkg/master/ppkg
+            run chmod a+x ppkg
+
+            run ./ppkg setup --syspm
+            run ./ppkg update
+            run ./ppkg formula-set elftool git-sha ${{ needs.check.outputs.git-sha }}
+            run ./ppkg install netbsd-${{ matrix.version }}-amd64/elftool --static --profile=${{ matrix.profile }}
+            run ./ppkg bundle  netbsd-${{ matrix.version }}-amd64/elftool .tar.xz
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: elftool---netbsd-${{ matrix.version }}-amd64-${{ matrix.profile }}.tar.xz
+          path: elftool-*-netbsd-${{ matrix.version }}-amd64.${{ matrix.profile }}.tar.xz
+
+
+  macos:
+    needs: check
+    if: needs.check.outputs.if-has-new-commit == 'yes'
+
+    runs-on: macos-26
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-version: ['10.15', '11.0', '12.0', '13.0', '14.0', '15.0', "26.0"]
+        target-arch: [x86_64, arm64]
+        profile: [debug, release]
+
+    steps:
+      - run: curl -LO https://raw.githubusercontent.com/leleliu008/ppkg/master/ppkg
+      - run: chmod a+x ppkg
+
+      - run: ./ppkg setup
+      - run: ./ppkg update
+      - run: ./ppkg formula-set elftool git-sha ${{ needs.check.outputs.git-sha }}
+      - run: ./ppkg install macos-${{ matrix.target-version }}-${{ matrix.target-arch }}/elftool --profile=${{ matrix.profile }}
+      - run: ./ppkg bundle  macos-${{ matrix.target-version }}-${{ matrix.target-arch }}/elftool .tar.xz
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: elftool-macos-${{ matrix.target-version }}-${{ matrix.target-arch }}.${{ matrix.profile }}.tar.xz
+          path: elftool-*.tar.xz
+
+
+  linux:
+    needs: [check]
+    if: needs.check.outputs.if-has-new-commit == 'yes'
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target-arch: [loongarch64, x86_64, aarch64, ppc64le, riscv64, s390x]
+        profile: [debug, release]
+
+    steps:
+      - run: |
+          cat > run.sh <<EOF
+          set -ex
+
+          COLOR_GREEN='\033[0;32m'        # Green
+          COLOR_PURPLE='\033[0;35m'       # Purple
+          COLOR_OFF='\033[0m'             # Reset
+
+          echo() {
+              printf '%b\n' "\$*"
+          }
+
+          run() {
+              echo "\${COLOR_PURPLE}==>\${COLOR_OFF} \${COLOR_GREEN}\$@\${COLOR_OFF}"
+              eval "\$*"
+          }
+
+          ########################################################################
+
+          run uname -a
+          run id
+          run pwd
+
+          export GITHUB_ACTIONS=true
+
+          ########################################################################
+
+          run wget https://raw.githubusercontent.com/leleliu008/ppkg/master/ppkg
+          run chmod a+x ppkg
+          run ./ppkg setup
+          run ./ppkg update
+          run ./ppkg formula-set elftool git-sha ${{ needs.check.outputs.git-sha }}
+          run ./ppkg install elftool --static --profile=${{ matrix.profile }}
+          run ./ppkg bundle  elftool .tar.xz
+          EOF
+
+      - run: curl -LO https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/master/alpine-chroot-install
+      - run: chmod +x alpine-chroot-install
+      - run: sudo ./alpine-chroot-install -d /alpine -a ${{ matrix.target-arch }} -p wget -p g++
+      - run: /alpine/enter-chroot sh run.sh
+      - run: /alpine/destroy
+
+      - run: ls
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: elftool---linux-${{ matrix.target-arch }}.${{ matrix.profile }}.tar.xz
+          path: elftool-*-linux-${{ matrix.target-arch }}.${{ matrix.profile }}.tar.xz
+
+
+  android:
+    needs: check
+    if: needs.check.outputs.if-has-new-commit == 'yes'
+
+    runs-on: ubuntu-latest
+
+    container: ubuntu:24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [debug, release]
+
+    steps:
+      - run: apt -y update
+      - run: apt -y install curl
+
+      - run: curl -LO https://raw.githubusercontent.com/leleliu008/ndk-pkg/master/ndk-pkg
+      - run: chmod +x ndk-pkg
+
+      - run: ./ndk-pkg about
+      - run: ./ndk-pkg setup
+      - run: ./ndk-pkg update
+
+      - run: ./ndk-pkg formula-set elftool git-sha ${{ needs.check.outputs.git-sha }}
+
+      - run: ./ndk-pkg install android-35-arm64-v8a,armeabi-v7a,x86_64,x86/elftool --static --profile=${{ matrix.profile }}
+
+      - run: ./ndk-pkg bundle  android-35-arm64-v8a/elftool   .tar.xz
+      - run: ./ndk-pkg bundle  android-35-armeabi-v7a/elftool .tar.xz
+      - run: ./ndk-pkg bundle  android-35-x86_64/elftool      .tar.xz
+      - run: ./ndk-pkg bundle  android-35-x86/elftool         .tar.xz
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: elftool---android-${{ matrix.profile }}
+          path: elftool-*-android-*.tar.xz
+
+
+  publish:
+    needs: [check, dragonflybsd, midnightbsd, freebsd, openbsd, netbsd, macos, linux, android]
+    if: needs.check.outputs.if-has-new-commit == 'yes'
+
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: '*'
+          path: .
+          merge-multiple: true
+
+      - run: ls -a
+
+      # to avaid: failed to run git: fatal: not a git repository (or any of the parent directories): .git
+      - run: git -c init.defaultBranch=master init
+      - run: git remote add origin ${{ github.repositoryUrl }}
+
+      - id: version
+        run: printf "VERSION=%s\n" "$(bin/elftool --version)" >> "$GITHUB_OUTPUT"
+
+      - run: |
+          gh release create '${{ steps.version.outputs.VERSION }}+${{ needs.check.outputs.git-sha }}' *.tar.xz --title '${{ steps.version.outputs.VERSION }}+${{ needs.check.outputs.git-sha }}' --notes 'build-from: https://github.com/leleliu008/elftool/tree/${{ needs.check.outputs.git-sha }}'

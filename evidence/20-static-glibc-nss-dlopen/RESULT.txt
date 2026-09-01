@@ -1,0 +1,76 @@
+===============================================================
+20 - does a static glibc binary dlopen host NSS modules, and can that be stopped
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-01T05:33:23Z
+host kernel  : Linux 6.18.44-fc-v22
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/20-static-glibc-nss-dlopen
+--------------------------------------------------------------
+
+  ok    linker warns about getaddrinfo in a static link = yes
+
+  synthetic root, /etc/nsswitch.conf = "hosts: files evil dns"
+  ok    A plain -static: host module markers           = EVIL-CALLED,EVIL-LOADED
+        the module's own constructor and its own lookup entry point both ran
+  ok    B +__nss_configure_lookup: host module markers = none
+        arm B still OPENS /etc/nsswitch.conf; what it does not do is load what the file names
+  ok    B never opened the host NSS module             = yes
+
+  real distributions (unmodified, pinned digests):
+    ENVIRONMENT          LIBC   A plain   B nssfix  C ctrl  host NSS modules arm A pulled in
+    alpine-3.22          musl   ok        ok        ok      none
+  ok    alpine-3.22: B loaded host NSS modules         = none
+  ok    alpine-3.22: B (portable arm) runs             = 0
+  ok    alpine-3.22: C (no-NSS control) runs           = 0
+    alpine-3.20          musl   ok        ok        ok      none
+  ok    alpine-3.20: B loaded host NSS modules         = none
+  ok    alpine-3.20: B (portable arm) runs             = 0
+  ok    alpine-3.20: C (no-NSS control) runs           = 0
+    alpine-3.10          musl   ok        ok        ok      none
+  ok    alpine-3.10: B loaded host NSS modules         = none
+  ok    alpine-3.10: B (portable arm) runs             = 0
+  ok    alpine-3.10: C (no-NSS control) runs           = 0
+    voidlinux-musl       musl   ok        ok        ok      libnss_mdns.so.2
+  ok    voidlinux-musl: B loaded host NSS modules      = none
+  ok    voidlinux-musl: B (portable arm) runs          = 0
+  ok    voidlinux-musl: C (no-NSS control) runs        = 0
+    debian-11            glibc  ok        ok        ok      none
+  ok    debian-11: B loaded host NSS modules           = none
+  ok    debian-11: B (portable arm) runs               = 0
+  ok    debian-11: C (no-NSS control) runs             = 0
+    debian-12            glibc  ok        ok        ok      none
+  ok    debian-12: B loaded host NSS modules           = none
+  ok    debian-12: B (portable arm) runs               = 0
+  ok    debian-12: C (no-NSS control) runs             = 0
+    ubuntu-20.04         glibc  ok        ok        ok      none
+  ok    ubuntu-20.04: B loaded host NSS modules        = none
+  ok    ubuntu-20.04: B (portable arm) runs            = 0
+  ok    ubuntu-20.04: C (no-NSS control) runs          = 0
+    rockylinux-8         glibc  ok        ok        ok      libnss_sss.so.2
+  ok    rockylinux-8: B loaded host NSS modules        = none
+  ok    rockylinux-8: B (portable arm) runs            = 0
+  ok    rockylinux-8: C (no-NSS control) runs          = 0
+    opensuse-leap-15.6   glibc  SIG8      ok        ok      libnss_compat.so.2
+  ok    opensuse-leap-15.6: B loaded host NSS modules  = none
+  ok    opensuse-leap-15.6: B (portable arm) runs      = 0
+  ok    opensuse-leap-15.6: C (no-NSS control) runs    = 0
+        opensuse-leap-15.6: arm A and arm B DIFFER -- host NSS changes the outcome here
+    fedora-42            glibc  ok        ok        ok      libnss_myhostname.so.2,libnss_resolve.so.2
+  ok    fedora-42: B loaded host NSS modules           = none
+  ok    fedora-42: B (portable arm) runs               = 0
+  ok    fedora-42: C (no-NSS control) runs             = 0
+    archlinux-latest     glibc  SIG8      ok        ok      libnss_mymachines.so.2
+  ok    archlinux-latest: B loaded host NSS modules    = none
+  ok    archlinux-latest: B (portable arm) runs        = 0
+  ok    archlinux-latest: C (no-NSS control) runs      = 0
+        archlinux-latest: arm A and arm B DIFFER -- host NSS changes the outcome here
+
+-- result ----------------------------------------------------
+pass=37 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

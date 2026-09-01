@@ -1,0 +1,902 @@
+[
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1311278790",
+  "pull_request_review_id": 1604219029,
+  "id": 1311278790,
+  "node_id": "PRRC_kwDOJ_lkfM5OKIbG",
+  "diff_hunk": "@@ -1,5 +1,2 @@\n \n-FROM ubuntu:23.04\n-\n-RUN apt update && \\\n-    apt install -y ca-certificates tzdata curl\n+FROM gcr.io/distroless/base-debian12",
+  "path": "Dockerfile",
+  "commit_id": "59ecfd3e74ae49b809755162eab40f26f3b96ccd",
+  "original_commit_id": "a3db99c6cbf6be2d36e81e446ca8ac298c81bd6c",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "- Hay que ponerle una versi\u00f3n.\r\n- Esta imagen no tiene glibc.",
+  "created_at": "2023-08-31T08:26:43Z",
+  "updated_at": "2023-08-31T08:26:58Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/1#discussion_r1311278790",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/1",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1311278790"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/1#discussion_r1311278790"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/1"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1311278790/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 2,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 6,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356052",
+  "pull_request_review_id": 2202305029,
+  "id": 1693356052,
+  "node_id": "PRRC_kwDOJ_lkfM5k7pAU",
+  "diff_hunk": "@@ -0,0 +1,27 @@\n+\n+name: PR\n+\n+on:\n+  push:\n+    branches: [ main ]\n+  pull_request:\n+    branches: [ main ]\n+\n+jobs:\n+  ci:\n+    name: CI\n+    runs-on: ubuntu-latest\n+    steps:\n+    - name: Checkout code\n+      uses: actions/checkout@v4\n+\n+    - name: Setup Go\n+      uses: actions/setup-go@v4\n+      with:\n+        go-version: '1.21'",
+  "path": ".github/workflows/pr.yml",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "4cd507f9015acabe579d417ed062a9239a8009c5",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "1.22 vamos ya.",
+  "created_at": "2024-07-26T17:01:33Z",
+  "updated_at": "2024-07-26T17:03:52Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693356052",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356052"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693356052"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356052/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 21,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 21,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356158",
+  "pull_request_review_id": 2202305029,
+  "id": 1693356158,
+  "node_id": "PRRC_kwDOJ_lkfM5k7pB-",
+  "diff_hunk": "@@ -1,2 +1,23 @@\n \n+FROM golang:1.21 AS builder",
+  "path": "Dockerfile",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "4cd507f9015acabe579d417ed062a9239a8009c5",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "same.",
+  "created_at": "2024-07-26T17:01:40Z",
+  "updated_at": "2024-07-26T17:03:52Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693356158",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356158"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693356158"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356158/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 2,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 2,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356298",
+  "pull_request_review_id": 2202305029,
+  "id": 1693356298,
+  "node_id": "PRRC_kwDOJ_lkfM5k7pEK",
+  "diff_hunk": "@@ -1,2 +1,23 @@\n \n+FROM golang:1.21 AS builder\n+\n+WORKDIR /workdir\n+\n+COPY go.mod go.mod\n+",
+  "path": "Dockerfile",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "4cd507f9015acabe579d417ed062a9239a8009c5",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Sin el go.sum no puede comprobar lo que se baja.",
+  "created_at": "2024-07-26T17:01:51Z",
+  "updated_at": "2024-07-26T17:03:52Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693356298",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356298"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693356298"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356298/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 7,
+  "original_line": 7,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 7,
+  "position": 7,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356686",
+  "pull_request_review_id": 2202305029,
+  "id": 1693356686,
+  "node_id": "PRRC_kwDOJ_lkfM5k7pKO",
+  "diff_hunk": "@@ -1,2 +1,23 @@\n \n+FROM golang:1.21 AS builder\n+\n+WORKDIR /workdir\n+\n+COPY go.mod go.mod\n+\n+RUN go mod download\n+\n+COPY cmd cmd\n+\n+ENV CGO_ENABLED 0",
+  "path": "Dockerfile",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "4cd507f9015acabe579d417ed062a9239a8009c5",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Necesitamos espec\u00edficamente cgo para que pueda resolver el dominio de localhost.",
+  "created_at": "2024-07-26T17:02:16Z",
+  "updated_at": "2024-07-26T17:03:52Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693356686",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356686"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693356686"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356686/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 12,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 12,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356973",
+  "pull_request_review_id": 2202305029,
+  "id": 1693356973,
+  "node_id": "PRRC_kwDOJ_lkfM5k7pOt",
+  "diff_hunk": "@@ -0,0 +1,12 @@\n+\n+FILES = $(shell find . -type f -name '*.go')\n+\n+lint:\n+\tgo install ./...\n+\tlinter ./...\n+\tgo vet ./...\n+\n+gofmt:\n+\t@gofmt -s -w $(FILES)\n+\t@gofmt -r '&\u03b1{} -> new(\u03b1)' -w $(FILES)\n+\t@impsort . -p github.com/altipla-consulting/onetbooking-hub",
+  "path": "Makefile",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "4cd507f9015acabe579d417ed062a9239a8009c5",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": ".",
+  "created_at": "2024-07-26T17:02:37Z",
+  "updated_at": "2024-07-26T17:03:52Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693356973",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356973"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693356973"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693356973/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 12,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 12,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693357725",
+  "pull_request_review_id": 2202305029,
+  "id": 1693357725,
+  "node_id": "PRRC_kwDOJ_lkfM5k7pad",
+  "diff_hunk": "@@ -0,0 +1,37 @@\n+package main\n+\n+import (\n+\t\"flag\"\n+\t\"fmt\"\n+\t\"net/http\"\n+\t\"os\"\n+)\n+\n+func main() {\n+\turl := flag.String(\"url\", \"http://localhost:8080\", \"URL to check\")",
+  "path": "cmd/healthcheck/main.go",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "4cd507f9015acabe579d417ed062a9239a8009c5",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Si les pones un valor por defecto nunca van a estar vac\u00edas.",
+  "created_at": "2024-07-26T17:03:27Z",
+  "updated_at": "2024-07-26T17:03:52Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693357725",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693357725"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693357725"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693357725/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 11,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 11,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693357847",
+  "pull_request_review_id": 2202305029,
+  "id": 1693357847,
+  "node_id": "PRRC_kwDOJ_lkfM5k7pcX",
+  "diff_hunk": "@@ -0,0 +1,37 @@\n+package main\n+\n+import (\n+\t\"flag\"\n+\t\"fmt\"\n+\t\"net/http\"\n+\t\"os\"\n+)\n+\n+func main() {\n+\turl := flag.String(\"url\", \"http://localhost:8080\", \"URL to check\")\n+\tfilePath := flag.String(\"file\", \"/file/path\", \"File path to check\")\n+\n+\tflag.Parse()\n+\n+\tif *url == \"\" && *filePath == \"\" {\n+\t\tfmt.Println(\"Need URL or file path to check.\")",
+  "path": "cmd/healthcheck/main.go",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "4cd507f9015acabe579d417ed062a9239a8009c5",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Si no hay nada va todo bien.",
+  "created_at": "2024-07-26T17:03:34Z",
+  "updated_at": "2024-07-26T17:03:52Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693357847",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693357847"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693357847"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693357847/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 17,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 17,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693361747",
+  "pull_request_review_id": 2202314043,
+  "id": 1693361747,
+  "node_id": "PRRC_kwDOJ_lkfM5k7qZT",
+  "diff_hunk": "@@ -1,2 +1,23 @@\n \n+FROM golang:1.21 AS builder\n+\n+WORKDIR /workdir\n+\n+COPY go.mod go.mod\n+",
+  "path": "Dockerfile",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "4cd507f9015acabe579d417ed062a9239a8009c5",
+  "user": {
+   "login": "ernestneller",
+   "id": 106681112,
+   "node_id": "U_kgDOBlvTGA",
+   "avatar_url": "https://avatars.githubusercontent.com/u/106681112?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestneller",
+   "html_url": "https://github.com/ernestneller",
+   "followers_url": "https://api.github.com/users/ernestneller/followers",
+   "following_url": "https://api.github.com/users/ernestneller/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestneller/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestneller/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestneller/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestneller/orgs",
+   "repos_url": "https://api.github.com/users/ernestneller/repos",
+   "events_url": "https://api.github.com/users/ernestneller/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestneller/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "No existe go.sum porque no hay dependencias que bajarse.",
+  "created_at": "2024-07-26T17:07:42Z",
+  "updated_at": "2024-07-26T17:07:42Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693361747",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693361747"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693361747"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693361747/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 7,
+  "original_line": 7,
+  "side": "RIGHT",
+  "in_reply_to_id": 1693356298,
+  "author_association": "CONTRIBUTOR",
+  "original_position": 7,
+  "position": 7,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693364709",
+  "pull_request_review_id": 2202323616,
+  "id": 1693364709,
+  "node_id": "PRRC_kwDOJ_lkfM5k7rHl",
+  "diff_hunk": "@@ -1,2 +1,23 @@\n \n+FROM golang:1.22 AS builder\n+\n+WORKDIR /workdir\n+\n+COPY go.mod go.mod\n+\n+RUN go mod download\n+\n+COPY cmd cmd\n+\n+ENV CGO_ENABLED 1",
+  "path": "Dockerfile",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "efaacecd0035bc90201ca4f70f81ac375014b7a2",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Sin nada.",
+  "created_at": "2024-07-26T17:11:07Z",
+  "updated_at": "2024-07-26T17:12:19Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693364709",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693364709"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693364709"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693364709/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 12,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 12,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693364858",
+  "pull_request_review_id": 2202323616,
+  "id": 1693364858,
+  "node_id": "PRRC_kwDOJ_lkfM5k7rJ6",
+  "diff_hunk": "@@ -1,2 +1,23 @@\n \n+FROM golang:1.22 AS builder\n+\n+WORKDIR /workdir\n+\n+COPY go.mod go.mod\n+\n+RUN go mod download\n+\n+COPY cmd cmd\n+\n+ENV CGO_ENABLED 1",
+  "path": "Dockerfile",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "efaacecd0035bc90201ca4f70f81ac375014b7a2",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Ninguna de las dos; en linux ya lo tiene porque es donde est\u00e1.",
+  "created_at": "2024-07-26T17:11:18Z",
+  "updated_at": "2024-07-26T17:12:19Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693364858",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693364858"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693364858"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693364858/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 12,
+  "side": "RIGHT",
+  "in_reply_to_id": 1693364709,
+  "author_association": "MEMBER",
+  "original_position": 12,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693365482",
+  "pull_request_review_id": 2202323616,
+  "id": 1693365482,
+  "node_id": "PRRC_kwDOJ_lkfM5k7rTq",
+  "diff_hunk": "@@ -0,0 +1,27 @@\n+",
+  "path": ".github/workflows/pr.yml",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "efaacecd0035bc90201ca4f70f81ac375014b7a2",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Mete un fichero de prettier para que se formatee solo.",
+  "created_at": "2024-07-26T17:12:00Z",
+  "updated_at": "2024-07-26T17:12:19Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693365482",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693365482"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693365482"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693365482/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 1,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693365566",
+  "pull_request_review_id": 2202323616,
+  "id": 1693365566,
+  "node_id": "PRRC_kwDOJ_lkfM5k7rU-",
+  "diff_hunk": "@@ -0,0 +1,27 @@\n+\n+name: PR\n+\n+on:\n+  push:\n+    branches: [ main ]\n+  pull_request:\n+    branches: [ main ]\n+\n+jobs:\n+  ci:\n+    name: CI\n+    runs-on: ubuntu-latest\n+    steps:\n+    - name: Checkout code\n+      uses: actions/checkout@v4\n+\n+    - name: Setup Go\n+      uses: actions/setup-go@v4\n+      with:\n+        go-version: '1.21'",
+  "path": ".github/workflows/pr.yml",
+  "commit_id": "57e800795b80efb4d13d9d1c8eae30c343e14f80",
+  "original_commit_id": "4cd507f9015acabe579d417ed062a9239a8009c5",
+  "user": {
+   "login": "ernestoalejo",
+   "id": 961966,
+   "node_id": "MDQ6VXNlcjk2MTk2Ng==",
+   "avatar_url": "https://avatars.githubusercontent.com/u/961966?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ernestoalejo",
+   "html_url": "https://github.com/ernestoalejo",
+   "followers_url": "https://api.github.com/users/ernestoalejo/followers",
+   "following_url": "https://api.github.com/users/ernestoalejo/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ernestoalejo/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ernestoalejo/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ernestoalejo/subscriptions",
+   "organizations_url": "https://api.github.com/users/ernestoalejo/orgs",
+   "repos_url": "https://api.github.com/users/ernestoalejo/repos",
+   "events_url": "https://api.github.com/users/ernestoalejo/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ernestoalejo/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Falta.",
+  "created_at": "2024-07-26T17:12:06Z",
+  "updated_at": "2024-07-26T17:12:19Z",
+  "html_url": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693365566",
+  "pull_request_url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693365566"
+   },
+   "html": {
+    "href": "https://github.com/altipla-consulting/distroless-glibc/pull/3#discussion_r1693365566"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/altipla-consulting/distroless-glibc/pulls/comments/1693365566/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 21,
+  "side": "RIGHT",
+  "in_reply_to_id": 1693356052,
+  "author_association": "MEMBER",
+  "original_position": 21,
+  "position": 1,
+  "subject_type": "line"
+ }
+]

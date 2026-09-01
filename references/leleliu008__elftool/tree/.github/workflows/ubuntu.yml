@@ -1,0 +1,66 @@
+name: ubuntu
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  ubuntu:
+
+    env:
+      DEBIAN_FRONTEND: noninteractive
+      TZ: Asia/Shanghai
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['26.04', '24.04', '22.04']
+
+    container: ubuntu:${{ matrix.version }}
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run:  ./build.sh
+
+      - run:  ./elftool
+
+      - run:  ./elftool --help
+      - run:  ./elftool --version
+
+      - run:  ./elftool -h
+      - run:  ./elftool -V
+
+      - run:  ./elftool print-interp elftool
+      - run:  ./elftool print-soname elftool
+      - run:  ./elftool print-needed elftool
+      - run:  ./elftool print-rpath  elftool
+
+      - run: apt -y update
+      - run: apt -y install curl xz-utils
+
+      - run: curl -LO https://github.com/leleliu008/ppkg-package-manually-build/releases/download/xxd-9.2.0750-linux-glibc-s390x.release.tar.xz/xxd-9.2.0750-linux-glibc-s390x.release.tar.xz
+
+      - run: tar xf xxd-*.tar.xz --strip-components=1
+
+      - run:  ./elftool print-interp bin/xxd
+      - run:  ./elftool print-soname bin/xxd
+      - run:  ./elftool print-needed bin/xxd
+      - run:  ./elftool print-rpath  bin/xxd
+
+      - run: |
+          set -ex
+
+          for ARCH in aarch64 riscv64 s390x
+          do
+            apt -y install gcc-$ARCH-linux-gnu
+            $ARCH-linux-gnu-gcc -o elftool.$ARCH -Isrc src/*.c -Wl,-rpath,/usr/local/xxxxxx -Wl,-soname,libxx.so
+            ./elftool print-interp elftool.$ARCH
+            ./elftool print-soname elftool.$ARCH
+            ./elftool print-needed elftool.$ARCH
+            ./elftool print-rpath  elftool.$ARCH
+          done

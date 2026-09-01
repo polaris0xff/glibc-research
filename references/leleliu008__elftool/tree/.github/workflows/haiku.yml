@@ -1,0 +1,45 @@
+name: Haiku
+
+on:
+  push:
+    branches: [ master, dev, tmp ]
+  pull_request:
+    branches: [ master, dev, tmp ]
+
+jobs:
+  haiku:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['r1beta5']
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: cross-platform-actions/action@master
+        with:
+          operating_system: haiku
+          version: ${{ matrix.version }}
+          shell: bash
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            run ./build.sh
+
+            run ./elftool
+
+            run ./elftool --help
+            run ./elftool --version
+
+            run ./elftool -h
+            run ./elftool -V
+
+            run ./elftool print-interp elftool
+            run ./elftool print-soname elftool
+            run ./elftool print-needed elftool
+            run ./elftool print-rpath  elftool

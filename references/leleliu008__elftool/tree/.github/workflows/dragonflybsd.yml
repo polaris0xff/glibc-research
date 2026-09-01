@@ -1,0 +1,46 @@
+name: DragonFlyBSD
+
+on:
+  push:
+    branches: [ master, dev, tmp ]
+  pull_request:
+    branches: [ master, dev, tmp ]
+
+jobs:
+  dragonflybsd:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        dragonflybsd-version: ['6.4.2']
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: vmactions/dragonflybsd-vm@v1
+        with:
+          release: "${{ matrix.dragonflybsd-version }}"
+          usesh: true
+          sync: rsync
+          copyback: true
+          run: |
+            run() {
+              printf "\033[0;35m==>\033[0m \033[0;32m%b\n\033[0m" "$*"
+              eval "$@"
+            }
+
+            run ./build.sh -o elftool -Os -flto -Wl,-s -I/usr/local/include -I/usr/local/include/libelf -L/usr/local/lib -Wl,-rpath,/usr/local/lib
+
+            run ./elftool
+
+            run ./elftool --help
+            run ./elftool --version
+
+            run ./elftool -h
+            run ./elftool -V
+
+            run ./elftool print-interp elftool
+            run ./elftool print-soname elftool
+            run ./elftool print-needed elftool
+            run ./elftool print-rpath  elftool

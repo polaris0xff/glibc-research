@@ -1,0 +1,109 @@
+name: ArchLinux
+
+on:
+  push:
+    branches: [ master, dev, tmp ]
+  pull_request:
+    branches: [ master, dev, tmp ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container: archlinux
+
+    steps:
+      - run: pacman -Syy --noconfirm
+      - run: pacman -S   --noconfirm curl gcc base-devel
+
+      - uses: actions/checkout@v5
+
+      - run: ./ppkg --help
+      - run: ./ppkg --version
+
+      - run: ./ppkg setup
+
+      - run: ./ppkg about
+
+      - run: ./ppkg sysinfo
+
+      - run: ./ppkg integrate zsh
+
+      - run: ./ppkg update
+
+      - run: ./ppkg search lib
+      - run: ./ppkg search libzip
+
+      - run: ./ppkg info libzip
+      - run: ./ppkg info libzip version
+      - run: ./ppkg info libzip web-url
+      - run: ./ppkg info libzip src-url
+
+      - run: ./ppkg depends libzip
+
+      - run: ./ppkg install libzip
+
+      - run: ./ppkg tree libzip
+
+      - run: ./ppkg bundle libzip .tar.xz
+
+      - run: ./ppkg formula-repo-list
+
+      - run: ./ppkg ls-available
+      - run: ./ppkg ls-installed
+      - run: ./ppkg ls-outdated
+
+      - run: ./ppkg is-available libzip
+      - run: ./ppkg is-installed libzip
+      - run: ./ppkg is-outdated  libzip || echo "not outdated"
+
+      - run: ./ppkg uninstall libzip
+
+      - run: ./ppkg fetch curl
+
+      - run: ./ppkg upgrade-self
+
+  export:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: |
+          cat > run.sh <<EOF
+          run() {
+            printf '%b\n' "\$*"
+            eval "\$@"
+          }
+
+          set -e
+
+          run ./ppkg setup
+          run ./ppkg update
+          run ./ppkg install libzip
+          run ./ppkg export  libzip .pkg.tar.xz
+          run ./ppkg export  libzip ~/.pkg.tar.xz
+          run ./ppkg export  libzip a/b.pkg.tar.xz
+
+          run sudo pacman -U --noconfirm *.pkg.tar.xz
+          run pacman -Qi libzip
+          EOF
+
+      - run: |
+          _GID=$(id -g)
+          _UID=$(id -u)
+
+          cat > Dockerfile <<EOF
+          FROM archlinux
+
+          RUN pacman -Syy --noconfirm && \
+              pacman -S sudo curl openssl gcc fakeroot base-devel --noconfirm && \
+              groupadd --gid $_GID leleliu008 && \
+              useradd  --gid $_GID --uid $_UID -m leleliu008 && \
+              echo 'leleliu008 ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+          USER leleliu008
+          EOF
+
+      - run: docker build -t myarchlinux .
+      - run: docker run -v $PWD:/home/leleliu008/w -w /home/leleliu008/w --name myarchlinux myarchlinux sh run.sh

@@ -1,0 +1,42 @@
+name: Rocky Linux
+
+on:
+  push:
+    branches: [ master, dev ]
+  pull_request:
+    branches: [ master, dev ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        tag: ['8', '9']
+
+    container: rockylinux:${{ matrix.tag }}
+
+    steps:
+      - run:  dnf -y update
+      - run:  dnf -y install xz
+      - run:  |
+          command -v curl > /dev/null || dnf -y install curl
+          # https://bugs.launchpad.net/tripleo/+bug/1953156
+
+      - uses: actions/checkout@main
+
+      - run:  ./build.sh
+
+      - run:  ./elftool
+
+      - run:  ./elftool --help
+      - run:  ./elftool --version
+
+      - run:  ./elftool -h
+      - run:  ./elftool -V
+
+      - run:  ./elftool print-interp elftool
+      - run:  ./elftool print-soname elftool
+      - run:  ./elftool print-needed elftool
+      - run:  ./elftool print-rpath  elftool

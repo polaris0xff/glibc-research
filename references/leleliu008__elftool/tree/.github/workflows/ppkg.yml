@@ -1,0 +1,43 @@
+name: ppkg
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  ppkg:
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-26.04, ubuntu-22.04, ubuntu-24.04, macos-14, macos-15, macos-26]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - run: curl -LO https://raw.githubusercontent.com/leleliu008/ppkg/master/ppkg
+      - run: chmod a+x ppkg
+
+      - run: ./ppkg setup
+      - run: ./ppkg update
+      - run: ./ppkg formula-set elftool git-sha ${{github.sha}}
+      - run: ./ppkg install elftool
+
+      - run: ln -s ~/.ppkg/installed/*/elftool/bin/elftool .
+
+      - run:  ./elftool
+
+      - run:  ./elftool --help
+      - run:  ./elftool --version
+
+      - run:  ./elftool -h
+      - run:  ./elftool -V
+
+      - run:  curl -LO https://github.com/leleliu008/test/releases/download/2023.10.08/typos-linux-glibc-x86_64
+
+      - run:  ./elftool print-interp typos-linux-glibc-x86_64
+      - run:  ./elftool print-soname typos-linux-glibc-x86_64
+      - run:  ./elftool print-needed typos-linux-glibc-x86_64
+      - run:  ./elftool print-rpath  typos-linux-glibc-x86_64

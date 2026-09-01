@@ -1,0 +1,52 @@
+diff --git a/lib/libdefs.h b/lib/libdefs.h
+index c63957d..5d42ea2 100644
+--- a/lib/libdefs.h
++++ b/lib/libdefs.h
+@@ -1,5 +1,5 @@
+-#if !defined(__LIBDEFS_H)
+-#define LIBDEFS_H
++#ifndef __LIBDEFS_H
++#define __LIBDEFS_H
+ 
+ /*
+    {{{ includes 
+diff --git a/lib/mhash_int.h b/lib/mhash_int.h
+index c1ed1c9..c27148a 100644
+--- a/lib/mhash_int.h
++++ b/lib/mhash_int.h
+@@ -1,4 +1,4 @@
+-#if !defined(__MHASH_INT)
++#ifndef __MHASH_INT
+ #define __MHASH_INT
+ 
+ #include <mutils/mincludes.h>
+@@ -34,23 +34,6 @@ MHASH hmac_mhash_init(__const hashid type, void *key, mutils_word32 keysize,
+ 
+ void *hmac_mhash_end(MHASH thread);
+ 
+-/* Key generation functions */
+-
+-#define EMPTY_PROTOTYPES 1
+-
+-#if defined(EMPTY_PROTOTYPES)
+-
+-mutils_error mhash_keygen();
+-mutils_error mhash_keygen_ext();
+-mutils_word8 *mhash_get_keygen_name();
+-mutils_word32 mhash_get_keygen_salt_size();
+-mutils_word32 mhash_keygen_count();
+-mutils_boolean mhash_keygen_uses_salt();
+-mutils_boolean mhash_keygen_uses_count();
+-mutils_boolean mhash_keygen_uses_hash_algorithm();
+-
+-#else
+-
+ mutils_error mhash_keygen(keygenid algorithm, hashid opt_algorithm,
+ 			  mutils_word64 count,
+ 			  void *keyword, mutils_word32 keysize,
+@@ -70,5 +53,3 @@ mutils_boolean mhash_keygen_uses_hash_algorithm(keygenid type);
+ 
+ #endif
+ 
+-#endif
+-

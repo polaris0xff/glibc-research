@@ -1,0 +1,138 @@
+name: CI
+
+on:
+  workflow_dispatch:
+
+env:
+  ZIG_VERSION: 0.16.0
+  ZIG_SHA256: 70e49664a74374b48b51e6f3fdfbf437f6395d42509050588bd49abe52ba3d00
+
+jobs:
+  build:
+    name: sharun-${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            env: X86_64_UNKNOWN_LINUX_MUSL
+            triple: x86_64-unknown-linux-musl
+            zigtarget: x86_64-linux-musl
+          - arch: aarch64
+            env: AARCH64_UNKNOWN_LINUX_MUSL
+            triple: aarch64-unknown-linux-musl
+            zigtarget: aarch64-linux-musl
+          - arch: riscv64
+            env: RISCV64GC_UNKNOWN_LINUX_MUSL
+            triple: riscv64gc-unknown-linux-musl
+            zigtarget: riscv64-linux-musl
+          - arch: ppc64
+            env: POWERPC64_UNKNOWN_LINUX_MUSL
+            triple: powerpc64-unknown-linux-musl
+            zigtarget: powerpc64-linux-musl
+          - arch: ppc64le
+            env: POWERPC64LE_UNKNOWN_LINUX_MUSL
+            triple: powerpc64le-unknown-linux-musl
+            zigtarget: powerpc64le-linux-musl
+          - arch: loongarch64
+            env: LOONGARCH64_UNKNOWN_LINUX_MUSL
+            triple: loongarch64-unknown-linux-musl
+            zigtarget: loongarch64-linux-musl
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup toolchain
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1
+        with:
+          toolchain: nightly
+          override: true
+          target: x86_64-unknown-linux-musl
+
+      - name: Install rust-src
+        run: rustup component add rust-src --toolchain nightly
+
+      - name: Install zig
+        run: |
+          curl -fL --retry 3 -o "$RUNNER_TEMP/zig.tar.xz" \
+            "https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_VERSION}.tar.xz"
+          echo "${ZIG_SHA256}  $RUNNER_TEMP/zig.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/zig"
+          tar xJf "$RUNNER_TEMP/zig.tar.xz" -C "$RUNNER_TEMP/zig" --strip-components=1
+
+      # zig cc rejects rustc's aarch64 --fix-cortex-a53-843419 workaround
+      # arg, so the wrapper filters it out before exec'ing zig
+      - name: Create zig-cc linker wrapper
+        run: |
+          {
+            echo '#!/bin/bash'
+            echo 'args=()'
+            echo 'for a in "$@"; do'
+            echo '  case "$a" in *fix-cortex-a53-843419*) continue ;; esac'
+            echo '  args+=("$a")'
+            echo 'done'
+            echo "exec \"$RUNNER_TEMP/zig/zig\" cc -target ${{ matrix.zigtarget }} \"\${args[@]}\""
+          } > "$RUNNER_TEMP/zigcc"
+          chmod +x "$RUNNER_TEMP/zigcc"
+
+      - name: Build
+        run: |
+          export CARGO_TARGET_${{ matrix.env }}_LINKER="$RUNNER_TEMP/zigcc"
+          export RUSTFLAGS="-C target-feature=+crt-static -C link-self-contained=no"
+          export ZIG_GLOBAL_CACHE_DIR="$RUNNER_TEMP/zig-cache"
+          export ZIG_LOCAL_CACHE_DIR="$RUNNER_TEMP/zig-cache"
+          cargo build --release --target ${{ matrix.triple }}
+          mv "target/${{ matrix.triple }}/release/sharun" "sharun-${{ matrix.arch }}"
+
+      - name: Strip
+        run: |
+          git clone -q https://github.com/aunali1/super-strip.git
+          make -C super-strip
+          ./super-strip/sstrip "sharun-${{ matrix.arch }}"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: sharun-${{ matrix.arch }}
+          path: sharun-${{ matrix.arch }}
+
+  release:
+    name: Draft release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: sharun-*
+          merge-multiple: true
+
+      - name: Get version
+        run: |
+          chmod +x sharun-*
+          cp sharun-x86_64 sharun
+          echo "VERSION=$(./sharun --version | awk '{print $NF}')" >> "${GITHUB_ENV}"
+
+      - name: Check tag doesn't exist
+        run: |
+          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q "$VERSION"; then
+            echo "Error: tag $VERSION already exists. Bump the version in Cargo.toml first."
+            exit 1
+          fi
+
+      - name: Draft Release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          name: "${{ env.VERSION }}"
+          tag_name: "${{ env.VERSION }}"
+          prerelease: false
+          draft: true
+          generate_release_notes: true
+          make_latest: true
+          files: sharun-*

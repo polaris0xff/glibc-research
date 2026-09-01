@@ -1,0 +1,729 @@
+const std = @import("std");
+const build_zon = @import("build.zig.zon");
+
+pub fn build(b: *std.Build) void {
+    // Get the library and example build options
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
+    const host_target = b.resolveTargetQuery(.{});
+    const host_optimize = .Debug;
+
+    const rtprio_client = b.option(u8, "rtprio_client", "PipeWire clients realtime priority") orelse 83;
+    if (rtprio_client < 11 or rtprio_client > 99) @panic("invalid rtprio_client");
+
+    const rtprio_server = b.option(u8, "rtprio_server", "PipeWire server realtime priority") orelse 88;
+    if (rtprio_server < 11 or rtprio_server > 99) @panic("invalid rtprio_server");
+
+    const resampler_precomp_tuples = b.option(
+        []const []const u8,
+        "resampler_precomp_tuples",
+        "Array of \"inrate,outrate[,quality]\" tuples to precompute resampler coefficients for",
+    ) orelse &[_][]const u8{
+        "32000,44100",
+        "32000,48000",
+        "48000,44100",
+        "44100,48000",
+    };
+
+    // Get the example specific build options
+    const use_zig_module = b.option(
+        bool,
+        "use_zig_module",
+        "Link examples to Pipewire as a Zig module, if or unset links via a static library.",
+    ) orelse true;
+
+    const example_options = b.addOptions();
+    example_options.addOption(bool, "use_zig_module", use_zig_module);
+
+    // Get the upstream sources
+    const upstream = b.dependency("upstream", .{});
+
+    // Create the pipewire static library
+    const libpipewire = b.addLibrary(.{
+        .name = "pipewire-0.3",
+        .linkage = .static,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("src/wrap/root.zig"),
+            .target = target,
+            .optimize = optimize,
+            .link_libc = true,
+        }),
+    });
+
+    {
+        // Add the varargs workaround
+        libpipewire.addCSourceFile(.{
+            .file = b.path("src/wrap/va.c"),
+            .flags = va_flags,
+        });
+
+        // Add the source files
+        libpipewire.addCSourceFiles(.{
+            .root = upstream.path("src/pipewire"),
+            .files = &.{
+                "buffers.c",
+                "conf.c",
+                "context.c",
+                "control.c",
+                "core.c",
+                "data-loop.c",
+                "filter.c",
+                "global.c",
+                "impl-client.c",
+                "impl-core.c",
+                "impl-device.c",
+                "impl-factory.c",
+                "impl-link.c",
+                "impl-metadata.c",
+                "impl-module.c",
+                "impl-node.c",
+                "impl-port.c",
+                "introspect.c",
+                "log.c",
+                "loop.c",
+                "main-loop.c",
+                "mem.c",
+                "pipewire.c",
+                "properties.c",
+                "protocol.c",
+                "proxy.c",
+                "resource.c",
+                "settings.c",
+                "stream.c",
+                "thread-loop.c",
+                "thread.c",
+                "timer-queue.c",
+                "utils.c",
+                "work-queue.c",
+            },
+            .flags = flags,
+        });
+
+        // Build the library configuration
+        {
+            const generate_client_conf = b.addExecutable(.{
+                .name = "generate_client_conf",
+                .root_module = b.createModule(.{
+                    .root_source_file = b.path("src/build/generate_client_conf.zig"),
+                    .target = host_target,
+                    .optimize = host_optimize,
+                }),
+            });
+
+            const options = b.addOptions();
+            options.addOption([]const u8, "VERSION", b.fmt("\"{s}\"", .{build_zon.version}));
+            options.addOption([]const u8, "PIPEWIRE_CONFIG_DIR", "[install path]");
+            options.addOption([]const u8, "rtprio_client", b.fmt("{}", .{rtprio_client}));
+            generate_client_conf.root_module.addOptions("options", options);
+
+            const run_generate_client_conf = b.addRunArtifact(generate_client_conf);
+            run_generate_client_conf.addFileArg(upstream.path("src/daemon/client.conf.in"));
+            const client_conf = run_generate_client_conf.addOutputFileArg("client.conf");
+
+            libpipewire.root_module.addImport("client.conf", b.createModule(.{
+                .root_source_file = client_conf,
+            }));
+        }
+
+        // Build the library configuration headers
+        const pipewire_version = std.SemanticVersion.parse(build_zon.version) catch
+            @panic("invalid version");
+        const version_h = b.addConfigHeader(.{
+            .style = .{ .cmake = upstream.path("src/pipewire/version.h.in") },
+            .include_path = "pipewire/version.h",
+        }, .{
+            .PIPEWIRE_VERSION_MAJOR = @as(i64, @intCast(pipewire_version.major)),
+            .PIPEWIRE_VERSION_MINOR = @as(i64, @intCast(pipewire_version.minor)),
+            .PIPEWIRE_VERSION_MICRO = @as(i64, @intCast(pipewire_version.patch)),
+            .PIPEWIRE_API_VERSION = build_zon.api_version,
+        });
+
+        const config_h = b.addConfigHeader(.{
+            .style = .blank,
+            .include_path = "config.h",
+        }, .{
+            .GETTEXT_PACKAGE = "pipewire",
+            .HAVE_ALSA_COMPRESS_OFFLOAD = {},
+            .HAVE_DBUS = {},
+            .HAVE_GETRANDOM = {},
+            .HAVE_GETTID = {},
+            .HAVE_GIO = {},
+            .HAVE_GLIB2 = {},
+            .HAVE_GRP_H = {},
+            .HAVE_GSTREAMER_DEVICE_PROVIDER = {},
+            .HAVE_MALLOC_INFO = {},
+            .HAVE_MEMFD_CREATE = {},
+            .HAVE_PIDFD_OPEN = {},
+            .HAVE_PWD_H = {},
+            .HAVE_REALLOCARRAY = {},
+            .HAVE_SIGABBREV_NP = {},
+            .HAVE_SPA_PLUGINS = {},
+            .HAVE_SYS_AUXV_H = {},
+            .HAVE_SYS_MOUNT_H = {},
+            .HAVE_SYS_PARAM_H = {},
+            .HAVE_SYS_RANDOM_H = {},
+            .HAVE_SYS_VFS_H = {},
+            .LIBDIR = "pipewire-0.3",
+            .LOCALEDIR = "pipewire-0.3",
+            .MODULEDIR = "pipewire-0.3/modules",
+            .PACKAGE = "pipewire",
+            .PACKAGE_NAME = "PipeWire",
+            .PACKAGE_STRING = b.fmt("PipeWire {s}", .{build_zon.version}),
+            .PACKAGE_TARNAME = "pipewire",
+            .PACKAGE_URL = "https://pipewire.org",
+            .PACKAGE_VERSION = build_zon.version,
+            .PIPEWIRE_CONFDATADIR = "pipewire-0.3/confdata",
+            .PIPEWIRE_CONFIG_DIR = "pipewire-0.3",
+            .PLUGINDIR = "pipewire-0.3/plugins",
+            .RTPRIO_CLIENT = rtprio_client,
+            .RTPRIO_SERVER = rtprio_server,
+        });
+        if (target.result.isGnuLibC()) {
+            config_h.addValues(.{
+                .HAVE_MALLOC_TRIM = {},
+                .HAVE_RANDOM_R = {},
+            });
+        }
+
+        // Build the library plugins and modules
+        {
+            const pm_ctx: PluginAndModuleCtx = .{
+                .upstream = upstream,
+                .target = target,
+                .optimize = optimize,
+                .version = version_h,
+                .config = config_h,
+                .libpipewire = libpipewire,
+            };
+
+            // Build and install the plugins
+            _ = PipewirePlugin.build(b, pm_ctx, .{
+                .name = "support",
+                .files = &.{
+                    "cpu.c",
+                    "logger.c",
+                    "loop.c",
+                    "node-driver.c",
+                    "null-audio-sink.c",
+                    "plugin.c",
+                    "system.c",
+                },
+            });
+            _ = PipewirePlugin.build(b, pm_ctx, .{
+                .name = "videoconvert",
+                .files = &.{
+                    "plugin.c",
+                    "videoadapter.c",
+                    "videoconvert-dummy.c",
+                },
+            });
+
+            {
+                // Build the audioconvert plugin
+                const audioconvert = PipewirePlugin.build(b, pm_ctx, .{
+                    .name = "audioconvert",
+                    .files = &.{
+                        "plugin.c",
+                        "audioadapter.c",
+                        "audioconvert.c",
+                        "biquad.c",
+                        "channelmix-ops-c.c",
+                        "channelmix-ops.c",
+                        "crossover.c",
+                        "peaks-ops-c.c",
+                        "peaks-ops.c",
+                        "resample-peaks.c",
+                        "resample-native-c.c",
+                        "resample-native.c",
+                        "fmt-ops-c.c",
+                        "fmt-ops.c",
+                        "volume-ops-c.c",
+                        "volume-ops.c",
+                        "wavfile.c",
+                    },
+                });
+
+                // Configure audioconvert SIMD
+                if (target.result.cpu.has(.x86, .sse)) {
+                    audioconvert.root_module.addCMacro("HAVE_SSE", "1");
+                    audioconvert.root_module.addCSourceFiles(.{
+                        .root = upstream.path("spa/plugins/audioconvert"),
+                        .files = &.{
+                            "resample-native-sse.c",
+                            "volume-ops-sse.c",
+                            "peaks-ops-sse.c",
+                            "channelmix-ops-sse.c",
+                        },
+                        .flags = flags,
+                    });
+                }
+                if (target.result.cpu.has(.x86, .sse2)) {
+                    audioconvert.root_module.addCMacro("HAVE_SSE2", "1");
+                    audioconvert.root_module.addCSourceFiles(.{
+                        .root = upstream.path("spa/plugins/audioconvert"),
+                        .files = &.{
+                            "fmt-ops-sse2.c",
+                        },
+                        .flags = flags,
+                    });
+                }
+                if (target.result.cpu.has(.x86, .ssse3)) {
+                    audioconvert.root_module.addCMacro("HAVE_SSSE3", "1");
+                    audioconvert.root_module.addCSourceFiles(.{
+                        .root = upstream.path("spa/plugins/audioconvert"),
+                        .files = &.{
+                            "fmt-ops-ssse3.c",
+                            "resample-native-ssse3.c",
+                        },
+                        .flags = flags,
+                    });
+                }
+                // https://github.com/allyourcodebase/pipewire/issues/10
+                // if (target.result.cpu.has(.x86, .sse4_1)) {
+                //     audioconvert.root_module.addCMacro("HAVE_SSE41", "1");
+                //     audioconvert.root_module.addCSourceFiles(.{
+                //         .root = upstream.path("spa/plugins/audioconvert"),
+                //         .files = &.{
+                //             "fmt-ops-sse41.c",
+                //         },
+                //         .flags = flags,
+                //     });
+                // }
+                if (target.result.cpu.has(.x86, .avx) and target.result.cpu.has(.x86, .fma)) {
+                    // Upstream build system also only defines either if both are present
+                    audioconvert.root_module.addCMacro("HAVE_AVX", "1");
+                    audioconvert.root_module.addCMacro("HAVE_FMA", "1");
+                    audioconvert.root_module.addCSourceFiles(.{
+                        .root = upstream.path("spa/plugins/audioconvert"),
+                        .files = &.{
+                            "resample-native-avx.c",
+                        },
+                        .flags = flags,
+                    });
+                }
+                if (target.result.cpu.has(.x86, .avx2)) {
+                    audioconvert.root_module.addCMacro("HAVE_AVX2", "1");
+                    audioconvert.root_module.addCSourceFiles(.{
+                        .root = upstream.path("spa/plugins/audioconvert"),
+                        .files = &.{
+                            "fmt-ops-avx2.c",
+                        },
+                        .flags = flags,
+                    });
+                }
+                if (target.result.cpu.has(.arm, .neon)) {
+                    audioconvert.root_module.addCMacro("HAVE_NEON", "1");
+                    audioconvert.root_module.addCSourceFiles(.{
+                        .root = upstream.path("spa/plugins/audioconvert"),
+                        .files = &.{
+                            "fmt-ops-neon.c",
+                        },
+                        .flags = flags,
+                    });
+                }
+                if (target.result.cpu.has(.riscv, .v)) {
+                    audioconvert.root_module.addCMacro("HAVE_RVV", "1");
+                    audioconvert.root_module.addCSourceFiles(.{
+                        .root = upstream.path("spa/plugins/audioconvert"),
+                        .files = &.{
+                            "fmt-ops-rvv.c",
+                        },
+                        .flags = flags,
+                    });
+                }
+
+                // Precompute coefficients
+                const dump_coeffs_exe = b.addExecutable(.{
+                    .name = "dump-coeffs",
+                    .root_module = b.createModule(.{
+                        .target = host_target,
+                        .optimize = .ReleaseSafe,
+                        .link_libc = true,
+                    }),
+                });
+                dump_coeffs_exe.addIncludePath(upstream.path("spa/include"));
+                dump_coeffs_exe.addCSourceFiles(.{
+                    .root = upstream.path("spa/plugins/audioconvert"),
+                    .files = &.{
+                        "resample-native.c",
+                        "resample-native-c.c",
+                        "spa-resample-dump-coeffs.c",
+                    },
+                    .flags = flags ++ &[_][]const u8{"-DRESAMPLE_DISABLE_PRECOMP"},
+                });
+
+                const dump_coeffs = b.addRunArtifact(dump_coeffs_exe);
+                for (resampler_precomp_tuples) |tuple| {
+                    dump_coeffs.addArgs(&.{ "-t", tuple });
+                }
+                const resample_native_precomp_h = dump_coeffs.captureStdOut();
+                const write_coeffs = b.addWriteFiles();
+                _ = write_coeffs.addCopyFile(
+                    resample_native_precomp_h,
+                    "resample-native-precomp.h",
+                );
+                audioconvert.addIncludePath(write_coeffs.getDirectory());
+            }
+
+            _ = PipewireModule.build(b, pm_ctx, .{
+                .name = "adapter",
+                .files = &.{
+                    "module-adapter.c",
+                    "module-adapter/adapter.c",
+                    "spa/spa-node.c",
+                },
+            });
+            _ = PipewireModule.build(b, pm_ctx, .{
+                .name = "client-device",
+                .files = &.{
+                    "module-client-device.c",
+                    "module-client-device/resource-device.c",
+                    "module-client-device/proxy-device.c",
+                    "module-client-device/protocol-native.c",
+                },
+            });
+            _ = PipewireModule.build(b, pm_ctx, .{
+                .name = "client-node",
+                .files = &.{
+                    "module-client-node.c",
+                    "module-client-node/remote-node.c",
+                    "module-client-node/client-node.c",
+                    "module-client-node/protocol-native.c",
+                    "spa/spa-node.c",
+                },
+            });
+            _ = PipewireModule.build(b, pm_ctx, .{
+                .name = "metadata",
+                .files = &.{
+                    "module-metadata.c",
+                    "module-metadata/proxy-metadata.c",
+                    "module-metadata/metadata.c",
+                    "module-metadata/protocol-native.c",
+                },
+            });
+            _ = PipewireModule.build(b, pm_ctx, .{
+                .name = "protocol-native",
+                .files = &.{
+                    "module-protocol-native.c",
+                    "module-protocol-native/local-socket.c",
+                    "module-protocol-native/portal-screencast.c",
+                    "module-protocol-native/protocol-native.c",
+                    "module-protocol-native/protocol-footer.c",
+                    "module-protocol-native/security-context.c",
+                    "module-protocol-native/connection.c",
+                },
+            });
+            _ = PipewireModule.build(b, pm_ctx, .{
+                .name = "session-manager",
+                .files = &.{
+                    "module-session-manager.c",
+                    "module-session-manager/client-endpoint/client-endpoint.c",
+                    "module-session-manager/client-endpoint/endpoint-stream.c",
+                    "module-session-manager/client-endpoint/endpoint.c",
+                    "module-session-manager/client-session/client-session.c",
+                    "module-session-manager/client-session/endpoint-link.c",
+                    "module-session-manager/client-session/session.c",
+                    "module-session-manager/endpoint-link.c",
+                    "module-session-manager/endpoint-stream.c",
+                    "module-session-manager/endpoint.c",
+                    "module-session-manager/protocol-native.c",
+                    "module-session-manager/proxy-session-manager.c",
+                    "module-session-manager/session.c",
+                },
+            });
+        }
+
+        // Include and install the library headers
+        {
+            libpipewire.addIncludePath(b.dependency("valgrind_h", .{}).path(""));
+            libpipewire.addIncludePath(upstream.path("spa/include"));
+            libpipewire.addIncludePath(upstream.path("src"));
+            libpipewire.addConfigHeader(version_h);
+            libpipewire.addConfigHeader(config_h);
+
+            libpipewire.installHeadersDirectory(upstream.path("src/pipewire"), "pipewire", .{});
+            libpipewire.installHeadersDirectory(upstream.path("spa/include/spa"), "spa", .{});
+            libpipewire.installConfigHeader(version_h);
+        }
+
+        // Install the library
+        b.installArtifact(libpipewire);
+    }
+
+    // Create the translated C module for importing pipewire headers into Zig. See the source file
+    // for why we're caching this rather than using translate c.
+    const c = b.createModule(.{
+        .root_source_file = b.path("src/lib/c.zig"),
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+
+    // Create the zig module. Using this rather than the static library allows for easier
+    // integration, and ties logging to the standard library logger.
+    const libpipewire_zig = b.addModule("pipewire", .{
+        .root_source_file = b.path("src/lib/root.zig"),
+        .target = target,
+        .optimize = optimize,
+        .imports = &.{
+            .{ .name = "c", .module = c },
+            .{ .name = "wrap", .module = libpipewire.root_module },
+        },
+    });
+
+    // Add the varargs workaround
+    libpipewire_zig.addCSourceFile(.{
+        .file = b.path("src/lib/va.c"),
+        .flags = va_flags,
+    });
+    libpipewire_zig.addIncludePath(upstream.path("spa/include"));
+
+    // Build the video play example.
+    {
+        const zin = b.dependency("zin", .{}).module("zin");
+
+        const video_play = b.addExecutable(.{
+            .name = "video-play",
+            .root_module = b.createModule(.{
+                .root_source_file = b.path("src/examples/video_play.zig"),
+                .target = target,
+                .optimize = optimize,
+                .imports = &.{
+                    .{ .name = "zin", .module = zin },
+                },
+            }),
+        });
+
+        if (use_zig_module) {
+            video_play.root_module.addImport("pipewire", libpipewire_zig);
+        } else {
+            video_play.linkLibrary(libpipewire);
+            video_play.root_module.addImport("pipewire", c);
+        }
+
+        video_play.root_module.addOptions("example_options", example_options);
+
+        b.installArtifact(video_play);
+
+        const run_step = b.step("video-play", "Run the video-play example");
+
+        const run_cmd = b.addRunArtifact(video_play);
+        run_step.dependOn(&run_cmd.step);
+
+        run_cmd.step.dependOn(b.getInstallStep());
+
+        if (b.args) |args| {
+            run_cmd.addArgs(args);
+        }
+    }
+
+    // Build the audio src example.
+    {
+        const audio_src = b.addExecutable(.{
+            .name = "audio-src",
+            .root_module = b.createModule(.{
+                .root_source_file = b.path("src/examples/audio_src.zig"),
+                .target = target,
+                .optimize = optimize,
+            }),
+        });
+
+        if (use_zig_module) {
+            audio_src.root_module.addImport("pipewire", libpipewire_zig);
+        } else {
+            audio_src.linkLibrary(libpipewire);
+            audio_src.root_module.addImport("pipewire", c);
+        }
+
+        audio_src.root_module.addOptions("example_options", example_options);
+
+        b.installArtifact(audio_src);
+
+        const run_step = b.step("audio-src", "Run the audio-src example");
+
+        const run_cmd = b.addRunArtifact(audio_src);
+        run_step.dependOn(&run_cmd.step);
+
+        run_cmd.step.dependOn(b.getInstallStep());
+
+        if (b.args) |args| {
+            run_cmd.addArgs(args);
+        }
+    }
+}
+
+/// Flags used for the vararg wrapper.
+const va_flags: []const []const u8 = &.{
+    "-fvisibility=hidden",
+    "-fno-strict-aliasing",
+    "-Wno-missing-field-initializers",
+    "-Wno-unused-parameter",
+    "-Wno-pedantic",
+    "-D_GNU_SOURCE",
+};
+
+/// Flags uses for all pipewire libraries.
+const flags: []const []const u8 = &.{
+    // Common build flags for libpipewire.
+    "-fvisibility=hidden",
+    "-fno-strict-aliasing",
+    "-Wno-missing-field-initializers",
+    "-Wno-unused-parameter",
+    "-Wno-pedantic",
+    "-D_GNU_SOURCE",
+    "-DFASTPATH",
+
+    // Translate C can't translate some of the variadic functions API so they get demoted to
+    // externs. However, since they're present only in headers and marked as `SPA_API_IMPL` which
+    // which defaults to `static inline`, the symbols end up being missing. We instead mark them as
+    // weak so that we don't get duplicate symbols, but are still able to reference the C
+    // implementations.
+    "-DSPA_API_IMPL=__attribute__((weak))",
+
+    // Wrap the standard library functions we want to replace with our own implementations to avoid
+    // relying on a dynamic linker.
+    "-Ddlopen=__wrap_dlopen",
+    "-Ddlclose=__wrap_dlclose",
+    "-Ddlsym=__wrap_dlsym",
+    "-Ddlerror=__wrap_dlerror",
+    "-Ddlinfo=__wrap_dlinfo",
+    "-Dstat=__wrap_stat",
+    "-Daccess=__wrap_access",
+    "-Dopen=__wrap_open",
+    "-Dclose=__wrap_close",
+    "-Dfstat=__wrap_fstat",
+    "-Dmmap=__wrap_mmap",
+    "-Dmunmap=__wrap_munmap",
+
+    // If we're using glibc, it aliases `open` in the header as part of extra checks on the variadic
+    // args. Since this is done in the header, and libc is likely linked first, our defines will
+    // apply to the definition as well and it will get called instead of our wrapper. To fix this,
+    // we just wrap the aliases as well.
+    "-D__open_2=__wrap_open_2",
+    "-D__open_alias=__wrap___open_alias",
+};
+
+pub const PluginAndModuleCtx = struct {
+    upstream: *std.Build.Dependency,
+    config: *std.Build.Step.ConfigHeader,
+    version: *std.Build.Step.ConfigHeader,
+    target: std.Build.ResolvedTarget,
+    optimize: std.builtin.OptimizeMode,
+    libpipewire: *std.Build.Step.Compile,
+};
+
+/// A pipewire module. These are typically opened with `dlopen`, but we're going to link to them
+/// statically.
+pub const PipewireModule = struct {
+    name: []const u8,
+    files: []const []const u8,
+
+    fn build(
+        b: *std.Build,
+        ctx: PluginAndModuleCtx,
+        self: PipewireModule,
+    ) *std.Build.Step.Compile {
+        const lib = b.addLibrary(.{
+            .name = b.fmt("pipewire-module-{s}", .{self.name}),
+            .linkage = .static,
+            .root_module = b.createModule(.{
+                .target = ctx.target,
+                .optimize = ctx.optimize,
+                .link_libc = true,
+                .sanitize_c = .off, // https://github.com/allyourcodebase/pipewire/issues/3
+            }),
+        });
+        lib.addCSourceFiles(.{
+            .root = ctx.upstream.path("src/modules"),
+            .files = self.files,
+            .flags = flags,
+        });
+        lib.addIncludePath(ctx.upstream.path("spa/include"));
+        lib.addIncludePath(ctx.upstream.path("src"));
+        lib.addConfigHeader(ctx.version);
+        lib.addConfigHeader(ctx.config);
+
+        namespace(lib, "pipewire__module_init");
+        namespace(lib, "mod_topic");
+
+        ctx.libpipewire.addIncludePath(ctx.upstream.path("spa/include"));
+        ctx.libpipewire.linkLibrary(lib);
+
+        return lib;
+    }
+};
+
+/// A pipewire plugin. These are typically opened with `dlopen`, but we're going to link to them
+/// statically.
+pub const PipewirePlugin = struct {
+    name: []const u8,
+    files: []const []const u8,
+
+    pub fn build(
+        b: *std.Build,
+        ctx: PluginAndModuleCtx,
+        self: PipewirePlugin,
+    ) *std.Build.Step.Compile {
+        const lib = b.addLibrary(.{
+            .name = b.fmt("spa-{s}", .{self.name}),
+            .linkage = .static,
+            .root_module = b.createModule(.{
+                .target = ctx.target,
+                .optimize = ctx.optimize,
+                .link_libc = true,
+            }),
+        });
+        lib.addCSourceFiles(.{
+            .root = ctx.upstream.path(b.pathJoin(&.{
+                "spa",
+                "plugins",
+                self.name,
+            })),
+            .files = self.files,
+            .flags = flags,
+        });
+        lib.addIncludePath(ctx.upstream.path("spa/include"));
+        lib.addConfigHeader(ctx.config);
+
+        namespace(lib, "spa_handle_factory_enum");
+        namespace(lib, "spa_log_topic_enum");
+
+        ctx.libpipewire.addIncludePath(ctx.upstream.path("spa/include"));
+        ctx.libpipewire.linkLibrary(lib);
+
+        return lib;
+    }
+};
+
+/// Namespaces a symbol using the preprocessor.
+pub fn namespace(library: *std.Build.Step.Compile, symbol: []const u8) void {
+    const b = library.root_module.owner;
+    library.root_module.addCMacro(
+        symbol,
+        b.fmt("{f}", .{Namespaced.init(library.name, symbol)}),
+    );
+}
+
+/// A namespaced symbol.
+pub const Namespaced = struct {
+    prefix: []const u8,
+    symbol: []const u8,
+
+    pub fn init(prefix: []const u8, symbol: []const u8) Namespaced {
+        return .{
+            .prefix = prefix,
+            .symbol = symbol,
+        };
+    }
+
+    pub fn format(self: @This(), writer: *std.Io.Writer) std.Io.Writer.Error!void {
+        for (self.prefix) |c| {
+            switch (c) {
+                '-' => try writer.writeByte('_'),
+                else => try writer.writeByte(c),
+            }
+        }
+        try writer.writeAll("__");
+        try writer.writeAll(self.symbol);
+    }
+};
