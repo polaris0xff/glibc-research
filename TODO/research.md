@@ -70,9 +70,60 @@ from nix, and each entry marked link-statically / build-static / bundle.
 problem with the nixappimages created, which further killed the dream of a
 'universal' builder as many graphical apps didn't work. See:
 https://github.com/nix-community/nixgl"*
-**Category** research · **Priority** P1 · **Effort** M · **Status** open
+**Category** research · **Priority** P1 · **Effort** M · **Status** ⚠partly
 
-**The problem, stated before it is measured.** OpenGL and Vulkan are the one
+## ⭐ THE MESA HALF IS SOLVED, AND MEASURED
+
+⛔ **The mechanism, which is not what the name suggests.** A nixpkgs GL
+program does not depend on mesa at all. It depends on **libglvnd**, the
+vendor-neutral dispatch layer, and libglvnd finds the implementation by reading
+`share/glvnd/egl_vendor.d/*.json` and `dlopen`ing what they name. That file is
+HOST configuration, so mesa is not in the closure — mesa-demos' 111-path
+closure carries libglvnd and mesa-libgbm and **not one mesa driver**.
+
+⭐ **That makes the libGL problem this project's own `docs/limitations.md` §1
+arriving from the GL side: a dlopen of an object the host is supposed to
+provide.** And `nix-community/nixGL` (commit `b6105297`, `nixGL.nix:54-62`)
+answers it the same way this project now does: for the mesa case it does NOT
+use the host's GL, it points nixpkgs' own mesa at itself with
+`LIBGL_DRIVERS_PATH`, `GBM_BACKENDS_PATH` and `__EGL_VENDOR_LIBRARY_*`.
+
+**Landed in `tool/nix-appimage.sh`**, in three parts, each because a real run
+failed:
+
+1. **mesa is pulled into the closure** when libglvnd is present and no driver
+   is. Before: `eglinfo: eglInitialize failed`, no vendor at all.
+2. **`lib/dri`, `lib/gbm` and the other module trees are copied as
+   DIRECTORIES.** They are found through a variable naming a directory, so a
+   flattened copy is invisible.
+3. ⛔ **The ICD JSONs name an absolute store path** —
+   `"library_path": "/nix/store/4cvv9...-mesa-26.2.1/lib/libEGL_mesa.so.0"` —
+   so libglvnd found the vendor file, opened a path that was not there, and
+   failed on a bundle with `libEGL_mesa.so.0` sitting in `lib/` beside it.
+   Rewritten to the bare soname.
+
+**Measured, on a machine with NO GPU:**
+
+```
+EGL vendor string: Mesa Project
+EGL driver name:   swrast
+EGL client APIs:   OpenGL OpenGL_ES
+```
+
+from `eglinfo` in a 163 MB bundle, surfaceless platform, no host GL involved.
+
+## ⛔ What is still open, and it is the hard half
+
+- **NVIDIA proprietary.** The userspace half must match the running kernel
+  module; nixGL reads `/proc/driver/nvidia/version` and FETCHES a matching
+  driver (`nixGL.nix:69`). A bundle cannot, and nothing here pretends to.
+- **No GPU has ever been in this loop.** `swrast` is a real GL implementation
+  and it is not evidence about anybody's iris, radeonsi or amdvlk path.
+- **Nothing has run on the eleven.** The result above is the build host.
+- **163 MB**, because mesa is 273 MB unstripped and nothing debloats it. The
+  Anylinux flow ships a debloated mesa; T-057 owns that.
+
+**The problem, as it was stated before it was measured.** OpenGL and Vulkan are the one
 class of library that **must** come from the host, because it is the host's
 kernel driver that the userspace half has to match. Bundling a `libGL.so` from
 nixpkgs and running it against another machine's GPU driver is not the same

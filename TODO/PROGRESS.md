@@ -31,7 +31,7 @@ Quoted, because the framing is load-bearing:
 | goal | entries | where it stands |
 |---|---|---|
 | 1. the builder | T-050, T-051, T-012 | ⚠ **started and working**: six packages built static from nixpkgs plans, two verified 11/11 |
-| 2. the bundler | T-057, T-052, T-053 | ⚠ **started**: one GTK app bundled and starting on musl; no debloat, no OpenGL answer, nothing measured against a hand-built AppImage |
+| 2. the bundler | T-057, T-052, T-053 | ⚠ **started**: a GTK app starting on musl, and ⭐ **the mesa half of the OpenGL problem solved and measured** — `EGL vendor string: Mesa Project`, `driver name: swrast`, on a machine with no GPU and no host GL. NVIDIA, debloat, and any comparison against a hand-built AppImage are all still open |
 | 3. kdenlive | T-054, T-055 | ⛔ **not started.** The ENGINE is already static and proved (POC 80); Qt/KF6 and the application are untouched |
 
 ## What this session did
@@ -76,6 +76,28 @@ fallback to evaluation is mandatory, and T-050 stays open saying so.
 ⛔ **An index lookup is not an evaluation**, two ways: nixpkgs' `bash`
 attribute is `bash-interactive`, and the channel index is one revision while a
 local nix is another.
+
+### ⭐ The OpenGL problem: the mesa half is solved
+
+⛔ **It is not what its name suggests.** A nixpkgs GL program depends on
+**libglvnd**, not mesa, and libglvnd finds the implementation by reading
+`share/glvnd/egl_vendor.d/*.json` and dlopen'ing what they name — HOST
+configuration, so mesa is not in the closure at all. mesa-demos' 111-path
+closure carries libglvnd and **not one driver**.
+
+⭐ **So the libGL problem is `docs/limitations.md` §1 arriving from the GL
+side**, and `nix-community/nixGL` answers it the same way the bundler now
+does: pull nixpkgs' own mesa in and point it at itself. Three parts, each
+added because a real run failed — mesa into the closure, the `lib/dri` and
+`lib/gbm` trees copied as directories rather than flattened, and ⛔ **the ICD
+JSONs rewritten off their absolute `/nix/store` `library_path`**, which had
+libglvnd opening a path that was not there while the library sat in `lib/`
+beside it.
+
+Measured with no GPU: `EGL vendor string: Mesa Project`, `EGL driver name:
+swrast`, OpenGL and OpenGL_ES. ⚠ NVIDIA proprietary is untouched and cannot be
+bundled; nothing has run on the eleven; the bundle is 163 MB because nothing
+debloats mesa. T-052.
 
 ### The GUI bundle
 

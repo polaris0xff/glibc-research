@@ -41,7 +41,7 @@ pretending to be one.
 | T-041 | P2 | M | open | ci | aarch64 |
 | T-050 | P1 | M | ⚠partly | toolchain | Plan a nixpkgs package with NO nix, from the `.drv` in the cache |
 | T-051 | P1 | M | open | toolchain | Enough nix for a host with no root, no docker and no nix |
-| T-052 | P1 | M | open | research | The libGL problem, and whether a bundle can claim "universal" |
+| T-052 | P1 | M | ⚠partly | research | The libGL problem, and whether a bundle can claim "universal" |
 | T-053 | P2 | S | open | research | patchelf and patsh: use them, or say why not |
 | T-054 | P1 | L | open | poc | kdenlive, static: exhaust it |
 | T-055 | P1 | L | open | poc | If static will not reach it, a kdenlive bundle that BEATS the field |
