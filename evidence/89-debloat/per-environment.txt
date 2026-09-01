@@ -1,0 +1,11 @@
+alpine-3.22         musl   N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0
+alpine-3.20         musl   N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0
+alpine-3.10         musl   N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0
+voidlinux-musl      musl   N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0
+debian-11           glibc  N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0
+debian-12           glibc  N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0
+ubuntu-20.04        glibc  N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0
+rockylinux-8        glibc  N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0
+opensuse-leap-15.6  glibc  N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0
+fedora-42           glibc  N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0
+archlinux-latest    glibc  N exit=3 vendor=Mesa Project driver=swrast | S exit=3 vendor=Mesa Project driver=swrast host_objects=0

@@ -189,7 +189,7 @@ entry does not close it by silence.
 
 **Source** operator, 2026-09-01c: *"did we have no need to use tools like
 patchelf & patsh here?"*
-**Category** research · **Priority** P2 · **Effort** S · **Status** open
+**Category** research · **Priority** P2 · **Effort** S · **Status** done
 
 **Where it stands.** `tool/elf-needed.py` does ONE edit — rewrite an absolute
 `DT_NEEDED` to its basename, in place, at the same `.dynstr` offset — because
@@ -215,6 +215,58 @@ longer a blocker for either tool.
 **Prove.** A written comparison at file and line, plus either a patsh-shaped
 step in the bundler with a wrapper-using application working through it, or
 the measurement that says why it is not needed.
+
+## ⭐ CLOSED — the hole is filled, and patsh is not what fills it
+
+**patchelf**: `tool/elf-needed.py` keeps its sixty lines and the reason is now
+measured rather than asserted. It does ONE edit — rewrite an absolute
+`DT_NEEDED` to its basename **at the same `.dynstr` offset** — and refuses to
+move anything, which is exactly the case patchelf is famous for getting wrong.
+`scripts/common/nix-fetch.sh` can fetch patchelf's closure, so availability is
+no longer the argument; the argument is that the bundler's only ELF edit is the
+one edit that needs no section growth. ⚠ **Revisit per edit, not per tool**: an
+RPATH or interpreter rewrite is patchelf's job and `elf-needed.py` must not
+grow one.
+
+⛔ **patsh: no, and the reason is that nixpkgs no longer produces the thing it
+patches.** patsh rewrites `/nix/store` paths **in shell scripts**. Two
+measurements against that:
+
+1. **The dominant wrapper is a compiled C program.** `mpv-with-scripts-0.41.0`'s
+   `bin/mpv` is a **16,560-byte ELF** — nixpkgs' current `makeWrapper` emits
+   `makeBinaryWrapper` output. There is no script to patch.
+2. **A bundle does not run the wrapper at all.** sharun runs the real ELF and
+   reads `.env`. Keeping a script working is the wrong end of the problem; the
+   job is to **lift the assignments out** and re-express them against the
+   bundle.
+
+⭐ **And the binary wrapper makes that exact rather than heuristic**, because
+nixpkgs embeds the generating command in the binary's own data:
+
+    makeCWrapper '/nix/store/...-mpv-0.41.0/bin/mpv' \
+        --inherit-argv0 \
+        --prefix 'LUA_CPATH' ';' '/nix/store/...-lua-5.2.4-env/lib/lua/5.2/?.so' \
+        --suffix 'PATH'     ':' '/nix/store/...-yt-dlp-2026.08.19/bin'
+
+`tool/nix-wrapper.py` reads both shapes (11-check selftest, including two
+refusal cases), and `tool/nix-appimage.sh` copies each referenced store path
+into `AppDir/store/<name>/` — keeping its internal layout, because `LUA_CPATH`
+names a sub-path — and writes `.env` lines with the same prefix/suffix/set
+semantics.
+
+⛔ **THE DEFECT THIS FOUND, and it shipped a broken bundle.** `resolve_entry`
+tested the **ELF magic first**, so a binary wrapper was declared to be the
+program and packed. The AppImage then failed with
+
+    Failed to run App: /tmp/.mount_mpv-.../bin/: Permission denied (os error 13)
+
+— which reads like a bug in sharun. It asks whether the file is a *wrapper*
+before asking whether it is an ELF now.
+
+**Measured**: `sh tool/nix-appimage.sh mpv` reports
+`bin/mpv is a nixpkgs wrapper -> mpv` and `4 variable(s) lifted out of the
+wrapper into .env`, and the artefact runs: `mpv v0.41.0`, decoding an ffmpeg
+lavfi test pattern with `VO: [null] 64x48 rgb24`.
 
 ## T-057 — The bundler: a maintained nix-appimage descendant, on the Anylinux mechanisms
 
@@ -298,11 +350,95 @@ here: the two arms are different distributions' builds; jq is a CLI, so this
 says nothing about a GUI (that is `85-`); nothing is debloated; one machine,
 one day.
 
-**What is left of this entry** — it stays **open**, with items 1, 3 and 4
-untouched: debloating (item 1, now with a number to beat), wrapper scripts and
-their environment (item 3, T-053, `patsh`), and the 32-bit path (item 4).
-Item 5 — *"nothing is measured against a hand-built Anylinux AppImage"* — is
-what closed here.
+## ⭐ ITEMS 1, 3 AND 4 ARE DONE — `experiments/89-debloat.sh`, 10 assertions, 0 fail
+
+### Item 1, debloating: three arms and a control on all eleven
+
+⛔ **What the 95 MiB actually is**, measured on `mesa-26.2.1` rather than
+assumed. Its `lib` is **273 MB** uncompressed and the GL driver is a minority
+of it: **twelve Vulkan ICDs are ~194 MiB**, and `libteflon.so` (12.1 MiB) is an
+NPU delegate rather than a GPU driver at all.
+
+⭐ **Seven of the twelve are for GPUs that cannot exist on x86_64 Linux** —
+panfrost is ARM Mali, freedreno is Adreno, broadcom is a Raspberry Pi, asahi is
+Apple silicon, powervr is Imagination, dzn is Direct3D 12 on Windows, gfxstream
+is an Android emulator transport. Dropping those is not a size/function trade.
+
+| arm | AppDir | AppImage | |
+|---|---|---|---|
+| `--debloat none` | 878,044,217 | 170,610,180 | what 85- and 86- measured |
+| ⭐ `--debloat safe` (default) | 676,429,749 | **147,196,846** | 0.77× / **0.86×** |
+| `--debloat aggressive` | 580,947,048 | **132,874,316** | 0.66× / **0.78×** |
+
+The rules that fired on the safe arm, each with its reason:
+
+    1.7 MiB   5  documentation and shell completions
+    0.0 MiB   7  static archives, headers and build metadata
+   87.5 MiB 188  locale catalogues (kept: none)
+   17.7 MiB   2  vulkan driver 'panfrost'   (no such GPU on x86_64)
+   16.3 MiB   2  vulkan driver 'freedreno'  (no such GPU on x86_64)
+   15.8 MiB   2  vulkan driver 'asahi'      (no such GPU on x86_64)
+   13.0 MiB   2  vulkan driver 'powervr'    (no such GPU on x86_64)
+   12.6 MiB   2  vulkan driver 'broadcom'   (no such GPU on x86_64)
+   12.6 MiB   2  vulkan driver 'dzn'        (no such GPU on x86_64)
+    3.0 MiB   2  vulkan driver 'gfxstream'  (no such GPU on x86_64)
+   12.1 MiB   1  libteflon (an NPU delegate, not a GPU driver)
+
+⭐ **AND THE CONTROL IS WHAT MAKES THE SIZE COLUMN REPORTABLE.** All three arms
+run on all eleven environments, and the debloated ones must reach **the same
+EGL vendor and the same driver as the undebloated one on every row**: 11 of 11
+`Mesa Project` / `swrast`, **zero host shared objects**, and 11 of 11 agreement
+for *both* the safe and the aggressive arm. A smaller bundle that stopped
+working is the obvious way to get a good size number, so the number is only
+printed next to that check.
+
+⚠ **The aggressive arm is a real trade and is not the default.** It also drops
+the Vulkan ICDs for GPUs this architecture *does* have. `eglinfo` is an
+OpenGL/EGL program and never touches them, so eleven green rows say the trade
+cost nothing **here** — they say nothing about a Vulkan application.
+
+⚠ **The compressed saving is much smaller than the uncompressed one** — 23% off
+the AppDir but 14% off the AppImage — because locales and driver blobs are
+exactly what zstd is best at. Quoting the AppDir figure alone would overstate
+what a user downloads.
+
+⛔ **And a nix-appimage-scale caveat: two more rules were considered and not
+taken.** The Anylinux chromium recipe deletes locale directories and then
+**symlinks them back to the host**; that is a deliberate reintroduction of a
+host dependency and is refused here — `--keep-locales` is the knob instead.
+Stripping symbols from every shared object was not attempted and is the next
+thing to measure.
+
+### Item 3, wrapper scripts: **T-053**, and patsh is not the answer
+
+nixpkgs' current `makeWrapper` emits a **compiled C program** — mpv's `bin/mpv`
+is a 16,560-byte ELF — so patsh has no script to patch, and a bundle does not
+run the wrapper anyway. `tool/nix-wrapper.py` reads the environment out of both
+wrapper shapes and `tool/nix-appimage.sh` re-expresses it against the bundle.
+Full write-up in T-053.
+
+### Item 4, lib32
+
+Shared objects are placed by **ELF class** (byte 5 of the header) — 32-bit into
+`lib32`, with its own loader and a `shared/lib32` symlink. Before this, an
+i386 and an x86_64 `libfoo.so.1` landed in one flat directory where the second
+`cp -n` silently lost. ⚠ **Not exercised by a 32-bit application**: nothing in
+the eleven-environment bed carries one, so what is proved is the classification
+and the layout, not a running 32-bit program. That is the next thing to try.
+
+### ⛔ Two defects the debloat pass itself required
+
+- **The symlink pass was order-dependent.** A closure has symlinks to symlinks
+  — `libvulkan.so -> libvulkan.so.1 -> libvulkan.so.1.4.357` — and one pass
+  left a `DT_NEEDED` on `libvulkan.so` resolving nowhere. It repeats until it
+  creates nothing.
+- ⭐ **An integrity pass now runs after the debloat**: every `DT_NEEDED` of
+  every ELF left in the bundle must resolve inside it. That check is what
+  caught the one above, and without it a debloat is a size number with no
+  safety property behind it.
+
+**What is left of this entry** — it stays **open** for one thing only: the
+32-bit path has no 32-bit application behind it.
 
 ## T-059 — GL on real hardware, and the NVIDIA case
 

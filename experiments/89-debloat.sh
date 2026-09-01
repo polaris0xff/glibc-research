@@ -34,6 +34,15 @@
 #   N  --debloat none    byte-for-byte what 85- and 86- measured
 #   S  --debloat safe    the default: docs, build metadata, locales, and the
 #                        drivers for hardware this architecture does not have
+#   A  --debloat aggressive
+#                        also the Vulkan ICDs for GPUs this architecture DOES
+#                        have. ⚠ THIS ONE IS A REAL TRADE and the control is
+#                        what makes it reportable: an OpenGL program does not
+#                        touch them, a Vulkan program does. Arm A is measured
+#                        with the same eglinfo assertions as the others, so
+#                        the row says whether the trade cost anything HERE --
+#                        it does not say a Vulkan application would survive
+#                        it, and that is stated rather than implied.
 #
 # Exit: 0 matched, 1 did not, 2 could not run.
 # SPDX-License-Identifier: MIT
@@ -74,8 +83,22 @@ trap 'reap_all' EXIT INT TERM
 printf -- '-- the two bundles -----------------------------------------------\n'
 N_CACHE="${PGB_DEBLOAT_CACHE_N:-/var/tmp/pgb-appimage-dbnone}"
 S_CACHE="${PGB_DEBLOAT_CACHE_S:-/var/tmp/pgb-appimage-dbsafe}"
+A_CACHE="${PGB_DEBLOAT_CACHE_A:-/var/tmp/pgb-appimage-dbaggr}"
 N_IMG="$N_CACHE/eglinfo/eglinfo-none-x86_64.AppImage"
 S_IMG="$S_CACHE/eglinfo/eglinfo-safe-x86_64.AppImage"
+A_IMG="$A_CACHE/eglinfo/eglinfo-aggr-x86_64.AppImage"
+
+# ⭐ The closure is identical for all three arms, so it is fetched once and
+# hard-linked across. Re-fetching 400 MB twice to measure a debloat would be
+# the experiment paying for its own arms.
+seed_cache() {  # from to
+  [ -d "$2/eglinfo/store" ] && return 0
+  mkdir -p "$2/eglinfo" 2>/dev/null || return 0
+  cp -al "$1/eglinfo/store" "$2/eglinfo/store" 2>/dev/null \
+    || cp -a "$1/eglinfo/store" "$2/eglinfo/store" 2>/dev/null || true
+  [ -d "$1/tools" ] && { mkdir -p "$2"; cp -a "$1/tools" "$2/" 2>/dev/null || true; }
+  return 0
+}
 
 if [ ! -s "$N_IMG" ]; then
   exp_note "building arm N (--debloat none) -- several minutes, ~400 MB of closure"
@@ -87,17 +110,27 @@ if [ ! -s "$S_IMG" ]; then
   PGB_APPIMAGE_CACHE="$S_CACHE" sh "$BUNDLER" mesa-demos --debloat safe \
     --out "$S_IMG" --name eglinfo >"$B/build-S.log" 2>&1 || true
 fi
+if [ ! -s "$A_IMG" ]; then
+  exp_note "building arm A (--debloat aggressive)"
+  seed_cache "$N_CACHE" "$A_CACHE"
+  PGB_APPIMAGE_CACHE="$A_CACHE" sh "$BUNDLER" mesa-demos --debloat aggressive \
+    --out "$A_IMG" --name eglinfo >"$B/build-A.log" 2>&1 || true
+fi
 [ -s "$N_IMG" ] || { exp_note "arm N did not build; see $B/build-N.log"; exit 2; }
 [ -s "$S_IMG" ] || { exp_note "arm S did not build; see $B/build-S.log"; exit 2; }
+[ -s "$A_IMG" ] || { exp_note "arm A did not build; see $B/build-A.log"; exit 2; }
 
-N_SZ=$(wc -c < "$N_IMG"); S_SZ=$(wc -c < "$S_IMG")
+N_SZ=$(wc -c < "$N_IMG"); S_SZ=$(wc -c < "$S_IMG"); A_SZ=$(wc -c < "$A_IMG")
 N_DIR=$(du -sb "$N_CACHE/eglinfo/AppDir" 2>/dev/null | cut -f1)
 S_DIR=$(du -sb "$S_CACHE/eglinfo/AppDir" 2>/dev/null | cut -f1)
+A_DIR=$(du -sb "$A_CACHE/eglinfo/AppDir" 2>/dev/null | cut -f1)
 exp_check "arm N built (--debloat none)" "$([ -s "$N_IMG" ] && echo yes)" yes
 exp_check "arm S built (--debloat safe)" "$([ -s "$S_IMG" ] && echo yes)" yes
+exp_check "arm A built (--debloat aggressive)" "$([ -s "$A_IMG" ] && echo yes)" yes
 printf '  %-26s %14s %14s\n' '' 'AppDir bytes' 'AppImage bytes'
 printf '  %-26s %14s %14s\n' 'N  --debloat none' "${N_DIR:-?}" "$N_SZ"
 printf '  %-26s %14s %14s\n' 'S  --debloat safe' "${S_DIR:-?}" "$S_SZ"
+printf '  %-26s %14s %14s\n' 'A  --debloat aggressive' "${A_DIR:-?}" "$A_SZ"
 SAVED=$((N_SZ - S_SZ))
 printf '  %-26s %14s %14s\n' '   saved' \
   "$(awk -v a="${N_DIR:-0}" -v b="${S_DIR:-0}" 'BEGIN{printf "%.1f MiB", (a-b)/1048576}')" \
@@ -105,6 +138,9 @@ printf '  %-26s %14s %14s\n' '   saved' \
 printf '  %-26s %14s %14s\n' '   ratio S/N' \
   "$(awk -v a="${N_DIR:-1}" -v b="${S_DIR:-1}" 'BEGIN{printf "%.2fx", b/a}')" \
   "$(awk -v a="$N_SZ" -v b="$S_SZ" 'BEGIN{printf "%.2fx", b/a}')"
+printf '  %-26s %14s %14s\n' '   ratio A/N' \
+  "$(awk -v a="${N_DIR:-1}" -v b="${A_DIR:-1}" 'BEGIN{printf "%.2fx", b/a}')" \
+  "$(awk -v a="$N_SZ" -v b="$A_SZ" 'BEGIN{printf "%.2fx", b/a}')"
 # The rules that fired, straight out of the build log, so a reader can see
 # what was removed and why rather than only the total.
 printf '\n  rules that fired:\n'
@@ -175,7 +211,7 @@ EGL_PLATFORM=surfaceless "$N_IMG" >"$B/out.HOST.N" 2>&1; HOST_EXIT=$?
 HOST_VEND=$(field "$B/out.HOST.N" 'EGL vendor string')
 exp_note "the build host, arm N: exit $HOST_EXIT, vendor '${HOST_VEND:-<none>}'"
 
-ENVS=0; S_MESA=0; S_DRV=0; S_CLEAN=0; AGREE=0
+ENVS=0; S_MESA=0; S_DRV=0; S_CLEAN=0; AGREE=0; AGREE_A=0
 while read -r ref name libc digest; do
   case "$ref" in ''|\#*) continue ;; esac
   root=$(exp_rootfs "$name") || root=""
@@ -189,6 +225,11 @@ while read -r ref name libc digest; do
   sst=$(run_arm "$root" "$S_IMG" "$name.S")
   svend=$(field "$B/out.$name.S" 'EGL vendor string')
   sdrv=$(field "$B/out.$name.S" 'EGL driver name')
+
+  ast=$(run_arm "$root" "$A_IMG" "$name.A")
+  avend=$(field "$B/out.$name.A" 'EGL vendor string')
+  adrv=$(field "$B/out.$name.A" 'EGL driver name')
+  [ "$avend" = "$nvend" ] && [ "$adrv" = "$ndrv" ] && AGREE_A=$((AGREE_A + 1))
 
   # The host-object question, asked of the DEBLOATED arm: it is the one whose
   # claim to be self-contained a removed file could have broken.
@@ -209,9 +250,10 @@ while read -r ref name libc digest; do
   # did", which is the only statement a size number is allowed to sit next to.
   [ "$svend" = "$nvend" ] && [ "$sdrv" = "$ndrv" ] && AGREE=$((AGREE + 1))
 
-  printf '  %-19s %-6s | %-8s %-14s %-9s | %-8s %-14s %-9s\n' \
+  printf '  %-19s %-6s | %-8s %-14s %-9s | %-8s %-14s %-9s | %-8s %-14s\n' \
     "$name" "$libc" "$nst" "${nvend:-<none>}" "${ndrv:-<none>}" \
-    "$sst" "${svend:-<none>}" "${sdrv:-<none>}"
+    "$sst" "${svend:-<none>}" "${sdrv:-<none>}" \
+    "$ast" "${avend:-<none>}"
   printf '%-19s %-6s N exit=%s vendor=%s driver=%s | S exit=%s vendor=%s driver=%s host_objects=%s\n' \
     "$name" "$libc" "$nst" "${nvend:-<none>}" "${ndrv:-<none>}" \
     "$sst" "${svend:-<none>}" "${sdrv:-<none>}" "${snh:-?}" \
@@ -224,6 +266,11 @@ exp_check "debloated arm reports Mesa Project"          "$S_MESA"  "$ENVS"
 exp_check "debloated arm reports the swrast driver"     "$S_DRV"   "$ENVS"
 exp_check "debloated arm loaded no host shared object"  "$S_CLEAN" "$ENVS"
 exp_check "debloated arm AGREES with the undebloated one" "$AGREE" "$ENVS"
+exp_check "the AGGRESSIVE arm agrees too, on this OpenGL subject" "$AGREE_A" "$ENVS"
+exp_note "⚠ arm A drops the Vulkan ICDs for THIS architecture as well. eglinfo"
+exp_note "  is an OpenGL/EGL program and does not touch them, so these eleven"
+exp_note "  rows say the trade cost nothing HERE. They say nothing about a"
+exp_note "  Vulkan application, which is why aggressive is not the default."
 
 {
   printf '89 - debloating the bundle, and the control that says nothing was lost\n\n'
@@ -231,6 +278,10 @@ exp_check "debloated arm AGREES with the undebloated one" "$AGREE" "$ENVS"
   printf '  %-26s %14s %14s\n' '' 'AppDir bytes' 'AppImage bytes'
   printf '  %-26s %14s %14s\n' 'N  --debloat none' "${N_DIR:-?}" "$N_SZ"
   printf '  %-26s %14s %14s\n' 'S  --debloat safe' "${S_DIR:-?}" "$S_SZ"
+  printf '  %-26s %14s %14s\n' 'A  --debloat aggressive' "${A_DIR:-?}" "$A_SZ"
+  printf '  %-26s %14s %14s\n' '   ratio A/N' \
+    "$(awk -v a="${N_DIR:-1}" -v b="${A_DIR:-1}" 'BEGIN{printf "%.2fx", b/a}')" \
+    "$(awk -v a="$N_SZ" -v b="$A_SZ" 'BEGIN{printf "%.2fx", b/a}')"
   printf '  %-26s %14s %14s\n' '   ratio S/N' \
     "$(awk -v a="${N_DIR:-1}" -v b="${S_DIR:-1}" 'BEGIN{printf "%.2fx", b/a}')" \
     "$(awk -v a="$N_SZ" -v b="$S_SZ" 'BEGIN{printf "%.2fx", b/a}')"
@@ -239,6 +290,7 @@ exp_check "debloated arm AGREES with the undebloated one" "$AGREE" "$ENVS"
   printf '\non the eleven: Mesa Project %s/%s, swrast %s/%s, zero host objects %s/%s,\n' \
     "$S_MESA" "$ENVS" "$S_DRV" "$ENVS" "$S_CLEAN" "$ENVS"
   printf 'and identical to the undebloated arm on %s/%s rows.\n' "$AGREE" "$ENVS"
+  printf 'the aggressive arm is identical to the undebloated one on %s/%s rows.\n' "$AGREE_A" "$ENVS"
   printf '\nconditions: %s, %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(uname -sr)"
 } > "$EXP_OUT/RESULT.txt"
 
