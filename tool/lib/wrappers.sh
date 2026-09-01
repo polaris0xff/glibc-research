@@ -371,7 +371,20 @@ link_flags() {
   printf -- '-static -Wl,--eh-frame-hdr %s -Wl,-u,pgb_runtime_anchor' "$rd/pgb-nssfix.o"
   if [ "$USE_ICONV" = 1 ]; then
     printf -- ' -Wl,--wrap=iconv_open,--wrap=iconv,--wrap=iconv_close'
-    [ "${1:-}" = cxx ] && \
+    # ⛔ AND THE SAME FORCING IS NEEDED WHENEVER --wrap-dlopen IS IN PLAY,
+    # for a C program, and this was measured on MLT linked against a static
+    # ffmpeg. The wrapper re-emits the caller's own -l after pgb's flags (see
+    # make_wrappers), so a caller archive is scanned AFTER -lpgbruntime -- and
+    # ffmpeg's libavformat calls iconv, so --wrap rewrites those to
+    # __wrap_iconv* and the archive that defines them is already behind the
+    # linker:
+    #
+    #   libavformat.a(mpegts.o): undefined reference to `__wrap_iconv_open'
+    #
+    # ⭐ -u pulls the defining member in AT -lpgbruntime, so the symbols exist
+    # before the repeated libraries are scanned. Identical technique, identical
+    # reason, one layer further out than the C++ case above.
+    { [ "${1:-}" = cxx ] || [ -n "${WRAP_DLOPEN:-}" ]; } && \
       printf -- ' -Wl,-u,__wrap_iconv_open -Wl,-u,__wrap_iconv -Wl,-u,__wrap_iconv_close'
     printf -- ' -L%s -lpgbruntime -L%s/lib -liconv' "$rd" "$PGB_LIBICONV_PREFIX"
   fi
@@ -406,6 +419,9 @@ make_wrappers() {
     # The C++ drivers get the forcing flags; the C ones must not -- see
     # link_flags() for what that costs and why the split is where it is.
     case "$name" in c++|g++) lf=$(link_flags cxx) ;; *) lf=$(link_flags) ;; esac
+    # ⛔ SET ONLY WHEN --wrap-dlopen IS IN PLAY, so a build without it produces
+    # a byte-identical wrapper to before this existed.
+    pgbdl=""; [ -n "${WRAP_DLOPEN:-}" ] && pgbdl=1
     realpath_=$(command -v "$real" 2>/dev/null) || realpath_=""
     [ -n "$realpath_" ] || continue
     case "$realpath_" in "$wd"/*) continue ;; esac
@@ -416,6 +432,7 @@ make_wrappers() {
 REAL="$realpath_"
 CF="$cf"
 LF="$lf"
+PGBDL="$pgbdl"
 mode=link
 for a in "\$@"; do
   case "\$a" in
@@ -433,8 +450,39 @@ case "\$mode" in
            exec "\$REAL" "\$@" \$CF ;;
   shared)  [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[shared,passthrough] \$REAL \$*" >&2
            exec "\$REAL" "\$@" ;;
-  link)    [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[link] \$REAL \$* \$CF \$LF" >&2
-           exec "\$REAL" "\$@" \$CF \$LF ;;
+  link)
+           # ⛔ THE PLUGIN OBJECTS ARE APPENDED AFTER THE CALLER'S LIBRARIES,
+           # and an object's undefined references can only be resolved by a
+           # library that comes AFTER it. So a plugin that calls pow() links
+           # against a -lm the caller already spent:
+           #
+           #   filter_lumaliftgaingamma.c:(.text+0x1e1):
+           #       undefined reference to \`pow'
+           #
+           # ⛔ AND THE CALLER CANNOT FIX IT, because the caller does not
+           # control where pgb puts those objects. Measured on MLT, whose
+           # modules are exactly this shape. Same defect class as the
+           # -lstdc++ ordering above, one layer further out.
+           #
+           # ⭐ The fix is to re-emit the caller's own -l/-L after them.
+           # Repeating a -l is safe: an archive member is pulled in once, and
+           # a repeated shared library is one DT_NEEDED either way. Only the
+           # caller's libraries are repeated -- nothing is invented, so a
+           # plugin needing a library the program never named still fails,
+           # loudly, which is correct.
+           RELIBS=""
+           if [ -n "\$PGBDL" ]; then
+             _next=""
+             for a in "\$@"; do
+               if [ -n "\$_next" ]; then RELIBS="\$RELIBS \$_next \$a"; _next=""; continue; fi
+               case "\$a" in
+                 -l|-L)   _next=\$a ;;
+                 -l*|-L*) RELIBS="\$RELIBS \$a" ;;
+               esac
+             done
+           fi
+           [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[link] \$REAL \$* \$CF \$LF \$RELIBS" >&2
+           exec "\$REAL" "\$@" \$CF \$LF \$RELIBS ;;
 esac
 EOF
     chmod +x "$wd/$name"

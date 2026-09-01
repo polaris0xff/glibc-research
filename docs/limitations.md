@@ -133,6 +133,28 @@ the verneed entry names — which 73-'s first control confirms, and which is
 exactly where a compiled-in provider table sits. That distinction is what makes
 §1's route D viable and 50-'s arm B a dead end.
 
+### ⛔ And one limit of `--wrap-dlopen` itself: it serves dlopen BY NAME
+
+`--wrap-dlopen` answers `dlopen("libfoo.so")` out of a compiled-in table. ⛔ A
+program that does not ASK for a plugin by name — one that **lists** its plugin
+directory and opens whatever it finds — never reaches the wrapper at all,
+because an empty directory yields an empty listing.
+
+**Measured**, `poc/80-mlt`: MLT's `mlt_repository_init` lists the module
+directory (`src/framework/mlt_repository.c`) and `dlopen`s each entry. With
+the directory emptied it registers nothing, and no `dlopen` is ever called.
+
+⭐ **The working answer today is one zero-byte file per plugin**, asserted to
+be zero bytes: nothing is mapped and no code is in them, they exist so the
+listing has entries, and every `dlopen` that follows is answered out of the
+table. POC 80 runs kdenlive's engine that way on all eleven.
+
+⚠ **That is a real difference from POC 70**, where SQLite's plugin directory
+is genuinely **empty**, and the difference is the program's discovery style
+rather than anything about the mechanism. A future `--wrap-dlopen` could also
+intercept `opendir`/`readdir` for the directories it knows about; it does not,
+and nothing has been tried.
+
 ### ⭐ Route D: do not use the host loader at all
 
 `docs/research/solo.md`, `TODO` T-033. The diagnosis above says the failure is

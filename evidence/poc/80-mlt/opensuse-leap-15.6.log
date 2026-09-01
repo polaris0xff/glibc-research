@@ -1,0 +1,6 @@
+  ok   producer avformat registered
+  ok   producer color registered
+  ok   producer noise registered
+  ok   producer timewarp registered
+  ok   rendered an MP4, 13886 bytes, ftyp box present
+PASSED: 0 failure(s)

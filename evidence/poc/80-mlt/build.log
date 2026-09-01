@@ -1,0 +1,2 @@
+/usr/bin/ld: /root/.local/state/pgb/runtime-x86_64-1715321726/pgb-dl-4-1-consumer_cbrts.c.o: in function `consumer_start':
+consumer_cbrts.c:(.text+0xb39): warning: Using 'getaddrinfo' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking

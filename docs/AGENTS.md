@@ -297,7 +297,7 @@ one kernel is not "works on Linux".
 | `pgb` podman engine | **UNTESTED** — podman is absent here. The code path is shared with docker except the binary name |
 | `pgb verify --engine` | **COMPLETE for chroot and docker**, and green on a runner in [run 14](https://github.com/polaris0xff/glibc-research/actions/runs/33512788793). Both arms agree on all 11 rows for both asserted columns; criterion 2 under docker is measured by `tool/runtime/pgb-trace.c`, a `ptrace` open-tracer carried into the container. ⚠ `unmeasured`, never `none`, when it cannot attach. podman untested |
 | NSS / iconv / locale mechanisms | **COMPLETE** — 11 of 11 each |
-| POCs 10 gawk, 20 nano, 30 curl, 40 jq, 50 CPython, 60 LevelDB, 70 SQLite | **COMPLETE** — all 11 environments each |
+| POCs 10 gawk, 20 nano, 30 curl, 40 jq, 50 CPython, 60 LevelDB, 70 SQLite, 80 MLT | **COMPLETE** — all 11 environments each |
 | CI workflow | ⭐ **GREEN**, 15 jobs, [run 14](https://github.com/polaris0xff/glibc-research/actions/runs/33512788793) — and it now asserts §3 criterion 2, not just exit status, through `pgb verify --engine docker`. ⚠ It was not unrun before: it ran 10 times and was red 10 times, and the two red rows never executed a binary — GitHub's Node.js cannot start in a musl container. `history/corrections.md` C8. ⭐ Run 13 caught a real defect, the first time this workflow has found one rather than reported one |
 | aarch64 | **UNTESTED** |
 | host `dlopen`, terminfo, CA bundle | **KNOWN LIMITATION** — §7 |
@@ -312,6 +312,7 @@ one kernel is not "works on Linux".
 | 40 | jq 1.7.1 + oniguruma 6.9.9 | Unicode round trip, surrogate pairs, optional-dep detection |
 | 50 | CPython 3.12.7 | 49 extension modules linked **in**, `lib-dynload` empty, NSS via `socket`/`pwd` |
 | 60 | LevelDB 1.23 + a C++ subject | ⭐ the first **C++** and first **CMake** POC: static init order, exception unwinding across a static link, RTTI/typeid across TUs, iostreams. Found that no C++ program linked at all — libstdc++ calls `iconv` and `-lstdc++` is scanned after `-lpgbruntime` |
+| 80 | **ffmpeg 7.1 + MLT 7.30.0 — kdenlive's ENGINE** | ⭐ the operator's challenge, taken seriously. A **105 MB static `melt`** with eight `dlopen`'d modules and the whole of ffmpeg compiled in, rendering a real MP4 on 11 of 11. ⛔ Found two failures worth having: MLT hard-codes `add_library(mlt SHARED)`, so `-static` cannot consume it and the answer is a link line rather than a patch; and its `avformat` module cannot be built as a shared object against a static ffmpeg while **the same objects link into a static executable perfectly**. Stops at Qt/KF6, said so |
 | 70 | SQLite 3.47.0 + **15** of its own `ext/misc` extensions | ⭐ **an OPEN plugin ABI with no way to link a plugin in.** `.load` calls `dlopen()` on a path the *user* names and derives the entry point from the filename, so there is no `Setup.local` equivalent. Fifteen plugins, **plugin directory created empty**, 11 of 11. Found that all 16 extensions define `sqlite3_api` and any two collided at link time — fixed with per-plugin symbol namespacing |
 
 ## 10. Overhead

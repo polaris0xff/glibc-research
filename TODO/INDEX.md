@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 22  OPEN 10  DONE 12
+    TOTAL 22  OPEN 9  DONE 13
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 0 | 0 | 0 |
-| P1 | a documented capability does not work, or a flag does nothing | 15 | 3 | 12 |
+| P1 | a documented capability does not work, or a flag does nothing | 15 | 2 | 13 |
 | P2 | worth doing; nothing is wrong without it | 7 | 7 | 0 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -19,7 +19,7 @@ pretending to be one.
 |---|---|---|---|---|---|
 | T-001 | P1 | M | done | poc | Build a C++ project with a real dependency tree |
 | T-002 | P1 | M | done | poc | Build something that dlopens its own plugins at scale |
-| T-003 | P1 | S | open | poc | Build a project that fails, and write down why |
+| T-003 | P1 | S | done | poc | Build a project that fails, and write down why |
 | T-010 | P1 | S | done | toolchain | Split `pgb` into `tool/lib/*.sh` |
 | T-011 | P1 | S | done | toolchain | Confirm or overturn the language decision |
 | T-012 | P1 | XL | open | toolchain | `pgb build <url-or-package>` |

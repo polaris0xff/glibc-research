@@ -161,7 +161,7 @@ would have reported eleven segfaults against the mechanism under test.
 
 ## T-003 — Build a project that fails, and write down why
 
-**Source** operator · **Category** poc · **Priority** P1 · **Effort** S · **Status** open
+**Source** operator · **Category** poc · **Priority** P1 · **Effort** S · **Status** ✅ done
 
 **Problem.** Every POC in the tree passes. A tree of only-passing POCs is a
 demo, not a test bed, and says nothing about where the edge is.
@@ -178,14 +178,90 @@ fundamental.
 **Prove.** A committed `evidence/` record of a build that did not work, with
 the cause named at file and line, and either a fix or a new entry.
 
-⚠ **Partly served already, and the entry stays OPEN because its subject has
-not been attempted.** `evidence/72-static-host-plugin-abi/CPYTHON-FAILURE.txt`
+### ✅ Closed with `poc/80-mlt/` — the kdenlive challenge, taken seriously
+
+⭐ **The operator set this as a challenge**: the `Anylinux-AppImages` README
+and this project's own documents make a joke of "just statically compile
+kdenlive". kdenlive is a Qt/KDE application on top of **MLT**, and MLT is
+where the video work happens — it is the engine, it loads its functionality
+as `dlopen`'d modules, and it links ffmpeg. The climb is
+
+    ffmpeg  ->  MLT (melt)  ->  Qt/KF6  ->  kdenlive
+
+and `poc/80-mlt` is the first two rungs. `pass=21 fail=0 skip=0`,
+`evidence/poc/80-mlt/RESULT.txt`.
+
+| rung | |
+|---|---|
+| **ffmpeg 7.1** | ✅ builds through `pgb`. 142 MB `libavcodec.a`, and the `ffmpeg` CLI it produces is static and runs |
+| **MLT 7.30.0 / `melt`** | ✅ **105 MB static binary, eight modules compiled in, renders a real MP4 on 11 of 11 with zero host shared objects** |
+| Qt 6 / KDE Frameworks | ⛔ not attempted — the next rung |
+| kdenlive | ⛔ not attempted |
+
+⛔ **Two real failures, and they are what this entry asked for.** Both are
+asserted on every run — one `make` of one target each — rather than grepped
+out of a build log, because the first version did grep a log and the second
+run of the POC (everything cached) then reported both failures as *not having
+happened*.
+
+1. ⛔ **`melt` cannot be linked through its own build system**, and the cause
+   is one line of somebody else's CMake:
+
+   ```
+   src/framework/CMakeLists.txt:36    add_library(mlt SHARED ...)
+   /usr/bin/ld: attempted static link of dynamic object
+                `../../out/lib/libmlt-7.so.7.30.0'
+   ```
+
+   `SHARED` is hard-coded, so `BUILD_SHARED_LIBS` cannot turn it off.
+   ⭐ **This project's rule is no source patches, so the answer is a link
+   line rather than an edit**: `melt` is linked from the objects the build
+   already produced. That turns *"kdenlive's engine cannot be static"* into
+   *"kdenlive's engine's BUILD SYSTEM cannot be, and the code is fine"* —
+   which is a different and much more useful sentence.
+
+2. ⛔ **The `avformat` module cannot be built as a shared object against a
+   static ffmpeg**: `libavcodec.a(cavsdsp.o): relocation R_X86_64_PC32
+   against symbol 'ff_pw_5' can not be used when making a shared object`.
+   ⭐ **And the same objects link into the static executable perfectly.** The
+   requirement was a property of the shared-module *shape*, not of the code,
+   so the module that could not be built the normal way is in the binary.
+
+### ⛔ One real limit of `--wrap-dlopen`, found here
+
+MLT does not `dlopen` a plugin **by name**. `mlt_repository_init` **lists**
+the module directory (`src/framework/mlt_repository.c`) and `dlopen`s whatever
+it finds, so an **empty** directory means it finds nothing and never calls
+`dlopen` at all — the wrapper is never reached.
+
+⭐ So the plugin directory in this POC holds one **zero-byte file** per
+module, asserted to be zero-byte. Nothing is mapped and no code is in them:
+they exist so the *listing* has entries. ⛔ `--wrap-dlopen` serves
+`dlopen`-by-name; a program that DISCOVERS its plugins by listing a directory
+needs that directory to have names in it. `docs/limitations.md` §1.
+
+### Landed in `pgb` while closing this
+
+⛔ **Two link-ordering defects, both of which the caller could not have worked
+around**, because the caller does not control where `pgb` puts its objects:
+
+| | |
+|---|---|
+| plugin objects appended **after** the caller's `-l` | a plugin calling `pow()` got `undefined reference to 'pow'` against a `-lm` the caller had already spent. The wrapper now **re-emits the caller's own `-l`/`-L` after them** — repeating a `-l` is safe, and nothing is invented, so a plugin needing a library the program never named still fails loudly |
+| that fix then put caller archives **after** `-lpgbruntime` | ffmpeg's `libavformat` calls `iconv`, `--wrap` rewrites it, and the archive defining `__wrap_iconv_open` was already behind the linker. Fixed with the same `-Wl,-u` forcing the C++ drivers already use — now applied whenever `--wrap-dlopen` is in play, for C too |
+
+⚠ **And one shape nothing in this tree had hit**: MLT's `plus` module contains
+`subtitles.cpp`, so a **C** program's plugin pulled in `std::ios_base::Init`
+and `__cxa_begin_catch`. The link needs the C++ driver even though the program
+is C.
+
+⚠ **Partly served already, and this was true before the above.** `evidence/72-static-host-plugin-abi/CPYTHON-FAILURE.txt`
 is a committed record of a build that did not work — CPython 3.12.7 with a
 static interpreter and shared stdlib modules — with the cause named at
 `Makefile:1125` and diagnosed to a structural fact (`.dynsym` entries: 0), and
 it produced both a fix in `--wrap-dlopen` and a new finding in
-`docs/limitations.md` §0. ⛔ But this entry asks for a failure found by
-building **above the current class** — the entry says a GTK or Qt application
-— and that is a different question: what breaks when the *dependency graph*
-gets large, rather than what breaks when a known-good project is deliberately
-configured the hard way. The GTK/Qt attempt is still owed.
+`docs/limitations.md` §0. ⛔ But this entry asked for a failure found by
+building **above the current class**, and that is the different question
+`poc/80-mlt` answers above: what breaks when the *dependency graph* gets
+large, rather than what breaks when a known-good project is deliberately
+configured the hard way.

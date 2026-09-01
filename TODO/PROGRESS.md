@@ -4,8 +4,8 @@
 and the entries.
 
     STATE     2026-09-01b, in progress
-    COUNTS    22 entries, 10 open, 12 done
-    BASELINE  pgb: 11/11 run, 11/11 no host object, SEVEN POCs
+    COUNTS    22 entries, 9 open, 13 done
+    BASELINE  pgb: 11/11 run, 11/11 no host object, EIGHT POCs
               CI: GREEN, 15 jobs, and it asserts criterion 2
               chroot and docker engines produce BYTE-IDENTICAL binaries
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
@@ -100,6 +100,32 @@ here: `docs/REQUIREMENTS.md`, `TODO/runtime.md` T-030,
   given it — `objcopy --redefine-syms` to a per-plugin prefix, table mapping
   the original name to the renamed one. That is `RTLD_LOCAL` at link time, and
   the collision is kept as a live check.
+- ⭐ **T-003 done, as the operator's kdenlive challenge.** `poc/80-mlt`:
+  **ffmpeg 7.1 and MLT 7.30.0 — kdenlive's engine — built through `pgb`, and
+  a 105 MB static `melt` with eight modules compiled in renders a real MP4 on
+  11 of 11 with zero host shared objects.** The climb stops at Qt/KF6, which
+  is named as not attempted rather than glossed.
+  ⛔ **Two real failures, both asserted on every run rather than grepped from
+  a log:** MLT hard-codes `add_library(mlt SHARED)` at
+  `src/framework/CMakeLists.txt:36`, so `-static` cannot consume it — the
+  answer is a link line, not a patch, and that turns "kdenlive's engine cannot
+  be static" into "its build system cannot be, and the code is fine"; and the
+  `avformat` module cannot be built as a shared object against a static ffmpeg
+  (`R_X86_64_PC32 against ff_pw_5`) while **the same objects link into the
+  static executable perfectly**.
+- ⛔ **A real limit of `--wrap-dlopen`, found by that POC.** MLT does not
+  `dlopen` by name — it **lists** its module directory and opens what it
+  finds, so an empty directory means the wrapper is never reached. The POC's
+  plugin directory therefore holds one **zero-byte file** per module, asserted
+  zero-byte. The mechanism serves `dlopen`-by-name; discovery-by-listing needs
+  names present.
+- ⛔ **Two link-ordering defects in `pgb`, neither of which a caller could
+  work around**, because the caller does not control where `pgb` puts its
+  objects: plugin objects landed after the caller's `-l` (a plugin calling
+  `pow()` failed against a `-lm` already spent), and the fix for that put
+  caller archives after `-lpgbruntime` (ffmpeg's `libavformat` calls `iconv`).
+  Both fixed, and the second with the same `-Wl,-u` forcing the C++ drivers
+  already used.
 - ⛔ **T-019: every build option silently did nothing under docker or podman.**
   A container does not inherit the caller's environment and the branch passed
   only `-e PGB_INNER=1`, so `--wrap-dlopen`, `--embed-locale`, `--no-iconv`,
@@ -124,7 +150,6 @@ Nothing half-written. See `RESUME.md`.
 
 ## Work order
 
-    T-003                      a project that FAILS, above the current class
     T-032                      the CA bundle and terminfo -- two of the three
                                open rows of REQUIREMENTS part 2
     T-012                      pgb build <spec> -- split it first, it is XL
