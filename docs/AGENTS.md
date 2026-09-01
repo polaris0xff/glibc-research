@@ -1,3 +1,51 @@
+<!-- OPERATOR DIRECTIVE — inserted at the top for visibility, out of budget to
+     place properly. A later agent SHOULD relocate this into its own file
+     (docs/REQUIREMENTS.md) and link it from §1. Do not delete it, do not
+     soften it, and do not treat it as satisfied. -->
+
+# ⛔ HARD REQUIREMENT (operator, binding, NOT yet met)
+
+> **pgb must produce a binary that works _everywhere_ — or, failing that, one
+> that is strictly better and/or faster than every existing format and
+> technique.**
+
+This is the project's acceptance bar. It is **not** met today: the current
+class is "programs that do not need to load host plugins" (§7), which is broad
+but not everything.
+
+**How to hold this bar without lying about it.** "Everywhere" cannot be
+verified — no matrix enumerates Linux, the kernel is never abstracted, and the
+CPU baseline is a build-time choice. So the directive is discharged in two
+parts, and **both** are required:
+
+1. **No known environment where it fails.** Every failure found is either
+   fixed or written into `limitations.md` with the measurement. The matrix
+   grows over time (§13); a failure that is known and unfixed means the bar is
+   not met, and the status must say so.
+2. **Strictly better than the alternatives, measured head to head.** ⛔ This
+   comparison **does not exist yet** and is the single largest gap against this
+   directive. `comparison.md` currently has dashes for every non-pgb row
+   because nothing else was ever run. Discharging this means actually building
+   the same program as an AppImage, a Flatpak, a snap, an onelf bundle and a
+   static-musl binary, and measuring all of them on the same matrix for:
+   coverage (environments it runs on), startup, memory, size, and host
+   dependencies pulled in. Until that table has numbers instead of dashes,
+   "better than existing techniques" is an assertion.
+
+⭐ **The honest public claim, until then**, is the falsifiable one `pgb verify`
+already emits: *built at tier N, ran correctly and loaded no host object on
+these N named environments, and here is the command that re-checks it on
+yours.* Use that in the README and anywhere else a claim is made. Do not write
+"universal" or "works everywhere" into any document as a statement of fact
+until part 1 and part 2 above are both discharged.
+
+**Work this implies, in addition to §13:** the tier plan in
+[`design/tiers.md`](design/tiers.md) is the route to part 1 (it is what brings
+the host-plugin class in scope), and a new head-to-head benchmark experiment —
+`experiments/60-versus-alternatives.sh` does not exist — is part 2.
+
+---
+
 # AGENTS.md — read this first, and you can work
 
 Standalone. Assumes no prior context. Every claim here is produced by a script
