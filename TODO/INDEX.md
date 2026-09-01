@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 31  OPEN 18  DONE 13
+    TOTAL 32  OPEN 18  DONE 14
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 0 | 0 | 0 |
-| P1 | a documented capability does not work, or a flag does nothing | 23 | 10 | 13 |
+| P1 | a documented capability does not work, or a flag does nothing | 24 | 10 | 14 |
 | P2 | worth doing; nothing is wrong without it | 8 | 8 | 0 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -41,13 +41,14 @@ pretending to be one.
 | T-041 | P2 | M | open | ci | aarch64 |
 | T-050 | P1 | M | ⚠partly | toolchain | Plan a nixpkgs package with NO nix, from the `.drv` in the cache |
 | T-051 | P1 | M | open | toolchain | Enough nix for a host with no root, no docker and no nix |
-| T-052 | P1 | M | ⚠partly | research | The libGL problem, and whether a bundle can claim "universal" |
+| T-052 | P1 | M | done | research | The libGL problem, and whether a bundle can claim "universal" |
 | T-053 | P2 | S | open | research | patchelf and patsh: use them, or say why not |
 | T-054 | P1 | L | open | poc | kdenlive, static: exhaust it |
 | T-055 | P1 | L | open | poc | If static will not reach it, a kdenlive bundle that BEATS the field |
 | T-056 | P2 | L | open | toolchain | Port the python helpers to Rust |
 | T-057 | P1 | L | ⚠started | research | The bundler: a maintained nix-appimage descendant on the Anylinux mechanisms |
 | T-058 | P1 | S | open | toolchain | Two `pgb build`s at once share one wrapper directory |
+| T-059 | P1 | M | open | research | GL on real hardware, and the NVIDIA case |
 
 ## The argument behind the ordering
 

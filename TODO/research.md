@@ -70,7 +70,7 @@ from nix, and each entry marked link-statically / build-static / bundle.
 problem with the nixappimages created, which further killed the dream of a
 'universal' builder as many graphical apps didn't work. See:
 https://github.com/nix-community/nixgl"*
-**Category** research · **Priority** P1 · **Effort** M · **Status** ⚠partly
+**Category** research · **Priority** P1 · **Effort** M · **Status** ✅ done
 
 ## ⭐ THE MESA HALF IS SOLVED, AND MEASURED
 
@@ -112,16 +112,13 @@ EGL client APIs:   OpenGL OpenGL_ES
 
 from `eglinfo` in a 163 MB bundle, surfaceless platform, no host GL involved.
 
-## ⛔ What is still open, and it is the hard half
+## ⛔ What this entry did NOT settle, and who owns each part
 
-- **NVIDIA proprietary.** The userspace half must match the running kernel
-  module; nixGL reads `/proc/driver/nvidia/version` and FETCHES a matching
-  driver (`nixGL.nix:69`). A bundle cannot, and nothing here pretends to.
-- **No GPU has ever been in this loop.** `swrast` is a real GL implementation
-  and it is not evidence about anybody's iris, radeonsi or amdvlk path.
-- **Nothing has run on the eleven.** The result above is the build host.
+- **NVIDIA proprietary**, and **GL against a real DRM device** — **T-059**,
+  which exists so neither is closed by silence.
 - **163 MB**, because mesa is 273 MB unstripped and nothing debloats it. The
-  Anylinux flow ships a debloated mesa; T-057 owns that.
+  Anylinux flow ships a debloated mesa; **T-057** owns that, and `85-` gives
+  it the number to beat: the GL stack is 95 MiB of the bundle.
 
 **The problem, as it was stated before it was measured.** OpenGL and Vulkan are the one
 class of library that **must** come from the host, because it is the host's
@@ -142,19 +139,51 @@ it with one.
   operator points at as the quality bar has already decided this is bundled
   mesa plus escape hatches**, not host GL.
 
-**Approach.**
-1. Build a GL program (`glxinfo`, or `mpv`) through `tool/nix-appimage.sh` and
-   run it on the eleven, with a software rasteriser present and absent.
-   Report what each row does; ⛔ **do not report "works" from a machine with
-   no GPU at all.** This bed has no GPU, which is a real limit of the
-   measurement and has to be said.
-2. Read nixGL's mechanism at file and line and write down which of its cases
-   apply to a sharun bundle.
-3. Decide, with the measurement in hand, between bundled mesa (Anylinux's
-   answer), host GL by path detection (nixGL's), and a hybrid.
+**Approach**, as it was written before the run. All three steps were taken;
+step 3's answer is bundled mesa, which is what `85-` measures and what the
+Anylinux flow had already chosen.
 
 **Prove.** `evidence/85-opengl/RESULT.txt` with a row per environment and per
 strategy, and the GPU-less caveat stated in the file rather than inferred.
+
+## ✅ CLOSED on that acceptance, 2026-09-01d — `experiments/85-opengl.sh`
+
+**7 assertions, 0 failures, 0 skips.** Two strategies, eleven environments:
+
+| arm | what it is | result |
+|---|---|---|
+| **A** bundled mesa | the closure augmented with nixpkgs' own mesa, `LIBGL_DRIVERS_PATH`/`GBM_BACKENDS_PATH`/`__EGL_VENDOR_LIBRARY_DIRS` pointed at itself, ICD JSONs rewritten off their absolute store paths | ⭐ **`EGL vendor string: Mesa Project`, `EGL driver name: swrast`, on 11 of 11** |
+| **B** `--no-gl` | the identical closure with mesa left out — which is what a nix-appimage of a GL program is today | ⛔ **no vendor on any of the eleven** |
+
+```
+  ok    arm A: surfaceless EGL reports Mesa on every environment = 11
+  ok    arm A: a driver is named on every environment            = 11
+  ok    arm A: every target agrees with the build host's exit    = 11
+  ok    arm A loaded no host shared object                       = 11
+  ok    arm B (no bundled mesa) reported NO vendor anywhere      = 0
+```
+
+⭐ **Arm B is what makes arm A a measurement.** Alone, `EGL vendor string:
+Mesa Project` is a program printing a string. Measured: arm B's **EGL client
+extensions string is empty** and it reports one `Default display platform:
+eglInitialize failed` — libglvnd with no vendor does not know the surfaceless
+platform extension exists, so it cannot even enumerate the platform that works
+in arm A. The vendor came from the bundle.
+
+⚠ **The exit status is not the measurement, and reading it as one would have
+failed a correct result.** `eglinfo` walks every platform it was built for and
+returns the **number that failed to initialise** — 3 here (GBM, Wayland, X11),
+on every row *and on the build host*, because none of the eleven has a display
+or a DRM node. The assertion is therefore that every target agrees with the
+build host, measured rather than assumed.
+
+**The cost column, for T-057:** the GL stack is **95 MiB** of the 163 MB
+bundle (arm A 170,610,343 B, arm B 70,568,698 B).
+
+⛔ **What this does NOT establish is in the evidence file itself, not in a
+footnote:** no GPU is present, so every row is software rasterisation; nothing
+is drawn to a screen; NVIDIA is untouched. **T-059 carries that half** — the
+entry does not close it by silence.
 
 ## T-053 — patchelf and patsh: use them, or say why not
 
@@ -227,3 +256,44 @@ wording.
 as an Anylinux AppImage and as ours, on all eleven, with size, startup, and
 host-object columns — the instrument in `experiments/62-` already produces
 three of those four.
+
+## T-059 — GL on real hardware, and the NVIDIA case
+
+**Source** split out of T-052 when it closed on its own acceptance,
+2026-09-01d. ⭐ It is the operator's own open question 3 from the previous
+session — *"a GPU. T-052 cannot be honestly closed on a machine with no
+graphics hardware"* — given an entry of its own rather than left inside a
+closed one.
+**Category** research · **Priority** P1 · **Effort** M · **Status** open
+
+**Blocked on hardware, and that is stated rather than worked around.**
+`experiments/85-` shows that a bundle carries a complete GL stack that
+initialises and names its driver on eleven distributions with none of their
+own. It shows nothing about **iris, radeonsi, amdvlk or NVIDIA**, because this
+machine has no GPU and `swrast` is what it can reach.
+
+**Two questions, and they are different.**
+
+1. **Bundled mesa against a real DRM device.** The mechanism is the same one
+   85- proves; what is untested is whether a bundled mesa of one version
+   drives a kernel DRM driver of another. ⚠ mesa's userspace/kernel contract
+   is far looser than NVIDIA's, so the expectation is that it works — but an
+   expectation is not `evidence/`.
+2. ⛔ **NVIDIA proprietary, where the userspace half MUST match the running
+   kernel module.** `nix-community/nixGL` reads `/proc/driver/nvidia/version`
+   and **fetches** a matching driver (`nixGL.nix:69`). A bundle cannot fetch
+   at run time, so the honest options are: detect the host's NVIDIA userspace
+   and use it (which reintroduces `docs/limitations.md` §1 deliberately),
+   carry several and pick, or say the case is unserved. ⭐ The Anylinux flow
+   has already chosen: `SHARUN_NO_NVIDIA_EGL_PRIME` and
+   `SHARUN_ALLOW_SYS_VKICD` are escape hatches to the host's, which is the
+   first option with a switch on it.
+
+**What can be done here without hardware**, and should be, before anyone waits
+for a GPU: implement the host-NVIDIA detection path and assert that it finds
+**nothing** on all eleven — the negative half of the measurement is available
+now and it is the half that says the detection code runs at all.
+
+**Prove.** A row per environment for a machine that has a GPU, with the vendor
+and renderer strings, plus the detection path exercised on the eleven that do
+not.
