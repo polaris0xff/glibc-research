@@ -483,6 +483,7 @@ compile_flags() {
 make_wrappers() {
   wd="$PGB_STATE/bin"; rm -rf "$wd"; mkdir -p "$wd" || die "cannot create $wd" 2
   cf=$(compile_flags)
+  bl="${ARCH_BASELINE:-$(default_baseline)}"
   for pair in "cc:cc" "gcc:gcc" "c++:c++" "g++:g++" "cpp:cpp"; do
     name=${pair%%:*}; real=${pair##*:}
     # The C++ drivers get the forcing flags; the C ones must not -- see
@@ -501,6 +502,7 @@ make_wrappers() {
 REAL="$realpath_"
 CF="$cf"
 LF="$lf"
+BL="$bl"
 PGBDL="$pgbdl"
 mode=link
 for a in "\$@"; do
@@ -514,9 +516,48 @@ for a in "\$@"; do
       exec "\$REAL" "\$@" ;;
   esac
 done
+
+# ⛔ -march=native IS THE ONE CALLER FLAG pgb REWRITES, AND EVERY OTHER -march
+# THE CALLER PASSES NOW WINS. It used to be the other way round -- \$CF was
+# appended AFTER the caller's argv, and gcc takes the LAST -march -- so pgb's
+# baseline silently overrode a project's own per-file ISA selection. Measured
+# on Qt 6.11.1, whose x86 intrinsics config test is compiled with
+# \`-march=cannonlake\` and whose AVX-512 intrinsics then failed to inline:
+#
+#   config.tests/x86intrin/main.cpp: error: inlining failed in call to
+#   'always_inline' '__m512i _mm512_setzero_si512()': target specific option
+#   mismatch
+#
+# ...and configure stopped with "x86 intrinsics support missing. Check your
+# compiler settings." ⭐ THE COMPILER SETTINGS WERE pgb'S. Every codebase that
+# compiles one translation unit per ISA level behind a runtime CPU check --
+# Qt, ffmpeg, mesa, x264, zlib-ng, glib -- has this shape, so the failure is
+# a class and not a Qt quirk.
+#
+# ⭐ The portability guarantee survives, because it was only ever about ONE
+# flag: -march=native bakes in the BUILD machine's CPU and the binary then
+# dies with SIGILL somewhere else. That one is rewritten to the baseline here;
+# an explicit -march=<named CPU> is a deliberate act by the project and is
+# honoured. ⚠ Not rewritten in -shared mode, which stays untouched by design.
+case " \$* " in
+  *" -march=native "*|*" -mtune=native "*|*" -mcpu=native "*)
+    _n=\$#; _i=0
+    while [ \$_i -lt \$_n ]; do
+      a=\$1; shift
+      case "\$a" in
+        -march=native)
+          if [ -n "\$BL" ]; then set -- "\$@" "-march=\$BL"; else set -- "\$@" "-mtune=generic"; fi ;;
+        -mtune=native|-mcpu=native) set -- "\$@" "-mtune=generic" ;;
+        *) set -- "\$@" "\$a" ;;
+      esac
+      _i=\$((_i+1))
+    done
+    [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[rewrote -march=native to \$BL]" >&2 ;;
+esac
+
 case "\$mode" in
-  compile) [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[compile] \$REAL \$* \$CF" >&2
-           exec "\$REAL" "\$@" \$CF ;;
+  compile) [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[compile] \$REAL \$CF \$*" >&2
+           exec "\$REAL" \$CF "\$@" ;;
   shared)  [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[shared,passthrough] \$REAL \$*" >&2
            exec "\$REAL" "\$@" ;;
   link)
@@ -550,8 +591,12 @@ case "\$mode" in
                esac
              done
            fi
-           [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[link] \$REAL \$* \$CF \$LF \$RELIBS" >&2
-           exec "\$REAL" "\$@" \$CF \$LF \$RELIBS ;;
+           [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[link] \$REAL \$CF \$* \$LF \$RELIBS" >&2
+           # ⚠ \$CF LEADS and \$LF TRAILS, and the asymmetry is deliberate:
+           # a compile flag is a default the caller may override, a link flag
+           # is an ordering statement about libraries and moving it changes
+           # what resolves.
+           exec "\$REAL" \$CF "\$@" \$LF \$RELIBS ;;
 esac
 EOF
     chmod +x "$wd/$name"
@@ -582,12 +627,22 @@ WHERE IT IS INJECTED
   library probes must keep working or the build fails before it starts.
 
 COMPILE FLAGS
+  ⭐ These LEAD the command line, so they are DEFAULTS and your own flags
+  override them. Link flags below still trail, because link order is meaning.
+
   -fno-plt                       no procedure linkage table indirection
   -march=$bl$(printf '%*s' $((22 - ${#bl})) '')CPU baseline. NOT -march=native. A binary built
                                  with -march=native runs on the machine that
                                  built it and crashes elsewhere with SIGILL,
                                  which looks exactly like a portability bug in
                                  this tool and is not one.
+
+  ⛔ AND THE ONE FLAG OF YOURS pgb REWRITES: -march=native becomes
+  -march=$bl, -mtune=native and -mcpu=native become -mtune=generic. Any OTHER
+  -march you pass wins, because a project compiling one file per ISA level
+  behind a runtime CPU check is doing the right thing and pgb used to break
+  it -- Qt 6.11.1's x86 intrinsics test, compiled -march=cannonlake, failed
+  to inline its AVX-512 intrinsics because pgb's baseline came last.
 
 LINK FLAGS
   -static                        no interpreter, no DT_NEEDED, nothing to

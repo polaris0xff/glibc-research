@@ -1,0 +1,188 @@
+'/usr/bin/cmake' '-DQT_INTERNAL_CALLED_FROM_CONFIGURE:BOOL=TRUE' '-DFEATURE_network=OFF' '-DFEATURE_sql=OFF' '-DFEATURE_testlib=OFF' '-DFEATURE_printsupport=OFF' '-DCMAKE_INSTALL_PREFIX=/var/tmp/pgb-poc/90-qt/inst' '-DQT_QPA_PLATFORMS=offscreen' '-DQT_QPA_DEFAULT_PLATFORM=offscreen' '-DBUILD_SHARED_LIBS=OFF' '-DQT_BUILD_EXAMPLES=FALSE' '-DQT_BUILD_TESTS=FALSE' '-DCMAKE_BUILD_TYPE=Release' '-DFEATURE_force_bundled_libs=ON' '-DFEATURE_dbus=OFF' '-DINPUT_opengl=no' '-DFEATURE_egl=OFF' '-DFEATURE_icu=OFF' '-DFEATURE_glib=OFF' '-DINPUT_openssl=no' '-DFEATURE_cups=OFF' '-DFEATURE_fontconfig=OFF' '-DFEATURE_xcb=OFF' '-DFEATURE_libudev=OFF' '-DFEATURE_evdev=OFF' '-DFEATURE_libinput=OFF' '-DFEATURE_mtdev=OFF' '-DFEATURE_eglfs=OFF' '-DFEATURE_gbm=OFF' '-DFEATURE_kms=OFF' '-DFEATURE_linuxfb=OFF' '-DFEATURE_directfb=OFF' '-G' 'Ninja' '/var/tmp/pgb-poc/90-qt/qtbase'
+-- The CXX compiler identification is GNU 12.2.0
+-- The C compiler identification is GNU 12.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /root/.local/state/pgb/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /root/.local/state/pgb/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- The ASM compiler identification is GNU
+-- Found assembler: /root/.local/state/pgb/bin/cc
+-- CMAKE_BUILD_TYPE was already explicitly set to: 'Release'
+
+-- Configuration summary has been written to /var/tmp/pgb-poc/90-qt/build/config.summary
+
+Note: Using static linking will disable the use of dynamically loaded plugins. Make sure to import all needed static plugins, or compile needed modules into the library.
+
+WARNING: No QPA platform plugin enabled! This will produce a Qt that cannot run GUI applications.  See "Platform backends" in the output of --help.
+
+-- 
+
+Qt is now configured for building. Just run 'cmake --build . --parallel'
+
+Once everything is built, you must run 'cmake --install .'
+Qt will be installed into '/var/tmp/pgb-poc/90-qt/inst'
+
+To configure and build other Qt modules, you can use the following convenience script:
+        /var/tmp/pgb-poc/90-qt/inst/bin/qt-configure-module
+
+If reconfiguration fails for some reason, try removing 'CMakeCache.txt' from the build directory
+Alternatively, you can add the --fresh flag to your CMake flags.
+
+-- Configuring done
+-- Generating done
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    FEATURE_cups
+
+
+-- Build files have been written to: /var/tmp/pgb-poc/90-qt/build
+[1/1283] Generating ../../../mkspecs/modules/qt_ext_pcre2.pri
+[2/1283] Generating mkspecs/qmodule.pri
+[3/1283] Generating ../../mkspecs/modules/qt_lib_core_private.pri
+[4/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_chartables.c.o
+[5/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_chkdint.c.o
+[6/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile_cgroup.c.o
+[7/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_auto_possess.c.o
+[8/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_config.c.o
+[9/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_context.c.o
+[10/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile_class.c.o
+[11/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_error.c.o
+[12/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_extuni.c.o
+[13/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_find_bracket.c.o
+[14/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_dfa_match.c.o
+[15/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_maketables.c.o
+[16/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile.c.o
+[17/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match_data.c.o
+[18/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match_next.c.o
+[19/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_newline.c.o
+[20/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_ord2utf.c.o
+[21/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_pattern_info.c.o
+[22/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_script_run.c.o
+[23/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_serialize.c.o
+[24/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_string_utils.c.o
+[25/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_study.c.o
+[26/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_substitute.c.o
+[27/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_substring.c.o
+[28/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_tables.c.o
+[29/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_ucd.c.o
+[30/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_valid_utf.c.o
+[31/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_xclass.c.o
+[32/1283] Generating ../../../mkspecs/modules/qt_ext_libpng.pri
+[33/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcapistd_16.c.o
+[34/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jccolor_16.c.o
+[35/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcdiffct_16.c.o
+[36/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jclossls_16.c.o
+[37/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcmainct_16.c.o
+[38/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcprepct_16.c.o
+[39/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcsample_16.c.o
+[40/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdapistd_16.c.o
+[41/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdcolor_16.c.o
+[42/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jddiffct_16.c.o
+[43/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdlossls_16.c.o
+[44/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match.c.o
+[45/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdmainct_16.c.o
+[46/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdpostct_16.c.o
+[47/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jutils_16.c.o
+[48/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdsample_16.c.o
+[49/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcapistd_12.c.o
+[50/1283] Linking C static library lib/libQt6BundledLibjpeg16bits.a
+[51/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcdiffct_12.c.o
+[52/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jclossls_12.c.o
+[53/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jccolor_12.c.o
+[54/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcmainct_12.c.o
+[55/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcprepct_12.c.o
+[56/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcsample_12.c.o
+[57/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdapistd_12.c.o
+[58/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jddiffct_12.c.o
+[59/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdlossls_12.c.o
+[60/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdcolor_12.c.o
+[61/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdmainct_12.c.o
+[62/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdpostct_12.c.o
+[63/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jutils_12.c.o
+[64/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdsample_12.c.o
+[65/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jccoefct_12.c.o
+[66/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcdctmgr_12.c.o
+[67/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jddctmgr_12.c.o
+[68/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdcoefct_12.c.o
+[69/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jfdctfst_12.c.o
+[70/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jfdctint_12.c.o
+[71/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctflt_12.c.o
+[72/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctfst_12.c.o
+[73/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdmerge_12.c.o
+[74/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctred_12.c.o
+[75/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jquant1_12.c.o
+[76/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctint_12.c.o
+[77/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jquant2_12.c.o
+[78/1283] Generating ../../../mkspecs/modules/qt_ext_libjpeg.pri
+[79/1283] Linking C static library lib/libQt6BundledLibjpeg12bits.a
+[80/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcapistd.c.o
+[81/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcdiffct.c.o
+[82/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jclossls.c.o
+[83/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jccolor.c.o
+[84/1283] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_jit_compile.c.o
+[85/1283] Linking C static library lib/libQt6BundledPcre2.a
+[86/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcmainct.c.o
+[87/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcprepct.c.o
+[88/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcsample.c.o
+[89/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdapistd.c.o
+[90/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jddiffct.c.o
+[91/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdlossls.c.o
+[92/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdpostct.c.o
+[93/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdmainct.c.o
+[94/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jutils.c.o
+[95/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdsample.c.o
+[96/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdcolor.c.o
+[97/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jccoefct.c.o
+[98/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcdctmgr.c.o
+[99/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jddctmgr.c.o
+[100/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jfdctfst.c.o
+[101/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jfdctint.c.o
+[102/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jidctflt.c.o
+[103/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdcoefct.c.o
+[104/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jidctfst.c.o
+[105/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdmerge.c.o
+[106/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jidctred.c.o
+[107/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jquant1.c.o
+[108/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jaricom.c.o
+[109/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcapimin.c.o
+[110/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jquant2.c.o
+[111/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jidctint.c.o
+[112/1283] Building CXX object src/tools/syncqt/CMakeFiles/syncqt.dir/main.cpp.o
+[113/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcicc.c.o
+[114/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcinit.c.o
+[115/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcarith.c.o
+[116/1283] Linking CXX executable libexec/syncqt
+[117/1283] Running syncqt.cpp for module: QtZlib
+[118/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jclhuff.c.o
+[119/1283] Running syncqt.cpp for module: QtPng
+[120/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcmarker.c.o
+[121/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcomapi.c.o
+[122/1283] Running syncqt.cpp for module: QtCore
+[123/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcmaster.c.o
+[124/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcparam.c.o
+[125/1283] Generating version linker script for target Core
+[126/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qassert.cpp.o
+[127/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qalloc.cpp.o
+[128/1283] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jchuff.c.o
+[129/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qabstractfileengine.cpp.o
+[130/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qtenvironmentvariables.cpp.o
+[131/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qdir.cpp.o
+[132/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfiledevice.cpp.o
+[133/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfile.cpp.o
+[134/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfileinfo.cpp.o
+[135/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystementry.cpp.o
+[136/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystemengine.cpp.o
+[137/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine.cpp.o
+[138/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine_iterator.cpp.o
+[139/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qiodevice.cpp.o
+[140/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qsystemerror.cpp.o
+[141/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qcborcommon.cpp.o
+[142/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qmetatype.cpp.o
+[143/1283] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qcoreapplication.cpp.o

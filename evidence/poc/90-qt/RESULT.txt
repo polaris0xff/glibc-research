@@ -1,0 +1,20 @@
+===============================================================
+POC 90-qt -- Qt 6 widgets, static glibc, on eleven environments -- T-054 rung 1
+===============================================================
+upstream      : nixpkgs qt6.qtbase -> qtbase-everywhere-src-6.11.1.tar.xz
+version       : Qt 6.11.1 (qtbase)
+sha256        : d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac
+normal build  : ./configure -prefix ... && cmake --build . && cmake --install .
+stresses      : a very large C++ build system, static plugin import, QPA, raster paint, CLDR data
+date (UTC)    : 2026-09-01T18:24:15Z
+evidence      : /home/user/glibc-research/evidence/poc/90-qt
+---------------------------------------------------------------
+-- rung 1: the source, planned by nixpkgs ----------------------
+  ok    qtbase source present                        = ok
+        d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac  2h62s8fj35hf19kkxj6c9r2idrgzwdky-qtbase-everywhere-src-6.11.1.tar.xz
+        nixpkgs named 11 patches; NONE applied -- see the header for why
+  ok    stock tarball, unpatched                     = ok
+
+-- rung 2: qtbase 6.11.1, -static, through pgb -----------------
+  building qtbase (this is the long pole: hours, not minutes)
+  ok    qtbase configures through pgb                = ok

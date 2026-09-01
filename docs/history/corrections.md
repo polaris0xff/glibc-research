@@ -452,6 +452,64 @@ configurable at build time, plugin directory emptied, functionality intact,
 11 of 11. ⚠ The original `Prove` keeps its place in the entry: it is what the
 entry was opened on, and 72- is why it moved.
 
+## C15 — "pgb's compile flags are additions, so where they sit on the command line does not matter"
+
+**Claimed** implicitly by `tool/lib/wrappers.sh` since the wrappers were
+written, and stated in `pgb explain` as a flat list of flags with no ordering.
+
+**Disproved by** `poc/90-qt`, on the first attempt to configure Qt 6.11.1. The
+wrapper ran `exec "$REAL" "$@" $CF`, appending pgb's `-march=x86-64` **after**
+the caller's argv, and **gcc takes the last `-march`**. So Qt's own intrinsics
+probe, compiled by Qt as
+
+```
+c++ -march=cannonlake -mrdrnd -mrdseed -maes -msha -w -std=gnu++17 \
+    -c config.tests/x86intrin/main.cpp
+```
+
+was silently downgraded to `x86-64` and every AVX-512 intrinsic in it failed:
+
+```
+/usr/lib/gcc/x86_64-linux-gnu/12/include/avx512fintrin.h:334:1: error:
+  inlining failed in call to 'always_inline'
+  '__m512i _mm512_setzero_si512()': target specific option mismatch
+```
+
+and configure stopped with:
+
+```
+ERROR: x86 intrinsics support missing. Check your compiler settings.
+```
+
+⭐ **The compiler settings were pgb's**, and the message points the user at
+their own compiler. ⛔ **This is a class, not a Qt quirk**: every codebase that
+compiles one translation unit per ISA level behind a runtime CPU check — Qt,
+ffmpeg, mesa, x264, zlib-ng, glib — is built this way, and pgb was overriding
+all of them. Where it did not stop the build outright it would have silently
+disabled the dispatched code paths, which is the worse outcome because nothing
+says so.
+
+**Fixed** by making compile flags **lead** the command line, so they are
+defaults the caller overrides, while link flags keep trailing because link
+order is meaning rather than preference. ⭐ **The portability guarantee is
+untouched**, because it was only ever about one flag: `-march=native` bakes in
+the build machine's CPU. That one is now **rewritten** to the baseline in the
+caller's own argv (and `-mtune=native`/`-mcpu=native` to `-mtune=generic`), so
+an explicit `-march=<named cpu>` is honoured and `native` still cannot escape.
+
+**Verified**, through `pgb build`, both directions in one run:
+
+```
++ cc -march=cannonlake -c /tmp/marchtest.c -o /tmp/marchtest.o
+CANNONLAKE-COMPILE-OK
++ PGB_VERBOSE=1 cc -march=native -c /tmp/marchtest.c -o /tmp/mt2.o
+pgb[rewrote -march=native to x86-64]
+pgb[compile] /usr/bin/cc -march=x86-64 -fno-plt -march=x86-64 -c ...
+/tmp/marchtest.c: In function 'f':      <- AVX-512 correctly refused
+```
+
+⚠ **`-shared` mode is not rewritten**, because it is passed through untouched
+by design so that `./configure`'s shared-library probes keep working.
 
 ---
 
