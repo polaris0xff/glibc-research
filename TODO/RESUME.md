@@ -41,12 +41,23 @@ Bundled: **galculator** (GTK3, reaches GTK on musl) and **mesa-demos**
 
 ## ⛔ Start here, in this order
 
-1. **`docs/research/nix.md`** — the findings, the instruments, and the
+```sh
+sh scripts/common/bootstrap.sh --detach   # FIRST LINE. ~10 min, in parallel
+```
+
+⭐ **Then read while it runs — that is what `--detach` is for.** Serially this
+setup is ~25 minutes of watching (nix ~7, `pgb env create` ~8,
+`fetch-rootfs.sh` ~10); nothing in it depends on anything else in it.
+`sh scripts/common/bootstrap.sh --check` says when it is ready, and re-running
+repeats only what failed.
+
+1. **`TODO/PROGRESS.md`** — the operator's three goals, quoted, and ⛔ **THE
+   STOP CONDITION: four required POCs, and this session ends when they are
+   done.** Read that table before choosing anything.
+2. **`docs/research/nix.md`** — the findings, the instruments, and the
    known-weak claims. It opens with what was NOT established; read that part.
-2. **`TODO/PROGRESS.md`** — the operator's three goals, quoted, and the work
-   order.
-3. **T-052** for the OpenGL half that is left (nvidia, and nothing has run on
-   the eleven), **T-057** for the bundler's five gaps, **T-054** for kdenlive.
+3. The four entries the stop condition names: **T-054** (Qt, and ⛔ read why
+   "impossible" is not what the record says), **T-052**, **T-057**, **T-032**.
 
 ## ⚠ Where the artefacts are on this machine
 
