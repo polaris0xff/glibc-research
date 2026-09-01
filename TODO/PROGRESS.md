@@ -151,9 +151,11 @@ Nothing half-written. See `RESUME.md`.
 ⭐ **None blocking.** Everything asked this session is either answered above or
 carried as an entry with the shape of the answer written down.
 
-1. ⛔ **Three remote `claude/*` branches are on GitHub** and this environment's
-   git proxy refuses to delete a remote branch. All point at commits `main`
-   contains; they need one click each in the web UI.
+1. ⭐ **The branch debt from the previous two sessions is CLEARED.**
+   `git ls-remote --heads origin` at session end lists `refs/heads/main` and
+   nothing else. ⚠ The explicit remote delete still errored with `remote ref
+   does not exist`, so what removed them is not established — check
+   `git ls-remote` rather than assuming the proxy can now delete branches.
 2. **T-015 changes what the bed is.** Unchanged from the previous session.
 3. ⚠ **A GPU.** T-052 cannot be honestly closed on a machine with no graphics
    hardware. This bed can show that a bundle's GL stack loads and initialises;

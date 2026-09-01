@@ -78,6 +78,10 @@ Bundled: **galculator** (GTK3, reaches GTK on musl) and **mesa-demos**
 The harness named `claude/nix-mining-static-builds-q2ffvi`; `RULES.md` §Git and
 the operator's own instruction say `main`. `main` was **nine commits behind**
 that branch at session start and was fast-forwarded onto it; every commit of
-this session is on `main` and pushed. ⚠ **Three remote `claude/*` branches are
-on GitHub**, all at commits `main` contains; this environment's git proxy
-refuses to delete a remote branch, so they need one click each in the web UI.
+this session is on `main` and pushed. ⭐ **And the cleanup worked this time, which it did not last session.**
+`git ls-remote --heads origin` at session end lists **`refs/heads/main` and
+nothing else**: the local branch was deleted with `-d` after verifying
+`git log main..<branch>` was empty, and the remote copies are gone. ⚠ The
+remote delete still ERRORED (`remote ref does not exist`) — what removed them
+is not established, so do not read this as "the proxy can delete branches now".
+Check `git ls-remote --heads origin` rather than assuming either way.
