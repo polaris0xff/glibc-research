@@ -110,6 +110,12 @@ exp_check "arm P built from the package name alone" \
   "$([ -s "$P_IMG" ] && echo yes || echo no)" yes
 [ -s "$P_IMG" ] || { exp_note "see $B/build-P.log"; exp_finish; }
 P_PATHS=$(sed -n 's/^closure *\([0-9]*\) store paths.*/\1/p' "$B/build-P.log" 2>/dev/null | tail -1)
+# ⚠ The log is only written when THIS run built the bundle. A cached artefact
+# leaves it empty, and "? store paths" in committed evidence is a gap, not a
+# measurement -- so fall back to counting the closure on disk.
+[ -n "$P_PATHS" ] || P_PATHS=$(find "${PGB_APPIMAGE_CACHE:-/var/tmp/pgb-appimage}/$APP/store" \
+  -mindepth 1 -maxdepth 1 2>/dev/null | wc -l | tr -d ' ')
+[ "${P_PATHS:-0}" = 0 ] && P_PATHS="?" 
 
 # ---------------------------------------------------------------------------
 # arm A -- the hand-built Anylinux route
@@ -171,7 +177,15 @@ A_LIBS=$(find "$B/AppDir-any/shared/lib" "$B/AppDir-any/lib" -name '*.so*' 2>/de
 # the SIZE column
 # ---------------------------------------------------------------------------
 P_SZ=$(wc -c < "$P_IMG"); A_SZ=$(wc -c < "$A_IMG")
+# ⛔ THE VERSIONS, RECORDED RATHER THAN ASSERTED EQUAL. The two arms ship
+# different distributions' builds of the same project and the closing section
+# says so; a reader cannot judge the size row without seeing whether they are
+# even the same release. ⚠ The first version of this file promised these were
+# "in per-environment.txt" and did not put them there.
+P_VER=$("$P_IMG" --version 2>/dev/null | head -1)
+A_VER=$("$A_IMG" --version 2>/dev/null | head -1)
 printf '\n-- size ----------------------------------------------------------\n'
+printf '  payload versions: P %s (nixpkgs)   A %s (Arch)\n' "${P_VER:-?}" "${A_VER:-?}"
 printf '  %-28s %12s  %s\n' ARTEFACT BYTES NOTE
 printf '  %-28s %12s  %s\n' "P  ours (nixpkgs closure)" "$P_SZ" "${P_PATHS:-?} store paths, nothing debloated"
 printf '  %-28s %12s  %s\n' "A  hand-built (Arch)"      "$A_SZ" "$A_LIBS libraries deployed"
@@ -221,9 +235,55 @@ re=$(/vs-arm -rn '"abc" | test("^a.c$")' 2>/dev/null) || exit 22
 [ "$re" = true ] || exit 23
 exit 0
 SH
+  # ⛔ A SEPARATE PAYLOAD FOR THE STARTUP COLUMN, and `--version` is the right
+  # thing to run in it. This column is the START cost, which is what T-057's
+  # `Prove` asks for; the functional column above is measured separately and
+  # is what says the program works. `docs/AGENTS.md` §14's rule -- do not
+  # benchmark portability with startup and size ALONE -- is satisfied by
+  # having all three columns, not by making this one measure something else.
+  cat > "$1/vs-time.sh" <<'SH'
+#!/bin/sh
+HOME=/tmp; export HOME
+TMPDIR=/tmp; export TMPDIR
+n=${1:-1}
+i=0
+while [ "$i" -lt "$n" ]; do /vs-arm --version >/dev/null 2>&1 || exit 30; i=$((i + 1)); done
+exit 0
+SH
 }
 
 now_ns() { date +%s%N; }
+
+# ---------------------------------------------------------------------------
+# ⛔ THE STARTUP INSTRUMENT, AND ITS FIRST VERSION MEASURED THE INSTRUMENT
+#
+# The first version timed one chroot enter per invocation and reaped the rootfs
+# after each. Every number came out at ~14,500 ms for BOTH arms -- which is not
+# an AppImage starting, it is `reap_rootfs` killing uruntime's dwarfs FUSE
+# daemon between runs so that every single run pays a cold mount. Measured on
+# the build host, where nothing reaps: the same artefact starts in 162 ms cold
+# and 17 ms warm, because the mount stays alive, which is what a real user
+# gets. A "warm" column that is 850x the real warm figure is not a slow
+# measurement, it is the wrong one.
+#
+# ⭐ So both numbers are taken with the mount left alone, and the arithmetic
+# subtracts the harness instead of hiding inside it:
+#
+#   cold  one chroot enter, one invocation, all mounts reaped BEFORE it
+#   warm  one chroot enter, six invocations, then (total - cold) / 5
+#
+# The subtraction removes exactly one cold start and one chroot enter, leaving
+# five warm ones. The chroot enter itself is 24 ms on this machine, measured;
+# it is identical for both arms either way.
+time_arm() {  # rootfs n -> milliseconds for one enter running the payload n times
+  _t0=$(now_ns)
+  timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$1" -- /bin/sh /vs-time.sh "$2" \
+    </dev/null >/dev/null 2>&1
+  _st=$?
+  _t1=$(now_ns)
+  [ "$_st" = 0 ] || { printf -- '-1'; return; }
+  printf '%s' "$(( (_t1 - _t0) / 1000000 ))"
+}
 
 # ---------------------------------------------------------------------------
 # the matrix: runs, host objects, startup
@@ -243,31 +303,25 @@ while read -r ref name libc digest; do
     case $arm in P) src="$P_IMG" ;; A) src="$A_IMG" ;; esac
     rm -f "$root/vs-arm"; cp "$src" "$root/vs-arm"; chmod +x "$root/vs-arm"
 
-    # ⚠ COLD IS THE FIRST RUN OF THIS ARTEFACT IN THIS ROOTFS, and for an
-    # AppImage that is a real cost rather than a page-cache artefact: uruntime
-    # has to set up the dwarfs mount before the payload exists at all.
-    t0=$(now_ns)
+    # Correctness first, and its own reap, so the timing below starts from a
+    # rootfs with nothing of this artefact mounted.
     timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$root" -- /bin/sh /vs-test.sh \
       </dev/null >"$B/out.$name.$arm" 2>&1
-    st=$?; t1=$(now_ns); reap_rootfs "$root"
-    cold=$(( (t1 - t0) / 1000000 ))
+    st=$?; reap_rootfs "$root"
 
+    # ⚠ COLD IS A COLD MOUNT, guaranteed by the reap above: uruntime has to set
+    # up the dwarfs mount before the payload exists at all.
+    cold=$(time_arm "$root" 1)
     warm=-1
-    if [ "$st" = 0 ]; then
-      best=""
-      i=0
-      while [ "$i" -lt "$WARM_RUNS" ]; do
-        w0=$(now_ns)
-        timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$root" -- /bin/sh /vs-test.sh \
-          </dev/null >/dev/null 2>&1
-        w1=$(now_ns); reap_rootfs "$root"
-        ms=$(( (w1 - w0) / 1000000 ))
-        [ -z "$best" ] && best=$ms
-        [ "$ms" -lt "$best" ] && best=$ms
-        i=$((i + 1))
-      done
-      warm=$best
+    if [ "$cold" != "-1" ]; then
+      # ⛔ NO REAP BETWEEN THESE, which is the whole point -- the mount stays
+      # alive across the six invocations exactly as it does for a real user.
+      tot=$(time_arm "$root" $((WARM_RUNS + 1)))
+      if [ "$tot" != "-1" ] && [ "$WARM_RUNS" -gt 0 ] && [ "$tot" -gt "$cold" ]; then
+        warm=$(( (tot - cold) / WARM_RUNS ))
+      fi
     fi
+    reap_rootfs "$root"
 
     timeout -k 10 "$RUN_TIMEOUT" strace -f \
       -e trace=openat,open,execve,clone,clone3,vfork,fork -o "$B/tr.$name.$arm" \
@@ -289,7 +343,8 @@ while read -r ref name libc digest; do
     {
       printf '== %s (%s) arm %s\n' "$name" "$libc" "$arm"
       printf '   status  : %s\n' "$res"
-      printf '   startup : cold %s ms, best-of-%s warm %s ms\n' "$cold" "$WARM_RUNS" "$warm"
+      printf '   startup : cold %s ms, warm %s ms (mean of %s with the mount alive)\n' \
+        "$cold" "$warm" "$WARM_RUNS"
       printf '   objects : host=%s bundled=%s\n' "$nh" "$nb"
       printf '   host .so: %s\n' "$(printf '%s\n' "$pl" | sed -n 's/^host //p' | tr '\n' ' ')"
     } >> "$EXP_OUT/per-environment.txt"
@@ -304,10 +359,11 @@ printf '\n  h = HOST shared objects the payload process opened. Objects the\n'
 printf '  artefact brought with it are counted separately and are in\n'
 printf '  per-environment.txt -- for both arms those are the bundled ld.so,\n'
 printf '  libc and the application'"'"'s own libraries.\n'
-printf '\n  ⚠ cold and warm both include the test harness (a chroot enter and\n'
-printf '  a /bin/sh) which is IDENTICAL for the two arms, so the difference\n'
-printf '  between the columns is the artefact and the absolute number is not\n'
-printf '  a startup time. experiments/40-'"'"'s noise floor applies: a\n'
+printf '\n  ⭐ cold is one chroot enter with a COLD dwarfs mount, guaranteed by\n'
+printf '  reaping the rootfs first. warm is (six invocations - cold) / %s, taken\n' "$WARM_RUNS"
+printf '  inside ONE enter with the mount left alive -- which is what a real\n'
+printf '  user gets and what the first version of this instrument destroyed by\n'
+printf '  reaping between runs. experiments/40-'"'"'s noise floor applies: a\n'
 printf '  difference at or under it is "no difference measurable".\n\n'
 
 exp_check "arm P ran on every environment"        "$P_RUNS"  "$ENVS"
@@ -316,8 +372,10 @@ exp_check "arm P loaded no host shared object"    "$P_CLEAN" "$ENVS"
 exp_check "arm A loaded no host shared object"    "$A_CLEAN" "$ENVS"
 
 printf '\n-- ⛔ what this does NOT establish --------------------------------\n'
-printf '  not the same build   arm P ships nixpkgs'"'"' %s, arm A ships Arch'"'"'s.\n' "$APP"
-printf '                       Both versions are in per-environment.txt.\n'
+printf '  not the same build   arm P ships nixpkgs'"'"' %s, arm A ships Arch'"'"'s;\n' "$APP"
+printf '                       %s and %s. Same release here, which is luck\n' "${P_VER:-?}" "${A_VER:-?}"
+printf '                       rather than design -- different compilers,\n'
+printf '                       flags and dependency versions either way.\n'
 printf '  not a GUI            none of the eleven has a display; the GL case\n'
 printf '                       is experiments/85-.\n'
 printf '  not debloated        T-057 item 1 is untouched, and the size row\n'

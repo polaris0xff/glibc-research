@@ -257,6 +257,53 @@ as an Anylinux AppImage and as ours, on all eleven, with size, startup, and
 host-object columns — the instrument in `experiments/62-` already produces
 three of those four.
 
+## ⭐ THE DISTANCE IS MEASURED — `experiments/86-bundler-vs-anylinux.sh`
+
+**7 assertions, 0 failures, 0 skips**, 2026-09-01d. Subject `jq 1.8.2`, the
+same release on both sides by luck rather than design.
+
+| | arm P — **ours, one command** | arm A — hand-built Anylinux |
+|---|---|---|
+| how | `sh tool/nix-appimage.sh jq` | install the distro package on Arch, `quick-sharun.sh`, `--make-appimage` |
+| size | **12,230,824 B** (7 store paths) | **4,006,946 B** (68 libraries) |
+| cold start | 162–198 ms | 79–107 ms |
+| warm start | 11–22 ms | 9–16 ms |
+| runs on the eleven | **11 of 11** | **11 of 11** |
+| host shared objects | **0 on every row** | **0 on every row** |
+
+⭐ **So the claim T-057 set out to make is supported and quantified**: not
+*"as good as a hand-crafted AppImage"* but *"produced by one command from a
+package name, and within measurable distance of one"* — **3.05× the size,
+about 1.9× the cold start, about 1.4× the warm start**, and identical on the
+two columns that decide whether it works at all.
+
+⛔ **And the size ratio is item 1 of this entry, not a mystery.** Nothing is
+debloated. The Anylinux flow strips locales, docs, static archives and unused
+drivers; ours ships the closure as nixpkgs built it. `experiments/85-` gives
+the other half of the number: on a GL application the undebloated mesa is
+**95 MiB** of a 163 MB bundle.
+
+⛔ **The startup instrument had to be rewritten, and the first version measured
+itself.** It timed one chroot enter per invocation and reaped the rootfs after
+each — which kills uruntime's dwarfs FUSE daemon, so **every** run paid a cold
+mount and both arms came out at ~14,500 ms. The same artefact starts in 162 ms
+cold and **17 ms** warm on the build host, where nothing reaps. A "warm" column
+850× the real figure is not a slow measurement, it is the wrong one. Cold is
+now one enter with the mount reaped *before*; warm is `(six invocations −
+cold) / 5` inside **one** enter with the mount left alive, which is what a real
+user gets.
+
+**What the entry does NOT claim**, stated in the evidence file rather than
+here: the two arms are different distributions' builds; jq is a CLI, so this
+says nothing about a GUI (that is `85-`); nothing is debloated; one machine,
+one day.
+
+**What is left of this entry** — it stays **open**, with items 1, 3 and 4
+untouched: debloating (item 1, now with a number to beat), wrapper scripts and
+their environment (item 3, T-053, `patsh`), and the 32-bit path (item 4).
+Item 5 — *"nothing is measured against a hand-built Anylinux AppImage"* — is
+what closed here.
+
 ## T-059 — GL on real hardware, and the NVIDIA case
 
 **Source** split out of T-052 when it closed on its own acceptance,

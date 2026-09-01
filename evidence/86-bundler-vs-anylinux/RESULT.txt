@@ -2,7 +2,7 @@
 86 - our bundler against a hand-built Anylinux AppImage
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-01T18:57:07Z
+date (UTC)   : 2026-09-01T19:16:35Z
 host kernel  : Linux 6.18.44-fc-v22
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -20,11 +20,55 @@ evidence     : /home/user/glibc-research/evidence/86-bundler-vs-anylinux
   ok    arm A built by the hand-built route            = yes
 
 -- size ----------------------------------------------------------
+  payload versions: P jq-1.8.2 (nixpkgs)   A jq-1.8.2 (Arch)
   ARTEFACT                            BYTES  NOTE
-  P  ours (nixpkgs closure)        12230824  ? store paths, nothing debloated
+  P  ours (nixpkgs closure)        12230824  7 store paths, nothing debloated
   A  hand-built (Arch)              4006946  68 libraries deployed
      ratio P/A                        3.05x  ⛔ ours is bigger and T-057 item 1 is why: no debloating at all
 
 -- the eleven: does it run, what did it load, how fast does it start --
   ENVIRONMENT         LIBC   | P:res    P:h   P:cold   P:warm   | A:res    A:h   A:cold   A:warm  
-  alpine-3.22         musl   | ok       0     14605ms  14564ms  | ok       0     14361ms  14366ms 
+  alpine-3.22         musl   | ok       0     214ms    9ms      | ok       0     79ms     10ms    
+  alpine-3.20         musl   | ok       0     211ms    25ms     | ok       0     89ms     13ms    
+  alpine-3.10         musl   | ok       0     183ms    22ms     | ok       0     98ms     9ms     
+  voidlinux-musl      musl   | ok       0     164ms    15ms     | ok       0     79ms     11ms    
+  debian-11           glibc  | ok       0     198ms    11ms     | ok       0     84ms     11ms    
+  debian-12           glibc  | ok       0     176ms    12ms     | ok       0     83ms     11ms    
+  ubuntu-20.04        glibc  | ok       0     162ms    11ms     | ok       0     97ms     9ms     
+  rockylinux-8        glibc  | ok       0     173ms    17ms     | ok       0     98ms     14ms    
+  opensuse-leap-15.6  glibc  | ok       0     177ms    15ms     | ok       0     92ms     16ms    
+  fedora-42           glibc  | ok       0     180ms    15ms     | ok       0     90ms     15ms    
+  archlinux-latest    glibc  | ok       0     177ms    18ms     | ok       0     86ms     13ms    
+
+  h = HOST shared objects the payload process opened. Objects the
+  artefact brought with it are counted separately and are in
+  per-environment.txt -- for both arms those are the bundled ld.so,
+  libc and the application's own libraries.
+
+  ⭐ cold is one chroot enter with a COLD dwarfs mount, guaranteed by
+  reaping the rootfs first. warm is (six invocations - cold) / 5, taken
+  inside ONE enter with the mount left alive -- which is what a real
+  user gets and what the first version of this instrument destroyed by
+  reaping between runs. experiments/40-'s noise floor applies: a
+  difference at or under it is "no difference measurable".
+
+  ok    arm P ran on every environment                 = 11
+  ok    arm A ran on every environment                 = 11
+  ok    arm P loaded no host shared object             = 11
+  ok    arm A loaded no host shared object             = 11
+
+-- ⛔ what this does NOT establish --------------------------------
+  not the same build   arm P ships nixpkgs' jq, arm A ships Arch's;
+                       jq-1.8.2 and jq-1.8.2. Same release here, which is luck
+                       rather than design -- different compilers,
+                       flags and dependency versions either way.
+  not a GUI            none of the eleven has a display; the GL case
+                       is experiments/85-.
+  not debloated        T-057 item 1 is untouched, and the size row
+                       above is what that costs.
+  one machine, one day
+
+-- result ----------------------------------------------------
+pass=7 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------
