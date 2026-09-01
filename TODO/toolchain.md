@@ -691,3 +691,45 @@ whether a runtime is present — it is a question of when the churn is worth it.
 ⭐ The operator also named `nixie-dev/nixie` as the shape a minimal relocatable
 nix might take. ⛔ Not started, and it must not start before T-050 and T-052
 have settled what these tools actually need to do.
+
+## T-058 — two `pgb build`s at once share one wrapper directory
+
+**Source** found while running `poc/90-qt` and `poc/20-nano` on the same
+machine, 2026-09-01d.
+**Category** toolchain · **Priority** P1 · **Effort** S · **Status** open
+
+**Problem.** `make_wrappers` writes one directory, `$PGB_STATE/bin`, and
+`tool/lib/build.sh` bind-mounts `$PGB_STATE` **into** the build environment
+(`--bind "$PGB_STATE:$PGB_STATE"`, lines 87 and 141). So the compiler a
+running build is executing out of is a directory the next `pgb build` rewrites.
+
+**Half of it is fixed and the fix is in.** The function used to open with
+`rm -rf "$wd"`, which takes the wrappers away from a running build between two
+compiler invocations — it surfaces as `cc: not found` from inside somebody
+else's ninja, minutes into a long build, with nothing pointing at the cause.
+Each wrapper is now written to a temporary name and renamed into place, which
+is atomic and leaves an already-exec'd wrapper untouched.
+
+⛔ **The half that is left is the OPTIONS, and it is the worse half.** The
+wrappers embed `CF` and `LF`, which depend on `--embed-terminfo`,
+`--embed-cacert`, `--embed-locale`, `--no-iconv` and `--wrap-dlopen`. Two
+concurrent builds with different options therefore share one set of flags,
+last writer wins, and **neither build reports anything**: the loser silently
+links a runtime it did not ask for, or loses one it did. That is the same
+defect class as T-019 (options lost at the engine boundary) arriving from the
+other side, and T-019's own note — *"a binary byte-identical to one built
+without it, with no error anywhere"* — is what it would look like.
+
+⚠ **This is why this session ran `poc/90-qt` to completion before starting
+`poc/20-nano`**, rather than using the idle cores. On a 4-core machine that is
+a real cost.
+
+**Approach.** A per-invocation wrapper directory is the obvious answer —
+`make_wrappers` already RETURNS the directory it made and the caller exports
+it, so the name is not load-bearing anywhere except `pgb cc-dir`. The open
+questions are what `pgb cc-dir` should then print, and who removes the
+directory when the build is killed rather than finished.
+
+**Prove.** Two `pgb build`s started together, one `--embed-terminfo` and one
+plain, both completing, and the binaries checked for the terminfo constructor:
+present in exactly one. Today that assertion fails whichever way the race goes.

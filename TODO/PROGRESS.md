@@ -3,8 +3,8 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log
 and the entries.
 
-    STATE     2026-09-01c
-    COUNTS    30 entries, 17 open, 13 done
+    STATE     2026-09-01d (in flight -- rewritten at session end)
+    COUNTS    31 entries, 18 open, 13 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, EIGHT POCs
               CI: GREEN, 15 jobs, and it asserts criterion 2
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)

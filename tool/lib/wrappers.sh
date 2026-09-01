@@ -481,7 +481,21 @@ compile_flags() {
 }
 
 make_wrappers() {
-  wd="$PGB_STATE/bin"; rm -rf "$wd"; mkdir -p "$wd" || die "cannot create $wd" 2
+  # ⛔ NO `rm -rf` HERE, AND THE REASON IS A RACE THAT COSTS A LONG BUILD.
+  # $PGB_STATE is bind-mounted INTO the build environment (tool/lib/build.sh),
+  # so this directory is the same one a running `pgb build` is executing its
+  # compiler out of. Wiping and recreating it takes the wrappers away from
+  # that build between two compiler invocations, and what it reports is
+  # `cc: not found` from inside somebody else's ninja. Each wrapper is now
+  # written to a temporary name and renamed into place, which is atomic and
+  # leaves an already-exec'd wrapper untouched.
+  #
+  # ⚠ THIS DOES NOT MAKE CONCURRENT `pgb build`s SAFE, and TODO T-058 carries
+  # what is left: two builds with DIFFERENT options (say one with
+  # --embed-terminfo and one without) still share one wrapper directory, so
+  # the second one's flags become the first one's too. Do not run them
+  # concurrently until that entry is closed.
+  wd="$PGB_STATE/bin"; mkdir -p "$wd" || die "cannot create $wd" 2
   cf=$(compile_flags)
   bl="${ARCH_BASELINE:-$(default_baseline)}"
   for pair in "cc:cc" "gcc:gcc" "c++:c++" "g++:g++" "cpp:cpp"; do
@@ -495,7 +509,7 @@ make_wrappers() {
     realpath_=$(command -v "$real" 2>/dev/null) || realpath_=""
     [ -n "$realpath_" ] || continue
     case "$realpath_" in "$wd"/*) continue ;; esac
-    cat > "$wd/$name" <<EOF
+    cat > "$wd/.tmp.$name.$$" <<EOF
 #!/bin/sh
 # pgb compiler wrapper -- generated, readable on purpose.
 # Real compiler: $realpath_
@@ -599,7 +613,8 @@ case "\$mode" in
            exec "\$REAL" \$CF "\$@" \$LF \$RELIBS ;;
 esac
 EOF
-    chmod +x "$wd/$name"
+    chmod +x "$wd/.tmp.$name.$$"
+    mv -f "$wd/.tmp.$name.$$" "$wd/$name"
   done
   printf '%s' "$wd"
 }
