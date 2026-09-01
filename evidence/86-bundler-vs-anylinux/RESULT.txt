@@ -27,3 +27,4 @@ evidence     : /home/user/glibc-research/evidence/86-bundler-vs-anylinux
 
 -- the eleven: does it run, what did it load, how fast does it start --
   ENVIRONMENT         LIBC   | P:res    P:h   P:cold   P:warm   | A:res    A:h   A:cold   A:warm  
+  alpine-3.22         musl   | ok       0     14605ms  14564ms  | ok       0     14361ms  14366ms 

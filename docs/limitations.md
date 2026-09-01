@@ -278,26 +278,39 @@ them.
 |---|---|---|
 | **gconv** (character encodings) | ✅ **solved** — static GNU libiconv behind `-Wl,--wrap`, no data directory | `experiments/30-` |
 | **glibc locale** (`/usr/lib/locale`) | ✅ **solved, opt-in** — `--embed-locale`, materialised only when the host cannot answer | `experiments/30-` |
-| **terminfo** (`/usr/share/terminfo`) | ⛔ **unsolved** | POC 20 |
-| **TLS CA bundle** | ⛔ **unsolved** | POC 30 |
+| **terminfo** (`/usr/share/terminfo`) | ✅ **solved, opt-in** — `--embed-terminfo`, host database preferred | `experiments/75-`, POC 20 |
+| **TLS CA bundle** | ✅ **solved, opt-in** — `--embed-cacert`, nine known store locations probed first | `experiments/74-`, POC 30 |
 | **a runtime's own library tree** (CPython's stdlib) | ⚠ **shipped, not solved** — 98 MiB beside a 46 MiB binary | POC 50 |
 
-**terminfo, measured** with a `setupterm()` probe linked against the same
-static ncursesw:
+**terminfo and the CA bundle, before and after.** ⭐ Both are now solved and
+both were measured in both states, which is why the "before" column is kept:
 
-| result | environments |
-|---|---|
-| `OK` | all 7 glibc |
-| `rc=-1 err=-1` — no terminfo database on the host at all | Alpine 3.10, 3.20, 3.22 |
-| `rc=-1 err=0` — database present, no `xterm-256color` entry | Void musl |
+| | with the mechanism | without |
+|---|---|---|
+| a usable **TLS trust store** found | **11 of 11** | 5 of 11 |
+| a **terminal description** for `$TERM` reachable | **11 of 11** | 7 of 11 |
+| never overrode a value the caller had set | 11 of 11 | — |
+| wrote anything to the filesystem | **3 of 11** (CA), **4 of 11** (terminfo) — exactly the hosts with nothing of their own | — |
 
-**CA bundle, measured** with the harness's own CA variables unset, since curl
-compiles exactly one path in:
+⭐ **The finding that shaped both.** Most failures were never *"this machine
+has no certificates"*. Rocky keeps its bundle at
+`/etc/pki/tls/certs/ca-bundle.crt`, openSUSE at `/etc/ssl/ca-bundle.pem`,
+Alpine 3.10 at `/etc/ssl/cert.pem`. **The data was there all along, on a path
+the binary had never been told about.** Only three of eleven genuinely ship
+none. So the first layer is to *look*, and the embedded copy is a fallback.
 
-| result | environments |
-|---|---|
-| verified | Alpine 3.20, Alpine 3.22, Void musl, Fedora 42, Arch — 5 of 11 |
-| unverified | Debian 11, Debian 12, Ubuntu 20.04 (no bundle at all in the minimal image); Rocky 8 (`/etc/pki/tls/certs/ca-bundle.crt`); openSUSE Leap (`/etc/ssl/ca-bundle.pem`); Alpine 3.10 (`/etc/ssl/cert.pem`) |
+⛔ **And the order of those two layers is a SECURITY property, asserted as
+one.** The embedded bundle is a build-time snapshot; roots are revoked and
+expire. A binary preferring its own stale copy over a store an administrator
+maintains would be a security regression wearing a portability fix's clothes.
+`experiments/74-` checks, against an independent oracle rather than the shim's
+own answer, that nothing was written on any host that has a store.
+
+**Proved end to end**, `poc/20-nano` and `poc/30-curl`, 12 assertions each,
+0 failures: `setupterm(xterm-256color)` succeeds on all eleven with `TERMINFO`
+and `TERMINFO_DIRS` unset — including the three Alpines with no terminfo tree
+at all — and curl completes a real TLS handshake on all eleven with
+`CURL_CA_BUNDLE`, `SSL_CERT_FILE`, `SSL_CERT_DIR` and `CURL_CA_PATH` unset.
 
 ⚠ **Bundling a libc does not solve gconv either, and that is measured rather
 than argued.** `experiments/60-` ran onelf — a bundled glibc with its own
@@ -306,12 +319,15 @@ any of them. It still fails the encoding assertions on **8 of 11**, and the 3
 it passes it passes by reaching the *host's* gconv modules. The `--wrap` onto
 static libiconv is what solves gconv, in any tier. `docs/design/tiers.md`.
 
-**Can terminfo and the CA bundle be fixed?** Yes, by the same mechanism as
-`--embed-locale`: both are found through an environment variable (`TERMINFO`,
-`CURL_CA_BUNDLE`/`SSL_CERT_FILE`), so embedding and materialising works
-identically. Neither is implemented. ⚠ Both are **application** data rather
-than libc data, which is why they are not in the tool by default: the argument
-for a glibc portability tool owning a terminal database is weak.
+⚠ **Both are still OPT-IN, and the reason is unchanged**: they are
+**application** data rather than libc data, and the argument for a glibc
+portability tool owning a terminal database by default is weak. `--embed-locale`,
+`--embed-terminfo` and `--embed-cacert` are the three mechanisms that can touch
+the filesystem, which is why all three are asked for rather than assumed.
+
+⛔ **The one that is left is the fifth row**: a runtime's own library tree.
+CPython ships 98 MiB of stdlib beside a 46 MiB binary and nothing here reduces
+that. It is shipped, not solved, and it is the honest gap in this section.
 
 ---
 

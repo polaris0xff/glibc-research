@@ -73,9 +73,9 @@ parts, and **both** are required:
    | networking / DNS | `getaddrinfo` via host NSS | ✅ **closed** — POC 30 resolves and does real TLS on 11/11 |
    | own plugins | a program's own `dlopen` needs the host loader | ✅ **closed** — `--wrap-dlopen`, 11/11 |
    | C++ unwinding | no `PT_GNU_EH_FRAME` on any static link | ✅ **closed** — T-018 |
-   | **CA bundle** | no compiled-in trust store; one path works on 5 of 11 | ⛔ **open** — T-032 |
-   | **terminfo** | host terminal database | ⛔ **open** — T-032 |
-   | **host plugins** | `dlopen` of a host `.so` is host-dependent | ⛔ **open** — T-033, and see part 1 |
+   | CA bundle | no compiled-in trust store; one path works on 5 of 11 | ✅ **closed** — opt-in `--embed-cacert`; POC 30 verifies real TLS on **11/11** with the harness's own CA variables unset. T-032 |
+   | terminfo | host terminal database | ✅ **closed** — opt-in `--embed-terminfo`; POC 20's `setupterm(xterm-256color)` succeeds on **11/11** with `TERMINFO`/`TERMINFO_DIRS` unset. T-032 |
+   | **host plugins** | `dlopen` of a host `.so` is host-dependent | ⛔ **open** — T-033, and see part 1. ⭐ **The last one.** |
 
    ⚠ **The old text of this part is not deleted, it is superseded**, and the
    measurement it asked for was carried out: `experiments/60-`, `61-` and
@@ -106,8 +106,8 @@ rather than as unmeasured gaps.
 
 | part | state | why |
 |---|---|---|
-| **1. No known environment where it fails** | ⛔ **not met** | One measured, unfixed failure: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ **Four** routes to it now, none exhausted — `AGENTS.md` §13 item 4. Route D is new and best-evidenced: `experiments/73-` measures 90.8%–97.8% of every glibc-versioned import of 5,807 real host shared objects as already definable by the pinned static glibc, with **zero** unexplained residue. T-033. Two host **data** dependencies, terminfo and the TLS CA bundle, are also open, and both have a proven mechanism waiting (`--embed-locale`'s shape) rather than an unknown. |
-| **2. A static glibc binary with none of the issues** | ⛔ **not met, and now countable** | Six of nine enumerated issues are closed on all eleven environments; three are open, each with an entry. The table above is the whole of it — there is no unenumerated remainder. |
+| **1. No known environment where it fails** | ⛔ **not met** | One measured, unfixed failure, and it is now the **only** one: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ **Four** routes to it, none exhausted — `AGENTS.md` §13 item 4. Route D is best-evidenced: `experiments/73-` measures 90.8%–97.8% of every glibc-versioned import of 5,807 real host shared objects as already definable by the pinned static glibc, with **zero** unexplained residue. T-033. ⭐ The two host **data** dependencies that used to sit on this row, terminfo and the TLS CA bundle, are **closed** as of 2026-09-01d. |
+| **2. A static glibc binary with none of the issues** | ⛔ **not met, and now countable** | ⭐ **Eight of nine** enumerated issues are closed on all eleven environments — it was six of nine before 2026-09-01d. **One** is open: host plugins. The table above is the whole of it; there is no unenumerated remainder, so the distance to the bar is one named problem with four untried routes rather than an unknown quantity. |
 
 ### The head-to-head, which is now evidence rather than the test
 
@@ -146,11 +146,13 @@ is work, not a verdict — `AGENTS.md` §13 item 4 now has **four** routes, and
 > ordinary ELF that mounts nothing and writes nothing — for programs that can
 > be statically linked today.
 
-**What would move part 2 to met**, under the amended text: the three open rows
-of the issues table close — T-032 for the CA bundle and terminfo, T-033 for
-host plugins — each on all eleven environments with the measurement recorded.
-⛔ **Six of nine are closed and three are not, so this is a countable
-deficit and not a judgement.** Do not soften the three.
+**What would move part 2 to met**, under the amended text: the open rows of the
+issues table close, each on all eleven environments with the measurement
+recorded. ⭐ **T-032 closed two of them on 2026-09-01d** — the CA bundle and
+terminfo — so **one** row is left: **T-033, host plugins**.
+⛔ **Eight of nine are closed and one is not, so this is a countable deficit
+and not a judgement.** Do not soften the one that remains: it is the hardest
+of the nine, and being last does not make it small.
 
 ### What is still unmeasured, and is not counted either way
 
