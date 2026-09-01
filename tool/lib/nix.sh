@@ -77,7 +77,15 @@ nix_plan() {   # attr [outfile]
   _out="${2:-}"
   _pfx=$(nix_prefix) || die "pgb nix plan needs nix. Install it, or use --plan with a plan another machine made." 2
 
-  _drv=$("$_pfx/nix-instantiate" '<nixpkgs>' --attr "$_attr" 2>"$PGB_STATE/nix-plan.err" | head -1)
+  # ⛔ A MULTI-OUTPUT ATTRIBUTE PRINTS `<drv>!bin`, NOT `<drv>`. jq, sqlite and
+  # curl all do, and the first version of this check required the path to END
+  # in `.drv`, so every one of them was reported as "nixpkgs has no attribute
+  # 'jq'" -- a message that sends the reader to nixpkgs to look for a package
+  # that is plainly there. The output selector is stripped; which output the
+  # caller wanted does not change the plan, because the plan is the INPUTS.
+  _drv=$("$_pfx/nix-instantiate" '<nixpkgs>' --attr "$_attr" 2>"$PGB_STATE/nix-plan.err" \
+         | grep '^/nix/store/' | head -1)
+  _drv="${_drv%%!*}"
   case "$_drv" in
     /nix/store/*.drv) ;;
     *) sed 's/^/  /' "$PGB_STATE/nix-plan.err" >&2
@@ -433,11 +441,14 @@ nix_build_tree() {   # srcdir planfile workdir
   done
   _flags="$_flags $NIX_CONFIGURE_EXTRA"
 
+  _hooks=$(plan_get "$_pf" buildSystemHooks | tr '\n' ' ')
+  [ -n "$_hooks" ] && say "build system: $_hooks"
+
   _round=0
   while [ "$_round" -lt "$NIX_MAX_ROUNDS" ]; do
     _round=$((_round + 1))
     say "round $_round: configure$_flags"
-    if nix_try_build "$_top" "$_flags" "$_log"; then
+    if nix_try_build "$_top" "$_flags" "$_log" "$_hooks"; then
       say "round $_round: built"
       return 0
     fi
@@ -465,22 +476,48 @@ nix_build_tree() {   # srcdir planfile workdir
   return 1
 }
 
-nix_try_build() {   # srcdir flags log
-  _t="$1"; _fl="$2"; _lg="$3"
+# ⭐ THE BUILD SYSTEM IS TAKEN FROM THE PLAN, NOT SNIFFED. nixpkgs already
+# decided, and says so through the setup hooks in nativeBuildInputs:
+# `autoreconf-hook` means the source has no ./configure and one must be
+# generated; a cmake or meson hook names the generator outright. Sniffing the
+# tree gets this wrong on any project that ships more than one build system,
+# and htop is the case that proved it: a bare git export with configure.ac and
+# no configure, where `make` reported "No targets specified".
+nix_try_build() {   # srcdir flags log hooks
+  _t="$1"; _fl="$2"; _lg="$3"; _hooks="${4:-}"
   ( cd "$_t" && make distclean >/dev/null 2>&1; true )
-  # ⛔ --disable-shared --enable-static ARE NOT OPTIONAL and they are appended
-  # AFTER the plan's flags, so a package that already says one of them keeps
-  # its own answer and everything else gets pgb's.
+  _j=$(nproc 2>/dev/null || echo 2)
+
+  _pre=""
+  case " $_hooks " in
+    *" autoreconf "*)
+      # ⚠ NOT `autoreconf -i` UNCONDITIONALLY: a tree that already has a
+      # configure gets nothing, because regenerating one with the build
+      # environment's autotools is a change nobody asked for.
+      _pre="[ -x ./configure ] || { autoreconf -fi || ./autogen.sh || ./bootstrap; } &&" ;;
+  esac
+
+  case " $_hooks " in
+    *" cmake "*)
+      _cmd="cmake -S . -B _pgbbuild -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release $(plan_flags cmake) && cmake --build _pgbbuild -j $_j" ;;
+    *" meson "*)
+      _cmd="meson setup _pgbbuild --default-library=static --prefer-static && ninja -C _pgbbuild" ;;
+    *)
+      # ⛔ --disable-shared --enable-static ARE NOT OPTIONAL and they come
+      # AFTER the plan's flags, so a package that already states one keeps its
+      # own answer and everything else gets pgb's.
+      _cmd="./configure --disable-shared --enable-static $_fl && make -j $_j" ;;
+  esac
+
   sh "$PGB_SELF/pgb" build --bind "$_t:$_t" -- sh -c "
-    cd '$_t' &&
-    if [ -x ./configure ]; then
-      ./configure --disable-shared --enable-static $_fl
-    elif [ -f CMakeLists.txt ]; then
-      cmake -S . -B _pgbbuild -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release
-    fi &&
-    { [ -d _pgbbuild ] && cmake --build _pgbbuild -j $(nproc) || make -j $(nproc); }
+    cd '$_t' && $_pre $_cmd
   " > "$_lg" 2>&1
 }
+
+# Extra flags for a generator, from the plan. Kept small on purpose: nixpkgs'
+# cmakeFlags routinely name /nix/store paths, and those are dropped upstream in
+# nix_build_tree for the same reason the configure ones are.
+plan_flags() { printf '%s' ""; }
 
 # ⛔ ONE PATTERN, ONE FIX, AND THE OBSERVED MESSAGE IS QUOTED. A diagnoser that
 # guesses is worse than none: it turns a clear failure into a loop.

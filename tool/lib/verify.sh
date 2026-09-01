@@ -109,7 +109,21 @@ cmd_verify() {
   [ -f "$list" ] || die "missing $list" 2
   any=0
   printf '    %-20s %-6s %-8s %-26s %s\n' ENVIRONMENT LIBC RESULT 'HOST .so LOADED' 'HOST DATA READ'
-  while read -r ref name libc digest; do
+  # ⛔ THE MATRIX IS READ ON FD 3, NOT ON STDIN, AND THE SUBJECT'S STDIN IS
+  # /dev/null. THE DEFECT THIS FIXES ATE THE MATRIX AND REPORTED A FAILURE.
+  #
+  # This loop used to be `while read ... done < "$list"` with the subject
+  # inheriting that stdin. A subject that READS STDIN therefore consumed the
+  # rest of rootfs-images.txt: measured here on a static `bash` built from a
+  # nixpkgs plan, `pgb verify` printed ONE row -- alpine-3.22 -- and called it
+  # `exit127`, because bash had swallowed the remaining ten lines of the image
+  # list and tried to execute the next one as a command. Ten environments were
+  # silently not tested and the one that was got a wrong verdict.
+  #
+  # ⚠ IT WAS INVISIBLE UNTIL NOW BECAUSE EVERY EARLIER SUBJECT IGNORED STDIN:
+  # ci/probe.c, `gawk --version`, `jq --version`. The first interactive program
+  # this tool was ever pointed at found it immediately.
+  while read -r ref name libc digest <&3; do
     case "$ref" in ''|\#*) continue ;; esac
     base=$(basename "$bin")
 
@@ -119,9 +133,9 @@ cmd_verify() {
       any=1
       cp "$bin" "$root/$base" 2>/dev/null || { printf '    %-20s copy failed\n' "$name"; rc=1; continue; }
       if [ $# -gt 0 ]; then
-        sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "/$base" "$@" >/dev/null 2>&1
+        sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "/$base" "$@" </dev/null >/dev/null 2>&1
       else
-        sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "/$base" >/dev/null 2>&1
+        sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "/$base" </dev/null >/dev/null 2>&1
       fi
       st=$?
       libs=$(trace_host_objects "$root" "/$base" "$@")
@@ -204,7 +218,7 @@ cmd_verify() {
       unmeasured)  saw_unmeasured=1 ;;
       *)           rc=1 ;;
     esac
-  done < "$list"
+  done 3< "$list"
   [ "$any" = 1 ] || { say "    nothing to run against. sh scripts/common/fetch-rootfs.sh"; return 2; }
   say ""
   if [ "$rc" = 0 ] && [ "${saw_unmeasured:-0}" = 1 ]; then
@@ -235,7 +249,7 @@ trace_host_objects() {
   command -v strace >/dev/null 2>&1 || { printf ''; return; }
   t=$(mktemp) || { printf ''; return; }
   strace -f -e trace=openat,open,execve -o "$t" \
-    sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "$inner" "$@" >/dev/null 2>&1
+    sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "$inner" "$@" </dev/null >/dev/null 2>&1
   awk -v want="$inner" '
     { pid = $1 }
     $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }
@@ -250,7 +264,7 @@ trace_host_data() { # rootfs in-root-binary [args...]
   command -v strace >/dev/null 2>&1 || { printf ''; return; }
   t=$(mktemp) || { printf ''; return; }
   strace -f -e trace=openat,open,execve -o "$t" \
-    sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "$inner" "$@" >/dev/null 2>&1
+    sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "$inner" "$@" </dev/null >/dev/null 2>&1
   awk -v want="$inner" '
     { pid = $1 }
     $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }

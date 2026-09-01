@@ -34,7 +34,29 @@ def sh(cmd):
 
 
 def split_ws(s):
-    return [x for x in (s or "").split() if x]
+    """Normalise a derivation attribute to a list of strings.
+
+    ⚠ THE SAME ATTRIBUTE IS A SPACE-JOINED STRING IN ONE DERIVATION SHAPE AND
+    A JSON ARRAY IN THE OTHER. Treating the array as a string gives you its
+    python repr, one 'flag' per plan and every one of them wrong.
+    """
+    if s is None:
+        return []
+    if isinstance(s, list):
+        return [str(x) for x in s if str(x)]
+    if isinstance(s, bool):
+        return []
+    return [x for x in str(s).split() if x]
+
+
+
+def dep_names_of(env, key):
+    """Store paths -> readable names, hash prefix stripped."""
+    out = []
+    for p in split_ws(env.get(key)):
+        b = os.path.basename(p)
+        out.append(b.split("-", 1)[1] if "-" in b else b)
+    return out
 
 
 def main(argv):
@@ -54,7 +76,22 @@ def main(argv):
             return 1
         drvpath = cand[0]
     top = drvs[drvpath]
+
+    # ⛔ TWO DERIVATION SHAPES, AND THE NEW ONE CARRIES NOTHING IN `env`.
+    # nixpkgs is migrating to __structuredAttrs, where the attributes are
+    # proper JSON under a top-level `structuredAttrs` key and `env` holds only
+    # the output names. Measured on this machine: bash is the old shape and
+    # tmux is the new one, and reading only `env` gave tmux a plan with no
+    # source at all -- "the plan has no source", which reads like a nixpkgs
+    # defect rather than a missing branch here.
+    #
+    # ⚠ AND THE TYPES DIFFER: the old shape space-joins lists into a string,
+    # the new one keeps them as JSON arrays. `attrs()` below normalises both,
+    # which is why nothing downstream has to know which shape it came from.
+    sattrs = top.get("structuredAttrs")
     env = top.get("env", {})
+    if isinstance(sattrs, dict) and sattrs:
+        env = dict(sattrs)
 
     # ⭐ INDEX THE FIXED-OUTPUT DERIVATIONS: those are the fetchurl calls, and
     # they are the only place the UPSTREAM URL and its hash exist. Everything
@@ -107,14 +144,34 @@ def main(argv):
         return rec
 
     def dep_names(key):
-        out = []
-        for p in split_ws(env.get(key)):
-            b = os.path.basename(p)
-            out.append(b.split("-", 1)[1] if "-" in b else b)
-        return out
+        return dep_names_of(env, key)
+
+    # ⭐ nixpkgs ALREADY KNOWS WHAT BUILD SYSTEM THIS IS, and says so by which
+    # setup hooks it puts in nativeBuildInputs. Reading them off is free and it
+    # is strictly better than sniffing the unpacked tree: a source that ships
+    # both `configure.ac` and a `CMakeLists.txt` is ambiguous to a sniffer and
+    # not to the derivation. `autoreconf-hook` in particular is nixpkgs saying
+    # "this tarball has no ./configure, generate one" -- htop's source is a
+    # bare git export, and without this the build ran `make` in a tree with no
+    # Makefile and reported "No targets specified".
+    natives = " ".join(dep_names_of(env, "nativeBuildInputs"))
+    hooks = []
+    for hook, flag in (
+        ("autoreconf-hook", "autoreconf"),
+        ("cmake-", "cmake"),
+        ("meson-", "meson"),
+        ("ninja-", "ninja"),
+        ("pkg-config-wrapper", "pkg-config"),
+        ("rustc", "cargo"),
+        ("cargo-", "cargo"),
+        ("go-", "go"),
+    ):
+        if hook in natives and flag not in hooks:
+            hooks.append(flag)
 
     src = env.get("src", "")
     plan = {
+        "buildSystemHooks": hooks,
         "schema": "pgb-nix-plan/1",
         "attr": attr,
         "pname": env.get("pname") or env.get("name") or attr,

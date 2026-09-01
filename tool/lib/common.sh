@@ -24,6 +24,12 @@ vsay() { [ "$VERBOSE" = 1 ] && printf 'pgb: %s\n' "$*" >&2; return 0; }
 # with a stray 2 that reads as part of the command the user is being told to
 # run. Thirteen call sites, every one of them affected.
 die()  { printf 'pgb: %s\n' "$1" >&2; exit "${2:-1}"; }
+# ⚠ SAY IT AND CARRY ON. `warn` is for a thing that changed the build and did
+# not stop it -- a dropped flag, a patch that would not apply -- and it goes to
+# stderr so a caller capturing stdout still sees it. ⛔ It did not exist and
+# `pgb nix` called it: the shell printed `pgb: 447: warn: not found` in the
+# middle of a build and the real message was never printed at all.
+warn() { printf 'pgb: %s\n' "$*" >&2; return 0; }
 usage(){ awk 'NR>1 { if (/^#/) { sub(/^# ?/, ""); print } else exit }' "$0"; }
 
 # ⛔ A RELATIVE BIND SOURCE IS SILENTLY A NAMED VOLUME, NOT A DIRECTORY.
