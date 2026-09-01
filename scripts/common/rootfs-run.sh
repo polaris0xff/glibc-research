@@ -142,6 +142,25 @@ if [ "$NET" = 1 ]; then
     # the behaviour of the resolver.
     cp /etc/resolv.conf "$ROOTFS/etc/resolv.conf" 2>/dev/null || true
   fi
+
+  # ⚠ A TLS TRUST ANCHOR IS A NETWORK INTERFACE, NOT HOST USERLAND, and it is
+  # replicated for the same reason /etc/resolv.conf is. Where the environment
+  # routes HTTPS through a proxy, the variables naming its CA bundle are
+  # inherited by anything run inside, but the FILE they name is not there, so
+  # every fetch fails with "error setting certificate file" -- which reads as
+  # "the network is down" and is not. The file is copied to the same absolute
+  # path so the inherited variable keeps resolving.
+  #
+  # ⛔ ONLY the file those variables already name is copied. This does not
+  # bring in the host's certificate store, and it adds no trust the caller's
+  # own environment did not already have.
+  for _cav in CURL_CA_BUNDLE SSL_CERT_FILE GIT_SSL_CAINFO REQUESTS_CA_BUNDLE NODE_EXTRA_CA_CERTS; do
+    eval "_cap=\${$_cav:-}"
+    [ -n "$_cap" ] && [ -f "$_cap" ] || continue
+    [ -f "$ROOTFS$_cap" ] && continue
+    mkdir -p "$ROOTFS$(dirname "$_cap")" 2>/dev/null || continue
+    cp "$_cap" "$ROOTFS$_cap" 2>/dev/null || true
+  done
 fi
 
 BINDSPEC=""

@@ -1,0 +1,671 @@
+#!/bin/sh
+# pgb -- build portable static glibc binaries.
+#
+# Produces an ordinary Linux ELF executable, statically linked against glibc,
+# that runs unchanged on glibc and musl distributions. No launcher, no AppDir,
+# no packaging format, no runtime beside it: one file you copy and run.
+#
+# ⛔ WHAT MAKES THIS DIFFERENT FROM `gcc -static`, WHICH IS THE WHOLE POINT.
+# A plain `gcc -static` glibc binary is NOT self-contained. Measured across 11
+# pinned distributions in experiments/:
+#
+#   - it reads the HOST /etc/nsswitch.conf and dlopen()s the modules named
+#     there, pulling a second libc into the process. That kills it outright on
+#     Arch Linux and openSUSE Leap 15.6;
+#   - it reaches every character encoding except a small builtin set through
+#     dlopen'd gconv modules, which kills it on Debian and Ubuntu and silently
+#     costs 11 of 12 tested encodings everywhere else;
+#   - it gets an ASCII charset from setlocale() on every musl host.
+#
+# pgb closes all three. `pgb explain` prints exactly how, and `pgb verify`
+# re-measures it on your binary rather than asking you to believe this text.
+#
+# COMMANDS
+#   pgb doctor                 what this machine can and cannot do
+#   pgb explain                every flag injected and why. No black box
+#   pgb env create             build the pinned, controlled build environment
+#   pgb env info               what the environment is, exactly
+#   pgb shell                  an interactive shell inside it
+#   pgb build [--] CMD...      run a build with the portable toolchain injected
+#   pgb cc-dir                 print the wrapper directory, for hand-driving
+#   pgb verify BIN             inspect a binary AND run it across the matrix
+#
+# OPTIONS (build)
+#   --embed-locale             embed C.UTF-8, materialised only if the host
+#                              lacks it. Off by default: it is the one
+#                              mechanism that writes to the filesystem
+#   --no-iconv                 do not link GNU libiconv
+#   --arch-baseline LEVEL      x86-64 | x86-64-v2 | x86-64-v3 (default x86-64)
+#   --engine chroot|docker|podman|host
+#   -v, --verbose              print every wrapped command line
+#
+# Exit codes: 0 ok, 1 the operation ran and failed, 2 it could not run.
+#
+# SPDX-License-Identifier: MIT
+
+set -u
+
+PGB_VERSION="0.1.0"
+PGB_SELF=$(cd "$(dirname "$0")" && pwd)
+PGB_STATE="${PGB_STATE:-${XDG_STATE_HOME:-$HOME/.local/state}/pgb}"
+PGB_ROOTFS_DIR="${PGB_ROOTFS_DIR:-/var/lib/pgb-rootfs}"
+PGB_LIBICONV_PREFIX="${PGB_LIBICONV_PREFIX:-/opt/pgb-libiconv}"
+
+# The build environment, pinned. glibc 2.36 is chosen deliberately and the
+# reason is in `pgb env info`: at or above 2.34 the `files` and `dns` NSS
+# services are implemented inside libc, which is what leaves the NSS override
+# with nothing to dlopen. Below that floor the override moves the dlopen
+# instead of removing it.
+PGB_ENV_IMAGE="${PGB_ENV_IMAGE:-debian:12}"
+PGB_ENV_DIGEST="${PGB_ENV_DIGEST:-sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929}"
+PGB_ENV_NAME="${PGB_ENV_NAME:-pgb-env-debian12}"
+PGB_ENV_PACKAGES="${PGB_ENV_PACKAGES:-gcc g++ make libc6-dev binutils pkg-config file}"
+
+# ⛔ OPTIONS CROSS THE ENGINE BOUNDARY THROUGH THE ENVIRONMENT, NOT THE ARGV.
+#
+# `pgb build` re-enters itself inside the chroot or container as
+# `pgb __inner-build ...`, and that re-entry carries only the user's COMMAND.
+# Options parsed by the outer process were therefore silently dropped: a build
+# asked for with --embed-locale produced a binary byte-identical to one built
+# without it, with no error anywhere. Seeding the defaults from PGB_OPT_* and
+# exporting them before re-entry makes the inner process inherit the same
+# decisions, and keeps working for the docker engine where argv rewriting
+# through `sh -c` would be fragile.
+VERBOSE="${PGB_OPT_VERBOSE:-0}"
+EMBED_LOCALE="${PGB_OPT_EMBED_LOCALE:-0}"
+USE_ICONV="${PGB_OPT_USE_ICONV:-1}"
+ARCH_BASELINE="${PGB_OPT_BASELINE:-}"
+ENGINE=""
+
+say()  { printf '%s\n' "$*"; }
+vsay() { [ "$VERBOSE" = 1 ] && printf 'pgb: %s\n' "$*" >&2; return 0; }
+die()  { printf 'pgb: %s\n' "$*" >&2; exit "${2:-1}"; }
+usage(){ awk 'NR>1 { if (/^#/) { sub(/^# ?/, ""); print } else exit }' "$0"; }
+
+default_baseline() {
+  case "$(uname -m)" in
+    x86_64|amd64)  printf 'x86-64' ;;
+    aarch64|arm64) printf 'armv8-a' ;;
+    *)             printf '' ;;
+  esac
+}
+
+# ---------------------------------------------------------------------------
+# doctor
+# ---------------------------------------------------------------------------
+cmd_doctor() {
+  rc=0
+  say "pgb $PGB_VERSION -- host report"
+  say ""
+  printf '  %-34s %s\n' "kernel"        "$(uname -sr)"
+  printf '  %-34s %s\n' "architecture"  "$(uname -m)"
+  [ -r /etc/os-release ] && printf '  %-34s %s\n' "distribution" \
+      "$(. /etc/os-release 2>/dev/null; printf '%s' "${PRETTY_NAME:-unknown}")"
+  printf '  %-34s %s\n' "host libc"     "$(ldd --version 2>&1 | head -1)"
+  printf '  %-34s %s\n' "cc"            "$({ ${CC:-cc} --version 2>/dev/null || echo none; } | head -1)"
+  say ""
+
+  chk() { # label ok-condition-result advice
+    if [ "$2" = yes ]; then printf '  ok    %-32s\n' "$1"
+    else printf '  MISS  %-32s %s\n' "$1" "$3"; rc=1; fi
+  }
+  chk "a C compiler"       "$(command -v ${CC:-cc} >/dev/null 2>&1 && echo yes || echo no)" "install gcc or clang"
+  chk "static linking"     "$(printf 'int main(void){return 0;}\n' > /tmp/.pgb$$.c 2>/dev/null &&
+                              ${CC:-cc} -static -o /tmp/.pgb$$ /tmp/.pgb$$.c 2>/dev/null && echo yes || echo no)" \
+                           "install libc6-dev / glibc-static"
+  rm -f /tmp/.pgb$$ /tmp/.pgb$$.c
+  LIBC_A=$(${CC:-cc} -print-file-name=libc.a 2>/dev/null)
+  chk "__nss_configure_lookup in libc.a" \
+      "$([ -f "$LIBC_A" ] && nm -A "$LIBC_A" 2>/dev/null | grep -q 'T __nss_configure_lookup' && echo yes || echo no)" \
+      "the NSS fix needs a glibc libc.a"
+  chk "GNU libiconv (static)" \
+      "$([ -f "$PGB_LIBICONV_PREFIX/lib/libiconv.a" ] && echo yes || echo no)" \
+      "run scripts/build-libiconv.sh"
+  say ""
+  say "  build environment engines:"
+  for e in docker podman; do
+    if command -v $e >/dev/null 2>&1 && $e info >/dev/null 2>&1; then
+      printf '    ok    %-10s usable\n' "$e"
+    elif command -v $e >/dev/null 2>&1; then
+      printf '    --    %-10s present but no daemon\n' "$e"
+    else
+      printf '    --    %-10s absent\n' "$e"
+    fi
+  done
+  if [ "$(id -u)" = 0 ] && command -v unshare >/dev/null 2>&1 &&
+     unshare --mount --propagation private true 2>/dev/null; then
+    printf '    ok    %-10s usable (root + CAP_SYS_ADMIN)\n' chroot
+  else
+    printf '    --    %-10s needs root and CAP_SYS_ADMIN\n' chroot
+  fi
+  printf '    ok    %-10s always available, but see the warning below\n' host
+  say ""
+  say "  chosen engine: $(pick_engine)"
+  if [ "$(pick_engine)" = host ]; then
+    say ""
+    say "  ⚠ THE host ENGINE BUILDS AGAINST WHATEVER GLIBC THIS MACHINE HAS."
+    say "    That is not a controlled environment: the binary inherits this"
+    say "    host's glibc version, its headers and its CPU defaults. Use it to"
+    say "    experiment, not to ship. \`pgb env create\` gives the pinned one."
+  fi
+  say ""
+  say "  target root filesystems for \`pgb verify\`:"
+  n=0
+  if [ -f "$PGB_SELF/scripts/common/rootfs-images.txt" ]; then
+    while read -r ref name libc digest; do
+      case "$ref" in ''|\#*) continue ;; esac
+      if [ -d "$PGB_ROOTFS_DIR/$name" ]; then n=$((n+1)); fi
+    done < "$PGB_SELF/scripts/common/rootfs-images.txt"
+  fi
+  printf '    %s present under %s\n' "$n" "$PGB_ROOTFS_DIR"
+  [ "$n" = 0 ] && say "    run: sh scripts/common/fetch-rootfs.sh"
+  return $rc
+}
+
+pick_engine() {
+  if [ -n "$ENGINE" ]; then printf '%s' "$ENGINE"; return; fi
+  if command -v podman >/dev/null 2>&1 && podman info >/dev/null 2>&1; then printf 'podman'; return; fi
+  if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then printf 'docker'; return; fi
+  if [ "$(id -u)" = 0 ] && command -v unshare >/dev/null 2>&1; then printf 'chroot'; return; fi
+  printf 'host'
+}
+
+# ---------------------------------------------------------------------------
+# explain -- the anti-black-box command
+# ---------------------------------------------------------------------------
+cmd_explain() {
+  bl="${ARCH_BASELINE:-$(default_baseline)}"
+  cat <<EOF
+pgb $PGB_VERSION injects exactly this, and nothing else.
+
+WHERE IT IS INJECTED
+  Not into your source and not into your build files. pgb puts a directory of
+  compiler wrappers first on PATH and sets CC/CXX to them, so autotools,
+  CMake, meson and plain make all pick it up without knowing pgb exists.
+  \`pgb cc-dir\` prints that directory; every wrapper is a readable shell
+  script you can cat.
+
+  Each wrapper looks at its own argv and decides:
+    -c / -E / -S / -M      a compile.  compile flags only
+    -shared                a shared library.  PASSED THROUGH UNCHANGED
+    anything else          an executable link.  link flags added
+  Passing -shared through is what lets a normal ./configure run: its shared
+  library probes must keep working or the build fails before it starts.
+
+COMPILE FLAGS
+  -fno-plt                       no procedure linkage table indirection
+  -march=$bl$(printf '%*s' $((22 - ${#bl})) '')CPU baseline. NOT -march=native. A binary built
+                                 with -march=native runs on the machine that
+                                 built it and crashes elsewhere with SIGILL,
+                                 which looks exactly like a portability bug in
+                                 this tool and is not one.
+
+LINK FLAGS
+  -static                        no interpreter, no DT_NEEDED, nothing to
+                                 resolve on the host
+  <pgb-nssfix.o>                 passed as a plain object, not from an archive
+  -Wl,-u,pgb_runtime_anchor      forces it to stay. A constructor with no
+                                 referenced symbol is dropped by the linker,
+                                 and an nssfix that silently did not link is
+                                 the exact failure it exists to prevent
+$( [ "$USE_ICONV" = 1 ] && cat <<EOF2
+  -Wl,--wrap=iconv_open          redirect the three public iconv entry points
+  -Wl,--wrap=iconv               to GNU libiconv, statically linked. Applies
+  -Wl,--wrap=iconv_close         to every object in the link, including static
+                                 libraries built before pgb existed
+  -lpgbruntime -liconv           the shim lives in an archive, so a program
+                                 that never calls iconv_open links none of it
+                                 and pays none of the ~900 KiB
+EOF2
+)
+$( [ "$EMBED_LOCALE" = 1 ] && cat <<EOF3
+  -Wl,--wrap=setlocale           embedded C.UTF-8, materialised ONLY when the
+  <pgb-locale-data.o>            host cannot answer a UTF-8 setlocale. A
+                                 program that never calls setlocale writes
+                                 nothing and touches no directory
+EOF3
+)
+
+WHAT EACH ONE IS FOR, WITH THE MEASUREMENT
+  NSS      __nss_configure_lookup() pins every database to services glibc
+           2.34+ implements inside libc, so the host's /etc/nsswitch.conf
+           names nothing that can be dlopen'd.
+           experiments/20-static-glibc-nss-dlopen.sh
+  iconv    glibc's gconv modules are dlopen'd and carry DT_NEEDED libc.so.6.
+           GNU libiconv carries the same tables as archive code.
+           experiments/30-gconv-and-locale.sh
+  locale   glibc's C.UTF-8 is files on disk, not code in libc.
+           experiments/30-gconv-and-locale.sh
+
+WHAT pgb DOES NOT DO, AND WILL NOT PRETEND TO
+  - It does not make dlopen() of host plugins work. A static binary that
+    dlopens a host shared object pulls a second libc in, which is the failure
+    this tool exists to avoid. A program whose CORE function is loading host
+    plugins is outside the class pgb serves. docs/limitations.md is explicit.
+  - It does not give you NSS data from LDAP, SSSD, NIS or systemd-resolved.
+    Keeping those modules out is the fix, and losing them is its cost.
+  - It does not lower the kernel ABI floor. Your build glibc decides that.
+EOF
+}
+
+# ---------------------------------------------------------------------------
+# env
+# ---------------------------------------------------------------------------
+env_root() { printf '%s/%s' "$PGB_ROOTFS_DIR" "$PGB_ENV_NAME"; }
+
+cmd_env() {
+  sub="${1:-info}"; shift 2>/dev/null || true
+  case "$sub" in
+    create) env_create ;;
+    info)   env_info ;;
+    *)      die "unknown: pgb env $sub" 2 ;;
+  esac
+}
+
+env_info() {
+  r=$(env_root)
+  say "build environment"
+  printf '  %-22s %s\n' "engine"        "$(pick_engine)"
+  printf '  %-22s %s\n' "image"         "$PGB_ENV_IMAGE"
+  printf '  %-22s %s\n' "digest"        "$PGB_ENV_DIGEST"
+  printf '  %-22s %s\n' "packages"      "$PGB_ENV_PACKAGES"
+  printf '  %-22s %s\n' "root"          "$r"
+  if [ -d "$r" ]; then
+    printf '  %-22s %s\n' "state" "created"
+    if [ -f "$r/.pgb-env" ]; then sed 's/^/    /' "$r/.pgb-env"; fi
+  else
+    printf '  %-22s %s\n' "state" "NOT created -- run: pgb env create"
+  fi
+  say ""
+  say "  why this image: glibc 2.36. At or above 2.34 the 'files' and 'dns'"
+  say "  NSS services are implemented inside libc, which is what leaves the"
+  say "  NSS override with nothing to dlopen. Below that floor it would move"
+  say "  the dlopen rather than remove it -- see experiments/21."
+}
+
+env_create() {
+  eng=$(pick_engine)
+  r=$(env_root)
+  case "$eng" in
+    chroot)
+      [ "$(id -u)" = 0 ] || die "the chroot engine needs root" 2
+      if [ -d "$r" ] && [ -f "$r/.pgb-env" ]; then
+        say "environment already at $r (delete it to rebuild)"; return 0
+      fi
+      say "creating $PGB_ENV_NAME from $PGB_ENV_IMAGE ($PGB_ENV_DIGEST)"
+      sh "$PGB_SELF/scripts/common/oci-pull.sh" "$PGB_ENV_IMAGE" \
+         --digest "$PGB_ENV_DIGEST" --out "$r" || die "image pull failed"
+      say "installing: $PGB_ENV_PACKAGES"
+      sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /bin/sh -c \
+        "export DEBIAN_FRONTEND=noninteractive; apt-get update -qq && \
+         apt-get install -y -qq --no-install-recommends $PGB_ENV_PACKAGES" \
+        >"$r.install.log" 2>&1 || { tail -20 "$r.install.log" >&2; die "package install failed"; }
+      # libiconv must be built by the ENVIRONMENT's compiler against the
+      # ENVIRONMENT's glibc. An archive built on the host would link fine and
+      # then carry the host's ABI assumptions into the pinned build.
+      if [ "$USE_ICONV" = 1 ]; then
+        say "building GNU libiconv inside the environment"
+        mkdir -p "$r$PGB_LIBICONV_PREFIX"
+        # ⚠ NOT /tmp: rootfs-run.sh mounts a tmpfs over it, so a file copied
+        # to $r/tmp is invisible to the very command that needs it.
+        mkdir -p "$r/opt"
+        cp "$PGB_SELF/scripts/build-libiconv.sh" "$r/opt/pgb-build-libiconv.sh"
+        sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /bin/sh -c \
+          "export DEBIAN_FRONTEND=noninteractive; apt-get install -y -qq --no-install-recommends curl ca-certificates >/dev/null 2>&1; \
+           PGB_LIBICONV_PREFIX=$PGB_LIBICONV_PREFIX sh /opt/pgb-build-libiconv.sh" \
+          >>"$r.install.log" 2>&1 || { tail -20 "$r.install.log" >&2; die "libiconv build failed"; }
+      fi
+      {
+        printf 'image: %s\n' "$PGB_ENV_IMAGE"
+        printf 'digest: %s\n' "$PGB_ENV_DIGEST"
+        printf 'packages: %s\n' "$PGB_ENV_PACKAGES"
+        printf 'created: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        printf 'gcc: %s\n' "$(sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /usr/bin/gcc --version 2>/dev/null | head -1)"
+        printf 'glibc: %s\n' "$(sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /bin/sh -c 'ldd --version' 2>/dev/null | head -1)"
+      } > "$r/.pgb-env"
+      say "created. $(sed -n 's/^gcc: //p' "$r/.pgb-env")"
+      ;;
+    docker|podman)
+      say "building image pgb-env:$PGB_VERSION with $eng"
+      d="$PGB_STATE/docker"; mkdir -p "$d"
+      cat > "$d/Dockerfile" <<EOF
+FROM ${PGB_ENV_IMAGE}@${PGB_ENV_DIGEST}
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \\
+      ${PGB_ENV_PACKAGES} curl ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY runtime /opt/pgb/runtime
+COPY build-libiconv.sh /opt/pgb/build-libiconv.sh
+RUN sh /opt/pgb/build-libiconv.sh
+EOF
+      mkdir -p "$d/runtime"
+      cp "$PGB_SELF"/tool/runtime/* "$d/runtime/" 2>/dev/null
+      cp "$PGB_SELF"/scripts/build-libiconv.sh "$d/" 2>/dev/null
+      $eng build -t "pgb-env:$PGB_VERSION" "$d" || die "image build failed"
+      say "built pgb-env:$PGB_VERSION"
+      ;;
+    host)
+      say "engine 'host': nothing to create. ⚠ builds use THIS machine's glibc."
+      ;;
+  esac
+}
+
+# ---------------------------------------------------------------------------
+# The runtime archive and the wrapper directory.
+# ---------------------------------------------------------------------------
+# ⛔ THE CACHE KEY IS THE COMPILER, NOT THE MACHINE.
+#
+# $PGB_STATE is bind-mounted into the build environment so the wrappers and
+# runtime objects are visible there. That means an object compiled by the
+# HOST's gcc 13.3 sits in the same directory the chrooted gcc 12.2 would look
+# in, and a key of just $(uname -m) would hand the pinned environment an object
+# built by the unpinned host -- silently reintroducing exactly the host
+# contamination `pgb env create` exists to remove. Keying on the compiler's own
+# identity makes the two coexist instead of colliding.
+runtime_dir() {
+  CCB="${PGB_INNER_CC:-${CC:-cc}}"
+  id=$({ $CCB -dumpmachine 2>/dev/null; $CCB --version 2>/dev/null | head -1; } \
+       | cksum | cut -d' ' -f1)
+  printf '%s/runtime-%s-%s' "$PGB_STATE" "$(uname -m)" "${id:-unknown}"
+}
+
+build_runtime() {
+  rd=$(runtime_dir); mkdir -p "$rd" || die "cannot create $rd" 2
+  src="$PGB_SELF/tool/runtime"
+  CCB="${PGB_INNER_CC:-${CC:-cc}}"
+
+  if [ ! -f "$rd/pgb-nssfix.o" ] || [ "$src/pgb-nssfix.c" -nt "$rd/pgb-nssfix.o" ]; then
+    vsay "compiling pgb-nssfix.o"
+    $CCB -O2 -fno-lto -c -o "$rd/pgb-nssfix.o" "$src/pgb-nssfix.c" || die "nssfix build failed"
+  fi
+  if [ "$USE_ICONV" = 1 ] &&
+     { [ ! -f "$rd/libpgbruntime.a" ] || [ "$src/pgb-iconv.c" -nt "$rd/libpgbruntime.a" ]; }; then
+    vsay "compiling libpgbruntime.a"
+    $CCB -O2 -fno-lto -c -o "$rd/pgb-iconv.o" "$src/pgb-iconv.c" || die "iconv shim build failed"
+    rm -f "$rd/libpgbruntime.a"
+    ar rcs "$rd/libpgbruntime.a" "$rd/pgb-iconv.o" || die "ar failed"
+  fi
+  if [ "$EMBED_LOCALE" = 1 ]; then
+    build_locale_data "$rd" "$CCB"
+  fi
+  printf '%s' "$rd"
+}
+
+# Turn a glibc locale directory into a C file of byte arrays.
+build_locale_data() {
+  rd="$1"; CCB="$2"
+  [ -f "$rd/pgb-locale.o" ] && [ -f "$rd/pgb-locale-data.o" ] && return 0
+  srcdir=""
+  for c in /usr/lib/locale/C.utf8 /usr/lib/locale/C.UTF-8; do
+    [ -d "$c" ] && { srcdir="$c"; break; }
+  done
+  [ -n "$srcdir" ] || die "--embed-locale needs a compiled C.UTF-8 on this machine (locale-gen C.UTF-8)" 2
+  vsay "embedding locale from $srcdir"
+  gen="$rd/pgb-locale-data.c"
+  {
+    printf '/* generated by pgb from %s -- do not edit */\n' "$srcdir"
+    printf 'struct pgb_locale_file { const char *name; const unsigned char *data; unsigned len; };\n'
+    # ⛔ `find -type f`, NOT a top-level glob. A glibc locale is a TREE:
+    # LC_MESSAGES is a directory holding SYS_LC_MESSAGES. A glob plus
+    # `[ -f ]` silently drops it, and a locale missing one category fails
+    # the whole LC_ALL composite at run time with no diagnostic anywhere.
+    # The name stored is RELATIVE to the locale root so the separator
+    # survives into the extracted tree.
+    files=$(cd "$srcdir" && find . -type f | sed 's|^\./||' | sort)
+    i=0
+    for f in $files; do
+      printf 'static const unsigned char d%d[] = {' "$i"
+      od -An -v -tu1 < "$srcdir/$f" | tr -s ' ' | tr ' ' '\n' | grep -v '^$' | tr '\n' ','
+      printf '};\n'
+      i=$((i+1))
+    done
+    printf 'const struct pgb_locale_file pgb_locale_files[] = {\n'
+    i=0
+    for f in $files; do
+      printf '  { "%s", d%d, sizeof d%d },\n' "$f" "$i" "$i"
+      i=$((i+1))
+    done
+    printf '};\n'
+    printf 'const unsigned pgb_locale_nfiles = %d;\n' "$i"
+    printf 'const char pgb_locale_name[] = "%s";\n' "$(basename "$srcdir")"
+  } > "$gen"
+  $CCB -O0 -fno-lto -c -o "$rd/pgb-locale-data.o" "$gen" || die "locale data build failed"
+  $CCB -O2 -fno-lto -c -o "$rd/pgb-locale.o" "$PGB_SELF/tool/runtime/pgb-locale.c" || die "locale shim build failed"
+}
+
+link_flags() {
+  rd=$(runtime_dir)
+  printf -- '-static %s -Wl,-u,pgb_runtime_anchor' "$rd/pgb-nssfix.o"
+  if [ "$USE_ICONV" = 1 ]; then
+    printf -- ' -Wl,--wrap=iconv_open,--wrap=iconv,--wrap=iconv_close'
+    printf -- ' -L%s -lpgbruntime -L%s/lib -liconv' "$rd" "$PGB_LIBICONV_PREFIX"
+  fi
+  if [ "$EMBED_LOCALE" = 1 ]; then
+    printf -- ' -Wl,--wrap=setlocale %s %s' "$rd/pgb-locale.o" "$rd/pgb-locale-data.o"
+  fi
+}
+
+compile_flags() {
+  bl="${ARCH_BASELINE:-$(default_baseline)}"
+  [ -n "$bl" ] && printf -- '-march=%s ' "$bl"
+  printf -- '-fno-plt'
+}
+
+make_wrappers() {
+  wd="$PGB_STATE/bin"; rm -rf "$wd"; mkdir -p "$wd" || die "cannot create $wd" 2
+  cf=$(compile_flags); lf=$(link_flags)
+  for pair in "cc:cc" "gcc:gcc" "c++:c++" "g++:g++" "cpp:cpp"; do
+    name=${pair%%:*}; real=${pair##*:}
+    realpath_=$(command -v "$real" 2>/dev/null) || realpath_=""
+    [ -n "$realpath_" ] || continue
+    case "$realpath_" in "$wd"/*) continue ;; esac
+    cat > "$wd/$name" <<EOF
+#!/bin/sh
+# pgb compiler wrapper -- generated, readable on purpose.
+# Real compiler: $realpath_
+REAL="$realpath_"
+CF="$cf"
+LF="$lf"
+mode=link
+for a in "\$@"; do
+  case "\$a" in
+    -c|-E|-S|-M|-MM)          mode=compile ;;
+    -shared|-dynamiclib)      mode=shared ;;
+    # ⛔ A QUERY MUST NEVER BE DECORATED. configure, libtool and CMake all
+    # parse the OUTPUT of these; adding flags changes what they read and the
+    # build then makes decisions on a value pgb invented.
+    -print-*|--print-*|-dumpmachine|-dumpversion|-dumpspecs|--version|-V)
+      exec "\$REAL" "\$@" ;;
+  esac
+done
+case "\$mode" in
+  compile) [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[compile] \$REAL \$* \$CF" >&2
+           exec "\$REAL" "\$@" \$CF ;;
+  shared)  [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[shared,passthrough] \$REAL \$*" >&2
+           exec "\$REAL" "\$@" ;;
+  link)    [ -n "\${PGB_VERBOSE:-}" ] && echo "pgb[link] \$REAL \$* \$CF \$LF" >&2
+           exec "\$REAL" "\$@" \$CF \$LF ;;
+esac
+EOF
+    chmod +x "$wd/$name"
+  done
+  printf '%s' "$wd"
+}
+
+# ---------------------------------------------------------------------------
+# build / shell
+# ---------------------------------------------------------------------------
+export_options() {
+  export PGB_OPT_VERBOSE="$VERBOSE" PGB_OPT_EMBED_LOCALE="$EMBED_LOCALE" \
+         PGB_OPT_USE_ICONV="$USE_ICONV" PGB_OPT_BASELINE="$ARCH_BASELINE" \
+         PGB_STATE="$PGB_STATE" PGB_LIBICONV_PREFIX="$PGB_LIBICONV_PREFIX"
+}
+
+cmd_build() {
+  [ $# -gt 0 ] || die "pgb build needs a command, e.g. pgb build -- make" 2
+  export_options
+  eng=$(pick_engine)
+  case "$eng" in
+    chroot)
+      r=$(env_root)
+      [ -d "$r" ] || die "no build environment. run: pgb env create" 2
+      wrk=$(pwd)
+      # ⭐ The source tree is bind-mounted at the SAME path inside, so every
+      # absolute path a build system bakes into a Makefile still resolves.
+      exec sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" \
+           --bind "$wrk:$wrk" --bind "$PGB_SELF:$PGB_SELF" \
+           --bind "$PGB_STATE:$PGB_STATE" --workdir "$wrk" \
+           -- /bin/sh -c 'PGB_INNER=1 "$0" __inner-build "$@"' "$PGB_SELF/pgb" "$@"
+      ;;
+    host)
+      inner_build "$@"
+      ;;
+    docker|podman)
+      wrk=$(pwd)
+      exec $eng run --rm -v "$wrk:$wrk" -v "$PGB_SELF:$PGB_SELF" -w "$wrk" \
+        -e PGB_INNER=1 "pgb-env:$PGB_VERSION" \
+        /bin/sh -c "$PGB_SELF/pgb __inner-build $*"
+      ;;
+  esac
+}
+
+inner_build() {
+  rd=$(build_runtime)
+  wd=$(make_wrappers)
+  export PATH="$wd:$PATH"
+  export CC="$wd/cc" CXX="$wd/c++"
+  [ "$VERBOSE" = 1 ] && export PGB_VERBOSE=1
+  vsay "wrappers: $wd"
+  vsay "runtime:  $rd"
+  "$@"
+}
+
+cmd_shell() {
+  eng=$(pick_engine)
+  r=$(env_root)
+  case "$eng" in
+    chroot)
+      [ -d "$r" ] || die "no build environment. run: pgb env create" 2
+      export_options
+      wrk=$(pwd)
+      exec sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" \
+           --bind "$wrk:$wrk" --bind "$PGB_SELF:$PGB_SELF" \
+           --bind "$PGB_STATE:$PGB_STATE" --workdir "$wrk" \
+           -- /bin/sh -c 'PGB_INNER=1 "$0" __inner-shell' "$PGB_SELF/pgb"
+      ;;
+    *) inner_build "${SHELL:-/bin/sh}" ;;
+  esac
+}
+
+# ---------------------------------------------------------------------------
+# verify -- the part that refuses to accept `file` as an answer
+# ---------------------------------------------------------------------------
+cmd_verify() {
+  bin="${1:-}"
+  [ -n "$bin" ] && [ -f "$bin" ] || die "pgb verify NEEDS a binary" 2
+  shift
+  rc=0
+  say "pgb verify: $bin"
+  say ""
+  say "  -- static inspection (NOT the success criterion) -------------------"
+  printf '    %-22s %s\n' "size" "$(wc -c < "$bin") bytes"
+  printf '    %-22s %s\n' "file" "$(file -b "$bin" 2>/dev/null | cut -c1-90)"
+  interp=$(readelf -l "$bin" 2>/dev/null | grep -c 'INTERP' || true)
+  printf '    %-22s %s\n' "PT_INTERP" "$([ "${interp:-0}" -gt 0 ] && echo present || echo absent)"
+  needed=$(readelf -d "$bin" 2>/dev/null | grep -c 'NEEDED' || true)
+  printf '    %-22s %s\n' "DT_NEEDED entries" "${needed:-0}"
+  printf '    %-22s %s\n' "nssfix linked in" \
+    "$(strings -a "$bin" 2>/dev/null | grep -qx 'pgb-runtime' && echo yes || echo 'NO -- not a pgb binary')"
+  say ""
+  say "    ⚠ None of the above is the test. A binary can satisfy every line"
+  say "      here and still die on Arch. The next section is the test."
+  say ""
+
+  say "  -- runtime, across the pinned matrix -------------------------------"
+  list="$PGB_SELF/scripts/common/rootfs-images.txt"
+  [ -f "$list" ] || die "missing $list" 2
+  any=0
+  printf '    %-20s %-6s %-8s %s\n' ENVIRONMENT LIBC RESULT 'HOST OBJECTS IT LOADED'
+  while read -r ref name libc digest; do
+    case "$ref" in ''|\#*) continue ;; esac
+    root="$PGB_ROOTFS_DIR/$name"
+    [ -d "$root" ] || { printf '    %-20s %-6s %-8s %s\n' "$name" "$libc" "-" "not fetched"; continue; }
+    any=1
+    base=$(basename "$bin")
+    cp "$bin" "$root/$base" 2>/dev/null || { printf '    %-20s copy failed\n' "$name"; rc=1; continue; }
+    if [ $# -gt 0 ]; then
+      sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "/$base" "$@" >/dev/null 2>&1
+    else
+      sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "/$base" >/dev/null 2>&1
+    fi
+    st=$?
+    case $st in
+      0) res=ok ;;
+      13[0-9]|1[4-6][0-9]) res="SIG$((st-128))"; rc=1 ;;
+      *) res="exit$st"; rc=1 ;;
+    esac
+    libs=$(trace_host_objects "$root" "/$base" "$@")
+    printf '    %-20s %-6s %-8s %s\n' "$name" "$libc" "$res" "${libs:-none}"
+    [ -n "$libs" ] && rc=1
+    rm -f "$root/$base"
+  done < "$list"
+  [ "$any" = 1 ] || { say "    nothing to run against. sh scripts/common/fetch-rootfs.sh"; return 2; }
+  say ""
+  if [ "$rc" = 0 ]; then
+    say "  VERDICT: ran on every fetched environment and loaded no host object."
+  else
+    say "  VERDICT: NOT portable as built. A non-zero exit or a host object"
+    say "           above is a real failure, not a labelling quibble."
+  fi
+  return $rc
+}
+
+# Report shared objects and gconv/NSS data the binary itself opened.
+trace_host_objects() {
+  root="$1"; inner="$2"; shift 2
+  command -v strace >/dev/null 2>&1 || { printf ''; return; }
+  t=$(mktemp) || { printf ''; return; }
+  strace -f -e trace=openat,open,execve -o "$t" \
+    sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "$inner" "$@" >/dev/null 2>&1
+  awk -v want="$inner" '
+    { pid = $1 }
+    $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }
+    seen && pid == target && /open(at)?\(/ && !/ENOENT|= -1/ { print }
+  ' "$t" | grep -oE '"[^"]*\.so[^"]*"|"[^"]*gconv[^"]*"' | tr -d '"' | sort -u | tr '\n' ' '
+  rm -f "$t"
+}
+
+# ---------------------------------------------------------------------------
+CMD=""
+ARGS_DONE=0
+while [ $# -gt 0 ]; do
+  if [ "$ARGS_DONE" = 1 ]; then break; fi
+  case "$1" in
+    -v|--verbose)     VERBOSE=1 ;;
+    --embed-locale)   EMBED_LOCALE=1 ;;
+    --no-iconv)       USE_ICONV=0 ;;
+    --arch-baseline)  shift; ARCH_BASELINE="${1:-}" ;;
+    --engine)         shift; ENGINE="${1:-}" ;;
+    -h|--help)        usage; exit 0 ;;
+    --version)        say "pgb $PGB_VERSION"; exit 0 ;;
+    --)               shift; ARGS_DONE=1; break ;;
+    -*)               die "unknown option: $1" 2 ;;
+    *)                if [ -z "$CMD" ]; then CMD="$1"; else break; fi ;;
+  esac
+  shift
+done
+
+mkdir -p "$PGB_STATE" 2>/dev/null || true
+
+case "${CMD:-}" in
+  doctor)         cmd_doctor ;;
+  explain)        cmd_explain ;;
+  env)            cmd_env "$@" ;;
+  build)          cmd_build "$@" ;;
+  shell)          cmd_shell ;;
+  cc-dir)         build_runtime >/dev/null; make_wrappers; printf '\n' ;;
+  verify)         cmd_verify "$@" ;;
+  __inner-build)  inner_build "$@" ;;
+  __inner-shell)  inner_build "${SHELL:-/bin/sh}" ;;
+  ""|help)        usage ;;
+  *)              die "unknown command: $CMD (try: pgb help)" 2 ;;
+esac
