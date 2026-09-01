@@ -1,10 +1,14 @@
 # The package front end: nix, ruled by the operator
 
-⛔ **This page records a DECISION and a READING LIST. Nothing on it has been
-built, and — apart from what is explicitly marked measured — nothing on it has
-been verified.** It was written at the end of the session of 2026-09-01b, at
-the operator's instruction, immediately before that session ended. The mining
-it calls for is the **first task of the next session**.
+⛔ **THE MINING IS DONE AND MOST OF THIS PAGE IS NOW HISTORY.** It was written
+at the end of the session of 2026-09-01b as a decision plus a reading list,
+with nothing verified. The session of 2026-09-01c mined all six references,
+built the front end, and measured the questions this page could not answer.
+
+⭐ **Read [`../research/nix.md`](../research/nix.md) instead of this page** for
+what is true; it carries the findings, the instruments and the known-weak
+claims. This page is kept for the ruling it records verbatim and for the
+answers now written under each open question below.
 
 ---
 
@@ -113,16 +117,38 @@ Then, and only then:
 3. answer the operator's open question about desktop files, below;
 4. turn the answer into `TODO` entries under T-012 and T-022, sized.
 
-## ⛔ Open questions this page cannot answer
+## The open questions, ANSWERED
 
-1. **Desktop files, icons and MIME data.** The operator asks for a way to get
-   them "automatically". nixpkgs derivations do carry them, in known places
-   under a store path. ⚠ Whether that generalises, and whether this project
-   should be shipping desktop integration at all when its output is *one
-   ordinary ELF*, is unanswered.
-2. **Does taking the nixpkgs graph make `pgb` depend on nix at RUN time?** It
-   must not. If the answer to "fetch without installing nix" is no, then the
-   dependency is a build-time one and needs saying out loud.
-3. **What happens to `--wrap-dlopen` and the four runtime mechanisms** when the
-   sources come from nixpkgs rather than an upstream tarball? Nothing suggests
-   they break; nothing has checked.
+1. **Desktop files, icons and MIME data.** ✅ **Automatic, and no patching.**
+   A nixpkgs derivation installs them where the freedesktop spec says, so
+   finding them is a `find` and not a rule per application.
+   `tool/nix-appimage.sh` does it, and so does the soarpkgs chromium recipe
+   this page pointed at.
+   ⛔ **With one trap, paid for here:** a closure carries every dependency's
+   `share/` too, so the first `.desktop` in the merged tree was **GTK's own**
+   `gtk3-widget-factory.desktop`. The application's own store path is searched
+   first now.
+2. **Does taking the nixpkgs graph make `pgb` depend on nix at RUN time?**
+   ✅ **No, and less than expected at BUILD time either.** `pgb nix build`
+   from a saved plan needs no nix; and `pgb nix plan` itself now has a
+   nix-free route, because a `.drv` is a store path in the binary cache like
+   any other. ⚠ That route resolves **47% of named packages** and 3% of the
+   store at large (`experiments/83-`), so evaluation stays as the fallback —
+   `TODO` T-050 and T-051 carry what is left.
+3. **What happens to `--wrap-dlopen` and the four runtime mechanisms** when
+   the sources come from nixpkgs? ⚠ **Still unchecked, and now checkable.**
+   Every package built through the front end so far — bash, gawk, jq, sqlite,
+   htop, tmux — went through the ordinary `pgb build` path with all four
+   mechanisms on, and all eleven rows are clean for the two that were
+   verified. Nothing has yet built a nixpkgs package that *needs*
+   `--wrap-dlopen`.
+
+## ⛔ What the mining found that this page did not expect
+
+- **`pkgsStatic` is musl.** The reference recipe this page names builds a
+  **musl** static bash. `pgb` is the glibc half, not a competitor.
+- **The `.drv` files are in the cache.** The operator asked; they are; the
+  rate is measured.
+- **nix-ld maps ELF segments itself** rather than exec'ing the real loader,
+  which makes it a reference for `TODO` T-033 route D rather than for this
+  page.

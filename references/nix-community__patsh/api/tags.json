@@ -1,0 +1,62 @@
+[
+ {
+  "name": "v0.2.1",
+  "zipball_url": "https://api.github.com/repos/nix-community/patsh/zipball/refs/tags/v0.2.1",
+  "tarball_url": "https://api.github.com/repos/nix-community/patsh/tarball/refs/tags/v0.2.1",
+  "commit": {
+   "sha": "3f740f0e7b9f17f61e6445a1d00e5d87805174c5",
+   "url": "https://api.github.com/repos/nix-community/patsh/commits/3f740f0e7b9f17f61e6445a1d00e5d87805174c5"
+  },
+  "node_id": "REF_kwDOIgUYcrByZWZzL3RhZ3MvdjAuMi4x"
+ },
+ {
+  "name": "v0.2.0",
+  "zipball_url": "https://api.github.com/repos/nix-community/patsh/zipball/refs/tags/v0.2.0",
+  "tarball_url": "https://api.github.com/repos/nix-community/patsh/tarball/refs/tags/v0.2.0",
+  "commit": {
+   "sha": "028a17ba2994db9f76b83dfe7da0ad1ea9c4b3d9",
+   "url": "https://api.github.com/repos/nix-community/patsh/commits/028a17ba2994db9f76b83dfe7da0ad1ea9c4b3d9"
+  },
+  "node_id": "REF_kwDOIgUYcrByZWZzL3RhZ3MvdjAuMi4w"
+ },
+ {
+  "name": "v0.1.3",
+  "zipball_url": "https://api.github.com/repos/nix-community/patsh/zipball/refs/tags/v0.1.3",
+  "tarball_url": "https://api.github.com/repos/nix-community/patsh/tarball/refs/tags/v0.1.3",
+  "commit": {
+   "sha": "55072503e01fc33ba7fcf52f43f6fd02b0154a91",
+   "url": "https://api.github.com/repos/nix-community/patsh/commits/55072503e01fc33ba7fcf52f43f6fd02b0154a91"
+  },
+  "node_id": "REF_kwDOIgUYcrByZWZzL3RhZ3MvdjAuMS4z"
+ },
+ {
+  "name": "v0.1.2",
+  "zipball_url": "https://api.github.com/repos/nix-community/patsh/zipball/refs/tags/v0.1.2",
+  "tarball_url": "https://api.github.com/repos/nix-community/patsh/tarball/refs/tags/v0.1.2",
+  "commit": {
+   "sha": "dba81073bfb006cee68e90de8739c0556fbbdfee",
+   "url": "https://api.github.com/repos/nix-community/patsh/commits/dba81073bfb006cee68e90de8739c0556fbbdfee"
+  },
+  "node_id": "REF_kwDOIgUYcrByZWZzL3RhZ3MvdjAuMS4y"
+ },
+ {
+  "name": "v0.1.1",
+  "zipball_url": "https://api.github.com/repos/nix-community/patsh/zipball/refs/tags/v0.1.1",
+  "tarball_url": "https://api.github.com/repos/nix-community/patsh/tarball/refs/tags/v0.1.1",
+  "commit": {
+   "sha": "bf86f4a889cad32ef236aed51ec1b4158da0efd7",
+   "url": "https://api.github.com/repos/nix-community/patsh/commits/bf86f4a889cad32ef236aed51ec1b4158da0efd7"
+  },
+  "node_id": "REF_kwDOIgUYcrByZWZzL3RhZ3MvdjAuMS4x"
+ },
+ {
+  "name": "v0.1.0",
+  "zipball_url": "https://api.github.com/repos/nix-community/patsh/zipball/refs/tags/v0.1.0",
+  "tarball_url": "https://api.github.com/repos/nix-community/patsh/tarball/refs/tags/v0.1.0",
+  "commit": {
+   "sha": "31455a0b541d9dab81a65216a1efbb7c184eaac0",
+   "url": "https://api.github.com/repos/nix-community/patsh/commits/31455a0b541d9dab81a65216a1efbb7c184eaac0"
+  },
+  "node_id": "REF_kwDOIgUYcrByZWZzL3RhZ3MvdjAuMS4w"
+ }
+]

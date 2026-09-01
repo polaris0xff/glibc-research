@@ -265,3 +265,64 @@ building **above the current class**, and that is the different question
 `poc/80-mlt` answers above: what breaks when the *dependency graph* gets
 large, rather than what breaks when a known-good project is deliberately
 configured the hard way.
+
+## T-054 — kdenlive, static: exhaust it
+
+**Source** ⭐ **operator, 2026-09-01c**: *"is there something about static
+kdenlive in our research, did we actually build/prove it was possible to build
+it statically?"* — and then: *"poc a kdenlive static (exhaust all resources)"*.
+**Category** poc · **Priority** P1 · **Effort** L · **Status** open
+
+⭐ **The answer to the question, precisely, because the record has it.**
+`poc/80-mlt` built **kdenlive's ENGINE** statically and proved it on the
+matrix: ffmpeg 7.1 with a 142 MB `libavcodec.a`, MLT 7.30.0, and a **105 MB
+static `melt`** with eight `dlopen`'d modules compiled in, **rendering a real
+MP4 on 11 of 11 with zero host shared objects**
+(`evidence/poc/80-mlt/RESULT.txt`). ⛔ **Qt 6 and KDE Frameworks were NOT
+attempted, and kdenlive itself was not attempted** — that POC says so in its
+own "depth reached" section. So: the engine is proved, the application is not,
+and nobody has yet shown either that it can or that it cannot be done.
+
+**Two failures worth carrying forward**, both from that POC and both about the
+build system rather than the code:
+- MLT hard-codes `add_library(mlt SHARED)` at `src/framework/CMakeLists.txt:36`,
+  so `BUILD_SHARED_LIBS` cannot turn it off and the answer is a link line;
+- its `avformat` module cannot be built as a shared object against a static
+  ffmpeg (`R_X86_64_PC32 against ff_pw_5`) while **the same objects link into
+  a static executable perfectly**.
+
+**What "exhaust" means here.** Qt 6 supports `-static`; KF6 is the open
+question, and so is whether Qt's own plugin system (`QPA`, image formats,
+`libqxcb`) can be served by `--wrap-dlopen`, which POC 70 proved on SQLite's
+open plugin ABI. ⛔ Per `docs/AGENTS.md` §14 this entry does not close as
+"impossible"; it closes with what was tried, at file and line, and what broke.
+
+**Prove.** `evidence/poc/90-kdenlive/RESULT.txt`, or a written record of the
+rung that stopped it with the error and the file it came from — the shape
+`evidence/72-static-host-plugin-abi/CPYTHON-FAILURE.txt` already uses.
+
+## T-055 — If static will not reach it, a kdenlive bundle that BEATS the field
+
+**Source** operator, 2026-09-01c: *"if impossible, pivot to
+kdenlive.nixappimage, but it must be smaller, load faster, run faster than
+pkgforge-dev/kdenlive-AppImage-Enhanced"*.
+**Category** poc · **Priority** P1 · **Effort** L · **Status** open
+
+⛔ **THE BAR IS A COMPARISON, NOT A BUILD.** An AppImage that works is not
+this entry; three measured columns against a named competitor is. And
+`docs/AGENTS.md` §14 forbids writing "strictly better" without the
+measurement, so the columns come first:
+
+| column | how, and the instrument that already exists |
+|---|---|
+| size | bytes, both artefacts, same day |
+| load | first-run and warm-run startup, `experiments/40-`'s method, and ⚠ its noise floor applies — a difference at or under it is "no difference measurable" |
+| run | a real render, `poc/80-mlt`'s MP4 workload, wall clock |
+
+⚠ **And the honest risk, named now:** the competitor is hand-crafted per
+application by people who do this full time, and `Anylinux-AppImages`'
+README lists dozens built that way. Beating it by automation is the claim
+worth making and it is not the same claim as beating it at all.
+
+**Blocked on** T-054 answering first, and on T-052, because a video editor is
+exactly the case where the OpenGL question decides whether the bundle runs.

@@ -620,7 +620,7 @@ Same class as T-014: a documented capability quietly doing something else.
 **Source** ⭐ **operator, session of 2026-09-01c**, quoted because the question
 is the finding: *"I think the downloaded nix store files themselves contain
 \*.drv files? so we don't actually need nix installed no?"*
-**Category** toolchain · **Priority** P1 · **Effort** M · **Status** ⚠ partly done
+**Category** toolchain · **Priority** P1 · **Effort** M · **Status** ⚠partly
 
 **They are right, and it is measured.** A narinfo names its own producer
 (`Deriver: <hash>-<name>.drv`), that `.drv` is **itself a store path in the

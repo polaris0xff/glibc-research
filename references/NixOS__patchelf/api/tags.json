@@ -1,0 +1,342 @@
+[
+ {
+  "name": "0.19.1",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.19.1",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.19.1",
+  "commit": {
+   "sha": "7688b17c18d16f67fa8d5a82a2404c2e3a18648d",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/7688b17c18d16f67fa8d5a82a2404c2e3a18648d"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xOS4x"
+ },
+ {
+  "name": "0.19.0",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.19.0",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.19.0",
+  "commit": {
+   "sha": "1e279e99b952c765824fa0401abb8dc0d944e4ea",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/1e279e99b952c765824fa0401abb8dc0d944e4ea"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xOS4w"
+ },
+ {
+  "name": "0.18.0",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.18.0",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.18.0",
+  "commit": {
+   "sha": "99c24238981b7b1084313aca8f5c493bb46f302c",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/99c24238981b7b1084313aca8f5c493bb46f302c"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xOC4w"
+ },
+ {
+  "name": "0.17.2",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.17.2",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.17.2",
+  "commit": {
+   "sha": "5908e16cd562bcb1909be4de0409c4912a8afc52",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/5908e16cd562bcb1909be4de0409c4912a8afc52"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNy4y"
+ },
+ {
+  "name": "0.17.1",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.17.1",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.17.1",
+  "commit": {
+   "sha": "583fd5a3607aafeb043e6b0e2a4240193e2421ed",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/583fd5a3607aafeb043e6b0e2a4240193e2421ed"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNy4x"
+ },
+ {
+  "name": "0.17.0",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.17.0",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.17.0",
+  "commit": {
+   "sha": "ad0265668f12eff59027259345fed4b0f315336a",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/ad0265668f12eff59027259345fed4b0f315336a"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNy4w"
+ },
+ {
+  "name": "0.16.1",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.16.1",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.16.1",
+  "commit": {
+   "sha": "438d23e29c73beb8f16e04efe2a91daa6819ef34",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/438d23e29c73beb8f16e04efe2a91daa6819ef34"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNi4x"
+ },
+ {
+  "name": "0.16.0",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.16.0",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.16.0",
+  "commit": {
+   "sha": "af77f12554be9cc4b9e8b639df26f2659dd30500",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/af77f12554be9cc4b9e8b639df26f2659dd30500"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNi4w"
+ },
+ {
+  "name": "0.15.5",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.15.5",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.15.5",
+  "commit": {
+   "sha": "cac8c90eaab21f1f4b10a3f6bfdbb7dedcbfe28a",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/cac8c90eaab21f1f4b10a3f6bfdbb7dedcbfe28a"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNS41"
+ },
+ {
+  "name": "0.15.4",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.15.4",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.15.4",
+  "commit": {
+   "sha": "5f773e4a1a4ecf233a87f344d0ada45933cacaa5",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/5f773e4a1a4ecf233a87f344d0ada45933cacaa5"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNS40"
+ },
+ {
+  "name": "0.15.3",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.15.3",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.15.3",
+  "commit": {
+   "sha": "35f952fd24fa6245f0060bae4807a09cec9c1426",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/35f952fd24fa6245f0060bae4807a09cec9c1426"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNS4z"
+ },
+ {
+  "name": "0.15.2",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.15.2",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.15.2",
+  "commit": {
+   "sha": "58f5b195036b1e37ee2e15301dfa96a2673327da",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/58f5b195036b1e37ee2e15301dfa96a2673327da"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNS4y"
+ },
+ {
+  "name": "0.15.1",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.15.1",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.15.1",
+  "commit": {
+   "sha": "db8cbe93f20d5b676c82ac2e093e94b87f249ceb",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/db8cbe93f20d5b676c82ac2e093e94b87f249ceb"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNS4x"
+ },
+ {
+  "name": "0.15.0",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.15.0",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.15.0",
+  "commit": {
+   "sha": "49008002562355b0e35075cbc1c42c645ff04e28",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/49008002562355b0e35075cbc1c42c645ff04e28"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNS4w"
+ },
+ {
+  "name": "0.14.5",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.14.5",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.14.5",
+  "commit": {
+   "sha": "a35054504293f9ff64539850d1ed0bfd2f5399f2",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/a35054504293f9ff64539850d1ed0bfd2f5399f2"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNC41"
+ },
+ {
+  "name": "0.14.4",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.14.4",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.14.4",
+  "commit": {
+   "sha": "df7c57a032e62b0e34d1a63e96278cf5e8782c67",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/df7c57a032e62b0e34d1a63e96278cf5e8782c67"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNC40"
+ },
+ {
+  "name": "0.14.3",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.14.3",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.14.3",
+  "commit": {
+   "sha": "bf3f37ec29edcdb3e2a163edaf84aeece39f8c9d",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/bf3f37ec29edcdb3e2a163edaf84aeece39f8c9d"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNC4z"
+ },
+ {
+  "name": "0.14.2",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.14.2",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.14.2",
+  "commit": {
+   "sha": "2ac5798fdc79762ceee520b2b3b4758f7f97b17e",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/2ac5798fdc79762ceee520b2b3b4758f7f97b17e"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNC4y"
+ },
+ {
+  "name": "0.14.1",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.14.1",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.14.1",
+  "commit": {
+   "sha": "8f7b4a7a3648970fe55824cfee2afd3808626a3f",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/8f7b4a7a3648970fe55824cfee2afd3808626a3f"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNC4x"
+ },
+ {
+  "name": "0.14",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.14",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.14",
+  "commit": {
+   "sha": "babde50a1ff8767c6c8cf38d080eb0f4abb60142",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/babde50a1ff8767c6c8cf38d080eb0f4abb60142"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xNA=="
+ },
+ {
+  "name": "0.13.1",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.13.1",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.13.1",
+  "commit": {
+   "sha": "72b6d44327ffec3182cbb8d42feeafebb5ab93e7",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/72b6d44327ffec3182cbb8d42feeafebb5ab93e7"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xMy4x"
+ },
+ {
+  "name": "0.13",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.13",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.13",
+  "commit": {
+   "sha": "a949ff23315bbb5863627c4655fe216ecbf341a2",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/a949ff23315bbb5863627c4655fe216ecbf341a2"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xMw=="
+ },
+ {
+  "name": "0.12",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.12",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.12",
+  "commit": {
+   "sha": "8d3a16e97294e3c5521c61b4c8835499c9918264",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/8d3a16e97294e3c5521c61b4c8835499c9918264"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xMg=="
+ },
+ {
+  "name": "0.11",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.11",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.11",
+  "commit": {
+   "sha": "d6b2a72d9ec3bdfde4b1aacdada823ce388968bb",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/d6b2a72d9ec3bdfde4b1aacdada823ce388968bb"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xMQ=="
+ },
+ {
+  "name": "0.10",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.10",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.10",
+  "commit": {
+   "sha": "e1e39f3639e39360ceebb2f7ed533cede4623070",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/e1e39f3639e39360ceebb2f7ed533cede4623070"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4xMA=="
+ },
+ {
+  "name": "0.9",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.9",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.9",
+  "commit": {
+   "sha": "44b7f9583ffe0ee09c4da8bd996ef9a6a0017e1a",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/44b7f9583ffe0ee09c4da8bd996ef9a6a0017e1a"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC45"
+ },
+ {
+  "name": "0.8",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.8",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.8",
+  "commit": {
+   "sha": "21a85cc1c63cf3ef060ece59cdd82455e2884703",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/21a85cc1c63cf3ef060ece59cdd82455e2884703"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC44"
+ },
+ {
+  "name": "0.7",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.7",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.7",
+  "commit": {
+   "sha": "e6b9f431e4d5c7122112812d905bb2f921afa939",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/e6b9f431e4d5c7122112812d905bb2f921afa939"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC43"
+ },
+ {
+  "name": "0.6",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.6",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.6",
+  "commit": {
+   "sha": "ea21044d4723204b76286f91af7b2f39e25d1826",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/ea21044d4723204b76286f91af7b2f39e25d1826"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC42"
+ },
+ {
+  "name": "0.5",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.5",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.5",
+  "commit": {
+   "sha": "3be9c9b32f3bb43b9b31806aade2779126a5bcbd",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/3be9c9b32f3bb43b9b31806aade2779126a5bcbd"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC41"
+ },
+ {
+  "name": "0.4",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.4",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.4",
+  "commit": {
+   "sha": "7925a4c07d358e9343b79db8f7684fd720611562",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/7925a4c07d358e9343b79db8f7684fd720611562"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC40"
+ },
+ {
+  "name": "0.3",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.3",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.3",
+  "commit": {
+   "sha": "6da9c264f3ff4335a73e15c77d0535dab5179c96",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/6da9c264f3ff4335a73e15c77d0535dab5179c96"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4z"
+ },
+ {
+  "name": "0.2",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.2",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.2",
+  "commit": {
+   "sha": "54ec53d9f376d95eb4eb439c67bbd1d387ed6017",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/54ec53d9f376d95eb4eb439c67bbd1d387ed6017"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4y"
+ },
+ {
+  "name": "0.1",
+  "zipball_url": "https://api.github.com/repos/NixOS/patchelf/zipball/refs/tags/0.1",
+  "tarball_url": "https://api.github.com/repos/NixOS/patchelf/tarball/refs/tags/0.1",
+  "commit": {
+   "sha": "84ee51e3602b4a9eaae5024f1551317e9daf4485",
+   "url": "https://api.github.com/repos/NixOS/patchelf/commits/84ee51e3602b4a9eaae5024f1551317e9daf4485"
+  },
+  "node_id": "MDM6UmVmMjkyODE2NDpyZWZzL3RhZ3MvMC4x"
+ }
+]
