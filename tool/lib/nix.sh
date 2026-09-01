@@ -614,6 +614,7 @@ nix_build_tree() {   # srcdir planfile workdir [install]
   _top="$1"; _pf="$2"; _work="$3"; _inst="${4:-}"
   _log="$_work/build.log"
   : > "$_work/adaptations.txt"
+  : > "$_work/adaptations.txt.seen"
 
   # nixpkgs' configure flags, minus the ones naming a /nix/store path: those
   # point at a dependency that does not exist outside nix, and keeping them
@@ -621,6 +622,23 @@ nix_build_tree() {   # srcdir planfile workdir [install]
   _flags=""
   for _f in $(plan_get "$_pf" configureFlags); do
     case "$_f" in
+      # ⭐ A STORE-PATH FLAG IS REPOINTED AT OUR PREFIX BEFORE IT IS DROPPED,
+      # and that is a better answer than dropping it. `--with-openssl=/nix/
+      # store/...` says the package WANTS openssl and names where nixpkgs put
+      # it; if the dependency walk built openssl into $NIX_PREFIX, the flag is
+      # still right, only the path is wrong. Measured on curl: with the flag
+      # simply dropped, configure ended with "select TLS backend(s)" and a
+      # list -- a failure caused by our own filter rather than by anything
+      # missing.
+      --with-*=/nix/store/*|--enable-*=/nix/store/*)
+        _fname=${_f%%=*}; _fname=${_fname#--with-}; _fname=${_fname#--enable-}
+        if [ -e "$NIX_PREFIX/.built/$_fname" ]; then
+          say "repointed $_f -> ${_f%%=*}=$NIX_PREFIX"
+          _flags="$_flags ${_f%%=*}=$NIX_PREFIX"
+        else
+          warn "dropped store-path flag (no $_fname in the static prefix): $_f"
+        fi
+        continue ;;
       */nix/store/*|--*=/nix/store/*)
         warn "dropped store-path flag: $_f"; continue ;;
       # ⛔ FLAGS THAT CONTRADICT THE ENTIRE POINT. nixpkgs builds shared
@@ -662,6 +680,21 @@ nix_build_tree() {   # srcdir planfile workdir [install]
       tail -30 "$_log" | sed 's/^/  /' >&2
       return 1
     fi
+    # ⛔ THE SAME ADAPTATION TWICE IS NOT PROGRESS, IT IS A LOOP, AND THIS
+    # LOOP RAN. tmux's configure refuses for want of libevent; the rule fired
+    # `add:--disable-utf8proc`, the flag changed nothing about libevent, and
+    # the next round diagnosed the same failure and appended it AGAIN. Round 8
+    # ended with the flag repeated seven times and the same error underneath.
+    # ⭐ A fix that has already been applied means the diagnoser is wrong about
+    # this failure, so the honest move is to stop and print the real error.
+    if grep -qxF "$_fix" "$_work/adaptations.txt.seen" 2>/dev/null; then
+      say ""
+      warn "adaptation '$_fix' was already applied and the build failed the same way."
+      warn "That is a wrong diagnosis, not a missing round. Last 30 lines:"
+      tail -30 "$_log" | sed 's/^/  /' >&2
+      return 1
+    fi
+    printf '%s\n' "$_fix" >> "$_work/adaptations.txt.seen"
     printf 'round %s: %s\n' "$_round" "$_fix" >> "$_work/adaptations.txt"
     say "round $_round: FAILED -> $_fix"
     case "$_fix" in
@@ -730,7 +763,15 @@ nix_try_build() {   # srcdir flags log hooks [install]
       _mk="make -j $_j SHARED=no prefix=$NIX_PREFIX PREFIX=$NIX_PREFIX $NIX_MAKE_FLAGS"
       _mki=""
       [ -n "$_in" ] && _mki=" && make install SHARED=no prefix=$NIX_PREFIX PREFIX=$NIX_PREFIX $NIX_MAKE_FLAGS"
-      _cmd="if [ -x ./configure ]; then ./configure --prefix=$NIX_PREFIX --disable-shared --enable-static $_fl && make -j $_j $_instcmd; else $_mk$_mki; fi" ;;
+      # ⚠ openssl's build system is `./Configure` (a perl script) plus
+      # `./config` (its autodetecting wrapper) and it takes `no-shared` rather
+      # than `--disable-shared`. It is not a one-package quirk: several
+      # libraries carry the same shape, and without this branch openssl fell
+      # into the plain-make path, failed, and took libevent -- and therefore
+      # tmux -- down with it.
+      _cmd="if [ -x ./configure ]; then ./configure --prefix=$NIX_PREFIX --disable-shared --enable-static $_fl && make -j $_j $_instcmd;
+            elif [ -x ./config ] && [ -f ./Configure ]; then ./config no-shared no-tests --prefix=$NIX_PREFIX --openssldir=$NIX_PREFIX/ssl && make -j $_j $_instcmd;
+            else $_mk$_mki; fi" ;;
   esac
 
   sh "$PGB_SELF/pgb" build --bind "$_t:$_t" --bind "$NIX_PREFIX:$NIX_PREFIX" -- sh -c "
@@ -790,11 +831,22 @@ nix_diagnose() {   # log srcdir flags -> a fix directive, or nothing
     fi
   done
 
-  # A configure that cannot find a library it considers mandatory, where the
-  # feature has no flag: say so with the library named, so the caller can add
-  # it to the plan's dependencies rather than guess.
-  if grep -qE 'configure: error: "?libevent not found' "$_lg" 2>/dev/null; then
-    printf 'add:--disable-utf8proc\n'; return 0
+  # ⭐ THE BEST RULE IN THIS FUNCTION, BECAUSE IT IS NOT A RULE ABOUT ANY
+  # PARTICULAR PACKAGE. autoconf's own error text very often names the flag
+  # that turns the missing thing off:
+  #
+  #   configure: error: openssl is a must but can not be found. You should add
+  #   ... or use `--disable-openssl' to disable support for openssl encryption
+  #
+  # Taking the flag from the message is targeted -- the package said it -- and
+  # it is the opposite of trying flags until one works.
+  _sugg=$(grep -oE "use \`--(disable|without)-[A-Za-z0-9_-]+'" "$_lg" 2>/dev/null \
+          | head -1 | sed "s/^use \`//; s/'\$//")
+  if [ -n "$_sugg" ]; then
+    case " $_flags " in
+      *" $_sugg "*) ;;
+      *) printf 'add:%s\n' "$_sugg"; return 0 ;;
+    esac
   fi
 
   # ncurses 6.6 through a nixpkgs plan. nixpkgs pins the autoconf cache

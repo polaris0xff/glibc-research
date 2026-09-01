@@ -84,9 +84,17 @@ PGB_ENV_NAME="${PGB_ENV_NAME:-pgb-env-debian12}"
 # carried a generated `configure`. ⚠ That is why all five POCs are autotools
 # tarballs: it was the only build system the environment supported, and
 # nothing said so. TODO T-016.
+# ⛔ AND THE PARSER GENERATORS WERE MISSING TOO, WHICH IS THE SAME DEFECT AS
+# THE ONE ABOVE, FOUND THE SAME WAY. `pgb nix build tmux` fetched the source,
+# built libevent and ncurses as dependencies, configured, and stopped at
+# `configure: error: "yacc not found"`. nixpkgs had already SAID so -- tmux's
+# nativeBuildInputs name bison-3.8.2 -- and the environment could not run it.
+# bison, flex, gettext and texinfo are what an autotools tarball asks for
+# beyond a compiler.
 PGB_ENV_PACKAGES="${PGB_ENV_PACKAGES:-gcc g++ make cmake ninja-build meson \
 autoconf automake libtool libc6-dev binutils pkg-config file \
-xz-utils bzip2 patch perl ca-certificates curl zlib1g-dev libffi-dev}"
+xz-utils bzip2 patch perl ca-certificates curl zlib1g-dev libffi-dev \
+bison flex gettext texinfo}"
 
 # ⛔ OPTIONS CROSS THE ENGINE BOUNDARY THROUGH THE ENVIRONMENT, NOT THE ARGV.
 #
