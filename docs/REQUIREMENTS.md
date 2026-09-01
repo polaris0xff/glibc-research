@@ -59,27 +59,58 @@ experiment — `experiments/60-versus-alternatives.sh` — is part 2.
 
 ## Status against the bar
 
-⛔ **The bar is NOT met.** The two parts are tracked separately because they
-fail for different reasons and are discharged by different work.
+⛔ **The bar is NOT met, and part 2 is now not-met as a MEASURED RESULT rather
+than as a gap.** That is a different and worse answer than "unmeasured", and it
+is the honest one.
 
-| part | state | what would move it |
+| part | state | why |
 |---|---|---|
-| **1. No known environment where it fails** | ⛔ **not met** | A known, unfixed failure exists and is measured: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). Tier 2 in [`design/tiers.md`](design/tiers.md) is the route; nothing of it is built. Two host **data** dependencies — terminfo and the TLS CA bundle — are also unsolved ([`limitations.md`](limitations.md) §3). |
-| **2. Strictly better than the alternatives** | ⚠ **partially discharged** | `experiments/60-versus-alternatives.sh` now exists and runs. See below for exactly which arms carry numbers and which do not. |
+| **1. No known environment where it fails** | ⛔ **not met** | A known, unfixed failure is measured: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). Tier 2 in [`design/tiers.md`](design/tiers.md) is the route and nothing of it is built. Two host **data** dependencies — terminfo and the TLS CA bundle — are also unsolved ([`limitations.md`](limitations.md) §3). |
+| **2. Strictly better than the alternatives** | ⛔ **measured, and FALSE** | `experiments/60-versus-alternatives.sh` built the same program eight ways and ran every runnable one on the same 11 environments. **A static musl binary ties `pgb` on coverage and beats it on startup and size.** Details below. |
 
-### Part 2, in detail
+### Part 2: what the measurement actually says
 
-⚠ **"Partially" is the accurate word and it is not a softening.** The
-experiment exists, it runs the same source through several delivery techniques
-on the same 11-environment matrix, and [`comparison.md`](comparison.md) now
-carries measurements where it carried dashes. What it does **not** yet carry is
-every arm the requirement names.
+The comparison the directive asked for exists now. All five named alternatives
+were built — AppImage, Flatpak, snap, onelf and static musl — plus the two
+controls. [`comparison.md`](comparison.md) carries the table;
+`evidence/60-versus-alternatives/RESULT.txt` is the run.
 
-Read [`comparison.md`](comparison.md) for the table and
-`evidence/60-versus-alternatives/RESULT.txt` for the run that produced it. The
-arms that could not be built or run here say so, with the reason and the probe
-that establishes it — a stated blocker is a result; a dash is not.
+| | `pgb` | static musl |
+|---|---|---|
+| ran correctly, 11 environments | 11 / 11 | 11 / 11 |
+| loaded zero host shared objects | 11 / 11 | 11 / 11 |
+| per exec | 980 µs | **160 µs** |
+| artefact size | 2,097,824 B | **447,264 B** |
 
-⛔ **Until every named arm carries numbers, the sentence "strictly better than
-every existing format and technique" is still an assertion.** What the evidence
-supports is narrower and is what the documents say instead.
+⛔ **So "strictly better and/or faster than every existing format and
+technique" is false, and no wording fixes it.** `pgb` beat every *packaging
+format* on this matrix — AppImage 2/11, onelf 3/11, Flatpak and snap 0/11
+because no target ships anything to run them with — and it did not beat the
+technique of simply building against musl.
+
+⭐ **What the evidence does support** is the claim `pgb verify` already emits,
+narrowed by one clause: *built at tier 1, ran correctly and loaded no host
+object on these 11 named environments, **for a glibc build***. The last clause
+is the whole value. Where a program can be rebuilt against musl, the
+measurement says to do that instead; `pgb` is for where it cannot — a
+dependency that will not cross to musl, a prebuilt glibc-linked archive,
+glibc-specific behaviour, or `--wrap` onto objects compiled before this tool
+existed.
+
+**What would move part 2 to met.** Either a column where `pgb` beats static
+musl and the formats at once, or the operator agreeing that "strictly better"
+was the wrong bar and replacing it with the class-restricted claim above.
+⛔ That second one is the operator's call and not an agent's: do not rewrite
+this requirement to match the result.
+
+### What is still unmeasured, and is not counted either way
+
+- **Flatpak and snap at run time.** Both artefacts were built here; neither
+  could be executed on this machine (`flatpak run` needs a D-Bus session bus
+  and `dbus-daemon` cannot raise its fd limit with `cap_sys_resource` dropped;
+  `snapd` needs systemd). ⚠ This does not affect their 0/11 coverage, which is
+  decided by the targets, but their startup and memory cells stay dashes.
+- **onelf in its preferred modes.** The chroot bed denies the user-namespace
+  calls its memfd, FUSE and tmpfs modes need, so every onelf row is its last
+  fallback. Its coverage result is unaffected — the failures are gconv, not
+  delivery — but its startup figure is a worst case.

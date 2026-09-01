@@ -19,7 +19,7 @@ evidence says you must.
 | tier | output | serves | cost | status |
 |---|---|---|---|---|
 | **1** | one static ELF, no interpreter | programs not loading host plugins | none beyond size | ✅ **measured**, 11/11 on five real projects |
-| **2** | bundled-glibc **dynamic** binary + directory, with `cross-libc-dlopen` preloaded | programs that must load **host** plugins | not one file; carries a loader | ⛔ design only |
+| **2** | bundled-glibc **dynamic** binary + directory, with `cross-libc-dlopen` preloaded | programs that must load **host** plugins | not one file; carries a loader; ⛔ **and gconv, unless the tier-1 iconv wrap comes with it** | ⛔ design only |
 | **3** | tier 2 collapsed to one file via a memfd bootstrap | same as tier 2, single-file | not a plain ELF any more | ⛔ design only |
 
 ## Why tier 2 has to exist, and why it is not a patch to tier 1
@@ -36,6 +36,37 @@ SIGFPE). A static binary has no loader, so `dlopen` borrows the **host's**
 and its own libc.** That is precisely the setting `cross-libc-dlopen` was
 built for — an `LD_PRELOAD` for a process that already has both — so in tier 2
 it applies **unmodified**. `../limitations.md` §1 has the full table.
+
+## ⛔ Tier 2 is not a superset of tier 1, and that is now measured
+
+`experiments/60-versus-alternatives.sh` did not set out to test this page, but
+it did: **onelf is already exactly the tier-2 shape** — bundled glibc plus its
+own loader, packed into one file — so running it on the same 11 environments is
+a direct measurement of the assumption above.
+
+**The half this page assumed, confirmed.** The bundled process carries its own
+libc everywhere. On all 11, musl included, the trace shows
+`ld-linux-x86-64.so.2`, `libc.so.6` and the runtime's own shim opened out of
+the package and **not one host object**. A glibc program really does start on
+Alpine 3.10 this way.
+
+⛔ **The half this page missed.** It fails the encoding assertions on **8 of
+11**, because *bundling glibc does not bundle gconv*. On the three it passes —
+Debian 11, Debian 12, Ubuntu 20.04 — the trace shows it reaching the **host's**
+`/usr/lib/x86_64-linux-gnu/gconv/` for `EUC-JP.so`, `ISO8859-1.so` and
+`libJIS.so`. So it passes by finding host modules whose path happens to match,
+and fails wherever no such path exists.
+
+⭐ **Which means tier 2 would regress a result tier 1 already has.** Tier 1
+solved gconv with `-Wl,--wrap` onto static GNU libiconv, and that mechanism is
+independent of which libc is in the process — so whoever builds tier 2 must
+carry it across. ⚠ And bundling the gconv modules instead is **not** the
+alternative: `../AGENTS.md` §14 refuses it, because each module carries
+`DT_NEEDED libc.so.6` and would reintroduce the second libc on every musl host.
+The wrap is the answer in both tiers.
+
+`../comparison.md` has the numbers and `evidence/60-versus-alternatives/per-environment.txt`
+the per-cell object lists.
 
 ## Tier 3: single file without extraction
 

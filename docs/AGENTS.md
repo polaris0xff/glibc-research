@@ -25,6 +25,16 @@ executable. No launcher, no AppDir, no loader, nothing beside it.
 **The answer reached: yes, for programs that do not need to load host
 plugins.** Five real projects prove it; §7 states the limits.
 
+⛔ **And one more clause, added when the head-to-head was finally measured: for
+programs that need *glibc*.** `experiments/60-` ran the same source through
+eight delivery techniques on the same 11 environments. A **static musl** binary
+matches `pgb` exactly on what this project measures — 11/11 running, 11/11 with
+no host object loaded — while starting 6× faster and shipping a quarter of the
+size. `pgb` beat every packaging format and did not beat that. So the useful
+statement of what this tool is for is: **the results below, for a build that
+has to be glibc.** [`comparison.md`](comparison.md) has the table and the cases
+where "has to be glibc" is real.
+
 ## 2. The problem
 
 `gcc -static` against glibc is **not** self-contained, though `file` and `ldd`
@@ -100,6 +110,7 @@ scripts/common/
 scripts/build-libiconv.sh GNU libiconv 1.18, pinned
 experiments/lib.sh        conditions block, assertions, pid-attributed tracing
 experiments/NN-*.sh       numbered; exit 0 matched, 1 did not, 2 could not run
+docs/REQUIREMENTS.md      the operator's acceptance bar, and how far short it is
 poc/common.sh             the POC contract
 poc/NN-*/run.sh           the five proof-of-concept projects
 evidence/                 committed RESULT.txt per experiment and POC
@@ -188,6 +199,7 @@ one kernel is not "works on Linux".
 | `experiments/30-gconv-and-locale.sh` | **COMPLETE** — 24 assertions |
 | `experiments/40-overhead.sh` | **COMPLETE** — §10 |
 | `experiments/50-host-plugin-feasibility.sh` | **COMPLETE** — settles §13 item 3 |
+| `experiments/60-versus-alternatives.sh` | **COMPLETE** — 8 arms head to head, `REQUIREMENTS.md` part 2. ⛔ Result: `pgb` does **not** beat static musl |
 | `pgb` chroot engine, host engine | **COMPLETE** |
 | `pgb` docker/podman engines | **UNTESTED** — no daemon here; code exists, never run. CI is where it first runs. |
 | NSS / iconv / locale mechanisms | **COMPLETE** — 11 of 11 each |
@@ -236,7 +248,7 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 | this file | current state; read to orient |
 | [`REQUIREMENTS.md`](REQUIREMENTS.md) | ⛔ **the operator's binding acceptance bar, and how far short of it the project is.** Read before choosing work |
 | [`limitations.md`](limitations.md) | what it cannot do, each with a reproduction |
-| [`comparison.md`](comparison.md) | approaches table; dashes where nothing was measured |
+| [`comparison.md`](comparison.md) | ⭐ **the head-to-head, now measured**: eight ways to ship the same program across the same 11 environments, and where `pgb` loses |
 | [`research/prior-art.md`](research/prior-art.md) | the reference sweep, verdicts, provenance |
 | [`design/tiers.md`](design/tiers.md) | ⛔ **design only, nothing built.** The tiered-output plan for covering the host-plugin class, and what "universal" can honestly mean |
 | [`history/corrections.md`](history/corrections.md) | ⚠ claims measured wrong, instrument defects, refused approaches. **Read on demand, not to orient.** |
@@ -267,6 +279,16 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 
 ## 13. Next steps, in order
 
+0. **Decide what this tool is for, now that the comparison exists.**
+   `experiments/60-` measured what `REQUIREMENTS.md` part 2 asked for, and the
+   answer removes a claim rather than adding one: **static musl ties `pgb` on
+   coverage and beats it on startup and size.** ⛔ This is not a defect to fix
+   and it is not work an agent can close. Either a column is found where `pgb`
+   wins outright, or the operator replaces "strictly better than every existing
+   technique" with the class-restricted claim `comparison.md` now leads with.
+   Everything below is worth doing either way; this decides what the project
+   says about itself while it happens.
+
 1. **Run CI.** `.github/workflows/portability.yml` and `ci/probe.c` are written
    and have **never executed on a runner**. Locally the probe passes on all 11
    and the plain control fails on all 11, so the workflow should be green on
@@ -290,6 +312,15 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
      that mode provides. The corpus is already in `references/`; its
      `scripts/build.sh` builds it, and `docs/integrating.md` covers wiring it
      into a bundle.
+   - ⛔ **And a second cost, measured since this item was written:
+     `experiments/60-` ran onelf, which is already exactly this shape — bundled
+     glibc plus its own loader in one file.** The bundling half works
+     everywhere: no host object on any of the 11, musl included. But it fails
+     the encoding assertions on **8 of 11**, because bundling glibc does not
+     bundle gconv — and on the 3 it passes it is reaching the *host's* gconv
+     modules to do it. **Tier 2 is not a superset of tier 1.** Whatever builds
+     it must carry the `--wrap` onto static libiconv across, or it will trade
+     the host-plugin class for the gconv result tier 1 already has.
    - The cost is the property the current mode exists for: one normal ELF, no
      interpreter. So it is a **mode**, chosen per project, not a replacement —
      and `pgb verify` should report which mode a binary is.
@@ -325,3 +356,19 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
   selftests.
 - **Do not assert a limitation without measuring it.** `history/corrections.md`
   C1 is what that cost.
+- **Do not rebuild the head-to-head from scratch.**
+  `experiments/60-versus-alternatives.sh` already builds all eight arms,
+  including a real Flatpak bundle and a real `.snap`. Re-run it; do not start
+  a new comparison.
+- **Do not write "strictly better than the alternatives" anywhere.** It was
+  measured and it is false — static musl ties `pgb` on coverage and beats it on
+  startup and size. `comparison.md` has the claim that *is* supported.
+- **Do not match `.so` as a substring** when deciding what a binary loaded:
+  `/etc/ld.so.cache` is an index, not an object, and both `poc_matrix` and
+  `pgb verify` assert on that value. Require `.so` or `.so.N` at the end.
+- **Do not attribute a bundle format's trace to one pid**, and do not reduce
+  traced paths to basenames. Both make a bundling format look clean when it is
+  not, or the reverse. `experiments/60-`'s `classify_trace` is the working
+  instrument; `history/corrections.md` says why.
+- **Do not reap test processes with `pkill -f`.** The pattern appears in the
+  runner's own command line, so it kills the experiment. `pkill -x` by name.

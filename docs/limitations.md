@@ -171,6 +171,13 @@ compiles exactly one path in:
 | verified | Alpine 3.20, Alpine 3.22, Void musl, Fedora 42, Arch — 5 of 11 |
 | unverified | Debian 11, Debian 12, Ubuntu 20.04 (no bundle at all in the minimal image); Rocky 8 (`/etc/pki/tls/certs/ca-bundle.crt`); openSUSE Leap (`/etc/ssl/ca-bundle.pem`); Alpine 3.10 (`/etc/ssl/cert.pem`) |
 
+⚠ **Bundling a libc does not solve gconv either, and that is measured rather
+than argued.** `experiments/60-` ran onelf — a bundled glibc with its own
+loader in one file — across the same 11. The bundling works: no host object on
+any of them. It still fails the encoding assertions on **8 of 11**, and the 3
+it passes it passes by reaching the *host's* gconv modules. The `--wrap` onto
+static libiconv is what solves gconv, in any tier. `docs/design/tiers.md`.
+
 **Can terminfo and the CA bundle be fixed?** Yes, by the same mechanism as
 `--embed-locale`: both are found through an environment variable (`TERMINFO`,
 `CURL_CA_BUNDLE`/`SSL_CERT_FILE`), so embedding and materialising works
@@ -238,6 +245,7 @@ namespaces are shared unless `--private-net` is passed.
 
 | | |
 |---|---|
+| **there is a better answer when you do not need glibc** | ⛔ **Measured, `experiments/60-`.** A static **musl** binary of the same program matches `pgb` on both things this project asserts — 11/11 running, 11/11 loading no host shared object — and beats it on startup (160 µs vs 980 µs per exec) and size (447 KB vs 2.1 MB). This is a real limit on when to reach for `pgb` at all: it earns its cost only when the build has to be glibc. `docs/comparison.md`. |
 | **architecture** | x86_64 only. aarch64 is **untested** — `docs/AGENTS.md` §9 and §13 item 2. |
 | **machines** | one. Every result is one machine, one kernel, one day. |
 | **glibc floor** | the build image is pinned at glibc 2.36 because `files`/`dns` became builtin in 2.34. ✅ **Measured**, not reasoned: `experiments/21-glibc-version-floor.sh` builds the same source at 2.31 and at 2.36 against the same target, and below the floor the override **moves** the `dlopen` rather than removing it — `libnss_files.so.2` and `libnss_dns.so.2` are opened with and without it. `docs/history/corrections.md` C6 has the table. ⚠ This row said "reasoned, not measured — planned and unwritten" for most of the project's life and was left stale after the experiment landed. |

@@ -66,6 +66,20 @@ for p in poc/*/run.sh; do sh "$p"; done
 
 ## Honest limits
 
+⛔ **If you can build against musl instead, do that.** The same program was
+built eight ways and run on the same 11 environments
+([`docs/comparison.md`](docs/comparison.md)). A plain **static musl** binary
+matches `pgb` exactly — 11/11 running, 11/11 loading no host shared object —
+while starting about 6× faster (160 µs vs 980 µs per exec) and shipping
+447 KB against 2.1 MB. `pgb` beat every *packaging format* on that matrix
+(AppImage 2/11, onelf 3/11, Flatpak and snap 0/11) and did not beat that.
+
+⭐ **So this tool is for when the build has to be glibc**: a dependency that
+will not cross to musl, a prebuilt glibc-linked archive, glibc-specific
+behaviour, or `--wrap` onto objects compiled long before this existed. That is
+a narrower claim than "portable Linux binaries", and it is the one the
+measurements support.
+
 ⛔ **`dlopen` of a *host* shared object is host-dependent, and success is the
 worse outcome.** gawk's own extension loads on Debian 12 and Arch — dragging
 the host loader and libc into the process — and is refused on the other nine.
@@ -87,7 +101,8 @@ wrong: [`docs/limitations.md`](docs/limitations.md) and
 |---|---|
 | [`docs/AGENTS.md`](docs/AGENTS.md) | ⭐ **the standalone handoff.** Read this first if you are picking the project up |
 | [`docs/limitations.md`](docs/limitations.md) | what it cannot do, with the measurement behind each |
-| [`docs/comparison.md`](docs/comparison.md) | the approaches table, dashes where nothing was measured |
+| [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) | the operator's acceptance bar, and how far short of it this is |
+| [`docs/comparison.md`](docs/comparison.md) | ⭐ **the head-to-head**: eight ways to ship the same program, same 11 environments, and where `pgb` loses |
 | [`docs/research/prior-art.md`](docs/research/prior-art.md) | the reference sweep, verdicts and provenance |
 | `experiments/` | numbered, re-runnable. Exit 0 matched, 1 did not, 2 could not run |
 | `poc/` | the five projects |
