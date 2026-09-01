@@ -1,4 +1,4 @@
-# SUMMARY.md — the session of 2026-09-01
+# SUMMARY.md — the session of 2026-09-01d
 
 ⛔ **Saved as well as printed**, per
 [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md), so it
@@ -10,43 +10,53 @@ thing was not measured this says so rather than giving a number.
 
 | row | before | after |
 |---|---|---|
-| **Elapsed** | 2026-09-01T11:49Z | 2026-09-01T13:52Z — **≈2h03m** |
-| **Commits** | `b77e033` | `5412b27` — **12 commits**, squashed to 1 at the end |
-| **Work** | 15 entries, 14 open, 1 done | **19 entries, 12 open, 7 done** — 6 completed, 4 opened, **0 deferred, 0 failed** |
-| **Changes** | — | **236 files**, 63847 insertions(+), 704 deletions(-) |
-| **Size** | 12,861 lines | **16,064 lines** (+3,203), excluding `references/` and `evidence/` |
-| **Checks** | gate green; ⛔ **CI red, 10 runs, 10 failures** | gate green; ⭐ **CI green, 15 jobs**, and it now asserts §3 criterion 2 |
-| **Cost** | — | ⚠ **not metered.** What can be pointed at: 11 target images pulled by digest + 1 build image, ~3.465GB of docker storage; 2 repositories mined into `references/` (~2.7 MiB kept after deleting 61 MiB of nested corpus); CPython 3.12.7 fetched and built once, then deleted. No paid service was used. |
-| **Health** | 3 tracked files wrong about observable facts | ⭐ **9 defects found and fixed**, every one of which read as success. **4 new debts, all carried as open entries** (T-015, T-017, and the two operator decisions). Tree **clean**, `main` pushed, no `ephemeral-*` branches. |
+| **Elapsed** | 2026-09-01T18:10Z | 2026-09-01T19:35Z — **≈1h25m** |
+| **Commits** | `544bfa61` | `60f997e8` — **11 commits**, every one on `main`, pushed as they landed |
+| **Work** | 4 required POCs assigned, 30 entries, 17 open, 13 done | ⭐ **4 of 4 completed**, **0 deferred, 0 failed**. 32 entries, 17 open, 15 done — T-032 and T-052 closed, T-058 and T-059 opened |
+| **Changes** | — | **64 files**, 2,840 insertions(+), 440 deletions(-) |
+| **Size** | 25,702 lines | **27,299 lines** (+1,597), excluding `references/` and `evidence/` |
+| **Checks** | `sh TODO/check.sh` green | green. Plus **9 selftests re-run, all pass** (bootstrap, oci-pull, rootfs-run, mine-repo, nix-fetch, nix-appimage, nix-drv, nix-nar, elf-needed) |
+| **Cost** | — | ⚠ **not metered.** What can be pointed at: qtbase 6.11.1 source (50.6 MB) and two mesa-demos closures (392 MB each, one from cache) fetched from cache.nixos.org; a jq closure (39 MB); Arch `pacman -Sy base-devel` in the test bed; four pinned anylinux tools. Disk went from 29 GiB free to ~15 GiB. No paid service was used. |
+| **Health** | ⛔ acceptance bar: 6 of 9 issues closed | ⭐ **8 of 9 closed**, one left (host plugins). **5 tool defects + 2 instrument defects found and fixed**; **2 new debts, both carried as open entries** (T-058, T-059). Tree **clean**, `main` pushed, no `ephemeral-*` branches, **no branch debt**. |
 
-## The nine defects, because "9" is not a finding
+## The four required POCs, discharged
 
-Every one of these produced a **passing** result while being wrong. That is
-the pattern, and it is why the entries above are worth more than the features.
+| # | required | result | evidence |
+|---|---|---|---|
+| 1 | `poc/90-qt` — Qt 6, static | ✅ **11 of 11, zero host objects** | 19 assertions, 0 fail |
+| 2 | `experiments/85-opengl` | ✅ **Mesa/swrast on 11 of 11**, control clean | 7 assertions, 0 fail |
+| 3 | `experiments/86-bundler-vs-anylinux` | ✅ **both 11 of 11; ours 3.05× the size** | 7 assertions, 0 fail |
+| 4 | `poc/20` + `poc/30` reruns | ✅ **11 of 11 each** | 12 assertions each, 0 fail |
+
+## The seven defects, because "7" is not a finding
+
+⭐ **Five were in the tools and two were in this session's own instruments.**
+Every one produced a plausible result while being wrong — that is the pattern,
+and it is why building above the current class is worth more than the features
+it produces.
 
 | # | defect | what it looked like |
 |---|---|---|
-| 1 | `pgb build --engine docker` flattened argv with `$*` | built nothing, **exited 0** |
-| 2 | docker/podman engines carried no TLS anchor | "libiconv is broken" (curl exit 60) |
-| 3 | `--bind` passed relative paths to `-v` | an empty **named volume**, exit 0 |
-| 4 | `die()` used `$*` where it meant `$1` | printed its exit code into its message |
-| 5 | a backtick in an unquoted heredoc | `nm` **executed** during `pgb explain` |
-| 6 | tracer reported opens at syscall **entry** | counted paths merely probed for — a false positive on criterion 2 |
-| 7 | tracer paired entry/exit with a bare toggle | `/bin/true` reported as opening **nothing** |
-| 8 | tracer resumed with signal 0 | **hung forever** on exactly the binaries `verify` exists to catch |
-| 9 | `poc_matrix` with no `poc_functional_test` | **11 green rows having executed nothing** |
+| 1 | pgb appended `-march=x86-64` **after** the caller's argv | *"x86 intrinsics support missing. **Check your compiler settings.**"* — Qt blaming the user for pgb's flag |
+| 2 | `make_wrappers` opened with `rm -rf` on a directory bind-mounted into a **running** build | `cc: not found` from inside somebody else's ninja, minutes in |
+| 3 | `nix-appimage.sh` fell back to the first binary in `bin/` when `--name` missed | packed `quadstrip-flat` instead of `eglinfo`, and said so in one line among eleven |
+| 4 | `nix-appimage.sh` read nixpkgs' `out` output | `no entry point in ...-jq-1.8.2/bin` — reads like a broken package, is a wrong output |
+| 5 | `pgb-cacert.c` missing `<stdio.h>` | implicit `snprintf`; a warning under gcc 12, an **error** under C23 |
+| 6 | 86-'s startup instrument reaped between runs, killing the dwarfs mount | both arms **~14,500 ms** where the real warm figure is **17 ms** |
+| 7 | two runs on the shared bed at once | `poc/30-curl`'s voidlinux row came back **SIG9** with nothing wrong with the binary |
 
-⚠ **Nos. 6–8 were in code written this session**, and 8 was caught by CI —
-the first time this workflow has found a defect rather than reported one.
-⚠ **No. 9 affected no committed result**: all five pre-existing POCs define
-the function. The harness could have certified a bad POC and had not yet.
+⚠ **And two assertion defects inside `poc/90-qt` itself**, caught before its
+evidence was committed: the plugin archive was looked for at nixpkgs'
+`INSTALL_PLUGINSDIR` rather than Qt's own default (reporting a FAILURE for a
+plugin built correctly), and the "no shared libraries" check was scoped to
+`libQt6*.so`, which would have passed a Qt whose *plugins* were still shared —
+the half that POC is about.
 
-## What was measured that had not been
+## What was NOT measured
 
-| | |
-|---|---|
-| `experiments/70-carried-helper.sh` | a carried-in static Rust helper runs on **12 of 12** targets, exactly where `sh` does |
-| `experiments/71-wrap-dlopen.sh` | `--wrap-dlopen`: **11 of 11**, zero host objects, **+544 bytes** |
-| `experiments/72-static-host-plugin-abi.sh` | ⛔ a static executable's dynamic symbol table is **empty**, so a shared plugin can never call back into its host |
-| `poc/60-leveldb` | the first **C++** and first **CMake** POC — **11 of 11** |
-| chroot vs docker engines | **byte-identical** output for the same source |
+- **Anything on a GPU.** Every GL row is `swrast`. **T-059.**
+- **Qt against a real display.** `-no-xcb`; the offscreen QPA is what ran.
+  T-054 rung 2.
+- **KF6 and kdenlive.** Untouched. T-054 rungs 3 and 4.
+- **A second machine or kernel.** One machine, one day, as every number in
+  this tree still is.
