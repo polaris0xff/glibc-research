@@ -57,13 +57,32 @@ Debian 11, Debian 12, Ubuntu 20.04 — the trace shows it reaching the **host's*
 `libJIS.so`. So it passes by finding host modules whose path happens to match,
 and fails wherever no such path exists.
 
-⭐ **Which means tier 2 would regress a result tier 1 already has.** Tier 1
-solved gconv with `-Wl,--wrap` onto static GNU libiconv, and that mechanism is
-independent of which libc is in the process — so whoever builds tier 2 must
-carry it across. ⚠ And bundling the gconv modules instead is **not** the
-alternative: `../AGENTS.md` §14 refuses it, because each module carries
-`DT_NEEDED libc.so.6` and would reintroduce the second libc on every musl host.
-The wrap is the answer in both tiers.
+⭐ **Which means tier 2 regresses a result tier 1 already has — unless it is
+told not to.** Tier 1 solved gconv with `-Wl,--wrap` onto static GNU libiconv,
+and that mechanism is independent of which libc is in the process, so carrying
+it across is one option.
+
+⛔ **The other option is bundling the gconv modules, and this page previously
+said that was refused. That refusal does not apply at tier 2.** `../AGENTS.md`
+§14 rules it out because each module carries `DT_NEEDED libc.so.6` and would
+pull a second libc in — which is true **for a static binary**, where there is
+no bundled libc for that edge to bind to. A tier-2 process already carries its
+own libc *and* its own loader, so the edge resolves inside the bundle and no
+second libc enters.
+
+⭐ **`Anylinux-AppImages` does exactly this and it works.** `quick-sharun.sh`
+deploys the whole `/usr/lib/gconv` tree plus its config and reaches it with
+`GCONV_PATH` — its own comment at line 816 reads "gconv is always deployed,
+removing it only saves ~30 KiB". `experiments/62-` measures the result: the
+same program in an anylinux AppImage passes the encoding assertions on **11 of
+11**, musl included, opening its gconv modules out of its own bundle and no
+host object at all. onelf fails 8 of 11 not because bundling cannot solve
+gconv but because onelf does not bundle it.
+
+⚠ **So tier 2 has two working answers for gconv and must pick one
+deliberately**: carry tier 1's `--wrap`, or bundle the modules the way sharun
+does. What it cannot do is inherit tier 1's refusal, which was reasoned about
+a different situation.
 
 `../comparison.md` has the numbers and `evidence/60-versus-alternatives/per-environment.txt`
 the per-cell object lists.

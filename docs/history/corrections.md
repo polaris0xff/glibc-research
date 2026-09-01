@@ -102,6 +102,59 @@ justification for the pinned build image.
 
 Below the floor the override **moves** the dlopen rather than removing it.
 
+## C7 — "static musl ties pgb and beats it; pgb is not better than the alternatives"
+
+⛔ **The worst claim this project has made, and it survived a full write-up
+into `comparison.md`, `REQUIREMENTS.md`, `AGENTS.md` §1, `limitations.md` and
+the README before it was caught.**
+
+**Claimed** by `experiments/60-versus-alternatives.sh`, from two measurements
+that were themselves correct: a static musl binary ran on 11 of 11
+environments loading no host object, started in 160 µs against pgb's 980, and
+shipped 447 KB against 2.1 MB.
+
+**Wrong because the metric was wrong, not because the numbers were.** Startup
+and size are the two axes on which musl wins *by construction* — it is a
+smaller libc with a shorter startup path — so choosing them decided the answer
+before the experiment ran. ⛔ **Nobody reaches for glibc to start faster.**
+`tmp/START.md` asks for static binaries "using GLIBC **rather than MUSL** …
+while avoiding the usual drawbacks", which makes musl the thing being avoided,
+not a rival to be beaten on its own ground.
+
+**Disproved by** `experiments/61-libc-throughput.sh`, same machine, same
+compiler, libc the only variable — the axis that was never measured:
+
+| workload | glibc static | musl static | musl slower by |
+|---|---|---|---|
+| malloc, 4 threads | 4.53 ns | 584.71 ns | **129×** |
+| qsort | 93.20 ns | 921.49 ns | 9.9× |
+| strlen/strchr/strstr | 149.14 ns | 1051.09 ns | 7.1× |
+| malloc, 1 thread | 12.95 ns | 42.20 ns | 3.3× |
+| snprintf | 344.42 ns | 989.67 ns | 2.9× |
+
+And the row that makes it this project's result rather than a libc trivia
+table: on **Alpine 3.22**, where the ordinary choice is a musl build, a `pgb`
+binary does the 4-thread allocator workload in **4.68 ns** against musl's
+**592 ns**. ⭐ That is the actual product — glibc's throughput on a machine
+that ships no glibc — and pgb costs nothing to get it: measured against plain
+`gcc -static` on the same workloads, 0.99×–1.05×.
+
+**Also wrong in the same experiment, and separately:** the AppImage arm was
+built with **vanilla `appimagetool`**, which does not bundle glibc and scored
+2 of 11. `tmp/START.md` names `pkgforge-dev/Anylinux-AppImages` as required
+reading precisely because it is the competitive one; built that way in
+`experiments/62-`, the same program in an AppImage runs on **11 of 11**,
+musl included, with zero host objects in the payload. The 2/11 was a fact
+about the wrong tool.
+
+**Now:** `experiments/61-` and `62-` exist, `comparison.md` leads with
+throughput, and the claim that survives is narrower and defensible — pgb and
+the anylinux stack both deliver glibc everywhere at glibc's speed, and what
+separates them is shape, not portability or performance. ⚠ **The general
+lesson is the one worth carrying:** an experiment that picks its metric from
+what is easy to measure will confirm whatever that metric favours. Choose the
+axis from the brief, not from the instrument.
+
 ---
 
 ## Instrument defects that corrupted a reading
@@ -121,6 +174,9 @@ Below the floor the override **moves** the dlopen rather than removing it.
 | `strace -f` on a program that leaves a helper running | strace does not return until every traced process exits, and an AppImage's FUSE helper does not exit with the payload. The run hung, and the tracee was left in ptrace-stop where SIGKILL to strace alone did not reap it | bound every traced run with `timeout`, retry without `-f`, and record that cell's tree column as **unmeasured** rather than clean |
 | `pkill -f` to reap the artefact's leftovers | the pattern also appears in the **measuring shell's own command line** (`rootfs-run.sh … -- /pgb-vs-arm`), so the reaper killed the experiment | `pkill -x` against the process **name**, which only the artefact has |
 | `poc_observe` **appending** to `observation.txt` | never truncated, so a second run of a POC left the file holding both runs back to back — 22 rows for an 11-environment matrix, the older half describing a binary that no longer existed. Found when re-running POC 10 to verify the `.so` fix above | `: > "$POC_OUT/observation.txt"` at the top of `poc_observe` |
+| reaping test processes **by name** | an AppImage's uruntime leaves a DWARFS FUSE daemon running by design — a mount that outlives the program is what mount mode *is* — and its `comm` is `memfd:dwarfs`, not the artefact's. `pkill -x <artefact>` therefore reaped nothing: a full pass of `experiments/62-` left **22 daemons alive**, one per AppImage invocation, and the operator had to kill them by hand. ⛔ The experiment reported success while leaking | match on `/proc/PID/root`, which is the chroot a process is actually in, so every straggler of a cell is caught whatever it is called and nothing outside the bed can match. Plus an `EXIT`/`INT`/`TERM` trap, and a closing `exp_check` that **fails the experiment** if anything is still running in the bed |
+| counting objects opened **before** the last `execve` | `execve` replaces the address space, so those are not mapped in the running program. An AppImage `AppRun` is a shell script, so one pid runs `AppImage → AppRun → /bin/sh → payload`, and on a distribution whose `/bin/sh` is dynamic the shell's libc, readline and ncurses were charged to the payload. The anylinux arm was reported as "payload clean 4 of 11" when the program itself had none of them mapped | clear the accumulated set at each successful `execve` in **payload** mode; never clear it in **tree** mode, because "what did the machine load in total" is a different and also real question |
+| matching a fork as **one** trace line | strace interleaves: `vfork( <unfinished ...>` then `<... vfork resumed>) = 1234`. The child pid appears only on the second line, which does not contain `vfork(`. Requiring both `vfork(` and a trailing `= N` matched neither line, so every interleaved fork child was dropped from the followed set. ⛔ An anylinux AppImage that ran and passed was recorded as opening **no objects at all** — not one, bundled or host — which is impossible for a program that executed | match `NAME(` **or** `<... NAME resumed>`, and take the pid from whichever line carries `= N` — `classify_trace` in `experiments/60-` and `62-` |
 
 ---
 

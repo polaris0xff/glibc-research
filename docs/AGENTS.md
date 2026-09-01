@@ -26,15 +26,35 @@ executable. No launcher, no AppDir, no loader, nothing beside it.
 **The answer reached: yes, for programs that do not need to load host
 plugins.** Five real projects prove it; §7 states the limits.
 
-⛔ **And one more clause, added when the head-to-head was finally measured: for
-programs that need *glibc*.** `experiments/60-` ran the same source through
-eight delivery techniques on the same 11 environments. A **static musl** binary
-matches `pgb` exactly on what this project measures — 11/11 running, 11/11 with
-no host object loaded — while starting 6× faster and shipping a quarter of the
-size. `pgb` beat every packaging format and did not beat that. So the useful
-statement of what this tool is for is: **the results below, for a build that
-has to be glibc.** [`comparison.md`](comparison.md) has the table and the cases
-where "has to be glibc" is real.
+⭐ **What that is worth, measured on the axis that matters.** `tmp/START.md`
+asks for static binaries "using GLIBC **rather than MUSL** … while avoiding the
+usual drawbacks", so musl is the thing being avoided, not a rival to beat on
+its own ground. `experiments/61-` measures the ground that is actually
+contested — steady-state throughput, same machine, same compiler, libc the only
+variable:
+
+| | glibc static | musl static |
+|---|---|---|
+| malloc, 4 threads | **4.53 ns/op** | 584.71 ns/op |
+| qsort | **93.20 ns/op** | 921.49 ns/op |
+| strlen/strchr/strstr | **149.14 ns/op** | 1051.09 ns/op |
+
+⭐ **And the row that is this project's actual product:** on **Alpine**, where
+the ordinary choice is a musl build, a `pgb` binary does that 4-thread
+allocator workload in **4.68 ns/op** against musl's **592**. Same glibc
+numbers, on a machine that ships no glibc — and `pgb` costs nothing to get
+them: 0.99×–1.05× against plain `gcc -static` on the same workloads.
+
+⚠ **A previous revision of this page said the opposite** — that static musl
+"ties pgb and beats it" — from an experiment that measured startup and size,
+the two axes musl wins by construction. `history/corrections.md` C7 has what
+went wrong and why. ⛔ Do not reintroduce that framing.
+
+The alternative that genuinely competes is **`Anylinux-AppImages`**, not musl
+and not vanilla AppImage: it bundles glibc, its loader and its gconv tree, and
+`experiments/62-` measures it running on 11 of 11 at glibc's speed too. What
+separates `pgb` from it is shape and reach, not portability or performance —
+[`comparison.md`](comparison.md) has both sides of that.
 
 ## 2. The problem
 
@@ -209,7 +229,9 @@ one kernel is not "works on Linux".
 | `experiments/30-gconv-and-locale.sh` | **COMPLETE** — 24 assertions |
 | `experiments/40-overhead.sh` | **COMPLETE** — §10 |
 | `experiments/50-host-plugin-feasibility.sh` | **COMPLETE** — settles §13 item 3 |
-| `experiments/60-versus-alternatives.sh` | **COMPLETE** — 8 arms head to head, `REQUIREMENTS.md` part 2. ⛔ Result: `pgb` does **not** beat static musl |
+| `experiments/60-versus-alternatives.sh` | **COMPLETE** — 8 arms head to head, `REQUIREMENTS.md` part 2. ⚠ Its AppImage arm used **vanilla** `appimagetool` and its performance columns were startup and size only; both are corrected by 62- and 61-. `history/corrections.md` C7 |
+| `experiments/61-libc-throughput.sh` | **COMPLETE** — the axis 60- got wrong. glibc vs musl at steady state, and whether the gap travels to a musl host |
+| `experiments/62-anylinux-appimage.sh` | **COMPLETE** — `pgb` against `Anylinux-AppImages`, the AppImage that actually competes |
 | `pgb` chroot engine, host engine | **COMPLETE** |
 | `pgb` docker/podman engines | **UNTESTED** — no daemon here; code exists, never run. CI is where it first runs. |
 | NSS / iconv / locale mechanisms | **COMPLETE** — 11 of 11 each |
@@ -314,8 +336,28 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
    limits of the idea: [`design/tiers.md`](design/tiers.md). `experiments/50-`
    has already done the feasibility work and the answer is precise:
 
-   - ⛔ **Do not port cross-libc-dlopen into the static output.** Measured: no
-     effect on any of 11. The failure class it fixes does not occur here.
+   - ⚠ **"Do not port cross-libc-dlopen into the static output" was stated
+     more broadly than the measurement supports, and is downgraded.**
+     `experiments/50-` ported **one function out of roughly forty**
+     (`cld_strip_versions`, 7 lines) from a 2015-line file, and found no effect
+     on 11 of 11. The rewrite in `cross-libc-dlopen.c:1857` is three
+     coordinated steps, and 50- tested only the first:
+     ```
+     cld_strip_versions(&e);                      // ported by 50-
+     e.dyn[drop_idx[i]].d_tag = CLD_NEUTRAL_TAG;  // NOT ported: drops the
+                                                  // DT_NEEDED edges that pull
+                                                  // a foreign libc in
+     cld_apply_renames(&e, dry_run);              // NOT ported
+     ```
+     ⛔ The failures 50- recorded — `_dl_call_libc_early_init: Assertion
+     'sym != NULL' failed` and friends — are what happens when the host object
+     drags the **host libc** in, which is exactly what step two removes. So the
+     untested part is the part most likely to matter. ⭐ And upstream's own
+     `docs/limits.md`, which this project's sweep never read, says the static
+     glibc case is one where `dlopen` **works** and that "the real blocker is
+     more likely the preload path" — a static binary has no `LD_PRELOAD`. It
+     also labels all three static cases **UNVERIFIED** upstream. Re-test with
+     the full rewrite and `CROSS_LIBC_DLOPEN_DRYRUN` before concluding again.
    - ⭐ **Do build a bundled-glibc dynamic mode**, where cross-libc-dlopen
      applies **as designed and unmodified** — it is an `LD_PRELOAD` for a
      process that already carries a libc and a loader, which is exactly what

@@ -9,5 +9,5 @@ arm P built=yes size=2097824 runs=11/11 payload_clean=11
 arm M built=yes size=447264 runs=11/11 payload_clean=11
 arm A built=yes size=948728 runs=2/11 payload_clean=4
 arm O built=yes size=1761241 runs=3/11 payload_clean=8
-arm F built=yes size=4228 runs=-/- payload_clean=-
+arm F built=yes size=4236 runs=-/- payload_clean=-
 arm K built=yes size=4096 runs=-/- payload_clean=-

@@ -1,0 +1,16 @@
+# arm A: host, same compiler
+A malloc1 glibc=12.95 musl=42.20
+A malloc4 glibc=4.53 musl=584.71
+A memcpy glibc=970.29 musl=1036.82
+A strops glibc=149.14 musl=1051.09
+A qsort glibc=93.20 musl=921.49
+A snprintf glibc=344.42 musl=989.67
+A math glibc=28.58 musl=32.07
+# arm B: pinned env, plain static vs pgb
+B malloc1 static=12.58 pgb=13.24
+B malloc4 static=4.37 pgb=4.42
+B memcpy static=964.06 pgb=968.35
+B strops static=149.32 pgb=149.24
+B qsort static=92.89 pgb=93.28
+B snprintf static=363.30 pgb=358.19
+B math static=27.85 pgb=27.65

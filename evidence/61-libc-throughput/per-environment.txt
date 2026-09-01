@@ -1,0 +1,88 @@
+C alpine-3.22 libc=musl
+  malloc1   pgb=12.99      musl=44.52
+  malloc4   pgb=4.68       musl=592.00
+  memcpy    pgb=984.50     musl=1114.29
+  strops    pgb=187.90     musl=1061.84
+  qsort     pgb=93.10      musl=941.21
+  snprintf  pgb=366.17     musl=991.10
+  math      pgb=27.85      musl=32.54
+C alpine-3.20 libc=musl
+  malloc1   pgb=12.96      musl=43.65
+  malloc4   pgb=4.92       musl=602.36
+  memcpy    pgb=973.60     musl=1040.58
+  strops    pgb=156.35     musl=1053.02
+  qsort     pgb=94.79      musl=942.37
+  snprintf  pgb=360.92     musl=980.81
+  math      pgb=27.68      musl=32.43
+C alpine-3.10 libc=musl
+  malloc1   pgb=13.10      musl=43.76
+  malloc4   pgb=4.68       musl=592.42
+  memcpy    pgb=979.61     musl=1040.31
+  strops    pgb=154.53     musl=1048.84
+  qsort     pgb=95.04      musl=936.20
+  snprintf  pgb=363.24     musl=972.91
+  math      pgb=27.80      musl=32.23
+C voidlinux-musl libc=musl
+  malloc1   pgb=12.92      musl=43.90
+  malloc4   pgb=4.39       musl=589.07
+  memcpy    pgb=966.73     musl=1032.77
+  strops    pgb=149.25     musl=1059.70
+  qsort     pgb=93.34      musl=946.03
+  snprintf  pgb=359.78     musl=986.00
+  math      pgb=27.86      musl=32.28
+C debian-11 libc=glibc
+  malloc1   pgb=13.73      musl=44.40
+  malloc4   pgb=4.44       musl=598.42
+  memcpy    pgb=968.93     musl=1031.64
+  strops    pgb=151.00     musl=1057.51
+  qsort     pgb=93.35      musl=937.65
+  snprintf  pgb=374.23     musl=984.79
+  math      pgb=28.78      musl=33.19
+C debian-12 libc=glibc
+  malloc1   pgb=12.96      musl=44.64
+  malloc4   pgb=4.66       musl=606.28
+  memcpy    pgb=994.50     musl=1048.63
+  strops    pgb=160.28     musl=1066.34
+  qsort     pgb=94.24      musl=939.82
+  snprintf  pgb=364.08     musl=989.23
+  math      pgb=27.91      musl=32.79
+C ubuntu-20.04 libc=glibc
+  malloc1   pgb=12.94      musl=43.93
+  malloc4   pgb=4.81       musl=593.59
+  memcpy    pgb=966.03     musl=1039.46
+  strops    pgb=151.86     musl=1059.35
+  qsort     pgb=94.06      musl=941.22
+  snprintf  pgb=365.70     musl=977.84
+  math      pgb=28.35      musl=32.34
+C rockylinux-8 libc=glibc
+  malloc1   pgb=13.05      musl=43.81
+  malloc4   pgb=4.39       musl=587.76
+  memcpy    pgb=966.19     musl=1049.78
+  strops    pgb=150.78     musl=1058.11
+  qsort     pgb=93.28      musl=943.09
+  snprintf  pgb=357.67     musl=974.63
+  math      pgb=27.66      musl=32.73
+C opensuse-leap-15.6 libc=glibc
+  malloc1   pgb=12.92      musl=43.37
+  malloc4   pgb=4.39       musl=592.76
+  memcpy    pgb=976.46     musl=1037.47
+  strops    pgb=154.75     musl=1089.20
+  qsort     pgb=94.40      musl=937.17
+  snprintf  pgb=364.07     musl=969.73
+  math      pgb=27.65      musl=32.26
+C fedora-42 libc=glibc
+  malloc1   pgb=13.64      musl=44.01
+  malloc4   pgb=4.34       musl=589.65
+  memcpy    pgb=968.91     musl=1051.00
+  strops    pgb=159.91     musl=1043.89
+  qsort     pgb=95.49      musl=944.85
+  snprintf  pgb=367.16     musl=985.50
+  math      pgb=28.24      musl=32.39
+C archlinux-latest libc=glibc
+  malloc1   pgb=12.83      musl=43.35
+  malloc4   pgb=4.37       musl=603.00
+  memcpy    pgb=974.52     musl=1047.92
+  strops    pgb=154.38     musl=1083.69
+  qsort     pgb=95.52      musl=958.34
+  snprintf  pgb=365.99     musl=992.79
+  math      pgb=30.73      musl=32.68

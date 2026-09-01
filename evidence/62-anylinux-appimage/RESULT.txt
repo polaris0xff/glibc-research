@@ -1,0 +1,91 @@
+===============================================================
+62 - pgb against Anylinux-AppImages, the competitive AppImage
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-01T11:03:43Z
+host kernel  : Linux 6.18.44-fc-v22
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/62-anylinux-appimage
+--------------------------------------------------------------
+
+  ok    anylinux toolchain staged at its pinned digests = yes
+  ok    anylinux AppImage built (subject)              = yes
+  ok    anylinux AppImage built (bench)                = yes
+
+-- runs correctly, and host objects loaded ------------------------
+  ENVIRONMENT         LIBC   anylinux       pgb            anylinux host .so
+  alpine-3.22         musl   ok/0           ok/0           none
+  alpine-3.20         musl   ok/0           ok/0           none
+  alpine-3.10         musl   ok/0           ok/0           none
+  voidlinux-musl      musl   ok/0           ok/0           none
+  debian-11           glibc  ok/0           ok/0           libc.so.6 
+  debian-12           glibc  ok/0           ok/0           libc.so.6 
+  ubuntu-20.04        glibc  ok/0           ok/0           libc.so.6 
+  rockylinux-8        glibc  ok/0           ok/0           libc.so.6 libdl.so.2 libtinfo.so.6 
+  opensuse-leap-15.6  glibc  ok/0           ok/0           libc.so.6 libdl.so.2 libreadline.so.7 libtinfo.so.6 
+  fedora-42           glibc  ok/0           ok/0           libc.so.6 libtinfo.so.6 
+  archlinux-latest    glibc  ok/0           ok/0           libc.so.6 libncursesw.so.6 libreadline.so.8 
+
+  cell is EXITSTATUS/H, H = HOST shared objects the payload process
+  opened. Objects the artefact brought with it are counted separately
+  and are in per-environment.txt -- for the anylinux arm they are its
+  bundled ld-linux, libc, anylinux.so and gconv modules.
+
+  ⚠ THE LAST COLUMN IS THE DELIVERY MECHANISM, NOT THE PROGRAM. An
+    AppImage AppRun is a shell script, so on a distribution whose
+    /bin/sh is dynamically linked the tree picks up that shell libc.
+    The payload process itself stays clean; both numbers are real and
+    they answer different questions.
+
+-- throughput, ns per operation, lower is better ------------------
+  one round at scale 1; see experiments/61- for the multi-round figures
+
+  ENVIRONMENT         LIBC     A mal4   P mal4   M mal4    A strop  P strop  M strop
+  alpine-3.22         musl       6.36     4.34   594.37     229.99   151.18  1081.22
+  alpine-3.20         musl       7.20     4.66   613.82     231.14   150.22  1053.26
+  alpine-3.10         musl       3.74     4.41   606.89     231.13   152.82  1059.75
+  voidlinux-musl      musl       3.66     4.60   593.67     228.51   150.79  1048.79
+  debian-11           glibc      3.68     4.33   592.86     232.26   152.74  1055.01
+  debian-12           glibc      7.20     4.85   607.12     231.89   153.76  1063.79
+  ubuntu-20.04        glibc      5.55     4.55   600.02     252.35   152.52  1063.40
+  rockylinux-8        glibc      3.96     4.41   634.82     231.63   150.20  1067.22
+  opensuse-leap-15.6  glibc      4.36     4.63   602.39     230.23   149.94  1056.26
+  fedora-42           glibc      3.68     5.02   617.15     230.93   152.37  1072.07
+  archlinux-latest    glibc      6.93     4.38   594.82     228.64   150.81  1050.77
+
+  A anylinux AppImage   P pgb   M static musl
+
+-- what each one is, and costs -----------------------------------
+  DELIVERY                   SHIP (B)  WHAT THE TARGET SEES
+  anylinux AppImage           3706343  a mount or an extraction into /tmp, then a shell AppRun
+  pgb                         2097824  one ELF, no interpreter, no mount, nothing written
+
+-- coverage, out of 11 ---------------------------------------------
+  DELIVERY                     RUNS    PAYLOAD CLEAN
+  anylinux AppImage           11/11            11/11
+  pgb                         11/11            11/11
+
+  ok    pgb ran on every environment                   = 11
+  ok    pgb loaded no host shared object               = 11
+  ok    no processes left running in the test bed      = 0
+        ⛔ THE HONEST READING, IF THE ROWS COME OUT AS THEY DID FIRST TIME.
+          Both deliver glibc everywhere and both keep glibc's throughput on a
+          musl host. They are not distinguished by portability or by speed.
+          What separates them is SHAPE: pgb hands you one ordinary ELF with
+          no interpreter that writes nothing and mounts nothing; the AppImage
+          hands you a runtime that mounts or extracts and then runs a shell.
+          ⭐ And the AppImage stack reaches a class pgb does not: it bundles
+          arbitrary shared libraries, so it packages software that cannot be
+          statically linked at all -- which is precisely the criticism its
+          own HOW-TO makes of the static approach.
+        
+        ⚠ One machine, one day. See the conditions block above.
+
+-- result ----------------------------------------------------
+pass=6 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

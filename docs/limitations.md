@@ -40,8 +40,7 @@ still leaves the other measurable.
 | Rocky 8 | **SIGABRT** | **SIGABRT, identical** |
 | openSUSE Leap, Fedora 42 | **SIGFPE** | **SIGFPE, identical** |
 
-⛔ **Arm B changes nothing anywhere, and the reason is that the failure is not
-the one that rewrite addresses.** No environment produced a symbol-version
+⛔ **Arm B changes nothing anywhere.** No environment produced a symbol-version
 error. The process dies *inside glibc's loader*, before `dlerror()` is ever
 set:
 
@@ -66,10 +65,29 @@ versioning is not involved, so neutralising version tags cannot help.
 the musl rows the object it loaded was musl-linked. Whether those libraries are
 *usable* is untested, and the two-libc hazard in §1 applies regardless.
 
-**So what would work?** The diagnosis names the requirement: the process must
-carry **its own loader and its own libc**, which is precisely what
+⚠ **What arm B does NOT establish, and an earlier revision of this page said
+it did.** It ported `cld_strip_versions()` — 7 lines, one function out of
+roughly forty in a 2015-line file. The rewrite it comes from
+(`cross-libc-dlopen.c:1857`) is three coordinated steps, and the two that were
+**not** ported are the ones aimed at the failure above: dropping the
+`DT_NEEDED` edges that pull a foreign libc in, and renaming the imports that
+are left. ⛔ So "the prior art cannot fix this, measured" overstates it. What
+was measured is that *one* function has no effect on its own.
+
+⭐ Upstream's own `docs/limits.md` — never read during this project's sweep —
+scopes the question further: for **static glibc** it says `dlopen` *works*,
+and that "the real blocker is more likely the preload path than `dlopen`",
+because a fully static binary has no `LD_PRELOAD` for the interposer to arrive
+through. It labels all three static cases **UNVERIFIED** upstream. It also
+ships `CROSS_LIBC_DLOPEN_DRYRUN`, a cheaper instrument than the one
+`experiments/50-` built. `docs/research/prior-art.md` has the detail.
+
+**So what would work?** The diagnosis still names a requirement: the process
+must carry **its own loader and its own libc**, which is precisely what
 cross-libc-dlopen assumes — it is an `LD_PRELOAD` for a process that already
-has both. That is a bundled-glibc **dynamic** binary, not a static one.
+has both. That is a bundled-glibc **dynamic** binary, not a static one. ⚠ But
+whether the full rewrite would also work *without* that, in the static case,
+is now recorded as untested rather than as settled.
 
 ⛔ **This cannot be bolted onto the static output.** It is a second output mode
 for `pgb`, and it costs the property that makes the current one worth having:
@@ -245,7 +263,8 @@ namespaces are shared unless `--private-net` is passed.
 
 | | |
 |---|---|
-| **there is a better answer when you do not need glibc** | ⛔ **Measured, `experiments/60-`.** A static **musl** binary of the same program matches `pgb` on both things this project asserts — 11/11 running, 11/11 loading no host shared object — and beats it on startup (160 µs vs 980 µs per exec) and size (447 KB vs 2.1 MB). This is a real limit on when to reach for `pgb` at all: it earns its cost only when the build has to be glibc. `docs/comparison.md`. |
+| **the program has to be statically linkable at all** | ⛔ **The real boundary, and it is not measured by any matrix here — it is a property of the software you are packaging.** `Anylinux-AppImages`' own guidance puts it: *"Compile statically! Sure, that works, go and compile all of kdenlive statically and get back to me once you get it done."* A large dynamic dependency graph — desktop toolkits, GPU stacks, anything loading host plugins — is served by bundling every library, not by static linking. `docs/comparison.md`. |
+| **startup and size, against musl** | ⚠ A static **musl** binary starts about 6× faster (160 µs vs 980 µs per exec) and ships 447 KB against 2.1 MB. Real advantages for short-lived processes. ⛔ **They are not a reason to prefer musl generally, and an earlier revision of this file said they were**: at steady state glibc is 3–129× faster on the same workloads (`experiments/61-`), which is why the brief asks for glibc in the first place. `docs/history/corrections.md` C7. |
 | **architecture** | x86_64 only. aarch64 is **untested** — `docs/AGENTS.md` §9 and §13 item 2. |
 | **machines** | one. Every result is one machine, one kernel, one day. |
 | **glibc floor** | the build image is pinned at glibc 2.36 because `files`/`dns` became builtin in 2.34. ✅ **Measured**, not reasoned: `experiments/21-glibc-version-floor.sh` builds the same source at 2.31 and at 2.36 against the same target, and below the floor the override **moves** the `dlopen` rather than removing it — `libnss_files.so.2` and `libnss_dns.so.2` are opened with and without it. `docs/history/corrections.md` C6 has the table. ⚠ This row said "reasoned, not measured — planned and unwritten" for most of the project's life and was left stale after the experiment landed. |

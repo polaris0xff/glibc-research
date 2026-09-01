@@ -39,3 +39,9 @@ evidence/poc/*/probe-build.log
 /tool/target/
 *.o
 *.so.tmp
+
+# 62-'s staged upstream artefacts: sharun, appimagetool, uruntime, mkdwarfs and
+# the AppImages built from them. All are re-fetched by digest and rebuilt by
+# the experiment; ⛔ A BUILT BINARY IS NOT EVIDENCE, IT IS OUTPUT.
+evidence/*/*.AppImage
+evidence/*/AppDir*/

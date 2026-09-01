@@ -66,19 +66,20 @@ for p in poc/*/run.sh; do sh "$p"; done
 
 ## Honest limits
 
-⛔ **If you can build against musl instead, do that.** The same program was
-built eight ways and run on the same 11 environments
-([`docs/comparison.md`](docs/comparison.md)). A plain **static musl** binary
-matches `pgb` exactly — 11/11 running, 11/11 loading no host shared object —
-while starting about 6× faster (160 µs vs 980 µs per exec) and shipping
-447 KB against 2.1 MB. `pgb` beat every *packaging format* on that matrix
-(AppImage 2/11, onelf 3/11, Flatpak and snap 0/11) and did not beat that.
+⛔ **If your program can be statically linked at all.** That is the real
+boundary, and the [Anylinux-AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages)
+project puts it best: *"Compile statically! Sure, that works, go and compile
+all of kdenlive statically and get back to me once you get it done."* For
+software with a large dynamic dependency graph — desktop applications, GPU
+stacks, anything loading host plugins — bundling every library is the approach
+that works, and that project is the one to use. `pgb` serves the class that
+*can* be linked statically, and hands it back as one ordinary ELF.
 
-⭐ **So this tool is for when the build has to be glibc**: a dependency that
-will not cross to musl, a prebuilt glibc-linked archive, glibc-specific
-behaviour, or `--wrap` onto objects compiled long before this existed. That is
-a narrower claim than "portable Linux binaries", and it is the one the
-measurements support.
+⚠ **`pgb` is not faster than an anylinux AppImage and does not run in more
+places.** Measured on the same 11 environments, both run everywhere and both
+deliver glibc's throughput. What differs is shape: `pgb` is one file with no
+interpreter that mounts nothing and writes nothing;
+[`docs/comparison.md`](docs/comparison.md) has both columns.
 
 ⛔ **`dlopen` of a *host* shared object is host-dependent, and success is the
 worse outcome.** gawk's own extension loads on Debian 12 and Arch — dragging

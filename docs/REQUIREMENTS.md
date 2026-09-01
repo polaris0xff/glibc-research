@@ -70,36 +70,45 @@ is the honest one.
 
 ### Part 2: what the measurement actually says
 
-The comparison the directive asked for exists now. All five named alternatives
-were built — AppImage, Flatpak, snap, onelf and static musl — plus the two
-controls. [`comparison.md`](comparison.md) carries the table;
-`evidence/60-versus-alternatives/RESULT.txt` is the run.
+The comparison the directive asked for exists now: AppImage, Flatpak, snap,
+onelf and static musl were all built, plus the two controls, and the AppImage
+arm was then rebuilt against `Anylinux-AppImages` because the vanilla one is
+not the competitor. [`comparison.md`](comparison.md) carries the table.
 
-| | `pgb` | static musl |
-|---|---|---|
-| ran correctly, 11 environments | 11 / 11 | 11 / 11 |
-| loaded zero host shared objects | 11 / 11 | 11 / 11 |
-| per exec | 980 µs | **160 µs** |
-| artefact size | 2,097,824 B | **447,264 B** |
+⚠ **A previous revision of this section answered this from the wrong
+measurement** — startup and size, where musl wins by construction — and
+concluded that static musl beat `pgb`. `history/corrections.md` C7 has the
+error. The corrected picture:
 
-⛔ **So "strictly better and/or faster than every existing format and
-technique" is false, and no wording fixes it.** `pgb` beat every *packaging
-format* on this matrix — AppImage 2/11, onelf 3/11, Flatpak and snap 0/11
-because no target ships anything to run them with — and it did not beat the
-technique of simply building against musl.
+| | `pgb` | anylinux AppImage | static musl |
+|---|---|---|---|
+| ran correctly, 11 environments | 11 / 11 | 11 / 11 | 11 / 11 |
+| loaded zero host objects in the payload | 11 / 11 | 11 / 11 | 11 / 11 |
+| malloc, 4 threads, on Alpine | **4.3 ns** | **3.7 ns** | 592 ns |
+| artefact size | **2.1 MB** | 3.7 MB | 447 KB |
+| target does nothing but execute it | ✅ | ⛔ mounts or extracts | ✅ |
+| serves programs that cannot be linked statically | ⛔ | ✅ | ⛔ |
 
-⭐ **What the evidence does support** is the claim `pgb verify` already emits,
-narrowed by one clause: *built at tier 1, ran correctly and loaded no host
-object on these 11 named environments, **for a glibc build***. The last clause
-is the whole value. Where a program can be rebuilt against musl, the
-measurement says to do that instead; `pgb` is for where it cannot — a
-dependency that will not cross to musl, a prebuilt glibc-linked archive,
-glibc-specific behaviour, or `--wrap` onto objects compiled before this tool
-existed.
+⛔ **"Strictly better and/or faster than every existing format and technique"
+is still false, but for a completely different reason than the one recorded
+before.** `pgb` is not beaten on portability or on speed by anything measured.
+It is **tied** with the anylinux AppImage on both, ahead of it on artefact size
+and on shape — one ELF, nothing mounted, nothing written — and **behind it on
+reach**: bundling serves software that cannot be statically linked at all, and
+static linking never will.
 
-**What would move part 2 to met.** Either a column where `pgb` beats static
-musl and the formats at once, or the operator agreeing that "strictly better"
-was the wrong bar and replacing it with the class-restricted claim above.
+⭐ **What the evidence does support**, and it is a real claim:
+
+> Built at tier 1, ran correctly and loaded no host shared object on these 11
+> named environments, at glibc's throughput including on musl hosts, as one
+> ordinary ELF that mounts nothing and writes nothing — for programs that can
+> be statically linked.
+
+**What would move part 2 to met.** Either `pgb` grows to serve the
+bundling class as well (that is [`design/tiers.md`](design/tiers.md), and
+⭐ the anylinux stack is now the reference implementation to measure against
+rather than a rival to beat), or the operator agrees that "strictly better than
+every existing format" was the wrong bar and replaces it with the claim above.
 ⛔ That second one is the operator's call and not an agent's: do not rewrite
 this requirement to match the result.
 

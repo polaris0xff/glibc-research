@@ -1,0 +1,80 @@
+===============================================================
+61 - libc throughput: what glibc buys once the program is running
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-01T10:24:31Z
+host kernel  : Linux 6.18.44-fc-v22
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/61-libc-throughput
+--------------------------------------------------------------
+
+  ok    A: both host arms built (same compiler)        = yes
+
+-- A: same machine, same compiler, libc is the only difference ----
+   cc: cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+   3 rounds, best round; ns per operation, lower is better
+
+   WORKLOAD     glibc static    musl static   musl / glibc
+   malloc1             12.95          42.20   3.26x
+   malloc4              4.53         584.71   129.08x
+   memcpy             970.29        1036.82   1.07x
+   strops             149.14        1051.09   7.05x
+   qsort               93.20         921.49   9.89x
+   snprintf           344.42         989.67   2.87x
+   math                28.58          32.07   1.12x
+
+  ok    B: both pinned-env arms built                  = yes
+-- B: plain gcc -static vs pgb, same pinned env, same compiler ----
+   3 rounds, best round; ns per operation, lower is better
+
+   WORKLOAD     plain static            pgb   pgb / plain
+   malloc1             12.58          13.24   1.05x
+   malloc4              4.37           4.42   1.01x
+   memcpy             964.06         968.35   1.00x
+   strops             149.32         149.24   1.00x
+   qsort               92.89          93.28   1.00x
+   snprintf           363.30         358.19   0.99x
+   math                27.85          27.65   0.99x
+
+  ok    C: static musl arm built                       = yes
+-- C: the same two binaries, run on every environment ------------
+   ns per operation, 1 round at matrix scale 1; lower is better
+   ⚠ arm C is one round, not 3 -- it is a per-environment check that
+     the gap travels, not a re-measurement of its size.
+
+   ENVIRONMENT         LIBC       P mal4     M mal4   P strops   M strops
+   alpine-3.22         musl         4.68     592.00     187.90    1061.84
+   alpine-3.20         musl         4.92     602.36     156.35    1053.02
+   alpine-3.10         musl         4.68     592.42     154.53    1048.84
+   voidlinux-musl      musl         4.39     589.07     149.25    1059.70
+   debian-11           glibc        4.44     598.42     151.00    1057.51
+   debian-12           glibc        4.66     606.28     160.28    1066.34
+   ubuntu-20.04        glibc        4.81     593.59     151.86    1059.35
+   rockylinux-8        glibc        4.39     587.76     150.78    1058.11
+   opensuse-leap-15.6  glibc        4.39     592.76     154.75    1089.20
+   fedora-42           glibc        4.34     589.65     159.91    1043.89
+   archlinux-latest    glibc        4.37     603.00     154.38    1083.69
+
+  ok    C: ran on every fetched environment            = yes
+   full per-workload figures per environment: /home/user/glibc-research/evidence/61-libc-throughput/per-environment.txt
+
+        ⛔ READ THE RATIO COLUMN, NOT THE ABSOLUTE NUMBERS. The ns/op figures
+          are one machine on one day and mean nothing elsewhere; the ratio
+          between two binaries measured back to back on the same machine is
+          the part that carries.
+        
+        ⚠ THIS DOES NOT MAKE musl A BAD LIBC. It is smaller and starts faster,
+          measured in experiments/40- and 60-, and those are real advantages
+          for short-lived processes. The two sets of measurements are about
+          different things and neither cancels the other.
+        
+        ⚠ One machine, one day, 4 cores. See the conditions block above.
+
+-- result ----------------------------------------------------
+pass=4 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

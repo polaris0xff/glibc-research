@@ -382,8 +382,27 @@ classify_trace() {
   awk -v want="$2" -v mode="$3" '
     { pid = $1 }
     $0 ~ ("execve\\(\"" want "\"") { inset[pid] = 1; payload = pid; next }
-    inset[pid] && /(clone|clone3|vfork|fork)\(/ && /= [0-9]+$/ { inset[$NF] = 1; next }
-    inset[pid] && /execve\(/ && !/ENOENT|= -1/ { payload = pid }
+    # ⛔ A FORK IS TWO LINES WHEN strace INTERLEAVES, AND THE FIRST VERSION OF
+    # THIS MATCHED ONLY THE FIRST. strace writes `vfork( <unfinished ...>` and
+    # then `<... vfork resumed>) = 1234`; the child pid is only on the second
+    # line, and that line does not contain `vfork(`. Requiring both `vfork(`
+    # and a trailing `= N` therefore matched NOTHING, and every interleaved
+    # fork child was silently dropped from the set. experiments/62- is where
+    # it showed: an AppImage that ran and passed was recorded as having opened
+    # no objects at all, which is impossible.
+    ($0 ~ /(clone|clone3|vfork|fork)\(/ || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) \
+      && /= [0-9]+$/ { if (inset[pid]) inset[$NF] = 1; next }
+    # ⛔ execve REPLACES THE ADDRESS SPACE, so an object opened before the last
+    # exec is not mapped in the running program. A delivery mechanism that
+    # execs through a shell would otherwise have that shells libraries counted
+    # against the payload. In payload mode the set is cleared at each exec; in
+    # tree mode it is not, because that column asks what the machine had to
+    # load in total. docs/history/corrections.md.
+    inset[pid] && /execve\(/ && !/ENOENT|= -1/ {
+      payload = pid
+      if (mode != "tree") delete cur
+      next
+    }
     inset[pid] && /open(at)?\(/ && !/ENOENT|= -1/ {
       if (mode != "tree" && pid != payload) next
       if (match($0, /"[^"]*"/) == 0) next
@@ -398,9 +417,10 @@ classify_trace() {
       # distributions own library directories. Anything else that is a .so
       # came out of the artefact -- its mount point, its extraction directory,
       # its cache -- and is the bundles own copy, not the hosts.
-      if (p ~ /^\/(usr\/)?(local\/)?lib(32|64)?\//) print "host " p
-      else print "bundled " p
+      if (p ~ /^\/(usr\/)?(local\/)?lib(32|64)?\//) cur["host " p] = 1
+      else cur["bundled " p] = 1
     }
+    END { for (k in cur) print k }
   ' "$1" | sort -u
 }
 
@@ -419,14 +439,38 @@ classify_trace() {
 # tree counters below count only cells where -f actually completed.
 RUN_TIMEOUT="${PGB_VS_TIMEOUT:-25}"
 
-# ⛔ `pkill -f` IS THE WRONG TOOL AND IT KILLED THE MEASURING SHELL. The
-# pattern has to appear in the runner's OWN command line -- `rootfs-run.sh ...
-# -- /pgb-vs-arm` -- so a full-command-line match reaps the experiment along
-# with the leftovers. -x matches the process NAME, which only the artefact has.
-reap() {
-  pkill -9 -x pgb-vs-arm >/dev/null 2>&1
+# ⛔ TWO REAPERS WERE WRONG BEFORE THIS ONE.
+#
+#   `pkill -f` matched the runner's OWN command line -- `rootfs-run.sh ... --
+#   /pgb-vs-arm` -- so it killed the experiment along with the leftovers.
+#
+#   `pkill -x pgb-vs-arm` matched the artefact and nothing else, which is not
+#   what a delivery format leaves behind: an AppImage's uruntime leaves a
+#   DWARFS FUSE daemon whose comm is `memfd:dwarfs`, by design, because a mount
+#   that outlives the program is what mount mode is. A full pass of
+#   experiments/62- left 22 of them running and they had to be killed by hand.
+#
+# ⭐ /proc/PID/root IS THE CHROOT A PROCESS IS ACTUALLY IN, so matching on it
+# reaps every straggler of a cell whatever it is called, and cannot match
+# anything outside the test bed. docs/history/corrections.md.
+reap_rootfs() {  # rootfs-path
+  for _d in /proc/[0-9]*; do
+    _p=${_d#/proc/}
+    _r=$(readlink "$_d/root" 2>/dev/null) || continue
+    case "$_r" in "$1"|"$1"/*) kill -9 "$_p" 2>/dev/null ;; esac
+  done
   return 0
 }
+
+# An interrupted run must not leave the bed populated either.
+reap_all() {
+  while read -r _ref _name _libc _digest; do
+    case "$_ref" in ''|\#*) continue ;; esac
+    _r=$(exp_rootfs "$_name"); [ -n "$_r" ] && reap_rootfs "$_r"
+  done < "$REPO_DIR/scripts/common/rootfs-images.txt"
+  return 0
+}
+trap 'reap_all' EXIT INT TERM
 
 # echoes `full` when -f completed, `nofork` when it had to be dropped
 trace_run() {  # rootfs /artefact tracefile
@@ -434,12 +478,12 @@ trace_run() {  # rootfs /artefact tracefile
     strace -f -e trace=openat,open,execve,clone,clone3,vfork,fork -o "$3" \
       sh "$RR" "$1" -- "$2" </dev/null >/dev/null 2>&1
   _rc=$?
-  reap
+  reap_rootfs "$1"
   if [ "$_rc" = 124 ] || [ "$_rc" = 137 ]; then
     timeout -k 10 "$RUN_TIMEOUT" \
       strace -e trace=openat,open,execve -o "$3" \
         sh "$RR" "$1" -- "$2" </dev/null >/dev/null 2>&1
-    reap
+    reap_rootfs "$1"
     printf 'nofork'
   else
     printf 'full'
@@ -476,7 +520,7 @@ while read -r ref name libc digest; do
     timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$root" -- /pgb-vs-arm \
       </dev/null >"$B/out.$name.$a" 2>&1
     st=$?
-    reap
+    reap_rootfs "$root"
     eval "TESTED_$a=\$((TESTED_$a+1))"
     case $st in
       0)   res=ok; eval "RUNS_$a=\$((RUNS_$a+1))" ;;
@@ -671,6 +715,20 @@ exp_check "pgb loaded no host shared object" "$P_CLEAN" "$P_T"
     printf 'arm %s built=%s size=%s runs=%s/%s payload_clean=%s\n' "$a" "$b" "$s" "$r" "$t" "$c"
   done
 } > "$EXP_OUT/summary.txt"
+
+# ⛔ A LEAK MUST FAIL THE EXPERIMENT, NOT BE LEFT FOR THE OPERATOR TO NOTICE.
+# The first version of this script left 22 FUSE daemons running and said
+# nothing; the person running it had to find and kill them by hand.
+strays=0
+while read -r _ref _name _libc _digest; do
+  case "$_ref" in ''|\#*) continue ;; esac
+  _r=$(exp_rootfs "$_name"); [ -n "$_r" ] || continue
+  for _d in /proc/[0-9]*; do
+    _rr=$(readlink "$_d/root" 2>/dev/null) || continue
+    case "$_rr" in "$_r"|"$_r"/*) strays=$((strays+1)) ;; esac
+  done
+done < "$REPO_DIR/scripts/common/rootfs-images.txt"
+exp_check "no processes left running in the test bed" "$strays" 0
 
 exp_note "READ THE TWO CLEAN COLUMNS SEPARATELY. 'payload clean' is the §3"
 exp_note "  criterion: no host object in the process the program runs in."
