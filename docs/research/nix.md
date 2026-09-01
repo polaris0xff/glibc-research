@@ -84,8 +84,59 @@ availability, by population:
 
 ⭐ And the packages that have one are not the *popular* ones, they are the ones
 that are **inputs to other builds**: zlib, gawk, gnugrep and coreutils do; jq,
-nano, htop, sqlite, ncurses and less do not. So the no-nix route is worth
-trying first and **the fallback to evaluation is mandatory**.
+nano, htop, sqlite, ncurses and less do not.
+
+## ⭐ REVISION 2: THE FALLBACK IS NOT AN EVALUATOR, AND THE CEILING IS GONE
+
+⛔ **Superseded, 2026-09-01e.** The sentence that stood here said the fallback
+to evaluation was mandatory. It is not, and `experiments/88-` measures the
+replacement: **hydra built the channel**, so it holds the derivation for every
+job it ran.
+
+    hydra.nixos.org/job/<project>/<jobset>/<attr>.<system>/latest-finished
+      -> drvpath, system, and every output's store path
+
+That is an index of **builds**, not a field somebody happened to upload beside
+a NAR, so `Deriver:` availability does not bound it. On **83-'s own twenty
+packages with 83-'s own predicate**:
+
+| route | resolved | not |
+|---|---|---|
+| ⭐ hydra | **19** | 1 |
+| narinfo `Deriver:` | 9 | 11 |
+
+and the one miss is a name that is not a nixpkgs attribute (`grep`; the
+attribute is `gnugrep`). ⭐ **The control**: for jq, gawk, zlib and openssl the
+drvpath hydra returns is **byte-identical** to what a local `nix-instantiate`
+computes, and the two routes' plans agree on **19 of 19** comparable fields.
+
+⚠ **It pins differently and that is stated rather than hidden.** hydra answers
+for its latest FINISHED eval; the channel is an older tested revision. The
+`drv` subcommand reports the revision and cross-checks the outputs against the
+channel index, and `ChannelPinAgrees: no` is usual. It matters for fetching a
+prebuilt binary and not for planning, because a plan is source URLs and
+configure flags and sources are fixed-output paths that do not move.
+
+### ⭐ And a second index answers finding 3b
+
+`releases.nixos.org/nixpkgs/<pin>/packages.json.br` sits beside
+`store-paths.xz`, is served with `Content-Encoding: br` so `curl --compressed`
+decodes it with **no brotli library on the host**, and carries per attribute
+the derivation `name` (**`bash` → `bash-interactive-5.3p15`**, which 3b says no
+name match can know), the default `outputName` (**`jq` → `bin`**), the `pname`,
+and the **`system`**.
+
+### ⛔ THE DEFECT BOTH INDEXES FIX, WHICH HAD BEEN THERE FROM THE START
+
+**`store-paths.xz` is every system the channel built.** Resolving `nix-2.35.2`
+by name in this tree returned an **aarch64-darwin** build — fetched, signature
+verified, NarHash checked, and a **Mach-O arm64 executable**. Nothing in the
+route could tell. What gave it away was its closure: 57 paths **with no glibc
+in it**, and two Apple-only libraries. The index holds **three** store paths
+named `nix-2.35.2`.
+
+⚠ **A `pname`-only match is reported as one**: `sed` reaches **`freebsd.sed`**,
+a real package for the wrong userland, and the answer says `Matched: pname`.
 
 ⛔ **An index lookup is not an evaluation, and `experiments/83-` arm 3b shows
 it two ways.** nixpkgs' `bash` attribute is `bash-interactive`, which no name

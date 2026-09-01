@@ -91,48 +91,37 @@ rung_failed() {  # rung-name summary logfile
 # feature and not the library that was absent.
 # ---------------------------------------------------------------------------
 printf -- '-- rung 1: the X stack, static, planned by nixpkgs -------------\n'
-XSTACK="xorg.libXau xorg.libXdmcp xorg.libxcb xorg.xcbutil xorg.xcbutilimage \
-xorg.xcbutilkeysyms xorg.xcbutilrenderutil xorg.xcbutilwm xorg.xcbutilcursor \
-libxkbcommon openssl"
-
-SYNTH="$W/xstack.plan"
-if [ ! -s "$PREFIX/.built/libxkbcommon" ] || [ ! -s "$SYNTH" ]; then
-  : > "$W/xstack.tsv"
-  for a in $XSTACK; do
-    p="$W/plan-$(printf '%s' "$a" | tr './' '__').json"
-    [ -s "$p" ] || sh "$PGB" nix plan "$a" --out "$p" >>"$LOG" 2>&1 || true
-    if [ -s "$p" ]; then
-      python3 - "$p" >> "$W/xstack.tsv" <<'PY'
-import json, sys
-d = json.load(open(sys.argv[1]))
-print("%s\t%s" % (d.get("pname", "") + "-" + d.get("version", ""), d.get("drv", "")))
-PY
-    else
-      poc_note "⚠ no plan for $a"
-    fi
-  done
-  python3 - "$W/xstack.tsv" > "$SYNTH" <<'PY'
-import json, sys
-deps = []
-for line in open(sys.argv[1]):
-    name, _, drv = line.rstrip("\n").partition("\t")
-    if name and drv:
-        deps.append({"name": name, "drv": drv, "out": ""})
-json.dump({"schema": "pgb-nix-plan/1", "attr": "qt-xcb-stack",
-           "pname": "qt-xcb-stack", "version": "0", "system": "x86_64-linux",
-           "src": {}, "patches": [], "outputs": ["out"],
-           "configureFlags": [], "cmakeFlags": [], "mesonFlags": [],
-           "makeFlags": [], "buildInputs": [d["name"] for d in deps],
-           "nativeBuildInputs": [], "propagatedBuildInputs": [],
-           "buildSystemHooks": [], "nix_only": {}, "nixpkgs": "",
-           "deps": deps}, sys.stdout, indent=1)
-PY
+# ⛔ THE ATTRIBUTE NAMES ARE NOT REACHABLE AND THE PLAN DOES NOT NEED THEM.
+# `packages.json` carries top-level attributes; `xorg.libxcb` and its siblings
+# are not among them, so `nix-fetch attr xorg.libxcb` answers "no attribute,
+# pname or name". ⭐ But the qtbase plan already NAMES EVERY DEPENDENCY'S
+# DERIVATION PATH -- that is what a plan is -- so the X stack is reachable
+# with no index lookup at all.
+#
+# ⚠ AND MOST OF THAT LIST IS NOT WANTED. nixpkgs' qtbase pulls 61 build
+# inputs: GTK, CUPS, MariaDB, PostgreSQL, ODBC, systemd, ICU, wayland, mesa,
+# Vulkan. `-force-bundled-libs` covers freetype, harfbuzz, pcre2, zlib, libpng
+# and libjpeg out of the tarball. So the KEEP list is written out and
+# everything else is skipped -- the opposite of a skip list, because naming
+# what is needed is checkable and naming what is not is a guess that grows.
+QTPLAN="${PGB_QT_PLAN:-$W/qtbase.plan}"
+if [ ! -s "$QTPLAN" ]; then
+  sh "$PGB" nix plan qt6.qtbase --out "$QTPLAN" >>"$LOG" 2>&1 || true
 fi
-poc_check "a plan for the X stack was produced" \
-  "$([ -s "$SYNTH" ] && echo ok || echo failed)" ok
-poc_note "$(python3 -c 'import json,sys;print(len(json.load(open(sys.argv[1]))["deps"]))' "$SYNTH" 2>/dev/null) derivations in the synthetic plan"
+poc_check "a plan for qtbase was produced" \
+  "$([ -s "$QTPLAN" ] && echo ok || echo failed)" ok
+[ -s "$QTPLAN" ] || poc_finish
 
-NIX_PREFIX="$PREFIX" sh "$PGB" nix deps --plan "$SYNTH" >>"$LOG" 2>&1 || true
+# What the xcb QPA plugin actually needs, plus TLS for QtNetwork.
+QT_KEEP="libxcb libxcb-util libxcb-image libxcb-keysyms libxcb-render-util \
+libxcb-wm libxcb-cursor libxdmcp libxau libx11 libxext libxrender libxi \
+libxkbcommon openssl xorgproto xcb-proto"
+SKIP=$(QT_KEEP="$QT_KEEP" QTPLAN="$QTPLAN" python3 "$POC_DIR/skiplist.py")
+poc_note "keeping: $QT_KEEP"
+poc_note "skipping $(printf '%s\n' $SKIP | grep -c .) of qtbase's build inputs"
+
+NIX_PREFIX="$PREFIX" NIX_DEP_SKIP="$SKIP" \
+  sh "$PGB" nix deps --plan "$QTPLAN" >>"$LOG" 2>&1 || true
 BUILT=$(ls "$PREFIX/.built" 2>/dev/null | tr '\n' ' ')
 poc_note "built into the static prefix: ${BUILT:-<none>}"
 for want in libxcb libxkbcommon openssl; do
