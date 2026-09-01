@@ -1,0 +1,7 @@
+  ok   version                        curl
+  ok   tls-built                      OpenSSL present
+  ok   nss-hosts-file                 resolved via files, connection refused as expected
+  ok   nss-localhost                  resolved
+  ok   numeric-control                control: no resolver involved
+  ok   file-scheme                    hello pgb
+  ok   live-https                     real DNS + TLS handshake + body
