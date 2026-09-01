@@ -230,12 +230,39 @@ case "$TARGET" in
     DRV=$("$NIXPFX/nix-instantiate" '<nixpkgs>' --attr "$TARGET" 2>/dev/null | grep '^/nix/store/' | head -1)
     DRV="${DRV%%!*}"
     [ -n "$DRV" ] || die "nixpkgs has no attribute '$TARGET'"
-    OUTPATH=$("$NIXPFX/nix" derivation show "$DRV" 2>/dev/null | python3 -c '
+    # ⛔ `out` IS NOT WHERE THE PROGRAM IS FOR A MULTI-OUTPUT PACKAGE, and
+    # taking it unconditionally is how "one command from a package name"
+    # stops being true. Measured on nixpkgs `jq`: its `out` output contains
+    # `lib/` and NOTHING ELSE -- `bin/jq` lives in the separate `bin` output,
+    # which is not in `out`'s closure at all. The run got as far as
+    # `no entry point in ...-jq-1.8.2/bin`, which reads like a broken package
+    # and is a wrong output.
+    #
+    # ⭐ Preferring `bin` is the right default rather than a special case:
+    # nixpkgs splits an output off exactly when it wants the executables
+    # separated, and the `bin` output REFERENCES `out`, so its closure carries
+    # both. Single-output packages are untouched -- there is only `out` and
+    # the preference falls through to it.
+    OUTSEL=$("$NIXPFX/nix" derivation show "$DRV" 2>/dev/null | python3 -c '
 import json, sys
 d = json.load(sys.stdin)["derivations"]
 v = list(d.values())[0]
-print(v["outputs"].get("out", {}).get("path", ""))')
-    [ -n "$OUTPATH" ] || die "could not find the out path of $DRV"
+o = v["outputs"]
+for name in ("bin", "out"):
+    p = o.get(name, {}).get("path", "")
+    if p:
+        print(name, p)
+        break
+else:
+    # Neither: take whatever single output there is rather than guessing.
+    for name, spec in o.items():
+        if spec.get("path"):
+            print(name, spec["path"])
+            break')
+    OUTNAME=${OUTSEL%% *}
+    OUTPATH=${OUTSEL#* }
+    [ -n "$OUTSEL" ] && [ "$OUTNAME" != "$OUTPATH" ] || die "could not find an output path of $DRV"
+    [ "$OUTNAME" = out ] || say "output      '$OUTNAME' (nixpkgs put the programs there, not in 'out')"
     ;;
 esac
 BASE=$(printf '%s' "$OUTPATH" | sed 's|^/nix/store/||')
