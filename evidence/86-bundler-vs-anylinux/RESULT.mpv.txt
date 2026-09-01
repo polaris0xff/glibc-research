@@ -1,0 +1,57 @@
+86 - our bundler against a hand-built Anylinux AppImage
+
+subject: mpv   (arm P: nixpkgs mpv v0.41.0, arm A: Arch mpv v0.41.0)
+⚠ WRITTEN FROM THE RUN LOG. This run predates the per-subject evidence
+  file the script now writes; every figure below is copied verbatim from
+  the run output kept beside it. The next run overwrites it properly.
+
+-- size ----------------------------------------------------------
+  payload versions: P mpv v0.41.0 Copyright © 2000-2025 mpv/MPlayer/mplayer2 projects (nixpkgs)   A mpv v0.41.0 Copyright © 2000-2025 mpv/MPlayer/mplayer2 projects (Arch)
+  ARTEFACT                            BYTES  NOTE
+  P  ours (nixpkgs closure)       221623798  297 store paths, --debloat safe
+  A  hand-built (Arch)             81849864  475 libraries deployed
+     ratio P/A                        2.71x  ⚠ ours is bigger; the debloat level this run used is printed above
+
+-- the eleven: does it run, what did it load, how fast does it start --
+  ENVIRONMENT         LIBC   | P:res    P:h   P:cold   P:warm   | A:res    A:h   A:cold   A:warm  
+  alpine-3.22         musl   | ok       0     1549ms   70ms     | ok       0     681ms    97ms    
+  alpine-3.20         musl   | ok       0     1298ms   96ms     | ok       0     659ms    92ms    
+  alpine-3.10         musl   | ok       0     1268ms   156ms    | ok       0     701ms    100ms   
+  voidlinux-musl      musl   | ok       0     1314ms   210ms    | ok       0     735ms    104ms   
+  debian-11           glibc  | ok       0     1282ms   112ms    | ok       0     646ms    102ms   
+  debian-12           glibc  | ok       0     1304ms   123ms    | ok       0     646ms    107ms   
+  ubuntu-20.04        glibc  | ok       0     1239ms   111ms    | ok       0     660ms    98ms    
+  rockylinux-8        glibc  | ok       0     1278ms   106ms    | ok       0     672ms    105ms   
+  opensuse-leap-15.6  glibc  | ok       0     1297ms   109ms    | ok       0     631ms    112ms   
+  fedora-42           glibc  | ok       0     1284ms   110ms    | ok       0     646ms    119ms   
+  archlinux-latest    glibc  | ok       0     1298ms   112ms    | ok       0     647ms    114ms   
+
+  h = HOST shared objects the payload process opened. Objects the
+  artefact brought with it are counted separately and are in
+  per-environment.txt -- for both arms those are the bundled ld.so,
+  libc and the application's own libraries.
+
+  ⭐ cold is one chroot enter with a COLD dwarfs mount, guaranteed by
+  reaping the rootfs first. warm is (six invocations - cold) / 5, taken
+  inside ONE enter with the mount left alive -- which is what a real
+  user gets and what the first version of this instrument destroyed by
+  reaping between runs. experiments/40-'s noise floor applies: a
+  difference at or under it is "no difference measurable".
+
+  ok    arm P ran on every environment                 = 11
+  ok    arm A ran on every environment                 = 11
+  ok    arm P loaded no host shared object             = 11
+  ok    arm A loaded no host shared object             = 11
+
+-- ⛔ what this does NOT establish --------------------------------
+  not the same build   arm P ships nixpkgs' mpv, arm A ships Arch's;
+                       mpv v0.41.0 Copyright © 2000-2025 mpv/MPlayer/mplayer2 projects and mpv v0.41.0 Copyright © 2000-2025 mpv/MPlayer/mplayer2 projects. Same release here, which is luck
+                       rather than design -- different compilers,
+                       flags and dependency versions either way.
+  not a GUI            none of the eleven has a display; the GL case
+                       is experiments/85-.
+  not debloated        T-057 item 1 is untouched, and the size row
+                       above is what that costs.
+  one machine, one day
+
+conditions: 2026-09-01T23:0xZ, Linux 6.18.44-fc-v22

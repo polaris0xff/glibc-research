@@ -1,0 +1,110 @@
+== alpine-3.22 (musl) arm P
+   status  : ok
+   startup : cold 1549 ms, warm 70 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== alpine-3.22 (musl) arm A
+   status  : ok
+   startup : cold 681 ms, warm 97 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 
+== alpine-3.20 (musl) arm P
+   status  : ok
+   startup : cold 1298 ms, warm 96 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== alpine-3.20 (musl) arm A
+   status  : ok
+   startup : cold 659 ms, warm 92 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 
+== alpine-3.10 (musl) arm P
+   status  : ok
+   startup : cold 1268 ms, warm 156 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== alpine-3.10 (musl) arm A
+   status  : ok
+   startup : cold 701 ms, warm 100 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 
+== voidlinux-musl (musl) arm P
+   status  : ok
+   startup : cold 1314 ms, warm 210 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== voidlinux-musl (musl) arm A
+   status  : ok
+   startup : cold 735 ms, warm 104 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 
+== debian-11 (glibc) arm P
+   status  : ok
+   startup : cold 1282 ms, warm 112 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== debian-11 (glibc) arm A
+   status  : ok
+   startup : cold 646 ms, warm 102 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 
+== debian-12 (glibc) arm P
+   status  : ok
+   startup : cold 1304 ms, warm 123 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== debian-12 (glibc) arm A
+   status  : ok
+   startup : cold 646 ms, warm 107 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 
+== ubuntu-20.04 (glibc) arm P
+   status  : ok
+   startup : cold 1239 ms, warm 111 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== ubuntu-20.04 (glibc) arm A
+   status  : ok
+   startup : cold 660 ms, warm 98 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 
+== rockylinux-8 (glibc) arm P
+   status  : ok
+   startup : cold 1278 ms, warm 106 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== rockylinux-8 (glibc) arm A
+   status  : ok
+   startup : cold 672 ms, warm 105 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 
+== opensuse-leap-15.6 (glibc) arm P
+   status  : ok
+   startup : cold 1297 ms, warm 109 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== opensuse-leap-15.6 (glibc) arm A
+   status  : ok
+   startup : cold 631 ms, warm 112 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 
+== fedora-42 (glibc) arm P
+   status  : ok
+   startup : cold 1284 ms, warm 110 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== fedora-42 (glibc) arm A
+   status  : ok
+   startup : cold 646 ms, warm 119 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 
+== archlinux-latest (glibc) arm P
+   status  : ok
+   startup : cold 1298 ms, warm 112 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=141
+   host .so: 
+== archlinux-latest (glibc) arm A
+   status  : ok
+   startup : cold 647 ms, warm 114 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=206
+   host .so: 

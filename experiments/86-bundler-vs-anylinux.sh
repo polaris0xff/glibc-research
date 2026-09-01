@@ -67,7 +67,7 @@ MKDWARFS_SHA="50891c38ba359db8271819a6cbf6aaa8068681523f0c4f2b8242007a45edaa28"
 
 B="$EXP_OUT/build"
 mkdir -p "$B" || exit 2
-: > "$EXP_OUT/per-environment.txt"
+: > "$EXP_OUT/per-environment.$APP.txt"
 : > "$B/build.log"
 
 [ -d "$ARCH_ROOT" ] || { exp_note "archlinux-latest not fetched"; exit 2; }
@@ -373,7 +373,7 @@ while read -r ref name libc digest; do
         "$cold" "$warm" "$WARM_RUNS"
       printf '   objects : host=%s bundled=%s\n' "$nh" "$nb"
       printf '   host .so: %s\n' "$(printf '%s\n' "$pl" | sed -n 's/^host //p' | tr '\n' ' ')"
-    } >> "$EXP_OUT/per-environment.txt"
+    } >> "$EXP_OUT/per-environment.$APP.txt"
     rm -f "$root/vs-arm"
   done
   printf '  %-19s %-6s |%s\n' "$name" "$libc" "${cells% |}"
@@ -402,10 +402,35 @@ printf '  not the same build   arm P ships nixpkgs'"'"' %s, arm A ships Arch'"'"
 printf '                       %s and %s. Same release here, which is luck\n' "${P_VER:-?}" "${A_VER:-?}"
 printf '                       rather than design -- different compilers,\n'
 printf '                       flags and dependency versions either way.\n'
-printf '  not a GUI            none of the eleven has a display; the GL case\n'
-printf '                       is experiments/85-.\n'
-printf '  not debloated        T-057 item 1 is untouched, and the size row\n'
-printf '                       above is what that costs.\n'
+printf '  not a GUI            none of the eleven has a display, so what runs\n'
+printf '                       here is the subject\047s non-graphical path; the\n'
+printf '                       GL case is experiments/85- and 89-.\n'
+printf '  debloat level        %s -- experiments/89- measures what each\n' "${PGB_APPIMAGE_DEBLOAT:-safe}"
+printf '                       level removes and shows on eleven rows that\n'
+printf '                       the removal cost nothing.\n'
 printf '  one machine, one day\n'
+
+# ⛔ ONE EVIDENCE FILE PER SUBJECT. This experiment is parameterised by
+# $PGB_VS_APP and its evidence directory is not: running it against mpv
+# overwrote the jq run's per-environment.txt and would have overwritten its
+# summary too, so the record would have silently lost the comparison it was
+# opened to make.
+{
+  printf '86 - our bundler against a hand-built Anylinux AppImage\n\n'
+  printf 'subject: %s   (arm P: nixpkgs %s, arm A: Arch %s)\n\n' \
+    "$APP" "${P_VER:-?}" "${A_VER:-?}"
+  printf '  %-28s %12s  %s\n' ARTEFACT BYTES NOTE
+  printf '  %-28s %12s  %s\n' "P  ours (nixpkgs closure)" "$P_SZ" \
+    "${P_PATHS:-?} store paths, --debloat ${PGB_APPIMAGE_DEBLOAT:-safe}"
+  printf '  %-28s %12s  %s\n' "A  hand-built (Arch)" "$A_SZ" "$A_LIBS libraries deployed"
+  printf '  %-28s %12s\n' "   ratio P/A" \
+    "$(awk -v p="$P_SZ" -v a="$A_SZ" 'BEGIN{printf "%.2fx", p/a}')"
+  printf '\nran on the eleven: P %s/%s   A %s/%s\n' "$P_RUNS" "$ENVS" "$A_RUNS" "$ENVS"
+  printf 'host shared objects: P %s/%s clean   A %s/%s clean\n' \
+    "$P_CLEAN" "$ENVS" "$A_CLEAN" "$ENVS"
+  printf '\nper-environment startup and object columns: %s\n' \
+    "$EXP_OUT/per-environment.$APP.txt"
+  printf '\nconditions: %s, %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(uname -sr)"
+} > "$EXP_OUT/RESULT.$APP.txt"
 
 exp_finish

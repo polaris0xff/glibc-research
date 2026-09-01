@@ -437,6 +437,45 @@ and the layout, not a running 32-bit program. That is the next thing to try.
   caught the one above, and without it a debloat is a size number with no
   safety property behind it.
 
+## ⭐ AND THE COMPARISON IS RE-RUN AGAINST A REAL APPLICATION
+
+⛔ **The operator's ruling on 2026-09-01e:** *"experiments/86- compared jq. jq
+is two shared libraries. Comparing bundlers on jq measures nothing about
+bundling."* Correct. `PGB_VS_APP=mpv` re-runs it against a subject whose
+closure is **297 store paths and 1.2 GB** — ffmpeg, libplacebo, libass, mesa,
+lua — and whose `bin/mpv` is a **nixpkgs wrapper** rather than the program.
+
+**7 assertions, 0 failures**, `evidence/86-bundler-vs-anylinux/RESULT.mpv.txt`:
+
+| | arm P — ours, one command | arm A — hand-built Anylinux |
+|---|---|---|
+| size | **221,623,798** B (297 paths, `--debloat safe`) | **81,849,864** B (475 libraries) |
+| ratio | **2.71×** (jq, undebloated, was 3.05×) | |
+| cold start | 1,239–1,549 ms | 631–735 ms |
+| warm start | **70–210 ms** | 92–119 ms |
+| runs on the eleven | **11 of 11** | **11 of 11** |
+| host shared objects | **0 on every row** | **0 on every row** |
+
+⭐ **The functional test is a real decode**, not `--version`: ffmpeg's lavfi
+generates a test pattern, libavcodec decodes it and the null video output
+reports `64x48 rgb24`. A bundle that starts and cannot reach its own
+libavcodec fails that and passes `--version`.
+
+⭐ **And the warm-start column has changed shape.** On jq ours was ~1.4× the
+hand-built one; on mpv the two are **within each other's spread** — 70 ms
+against 97 ms on alpine 3.22, 112 against 114 on Arch. ⚠ `experiments/40-`'s
+noise floor applies and the honest reading is *"no difference measurable on
+this subject"*, not that ours is faster.
+
+⛔ **Cold start is still about 2× and that is not noise.** 297 store paths of
+dwarfs to mount against 475 flat libraries; it is the size row arriving in the
+time column.
+
+⛔ **A record defect this run caused and fixed.** The experiment is
+parameterised by `$PGB_VS_APP` and its evidence directory was not, so running
+it against mpv **overwrote the jq run's `per-environment.txt`**. Evidence files
+are per subject now.
+
 **What is left of this entry** — it stays **open** for one thing only: the
 32-bit path has no 32-bit application behind it.
 
