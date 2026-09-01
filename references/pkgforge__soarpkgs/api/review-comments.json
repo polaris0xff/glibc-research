@@ -1,0 +1,1456 @@
+[
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917640260",
+  "pull_request_review_id": 2554678308,
+  "id": 1917640260,
+  "node_id": "PRRC_kwDONKMmL85yTN5E",
+  "diff_hunk": "",
+  "path": "packages/flameshot/assets/default.png",
+  "commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "We actually don't need this file, unless we use the `icon` field: https://docs.pkgforge.dev/sbuild/specification/12.icon\r\nI keep these for our pkgs.pkgforge.dev website & other metadata",
+  "created_at": "2025-01-16T04:19:03Z",
+  "updated_at": "2025-01-16T04:32:47Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917640260",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917640260"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917640260"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917640260/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917640767",
+  "pull_request_review_id": 2554678308,
+  "id": 1917640767,
+  "node_id": "PRRC_kwDONKMmL85yTOA_",
+  "diff_hunk": "",
+  "path": "packages/flameshot/assets/flameshot.png",
+  "commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "If an `SBUILD` has single `provides`, then a default.png or default.svg is enough\r\nIf there's many provides then sure we will add files like this ",
+  "created_at": "2025-01-16T04:20:12Z",
+  "updated_at": "2025-01-16T04:32:47Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917640767",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917640767"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917640767"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917640767/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917641433",
+  "pull_request_review_id": 2554678308,
+  "id": 1917641433,
+  "node_id": "PRRC_kwDONKMmL85yTOLZ",
+  "diff_hunk": "@@ -0,0 +1,60 @@\n+#!/SBUILD ver @v1.0.0\n+#SELF: https://raw.githubusercontent.com/pkgforge/soarpkgs/refs/heads/main/packages/flameshot/appimage.stable.yaml",
+  "path": "packages/flameshot/appimage.stable.yaml",
+  "commit_id": "196fdae003423edaf94d3dd2b837028e2987dcdd",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "We should make it `appimage.official.stable.yaml` instead of `appimage.stable.yaml` as this `SBUILD` uses officially provided binary",
+  "created_at": "2025-01-16T04:21:15Z",
+  "updated_at": "2025-01-16T04:32:47Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917641433",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917641433"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917641433"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917641433/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 2,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 2,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917642344",
+  "pull_request_review_id": 2554678308,
+  "id": 1917642344,
+  "node_id": "PRRC_kwDONKMmL85yTOZo",
+  "diff_hunk": "@@ -0,0 +1,60 @@\n+#!/SBUILD ver @v1.0.0\n+#SELF: https://raw.githubusercontent.com/pkgforge/soarpkgs/refs/heads/main/packages/flameshot/appimage.stable.yaml\n+_disabled: false\n+\n+pkg: \"flameshot\"\n+pkg_id: \"github.com.flameshot-org.flameshot\"\n+pkg_type: \"appimage\"\n+app_id: \"org.flameshot.Flameshot\"\n+build_util:\n+  - \"curl#bin\"\n+  - \"jq#bin\"\n+category:\n+  - \"Utility\"\n+description: \"Powerful yet simple to use screenshot software\"\n+distro_pkg:\n+  alpine:\n+    - \"flameshot\"\n+  archlinux:\n+    aur:\n+      - \"flameshot\"\n+  nixpkgs:\n+    - \"flameshot\"\n+homepage:\n+  - \"https://flameshot.org/\"\n+  - \"https://github.com/flameshot-org/flameshot\"\n+maintainer:",
+  "path": "packages/flameshot/appimage.stable.yaml",
+  "commit_id": "196fdae003423edaf94d3dd2b837028e2987dcdd",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "You should add yourself to `maintainer` as you are the one who wrote & submitted this PR\r\n```yaml\r\nmaintainer:\r\n  - \"harilvfs (https://github.com/harilvfs)\"\r\n```",
+  "created_at": "2025-01-16T04:23:01Z",
+  "updated_at": "2025-01-16T04:32:47Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917642344",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917642344"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917642344"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917642344/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 26,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 26,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917645399",
+  "pull_request_review_id": 2554678308,
+  "id": 1917645399,
+  "node_id": "PRRC_kwDONKMmL85yTPJX",
+  "diff_hunk": "@@ -0,0 +1,60 @@\n+#!/SBUILD ver @v1.0.0\n+#SELF: https://raw.githubusercontent.com/pkgforge/soarpkgs/refs/heads/main/packages/flameshot/appimage.stable.yaml\n+_disabled: false\n+\n+pkg: \"flameshot\"\n+pkg_id: \"github.com.flameshot-org.flameshot\"\n+pkg_type: \"appimage\"\n+app_id: \"org.flameshot.Flameshot\"\n+build_util:\n+  - \"curl#bin\"\n+  - \"jq#bin\"\n+category:\n+  - \"Utility\"\n+description: \"Powerful yet simple to use screenshot software\"\n+distro_pkg:\n+  alpine:\n+    - \"flameshot\"\n+  archlinux:\n+    aur:\n+      - \"flameshot\"\n+  nixpkgs:\n+    - \"flameshot\"\n+homepage:\n+  - \"https://flameshot.org/\"\n+  - \"https://github.com/flameshot-org/flameshot\"\n+maintainer:\n+  - \"Azathothas (https://github.com/Azathothas)\"",
+  "path": "packages/flameshot/appimage.stable.yaml",
+  "commit_id": "196fdae003423edaf94d3dd2b837028e2987dcdd",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "We should also add a `note`  (after `maintainer`) like:\r\n```yaml\r\nmaintainer:\r\n  - \"harilvfs (https://github.com/harilvfs)\"\r\nnote:\r\n  - \"Pre Built AppImage Fetched from Upstream. Check/Report @ https://github.com/flameshot-org/flameshot\"\r\n ```\r\n \r\n This is to specifically tell users that we simply downloaded upstream appimage\r\n \r\n You can see more examples: \r\n - https://github.com/pkgforge/soarpkgs/blob/main/packages/86box/appimage.official.stable.yaml#L36\r\n - https://github.com/pkgforge/soarpkgs/blob/main/packages/brave/appimage.srevinsaju.stable.yaml#L31",
+  "created_at": "2025-01-16T04:26:30Z",
+  "updated_at": "2025-01-16T04:34:13Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917645399",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917645399"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917645399"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917645399/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 27,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 27,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917646754",
+  "pull_request_review_id": 2554678308,
+  "id": 1917646754,
+  "node_id": "PRRC_kwDONKMmL85yTPei",
+  "diff_hunk": "@@ -0,0 +1,60 @@\n+#!/SBUILD ver @v1.0.0\n+#SELF: https://raw.githubusercontent.com/pkgforge/soarpkgs/refs/heads/main/packages/flameshot/appimage.stable.yaml\n+_disabled: false\n+\n+pkg: \"flameshot\"\n+pkg_id: \"github.com.flameshot-org.flameshot\"\n+pkg_type: \"appimage\"\n+app_id: \"org.flameshot.Flameshot\"\n+build_util:\n+  - \"curl#bin\"\n+  - \"jq#bin\"\n+category:\n+  - \"Utility\"\n+description: \"Powerful yet simple to use screenshot software\"\n+distro_pkg:\n+  alpine:\n+    - \"flameshot\"\n+  archlinux:\n+    aur:\n+      - \"flameshot\"\n+  nixpkgs:\n+    - \"flameshot\"\n+homepage:\n+  - \"https://flameshot.org/\"\n+  - \"https://github.com/flameshot-org/flameshot\"\n+maintainer:\n+  - \"Azathothas (https://github.com/Azathothas)\"\n+repology:\n+  - \"flameshot\"\n+license:",
+  "path": "packages/flameshot/appimage.stable.yaml",
+  "commit_id": "196fdae003423edaf94d3dd2b837028e2987dcdd",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "This is perfectly okay,\r\nbut homebrew has a neat rule that says every project they add must have a license\r\nThis is to avoid legal problems\r\n\r\nSo we can extend this\r\n```yaml\r\nlicense:\r\n - id: \"GPL-3.0\"\r\n   url: \"https://github.com/flameshot-org/flameshot/raw/3fafcf4aa9ae3d620ff691cba3a1a2195d592914/LICENSE\"\r\n```\r\n\r\nI just went to: https://github.com/flameshot-org/flameshot/blob/master/LICENSE\r\nand then copied as permalink and changed `blob` to `raw`",
+  "created_at": "2025-01-16T04:29:04Z",
+  "updated_at": "2025-01-16T04:32:47Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917646754",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917646754"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917646754"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917646754/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 30,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 30,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917647575",
+  "pull_request_review_id": 2554678308,
+  "id": 1917647575,
+  "node_id": "PRRC_kwDONKMmL85yTPrX",
+  "diff_hunk": "@@ -0,0 +1,60 @@\n+#!/SBUILD ver @v1.0.0\n+#SELF: https://raw.githubusercontent.com/pkgforge/soarpkgs/refs/heads/main/packages/flameshot/appimage.stable.yaml\n+_disabled: false\n+\n+pkg: \"flameshot\"\n+pkg_id: \"github.com.flameshot-org.flameshot\"\n+pkg_type: \"appimage\"\n+app_id: \"org.flameshot.Flameshot\"\n+build_util:\n+  - \"curl#bin\"\n+  - \"jq#bin\"\n+category:\n+  - \"Utility\"\n+description: \"Powerful yet simple to use screenshot software\"\n+distro_pkg:\n+  alpine:\n+    - \"flameshot\"\n+  archlinux:\n+    aur:\n+      - \"flameshot\"\n+  nixpkgs:\n+    - \"flameshot\"\n+homepage:\n+  - \"https://flameshot.org/\"\n+  - \"https://github.com/flameshot-org/flameshot\"\n+maintainer:\n+  - \"Azathothas (https://github.com/Azathothas)\"\n+repology:\n+  - \"flameshot\"\n+license:\n+  - \"GPL-3.0\"\n+src_url:\n+  - \"https://github.com/flameshot-org/flameshot\"\n+tag:\n+  - \"screenshot\"\n+  - \"capture\"\n+  - \"image-editing\"\n+  - \"gui\"\n+  - \"gnu-linux\"\n+x_exec:",
+  "path": "packages/flameshot/appimage.stable.yaml",
+  "commit_id": "196fdae003423edaf94d3dd2b837028e2987dcdd",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "We can also add `host`, https://docs.pkgforge.dev/sbuild/specification/20.x_exec#host\r\nthis way we can completely avoid checking for unsupported hosts in `run step`\r\n\r\n```yaml\r\nx_exec:\r\n  host:\r\n    - \"x86_64-Linux\"\r\n  ```",
+  "created_at": "2025-01-16T04:30:34Z",
+  "updated_at": "2025-01-16T04:32:47Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917647575",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917647575"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917647575"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917647575/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 40,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 40,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917648332",
+  "pull_request_review_id": 2554678308,
+  "id": 1917648332,
+  "node_id": "PRRC_kwDONKMmL85yTP3M",
+  "diff_hunk": "@@ -0,0 +1,60 @@\n+#!/SBUILD ver @v1.0.0\n+#SELF: https://raw.githubusercontent.com/pkgforge/soarpkgs/refs/heads/main/packages/flameshot/appimage.stable.yaml\n+_disabled: false\n+\n+pkg: \"flameshot\"\n+pkg_id: \"github.com.flameshot-org.flameshot\"\n+pkg_type: \"appimage\"\n+app_id: \"org.flameshot.Flameshot\"\n+build_util:\n+  - \"curl#bin\"\n+  - \"jq#bin\"\n+category:\n+  - \"Utility\"\n+description: \"Powerful yet simple to use screenshot software\"\n+distro_pkg:\n+  alpine:\n+    - \"flameshot\"\n+  archlinux:\n+    aur:\n+      - \"flameshot\"\n+  nixpkgs:\n+    - \"flameshot\"\n+homepage:\n+  - \"https://flameshot.org/\"\n+  - \"https://github.com/flameshot-org/flameshot\"\n+maintainer:\n+  - \"Azathothas (https://github.com/Azathothas)\"\n+repology:\n+  - \"flameshot\"\n+license:\n+  - \"GPL-3.0\"\n+src_url:\n+  - \"https://github.com/flameshot-org/flameshot\"\n+tag:\n+  - \"screenshot\"\n+  - \"capture\"\n+  - \"image-editing\"\n+  - \"gui\"\n+  - \"gnu-linux\"\n+x_exec:\n+  shell: \"bash\"\n+  pkgver: |\n+    curl -qfsSL \"https://api.gh.pkgforge.dev/repos/flameshot-org/flameshot/releases?per_page=100\" | jq -r '[.[] | select(.draft == false and .prerelease == false)] | .[0].tag_name | gsub(\"\\\\s+\"; \"\")' | tr -d '[:space:]'\n+  run: |\n+    # Download\n+    RELEASE_TAG=\"$(cat ./${PKG}.version)\"",
+  "path": "packages/flameshot/appimage.stable.yaml",
+  "commit_id": "196fdae003423edaf94d3dd2b837028e2987dcdd",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "I had forgotten that we also have `PKGVER` exposed to us...\r\nSee I made a massive commit: https://github.com/pkgforge/soarpkgs/commit/e33165ce847f1aa8ee639b0ed8f39fade5b5cdeb\r\nSo we no longer have to do RELEASE_TAG=\r\nas we can simply use `${PKGVER}`\r\n",
+  "created_at": "2025-01-16T04:31:46Z",
+  "updated_at": "2025-01-16T04:32:47Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917648332",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917648332"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917648332"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917648332/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 46,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 46,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917648722",
+  "pull_request_review_id": 2554678308,
+  "id": 1917648722,
+  "node_id": "PRRC_kwDONKMmL85yTP9S",
+  "diff_hunk": "@@ -0,0 +1,60 @@\n+#!/SBUILD ver @v1.0.0\n+#SELF: https://raw.githubusercontent.com/pkgforge/soarpkgs/refs/heads/main/packages/flameshot/appimage.stable.yaml\n+_disabled: false\n+\n+pkg: \"flameshot\"\n+pkg_id: \"github.com.flameshot-org.flameshot\"\n+pkg_type: \"appimage\"\n+app_id: \"org.flameshot.Flameshot\"\n+build_util:\n+  - \"curl#bin\"\n+  - \"jq#bin\"\n+category:\n+  - \"Utility\"\n+description: \"Powerful yet simple to use screenshot software\"\n+distro_pkg:\n+  alpine:\n+    - \"flameshot\"\n+  archlinux:\n+    aur:\n+      - \"flameshot\"\n+  nixpkgs:\n+    - \"flameshot\"\n+homepage:\n+  - \"https://flameshot.org/\"\n+  - \"https://github.com/flameshot-org/flameshot\"\n+maintainer:\n+  - \"Azathothas (https://github.com/Azathothas)\"\n+repology:\n+  - \"flameshot\"\n+license:\n+  - \"GPL-3.0\"\n+src_url:\n+  - \"https://github.com/flameshot-org/flameshot\"\n+tag:\n+  - \"screenshot\"\n+  - \"capture\"\n+  - \"image-editing\"\n+  - \"gui\"\n+  - \"gnu-linux\"\n+x_exec:\n+  shell: \"bash\"\n+  pkgver: |\n+    curl -qfsSL \"https://api.gh.pkgforge.dev/repos/flameshot-org/flameshot/releases?per_page=100\" | jq -r '[.[] | select(.draft == false and .prerelease == false)] | .[0].tag_name | gsub(\"\\\\s+\"; \"\")' | tr -d '[:space:]'\n+  run: |\n+    # Download\n+    RELEASE_TAG=\"$(cat ./${PKG}.version)\"\n+    case \"$(uname -m)\" in\n+      aarch64)\n+        echo -e \"\\n[\u2717] aarch64 is not yet supported for Flameshot AppImage\\n\"\n+        exit 1\n+        ;;\n+      x86_64)\n+        soar dl \"https://github.com/flameshot-org/flameshot@${RELEASE_TAG}\" \\",
+  "path": "packages/flameshot/appimage.stable.yaml",
+  "commit_id": "196fdae003423edaf94d3dd2b837028e2987dcdd",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "since we have  a `PKGVER` now, this can be written as\r\n```bash\r\nsoar dl \"https://github.com/flameshot-org/flameshot@${PKGVER}\"\r\n```",
+  "created_at": "2025-01-16T04:32:30Z",
+  "updated_at": "2025-01-16T04:32:47Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917648722",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917648722"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917648722"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917648722/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 53,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 53,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917649371",
+  "pull_request_review_id": 2554690813,
+  "id": 1917649371,
+  "node_id": "PRRC_kwDONKMmL85yTQHb",
+  "diff_hunk": "",
+  "path": "packages/flameshot/assets/default.png",
+  "commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "But please don't delete it, now that you have already added it",
+  "created_at": "2025-01-16T04:33:22Z",
+  "updated_at": "2025-01-16T04:33:22Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917649371",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917649371"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917649371"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917649371/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "in_reply_to_id": 1917640260,
+  "author_association": "MEMBER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917649434",
+  "pull_request_review_id": 2554690948,
+  "id": 1917649434,
+  "node_id": "PRRC_kwDONKMmL85yTQIa",
+  "diff_hunk": "",
+  "path": "packages/flameshot/assets/flameshot.png",
+  "commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "You can delete this",
+  "created_at": "2025-01-16T04:33:31Z",
+  "updated_at": "2025-01-16T04:33:31Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917649434",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917649434"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917649434"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917649434/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "in_reply_to_id": 1917640767,
+  "author_association": "MEMBER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917749786",
+  "pull_request_review_id": 2554794798,
+  "id": 1917749786,
+  "node_id": "PRRC_kwDONKMmL85yTooa",
+  "diff_hunk": "@@ -0,0 +1,60 @@\n+#!/SBUILD ver @v1.0.0\n+#SELF: https://raw.githubusercontent.com/pkgforge/soarpkgs/refs/heads/main/packages/flameshot/appimage.stable.yaml\n+_disabled: false\n+\n+pkg: \"flameshot\"\n+pkg_id: \"github.com.flameshot-org.flameshot\"\n+pkg_type: \"appimage\"\n+app_id: \"org.flameshot.Flameshot\"\n+build_util:\n+  - \"curl#bin\"\n+  - \"jq#bin\"\n+category:\n+  - \"Utility\"\n+description: \"Powerful yet simple to use screenshot software\"\n+distro_pkg:\n+  alpine:\n+    - \"flameshot\"\n+  archlinux:\n+    aur:\n+      - \"flameshot\"\n+  nixpkgs:\n+    - \"flameshot\"\n+homepage:\n+  - \"https://flameshot.org/\"\n+  - \"https://github.com/flameshot-org/flameshot\"\n+maintainer:\n+  - \"Azathothas (https://github.com/Azathothas)\"\n+repology:",
+  "path": "packages/flameshot/appimage.stable.yaml",
+  "commit_id": "196fdae003423edaf94d3dd2b837028e2987dcdd",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "It's also recommended you add a `provides` field: https://docs.pkgforge.dev/sbuild/specification/16.provides\r\nThough it's not required as the value of `pkg` is used by default\r\n```yaml\r\nprovides:\r\n  - \"falmeshot\"\r\nrepology:\r\n  - \"flameshot\"",
+  "created_at": "2025-01-16T04:54:16Z",
+  "updated_at": "2025-01-16T04:55:31Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917749786",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917749786"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917749786"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917749786/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 28,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 28,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917750312",
+  "pull_request_review_id": 2554794798,
+  "id": 1917750312,
+  "node_id": "PRRC_kwDONKMmL85yTowo",
+  "diff_hunk": "@@ -0,0 +1,60 @@\n+#!/SBUILD ver @v1.0.0\n+#SELF: https://raw.githubusercontent.com/pkgforge/soarpkgs/refs/heads/main/packages/flameshot/appimage.stable.yaml\n+_disabled: false\n+\n+pkg: \"flameshot\"\n+pkg_id: \"github.com.flameshot-org.flameshot\"\n+pkg_type: \"appimage\"\n+app_id: \"org.flameshot.Flameshot\"\n+build_util:\n+  - \"curl#bin\"\n+  - \"jq#bin\"\n+category:\n+  - \"Utility\"\n+description: \"Powerful yet simple to use screenshot software\"\n+distro_pkg:\n+  alpine:\n+    - \"flameshot\"\n+  archlinux:\n+    aur:\n+      - \"flameshot\"\n+  nixpkgs:\n+    - \"flameshot\"\n+homepage:\n+  - \"https://flameshot.org/\"\n+  - \"https://github.com/flameshot-org/flameshot\"\n+maintainer:\n+  - \"Azathothas (https://github.com/Azathothas)\"\n+repology:\n+  - \"flameshot\"\n+license:",
+  "path": "packages/flameshot/appimage.stable.yaml",
+  "commit_id": "196fdae003423edaf94d3dd2b837028e2987dcdd",
+  "original_commit_id": "c52fd98eb5526d91f0ac5418b742f9432bbc7e1c",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "You should also move this before `maintainer` & after `homepage`\r\nto maintain an alphabetical order...\r\n",
+  "created_at": "2025-01-16T04:55:12Z",
+  "updated_at": "2025-01-16T04:55:31Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917750312",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917750312"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/143#discussion_r1917750312"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/143"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1917750312/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 30,
+  "side": "RIGHT",
+  "in_reply_to_id": 1917646754,
+  "author_association": "MEMBER",
+  "original_position": 30,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1975576825",
+  "pull_request_review_id": 2651037054,
+  "id": 1975576825,
+  "node_id": "PRRC_kwDONKMmL851wOj5",
+  "diff_hunk": "",
+  "path": "packages/pixelpulse2/appimage.stable.yaml.validated",
+  "commit_id": "c26f54db36f5232fe977f8345a1267cfd3eed709",
+  "original_commit_id": "c26f54db36f5232fe977f8345a1267cfd3eed709",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "I had meant attach as a comment not as a commit...",
+  "created_at": "2025-02-28T15:13:14Z",
+  "updated_at": "2025-02-28T15:13:14Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/159#discussion_r1975576825",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/159",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1975576825"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/159#discussion_r1975576825"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/159"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1975576825/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1975579259",
+  "pull_request_review_id": 2651041297,
+  "id": 1975579259,
+  "node_id": "PRRC_kwDONKMmL851wPJ7",
+  "diff_hunk": "",
+  "path": "packages/pixelpulse2/appimage.sounddrill31.stable.yaml",
+  "commit_id": "d13816a8b122476c0c3251a6132c09bf5189cd98",
+  "original_commit_id": "d13816a8b122476c0c3251a6132c09bf5189cd98",
+  "user": {
+   "login": "Azathothas",
+   "id": 58171889,
+   "node_id": "MDQ6VXNlcjU4MTcxODg5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/58171889?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Azathothas",
+   "html_url": "https://github.com/Azathothas",
+   "followers_url": "https://api.github.com/users/Azathothas/followers",
+   "following_url": "https://api.github.com/users/Azathothas/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Azathothas/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Azathothas/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Azathothas/subscriptions",
+   "organizations_url": "https://api.github.com/users/Azathothas/orgs",
+   "repos_url": "https://api.github.com/users/Azathothas/repos",
+   "events_url": "https://api.github.com/users/Azathothas/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Azathothas/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "renamed to your username since this is not official",
+  "created_at": "2025-02-28T15:14:53Z",
+  "updated_at": "2025-02-28T15:16:10Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/159#discussion_r1975579259",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/159",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1975579259"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/159#discussion_r1975579259"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/159"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1975579259/reactions",
+   "total_count": 1,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 1,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1975864771",
+  "pull_request_review_id": 2651530927,
+  "id": 1975864771,
+  "node_id": "PRRC_kwDONKMmL851xU3D",
+  "diff_hunk": "",
+  "path": "packages/pixelpulse2/appimage.stable.yaml.validated",
+  "commit_id": "c26f54db36f5232fe977f8345a1267cfd3eed709",
+  "original_commit_id": "c26f54db36f5232fe977f8345a1267cfd3eed709",
+  "user": {
+   "login": "sounddrill31",
+   "id": 84176052,
+   "node_id": "MDQ6VXNlcjg0MTc2MDUy",
+   "avatar_url": "https://avatars.githubusercontent.com/u/84176052?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/sounddrill31",
+   "html_url": "https://github.com/sounddrill31",
+   "followers_url": "https://api.github.com/users/sounddrill31/followers",
+   "following_url": "https://api.github.com/users/sounddrill31/following{/other_user}",
+   "gists_url": "https://api.github.com/users/sounddrill31/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/sounddrill31/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/sounddrill31/subscriptions",
+   "organizations_url": "https://api.github.com/users/sounddrill31/orgs",
+   "repos_url": "https://api.github.com/users/sounddrill31/repos",
+   "events_url": "https://api.github.com/users/sounddrill31/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/sounddrill31/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "oh lol",
+  "created_at": "2025-02-28T18:38:15Z",
+  "updated_at": "2025-02-28T18:38:16Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/159#discussion_r1975864771",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/159",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1975864771"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/159#discussion_r1975864771"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/159"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/1975864771/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "in_reply_to_id": 1975576825,
+  "author_association": "CONTRIBUTOR",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2030216300",
+  "pull_request_review_id": 2745203607,
+  "id": 2030216300,
+  "node_id": "PRRC_kwDONKMmL855AqRs",
+  "diff_hunk": "@@ -0,0 +1,113 @@\n+#!/SBUILD ver @v1.0.0\n+#SELF: https://raw.githubusercontent.com/pkgforge/soarpkgs/refs/heads/main/binaries/bear/static.official.source.yaml\n+_disabled: false\n+\n+pkg: \"bear\"\n+pkg_id: \"github.com.rizsotto.Bear\"\n+pkg_type: \"static\"\n+category:\n+  - \"ConsoleOnly\"\n+  - \"Utility\"\n+description: \"A tool that generates a compilation database for clang tooling\"\n+distro_pkg:\n+  alpine:\n+    - \"bear\"\n+  archlinux:\n+    aur:\n+      - \"bear-git\"\n+    extra:\n+      - \"bear\"\n+  debian:\n+    - \"bear\"\n+  gentoo:\n+    - \"dev-util/bear\"\n+  gnuguix:\n+    - \"bear\"\n+  homebrew:\n+    - \"bear\"\n+  nixpkgs:\n+    - \"bear\"\n+homepage:\n+  - \"https://github.com/rizsotto/Bear\"\n+maintainer:\n+  - \"QaidVoid (https://github.com/QaidVoid)\"\n+license:\n+  - id: \"GPL-3.0+\"\n+    url: \"https://github.com/rizsotto/Bear/raw/14c2e0174a7196040cc54584465600fc4e1ea946/COPYING\"\n+note:\n+  - \"[DO NOT RUN] (Meant for pkgforge CI Only)\"\n+  - \"Built From Source (Latest Git HEAD). Check/Report @ https://github.com/rizsotto/Bear\"\n+provides:\n+  - \"bear\"\n+repology:\n+  - \"bear-clang\"\n+src_url:\n+  - \"https://github.com/rizsotto/Bear\"\n+tag:\n+  - \"clang\"\n+  - \"bear\"\n+x_exec:\n+  host:\n+    - \"aarch64-linux\"\n+    - \"x86_64-linux\"\n+  shell: \"bash\"\n+  pkgver: |\n+    pushd \"$(mktemp -d)\" >/dev/null 2>&1 && \\\n+    git clone --depth=\"1\" --filter=\"blob:none\" --no-checkout --single-branch --quiet \"https://github.com/rizsotto/Bear\" \"./TEMPREPO\" >/dev/null 2>&1 && \\\n+    git --git-dir=\"./TEMPREPO/.git\" --no-pager log -1 --pretty=format:'HEAD-%h-%cd' --date=format:'%y%m%dT%H%M%S' && \\\n+    [ -d \"$(realpath .)/TEMPREPO\" ] && rm -rf \"$(realpath .)\" >/dev/null 2>&1 && popd >/dev/null 2>&1",
+  "path": "binaries/bear/static.official.source.yaml",
+  "commit_id": "4f25cfccbb96ced2f716efdca8f5bd9631b1c9bc",
+  "original_commit_id": "22dd6dd037a0dc175183c22fde94086838fd1cfa",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "The removal command 'rm -rf \"$(realpath .)\"' may unintentionally remove more than just the TEMPREPO directory. Consider targeting the TEMPREPO directory explicitly (e.g., 'rm -rf \"$(realpath .)/TEMPREPO\"') to avoid potential issues.\n```suggestion\n    [ -d \"$(realpath .)/TEMPREPO\" ] && rm -rf \"$(realpath .)/TEMPREPO\" >/dev/null 2>&1 && popd >/dev/null 2>&1\n```",
+  "created_at": "2025-04-06T17:48:48Z",
+  "updated_at": "2025-04-06T17:48:48Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/176#discussion_r2030216300",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/176",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2030216300"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/176#discussion_r2030216300"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/176"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2030216300/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 58,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 58,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2321524969",
+  "pull_request_review_id": 3184417103,
+  "id": 2321524969,
+  "node_id": "PRRC_kwDONKMmL86KX6jp",
+  "diff_hunk": "@@ -50,7 +51,7 @@ x_exec:\n        set -x ; mkdir -p \"/build-bins\" && pushd \"$(mktemp -d)\" &>/dev/null\n        CGO_ENABLED=\"1\" \n        CGO_CFLAGS=\"-O2 -flto=auto -fPIE -fpie -static -w -pipe\"\n-       GOARCH=\"$(uname -m | sed \"s/x86_64/amd64/;s/aarch64/arm64/;s/loongarch64/loong64/\")\"\n+       GOARCH=\"$(uname -m | sed \"s/x86_64/amd64/;s/aarch64/arm64/;s/loongarch64/loong64/;s/riscv64/riscv64/\")\"",
+  "path": "binaries/40four/static.official.source.yaml",
+  "commit_id": "5d96f257ae6bdf3046788bbfd92066d3ac306c45",
+  "original_commit_id": "7da009981c71c24bca59269b26687580057bd907",
+  "user": {
+   "login": "QaidVoid",
+   "id": 12017109,
+   "node_id": "MDQ6VXNlcjEyMDE3MTA5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/12017109?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/QaidVoid",
+   "html_url": "https://github.com/QaidVoid",
+   "followers_url": "https://api.github.com/users/QaidVoid/followers",
+   "following_url": "https://api.github.com/users/QaidVoid/following{/other_user}",
+   "gists_url": "https://api.github.com/users/QaidVoid/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/QaidVoid/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/QaidVoid/subscriptions",
+   "organizations_url": "https://api.github.com/users/QaidVoid/orgs",
+   "repos_url": "https://api.github.com/users/QaidVoid/repos",
+   "events_url": "https://api.github.com/users/QaidVoid/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/QaidVoid/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "`riscv64` substitution isn\u2019t necessary since it\u2019s already the same as `uname -m`",
+  "created_at": "2025-09-04T10:10:56Z",
+  "updated_at": "2025-09-04T10:13:08Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/214#discussion_r2321524969",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/214",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2321524969"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/214#discussion_r2321524969"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/214"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2321524969/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 54,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 13,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2321609754",
+  "pull_request_review_id": 3184542840,
+  "id": 2321609754,
+  "node_id": "PRRC_kwDONKMmL86KYPQa",
+  "diff_hunk": "@@ -50,7 +51,7 @@ x_exec:\n        set -x ; mkdir -p \"/build-bins\" && pushd \"$(mktemp -d)\" &>/dev/null\n        CGO_ENABLED=\"1\" \n        CGO_CFLAGS=\"-O2 -flto=auto -fPIE -fpie -static -w -pipe\"\n-       GOARCH=\"$(uname -m | sed \"s/x86_64/amd64/;s/aarch64/arm64/;s/loongarch64/loong64/\")\"\n+       GOARCH=\"$(uname -m | sed \"s/x86_64/amd64/;s/aarch64/arm64/;s/loongarch64/loong64/;s/riscv64/riscv64/\")\"",
+  "path": "binaries/40four/static.official.source.yaml",
+  "commit_id": "5d96f257ae6bdf3046788bbfd92066d3ac306c45",
+  "original_commit_id": "7da009981c71c24bca59269b26687580057bd907",
+  "user": {
+   "login": "akifejaz",
+   "id": 81078376,
+   "node_id": "MDQ6VXNlcjgxMDc4Mzc2",
+   "avatar_url": "https://avatars.githubusercontent.com/u/81078376?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/akifejaz",
+   "html_url": "https://github.com/akifejaz",
+   "followers_url": "https://api.github.com/users/akifejaz/followers",
+   "following_url": "https://api.github.com/users/akifejaz/following{/other_user}",
+   "gists_url": "https://api.github.com/users/akifejaz/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/akifejaz/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/akifejaz/subscriptions",
+   "organizations_url": "https://api.github.com/users/akifejaz/orgs",
+   "repos_url": "https://api.github.com/users/akifejaz/repos",
+   "events_url": "https://api.github.com/users/akifejaz/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/akifejaz/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "yeah, that's right, just wanted to make the code flow consistent :) ",
+  "created_at": "2025-09-04T10:46:46Z",
+  "updated_at": "2025-09-04T10:46:46Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/214#discussion_r2321609754",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/214",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2321609754"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/214#discussion_r2321609754"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/214"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2321609754/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 54,
+  "side": "RIGHT",
+  "in_reply_to_id": 2321524969,
+  "author_association": "CONTRIBUTOR",
+  "original_position": 13,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2665470190",
+  "pull_request_review_id": 3631523691,
+  "id": 2665470190,
+  "node_id": "PRRC_kwDONKMmL86e39ju",
+  "diff_hunk": "@@ -0,0 +1,37 @@\n+#!/SBUILD ver @v1.0.0\n+\n+_disabled: false\n+\n+pkg: \"12to11\"\n+pkg_id: \"pkgforge-dev.12to11\"\n+pkg_type: \"appimage\"\n+pkgver: \"510a27f@2026-01-06_1767711172\"\n+ghcr_pkg: \"pkgcache/pkgforge-dev/12to11\"\n+category:\n+  - \"Utility\"\n+description: \"Tool for running Wayland applications on an X server\"\n+homepage:\n+  - \"https://git.linuxping.win/12to11/12to11\"\n+maintainer:\n+  - \"Samueru-sama@hgithub.com/Samueru-sama\"",
+  "path": "packages/12to11/appimage.stable.yaml",
+  "commit_id": "63aeb2647b75c57944cf443b18676443f8884665",
+  "original_commit_id": "63aeb2647b75c57944cf443b18676443f8884665",
+  "user": {
+   "login": "QaidVoid",
+   "id": 12017109,
+   "node_id": "MDQ6VXNlcjEyMDE3MTA5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/12017109?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/QaidVoid",
+   "html_url": "https://github.com/QaidVoid",
+   "followers_url": "https://api.github.com/users/QaidVoid/followers",
+   "following_url": "https://api.github.com/users/QaidVoid/following{/other_user}",
+   "gists_url": "https://api.github.com/users/QaidVoid/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/QaidVoid/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/QaidVoid/subscriptions",
+   "organizations_url": "https://api.github.com/users/QaidVoid/orgs",
+   "repos_url": "https://api.github.com/users/QaidVoid/repos",
+   "events_url": "https://api.github.com/users/QaidVoid/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/QaidVoid/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Maintainer in format\r\n```\r\n- \"Name (contact)\"\r\n```",
+  "created_at": "2026-01-06T16:15:57Z",
+  "updated_at": "2026-01-06T16:16:09Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/235#discussion_r2665470190",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/235",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2665470190"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/235#discussion_r2665470190"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/235"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2665470190/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": 15,
+  "start_side": "RIGHT",
+  "line": null,
+  "original_line": 16,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 16,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2665525917",
+  "pull_request_review_id": 3631594746,
+  "id": 2665525917,
+  "node_id": "PRRC_kwDONKMmL86e4LKd",
+  "diff_hunk": "@@ -0,0 +1,37 @@\n+#!/SBUILD ver @v1.0.0\n+\n+_disabled: false\n+\n+pkg: \"12to11\"\n+pkg_id: \"pkgforge-dev.12to11\"\n+pkg_type: \"appimage\"\n+pkgver: \"HEAD-510a27f@2026-01-06_1767711172\"\n+ghcr_pkg: \"pkgcache/pkgforge-dev/12to11\"\n+category:\n+  - \"Utility\"\n+description: \"Tool for running Wayland applications on an X server\"\n+homepage:\n+  - \"https://git.linuxping.win/12to11/12to11\"\n+maintainer:\n+  - \"Samueru-sama (github.com/Samueru-sama)\"\n+license:\n+  - id: \"GPL-3.0\"\n+    url: \"https://git.linuxping.win/12to11/12to11/src/branch/master/COPYING\"\n+note:\n+  - \"Fetched from Pre Built Community Created AppImage. Check/Report @ https://github.com/pkgforge-dev/12to11-AppImage\"\n+  - \"[PORTABLE] (Works on AnyLinux)\"\n+provides:\n+  - \"12to11\"\n+src_url:\n+  - \"https://git.linuxping.win/12to11/12to11\"\n+tag:\n+  - \"utility\"\n+x_exec:\n+  host:\n+    - \"x86_64-Linux\"\n+    - \"aarch64-Linux\"\n+  shell: \"sh\"\n+  pkgver: |\n+    echo \"HEAD-$(curl -qfsSL \"https://api.gh.pkgforge.dev/repos/pkgforge-dev/12to11-AppImage/releases/latest?per_page=20\" | jq -r '.tag_name' | tr -d '\"'\\''[:space:]')\"\n+  run: |\n+    soar dl \"https://github.com/pkgforge-dev/12to11-AppImage@${PKGVER}\" --glob \"*$(uname -m)*.appimage\" -o \"./${PKG}\" --yes",
+  "path": "packages/12to11/appimage.stable.yaml",
+  "commit_id": "fc54a3f28b9d58405e586ef6130ab06328caf2c9",
+  "original_commit_id": "fc54a3f28b9d58405e586ef6130ab06328caf2c9",
+  "user": {
+   "login": "QaidVoid",
+   "id": 12017109,
+   "node_id": "MDQ6VXNlcjEyMDE3MTA5",
+   "avatar_url": "https://avatars.githubusercontent.com/u/12017109?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/QaidVoid",
+   "html_url": "https://github.com/QaidVoid",
+   "followers_url": "https://api.github.com/users/QaidVoid/followers",
+   "following_url": "https://api.github.com/users/QaidVoid/following{/other_user}",
+   "gists_url": "https://api.github.com/users/QaidVoid/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/QaidVoid/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/QaidVoid/subscriptions",
+   "organizations_url": "https://api.github.com/users/QaidVoid/orgs",
+   "repos_url": "https://api.github.com/users/QaidVoid/repos",
+   "events_url": "https://api.github.com/users/QaidVoid/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/QaidVoid/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "```suggestion\r\n    soar dl \"https://github.com/pkgforge-dev/12to11-AppImage@${PKGVER#HEAD-}\" --glob \"*$(uname -m)*.appimage\" -o \"./${PKG}\" --yes\r\n```",
+  "created_at": "2026-01-06T16:32:26Z",
+  "updated_at": "2026-01-06T16:32:29Z",
+  "html_url": "https://github.com/pkgforge/soarpkgs/pull/235#discussion_r2665525917",
+  "pull_request_url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/235",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2665525917"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge/soarpkgs/pull/235#discussion_r2665525917"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/235"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/pulls/comments/2665525917/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 37,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 37,
+  "position": 1,
+  "subject_type": "line"
+ }
+]

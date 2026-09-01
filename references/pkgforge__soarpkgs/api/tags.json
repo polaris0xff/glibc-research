@@ -1,0 +1,652 @@
+[
+ {
+  "name": "v20260221.142626",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/v20260221.142626",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/v20260221.142626",
+  "commit": {
+   "sha": "473a4b49b89e69739d3227bb227de0c16ff10656",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/473a4b49b89e69739d3227bb227de0c16ff10656"
+  },
+  "node_id": "REF_kwDONKMmL7pyZWZzL3RhZ3MvdjIwMjYwMjIxLjE0MjYyNg"
+ },
+ {
+  "name": "v20260215.083816",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/v20260215.083816",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/v20260215.083816",
+  "commit": {
+   "sha": "b80d6a543f685d4b2567566af7d6b3078dd61ce2",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/b80d6a543f685d4b2567566af7d6b3078dd61ce2"
+  },
+  "node_id": "REF_kwDONKMmL7pyZWZzL3RhZ3MvdjIwMjYwMjE1LjA4MzgxNg"
+ },
+ {
+  "name": "v20260208.172321",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/v20260208.172321",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/v20260208.172321",
+  "commit": {
+   "sha": "8b3b2882729e4ecce716f0d168eca030b0dc1422",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/8b3b2882729e4ecce716f0d168eca030b0dc1422"
+  },
+  "node_id": "REF_kwDONKMmL7pyZWZzL3RhZ3MvdjIwMjYwMjA4LjE3MjMyMQ"
+ },
+ {
+  "name": "v20260203.062236",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/v20260203.062236",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/v20260203.062236",
+  "commit": {
+   "sha": "b01c3b8e01e450f68e73076504f39be07847f95e",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/b01c3b8e01e450f68e73076504f39be07847f95e"
+  },
+  "node_id": "REF_kwDONKMmL7pyZWZzL3RhZ3MvdjIwMjYwMjAzLjA2MjIzNg"
+ },
+ {
+  "name": "soar-nest",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/soar-nest",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/soar-nest",
+  "commit": {
+   "sha": "823447527d119e2e05bdd16bff576ac52275e138",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/823447527d119e2e05bdd16bff576ac52275e138"
+  },
+  "node_id": "REF_kwDONKMmL7NyZWZzL3RhZ3Mvc29hci1uZXN0"
+ },
+ {
+  "name": "snapshot-2025-03-01",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/snapshot-2025-03-01",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/snapshot-2025-03-01",
+  "commit": {
+   "sha": "ac673a9dc58551aca5afae3a730a0b203f27b2af",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/ac673a9dc58551aca5afae3a730a0b203f27b2af"
+  },
+  "node_id": "REF_kwDONKMmL71yZWZzL3RhZ3Mvc25hcHNob3QtMjAyNS0wMy0wMQ"
+ },
+ {
+  "name": "build-cache",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/build-cache",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/build-cache",
+  "commit": {
+   "sha": "1a609c56c99de02b21ba10d9cf40078af8420041",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/1a609c56c99de02b21ba10d9cf40078af8420041"
+  },
+  "node_id": "REF_kwDONKMmL7VyZWZzL3RhZ3MvYnVpbGQtY2FjaGU"
+ },
+ {
+  "name": "20260831.112633",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260831.112633",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260831.112633",
+  "commit": {
+   "sha": "ea7c4dd62db15e01fd011839ef57b45ccbdc9dba",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/ea7c4dd62db15e01fd011839ef57b45ccbdc9dba"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA4MzEuMTEyNjMz"
+ },
+ {
+  "name": "20260827.161206",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260827.161206",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260827.161206",
+  "commit": {
+   "sha": "58942d0ddcfd50db17481acad358675ef6d42207",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/58942d0ddcfd50db17481acad358675ef6d42207"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA4MjcuMTYxMjA2"
+ },
+ {
+  "name": "20260824.054014",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260824.054014",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260824.054014",
+  "commit": {
+   "sha": "58942d0ddcfd50db17481acad358675ef6d42207",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/58942d0ddcfd50db17481acad358675ef6d42207"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA4MjQuMDU0MDE0"
+ },
+ {
+  "name": "20260820.053305",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260820.053305",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260820.053305",
+  "commit": {
+   "sha": "58942d0ddcfd50db17481acad358675ef6d42207",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/58942d0ddcfd50db17481acad358675ef6d42207"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA4MjAuMDUzMzA1"
+ },
+ {
+  "name": "20260817.053713",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260817.053713",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260817.053713",
+  "commit": {
+   "sha": "fb2e90940d9659af8e187709edaf39aea850a2c7",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/fb2e90940d9659af8e187709edaf39aea850a2c7"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA4MTcuMDUzNzEz"
+ },
+ {
+  "name": "20260815.135453",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260815.135453",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260815.135453",
+  "commit": {
+   "sha": "e4070065353d84b7de5a95444bd3cbf053489836",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/e4070065353d84b7de5a95444bd3cbf053489836"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA4MTUuMTM1NDUz"
+ },
+ {
+  "name": "20260813.061833",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260813.061833",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260813.061833",
+  "commit": {
+   "sha": "a082e1228d9d7a7736b82efa408727e39c75180c",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/a082e1228d9d7a7736b82efa408727e39c75180c"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA4MTMuMDYxODMz"
+ },
+ {
+  "name": "20260810.061151",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260810.061151",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260810.061151",
+  "commit": {
+   "sha": "5029c3d6d76b1c1dcc6147599ed1f3fcfcd09f87",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/5029c3d6d76b1c1dcc6147599ed1f3fcfcd09f87"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA4MTAuMDYxMTUx"
+ },
+ {
+  "name": "20260727.083212",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260727.083212",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260727.083212",
+  "commit": {
+   "sha": "c90068c555c3ee528b099b7b2ff9eb16ad67c739",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/c90068c555c3ee528b099b7b2ff9eb16ad67c739"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA3MjcuMDgzMjEy"
+ },
+ {
+  "name": "20260723.073330",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260723.073330",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260723.073330",
+  "commit": {
+   "sha": "c90068c555c3ee528b099b7b2ff9eb16ad67c739",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/c90068c555c3ee528b099b7b2ff9eb16ad67c739"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA3MjMuMDczMzMw"
+ },
+ {
+  "name": "20260720.075952",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260720.075952",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260720.075952",
+  "commit": {
+   "sha": "c90068c555c3ee528b099b7b2ff9eb16ad67c739",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/c90068c555c3ee528b099b7b2ff9eb16ad67c739"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA3MjAuMDc1OTUy"
+ },
+ {
+  "name": "20260716.072346",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260716.072346",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260716.072346",
+  "commit": {
+   "sha": "5705bea76b02e11e265a205dfcfe705152dbd21e",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/5705bea76b02e11e265a205dfcfe705152dbd21e"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA3MTYuMDcyMzQ2"
+ },
+ {
+  "name": "20260713.081720",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260713.081720",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260713.081720",
+  "commit": {
+   "sha": "432792f909d1b26c7bae8a1d30ac18fcd2e72024",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/432792f909d1b26c7bae8a1d30ac18fcd2e72024"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA3MTMuMDgxNzIw"
+ },
+ {
+  "name": "20260709.082712",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260709.082712",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260709.082712",
+  "commit": {
+   "sha": "e6d88dc82449587eceab6b6079165a6a50e99fe6",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/e6d88dc82449587eceab6b6079165a6a50e99fe6"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA3MDkuMDgyNzEy"
+ },
+ {
+  "name": "20260706.090019",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260706.090019",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260706.090019",
+  "commit": {
+   "sha": "aaf6a18b8337842b5bafcac43cb00bc4f0358515",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/aaf6a18b8337842b5bafcac43cb00bc4f0358515"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA3MDYuMDkwMDE5"
+ },
+ {
+  "name": "20260702.081223",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260702.081223",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260702.081223",
+  "commit": {
+   "sha": "2320100b6c98ec0ca0fb6d5343e64c921e39573b",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/2320100b6c98ec0ca0fb6d5343e64c921e39573b"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA3MDIuMDgxMjIz"
+ },
+ {
+  "name": "20260629.092635",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260629.092635",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260629.092635",
+  "commit": {
+   "sha": "2320100b6c98ec0ca0fb6d5343e64c921e39573b",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/2320100b6c98ec0ca0fb6d5343e64c921e39573b"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA2MjkuMDkyNjM1"
+ },
+ {
+  "name": "20260625.082300",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260625.082300",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260625.082300",
+  "commit": {
+   "sha": "2320100b6c98ec0ca0fb6d5343e64c921e39573b",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/2320100b6c98ec0ca0fb6d5343e64c921e39573b"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA2MjUuMDgyMzAw"
+ },
+ {
+  "name": "20260624.025753",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260624.025753",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260624.025753",
+  "commit": {
+   "sha": "2320100b6c98ec0ca0fb6d5343e64c921e39573b",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/2320100b6c98ec0ca0fb6d5343e64c921e39573b"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA2MjQuMDI1NzUz"
+ },
+ {
+  "name": "20260622.103654",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260622.103654",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260622.103654",
+  "commit": {
+   "sha": "4c0ce35bd208b55ae364b5266c579eb080913910",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/4c0ce35bd208b55ae364b5266c579eb080913910"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA2MjIuMTAzNjU0"
+ },
+ {
+  "name": "20260618.091259",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260618.091259",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260618.091259",
+  "commit": {
+   "sha": "746294b0aed6d80330f2d2274b9c8d0426d96c6d",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/746294b0aed6d80330f2d2274b9c8d0426d96c6d"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA2MTguMDkxMjU5"
+ },
+ {
+  "name": "20260615.105538",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260615.105538",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260615.105538",
+  "commit": {
+   "sha": "746294b0aed6d80330f2d2274b9c8d0426d96c6d",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/746294b0aed6d80330f2d2274b9c8d0426d96c6d"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA2MTUuMTA1NTM4"
+ },
+ {
+  "name": "20260611.091322",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260611.091322",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260611.091322",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA2MTEuMDkxMzIy"
+ },
+ {
+  "name": "20260608.092425",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260608.092425",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260608.092425",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA2MDguMDkyNDI1"
+ },
+ {
+  "name": "20260604.085251",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260604.085251",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260604.085251",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA2MDQuMDg1MjUx"
+ },
+ {
+  "name": "20260528.084300",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260528.084300",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260528.084300",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA1MjguMDg0MzAw"
+ },
+ {
+  "name": "20260525.085651",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260525.085651",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260525.085651",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA1MjUuMDg1NjUx"
+ },
+ {
+  "name": "20260521.083201",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260521.083201",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260521.083201",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA1MjEuMDgzMjAx"
+ },
+ {
+  "name": "20260518.084357",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260518.084357",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260518.084357",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA1MTguMDg0MzU3"
+ },
+ {
+  "name": "20260514.074206",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260514.074206",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260514.074206",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA1MTQuMDc0MjA2"
+ },
+ {
+  "name": "20260511.082550",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260511.082550",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260511.082550",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA1MTEuMDgyNTUw"
+ },
+ {
+  "name": "20260507.074307",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260507.074307",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260507.074307",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA1MDcuMDc0MzA3"
+ },
+ {
+  "name": "20260504.074810",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260504.074810",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260504.074810",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA1MDQuMDc0ODEw"
+ },
+ {
+  "name": "20260430.072825",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260430.072825",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260430.072825",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA0MzAuMDcyODI1"
+ },
+ {
+  "name": "20260427.073447",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260427.073447",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260427.073447",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA0MjcuMDczNDQ3"
+ },
+ {
+  "name": "20260423.070225",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260423.070225",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260423.070225",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA0MjMuMDcwMjI1"
+ },
+ {
+  "name": "20260420.071634",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260420.071634",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260420.071634",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA0MjAuMDcxNjM0"
+ },
+ {
+  "name": "20260416.065716",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260416.065716",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260416.065716",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA0MTYuMDY1NzE2"
+ },
+ {
+  "name": "20260413.071358",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260413.071358",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260413.071358",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA0MTMuMDcxMzU4"
+ },
+ {
+  "name": "20260409.062234",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260409.062234",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260409.062234",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA0MDkuMDYyMjM0"
+ },
+ {
+  "name": "20260406.065445",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260406.065445",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260406.065445",
+  "commit": {
+   "sha": "70f0f1a7bbf29e406883934fd7538007f5f72447",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/70f0f1a7bbf29e406883934fd7538007f5f72447"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA0MDYuMDY1NDQ1"
+ },
+ {
+  "name": "20260402.061206",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260402.061206",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260402.061206",
+  "commit": {
+   "sha": "04eb3713608e5bd770c436f424ff26327524b463",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/04eb3713608e5bd770c436f424ff26327524b463"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjA0MDIuMDYxMjA2"
+ },
+ {
+  "name": "20260330.065246",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260330.065246",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260330.065246",
+  "commit": {
+   "sha": "04eb3713608e5bd770c436f424ff26327524b463",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/04eb3713608e5bd770c436f424ff26327524b463"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAzMzAuMDY1MjQ2"
+ },
+ {
+  "name": "20260326.061314",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260326.061314",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260326.061314",
+  "commit": {
+   "sha": "5dfb67326af598f284ac7b2c00e6c1f03ed7c20f",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/5dfb67326af598f284ac7b2c00e6c1f03ed7c20f"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAzMjYuMDYxMzE0"
+ },
+ {
+  "name": "20260323.061117",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260323.061117",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260323.061117",
+  "commit": {
+   "sha": "5dfb67326af598f284ac7b2c00e6c1f03ed7c20f",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/5dfb67326af598f284ac7b2c00e6c1f03ed7c20f"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAzMjMuMDYxMTE3"
+ },
+ {
+  "name": "20260319.055852",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260319.055852",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260319.055852",
+  "commit": {
+   "sha": "21dc769099306fdf1dfc39a80a660925d3928250",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/21dc769099306fdf1dfc39a80a660925d3928250"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAzMTkuMDU1ODUy"
+ },
+ {
+  "name": "20260316.062019",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260316.062019",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260316.062019",
+  "commit": {
+   "sha": "21dc769099306fdf1dfc39a80a660925d3928250",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/21dc769099306fdf1dfc39a80a660925d3928250"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAzMTYuMDYyMDE5"
+ },
+ {
+  "name": "20260312.055144",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260312.055144",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260312.055144",
+  "commit": {
+   "sha": "59ef4cb3c555a04501a7cc14f9918b6c4cd8e51b",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/59ef4cb3c555a04501a7cc14f9918b6c4cd8e51b"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAzMTIuMDU1MTQ0"
+ },
+ {
+  "name": "20260309.055819",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260309.055819",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260309.055819",
+  "commit": {
+   "sha": "fce51c5afb01ece3db90934442ca5c928f34c321",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/fce51c5afb01ece3db90934442ca5c928f34c321"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAzMDkuMDU1ODE5"
+ },
+ {
+  "name": "20260308.124205",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260308.124205",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260308.124205",
+  "commit": {
+   "sha": "fce51c5afb01ece3db90934442ca5c928f34c321",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/fce51c5afb01ece3db90934442ca5c928f34c321"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAzMDguMTI0MjA1"
+ },
+ {
+  "name": "20260305.054754",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260305.054754",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260305.054754",
+  "commit": {
+   "sha": "6f2f8a6848cf4f74a75484fdda1c019eae16ee51",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/6f2f8a6848cf4f74a75484fdda1c019eae16ee51"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAzMDUuMDU0NzU0"
+ },
+ {
+  "name": "20260302.055334",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260302.055334",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260302.055334",
+  "commit": {
+   "sha": "b7eb253750020fe405e1ba0a69918dcaf5233b60",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/b7eb253750020fe405e1ba0a69918dcaf5233b60"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAzMDIuMDU1MzM0"
+ },
+ {
+  "name": "20260226.055806",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260226.055806",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260226.055806",
+  "commit": {
+   "sha": "3e74317af6110fb45dea7c8b4c5aca770aaa60c7",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/3e74317af6110fb45dea7c8b4c5aca770aaa60c7"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAyMjYuMDU1ODA2"
+ },
+ {
+  "name": "20260223.060533",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260223.060533",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260223.060533",
+  "commit": {
+   "sha": "d6992784ac5b59c5cef45a5c3712365926c6399e",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/d6992784ac5b59c5cef45a5c3712365926c6399e"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAyMjMuMDYwNTMz"
+ },
+ {
+  "name": "20260222.040238",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260222.040238",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260222.040238",
+  "commit": {
+   "sha": "d6992784ac5b59c5cef45a5c3712365926c6399e",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/d6992784ac5b59c5cef45a5c3712365926c6399e"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAyMjIuMDQwMjM4"
+ },
+ {
+  "name": "20260221.164224",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260221.164224",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260221.164224",
+  "commit": {
+   "sha": "d6992784ac5b59c5cef45a5c3712365926c6399e",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/d6992784ac5b59c5cef45a5c3712365926c6399e"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAyMjEuMTY0MjI0"
+ },
+ {
+  "name": "20260221.155728",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260221.155728",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260221.155728",
+  "commit": {
+   "sha": "d6992784ac5b59c5cef45a5c3712365926c6399e",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/d6992784ac5b59c5cef45a5c3712365926c6399e"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAyMjEuMTU1NzI4"
+ },
+ {
+  "name": "20260221.154944",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soarpkgs/zipball/refs/tags/20260221.154944",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soarpkgs/tarball/refs/tags/20260221.154944",
+  "commit": {
+   "sha": "d6992784ac5b59c5cef45a5c3712365926c6399e",
+   "url": "https://api.github.com/repos/pkgforge/soarpkgs/commits/d6992784ac5b59c5cef45a5c3712365926c6399e"
+  },
+  "node_id": "REF_kwDONKMmL7lyZWZzL3RhZ3MvMjAyNjAyMjEuMTU0OTQ0"
+ }
+]
