@@ -87,7 +87,12 @@ poc_fetch() { # url outfile [sha256]
 # ⚠ $WORK IS OUTSIDE THE REPOSITORY, so the build environment cannot see it
 # without an explicit bind. Without this the chroot reports "cd: can't cd to
 # /var/tmp/..." and it reads like a missing tarball rather than a missing mount.
-poc_in_env() { sh "$PGB" --bind "$WORK" build -- /bin/sh -c "$1"; }
+# ⚠ POC_PGB_FLAGS lets a POC ask for an OPT-IN mechanism -- --embed-cacert,
+# --embed-terminfo, --embed-locale -- for its own builds. It is deliberately
+# not a per-call argument: a POC that used a flag for the final link and not
+# for the dependencies it links in would be measuring two different toolchains
+# and calling the result one.
+poc_in_env() { sh "$PGB" --bind "$WORK" ${POC_PGB_FLAGS:-} build -- /bin/sh -c "$1"; }
 
 # ---------------------------------------------------------------------------
 # The matrix run. This is what the POC is FOR.

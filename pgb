@@ -33,6 +33,8 @@
 # OPTIONS (build)
 #   --embed-cacert             find the host's TLS trust store wherever it is,
 #                              and carry a copy for hosts that have none
+#   --embed-terminfo           carry a handful of terminal descriptions, used
+#                              only when the host cannot describe $TERM
 #   --embed-locale             embed C.UTF-8, materialised only if the host
 #                              lacks it. Off by default: it is the one
 #                              mechanism that writes to the filesystem
@@ -98,6 +100,7 @@ xz-utils bzip2 patch perl ca-certificates curl zlib1g-dev libffi-dev}"
 VERBOSE="${PGB_OPT_VERBOSE:-0}"
 EMBED_LOCALE="${PGB_OPT_EMBED_LOCALE:-0}"
 EMBED_CACERT="${PGB_OPT_EMBED_CACERT:-0}"
+EMBED_TERMINFO="${PGB_OPT_EMBED_TERMINFO:-0}"
 USE_ICONV="${PGB_OPT_USE_ICONV:-1}"
 ARCH_BASELINE="${PGB_OPT_BASELINE:-}"
 # Extra paths to expose inside the build environment. A build whose sources,
@@ -135,6 +138,7 @@ while [ $# -gt 0 ]; do
     -v|--verbose)     VERBOSE=1 ;;
     --embed-locale)   EMBED_LOCALE=1 ;;
     --embed-cacert)   EMBED_CACERT=1 ;;
+    --embed-terminfo) EMBED_TERMINFO=1 ;;
     --no-iconv)       USE_ICONV=0 ;;
     --arch-baseline)  shift; ARCH_BASELINE="${1:-}" ;;
     --bind)           shift; EXTRA_BINDS="$EXTRA_BINDS ${1:-}" ;;

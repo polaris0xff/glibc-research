@@ -241,7 +241,11 @@ the executable's own unwind tables are discoverable through program headers.
 
 ## T-032 — `--embed-terminfo` and a CA-bundle answer
 
-**Source** `docs/limitations.md` §3 · **Category** runtime · **Priority** P2 · **Effort** S · **Status** open
+**Source** `docs/limitations.md` §3 · **Category** runtime · **Priority** P1 · **Effort** S · **Status** open
+
+⚠ **PROMOTED to P1**: the operator's framing of the goal names both —
+*"no networking/iconv/gconv/nss/locale/**cert**/etc issues"* — and they are two
+of the three open rows of `REQUIREMENTS.md` part 2.
 
 **Problem.** Two of five host data dependencies are open. Both are reached
 through an environment variable, which is the shape `--embed-locale` already
@@ -249,3 +253,62 @@ proved.
 
 **Prove.** POC 20's `setupterm()` probe passing on all 11, and POC 30's curl
 verifying TLS on all 11 with the harness's own CA variables unset.
+
+### ⛔ BOTH MECHANISMS ARE BUILT AND MEASURED; THE ACCEPTANCE IS NOT MET
+
+⛔ **This entry stays OPEN.** `RULES.md`: an entry closes on its own acceptance
+command and not on a nearby one. The `Prove` above names POC 20 and POC 30,
+both POCs have been wired to the new flags, and **neither has been run to
+completion** — the session ended during POC 20's ncurses build. What is
+measured below is the mechanism on its own, by two new experiments.
+
+**Landed:**
+
+| | |
+|---|---|
+| `tool/runtime/pgb-cacert.c` | a constructor that probes nine known trust-store locations, then materialises an embedded copy only where there is none |
+| `tool/runtime/pgb-terminfo.c` | the same shape for terminal descriptions, with the host's database preferred |
+| `pgb --embed-cacert`, `--embed-terminfo` | both opt-in, both carried across the engine boundary |
+| `experiments/74-cacert.sh` | 6 assertions |
+| `experiments/75-terminfo.sh` | 4 assertions |
+| `poc/common.sh` `POC_PGB_FLAGS` | lets a POC ask for an opt-in mechanism for its own builds |
+
+**Measured**, `evidence/74-cacert/RESULT.txt` and `evidence/75-terminfo/RESULT.txt`:
+
+| | with the mechanism | without |
+|---|---|---|
+| a usable **TLS trust store** found | **11 of 11** | 5 of 11 |
+| a **terminal description** for `$TERM` reachable | **11 of 11** | 7 of 11 |
+| never overrode a value the caller had set | 11 of 11 | — |
+| wrote anything to the filesystem | **3 of 11** (CA), **4 of 11** (terminfo) — exactly the hosts with nothing of their own | — |
+
+⭐ **The finding that shaped both mechanisms**: most of the failures were never
+*"this machine has no certificates"*. Rocky keeps its bundle at
+`/etc/pki/tls/certs/ca-bundle.crt`, openSUSE at `/etc/ssl/ca-bundle.pem`,
+Alpine 3.10 at `/etc/ssl/cert.pem`. **The data was there all along, on a path
+the binary had never been told about.** Only three of eleven genuinely ship
+none. So the first layer is to *look*, and the embedded copy is a fallback.
+
+⛔ **And the order of those two layers is a SECURITY property, asserted as
+one.** The embedded bundle is a build-time snapshot; roots are revoked and
+expire. A binary preferring its own stale copy over a store an administrator
+maintains would be a security regression wearing a portability fix's clothes.
+`74-` checks, against an independent oracle rather than the shim's own answer,
+that nothing was written on any host that has a store.
+
+**What is left, exactly:**
+
+1. run `poc/20-nano` (now carrying `POC_PGB_FLAGS=--embed-terminfo`, with the
+   `setupterm()` probe moved from an observation to an **assertion** staged
+   into `poc_matrix`) to completion, 11 of 11;
+2. run `poc/30-curl` (now carrying `POC_PGB_FLAGS=--embed-cacert`, with a new
+   step 8 that verifies TLS with the harness's own CA variables unset, and
+   with the old *"trust store missing on host"* branch turned from `ok` into a
+   **failure** — it was rightly `ok` while no mechanism existed).
+
+⚠ **One confound to watch when running POC 30**: this development environment
+routes HTTPS through a proxy that exports its own `CURL_CA_BUNDLE` and
+`SSL_CERT_FILE`. The POC already unsets them for exactly that reason and the
+existing observation records why — `docs/history/corrections.md`. If the new
+step 8 fails on hosts that DO have a store, suspect the proxy's certificate
+before suspecting the mechanism, and say which it was.

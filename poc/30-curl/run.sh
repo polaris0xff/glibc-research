@@ -31,6 +31,12 @@ POC_VERSION="8.11.0"
 POC_SHA256="264537d90e58d2b09dddc50944baf3c38e7089151c8986715e2aaeaaf2b8118f"
 POC_NORMAL_BUILD="./configure --with-openssl && make"
 POC_STRESSES="getaddrinfo/NSS, DNS, TLS, CA bundle data, 3-package dependency chain"
+
+# ⭐ --embed-cacert, so this POC measures TODO T-032's acceptance rather than
+# only observing the gap. The mechanism finds the host's own trust store
+# wherever it is and materialises an embedded copy only where there is none;
+# the observation section below still reports which of the two happened.
+POC_PGB_FLAGS="--embed-cacert"
 POC_WHY="the getaddrinfo case the linker warns about, end to end over real TLS"
 
 SSL_URL="https://github.com/openssl/openssl/releases/download/openssl-3.0.15/openssl-3.0.15.tar.gz"
@@ -117,14 +123,31 @@ else
     *"resolve"*)
       printf '  FAIL %-30s DNS FAILED: %s\n' live-https "$e"; fail=1 ;;
     *"certificate"*|*"CA"*|*"SSL"*)
-      # ⚠ A CA failure is a DATA dependency, not a libc one, and it is
-      # reported as its own thing rather than folded into "DNS broke".
-      printf '  ok   %-30s DNS worked; TLS trust store missing on host: %s\n' live-https "$e" ;;
+      # ⛔ THIS USED TO BE `ok`, AND IT WAS RIGHT TO BE. Before
+      # --embed-cacert there was no mechanism, so a missing trust store was a
+      # DATA dependency being reported rather than a defect. With the
+      # mechanism it is a failure: the store is supposed to be found now.
+      printf '  FAIL %-30s TLS trust store not found: %s\n' live-https "$e"; fail=1 ;;
     *)
       printf '  SKIP %-30s no route out: %s\n' live-https "$e" ;;
   esac
 fi
-rm -f /tmp/src.txt /tmp/out.html /tmp/err.txt
+# 8. ⭐ TODO T-032's ACCEPTANCE CLAUSE: verify TLS with the HARNESS's own CA
+#    variables unset, so what answers is the host's store or the embedded
+#    copy and never the development proxy's anchor. The observation section
+#    below explains why that distinction was worth a correction.
+(
+  unset CURL_CA_BUNDLE SSL_CERT_FILE SSL_CERT_DIR CURL_CA_PATH
+  if /curl -sS --connect-timeout 8 --max-time 25 -o /dev/null https://example.com/ 2>/tmp/e2.txt; then
+    printf '  ok   %-30s harness CA variables unset\n' https-verify-host
+  else
+    printf '  FAIL %-30s harness CA variables unset: %s\n' https-verify-host \
+      "$(head -c 100 /tmp/e2.txt)"
+    exit 1
+  fi
+) || fail=1
+
+rm -f /tmp/src.txt /tmp/out.html /tmp/err.txt /tmp/e2.txt
 exit $fail
 TEST
 }

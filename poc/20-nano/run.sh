@@ -32,6 +32,13 @@ POC_VERSION="8.2"
 POC_SHA256="d5ad07dd862facae03051c54c6535e54c7ed7407318783fcad1ad2d7076fffeb"
 POC_NORMAL_BUILD="./configure && make (against the distro's libncursesw)"
 POC_STRESSES="terminfo data, ncurses static dependency, iconv, locale, multibyte"
+
+# ⭐ --embed-terminfo, so this POC measures TODO T-032's acceptance rather than
+# only observing the gap. It applies to ncurses, nano and the probe alike --
+# poc/common.sh says why it is not per-call. Everything below that reports on
+# the HOST database still does: the mechanism only acts where the host cannot
+# answer for $TERM, so the observation section still separates the two.
+POC_PGB_FLAGS="--embed-terminfo"
 POC_WHY="a curses program: static code, host DATA"
 
 NCURSES_URL="https://ftp.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz"
@@ -79,6 +86,24 @@ t help "$(/nano --help 2>&1 | grep -c '^ *-')" "$(/nano --help 2>&1 | grep -c '^
 #    parser, which is real work over real data:
 printf 'hello\n' > /tmp/t.txt
 printf 'caf\303\251 na\303\257ve \342\202\254\n' > /tmp/utf8.txt
+
+# 3b. ⛔ THE setupterm() ASSERTION, which is TODO T-032's acceptance clause.
+#     `nano --version` never initialises curses, so it cannot see this; the
+#     probe is linked against the same static ncursesw and calls setupterm()
+#     directly, with TERMINFO and TERMINFO_DIRS unset so the harness cannot
+#     answer for the host. xterm-256color is the entry Void musl's database
+#     does NOT have, which is the case a directory check would miss.
+if [ -x /terminfo-probe ]; then
+  if (unset TERMINFO TERMINFO_DIRS; TERM=xterm-256color /terminfo-probe) >/dev/null 2>&1; then
+    printf '  ok   %-30s setupterm(xterm-256color)\n' terminfo-setupterm
+  else
+    printf '  FAIL %-30s setupterm(xterm-256color): %s\n' terminfo-setupterm \
+      "$(unset TERMINFO TERMINFO_DIRS; TERM=xterm-256color /terminfo-probe 2>&1 | head -1)"
+    fail=1
+  fi
+else
+  printf '  FAIL %-30s probe not staged\n' terminfo-setupterm; fail=1
+fi
 
 # 4. terminfo: a TERM the host is very likely to have
 if TERM=xterm /nano --version >/dev/null 2>&1; then
@@ -217,6 +242,6 @@ fi
 
 poc_check "built" "$([ -x "$BIN" ] && echo yes || echo no)" yes
 poc_inspect "$BIN"
-poc_matrix "$BIN"
+poc_matrix "$BIN" "$POC_OUT/terminfo-probe:/terminfo-probe"
 poc_observe "$BIN" "terminfo: setupterm() against the host database" "$POC_OUT/terminfo-probe:/terminfo-probe"
 poc_finish
