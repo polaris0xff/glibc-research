@@ -87,6 +87,7 @@
 #   sh scripts/common/mine-repo.sh OWNER/NAME
 #   sh scripts/common/mine-repo.sh OWNER/NAME --out references
 #   sh scripts/common/mine-repo.sh OWNER/NAME --route proxy --no-clone
+#   sh scripts/common/mine-repo.sh OWNER/NAME --ref <sha-or-tag-or-branch>
 #   sh scripts/common/mine-repo.sh OWNER/NAME --json
 #   sh scripts/common/mine-repo.sh --selftest      prove the page joiner, offline
 #
@@ -99,6 +100,7 @@ set -u
 TARGET=""
 OUT="references"
 ROUTE="auto"
+REF=""
 CLONE=1
 JSON=0
 SELFTEST=0
@@ -109,6 +111,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --out)      shift; OUT="${1:-references}" ;;
     --route)    shift; ROUTE="${1:-auto}" ;;
+    --ref)      shift; REF="${1:-}" ;;
     --no-clone) CLONE=0 ;;
     --json)     JSON=1 ;;
     --selftest) SELFTEST=1 ;;
@@ -537,7 +540,53 @@ fi
 
 # -- the tree ----------------------------------------------------------------
 COMMIT="-"
-if [ "$CLONE" = "1" ]; then
+# ⭐ --ref EXISTS BECAUSE A PIN CAN BE THE WHOLE POINT OF A REFERENCE. An
+# operator ruling in this project names `pkgforge/soarpkgs` at
+# 55c774a5e24d9f17af69911a4d70884dfb566626 and states that later commits
+# ABANDONED the approach being studied, so HEAD is a different subject and a
+# sweep of it answers a question nobody asked.
+#
+# ⚠ `git clone --depth 1` CANNOT TAKE A COMMIT SHA — `--branch` accepts a
+# branch or a tag and nothing else. The shallow-fetch-then-checkout below does,
+# because github.com serves uploadpack.allowAnySHA1InWant. A ref that the
+# server will not serve that way falls back to a full clone plus checkout
+# rather than silently keeping HEAD, which would put the wrong commit in
+# PROVENANCE.md and make every citation describe another tree.
+clone_at_ref() {   # dest ref -> 0 if the working tree is at that ref
+  mkdir -p "$1" || return 1
+  git -C "$1" init -q 2>/dev/null || return 1
+  git -C "$1" remote add origin "https://github.com/$TARGET.git" 2>/dev/null || return 1
+  if git -C "$1" fetch --depth 1 -q origin "$2" 2>/dev/null &&
+     git -C "$1" checkout -q FETCH_HEAD 2>/dev/null; then
+    return 0
+  fi
+  rm -rf "$1"
+  git clone -q "https://github.com/$TARGET.git" "$1" 2>/dev/null || return 1
+  git -C "$1" checkout -q "$2" 2>/dev/null || return 1
+  return 0
+}
+if [ "$CLONE" = "1" ] && [ -n "$REF" ]; then
+  rm -rf "$DEST/tree"
+  if clone_at_ref "$DEST/tree" "$REF"; then
+    COMMIT=$(git -C "$DEST/tree" rev-parse HEAD 2>/dev/null || printf '-')
+    say "  tree: $COMMIT (pinned to $REF)"
+    # ⛔ THE PIN IS CHECKED, NOT ASSUMED. A tag can move and a branch name that
+    # looks like a sha is not one; either way the commit written below is the
+    # one on disk, and a mismatch is a gap rather than a silent substitution.
+    case "$COMMIT" in
+      "$REF"*) ;;
+      *) gap "ref: --ref $REF resolved to $COMMIT. A tag or branch was asked for, so this commit is what the tree holds and the pin is not by sha." ;;
+    esac
+    rm -rf "$DEST/tree/.git"
+    for junk in node_modules target build dist .next vendor/bundle .venv __pycache__; do
+      find "$DEST/tree" -type d -name "$junk" -prune -exec rm -rf {} + 2>/dev/null || true
+    done
+  else
+    rm -rf "$DEST/tree"
+    gap "tree: the clone at --ref $REF failed, and NOTHING was kept. A tree at the wrong commit is worse than no tree, so HEAD was not substituted."
+    say "  tree: FAILED (ref $REF)"
+  fi
+elif [ "$CLONE" = "1" ]; then
   rm -rf "$DEST/tree"
   if git clone --depth 1 -q "https://github.com/$TARGET.git" "$DEST/tree" 2>/dev/null; then
     # ⛔ CAPTURED BEFORE THE STRIP. This order is the whole reason the two
@@ -568,6 +617,7 @@ fi
   printf 'Fetched %s by `scripts/common/mine-repo.sh`.\n\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   printf '| | |\n| --- | --- |\n'
   printf '| commit | `%s` |\n' "$COMMIT"
+  [ -n "$REF" ] && printf '| ref asked for | `%s` |\n' "$REF"
   printf '| route | %s |\n' "$ROUTE"
   printf '| control | %s |\n' "$CONTROL_OK"
   printf '\n'

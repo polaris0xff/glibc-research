@@ -1,0 +1,179 @@
+name: CI
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - master
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
+      image-digest: ${{ steps.build.outputs.digest }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Build Docker image (amd64)
+        id: build-amd64
+        run: |
+          nix --extra-experimental-features 'nix-command flakes' build .#default --out-link result-amd64
+          docker load < result-amd64
+          docker tag nix-nixuser:latest nix-nixuser:amd64
+
+      - name: Set up QEMU for cross-build
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: arm64
+
+      - name: Build Docker image (arm64)
+        id: build-arm64
+        run: |
+          nix --extra-experimental-features 'nix-command flakes' build .#default --system aarch64-linux --out-link result-arm64
+          docker load < result-arm64
+          docker tag nix-nixuser:latest nix-nixuser:arm64
+
+      - name: Extract metadata
+        id: meta
+        run: |
+          # Determine image tag based on event
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            # Remove 'v' prefix if present for semantic versioning
+            TAG="${{ github.ref_name }}"
+            if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              TAG="${TAG#v}"
+            fi
+            IMAGE_TAG="ghcr.io/${{ github.repository }}:$TAG"
+          else
+            IMAGE_TAG="ghcr.io/${{ github.repository }}:latest"
+          fi
+          echo "tags=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "Image tag: $IMAGE_TAG"
+
+      - name: Test the container (amd64)
+        run: |
+          docker run --rm nix-nixuser:amd64 sh -c 'whoami && nix profile add nixpkgs#hello && hello'
+
+      - name: Test the container (arm64)
+        run: |
+          docker run --rm --platform linux/arm64 nix-nixuser:arm64 sh -c 'whoami && nix profile add nixpkgs#hello && hello'
+
+  publish:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+        with:
+          platforms: linux/amd64,linux/arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Build Docker image with Nix (amd64)
+        run: |
+          nix --extra-experimental-features 'nix-command flakes' build .#default --out-link result-amd64
+          docker load < result-amd64
+          docker tag nix-nixuser:latest nix-nixuser:amd64
+
+      - name: Build Docker image with Nix (arm64)
+        run: |
+          nix --extra-experimental-features 'nix-command flakes' build .#default --system aarch64-linux --out-link result-arm64
+          docker load < result-arm64
+          docker tag nix-nixuser:latest nix-nixuser:arm64
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      - name: Push each platform image
+        run: |
+          TAG="${{ github.ref_name }}"
+          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            TAG="${TAG#v}"
+          fi
+          
+          # Tag and push amd64
+          docker tag nix-nixuser:amd64 ghcr.io/${{ github.repository }}:$TAG-amd64
+          docker push ghcr.io/${{ github.repository }}:$TAG-amd64
+          
+          # Tag and push arm64
+          docker tag nix-nixuser:arm64 ghcr.io/${{ github.repository }}:$TAG-arm64
+          docker push ghcr.io/${{ github.repository }}:$TAG-arm64
+
+      - name: Create and push manifest
+        run: |
+          TAG="${{ github.ref_name }}"
+          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            TAG="${TAG#v}"
+          fi
+          
+          # Pull images for manifest (need to be in registry)
+          docker pull ghcr.io/${{ github.repository }}:$TAG-amd64
+          docker pull ghcr.io/${{ github.repository }}:$TAG-arm64
+          
+          # Create manifest for version tag
+          docker manifest create ghcr.io/${{ github.repository }}:$TAG \
+            ghcr.io/${{ github.repository }}:$TAG-amd64 \
+            ghcr.io/${{ github.repository }}:$TAG-arm64
+          
+          # Annotate
+          docker manifest annotate ghcr.io/${{ github.repository }}:$TAG \
+            ghcr.io/${{ github.repository }}:$TAG-amd64 --arch amd64
+          docker manifest annotate ghcr.io/${{ github.repository }}:$TAG \
+            ghcr.io/${{ github.repository }}:$TAG-arm64 --arch arm64
+          
+          # Push manifest
+          docker manifest push ghcr.io/${{ github.repository }}:$TAG
+          
+          # Also create and push latest tag
+          docker manifest create ghcr.io/${{ github.repository }}:latest \
+            ghcr.io/${{ github.repository }}:$TAG-amd64 \
+            ghcr.io/${{ github.repository }}:$TAG-arm64
+          
+          docker manifest annotate ghcr.io/${{ github.repository }}:latest \
+            ghcr.io/${{ github.repository }}:$TAG-amd64 --arch amd64
+          docker manifest annotate ghcr.io/${{ github.repository }}:latest \
+            ghcr.io/${{ github.repository }}:$TAG-arm64 --arch arm64
+          
+          docker manifest push ghcr.io/${{ github.repository }}:latest
+
+      - name: Output image info
+        run: |
+          TAG="${{ github.ref_name }}"
+          if [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            TAG="${TAG#v}"
+          fi
+          echo "🎉 Image published to: ghcr.io/${{ github.repository }}:$TAG"
+          echo "📦 Pull with: docker pull ghcr.io/${{ github.repository }}:$TAG"
+          echo "   - amd64: docker pull ghcr.io/${{ github.repository }}:$TAG-amd64"
+          echo "   - arm64: docker pull ghcr.io/${{ github.repository }}:$TAG-arm64"

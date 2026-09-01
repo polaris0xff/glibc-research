@@ -1,0 +1,17 @@
+.direnv
+.vscode
+
+result*
+
+*.o
+*.so
+*.out
+
+*~
+*.swp
+
+
+
+# Added by cargo
+
+/target

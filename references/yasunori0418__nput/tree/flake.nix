@@ -1,0 +1,350 @@
+{
+  description = "Place fetched git repositories at arbitrary paths via symlink or copy.";
+
+  # nput 自体を clone して nix develop / build / flake check する際に cachix からビルド済み
+  # バイナリを引くための設定（trusted-user / accept-flake-config 前提）。flake の nixConfig は
+  # input に伝播しないため、nput を flake input として消費する側のキャッシュ取得には効かない。
+  nixConfig = {
+    extra-substituters = [
+      "https://cache.nixos.org/"
+      "https://nix-community.cachix.org"
+      "https://yasunori0418.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "yasunori0418.cachix.org-1:mC1j+M5A6063OHaOB5bH2nS0BiCW/BJsSRiOWjLeV9o="
+    ];
+  };
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      # nix-unit の flake-parts モジュールは nixpkgs-lib follows を要求する。
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # HM モジュール統合の評価テスト専用（→ Issue #17・checks.hm-module）。
+    # lib/ は home-manager に依存しない（→ ADR-0006）。本 input は checks でのみ使う。
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # lib 評価テスト（→ ADR-0006, ADR-0012）。
+    nix-unit = {
+      url = "github:nix-community/nix-unit";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    haumea = {
+      url = "github:nix-community/haumea";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    namaka = {
+      url = "github:nix-community/namaka";
+      inputs.haumea.follows = "haumea";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs =
+    inputs@{ flake-parts, ... }:
+    let
+      # flake output（lib）とテスト入力で同一実体を共有する（self 参照を避ける）。
+      nputLib = import ./lib;
+      # バージョンの一次情報はリポジトリ直下の VERSION（semver 1 行・→ ADR-0042）。
+      # flake / Go バイナリの双方をこの単一ソースから導出し二重管理しない。
+      # 末尾改行を落として semver 文字列だけを取り出す（nixos-unstable の lib.strings.trim）。
+      version = inputs.nixpkgs.lib.strings.trim (builtins.readFile ./VERSION);
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+        "x86_64-darwin"
+      ];
+    in
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [
+        inputs.treefmt-nix.flakeModule
+        inputs.nix-unit.modules.flake.default
+        # nput output を perSystem へ集約する flake-parts module（→ ADR-0029）。
+        # 循環参照回避のため、公開（flake.flakeModules.default）も import も同一パスを参照する。
+        # self.flakeModules.default 経由の self-import にはしない（ADR 決定4）。
+        ./modules/flake-parts.nix
+      ];
+      inherit systems;
+      perSystem =
+        {
+          config,
+          pkgs,
+          lib,
+          ...
+        }:
+        let
+          # Go ビルド・lint の入力（go.mod + go.sum + internal/ + cmd/。docs 変更で再ビルドしないよう絞る）。
+          goSrc = lib.fileset.toSource {
+            root = ./.;
+            fileset = lib.fileset.unions [
+              ./go.mod
+              ./go.sum
+              ./internal
+              ./cmd
+            ];
+          };
+          # nix sandbox（ネットワーク遮断）で go ツールを回すための環境。
+          # CLI 層が cobra に依存するため（→ ADR-0011）、buildGoModule が固定 hash で取得した
+          # vendored deps（goModules）を vendor/ に展開し GOFLAGS=-mod=vendor でオフライン解決する。
+          # build dir 直下は Go が temp root とみなし go.mod を無視するため、サブディレクトリで作業する。
+          goToolEnv = ''
+            export HOME="$TMPDIR"
+            export GOCACHE="$TMPDIR/go-cache"
+            export GOTOOLCHAIN=local
+            # cgo 未使用。サンドボックスに C コンパイラを持ち込まずピュア Go で検査する。
+            export CGO_ENABLED=0
+            export GOFLAGS=-mod=vendor
+            export GOPROXY=off
+            mkdir -p build && cd build
+            cp -r --no-preserve=mode ${goSrc}/. .
+            cp -r --no-preserve=mode ${config.packages.nput.goModules} vendor
+          '';
+        in
+        {
+          # nput CLI（cmd/nput）+ 配置エンジン（internal/）を含む Go モジュール（→ ADR-0006, ADR-0011）。
+          # CLI 層が cobra に依存するため vendorHash 文字列を pin する（依存変更時に更新）。
+          # doCheck で go test（engine の unit + tmpdir 統合テスト）を回す。
+          packages.nput = pkgs.buildGoModule {
+            pname = "nput";
+            inherit version;
+            src = goSrc;
+            vendorHash = "sha256-0f+MDJBF3bFSUuXMoSJpnnNRzkJqY/eT/EPdChWseiw=";
+            doCheck = true;
+            env.GOTOOLCHAIN = "local";
+            # VERSION の値を cmd/nput の main.version へ埋め込む（→ ADR-0042）。ldflags 未設定の
+            # 素の go build では main.version は "dev" のまま（後続 #130 が tool.version の供給源として読む）。
+            ldflags = [
+              "-X"
+              "main.version=${version}"
+            ];
+            # 既存 go test と同じ対象（unit + tmpdir 統合）を -coverprofile 付きで回し、func サマリを
+            # build ログへ出す。計測・レポート出力のみで閾値ゲートは持たない（テスト追加 PR の
+            # マージ順依存を避ける → タスク規約）。`go test ./...` は default checkPhase と同等の対象。
+            # この custom checkPhase は go test へ ldflags を渡さない。TestVersionDefault が
+            # main.version="dev" を前提にしているため、default checkPhase へ戻すと（ldflags が test
+            # ビルドにも波及し version が埋まって）当該テストが壊れる点に注意（→ ADR-0042）。
+            checkPhase = ''
+              runHook preCheck
+              go test -coverprofile="$TMPDIR/cover.out" ./...
+              go tool cover -func="$TMPDIR/cover.out" | tee "$TMPDIR/coverage-func.txt"
+              runHook postCheck
+            '';
+            # coverprofile / func レポートを成果物へ同梱する。CI は cache hit でも $out から決定論的に
+            # 取り出して Step Summary に出せる（build ログ依存だと cache hit で消えるため）。
+            postInstall = ''
+              install -Dm644 "$TMPDIR/cover.out" "$out/share/nput/coverage/cover.out"
+              install -Dm644 "$TMPDIR/coverage-func.txt" "$out/share/nput/coverage/coverage-func.txt"
+            '';
+            # ldflags 経由の埋め込み配線（VERSION → main.version → バイナリ）を build 内で smoke する
+            # （→ ADR-0042）。go test は ldflags 未設定で走る（上記 checkPhase）ため埋め込みを観測できず、
+            # -X のキー名ミス・trim 漏れが unit テストを素通りする。installCheck でビルド済みバイナリの
+            # `--version` 出力に VERSION の値が入ることを確認し、二重管理防止の核心を機械検証する。
+            # ネイティブビルド前提（本 flake は cross を持たない）。
+            doInstallCheck = true;
+            installCheckPhase = ''
+              runHook preInstallCheck
+              got=$("$out/bin/nput" --version)
+              case "$got" in
+                "nput version ${version}") : ;;
+                *) echo "FAIL: nput --version = '$got', want 'nput version ${version}'"; exit 1 ;;
+              esac
+              runHook postInstallCheck
+            '';
+            meta = {
+              description = "Place fetched git repositories at arbitrary paths via symlink or copy.";
+              mainProgram = "nput";
+            };
+          };
+
+          # ドッグフーディング用の project mode config（→ Issue #7・AC e2e 経路・ADR-0029）。
+          # `nput apply default` で git toplevel 配下の .nput-example/docs に本 repo（self）の
+          # docs を store-symlink 配置する最小 example。flake-parts module（imports）が
+          # perSystem.nput.default を flake.nput.<system>.default へ転置する。pkgs は perSystem
+          # 由来になり packages.nput と一貫する（legacyPackages.${system} 直書きの二重解決が消える）。
+          # `nput.<system>.<name>` は標準 flake output ではないため `nix flake check` で
+          # `warning: unknown flake output 'nput'`（exit 0・想定内）が残る（→ docs/spec.md, ADR-0029 影響節）。
+          nput.default = nputLib.mkManifest {
+            inherit pkgs;
+            root = nputLib.projectRoot;
+            entries.".nput-example/docs" = {
+              src = inputs.self;
+              subpath = "docs";
+            };
+          };
+
+          treefmt = {
+            projectRootFile = "flake.nix";
+            programs.nixfmt = {
+              enable = true;
+              package = pkgs.nixfmt;
+            };
+            # Go 整形（→ ADR-0025）。
+            programs.gofmt.enable = true;
+          };
+
+          # 静的解析を flake check に載せる（→ ADR-0025）。stdlib-only ゆえ依存検出は軽い。
+          checks.go-vet = pkgs.runCommandLocal "nput-go-vet" { nativeBuildInputs = [ pkgs.go ]; } ''
+            ${goToolEnv}
+            go vet ./...
+            touch "$out"
+          '';
+          checks.golangci-lint =
+            pkgs.runCommandLocal "nput-golangci-lint"
+              {
+                nativeBuildInputs = [
+                  pkgs.go
+                  pkgs.golangci-lint
+                ];
+              }
+              ''
+                ${goToolEnv}
+                export GOLANGCI_LINT_CACHE="$TMPDIR/golangci-cache"
+                golangci-lint run ./...
+                touch "$out"
+              '';
+          # go test（unit + tmpdir 統合テスト）も flake check で回す。
+          checks.nput = config.packages.nput;
+
+          # nix-unit: デフォルト適用・manifest 構造の不変条件をアサート（→ ADR-0006, ADR-0010）。
+          # flake-parts モジュールが checks 派生を組み `nix flake check` に載せる。
+          # check は sandbox 内で `nix-unit --flake ${self}#tests.systems.<system>` を回し flake を
+          # 再 import するため、全 direct input を override-input でローカルに渡しオフライン評価する。
+          nix-unit.inputs = {
+            inherit (inputs)
+              nixpkgs
+              flake-parts
+              treefmt-nix
+              nix-unit
+              haumea
+              namaka
+              ;
+          };
+          nix-unit.tests = import ./tests/nix-unit.nix {
+            inherit (pkgs) lib;
+            nput = nputLib;
+          };
+
+          # namaka: manifest.json 全体（= normalizeManifest 出力）のスナップショット回帰（→ ADR-0006）。
+          # namaka.lib.load は不一致で throw・成功で {} を返す純評価。seq で評価を強制し
+          # check 派生に紐付けて `nix flake check` に載せる。
+          checks.namaka = builtins.seq (inputs.namaka.lib.load {
+            src = ./tests/namaka;
+            inputs = {
+              inherit (pkgs) lib;
+              nput = nputLib;
+            };
+          }) (pkgs.runCommandLocal "nput-namaka-snapshots" { } "touch \"$out\"");
+
+          # HM モジュール統合の評価アサート（→ Issue #17 AC・NixOS VM / 実 activate は #19 E2E）。
+          # standalone な homeManagerConfiguration を評価し、(1) activation が home.file へ翻訳せず
+          # `nput apply --manifest` で engine を起動する配線であること、(2) 渡す manifest が
+          # root=homeRoot を pin すること、(3) nput.entries が manifest に流れることをアサートする。
+          # 実 activate（nix-env --set・FS 配置）は build sandbox では行えないため E2E（#19）へ回す。
+          checks.hm-module =
+            let
+              # store hash 揺れを避ける fake な flake-input 相当（nix-unit / namaka と同じ test double）。
+              fakeSrc = {
+                outPath = "/nix/store/00000000000000000000000000000000-fake-src";
+              };
+              hm = inputs.home-manager.lib.homeManagerConfiguration {
+                inherit pkgs;
+                modules = [
+                  ./modules/home-manager.nix
+                  {
+                    # ラッパー（flake.homeManagerModules.default）と同じく pin 版 nput を注入する。
+                    _module.args.nputPackage = config.packages.nput;
+                    home.username = "nput-test";
+                    home.homeDirectory = "/home/nput-test";
+                    home.stateVersion = "24.05";
+                    # nixpkgs=unstable と HM=master の release 文字列ずれによる無害な
+                    # warning を抑制する（packages は nixpkgs follows で一致・→ #17 レビュー）。
+                    home.enableNixpkgsReleaseCheck = false;
+                    nput.enable = true;
+                    nput.entries.".claude/skills/nix" = {
+                      src = fakeSrc;
+                      subpath = "skills/nix";
+                    };
+                    # nput.backup.enable の wiring 確認（→ ADR-0045, issue #169）。suffix 省略時は
+                    # submodule 既定値 "nput-backup" が activation に渡ることを検証する。
+                    nput.backup.enable = true;
+                  }
+                ];
+              };
+              # home.activation の dag entry の生スクリプト。
+              activationScript = pkgs.writeText "nput-activation" hm.config.home.activation.nput.data;
+            in
+            pkgs.runCommandLocal "nput-hm-module-check" { } ''
+              script=${activationScript}
+
+              # (1) home.file へ翻訳せず engine を --manifest 経路で起動する配線であること。
+              grep -q 'apply --manifest /nix/store/' "$script" \
+                || { echo "FAIL: activation が nput apply --manifest を起動していません"; cat "$script"; exit 1; }
+
+              # (2) 渡す manifest が root=homeRoot を pin していること（mkManifest が記録）。
+              manifest=$(grep -oE '/nix/store/[a-z0-9]+-nput-manifest' "$script" | head -n1)
+              test -n "$manifest" || { echo "FAIL: manifest の store パスを抽出できません"; cat "$script"; exit 1; }
+              test -f "$manifest/manifest.json" || { echo "FAIL: $manifest/manifest.json がありません"; exit 1; }
+              grep -q '"rootKind":"home"' "$manifest/manifest.json" \
+                || { echo "FAIL: manifest が homeRoot を pin していません"; cat "$manifest/manifest.json"; exit 1; }
+
+              # (3) nput.entries が manifest に流れていること（target = 属性キー）。
+              grep -q '".claude/skills/nix"' "$manifest/manifest.json" \
+                || { echo "FAIL: nput.entries が manifest に反映されていません"; cat "$manifest/manifest.json"; exit 1; }
+
+              # (4) nput.backup.enable が --backup=<既定 suffix> として同じ apply 起動に配線されること
+              #     （→ ADR-0045, issue #169）。
+              grep -q -- '--backup=nput-backup' "$script" \
+                || { echo "FAIL: activation が --backup=<suffix> を配線していません"; cat "$script"; exit 1; }
+
+              touch "$out"
+            '';
+        };
+      flake = {
+        lib = nputLib;
+
+        # `nput init <template>` / `nix flake init -t <ref>#<template>` で展開する starter テンプレ。
+        # default = project（spec が project mode を canonical と明記・最も完備した例を渡す）。
+        templates = {
+          standalone = {
+            path = ./templates/standalone;
+            description = "nput standalone config（homeRoot 例 + バリエーションコメント）";
+          };
+          project = {
+            path = ./templates/project;
+            description = "nput project config（projectRoot + devShell + shellHook + .gitignore）";
+          };
+          default = inputs.self.templates.project;
+        };
+
+        # flake-parts module を consumer 向けに公開する（→ ADR-0029）。flake-parts を使う repo は
+        # `imports = [ inputs.nput.flakeModules.default ]` してから `perSystem.nput.<name> = ...` を書ける。
+        # 循環参照回避のため、公開も import（上の imports）も同一パスを参照する（ADR 決定4）。
+        flakeModules.default = ./modules/flake-parts.nix;
+
+        # HM モジュール本体（modules/home-manager.nix）は engine をキックするのに pin 版 nput
+        # CLI を要する。利用者システムの packages.nput を _module.args として注入する薄い
+        # ラッパーで包む（利用者は import するだけ・→ ADR-0007, modules/home-manager.nix）。
+        homeManagerModules.default =
+          { pkgs, ... }:
+          {
+            imports = [ ./modules/home-manager.nix ];
+            _module.args.nputPackage = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.nput;
+          };
+        nixosModules.default = ./modules/nixos.nix;
+        darwinModules.default = ./modules/nix-darwin.nix;
+      };
+    };
+}

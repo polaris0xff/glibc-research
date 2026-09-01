@@ -1,0 +1,11 @@
+
+services:
+  nixuser:
+    image: ghcr.io/grigio/docker-nixuser
+    command: bash
+    stdin_open: true
+    tty: true
+    ports:
+      - 8000:8000
+    volumes:
+      - ./data:/data

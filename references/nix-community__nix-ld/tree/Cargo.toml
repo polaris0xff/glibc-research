@@ -1,0 +1,47 @@
+[package]
+name = "nix-ld"
+version = "2.0.6"
+edition = "2024"
+
+[[bin]]
+name = "nix-ld"
+test = false
+
+[[test]]
+name = "tests"
+
+[dependencies]
+embedded-io = "0.6.1"
+goblin = { version = "0.10.7", default-features = false, features = [
+    "elf32",
+    "elf64",
+] }
+heapless = "0.9.3"
+linux-raw-sys = { version = "0.12.1", default-features = false, features = [
+    "no_std",
+    "general",
+    "errno",
+] }
+log = "0.4.32"
+
+[build-dependencies]
+cc = "1.2.63"
+
+[dev-dependencies]
+cc = "1.2.63"
+rstest = { version = "0.26.1", default-features = false }
+tempfile = "3.27.0"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+lto = true
+debug = true
+
+[features]
+default = ["entry_trampoline"]
+
+# Use a trampoline to revert our changes to LD_LIBRARY_PATH before executing the real program
+entry_trampoline = []

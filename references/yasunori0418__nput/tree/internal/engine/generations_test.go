@@ -1,0 +1,627 @@
+package engine
+
+import (
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/yasunori0418/nput/internal/manifest"
+	"github.com/yasunori0418/nput/internal/paths"
+)
+
+func homeManifest(entries ...manifest.Entry) manifest.Manifest {
+	return manifest.Manifest{
+		SchemaVersion: 1,
+		Root:          manifest.Root{RootKind: manifest.RootKindHome},
+		Entries:       entries,
+	}
+}
+
+func TestParseGenerations(t *testing.T) {
+	out := "" +
+		"   1   2026-06-01 10:00:00   \n" +
+		"   2   2026-06-02 11:30:00   (current)\n"
+	gens, err := parseGenerations(out)
+	if err != nil {
+		t.Fatalf("parseGenerations: %v", err)
+	}
+	if len(gens) != 2 {
+		t.Fatalf("len = %d, want 2", len(gens))
+	}
+	if gens[0].Number != 1 || gens[0].Current {
+		t.Errorf("gen[0] = %+v", gens[0])
+	}
+	if gens[0].Date != "2026-06-01 10:00:00" {
+		t.Errorf("gen[0].Date = %q", gens[0].Date)
+	}
+	if gens[1].Number != 2 || !gens[1].Current {
+		t.Errorf("gen[1] = %+v", gens[1])
+	}
+	if gens[1].Date != "2026-06-02 11:30:00" {
+		t.Errorf("gen[1].Date = %q (should not include (current))", gens[1].Date)
+	}
+}
+
+func TestParseGenerationsEmpty(t *testing.T) {
+	gens, err := parseGenerations("\n  \n")
+	if err != nil {
+		t.Fatalf("parseGenerations: %v", err)
+	}
+	if len(gens) != 0 {
+		t.Errorf("len = %d, want 0", len(gens))
+	}
+}
+
+func TestParseGenerationsBadLine(t *testing.T) {
+	if _, err := parseGenerations("not-a-number 2026-06-01\n"); err == nil {
+		t.Fatal("expected parse error for non-numeric generation, got nil")
+	}
+}
+
+// TestRollbackReconverges verifies FS re-convergence from current generation N → previous generation N-1.
+// gen1 = {a, b}, gen2(current) = {a, c}. Rollback stale-removes c, re-places b, and keeps a.
+func TestRollbackReconverges(t *testing.T) {
+	root := realTempDir(t)
+	state := realTempDir(t)
+	srcA := makeSrc(t, "x")
+	srcB := makeSrc(t, "x")
+	srcC := makeSrc(t, "x")
+
+	// Use the --root override for home + roothash key to be independent of $HOME.
+	prof := paths.Resolve(state, "vim", manifest.RootKindHome, root, true)
+	if err := os.MkdirAll(prof.Dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	lf1 := writeLinkFarm(t, homeManifest(
+		storeEntry(srcA, ".", "a"),
+		storeEntry(srcB, ".", "b"),
+	))
+	lf2 := writeLinkFarm(t, homeManifest(
+		storeEntry(srcA, ".", "a"),
+		storeEntry(srcC, ".", "c"),
+	))
+
+	// Prepare the generation links (profile-N-link) and the current profile (gen2).
+	if err := os.Symlink(lf1, paths.GenerationLink(prof.Profile, 1)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, paths.GenerationLink(prof.Profile, 2)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, prof.Profile); err != nil {
+		t.Fatal(err)
+	}
+
+	// Current FS = gen2: place a→srcA, c→srcC.
+	if err := os.Symlink(srcA, filepath.Join(root, "a")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(srcC, filepath.Join(root, "c")); err != nil {
+		t.Fatal(err)
+	}
+
+	var switched int
+	res, err := Rollback(RollbackOptions{
+		Name:         "vim",
+		RootKind:     manifest.RootKindHome,
+		RootOverride: root,
+		StateDir:     state,
+		ListGenerations: func(string) ([]Generation, error) {
+			return []Generation{{Number: 1}, {Number: 2, Current: true}}, nil
+		},
+		SwitchGeneration: func(_ string, gen int) error { switched = gen; return nil },
+	})
+	if err != nil {
+		t.Fatalf("Rollback: %v", err)
+	}
+
+	if res.From != 2 || res.To != 1 {
+		t.Errorf("From/To = %d/%d, want 2/1", res.From, res.To)
+	}
+	if switched != 1 {
+		t.Errorf("switched generation = %d, want 1", switched)
+	}
+	// #130's generation observation mirrors From/To (numbers come from the listing, and the
+	// pointer moves last), and Entries carries the rolled-back-to generation's full inventory.
+	if res.GenBefore == nil || *res.GenBefore != 2 || res.GenAfter == nil || *res.GenAfter != 1 {
+		t.Errorf("GenBefore/GenAfter = %v/%v, want 2/1", res.GenBefore, res.GenAfter)
+	}
+	if len(res.Entries) != 2 {
+		t.Errorf("Entries = %+v, want gen1's 2-entry inventory", res.Entries)
+	}
+
+	// FS matches gen1: a remains, b new, c removed.
+	if dest, err := os.Readlink(filepath.Join(root, "a")); err != nil || dest != srcA {
+		t.Errorf("a: dest=%q err=%v, want %q", dest, err, srcA)
+	}
+	if dest, err := os.Readlink(filepath.Join(root, "b")); err != nil || dest != srcB {
+		t.Errorf("b: dest=%q err=%v, want %q", dest, err, srcB)
+	}
+	if _, err := os.Lstat(filepath.Join(root, "c")); !os.IsNotExist(err) {
+		t.Errorf("c should be removed, lstat err = %v", err)
+	}
+	if len(res.Removed) != 1 || res.Removed[0] != "c" {
+		t.Errorf("Removed = %v, want [c]", res.Removed)
+	}
+}
+
+// TestRollbackSwitchGenerationFailureDoesNotUnwind verifies Rollback's own asymmetry, mirroring
+// Apply's commit-failure asymmetry (→ ADR-0044 §2): every FS write (PreRemove/place/removeStale)
+// has already succeeded by the time SwitchGeneration runs, so a failure there is not rolled back —
+// discardJournal is only reached after SwitchGeneration succeeds. Same setup as
+// TestRollbackReconverges, but SwitchGeneration fails.
+func TestRollbackSwitchGenerationFailureDoesNotUnwind(t *testing.T) {
+	root := realTempDir(t)
+	state := realTempDir(t)
+	srcA := makeSrc(t, "x")
+	srcB := makeSrc(t, "x")
+	srcC := makeSrc(t, "x")
+
+	prof := paths.Resolve(state, "vim", manifest.RootKindHome, root, true)
+	if err := os.MkdirAll(prof.Dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	lf1 := writeLinkFarm(t, homeManifest(
+		storeEntry(srcA, ".", "a"),
+		storeEntry(srcB, ".", "b"),
+	))
+	lf2 := writeLinkFarm(t, homeManifest(
+		storeEntry(srcA, ".", "a"),
+		storeEntry(srcC, ".", "c"),
+	))
+
+	if err := os.Symlink(lf1, paths.GenerationLink(prof.Profile, 1)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, paths.GenerationLink(prof.Profile, 2)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, prof.Profile); err != nil {
+		t.Fatal(err)
+	}
+
+	// Current FS = gen2: place a→srcA, c→srcC.
+	if err := os.Symlink(srcA, filepath.Join(root, "a")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(srcC, filepath.Join(root, "c")); err != nil {
+		t.Fatal(err)
+	}
+
+	var warns []string
+	res, err := Rollback(RollbackOptions{
+		Name:         "vim",
+		RootKind:     manifest.RootKindHome,
+		RootOverride: root,
+		StateDir:     state,
+		ListGenerations: func(string) ([]Generation, error) {
+			return []Generation{{Number: 1}, {Number: 2, Current: true}}, nil
+		},
+		SwitchGeneration: func(string, int) error { return os.ErrPermission },
+		Warnf:            collectFormatted(&warns),
+	})
+	if err == nil {
+		t.Fatal("expected the SwitchGeneration failure to propagate, got nil")
+	}
+	// The partial result mirrors Apply's failure contract (→ issue #130): no transition
+	// happened (From == To == current), the pointer stayed at 2, and the failure is not
+	// entry-scoped (every planned FS action had already succeeded).
+	if res == nil {
+		t.Fatal("Rollback must return the partial result alongside a SwitchGeneration failure")
+	}
+	if res.From != 2 || res.To != 2 {
+		t.Errorf("From/To = %d/%d, want 2/2 (no transition on failure)", res.From, res.To)
+	}
+	if res.GenAfter == nil || *res.GenAfter != 2 {
+		t.Errorf("GenAfter = %v, want 2 (pointer unmoved)", res.GenAfter)
+	}
+	if res.FailedTarget != "" || len(res.Unreached) != 0 {
+		t.Errorf("FailedTarget/Unreached = %q/%v, want empty (not entry-scoped)", res.FailedTarget, res.Unreached)
+	}
+
+	// All FS writes already succeeded before SwitchGeneration ran, and must survive untouched:
+	// b was newly placed (re-converged to gen1) and c was stale-removed. Neither is rolled back.
+	if dest, rerr := os.Readlink(filepath.Join(root, "b")); rerr != nil || dest != srcB {
+		t.Errorf("b must survive a SwitchGeneration failure untouched: dest=%q, err=%v, want %q", dest, rerr, srcB)
+	}
+	if _, lerr := os.Lstat(filepath.Join(root, "c")); !os.IsNotExist(lerr) {
+		t.Errorf("c's stale removal must survive a SwitchGeneration failure, lstat err = %v", lerr)
+	}
+	for _, w := range warns {
+		if strings.Contains(w, "rolled back this run's filesystem changes") {
+			t.Errorf("warns = %v, must not report a rollback for a SwitchGeneration-only failure", warns)
+		}
+	}
+}
+
+// TestRollbackAncestorMigration verifies rollback from a whole-tree-ancestor-symlink generation
+// (N, current) back to a per-file generation (N-1): baseline (N) records the ancestor symlink,
+// target (N-1) records the nested children, so the plan carries a PreRemove for the ancestor and
+// the children are placed fresh into the real directory. Before the fix Rollback dropped
+// plan.PreRemove, so place ran with the ancestor symlink still present: ensureParentDir's
+// MkdirAll on the symlinked dir was a no-op, and os.Symlink for the nested child then resolved
+// through it into srcNew (store-equivalent) and failed with EEXIST/EROFS (→ ADR-0046, issue #173).
+func TestRollbackAncestorMigration(t *testing.T) {
+	root := realTempDir(t)
+	state := realTempDir(t)
+	srcOld := realTempDir(t)
+	for _, name := range []string{"foo", "bar"} {
+		if err := os.WriteFile(filepath.Join(srcOld, name), []byte("old"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	srcNew := realTempDir(t)
+	for _, name := range []string{"foo", "bar"} {
+		if err := os.WriteFile(filepath.Join(srcNew, name), []byte("new"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	prof := paths.Resolve(state, "c", manifest.RootKindHome, root, true)
+	if err := os.MkdirAll(prof.Dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	// gen1 (N-1): nested per-file children pointing at srcOld.
+	lf1 := writeLinkFarm(t, homeManifest(
+		storeEntry(srcOld, "foo", ".claude/skills/foo"),
+		storeEntry(srcOld, "bar", ".claude/skills/bar"),
+	))
+	// gen2 (N, current): migrated to a whole-tree ancestor symlink at .claude/skills → srcNew.
+	lf2 := writeLinkFarm(t, homeManifest(storeEntry(srcNew, ".", ".claude/skills")))
+
+	if err := os.Symlink(lf1, paths.GenerationLink(prof.Profile, 1)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, paths.GenerationLink(prof.Profile, 2)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, prof.Profile); err != nil {
+		t.Fatal(err)
+	}
+
+	// Current FS = gen2: .claude/skills is a whole-tree symlink to srcNew.
+	if err := os.MkdirAll(filepath.Join(root, ".claude"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(srcNew, filepath.Join(root, ".claude", "skills")); err != nil {
+		t.Fatal(err)
+	}
+
+	var switched int
+	var warns []string
+	res, err := Rollback(RollbackOptions{
+		Name: "c", RootKind: manifest.RootKindHome, RootOverride: root, StateDir: state,
+		ListGenerations: func(string) ([]Generation, error) {
+			return []Generation{{Number: 1}, {Number: 2, Current: true}}, nil
+		},
+		SwitchGeneration: func(_ string, gen int) error { switched = gen; return nil },
+		Warnf:            collectWarnings(&warns),
+	})
+	if err != nil {
+		t.Fatalf("Rollback: %v", err)
+	}
+	if switched != 1 {
+		t.Errorf("switched generation = %d, want 1", switched)
+	}
+	if len(warns) != 0 {
+		t.Errorf("rollback migration emitted warnings, want none: %v", warns)
+	}
+
+	// .claude/skills is now a real directory (the ancestor symlink was pre-removed).
+	info, err := os.Lstat(filepath.Join(root, ".claude", "skills"))
+	if err != nil {
+		t.Fatalf(".claude/skills lstat: %v", err)
+	}
+	if info.Mode()&os.ModeSymlink != 0 {
+		t.Errorf(".claude/skills is still a symlink after rollback, want a real directory")
+	}
+	for _, name := range []string{"foo", "bar"} {
+		got, err := os.Readlink(filepath.Join(root, ".claude", "skills", name))
+		if err != nil {
+			t.Fatalf("child %s readlink: %v", name, err)
+		}
+		if want := filepath.Join(srcOld, name); got != want {
+			t.Errorf("child %s → %q, want %q", name, got, want)
+		}
+	}
+	if len(res.Removed) != 1 || res.Removed[0] != ".claude/skills" {
+		t.Errorf("Removed = %v, want [.claude/skills]", res.Removed)
+	}
+	placed := map[string]bool{}
+	for _, p := range res.Placed {
+		placed[p] = true
+	}
+	if len(res.Placed) != 2 || !placed[".claude/skills/foo"] || !placed[".claude/skills/bar"] {
+		t.Errorf("Placed = %v, want [.claude/skills/foo .claude/skills/bar]", res.Placed)
+	}
+}
+
+// TestRollbackMidBatchFailureRollsBackPreRemoveMigration verifies Rollback's own undo-journal
+// wiring (→ ADR-0044, issue #168): same ancestor-migration setup as TestRollbackAncestorMigration
+// (PreRemove unlinks the whole-tree symlink so the per-file child can be placed), plus an
+// unrelated second entry in the same target manifest whose placement is blocked by a
+// permission-denied parent directory. Both PreRemove's ancestor unlink AND the child placement it
+// enabled must be rolled back when the later, unrelated placement fails — Rollback must not leave
+// the migration half-done, unlike relying solely on a subsequent idempotent re-run to converge.
+func TestRollbackMidBatchFailureRollsBackPreRemoveMigration(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("permission-denied placement cannot be induced as root")
+	}
+	root := realTempDir(t)
+	state := realTempDir(t)
+	srcOld := realTempDir(t)
+	if err := os.WriteFile(filepath.Join(srcOld, "foo"), []byte("old"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	srcNew := realTempDir(t)
+
+	prof := paths.Resolve(state, "c", manifest.RootKindHome, root, true)
+	if err := os.MkdirAll(prof.Dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	blockWrite(t, filepath.Join(root, "ro"))
+
+	// gen1 (N-1, rollback target): the per-file child, plus an unrelated entry whose parent denies
+	// write access so its placement fails after the ancestor migration has already succeeded.
+	lf1 := writeLinkFarm(t, homeManifest(
+		storeEntry(srcOld, "foo", ".claude/skills/foo"),
+		storeEntry(realTempDir(t), ".", "ro/leaf"),
+	))
+	// gen2 (N, current/baseline): whole-tree ancestor symlink at .claude/skills → srcNew.
+	lf2 := writeLinkFarm(t, homeManifest(storeEntry(srcNew, ".", ".claude/skills")))
+
+	if err := os.Symlink(lf1, paths.GenerationLink(prof.Profile, 1)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, paths.GenerationLink(prof.Profile, 2)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, prof.Profile); err != nil {
+		t.Fatal(err)
+	}
+
+	// Current FS = gen2: .claude/skills is a whole-tree symlink to srcNew.
+	claudeDir := filepath.Join(root, ".claude")
+	if err := os.MkdirAll(claudeDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(srcNew, filepath.Join(claudeDir, "skills")); err != nil {
+		t.Fatal(err)
+	}
+
+	var switched int
+	var warns []string
+	_, err := Rollback(RollbackOptions{
+		Name: "c", RootKind: manifest.RootKindHome, RootOverride: root, StateDir: state,
+		ListGenerations: func(string) ([]Generation, error) {
+			return []Generation{{Number: 1}, {Number: 2, Current: true}}, nil
+		},
+		SwitchGeneration: func(_ string, gen int) error { switched = gen; return nil },
+		Warnf:            collectFormatted(&warns),
+	})
+	if err == nil {
+		t.Fatal("expected an error, got nil")
+	}
+	if switched != 0 {
+		t.Errorf("SwitchGeneration was called (switched=%d), want it skipped when placement fails", switched)
+	}
+
+	// The whole migration must be undone: .claude/skills is the ancestor symlink again, and the
+	// child that PreRemove made room for is gone (undone in the correct order: unlink the child
+	// first, then recreate the ancestor symlink where PreRemove had cleared it).
+	info, serr := os.Lstat(filepath.Join(claudeDir, "skills"))
+	if serr != nil || info.Mode()&os.ModeSymlink == 0 {
+		t.Fatalf(".claude/skills must be restored as the ancestor symlink, got mode %v, err %v", info, serr)
+	}
+	got, rerr := os.Readlink(filepath.Join(claudeDir, "skills"))
+	if rerr != nil || got != srcNew {
+		t.Errorf("restored ancestor readlink = %q, err %v; want %q", got, rerr, srcNew)
+	}
+	foundRollbackMsg := false
+	for _, w := range warns {
+		if strings.Contains(w, "rolled back this run's filesystem changes") {
+			foundRollbackMsg = true
+		}
+	}
+	if !foundRollbackMsg {
+		t.Errorf("warns = %v, want a rollback-reported message", warns)
+	}
+}
+
+// TestRollbackAncestorPreRemoveErrorSkipsSwitch verifies the Rollback-level wiring of preRemove's
+// error path: same setup as TestRollbackAncestorMigration, but the ancestor symlink's parent dir
+// is read-only, so preRemove's os.Remove fails. Rollback must propagate the error instead of
+// swallowing it and must not move the profile pointer — a regression a unit test on preRemove
+// alone (TestPreRemoveDriftErrors) cannot catch, since it never exercises the Rollback() call
+// site added by this fix (→ #173). (A pre-plan drift setup cannot be used here: it would make
+// planner.Compute itself see a mismatch and route to Conflicts instead of PreRemove, never
+// reaching this call site — → planner.go recordedLink.)
+func TestRollbackAncestorPreRemoveErrorSkipsSwitch(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("permission-denied unlink cannot be induced as root")
+	}
+	root := realTempDir(t)
+	state := realTempDir(t)
+	srcOld := realTempDir(t)
+	for _, name := range []string{"foo", "bar"} {
+		if err := os.WriteFile(filepath.Join(srcOld, name), []byte("old"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	srcNew := realTempDir(t) // stays empty: preRemove errors before place ever reads its contents
+
+	prof := paths.Resolve(state, "c", manifest.RootKindHome, root, true)
+	if err := os.MkdirAll(prof.Dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	// gen1 (N-1): nested per-file children pointing at srcOld.
+	lf1 := writeLinkFarm(t, homeManifest(
+		storeEntry(srcOld, "foo", ".claude/skills/foo"),
+		storeEntry(srcOld, "bar", ".claude/skills/bar"),
+	))
+	// gen2 (N, current): whole-tree ancestor symlink recorded at .claude/skills → srcNew.
+	lf2 := writeLinkFarm(t, homeManifest(storeEntry(srcNew, ".", ".claude/skills")))
+
+	if err := os.Symlink(lf1, paths.GenerationLink(prof.Profile, 1)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, paths.GenerationLink(prof.Profile, 2)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, prof.Profile); err != nil {
+		t.Fatal(err)
+	}
+
+	// Current FS = gen2: .claude/skills is a whole-tree symlink to srcNew (invariant holds, no drift).
+	claudeDir := filepath.Join(root, ".claude")
+	if err := os.MkdirAll(claudeDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(srcNew, filepath.Join(claudeDir, "skills")); err != nil {
+		t.Fatal(err)
+	}
+	// Removing a directory entry requires write on its parent; drop it to force the unlink to fail.
+	if err := os.Chmod(claudeDir, 0o555); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.Chmod(claudeDir, 0o755) }) // restore so TempDir cleanup can recurse
+
+	var switched int
+	_, err := Rollback(RollbackOptions{
+		Name: "c", RootKind: manifest.RootKindHome, RootOverride: root, StateDir: state,
+		ListGenerations: func(string) ([]Generation, error) {
+			return []Generation{{Number: 1}, {Number: 2, Current: true}}, nil
+		},
+		SwitchGeneration: func(_ string, gen int) error { switched = gen; return nil },
+	})
+	// The message pins the failure to preRemove's os.Remove path specifically (staleremove.go),
+	// not merely to any early return — e.g. a future planner change that routed this setup to
+	// Conflicts instead of PreRemove would also make Rollback error out before switchFn, and a
+	// bare err != nil check would pass despite never reaching the code this test targets.
+	if err == nil || !strings.Contains(err.Error(), "cannot remove recorded symlink for migration") {
+		t.Fatalf("expected a preRemove unlink error, got %v", err)
+	}
+	if switched != 0 {
+		t.Errorf("SwitchGeneration was called (switched=%d), want it skipped when preRemove fails", switched)
+	}
+	// The ancestor symlink must be left untouched (unlink failed, not silently skipped).
+	got, rerr := os.Readlink(filepath.Join(claudeDir, "skills"))
+	if rerr != nil || got != srcNew {
+		t.Errorf(".claude/skills after error = %q (err %v), want untouched %q", got, rerr, srcNew)
+	}
+}
+
+// TestRollbackNoPreviousErrors verifies that rollback stops with an error when the current generation is the oldest (no previous generation).
+func TestRollbackNoPreviousErrors(t *testing.T) {
+	root := realTempDir(t)
+	state := realTempDir(t)
+	prof := paths.Resolve(state, "vim", manifest.RootKindHome, root, true)
+	if err := os.MkdirAll(prof.Dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	lf := writeLinkFarm(t, homeManifest(storeEntry(makeSrc(t, "x"), ".", "a")))
+	if err := os.Symlink(lf, prof.Profile); err != nil {
+		t.Fatal(err)
+	}
+
+	_, err := Rollback(RollbackOptions{
+		Name: "vim", RootKind: manifest.RootKindHome, RootOverride: root, StateDir: state,
+		ListGenerations:  func(string) ([]Generation, error) { return []Generation{{Number: 1, Current: true}}, nil },
+		SwitchGeneration: func(string, int) error { return nil },
+	})
+	if err == nil || !strings.Contains(err.Error(), "no previous generation") {
+		t.Fatalf("expected no-previous-generation error, got %v", err)
+	}
+}
+
+// TestRollbackConflictReportsAll verifies that Rollback, like Apply, lists every planner-detected
+// conflict to stderr (with guidance) before returning a single count-bearing aggregate error
+// (→ #176, grilling 2026-07-12 D6). gen1(target) has {b, c}; gen2(current/baseline) has {a}; both
+// b and c are occupied by regular files on disk, so rolling back to gen1 conflicts on both.
+func TestRollbackConflictReportsAll(t *testing.T) {
+	root := realTempDir(t)
+	state := realTempDir(t)
+	srcA := makeSrc(t, "x")
+	srcB := makeSrc(t, "x")
+	srcC := makeSrc(t, "x")
+
+	prof := paths.Resolve(state, "vim", manifest.RootKindHome, root, true)
+	if err := os.MkdirAll(prof.Dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	lf1 := writeLinkFarm(t, homeManifest(
+		storeEntry(srcB, ".", "b"),
+		storeEntry(srcC, ".", "c"),
+	))
+	lf2 := writeLinkFarm(t, homeManifest(storeEntry(srcA, ".", "a")))
+
+	if err := os.Symlink(lf1, paths.GenerationLink(prof.Profile, 1)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, paths.GenerationLink(prof.Profile, 2)); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink(lf2, prof.Profile); err != nil {
+		t.Fatal(err)
+	}
+
+	// Current FS = gen2: only a. b/c are occupied by regular files (foreign entity conflicts on rollback).
+	if err := os.Symlink(srcA, filepath.Join(root, "a")); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "b"), []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(root, "c"), []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	var warns []string
+	_, err := Rollback(RollbackOptions{
+		Name: "vim", RootKind: manifest.RootKindHome, RootOverride: root, StateDir: state,
+		ListGenerations: func(string) ([]Generation, error) {
+			return []Generation{{Number: 1}, {Number: 2, Current: true}}, nil
+		},
+		SwitchGeneration: func(string, int) error { return nil },
+		Warnf:            collectFormatted(&warns),
+	})
+	if err == nil {
+		t.Fatal("expected a conflict error, got nil")
+	}
+	if !strings.Contains(err.Error(), "2 conflict") {
+		t.Errorf("aggregate error = %q, want it to mention the conflict count (2)", err.Error())
+	}
+	for _, target := range []string{"b", "c"} {
+		found := false
+		for _, w := range warns {
+			if strings.Contains(w, "target: "+target) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("expected a conflict line mentioning target %q, warns = %v", target, warns)
+		}
+	}
+}
+
+// TestRollbackNoProfileErrors verifies that rollback stops with an error when profileDir is absent (never applied).
+func TestRollbackNoProfileErrors(t *testing.T) {
+	root := realTempDir(t)
+	state := realTempDir(t)
+	_, err := Rollback(RollbackOptions{
+		Name: "vim", RootKind: manifest.RootKindHome, RootOverride: root, StateDir: state,
+		ListGenerations:  func(string) ([]Generation, error) { return nil, nil },
+		SwitchGeneration: func(string, int) error { return nil },
+	})
+	if err == nil || !strings.Contains(err.Error(), "profile") {
+		t.Fatalf("expected no-profile error, got %v", err)
+	}
+}

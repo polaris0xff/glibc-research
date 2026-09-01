@@ -1,0 +1,314 @@
+package engine
+
+import (
+	"bytes"
+	"fmt"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"strconv"
+	"strings"
+
+	"github.com/yasunori0418/nput/internal/manifest"
+	"github.com/yasunori0418/nput/internal/paths"
+	"github.com/yasunori0418/nput/internal/planner"
+)
+
+// Generation operations are unified under the `nix-env --profile <profileDir>/profile`
+// family (→ docs/spec.md generation management spec · ADR-0015, ADR-0025). Commit (--set)
+// lives in commit.go; here we handle rollback (--switch-generation) and listing
+// (--list-generations). Like --set, these are injectable so tmpdir tests do not call nix.
+
+// Generation is one generation of a profile (one line of nix-env --list-generations).
+type Generation struct {
+	Number  int    // generation number
+	Date    string // creation timestamp (nix-env's display verbatim; carried unparsed)
+	Current bool   // whether it is the current generation (the one the profile link points at)
+}
+
+// ListGenerationsFunc is the generation-list retrieval point (default nix-env --list-generations). Substituted in tmpdir tests.
+type ListGenerationsFunc func(profileLink string) ([]Generation, error)
+
+// SwitchGenerationFunc is the profile pointer move point (default nix-env --switch-generation). Substituted in tmpdir tests.
+type SwitchGenerationFunc func(profileLink string, gen int) error
+
+// ProfileOptions is the input for fixing the profileDir (shared by Rollback / list-generations).
+type ProfileOptions struct {
+	Name         string
+	RootKind     string
+	FixedRoot    string
+	RootOverride string
+	WorkDir      string
+	StateDir     string
+	Git          GitFunc
+}
+
+// ProfileFor resolves root and fixes the profileDir layout (same shape as apply's preamble · → ADR-0023, ADR-0024).
+// Used in common by non-building rollback / list-generations for flock / generation reads.
+func ProfileFor(opts ProfileOptions) (paths.Profile, string, error) {
+	root, err := resolveRoot(opts.RootKind, opts.FixedRoot, opts.RootOverride, opts.WorkDir, opts.Git)
+	if err != nil {
+		return paths.Profile{}, "", err
+	}
+	stateDir := opts.StateDir
+	if stateDir == "" {
+		stateDir, err = paths.StateDir()
+		if err != nil {
+			return paths.Profile{}, "", err
+		}
+	}
+	prof := paths.Resolve(stateDir, opts.Name, opts.RootKind, root, opts.RootOverride != "")
+	return prof, root, nil
+}
+
+// ListGenerations returns the generation list for profileLink (default nix-env implementation). Used by the CLI's list-generations.
+func ListGenerations(profileLink string) ([]Generation, error) {
+	return nixEnvListGenerations(profileLink)
+}
+
+// observeGeneration returns the generation number the profile link currently points at, or nil
+// when it cannot be observed: no profile yet (first apply), or a link whose destination does not
+// parse as the sibling generation link "<base>-<N>-link" that nix-env maintains
+// (→ paths.GenerationLink · issue #130, niface ADR-0015's nil-able Generation.Before/After).
+// A readlink is used instead of nix-env --list-generations because the observation runs on every
+// apply/reset and must stay a cheap, subprocess-free probe.
+func observeGeneration(profileLink string) *int {
+	dest, err := os.Readlink(profileLink)
+	if err != nil {
+		return nil
+	}
+	base := filepath.Base(dest)
+	prefix := filepath.Base(profileLink) + "-"
+	if !strings.HasPrefix(base, prefix) || !strings.HasSuffix(base, "-link") {
+		return nil
+	}
+	n, err := strconv.Atoi(strings.TrimSuffix(strings.TrimPrefix(base, prefix), "-link"))
+	if err != nil || n < 0 {
+		return nil
+	}
+	return &n
+}
+
+// intPtr copies n onto the heap for the nil-able generation observation fields (→ issue #130).
+func intPtr(n int) *int { return &n }
+
+// RollbackOptions is the input to Rollback. Rollback is home mode only, but that decision is
+// the CLI's; the engine resolves the profileDir regardless of rootKind and converges to the previous generation.
+type RollbackOptions struct {
+	Name         string
+	RootKind     string
+	FixedRoot    string
+	RootOverride string
+	WorkDir      string
+	StateDir     string
+
+	// ListGenerations / SwitchGeneration substitute the nix-env calls (nil = default nix-env implementation).
+	ListGenerations  ListGenerationsFunc
+	SwitchGeneration SwitchGenerationFunc
+	// Git substitutes git toplevel resolution (nil = gitutil.Toplevel). Unused in home mode.
+	Git GitFunc
+	// Warnf is the warning output sink (nil = stderr).
+	Warnf func(format string, args ...any)
+}
+
+// RollbackResult is the result report of Rollback. It augments Result (placement diff) with the
+// generation transition From→To. On a failure return the partial result carries From == To ==
+// the current generation: no transition happened (→ issue #130 到達状態, same contract as Apply's
+// stage-failure partial Result).
+type RollbackResult struct {
+	Result
+	From int // current generation N before rolling back
+	To   int // previous generation N-1 rolled back to
+}
+
+// Rollback reverts a home-mode profile to one generation earlier. A profile pointer move alone
+// does not change the FS at an arbitrary root, so it diffs with the planner using current
+// generation N as baseline and previous generation N-1 as target, conservatively stale-removes
+// N∖N-1, re-places N-1's entries, and only **last** moves the profile pointer (→ docs/spec.md
+// rollback · ADR-0015). Moving the pointer first would shift the baseline to N-2 and corrupt
+// stale removal, so FS convergence comes first and the pointer move last.
+func Rollback(opts RollbackOptions) (*RollbackResult, error) {
+	warnf := opts.Warnf
+	if warnf == nil {
+		warnf = func(format string, args ...any) {
+			fmt.Fprintf(os.Stderr, format+"\n", args...)
+		}
+	}
+	listFn := opts.ListGenerations
+	if listFn == nil {
+		listFn = nixEnvListGenerations
+	}
+	switchFn := opts.SwitchGeneration
+	if switchFn == nil {
+		switchFn = nixEnvSwitchGeneration
+	}
+
+	// 1. fix profileDir (resolve root → layout · preamble shared with apply).
+	prof, root, err := ProfileFor(ProfileOptions{
+		Name: opts.Name, RootKind: opts.RootKind, FixedRoot: opts.FixedRoot,
+		RootOverride: opts.RootOverride, WorkDir: opts.WorkDir, StateDir: opts.StateDir, Git: opts.Git,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// If profileDir is absent, apply has never run → no generation to roll back to.
+	if _, err := os.Stat(prof.Dir); err != nil {
+		return nil, fmt.Errorf("nput: no profile (apply has never run): %s", prof.Dir)
+	}
+
+	// 2. serialize with concurrent apply / rollback via a blocking flock (→ ADR-0013).
+	l, err := acquireProfileLock(prof.Dir, true)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = l.Release() }()
+
+	// 3. identify current generation N and previous generation N-1 from the generation list.
+	gens, err := listFn(prof.Profile)
+	if err != nil {
+		return nil, err
+	}
+	curIdx := -1
+	for i, g := range gens {
+		if g.Current {
+			curIdx = i
+		}
+	}
+	if curIdx < 0 {
+		return nil, fmt.Errorf("nput: cannot identify the current generation (profile: %s)", prof.Profile)
+	}
+	if curIdx == 0 {
+		return nil, fmt.Errorf("nput: no previous generation (this is the oldest generation, cannot rollback)")
+	}
+	cur := gens[curIdx]
+	prev := gens[curIdx-1]
+
+	// 4. baseline = current generation N's manifest (current FS state) / target = previous generation N-1's manifest.
+	baseline, err := manifest.Load(prof.Profile)
+	if err != nil {
+		return nil, fmt.Errorf("nput: cannot read the current generation's manifest: %w", err)
+	}
+	target, err := manifest.Load(paths.GenerationLink(prof.Profile, prev.Number))
+	if err != nil {
+		return nil, fmt.Errorf("nput: cannot read the previous generation's manifest (generation %d): %w", prev.Number, err)
+	}
+
+	// 5. compute the plan for N∖N-1 stale removal · N-1 entry re-placement with the planner (reusing the apply engine with (baseline, target) substituted).
+	plan, err := planner.Compute(baseline, target, root, planner.OSFS, planner.Options{})
+	if err != nil {
+		return nil, err
+	}
+
+	// The generation numbers come from the listing rather than a readlink observation: cur/prev
+	// are already identified above, and the pointer only moves at step 7 (→ issue #130, niface
+	// ADR-0015). GenAfter is set after the pointer move below.
+
+	// 6. reflect the plan onto the real FS: same PreRemove-first ordering as Apply (unlink
+	//    self-recorded stale ancestor symlinks so nested children land in a real dir · →
+	//    engine.go, ADR-0046), then new/re-link, then stale removal last (→ ADR-0006). Unlike
+	//    Apply, Rollback has no materializeCopies step, so copy entries in plan.Copies are not
+	//    reflected onto the FS (pre-existing gap, out of scope here · → issue #178).
+	a := &applier{opts: Options{Warnf: warnf}, result: &Result{Root: root, ProfileDir: prof.Dir, Profile: prof.Profile}}
+	a.profile = prof
+	a.root = root
+	a.result.GenBefore = intPtr(cur.Number)
+	// Full inventory = the generation being rolled back to (its entries are the FS end state · → issue #130).
+	a.result.Entries = target.Entries
+	a.recordRemovalPlan(plan)
+	// Each stage journals its own FS writes; a failure in any of the three unwinds everything
+	// this Rollback call has done so far before returning (→ ADR-0044, same shape as Apply).
+	// Mirroring Apply's stage-failure contract, the partial result is returned alongside the
+	// error, with GenAfter pinned at the unmoved current generation (→ issue #130 到達状態).
+	fail := func(err error) (*RollbackResult, error) {
+		res, _ := a.fail(plan, err)
+		res.GenAfter = intPtr(cur.Number)
+		return &RollbackResult{Result: *res, From: cur.Number, To: cur.Number}, err
+	}
+	if len(plan.Conflicts) > 0 {
+		// Same partial-result contract as Apply's conflict stop: structured conflicts + the
+		// everything-unreached partition, so the CLI can map failed/skipped items (→ issue #131).
+		a.result.Conflicts = plan.Conflicts
+		return fail(reportConflicts(warnf, plan.Conflicts))
+	}
+	a.emitWarnings(plan.Warnings, false)
+	if err := a.runJournaled(func() error { return a.preRemove(plan.PreRemove) }); err != nil {
+		return fail(err)
+	}
+	if err := a.runJournaled(func() error { return a.place(plan.Place) }); err != nil {
+		return fail(err)
+	}
+	if err := a.runJournaled(func() error { return a.removeStale(plan.Remove) }); err != nil {
+		return fail(err)
+	}
+
+	// 7. finally move the profile pointer to N-1 (→ docs/spec.md rollback step 3). Not unwound on
+	//    failure: every FS write up to this point already succeeded, so there is nothing to roll
+	//    back — only the pointer move itself failed, and re-running Rollback retries it (→ ADR-0044 §2).
+	if err := switchFn(prof.Profile, prev.Number); err != nil {
+		// Every planned FS action already succeeded, so the failure is not entry-scoped
+		// (FailedTarget / Unreached stay empty) — but the partial result is still returned.
+		return fail(fmt.Errorf("nput: failed to move the profile pointer (--switch-generation %d): %w", prev.Number, err))
+	}
+	a.discardJournal()
+	a.result.GenAfter = intPtr(prev.Number)
+
+	return &RollbackResult{Result: *a.result, From: cur.Number, To: prev.Number}, nil
+}
+
+// nixEnvListGenerations is the default generation-list retrieval (nix-env --profile <p> --list-generations).
+// It captures and parses stdout (ingesting machine-readable output).
+func nixEnvListGenerations(profileLink string) ([]Generation, error) {
+	if _, err := exec.LookPath("nix-env"); err != nil {
+		return nil, fmt.Errorf("nix-env is not on PATH: %w", err)
+	}
+	cmd := exec.Command("nix-env", "--profile", profileLink, "--list-generations")
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		trimmed := strings.TrimSpace(stderr.String())
+		if trimmed != "" {
+			return nil, fmt.Errorf("nput: nix-env --list-generations failed: %w\n%s", err, trimmed)
+		}
+		return nil, fmt.Errorf("nput: nix-env --list-generations failed: %w", err)
+	}
+	return parseGenerations(stdout.String())
+}
+
+// nixEnvSwitchGeneration is the default profile pointer move (nix-env --profile <p> --switch-generation <gen>).
+// nix output is routed to stderr (stdout is reserved for machine-readable output · → docs/spec.md stream discipline).
+func nixEnvSwitchGeneration(profileLink string, gen int) error {
+	if _, err := exec.LookPath("nix-env"); err != nil {
+		return fmt.Errorf("nix-env is not on PATH: %w", err)
+	}
+	cmd := exec.Command("nix-env", "--profile", profileLink, "--switch-generation", strconv.Itoa(gen))
+	cmd.Stdout = os.Stderr
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+// parseGenerations parses the output of `nix-env --list-generations`. Each line is of the
+// form "<number>   <timestamp>   [(current)]" (leading and separating whitespace is variable).
+func parseGenerations(out string) ([]Generation, error) {
+	var gens []Generation
+	for _, line := range strings.Split(out, "\n") {
+		fields := strings.Fields(line)
+		if len(fields) == 0 {
+			continue
+		}
+		n, err := strconv.Atoi(fields[0])
+		if err != nil {
+			return nil, fmt.Errorf("nput: cannot parse a line of the generation list: %q", line)
+		}
+		g := Generation{Number: n}
+		end := len(fields)
+		if fields[end-1] == "(current)" {
+			g.Current = true
+			end--
+		}
+		g.Date = strings.Join(fields[1:end], " ")
+		gens = append(gens, g)
+	}
+	return gens, nil
+}

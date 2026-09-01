@@ -1,0 +1,558 @@
+[
+ {
+  "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791313108",
+  "pull_request_review_id": 4945765720,
+  "id": 3791313108,
+  "node_id": "PRRC_kwDOSmgGHc7h-tjU",
+  "diff_hunk": "",
+  "path": "dev/skills/sara-docs/references/frontmatter.md",
+  "commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "original_commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "user": {
+   "login": "yasunori0418",
+   "id": 74786563,
+   "node_id": "MDQ6VXNlcjc0Nzg2NTYz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/74786563?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/yasunori0418",
+   "html_url": "https://github.com/yasunori0418",
+   "followers_url": "https://api.github.com/users/yasunori0418/followers",
+   "following_url": "https://api.github.com/users/yasunori0418/following{/other_user}",
+   "gists_url": "https://api.github.com/users/yasunori0418/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/yasunori0418/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/yasunori0418/subscriptions",
+   "organizations_url": "https://api.github.com/users/yasunori0418/orgs",
+   "repos_url": "https://api.github.com/users/yasunori0418/repos",
+   "events_url": "https://api.github.com/users/yasunori0418/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/yasunori0418/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "\u3053\u306e\u30d5\u30a1\u30a4\u30eb\u306b\u8a18\u8f09\u3055\u308c\u3066\u3044\u308b\u5185\u5bb9\u306f\u3001sara\u306b\u3088\u3063\u3066\u30d5\u30a1\u30a4\u30eb\u3092\u4f5c\u6210\u3059\u308c\u3070\u81ea\u52d5\u3067\u4ed8\u4e0e\u3055\u308c\u308b\u30d5\u30ed\u30f3\u30c8\u30de\u30bf\u30fc\u306b\u306a\u308b\u3068\u601d\u3046\u306e\u3067\u4e0d\u8981\u3060\u3068\u601d\u308f\u308c\u308b\u3002\nsara-cli\u306e\u4f7f\u3044\u65b9\u306b\u8a18\u8f09\u3055\u308c\u3066\u3044\u308c\u3070\u826f\u3044\u3068\u601d\u3046\u3002",
+  "created_at": "2026-08-16T08:18:39Z",
+  "updated_at": "2026-08-16T09:14:34Z",
+  "html_url": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791313108",
+  "pull_request_url": "https://api.github.com/repos/yasunori0418/nput/pulls/361",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791313108"
+   },
+   "html": {
+    "href": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791313108"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/361"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791313108/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "author_association": "OWNER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ },
+ {
+  "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791316519",
+  "pull_request_review_id": 4945765720,
+  "id": 3791316519,
+  "node_id": "PRRC_kwDOSmgGHc7h-uYn",
+  "diff_hunk": "@@ -0,0 +1,74 @@\n+# sara CLI \u306e\u4f7f\u3044\u65b9\n+\n+sara \u306f devShell \u7d4c\u7531\u3067\u4f7f\u3046\uff08\u4f8b: `nix develop ./dev --command sara ...`\u3002\u547c\u3073\u51fa\u3057\u5f62\u306f",
+  "path": "dev/skills/sara-docs/references/sara-cli.md",
+  "commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "original_commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "user": {
+   "login": "yasunori0418",
+   "id": 74786563,
+   "node_id": "MDQ6VXNlcjc0Nzg2NTYz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/74786563?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/yasunori0418",
+   "html_url": "https://github.com/yasunori0418",
+   "followers_url": "https://api.github.com/users/yasunori0418/followers",
+   "following_url": "https://api.github.com/users/yasunori0418/following{/other_user}",
+   "gists_url": "https://api.github.com/users/yasunori0418/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/yasunori0418/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/yasunori0418/subscriptions",
+   "organizations_url": "https://api.github.com/users/yasunori0418/orgs",
+   "repos_url": "https://api.github.com/users/yasunori0418/repos",
+   "events_url": "https://api.github.com/users/yasunori0418/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/yasunori0418/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "\u4f7f\u3046\u7d4c\u8def\u3068\u3057\u3066\u306f\u73fe\u6642\u70b9\u3067\u306f `nix develop` \u306b\u5ba3\u8a00\u3057\u3066\u3044\u308bsara\u3092\u4f7f\u3046\u304c\u3001\u5b9f\u969b\u306b\u4f7f\u3046\u5834\u5408\u306fpath\u306b\u901a\u3063\u3066\u3044\u308b\u72b6\u614b\u3092\u524d\u63d0\u306b\u3057\u305f\u3044\u3002\n\u30b9\u30ad\u30eb\u306e\u30c9\u30ad\u30e5\u30e1\u30f3\u30c8\u306b\u8a18\u8f09\u3057\u306a\u304f\u3066\u3082\u826f\u3044\u304c\u3001direnv\u3067\u81ea\u52d5\u3067nix develop\u304c\u8d70\u3063\u305f\u5f8c\u306b\u306a\u3063\u3066\u3044\u308b\u306e\u3067\u3001\u65e2\u306bsara\u306fpath\u304c\u901a\u3063\u3066\u3044\u308b\u306f\u305a\u3067\u3042\u308b\u3002",
+  "created_at": "2026-08-16T08:20:41Z",
+  "updated_at": "2026-08-16T09:14:34Z",
+  "html_url": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791316519",
+  "pull_request_url": "https://api.github.com/repos/yasunori0418/nput/pulls/361",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791316519"
+   },
+   "html": {
+    "href": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791316519"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/361"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791316519/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 3,
+  "side": "RIGHT",
+  "author_association": "OWNER",
+  "original_position": 3,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791344740",
+  "pull_request_review_id": 4945765720,
+  "id": 3791344740,
+  "node_id": "PRRC_kwDOSmgGHc7h-1Rk",
+  "diff_hunk": "@@ -0,0 +1,98 @@\n+---\n+name: sara-docs\n+description: sara \u30c9\u30ad\u30e5\u30e1\u30f3\u30c8\u30b0\u30e9\u30d5\uff08docs/ \u914d\u4e0b\u306e 1 \u30d5\u30a1\u30a4\u30eb 1 item\u30fbfrontmatter relation\u30fbsara CLI \u306b\u3088\u308b\u6a5f\u68b0\u691c\u8a3c\uff09\u306e\u57fa\u76e4\u77e5\u8b58\u30b9\u30ad\u30eb\u3002sara \u7ba1\u7406\u4e0b\u306e docs/ \u3067 item\uff08solution / use_case / requirement / design / quality / test_plan / infrastructure / adr / risk / test_condition / test_case\uff09\u3092\u65b0\u898f\u4f5c\u6210\u30fb\u7de8\u96c6\u30fb\u524a\u9664\u3059\u308b\u3001relation \u3092\u5f35\u308b\u30fb\u5f35\u308a\u66ff\u3048\u308b\u3001\u30b0\u30e9\u30d5\u3092\u8fbf\u308b\u30fb\u691c\u8a3c\u3059\u308b\u3001ID \u3092\u63a1\u756a\u3059\u308b\u3001\u3068\u3044\u3063\u305f\u64cd\u4f5c\u306e\u524d\u306b\u5fc5\u305a\u53c2\u7167\u3059\u308b\u3002\u5de5\u7a0b\u30b9\u30ad\u30eb\uff08/test-plan\u30fb/test-analyze \u7b49\uff09\u304c\u524d\u63d0\u3068\u3059\u308b\u578b\u30fbrelation\u30fbID\u30fbspecification \u306e\u898f\u7d04\u306f\u3053\u3053\u304c\u6b63\u672c\u3002sara \u3092\u4f7f\u308f\u306a\u3044\u30ea\u30dd\u30b8\u30c8\u30ea\u306e Markdown \u30c9\u30ad\u30e5\u30e1\u30f3\u30c8\u4e00\u822c\u306f\u5bfe\u8c61\u5916\u3002",
+  "path": "dev/skills/sara-docs/SKILL.md",
+  "commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "original_commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "user": {
+   "login": "yasunori0418",
+   "id": 74786563,
+   "node_id": "MDQ6VXNlcjc0Nzg2NTYz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/74786563?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/yasunori0418",
+   "html_url": "https://github.com/yasunori0418",
+   "followers_url": "https://api.github.com/users/yasunori0418/followers",
+   "following_url": "https://api.github.com/users/yasunori0418/following{/other_user}",
+   "gists_url": "https://api.github.com/users/yasunori0418/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/yasunori0418/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/yasunori0418/subscriptions",
+   "organizations_url": "https://api.github.com/users/yasunori0418/orgs",
+   "repos_url": "https://api.github.com/users/yasunori0418/repos",
+   "events_url": "https://api.github.com/users/yasunori0418/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/yasunori0418/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "`disable-model-invocation: false`\u3067\u81ea\u52d5\u3067\u547c\u3073\u51fa\u3055\u308c\u308b\u306a\u3089\u3001disable-model-invocation\u306e\u660e\u793a\u306f\u4e0d\u8981\u3002\u30c7\u30d5\u30a9\u30eb\u30c8\u3067false\u3068\u3057\u3066\u89e3\u91c8\u3055\u308c\u308b\u3002\ndescription\u306e\u5185\u5bb9\u3092\u8aad\u3080\u9650\u308a\u3001\u81ea\u52d5\u3067\u30b9\u30ad\u30eb\u304c\u547c\u3073\u51fa\u3055\u308c\u308b\u524d\u63d0\u306edescription\u306b\u306a\u3063\u3066\u3044\u306a\u3044\u3002\n\u3069\u306e\u3088\u3046\u306a\u30b3\u30f3\u30c6\u30ad\u30b9\u30c8\u304c\u3042\u3063\u305f\u3068\u304d\u306b\u30b9\u30ad\u30eb\u304c\u547c\u3073\u51fa\u3055\u308c\u308b\u304b\u4e0d\u660e\u306a\u30b9\u30ad\u30eb\u306b\u306a\u3063\u3066\u3044\u308b",
+  "created_at": "2026-08-16T08:37:40Z",
+  "updated_at": "2026-08-16T09:14:34Z",
+  "html_url": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791344740",
+  "pull_request_url": "https://api.github.com/repos/yasunori0418/nput/pulls/361",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791344740"
+   },
+   "html": {
+    "href": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791344740"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/361"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791344740/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 3,
+  "side": "RIGHT",
+  "author_association": "OWNER",
+  "original_position": 3,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791400965",
+  "pull_request_review_id": 4945765720,
+  "id": 3791400965,
+  "node_id": "PRRC_kwDOSmgGHc7h_DAF",
+  "diff_hunk": "",
+  "path": "dev/tests/fixtures/sara-gap/model.yaml",
+  "commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "original_commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "user": {
+   "login": "yasunori0418",
+   "id": 74786563,
+   "node_id": "MDQ6VXNlcjc0Nzg2NTYz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/74786563?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/yasunori0418",
+   "html_url": "https://github.com/yasunori0418",
+   "followers_url": "https://api.github.com/users/yasunori0418/followers",
+   "following_url": "https://api.github.com/users/yasunori0418/following{/other_user}",
+   "gists_url": "https://api.github.com/users/yasunori0418/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/yasunori0418/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/yasunori0418/subscriptions",
+   "organizations_url": "https://api.github.com/users/yasunori0418/orgs",
+   "repos_url": "https://api.github.com/users/yasunori0418/repos",
+   "events_url": "https://api.github.com/users/yasunori0418/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/yasunori0418/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "\u3053\u306e\u30d5\u30a1\u30a4\u30eb\u3092\u4f7f\u3046\u306e\u3067\u306f\u306a\u304f\u3001`docs/model.yaml`\u3092\u4f7f\u3046\u3088\u3046\u306b\u3057\u305f\u3044\u3002\n\u3053\u306e\u72b6\u614b\u3067\u306f\u4e8c\u91cd\u7ba1\u7406\u306b\u306a\u3063\u3066\u3057\u307e\u3046\u3002",
+  "created_at": "2026-08-16T09:11:55Z",
+  "updated_at": "2026-08-16T09:14:34Z",
+  "html_url": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791400965",
+  "pull_request_url": "https://api.github.com/repos/yasunori0418/nput/pulls/361",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791400965"
+   },
+   "html": {
+    "href": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791400965"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/361"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791400965/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "author_association": "OWNER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ },
+ {
+  "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446043",
+  "pull_request_review_id": 4945890693,
+  "id": 3791446043,
+  "node_id": "PRRC_kwDOSmgGHc7h_OAb",
+  "diff_hunk": "",
+  "path": "dev/skills/sara-docs/references/frontmatter.md",
+  "commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "original_commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "user": {
+   "login": "yasunori0418",
+   "id": 74786563,
+   "node_id": "MDQ6VXNlcjc0Nzg2NTYz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/74786563?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/yasunori0418",
+   "html_url": "https://github.com/yasunori0418",
+   "followers_url": "https://api.github.com/users/yasunori0418/followers",
+   "following_url": "https://api.github.com/users/yasunori0418/following{/other_user}",
+   "gists_url": "https://api.github.com/users/yasunori0418/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/yasunori0418/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/yasunori0418/subscriptions",
+   "organizations_url": "https://api.github.com/users/yasunori0418/orgs",
+   "repos_url": "https://api.github.com/users/yasunori0418/repos",
+   "events_url": "https://api.github.com/users/yasunori0418/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/yasunori0418/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "a06c805 \u3067\u5bfe\u5fdc\u3002references/frontmatter.md \u3092\u524a\u9664\u3057\u3001references/sara-cli.md \u306b init \u7bc0\u3092\u8ffd\u52a0\u3057\u307e\u3057\u305f\uff08`sara-id` \u3067\u63a1\u756a\u3057\u305f ID \u3092 `--id` \u3067\u6e21\u3057\u3066 `sara init <\u578b> <file>` \u3067 frontmatter \u3092\u751f\u6210\u30fb\u578b\u5225\u30d5\u30a3\u30fc\u30eb\u30c9\u3068 relation \u306f\u30aa\u30d7\u30b7\u30e7\u30f3\u3067\u6e21\u3059\u30fb\u65e2\u5b58 item \u306e\u5909\u66f4\u306f `sara edit`\uff09\u3002\u30c6\u30f3\u30d7\u30ec\u306b\u540c\u5c45\u3057\u3066\u3044\u305f\u898f\u7d04\uff08threatens \u306e\u5f35\u308a\u5148\u5224\u65ad\u30fblevel \u5c0e\u51fa\u30de\u30c8\u30ea\u30af\u30b9\u30fbTC \u512a\u5148\u5ea6\u5c0e\u51fa\uff09\u306f SKILL.md \u672c\u6587\u306e\u300crisk \u306e\u8a55\u4fa1\u3068\u512a\u5148\u5ea6\u306e\u5c0e\u51fa\u300d\u7bc0\u3078\u79fb\u8a2d\u3057\u3001test-plan / test-analyze \u306e\u66f8\u304d\u8fbc\u307f\u624b\u9806\uff08\u624b\u9806 4\uff09\u3082 sara init \u7d4c\u7531\u3078\u66f4\u65b0\u3057\u3066\u3044\u307e\u3059\u3002",
+  "created_at": "2026-08-16T09:39:00Z",
+  "updated_at": "2026-08-16T09:39:00Z",
+  "html_url": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791446043",
+  "pull_request_url": "https://api.github.com/repos/yasunori0418/nput/pulls/361",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446043"
+   },
+   "html": {
+    "href": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791446043"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/361"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446043/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "in_reply_to_id": 3791313108,
+  "author_association": "OWNER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ },
+ {
+  "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446139",
+  "pull_request_review_id": 4945890765,
+  "id": 3791446139,
+  "node_id": "PRRC_kwDOSmgGHc7h_OB7",
+  "diff_hunk": "@@ -0,0 +1,74 @@\n+# sara CLI \u306e\u4f7f\u3044\u65b9\n+\n+sara \u306f devShell \u7d4c\u7531\u3067\u4f7f\u3046\uff08\u4f8b: `nix develop ./dev --command sara ...`\u3002\u547c\u3073\u51fa\u3057\u5f62\u306f",
+  "path": "dev/skills/sara-docs/references/sara-cli.md",
+  "commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "original_commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "user": {
+   "login": "yasunori0418",
+   "id": 74786563,
+   "node_id": "MDQ6VXNlcjc0Nzg2NTYz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/74786563?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/yasunori0418",
+   "html_url": "https://github.com/yasunori0418",
+   "followers_url": "https://api.github.com/users/yasunori0418/followers",
+   "following_url": "https://api.github.com/users/yasunori0418/following{/other_user}",
+   "gists_url": "https://api.github.com/users/yasunori0418/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/yasunori0418/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/yasunori0418/subscriptions",
+   "organizations_url": "https://api.github.com/users/yasunori0418/orgs",
+   "repos_url": "https://api.github.com/users/yasunori0418/repos",
+   "events_url": "https://api.github.com/users/yasunori0418/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/yasunori0418/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "76fe99b \u3067\u5bfe\u5fdc\u3002sara-cli.md \u5192\u982d\u306e `nix develop ./dev --command sara ...` \u306e\u547c\u3073\u51fa\u3057\u4f8b\u3092\u6d88\u3057\u3001\u300csara\uff08\u3068 sara-id / sara-gap\uff09\u306f PATH \u306b\u901a\u3063\u3066\u3044\u308b\u524d\u63d0\u3067\u76f4\u63a5\u53e9\u304f\uff08direnv \u7b49\u3067\u958b\u767a\u30b7\u30a7\u30eb\u304c\u8aad\u307f\u8fbc\u307e\u308c\u305f\u74b0\u5883\u306a\u3089\u901a\u3063\u3066\u3044\u308b\uff09\u300d\u306b\u6539\u3081\u307e\u3057\u305f\u3002",
+  "created_at": "2026-08-16T09:39:03Z",
+  "updated_at": "2026-08-16T09:39:03Z",
+  "html_url": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791446139",
+  "pull_request_url": "https://api.github.com/repos/yasunori0418/nput/pulls/361",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446139"
+   },
+   "html": {
+    "href": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791446139"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/361"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446139/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 3,
+  "side": "RIGHT",
+  "in_reply_to_id": 3791316519,
+  "author_association": "OWNER",
+  "original_position": 3,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446230",
+  "pull_request_review_id": 4945890845,
+  "id": 3791446230,
+  "node_id": "PRRC_kwDOSmgGHc7h_ODW",
+  "diff_hunk": "@@ -0,0 +1,98 @@\n+---\n+name: sara-docs\n+description: sara \u30c9\u30ad\u30e5\u30e1\u30f3\u30c8\u30b0\u30e9\u30d5\uff08docs/ \u914d\u4e0b\u306e 1 \u30d5\u30a1\u30a4\u30eb 1 item\u30fbfrontmatter relation\u30fbsara CLI \u306b\u3088\u308b\u6a5f\u68b0\u691c\u8a3c\uff09\u306e\u57fa\u76e4\u77e5\u8b58\u30b9\u30ad\u30eb\u3002sara \u7ba1\u7406\u4e0b\u306e docs/ \u3067 item\uff08solution / use_case / requirement / design / quality / test_plan / infrastructure / adr / risk / test_condition / test_case\uff09\u3092\u65b0\u898f\u4f5c\u6210\u30fb\u7de8\u96c6\u30fb\u524a\u9664\u3059\u308b\u3001relation \u3092\u5f35\u308b\u30fb\u5f35\u308a\u66ff\u3048\u308b\u3001\u30b0\u30e9\u30d5\u3092\u8fbf\u308b\u30fb\u691c\u8a3c\u3059\u308b\u3001ID \u3092\u63a1\u756a\u3059\u308b\u3001\u3068\u3044\u3063\u305f\u64cd\u4f5c\u306e\u524d\u306b\u5fc5\u305a\u53c2\u7167\u3059\u308b\u3002\u5de5\u7a0b\u30b9\u30ad\u30eb\uff08/test-plan\u30fb/test-analyze \u7b49\uff09\u304c\u524d\u63d0\u3068\u3059\u308b\u578b\u30fbrelation\u30fbID\u30fbspecification \u306e\u898f\u7d04\u306f\u3053\u3053\u304c\u6b63\u672c\u3002sara \u3092\u4f7f\u308f\u306a\u3044\u30ea\u30dd\u30b8\u30c8\u30ea\u306e Markdown \u30c9\u30ad\u30e5\u30e1\u30f3\u30c8\u4e00\u822c\u306f\u5bfe\u8c61\u5916\u3002",
+  "path": "dev/skills/sara-docs/SKILL.md",
+  "commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "original_commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "user": {
+   "login": "yasunori0418",
+   "id": 74786563,
+   "node_id": "MDQ6VXNlcjc0Nzg2NTYz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/74786563?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/yasunori0418",
+   "html_url": "https://github.com/yasunori0418",
+   "followers_url": "https://api.github.com/users/yasunori0418/followers",
+   "following_url": "https://api.github.com/users/yasunori0418/following{/other_user}",
+   "gists_url": "https://api.github.com/users/yasunori0418/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/yasunori0418/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/yasunori0418/subscriptions",
+   "organizations_url": "https://api.github.com/users/yasunori0418/orgs",
+   "repos_url": "https://api.github.com/users/yasunori0418/repos",
+   "events_url": "https://api.github.com/users/yasunori0418/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/yasunori0418/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "8559964 \u3067\u5bfe\u5fdc\u3002`disable-model-invocation: false` / `user-invocable: true` \u306f\u30c7\u30d5\u30a9\u30eb\u30c8\u5024\u306e\u305f\u3081\u660e\u793a\u3092\u3084\u3081\u307e\u3057\u305f\u3002description \u306f\u81ea\u52d5\u767a\u706b\u306e\u5224\u65ad\u6750\u6599\u306b\u306a\u308b\u30c8\u30ea\u30ac\u30fc\u30b3\u30f3\u30c6\u30ad\u30b9\u30c8\u306e\u5217\u6319\u3078\u66f8\u304d\u76f4\u3057\u3066\u3044\u307e\u3059: \u2460 sara.toml + docs/model.yaml \u3092\u6301\u3064\u30ea\u30dd\u30b8\u30c8\u30ea\u3067 docs/ \u914d\u4e0b\u306e item \u3092\u4f5c\u6210\u30fb\u7de8\u96c6\u30fb\u524a\u9664\u3059\u308b \u2461 REQ-xxxxxxxx \u7b49\u306e ID \u3084 threatens / mitigates \u7b49\u306e relation \u304c\u4f9d\u983c\u30fb\u30d5\u30a1\u30a4\u30eb\u30fb\u30a8\u30e9\u30fc\u306b\u73fe\u308c\u305f \u2462 sara / sara-id / sara-gap \u3092\u5b9f\u884c\u3059\u308b\u30fbsara check \u306e\u30a8\u30e9\u30fc\u3092\u76f4\u3059 \u2463 \u8981\u6c42\u30fb\u30ea\u30b9\u30af\u7b49\u3092\u300citem \u3068\u3057\u3066\u8d77\u3053\u3057\u3066\u300d\u3068\u4f9d\u983c\u3055\u308c\u305f\u3002",
+  "created_at": "2026-08-16T09:39:06Z",
+  "updated_at": "2026-08-16T09:39:06Z",
+  "html_url": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791446230",
+  "pull_request_url": "https://api.github.com/repos/yasunori0418/nput/pulls/361",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446230"
+   },
+   "html": {
+    "href": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791446230"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/361"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446230/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 3,
+  "side": "RIGHT",
+  "in_reply_to_id": 3791344740,
+  "author_association": "OWNER",
+  "original_position": 3,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446353",
+  "pull_request_review_id": 4945890932,
+  "id": 3791446353,
+  "node_id": "PRRC_kwDOSmgGHc7h_OFR",
+  "diff_hunk": "",
+  "path": "dev/tests/fixtures/sara-gap/model.yaml",
+  "commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "original_commit_id": "9babd7bd38c63632d01de846c68db94a90e5bc7e",
+  "user": {
+   "login": "yasunori0418",
+   "id": 74786563,
+   "node_id": "MDQ6VXNlcjc0Nzg2NTYz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/74786563?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/yasunori0418",
+   "html_url": "https://github.com/yasunori0418",
+   "followers_url": "https://api.github.com/users/yasunori0418/followers",
+   "following_url": "https://api.github.com/users/yasunori0418/following{/other_user}",
+   "gists_url": "https://api.github.com/users/yasunori0418/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/yasunori0418/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/yasunori0418/subscriptions",
+   "organizations_url": "https://api.github.com/users/yasunori0418/orgs",
+   "repos_url": "https://api.github.com/users/yasunori0418/repos",
+   "events_url": "https://api.github.com/users/yasunori0418/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/yasunori0418/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "d4a3226 \u3067\u5bfe\u5fdc\u3002fixture \u5c02\u7528\u306e model.yaml \u3092\u524a\u9664\u3057\u3001\u30c6\u30b9\u30c8\u304c\u5b9f\u884c\u6642\u306b\u5b9f\u7269 docs/model.yaml \u3092 fixture \u306e\u8907\u88fd\u3078\u91cd\u306d\u308b\u69cb\u6210\u306b\u3057\u307e\u3057\u305f\uff08checks \u7d4c\u7531\u306f SARA_GAP_MODEL_YAML \u3067 store path \u3092\u6e21\u3057\u3001devShell / CI \u7d4c\u8def\u306f git \u30eb\u30fc\u30c8\u57fa\u6e96\u3067\u89e3\u6c7a\u3002\u3069\u3061\u3089\u3082\u89e3\u6c7a\u3067\u304d\u306a\u3051\u308c\u3070 skip \u305b\u305a\u5931\u6557\uff09\u3002\u3042\u308f\u305b\u3066 fixture \u306e item \u3092\u5b9f\u30e2\u30c7\u30eb\u306e\u5fc5\u9808\u30d5\u30a3\u30fc\u30eb\u30c9\uff08requirement \u306e specification / specification_ja\u30fbrisk \u306e likelihood / impact / level\u30fbtest_case \u306e target\uff09\u3092\u6e80\u305f\u3059\u3088\u3046\u66f4\u65b0\u3057\u3066\u3044\u307e\u3059\u3002\u5b9f\u30e2\u30c7\u30eb\u306e\u578b\u30fb\u5fc5\u9808\u30d5\u30a3\u30fc\u30eb\u30c9\u304c\u5909\u308f\u308b\u3068 fixture \u304c\u8ffd\u968f\u3092\u8981\u6c42\u3055\u308c\u308b\uff08\u30c6\u30b9\u30c8\u304c\u843d\u3061\u3066\u6559\u3048\u308b\uff09\u69cb\u56f3\u306b\u306a\u308a\u307e\u3059\u3002",
+  "created_at": "2026-08-16T09:39:10Z",
+  "updated_at": "2026-08-16T09:39:10Z",
+  "html_url": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791446353",
+  "pull_request_url": "https://api.github.com/repos/yasunori0418/nput/pulls/361",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446353"
+   },
+   "html": {
+    "href": "https://github.com/yasunori0418/nput/pull/361#discussion_r3791446353"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/yasunori0418/nput/pulls/361"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/yasunori0418/nput/pulls/comments/3791446353/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 1,
+  "original_line": 1,
+  "side": "RIGHT",
+  "in_reply_to_id": 3791400965,
+  "author_association": "OWNER",
+  "original_position": 1,
+  "position": 1,
+  "subject_type": "file"
+ }
+]

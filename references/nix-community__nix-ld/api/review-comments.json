@@ -1,0 +1,349 @@
+[
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/547917651",
+  "pull_request_review_id": 557817682,
+  "id": 547917651,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU0NzkxNzY1MQ==",
+  "diff_hunk": "@@ -1,34 +1,274 @@\n+#define _GNU_SOURCE\n+#include <elf.h>\n+#include <errno.h>\n+#include <fcntl.h>\n+#include <stdint.h>\n #include <stdio.h>\n #include <stdlib.h>\n #include <string.h>\n+#include <sys/auxv.h>\n+#include <sys/mman.h>\n #include <unistd.h>\n-#include <limits.h>\n \n-#ifndef REAL_LD\n-#error REAL_LD is not defined\n+static inline void closep(int *fd) { close(*fd); }\n+static inline void freep(void *p) { free(*(void **)p); }\n+\n+#define _cleanup_(f) __attribute__((cleanup(f)))\n+#define _cleanup_close_ _cleanup_(closep)\n+#define _cleanup_free_ _cleanup_(freep)\n+#define _cleanup__ _cleanup_(free)\n+\n+#if UINTPTR_MAX == 0xffffffff\n+typedef Elf32_Ehdr Ehdr;\n+typedef Elf32_Phdr Phdr;\n+#else\n+typedef Elf64_Ehdr Ehdr;\n+typedef Elf64_Phdr Phdr;\n #endif\n \n-int main(int argc, char **argv) {\n-  const char exe[PATH_MAX];\n-  const char *ld_path = getenv(\"NIX_LD_LIBRARY_PATH\");\n-  if (ld_path) {\n-    int r = setenv(\"LD_LIBRARY_PATH\", ld_path, 1);\n-    if (r < 0) {\n-      perror(\"setenv\");\n-      return 1;\n+typedef struct {\n+  void *addr;\n+  size_t size;\n+} mmap_t;\n+\n+struct ld_ctx {\n+  const char *prog_name;\n+  const char *interp_path;\n+\n+  // filled out by elf_load\n+  unsigned long load_addr;\n+  unsigned long entry_point;\n+  mmap_t mapping;\n+};\n+\n+static inline void munmapp(mmap_t *m) {\n+  if (m->size) {\n+    munmap(m->addr, m->size);\n+  }\n+}\n+\n+static size_t total_mapping_size(Phdr *phdrs, size_t phdr_num) {\n+  size_t addr_min = UINTPTR_MAX;\n+  size_t addr_max = 0;\n+  for (size_t i = 0; i < phdr_num; i++) {\n+    Phdr *ph = &phdrs[i];\n+    if (ph->p_type != PT_LOAD || ph->p_memsz == 0) {\n+      continue;\n+    }\n+    if (ph->p_vaddr < addr_min) {\n+      addr_min = ph->p_vaddr;\n+    }\n+    if (ph->p_vaddr + ph->p_memsz > addr_max) {\n+      addr_max = ph->p_vaddr + ph->p_memsz;\n     }\n   }\n-  // XXX multi-call binaries\n-  if (readlink(\"/proc/self/exe\", exe, PATH_MAX) == -1) {\n-    perror(\"readlink\");\n+  return addr_max - addr_min;\n+}\n+#define ELF_PAGESTART(_v) ((_v) & ~(unsigned long)(ELF_MIN_ALIGN - 1))\n+#define ELF_PAGEOFFSET(_v) ((_v) & (ELF_MIN_ALIGN - 1))\n+#define ELF_PAGEALIGN(_v) (((_v) + ELF_MIN_ALIGN - 1) & ~(ELF_MIN_ALIGN - 1))\n+\n+static inline unsigned long elf_page_start(unsigned long v) {\n+  return v & ~(getpagesize() - 1);\n+}\n+\n+static inline unsigned long elf_page_offset(unsigned long v) {\n+  return v & (getpagesize() - 1);\n+}\n+\n+static inline unsigned long elf_page_align(unsigned long v) {\n+  return (v + getpagesize() - 1) & ~(getpagesize() - 1);\n+}\n+\n+static inline int32_t prot_flags(uint32_t p_flags) {\n+  return (p_flags & PF_R ? PROT_READ : 0) | (p_flags & PF_W ? PROT_WRITE : 0) |\n+         (p_flags & PF_X ? PROT_EXEC : 0);\n+}\n+\n+static int elf_map(struct ld_ctx *ctx, int fd, Phdr *prog_headers,\n+                   size_t headers_num) {\n+  const size_t total_size = total_mapping_size(prog_headers, headers_num);\n+\n+  if (total_size == 0) {\n+    fprintf(stderr,\n+            \"cannot execute %s: no program headers found in $NIX_LD (%s)\",\n+            ctx->prog_name, ctx->interp_path);\n+    return -1;\n+  }\n+\n+  ctx->load_addr = 0;\n+  ctx->mapping.addr = NULL;\n+  _cleanup_(munmapp) mmap_t total_mapping = {};\n+\n+  for (size_t i = 0; i < headers_num; i++) {\n+    Phdr *ph = &prog_headers[i];\n+    // zero sized segments are valid but we won't mmap them\n+    if (ph->p_type != PT_LOAD || !ph->p_filesz) {\n+      continue;\n+    }\n+    const int32_t prot = prot_flags(ph->p_flags);\n+    unsigned long addr = elf_page_start(ctx->load_addr + ph->p_vaddr);\n+    size_t size = elf_page_align(ph->p_filesz - elf_page_offset(ph->p_vaddr));\n+    if (!ctx->load_addr) {\n+      // mmap the whole library range to reserve the area,\n+      // later smaller parts will be mmaped over it.\n+      size = elf_page_align(total_size);\n+    };\n+    off_t off_start = ph->p_offset - (off_t)elf_page_offset(ph->p_vaddr);\n+    int flags = MAP_PRIVATE | MAP_FIXED;\n+    if (!ctx->load_addr) {\n+      flags = MAP_PRIVATE;\n+    };\n+    void *mapping = mmap((void *)addr, size, prot, flags, fd, off_start);\n+    if (mapping == MAP_FAILED) {\n+      fprintf(stderr, \"cannot execute %s: mmap segment of %s failed: %s\\n\",\n+              ctx->prog_name, ctx->interp_path, strerror(errno));\n+      return -1;\n+    }\n+    // eprint!(\"mmap {:x} ({:x}) at {:x} ({:x}) (vaddr: {:x}, load_addr: {:x},\n+    // prot: \",\n+    //        size,\n+    //        ph.p_filesz,\n+    //        mapping.data.as_ptr() as usize,\n+    //        addr,\n+    //        ph.p_vaddr,\n+    //        load_addr);\n+    // eprint!(\"{}{}{}\",\n+    //        (if ph.p_flags & PF_R != 0 { \"r\" } else { \"-\" }),\n+    //        (if ph.p_flags & PF_W != 0 { \"w\" } else { \"-\" }),\n+    //        (if ph.p_flags & PF_X != 0 { \"x\" } else { \"-\" }));\n+    // eprint!(\")\\n\");\n+\n+    if (ctx->load_addr == 0) {\n+      ctx->load_addr = (unsigned long)mapping - ph->p_vaddr;\n+      total_mapping.addr = mapping;\n+      total_mapping.size = size;\n+    }\n+  }\n+  ctx->mapping = total_mapping;\n+  total_mapping.addr = NULL;\n+  total_mapping.size = 0;\n+  return 0;\n+}\n+\n+static int elf_load(struct ld_ctx *ctx) {\n+  _cleanup_close_ int fd = open(ctx->interp_path, O_RDONLY);\n+  if (fd < 0) {\n+    fprintf(stderr, \"cannot execute '%s': cannot open $NIX_LD (%s): %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+  Ehdr header = {};\n+  ssize_t res = read(fd, &header, sizeof(header));\n+  if (res < 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': cannot read elf header of $NIX_LD (%s): %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+\n+  if (memcmp(header.e_ident, ELFMAG, SELFMAG) != 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': $NIX_LD (%s) is not an elf file: %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+\n+  // TODO also support dynamic excutable\n+  if (header.e_type != ET_DYN) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': $NIX_LD (%s) is not a dynamic library\\n\",\n+            ctx->prog_name, ctx->interp_path);\n+    return -1;\n+  }\n+\n+  size_t ph_size = sizeof(Phdr) * header.e_phnum;\n+  // XXX binfmt_elf also checks ELF_MIN_ALIGN here\n+  if (ph_size == 0 || ph_size > 65536) {\n+    fprintf(\n+        stderr,\n+        \"cannot execute %s: $NIX_LD (%s) has incorrect program header size: \"\n+        \"%zu\\n\",\n+        ctx->prog_name, ctx->interp_path, ph_size);\n+    return -1;\n+  }\n+\n+  _cleanup_free_ Phdr *prog_headers = malloc(ph_size);\n+  if (!prog_headers) {\n+    fprintf(stderr, \"cannot execute '%s': cannot allocate program headers\\n\",\n+            ctx->prog_name);\n+    return -1;\n+  }\n+  res = read(fd, prog_headers, ph_size);\n+\n+  if (res < 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': cannot read program headers of elf \"\n+            \"interpreter: %s\\n\",\n+            ctx->prog_name, strerror(errno));\n+    return -1;\n+  }\n+\n+  if ((size_t)res != ph_size) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': less program headers in elf interpreter than \"\n+            \"expected: %zu != %zu\\n\",\n+            ctx->prog_name, (size_t)res, ph_size);\n+    return -1;\n+  }\n+\n+  int r = elf_map(ctx, fd, prog_headers, header.e_phnum);\n+  if (r < 0) {\n+    // elf_map prints the error;\n+    return -1;\n+  }\n+\n+  ctx->entry_point = ctx->load_addr + header.e_entry;\n+  return 0;\n+}\n+\n+\n+static inline _Noreturn void jmp_ld(void(*entry_point)(void), void* stackp) {\n+  asm(\"mov %0, %%rsp; jmp *%1\"",
+  "path": "nix-ld.c",
+  "commit_id": "8d943d52deb32d34f8e03b21987aaa28afc84ee3",
+  "original_commit_id": "22edf00df9391d222d419df423b25af57f8c664e",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "This needs to be ported to aarch64, aarch32 and i686.",
+  "created_at": "2020-12-23T11:42:43Z",
+  "updated_at": "2020-12-26T09:01:01Z",
+  "html_url": "https://github.com/nix-community/nix-ld/pull/4#discussion_r547917651",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-ld/pulls/4",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/547917651"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-ld/pull/4#discussion_r547917651"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-ld/pulls/4"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/547917651/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 232,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 246,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/547917810",
+  "pull_request_review_id": 557817900,
+  "id": 547917810,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU0NzkxNzgxMA==",
+  "diff_hunk": "@@ -1,34 +1,274 @@\n+#define _GNU_SOURCE\n+#include <elf.h>\n+#include <errno.h>\n+#include <fcntl.h>\n+#include <stdint.h>\n #include <stdio.h>\n #include <stdlib.h>\n #include <string.h>\n+#include <sys/auxv.h>\n+#include <sys/mman.h>\n #include <unistd.h>\n-#include <limits.h>\n \n-#ifndef REAL_LD\n-#error REAL_LD is not defined\n+static inline void closep(int *fd) { close(*fd); }\n+static inline void freep(void *p) { free(*(void **)p); }\n+\n+#define _cleanup_(f) __attribute__((cleanup(f)))\n+#define _cleanup_close_ _cleanup_(closep)\n+#define _cleanup_free_ _cleanup_(freep)\n+#define _cleanup__ _cleanup_(free)\n+\n+#if UINTPTR_MAX == 0xffffffff\n+typedef Elf32_Ehdr Ehdr;\n+typedef Elf32_Phdr Phdr;\n+#else\n+typedef Elf64_Ehdr Ehdr;\n+typedef Elf64_Phdr Phdr;\n #endif\n \n-int main(int argc, char **argv) {\n-  const char exe[PATH_MAX];\n-  const char *ld_path = getenv(\"NIX_LD_LIBRARY_PATH\");\n-  if (ld_path) {\n-    int r = setenv(\"LD_LIBRARY_PATH\", ld_path, 1);\n-    if (r < 0) {\n-      perror(\"setenv\");\n-      return 1;\n+typedef struct {\n+  void *addr;\n+  size_t size;\n+} mmap_t;\n+\n+struct ld_ctx {\n+  const char *prog_name;\n+  const char *interp_path;\n+\n+  // filled out by elf_load\n+  unsigned long load_addr;\n+  unsigned long entry_point;\n+  mmap_t mapping;\n+};\n+\n+static inline void munmapp(mmap_t *m) {\n+  if (m->size) {\n+    munmap(m->addr, m->size);\n+  }\n+}\n+\n+static size_t total_mapping_size(Phdr *phdrs, size_t phdr_num) {\n+  size_t addr_min = UINTPTR_MAX;\n+  size_t addr_max = 0;\n+  for (size_t i = 0; i < phdr_num; i++) {\n+    Phdr *ph = &phdrs[i];\n+    if (ph->p_type != PT_LOAD || ph->p_memsz == 0) {\n+      continue;\n+    }\n+    if (ph->p_vaddr < addr_min) {\n+      addr_min = ph->p_vaddr;\n+    }\n+    if (ph->p_vaddr + ph->p_memsz > addr_max) {\n+      addr_max = ph->p_vaddr + ph->p_memsz;\n     }\n   }\n-  // XXX multi-call binaries\n-  if (readlink(\"/proc/self/exe\", exe, PATH_MAX) == -1) {\n-    perror(\"readlink\");\n+  return addr_max - addr_min;\n+}\n+#define ELF_PAGESTART(_v) ((_v) & ~(unsigned long)(ELF_MIN_ALIGN - 1))\n+#define ELF_PAGEOFFSET(_v) ((_v) & (ELF_MIN_ALIGN - 1))\n+#define ELF_PAGEALIGN(_v) (((_v) + ELF_MIN_ALIGN - 1) & ~(ELF_MIN_ALIGN - 1))\n+\n+static inline unsigned long elf_page_start(unsigned long v) {\n+  return v & ~(getpagesize() - 1);\n+}\n+\n+static inline unsigned long elf_page_offset(unsigned long v) {\n+  return v & (getpagesize() - 1);\n+}\n+\n+static inline unsigned long elf_page_align(unsigned long v) {\n+  return (v + getpagesize() - 1) & ~(getpagesize() - 1);\n+}\n+\n+static inline int32_t prot_flags(uint32_t p_flags) {\n+  return (p_flags & PF_R ? PROT_READ : 0) | (p_flags & PF_W ? PROT_WRITE : 0) |\n+         (p_flags & PF_X ? PROT_EXEC : 0);\n+}\n+\n+static int elf_map(struct ld_ctx *ctx, int fd, Phdr *prog_headers,\n+                   size_t headers_num) {\n+  const size_t total_size = total_mapping_size(prog_headers, headers_num);\n+\n+  if (total_size == 0) {\n+    fprintf(stderr,\n+            \"cannot execute %s: no program headers found in $NIX_LD (%s)\",\n+            ctx->prog_name, ctx->interp_path);\n+    return -1;\n+  }\n+\n+  ctx->load_addr = 0;\n+  ctx->mapping.addr = NULL;\n+  _cleanup_(munmapp) mmap_t total_mapping = {};\n+\n+  for (size_t i = 0; i < headers_num; i++) {\n+    Phdr *ph = &prog_headers[i];\n+    // zero sized segments are valid but we won't mmap them\n+    if (ph->p_type != PT_LOAD || !ph->p_filesz) {\n+      continue;\n+    }\n+    const int32_t prot = prot_flags(ph->p_flags);\n+    unsigned long addr = elf_page_start(ctx->load_addr + ph->p_vaddr);\n+    size_t size = elf_page_align(ph->p_filesz - elf_page_offset(ph->p_vaddr));\n+    if (!ctx->load_addr) {\n+      // mmap the whole library range to reserve the area,\n+      // later smaller parts will be mmaped over it.\n+      size = elf_page_align(total_size);\n+    };\n+    off_t off_start = ph->p_offset - (off_t)elf_page_offset(ph->p_vaddr);\n+    int flags = MAP_PRIVATE | MAP_FIXED;\n+    if (!ctx->load_addr) {\n+      flags = MAP_PRIVATE;\n+    };\n+    void *mapping = mmap((void *)addr, size, prot, flags, fd, off_start);\n+    if (mapping == MAP_FAILED) {\n+      fprintf(stderr, \"cannot execute %s: mmap segment of %s failed: %s\\n\",\n+              ctx->prog_name, ctx->interp_path, strerror(errno));\n+      return -1;\n+    }\n+    // eprint!(\"mmap {:x} ({:x}) at {:x} ({:x}) (vaddr: {:x}, load_addr: {:x},\n+    // prot: \",\n+    //        size,\n+    //        ph.p_filesz,\n+    //        mapping.data.as_ptr() as usize,\n+    //        addr,\n+    //        ph.p_vaddr,\n+    //        load_addr);\n+    // eprint!(\"{}{}{}\",\n+    //        (if ph.p_flags & PF_R != 0 { \"r\" } else { \"-\" }),\n+    //        (if ph.p_flags & PF_W != 0 { \"w\" } else { \"-\" }),\n+    //        (if ph.p_flags & PF_X != 0 { \"x\" } else { \"-\" }));\n+    // eprint!(\")\\n\");\n+\n+    if (ctx->load_addr == 0) {\n+      ctx->load_addr = (unsigned long)mapping - ph->p_vaddr;\n+      total_mapping.addr = mapping;\n+      total_mapping.size = size;\n+    }\n+  }\n+  ctx->mapping = total_mapping;\n+  total_mapping.addr = NULL;\n+  total_mapping.size = 0;\n+  return 0;\n+}\n+\n+static int elf_load(struct ld_ctx *ctx) {\n+  _cleanup_close_ int fd = open(ctx->interp_path, O_RDONLY);\n+  if (fd < 0) {\n+    fprintf(stderr, \"cannot execute '%s': cannot open $NIX_LD (%s): %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+  Ehdr header = {};\n+  ssize_t res = read(fd, &header, sizeof(header));\n+  if (res < 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': cannot read elf header of $NIX_LD (%s): %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+\n+  if (memcmp(header.e_ident, ELFMAG, SELFMAG) != 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': $NIX_LD (%s) is not an elf file: %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+\n+  // TODO also support dynamic excutable\n+  if (header.e_type != ET_DYN) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': $NIX_LD (%s) is not a dynamic library\\n\",\n+            ctx->prog_name, ctx->interp_path);\n+    return -1;\n+  }\n+\n+  size_t ph_size = sizeof(Phdr) * header.e_phnum;\n+  // XXX binfmt_elf also checks ELF_MIN_ALIGN here\n+  if (ph_size == 0 || ph_size > 65536) {\n+    fprintf(\n+        stderr,\n+        \"cannot execute %s: $NIX_LD (%s) has incorrect program header size: \"\n+        \"%zu\\n\",\n+        ctx->prog_name, ctx->interp_path, ph_size);\n+    return -1;\n+  }\n+\n+  _cleanup_free_ Phdr *prog_headers = malloc(ph_size);\n+  if (!prog_headers) {\n+    fprintf(stderr, \"cannot execute '%s': cannot allocate program headers\\n\",\n+            ctx->prog_name);\n+    return -1;\n+  }\n+  res = read(fd, prog_headers, ph_size);\n+\n+  if (res < 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': cannot read program headers of elf \"\n+            \"interpreter: %s\\n\",\n+            ctx->prog_name, strerror(errno));\n+    return -1;\n+  }\n+\n+  if ((size_t)res != ph_size) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': less program headers in elf interpreter than \"\n+            \"expected: %zu != %zu\\n\",\n+            ctx->prog_name, (size_t)res, ph_size);\n+    return -1;\n+  }\n+\n+  int r = elf_map(ctx, fd, prog_headers, header.e_phnum);\n+  if (r < 0) {\n+    // elf_map prints the error;\n+    return -1;\n+  }\n+\n+  ctx->entry_point = ctx->load_addr + header.e_entry;\n+  return 0;\n+}\n+\n+\n+static inline _Noreturn void jmp_ld(void(*entry_point)(void), void* stackp) {\n+  asm(\"mov %0, %%rsp; jmp *%1\"\n+      :: \"r\" (stackp), \"r\" (entry_point));\n+  __builtin_unreachable();\n+}\n+\n+int main(int argc, char **argv) {\n+  struct ld_ctx ctx = {};\n+  ctx.prog_name = argv[0];\n+  ctx.interp_path = secure_getenv(\"NIX_LD\");\n+\n+  const char *lib_path = secure_getenv(\"NIX_LD_LIBRARY_PATH\");\n+\n+  if (!ctx.interp_path) {\n+    fprintf(stderr, \"cannot execute '%s': $NIX_LD is not set\\n\", argv[0]);\n     return 1;\n-  };\n-  char **new_argv = malloc((argc + 3) * sizeof(argv[0]));\n-  memcpy(&new_argv[1], argv, argc * sizeof(argv[0]));\n-  new_argv[0] = REAL_LD;\n-  new_argv[1] = exe;\n-  new_argv[argc + 1] = NULL;\n-  execv(REAL_LD, new_argv);\n-  perror(\"failed to execute \" REAL_LD);\n-  return 1;\n+  }\n+\n+  if (elf_load(&ctx) < 0) {\n+    // elf_load prints the error;\n+    return 1;\n+  }\n+\n+  const size_t *stackp = ((size_t*)argv - 1);\n+  char **envp;\n+  for (envp = &argv[argc + 1]; *envp; envp++);\n+\n+  size_t* auxv = (size_t*)(envp + 1);\n+\n+  // AT_BASE points to us, we need to point it to the new interpreter\n+  for (; auxv[0]; auxv += 2) {\n+    size_t key = auxv[0];\n+    size_t *value = &auxv[1];\n+    if (key == AT_BASE) {\n+      *value = ctx.load_addr;\n+      break;\n+    }\n+  }\n+\n+  jmp_ld((void(*)(void))ctx.entry_point, (void*)stackp);",
+  "path": "nix-ld.c",
+  "commit_id": "8d943d52deb32d34f8e03b21987aaa28afc84ee3",
+  "original_commit_id": "22edf00df9391d222d419df423b25af57f8c664e",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "This part still crashes in in glibc ld. Needs investigation.",
+  "created_at": "2020-12-23T11:43:13Z",
+  "updated_at": "2020-12-26T09:01:01Z",
+  "html_url": "https://github.com/nix-community/nix-ld/pull/4#discussion_r547917810",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-ld/pulls/4",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/547917810"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-ld/pull/4#discussion_r547917810"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-ld/pulls/4"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/547917810/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 270,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 293,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/548386680",
+  "pull_request_review_id": 558340203,
+  "id": 548386680,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU0ODM4NjY4MA==",
+  "diff_hunk": "@@ -1,34 +1,274 @@\n+#define _GNU_SOURCE\n+#include <elf.h>\n+#include <errno.h>\n+#include <fcntl.h>\n+#include <stdint.h>\n #include <stdio.h>\n #include <stdlib.h>\n #include <string.h>\n+#include <sys/auxv.h>\n+#include <sys/mman.h>\n #include <unistd.h>\n-#include <limits.h>\n \n-#ifndef REAL_LD\n-#error REAL_LD is not defined\n+static inline void closep(int *fd) { close(*fd); }\n+static inline void freep(void *p) { free(*(void **)p); }\n+\n+#define _cleanup_(f) __attribute__((cleanup(f)))\n+#define _cleanup_close_ _cleanup_(closep)\n+#define _cleanup_free_ _cleanup_(freep)\n+#define _cleanup__ _cleanup_(free)\n+\n+#if UINTPTR_MAX == 0xffffffff\n+typedef Elf32_Ehdr Ehdr;\n+typedef Elf32_Phdr Phdr;\n+#else\n+typedef Elf64_Ehdr Ehdr;\n+typedef Elf64_Phdr Phdr;\n #endif\n \n-int main(int argc, char **argv) {\n-  const char exe[PATH_MAX];\n-  const char *ld_path = getenv(\"NIX_LD_LIBRARY_PATH\");\n-  if (ld_path) {\n-    int r = setenv(\"LD_LIBRARY_PATH\", ld_path, 1);\n-    if (r < 0) {\n-      perror(\"setenv\");\n-      return 1;\n+typedef struct {\n+  void *addr;\n+  size_t size;\n+} mmap_t;\n+\n+struct ld_ctx {\n+  const char *prog_name;\n+  const char *interp_path;\n+\n+  // filled out by elf_load\n+  unsigned long load_addr;\n+  unsigned long entry_point;\n+  mmap_t mapping;\n+};\n+\n+static inline void munmapp(mmap_t *m) {\n+  if (m->size) {\n+    munmap(m->addr, m->size);\n+  }\n+}\n+\n+static size_t total_mapping_size(Phdr *phdrs, size_t phdr_num) {\n+  size_t addr_min = UINTPTR_MAX;\n+  size_t addr_max = 0;\n+  for (size_t i = 0; i < phdr_num; i++) {\n+    Phdr *ph = &phdrs[i];\n+    if (ph->p_type != PT_LOAD || ph->p_memsz == 0) {\n+      continue;\n+    }\n+    if (ph->p_vaddr < addr_min) {\n+      addr_min = ph->p_vaddr;\n+    }\n+    if (ph->p_vaddr + ph->p_memsz > addr_max) {\n+      addr_max = ph->p_vaddr + ph->p_memsz;\n     }\n   }\n-  // XXX multi-call binaries\n-  if (readlink(\"/proc/self/exe\", exe, PATH_MAX) == -1) {\n-    perror(\"readlink\");\n+  return addr_max - addr_min;\n+}\n+#define ELF_PAGESTART(_v) ((_v) & ~(unsigned long)(ELF_MIN_ALIGN - 1))\n+#define ELF_PAGEOFFSET(_v) ((_v) & (ELF_MIN_ALIGN - 1))\n+#define ELF_PAGEALIGN(_v) (((_v) + ELF_MIN_ALIGN - 1) & ~(ELF_MIN_ALIGN - 1))\n+\n+static inline unsigned long elf_page_start(unsigned long v) {\n+  return v & ~(getpagesize() - 1);\n+}\n+\n+static inline unsigned long elf_page_offset(unsigned long v) {\n+  return v & (getpagesize() - 1);\n+}\n+\n+static inline unsigned long elf_page_align(unsigned long v) {\n+  return (v + getpagesize() - 1) & ~(getpagesize() - 1);\n+}\n+\n+static inline int32_t prot_flags(uint32_t p_flags) {\n+  return (p_flags & PF_R ? PROT_READ : 0) | (p_flags & PF_W ? PROT_WRITE : 0) |\n+         (p_flags & PF_X ? PROT_EXEC : 0);\n+}\n+\n+static int elf_map(struct ld_ctx *ctx, int fd, Phdr *prog_headers,\n+                   size_t headers_num) {\n+  const size_t total_size = total_mapping_size(prog_headers, headers_num);\n+\n+  if (total_size == 0) {\n+    fprintf(stderr,\n+            \"cannot execute %s: no program headers found in $NIX_LD (%s)\",\n+            ctx->prog_name, ctx->interp_path);\n+    return -1;\n+  }\n+\n+  ctx->load_addr = 0;\n+  ctx->mapping.addr = NULL;\n+  _cleanup_(munmapp) mmap_t total_mapping = {};\n+\n+  for (size_t i = 0; i < headers_num; i++) {\n+    Phdr *ph = &prog_headers[i];\n+    // zero sized segments are valid but we won't mmap them\n+    if (ph->p_type != PT_LOAD || !ph->p_filesz) {\n+      continue;\n+    }\n+    const int32_t prot = prot_flags(ph->p_flags);\n+    unsigned long addr = elf_page_start(ctx->load_addr + ph->p_vaddr);\n+    size_t size = elf_page_align(ph->p_filesz - elf_page_offset(ph->p_vaddr));\n+    if (!ctx->load_addr) {\n+      // mmap the whole library range to reserve the area,\n+      // later smaller parts will be mmaped over it.\n+      size = elf_page_align(total_size);\n+    };\n+    off_t off_start = ph->p_offset - (off_t)elf_page_offset(ph->p_vaddr);\n+    int flags = MAP_PRIVATE | MAP_FIXED;\n+    if (!ctx->load_addr) {\n+      flags = MAP_PRIVATE;\n+    };\n+    void *mapping = mmap((void *)addr, size, prot, flags, fd, off_start);\n+    if (mapping == MAP_FAILED) {\n+      fprintf(stderr, \"cannot execute %s: mmap segment of %s failed: %s\\n\",\n+              ctx->prog_name, ctx->interp_path, strerror(errno));\n+      return -1;\n+    }\n+    // eprint!(\"mmap {:x} ({:x}) at {:x} ({:x}) (vaddr: {:x}, load_addr: {:x},\n+    // prot: \",\n+    //        size,\n+    //        ph.p_filesz,\n+    //        mapping.data.as_ptr() as usize,\n+    //        addr,\n+    //        ph.p_vaddr,\n+    //        load_addr);\n+    // eprint!(\"{}{}{}\",\n+    //        (if ph.p_flags & PF_R != 0 { \"r\" } else { \"-\" }),\n+    //        (if ph.p_flags & PF_W != 0 { \"w\" } else { \"-\" }),\n+    //        (if ph.p_flags & PF_X != 0 { \"x\" } else { \"-\" }));\n+    // eprint!(\")\\n\");\n+\n+    if (ctx->load_addr == 0) {\n+      ctx->load_addr = (unsigned long)mapping - ph->p_vaddr;\n+      total_mapping.addr = mapping;\n+      total_mapping.size = size;\n+    }\n+  }\n+  ctx->mapping = total_mapping;\n+  total_mapping.addr = NULL;\n+  total_mapping.size = 0;\n+  return 0;\n+}\n+\n+static int elf_load(struct ld_ctx *ctx) {\n+  _cleanup_close_ int fd = open(ctx->interp_path, O_RDONLY);\n+  if (fd < 0) {\n+    fprintf(stderr, \"cannot execute '%s': cannot open $NIX_LD (%s): %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+  Ehdr header = {};\n+  ssize_t res = read(fd, &header, sizeof(header));\n+  if (res < 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': cannot read elf header of $NIX_LD (%s): %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+\n+  if (memcmp(header.e_ident, ELFMAG, SELFMAG) != 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': $NIX_LD (%s) is not an elf file: %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+\n+  // TODO also support dynamic excutable\n+  if (header.e_type != ET_DYN) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': $NIX_LD (%s) is not a dynamic library\\n\",\n+            ctx->prog_name, ctx->interp_path);\n+    return -1;\n+  }\n+\n+  size_t ph_size = sizeof(Phdr) * header.e_phnum;\n+  // XXX binfmt_elf also checks ELF_MIN_ALIGN here\n+  if (ph_size == 0 || ph_size > 65536) {\n+    fprintf(\n+        stderr,\n+        \"cannot execute %s: $NIX_LD (%s) has incorrect program header size: \"\n+        \"%zu\\n\",\n+        ctx->prog_name, ctx->interp_path, ph_size);\n+    return -1;\n+  }\n+\n+  _cleanup_free_ Phdr *prog_headers = malloc(ph_size);\n+  if (!prog_headers) {\n+    fprintf(stderr, \"cannot execute '%s': cannot allocate program headers\\n\",\n+            ctx->prog_name);\n+    return -1;\n+  }\n+  res = read(fd, prog_headers, ph_size);\n+\n+  if (res < 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': cannot read program headers of elf \"\n+            \"interpreter: %s\\n\",\n+            ctx->prog_name, strerror(errno));\n+    return -1;\n+  }\n+\n+  if ((size_t)res != ph_size) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': less program headers in elf interpreter than \"\n+            \"expected: %zu != %zu\\n\",\n+            ctx->prog_name, (size_t)res, ph_size);\n+    return -1;\n+  }\n+\n+  int r = elf_map(ctx, fd, prog_headers, header.e_phnum);\n+  if (r < 0) {\n+    // elf_map prints the error;\n+    return -1;\n+  }\n+\n+  ctx->entry_point = ctx->load_addr + header.e_entry;\n+  return 0;\n+}\n+\n+\n+static inline _Noreturn void jmp_ld(void(*entry_point)(void), void* stackp) {\n+  asm(\"mov %0, %%rsp; jmp *%1\"\n+      :: \"r\" (stackp), \"r\" (entry_point));\n+  __builtin_unreachable();\n+}\n+\n+int main(int argc, char **argv) {\n+  struct ld_ctx ctx = {};\n+  ctx.prog_name = argv[0];\n+  ctx.interp_path = secure_getenv(\"NIX_LD\");\n+\n+  const char *lib_path = secure_getenv(\"NIX_LD_LIBRARY_PATH\");\n+\n+  if (!ctx.interp_path) {\n+    fprintf(stderr, \"cannot execute '%s': $NIX_LD is not set\\n\", argv[0]);\n     return 1;\n-  };\n-  char **new_argv = malloc((argc + 3) * sizeof(argv[0]));\n-  memcpy(&new_argv[1], argv, argc * sizeof(argv[0]));\n-  new_argv[0] = REAL_LD;\n-  new_argv[1] = exe;\n-  new_argv[argc + 1] = NULL;\n-  execv(REAL_LD, new_argv);\n-  perror(\"failed to execute \" REAL_LD);\n-  return 1;\n+  }\n+\n+  if (elf_load(&ctx) < 0) {\n+    // elf_load prints the error;\n+    return 1;\n+  }\n+\n+  const size_t *stackp = ((size_t*)argv - 1);\n+  char **envp;\n+  for (envp = &argv[argc + 1]; *envp; envp++);\n+\n+  size_t* auxv = (size_t*)(envp + 1);\n+\n+  // AT_BASE points to us, we need to point it to the new interpreter\n+  for (; auxv[0]; auxv += 2) {\n+    size_t key = auxv[0];\n+    size_t *value = &auxv[1];\n+    if (key == AT_BASE) {\n+      *value = ctx.load_addr;\n+      break;\n+    }\n+  }\n+\n+  jmp_ld((void(*)(void))ctx.entry_point, (void*)stackp);",
+  "path": "nix-ld.c",
+  "commit_id": "8d943d52deb32d34f8e03b21987aaa28afc84ee3",
+  "original_commit_id": "22edf00df9391d222d419df423b25af57f8c664e",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "works now!",
+  "created_at": "2020-12-24T05:20:49Z",
+  "updated_at": "2020-12-26T09:01:01Z",
+  "html_url": "https://github.com/nix-community/nix-ld/pull/4#discussion_r548386680",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-ld/pulls/4",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/548386680"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-ld/pull/4#discussion_r548386680"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-ld/pulls/4"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/548386680/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 270,
+  "side": "RIGHT",
+  "in_reply_to_id": 547917810,
+  "author_association": "MEMBER",
+  "original_position": 293,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/548447213",
+  "pull_request_review_id": 558407092,
+  "id": 548447213,
+  "node_id": "MDI0OlB1bGxSZXF1ZXN0UmV2aWV3Q29tbWVudDU0ODQ0NzIxMw==",
+  "diff_hunk": "@@ -1,34 +1,274 @@\n+#define _GNU_SOURCE\n+#include <elf.h>\n+#include <errno.h>\n+#include <fcntl.h>\n+#include <stdint.h>\n #include <stdio.h>\n #include <stdlib.h>\n #include <string.h>\n+#include <sys/auxv.h>\n+#include <sys/mman.h>\n #include <unistd.h>\n-#include <limits.h>\n \n-#ifndef REAL_LD\n-#error REAL_LD is not defined\n+static inline void closep(int *fd) { close(*fd); }\n+static inline void freep(void *p) { free(*(void **)p); }\n+\n+#define _cleanup_(f) __attribute__((cleanup(f)))\n+#define _cleanup_close_ _cleanup_(closep)\n+#define _cleanup_free_ _cleanup_(freep)\n+#define _cleanup__ _cleanup_(free)\n+\n+#if UINTPTR_MAX == 0xffffffff\n+typedef Elf32_Ehdr Ehdr;\n+typedef Elf32_Phdr Phdr;\n+#else\n+typedef Elf64_Ehdr Ehdr;\n+typedef Elf64_Phdr Phdr;\n #endif\n \n-int main(int argc, char **argv) {\n-  const char exe[PATH_MAX];\n-  const char *ld_path = getenv(\"NIX_LD_LIBRARY_PATH\");\n-  if (ld_path) {\n-    int r = setenv(\"LD_LIBRARY_PATH\", ld_path, 1);\n-    if (r < 0) {\n-      perror(\"setenv\");\n-      return 1;\n+typedef struct {\n+  void *addr;\n+  size_t size;\n+} mmap_t;\n+\n+struct ld_ctx {\n+  const char *prog_name;\n+  const char *interp_path;\n+\n+  // filled out by elf_load\n+  unsigned long load_addr;\n+  unsigned long entry_point;\n+  mmap_t mapping;\n+};\n+\n+static inline void munmapp(mmap_t *m) {\n+  if (m->size) {\n+    munmap(m->addr, m->size);\n+  }\n+}\n+\n+static size_t total_mapping_size(Phdr *phdrs, size_t phdr_num) {\n+  size_t addr_min = UINTPTR_MAX;\n+  size_t addr_max = 0;\n+  for (size_t i = 0; i < phdr_num; i++) {\n+    Phdr *ph = &phdrs[i];\n+    if (ph->p_type != PT_LOAD || ph->p_memsz == 0) {\n+      continue;\n+    }\n+    if (ph->p_vaddr < addr_min) {\n+      addr_min = ph->p_vaddr;\n+    }\n+    if (ph->p_vaddr + ph->p_memsz > addr_max) {\n+      addr_max = ph->p_vaddr + ph->p_memsz;\n     }\n   }\n-  // XXX multi-call binaries\n-  if (readlink(\"/proc/self/exe\", exe, PATH_MAX) == -1) {\n-    perror(\"readlink\");\n+  return addr_max - addr_min;\n+}\n+#define ELF_PAGESTART(_v) ((_v) & ~(unsigned long)(ELF_MIN_ALIGN - 1))\n+#define ELF_PAGEOFFSET(_v) ((_v) & (ELF_MIN_ALIGN - 1))\n+#define ELF_PAGEALIGN(_v) (((_v) + ELF_MIN_ALIGN - 1) & ~(ELF_MIN_ALIGN - 1))\n+\n+static inline unsigned long elf_page_start(unsigned long v) {\n+  return v & ~(getpagesize() - 1);\n+}\n+\n+static inline unsigned long elf_page_offset(unsigned long v) {\n+  return v & (getpagesize() - 1);\n+}\n+\n+static inline unsigned long elf_page_align(unsigned long v) {\n+  return (v + getpagesize() - 1) & ~(getpagesize() - 1);\n+}\n+\n+static inline int32_t prot_flags(uint32_t p_flags) {\n+  return (p_flags & PF_R ? PROT_READ : 0) | (p_flags & PF_W ? PROT_WRITE : 0) |\n+         (p_flags & PF_X ? PROT_EXEC : 0);\n+}\n+\n+static int elf_map(struct ld_ctx *ctx, int fd, Phdr *prog_headers,\n+                   size_t headers_num) {\n+  const size_t total_size = total_mapping_size(prog_headers, headers_num);\n+\n+  if (total_size == 0) {\n+    fprintf(stderr,\n+            \"cannot execute %s: no program headers found in $NIX_LD (%s)\",\n+            ctx->prog_name, ctx->interp_path);\n+    return -1;\n+  }\n+\n+  ctx->load_addr = 0;\n+  ctx->mapping.addr = NULL;\n+  _cleanup_(munmapp) mmap_t total_mapping = {};\n+\n+  for (size_t i = 0; i < headers_num; i++) {\n+    Phdr *ph = &prog_headers[i];\n+    // zero sized segments are valid but we won't mmap them\n+    if (ph->p_type != PT_LOAD || !ph->p_filesz) {\n+      continue;\n+    }\n+    const int32_t prot = prot_flags(ph->p_flags);\n+    unsigned long addr = elf_page_start(ctx->load_addr + ph->p_vaddr);\n+    size_t size = elf_page_align(ph->p_filesz - elf_page_offset(ph->p_vaddr));\n+    if (!ctx->load_addr) {\n+      // mmap the whole library range to reserve the area,\n+      // later smaller parts will be mmaped over it.\n+      size = elf_page_align(total_size);\n+    };\n+    off_t off_start = ph->p_offset - (off_t)elf_page_offset(ph->p_vaddr);\n+    int flags = MAP_PRIVATE | MAP_FIXED;\n+    if (!ctx->load_addr) {\n+      flags = MAP_PRIVATE;\n+    };\n+    void *mapping = mmap((void *)addr, size, prot, flags, fd, off_start);\n+    if (mapping == MAP_FAILED) {\n+      fprintf(stderr, \"cannot execute %s: mmap segment of %s failed: %s\\n\",\n+              ctx->prog_name, ctx->interp_path, strerror(errno));\n+      return -1;\n+    }\n+    // eprint!(\"mmap {:x} ({:x}) at {:x} ({:x}) (vaddr: {:x}, load_addr: {:x},\n+    // prot: \",\n+    //        size,\n+    //        ph.p_filesz,\n+    //        mapping.data.as_ptr() as usize,\n+    //        addr,\n+    //        ph.p_vaddr,\n+    //        load_addr);\n+    // eprint!(\"{}{}{}\",\n+    //        (if ph.p_flags & PF_R != 0 { \"r\" } else { \"-\" }),\n+    //        (if ph.p_flags & PF_W != 0 { \"w\" } else { \"-\" }),\n+    //        (if ph.p_flags & PF_X != 0 { \"x\" } else { \"-\" }));\n+    // eprint!(\")\\n\");\n+\n+    if (ctx->load_addr == 0) {\n+      ctx->load_addr = (unsigned long)mapping - ph->p_vaddr;\n+      total_mapping.addr = mapping;\n+      total_mapping.size = size;\n+    }\n+  }\n+  ctx->mapping = total_mapping;\n+  total_mapping.addr = NULL;\n+  total_mapping.size = 0;\n+  return 0;\n+}\n+\n+static int elf_load(struct ld_ctx *ctx) {\n+  _cleanup_close_ int fd = open(ctx->interp_path, O_RDONLY);\n+  if (fd < 0) {\n+    fprintf(stderr, \"cannot execute '%s': cannot open $NIX_LD (%s): %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+  Ehdr header = {};\n+  ssize_t res = read(fd, &header, sizeof(header));\n+  if (res < 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': cannot read elf header of $NIX_LD (%s): %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+\n+  if (memcmp(header.e_ident, ELFMAG, SELFMAG) != 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': $NIX_LD (%s) is not an elf file: %s\\n\",\n+            ctx->prog_name, ctx->interp_path, strerror(errno));\n+    return -1;\n+  }\n+\n+  // TODO also support dynamic excutable\n+  if (header.e_type != ET_DYN) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': $NIX_LD (%s) is not a dynamic library\\n\",\n+            ctx->prog_name, ctx->interp_path);\n+    return -1;\n+  }\n+\n+  size_t ph_size = sizeof(Phdr) * header.e_phnum;\n+  // XXX binfmt_elf also checks ELF_MIN_ALIGN here\n+  if (ph_size == 0 || ph_size > 65536) {\n+    fprintf(\n+        stderr,\n+        \"cannot execute %s: $NIX_LD (%s) has incorrect program header size: \"\n+        \"%zu\\n\",\n+        ctx->prog_name, ctx->interp_path, ph_size);\n+    return -1;\n+  }\n+\n+  _cleanup_free_ Phdr *prog_headers = malloc(ph_size);\n+  if (!prog_headers) {\n+    fprintf(stderr, \"cannot execute '%s': cannot allocate program headers\\n\",\n+            ctx->prog_name);\n+    return -1;\n+  }\n+  res = read(fd, prog_headers, ph_size);\n+\n+  if (res < 0) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': cannot read program headers of elf \"\n+            \"interpreter: %s\\n\",\n+            ctx->prog_name, strerror(errno));\n+    return -1;\n+  }\n+\n+  if ((size_t)res != ph_size) {\n+    fprintf(stderr,\n+            \"cannot execute '%s': less program headers in elf interpreter than \"\n+            \"expected: %zu != %zu\\n\",\n+            ctx->prog_name, (size_t)res, ph_size);\n+    return -1;\n+  }\n+\n+  int r = elf_map(ctx, fd, prog_headers, header.e_phnum);\n+  if (r < 0) {\n+    // elf_map prints the error;\n+    return -1;\n+  }\n+\n+  ctx->entry_point = ctx->load_addr + header.e_entry;\n+  return 0;\n+}\n+\n+\n+static inline _Noreturn void jmp_ld(void(*entry_point)(void), void* stackp) {\n+  asm(\"mov %0, %%rsp; jmp *%1\"",
+  "path": "nix-ld.c",
+  "commit_id": "8d943d52deb32d34f8e03b21987aaa28afc84ee3",
+  "original_commit_id": "22edf00df9391d222d419df423b25af57f8c664e",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "fixed.",
+  "created_at": "2020-12-24T08:32:18Z",
+  "updated_at": "2020-12-26T09:01:01Z",
+  "html_url": "https://github.com/nix-community/nix-ld/pull/4#discussion_r548447213",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-ld/pulls/4",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/548447213"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-ld/pull/4#discussion_r548447213"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-ld/pulls/4"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/548447213/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 232,
+  "side": "RIGHT",
+  "in_reply_to_id": 547917651,
+  "author_association": "MEMBER",
+  "original_position": 246,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/1160657440",
+  "pull_request_review_id": 1376136500,
+  "id": 1160657440,
+  "node_id": "PRRC_kwDOEqgAcM5FLjog",
+  "diff_hunk": "@@ -39,7 +39,7 @@ libraries that the executable needs to run.\n \n ## Installation\n \n-nix-ld is now part of nixpkgs and will be available NixOS 22.05. There one can enable it with the following\n+nix-ld is now part of nixpkgs and will be available starting with NixOS 22.05. There one can enable it with the following",
+  "path": "README.md",
+  "commit_id": "58885b38556fce8cefe97aa2969896733429e030",
+  "original_commit_id": "f5a02628c8bfb3fa527a1e3310c4305df93235a6",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "```suggestion\r\nnix-ld is part of nixpkgs since NixOS 22.05. There one can enable it with the following\r\n```",
+  "created_at": "2023-04-07T12:05:51Z",
+  "updated_at": "2023-04-07T12:05:52Z",
+  "html_url": "https://github.com/nix-community/nix-ld/pull/49#discussion_r1160657440",
+  "pull_request_url": "https://api.github.com/repos/nix-community/nix-ld/pulls/49",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/1160657440"
+   },
+   "html": {
+    "href": "https://github.com/nix-community/nix-ld/pull/49#discussion_r1160657440"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/nix-community/nix-ld/pulls/49"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/nix-community/nix-ld/pulls/comments/1160657440/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 42,
+  "side": "RIGHT",
+  "author_association": "MEMBER",
+  "original_position": 5,
+  "position": 1,
+  "subject_type": "line"
+ }
+]

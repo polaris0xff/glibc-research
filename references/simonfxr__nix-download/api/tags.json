@@ -1,0 +1,22 @@
+[
+ {
+  "name": "v0.2.0",
+  "zipball_url": "https://api.github.com/repos/simonfxr/nix-download/zipball/refs/tags/v0.2.0",
+  "tarball_url": "https://api.github.com/repos/simonfxr/nix-download/tarball/refs/tags/v0.2.0",
+  "commit": {
+   "sha": "095cc446e7bf9fe1ccc9147599a9c7256684d1a2",
+   "url": "https://api.github.com/repos/simonfxr/nix-download/commits/095cc446e7bf9fe1ccc9147599a9c7256684d1a2"
+  },
+  "node_id": "REF_kwDOMqbkbrByZWZzL3RhZ3MvdjAuMi4w"
+ },
+ {
+  "name": "v0.1.0",
+  "zipball_url": "https://api.github.com/repos/simonfxr/nix-download/zipball/refs/tags/v0.1.0",
+  "tarball_url": "https://api.github.com/repos/simonfxr/nix-download/tarball/refs/tags/v0.1.0",
+  "commit": {
+   "sha": "6e3dc898bca6526221e9d8998429f8fe2a4fde1a",
+   "url": "https://api.github.com/repos/simonfxr/nix-download/commits/6e3dc898bca6526221e9d8998429f8fe2a4fde1a"
+  },
+  "node_id": "REF_kwDOMqbkbrByZWZzL3RhZ3MvdjAuMS4w"
+ }
+]
