@@ -25,14 +25,59 @@ exists to prevent; it simply has not crashed yet.
 **Reproduce:** `sh poc/10-gawk/run.sh`, then read
 `evidence/poc/10-gawk/observation.txt`.
 
-**Can it be fixed?** Not within this design. Making it work means rewriting the
-host object so it binds to the in-process libc — which is what
-`cross-libc-dlopen` does, and it needs a *dynamic* process to do it in
-(`docs/research/prior-art.md`). **The class of program this tool serves is
-therefore: programs that do not need to load host plugins.** A program whose
-core function is loading host plugins — a browser using system codecs, a
-desktop application needing the host's GPU driver — is out of scope, and one of
-the bundling approaches in `docs/comparison.md` is the right answer for it.
+### Can cross-libc-dlopen's rewrite fix this? Measured: no.
+
+`experiments/50-host-plugin-feasibility.sh` ports `cld_strip_versions()`
+(`cross-libc-dlopen.c:811-817` @ `1cecf50e`) into a static `pgb` binary and
+runs two arms per environment, **each in its own child** so a crash in one
+still leaves the other measurable.
+
+| environment | arm A plain `dlopen` | arm B version-stripped copy |
+|---|---|---|
+| Alpine 3.10/3.20/3.22, Void musl | handle returned | handle returned |
+| Debian 12, Arch | handle returned | handle returned |
+| Debian 11, Ubuntu 20.04 | **SIGABRT** | **SIGABRT, identical** |
+| Rocky 8 | **SIGABRT** | **SIGABRT, identical** |
+| openSUSE Leap, Fedora 42 | **SIGFPE** | **SIGFPE, identical** |
+
+⛔ **Arm B changes nothing anywhere, and the reason is that the failure is not
+the one that rewrite addresses.** No environment produced a symbol-version
+error. The process dies *inside glibc's loader*, before `dlerror()` is ever
+set:
+
+```
+dl-call-libc-early-init.c:37: _dl_call_libc_early_init:
+    Assertion `sym != NULL' failed.              Debian 11, Ubuntu 20.04
+dl-machine.h:487: elf_machine_rela_relative:
+    Assertion `R_X86_64_RELATIVE' failed.        Rocky 8
+signal 8 (SIGFPE) in the loader                  openSUSE Leap, Fedora 42
+```
+
+⭐ **The diagnosis.** A static glibc binary has no loader of its own, so
+`dlopen` borrows the **host's** `ld.so` and `libc.so.6` — the traces in §1
+above show both being opened. What breaks is that pairing: our statically
+linked glibc 2.36 driving a host loader and host libc of a different version.
+`_dl_call_libc_early_init` looking for `__libc_early_init` in a host libc that
+does not present it the expected way is that mismatch exactly. Symbol
+versioning is not involved, so neutralising version tags cannot help.
+
+⚠ **Do not read the "handle returned" rows as success.** The probe checks that
+`dlopen` returned non-NULL. It does **not** call anything in the object, and on
+the musl rows the object it loaded was musl-linked. Whether those libraries are
+*usable* is untested, and the two-libc hazard in §1 applies regardless.
+
+**So what would work?** The diagnosis names the requirement: the process must
+carry **its own loader and its own libc**, which is precisely what
+cross-libc-dlopen assumes — it is an `LD_PRELOAD` for a process that already
+has both. That is a bundled-glibc **dynamic** binary, not a static one.
+
+⛔ **This cannot be bolted onto the static output.** It is a second output mode
+for `pgb`, and it costs the property that makes the current one worth having:
+a single normal ELF with no interpreter. `docs/AGENTS.md` §13 item 3 scopes it.
+**The class this tool serves is unchanged: programs that do not need to load
+host plugins.** A program whose core function is loading them — a browser using
+system codecs, a desktop application needing the host's GPU driver — needs that
+second mode or one of the bundling approaches in `docs/comparison.md`.
 
 ⭐ **A program that loads its OWN plugins is a different case and can be
 served**: build them into the binary. POC 50 does exactly that, turning 49

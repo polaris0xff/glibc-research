@@ -126,9 +126,19 @@ Full detail with reproductions: [`limitations.md`](limitations.md).
 
 1. **`dlopen` of a *host* object is host-dependent, and success is the worse
    outcome.** gawk's own extension **loads** on Debian 12 and Arch (dragging in
-   the host loader and libc), is refused on the other nine. **The class this
-   tool serves is: programs that do not need host plugins.** A program loading
-   its *own* plugins is fine — build them in, as POC 50 does.
+   the host loader and libc), is refused on the other nine.
+   ⛔ **`experiments/50-` settles whether prior art can fix this: it cannot.**
+   Porting cross-libc-dlopen's symbol-version rewrite into a static binary
+   changes the outcome on **zero of 11** environments, because no environment
+   fails on symbol versions — they die inside glibc's loader
+   (`_dl_call_libc_early_init` assertion, `elf_machine_rela_relative`
+   assertion, SIGFPE). A static binary has no loader, so `dlopen` borrows the
+   host's `ld.so` and `libc.so.6`, and *that pairing* is the failure. Fixing it
+   requires the process to carry its own loader and libc — a bundled-glibc
+   **dynamic** binary, which is a second output mode, not a patch to this one.
+   §13 item 3.
+   **The class this tool serves is: programs that do not need host plugins.** A
+   program loading its *own* plugins is fine — build them in, as POC 50 does.
 2. **NSS beyond `files`/`dns` is gone**: no LDAP, SSSD, NIS, mDNS,
    systemd-resolved. Measured cost: on Fedora 42 a plain static binary resolves
    the machine's own hostname via `libnss_myhostname` and the pgb binary does
@@ -170,6 +180,7 @@ one kernel is not "works on Linux".
 | `experiments/21-glibc-version-floor.sh` | **COMPLETE** — confirms the ≥2.34 pin |
 | `experiments/30-gconv-and-locale.sh` | **COMPLETE** — 24 assertions |
 | `experiments/40-overhead.sh` | **COMPLETE** — §10 |
+| `experiments/50-host-plugin-feasibility.sh` | **COMPLETE** — settles §13 item 3 |
 | `pgb` chroot engine, host engine | **COMPLETE** |
 | `pgb` docker/podman engines | **UNTESTED** — no daemon here; code exists, never run. CI is where it first runs. |
 | NSS / iconv / locale mechanisms | **COMPLETE** — 11 of 11 each |
@@ -257,14 +268,37 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
    exist and re-resolve by tag, which trades the digest pin away and says so.
    Nothing has been run. Expect IFUNC and CPU-baseline questions that x86_64
    did not raise.
-3. **`--embed-terminfo`.** The mechanism is already proven by `--embed-locale`
+3. **A second output mode, for the host-plugin class — the one thing that
+   would make this universal rather than broad.** `experiments/50-` has already
+   done the feasibility work and the answer is precise:
+
+   - ⛔ **Do not port cross-libc-dlopen into the static output.** Measured: no
+     effect on any of 11. The failure class it fixes does not occur here.
+   - ⭐ **Do build a bundled-glibc dynamic mode**, where cross-libc-dlopen
+     applies **as designed and unmodified** — it is an `LD_PRELOAD` for a
+     process that already carries a libc and a loader, which is exactly what
+     that mode provides. The corpus is already in `references/`; its
+     `scripts/build.sh` builds it, and `docs/integrating.md` covers wiring it
+     into a bundle.
+   - The cost is the property the current mode exists for: one normal ELF, no
+     interpreter. So it is a **mode**, chosen per project, not a replacement —
+     and `pgb verify` should report which mode a binary is.
+   - Sequence: (a) teach `pgb` to emit a bundled-glibc dynamic binary with its
+     own loader; (b) verify the two-libc invariant holds via
+     `cross-libc-dlopen`'s own `tests/invariants.c`; (c) re-run POC 10's
+     observation arm in that mode — the gawk extension loading on 11 of 11
+     instead of 2 of 11 is the acceptance test.
+   - ⚠ Read `references/pkgforge-dev__cross-libc-dlopen/tree/docs/limits.md`
+     first: it is that project's own measured list of what its approach cannot
+     do, and it was **not** read during this project's sweep.
+4. **`--embed-terminfo`.** The mechanism is already proven by `--embed-locale`
    and ncurses reads `TERMINFO` from the environment, so it is the same shape.
    Decide first whether a *glibc* portability tool should own a terminal
    database — §7.3 argues both ways.
-4. **A CA-bundle answer.** Same shape again (`SSL_CERT_FILE`). One compiled-in
+5. **A CA-bundle answer.** Same shape again (`SSL_CERT_FILE`). One compiled-in
    path works on 5 of 11.
-5. **Second machine, second kernel.** Every number here is one machine.
-6. **Sweep depth.** `allyourcodebase/pipewire` was fetched and never read;
+6. **Second machine, second kernel.** Every number here is one machine.
+7. **Sweep depth.** `allyourcodebase/pipewire` was fetched and never read;
    sharun, userland-execve-rust, ppkg and elftool were read at README/file-list
    depth. See `research/prior-art.md` for what that does and does not support.
 
