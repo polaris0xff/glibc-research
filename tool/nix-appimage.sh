@@ -268,12 +268,32 @@ case "$TARGET" in
   [a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9]-*)
     OUTPATH="$TARGET" ;;
   *)
+    # ⭐ THE NIX-FREE ROUTE FIRST, and it is not an optimisation: this line
+    # used to be the ONLY reason `tool/nix-appimage.sh <name>` needed nix
+    # installed. hydra's job API names the derivation AND every output's store
+    # path, and `packages.json` names which output nixpkgs installs by default
+    # -- so the two questions this block asks are both answered over plain
+    # HTTPS. Measured on `kdenlive`, which the local channel's
+    # `nix-instantiate '<nixpkgs>' -A kdenlive` could not resolve at all while
+    # hydra answers `kdenlive-26.08.0` without hesitating.
+    OUTPATH=""
+    _hy=$(sh "$FETCH" drv "$TARGET" 2>/dev/null) || _hy=""
+    if [ -n "$_hy" ]; then
+      _on=$(sh "$FETCH" attr "$TARGET" 2>/dev/null | sed -n 's/^OutputName: //p')
+      for _cand in "$_on" bin out; do
+        [ -n "$_cand" ] || continue
+        OUTPATH=$(printf '%s\n' "$_hy" | sed -n "s|^Out\.$_cand: ||p" | head -1)
+        [ -n "$OUTPATH" ] && break
+      done
+      [ -n "$OUTPATH" ] && say "resolved    $TARGET -> $OUTPATH  (hydra, no nix)"
+    fi
+    if [ -z "$OUTPATH" ]; then
     NIXBIN=""
     for c in nix /nix/var/nix/profiles/default/bin/nix; do
       command -v "$c" >/dev/null 2>&1 && { NIXBIN=$(command -v "$c"); break; }
       [ -x "$c" ] && { NIXBIN="$c"; break; }
     done
-    [ -n "$NIXBIN" ] || die "resolving an ATTRIBUTE needs nix; pass a store path instead" 2
+    [ -n "$NIXBIN" ] || die "no nix here, and no hydra job for '$TARGET'; pass a store path instead" 2
     NIXPFX=$(dirname "$NIXBIN")
     DRV=$("$NIXPFX/nix-instantiate" '<nixpkgs>' --attr "$TARGET" 2>/dev/null | grep '^/nix/store/' | head -1)
     DRV="${DRV%%!*}"
@@ -311,6 +331,7 @@ else:
     OUTPATH=${OUTSEL#* }
     [ -n "$OUTSEL" ] && [ "$OUTNAME" != "$OUTPATH" ] || die "could not find an output path of $DRV"
     [ "$OUTNAME" = out ] || say "output      '$OUTNAME' (nixpkgs put the programs there, not in 'out')"
+    fi
     ;;
 esac
 BASE=$(printf '%s' "$OUTPATH" | sed 's|^/nix/store/||')
@@ -417,6 +438,29 @@ ENTRY=$(resolve_entry "$ROOT/$BASE" "$PROG") || die "no entry point in $BASE/bin
 say "entry       $ENTRY"
 cp -L "$ENTRY" "$APPDIR/shared/bin/$PROG"
 chmod +x "$APPDIR/shared/bin/$PROG"
+
+# ⭐ EVERY OTHER PROGRAM IN THE SAME bin/, TOO, AND THAT IS NOT GENEROSITY.
+# An application is often a set: `pkgforge-dev/kdenlive-AppImage-Enhanced`
+# ships kdenlive, kdenlive_render, melt, ffmpeg, ffprobe and ffplay in one
+# artefact, and a bundle with only the main window cannot render a project or
+# be compared against one that can. The extra programs cost almost nothing --
+# the libraries they share are already in lib/ -- and sharun dispatches on the
+# name it was invoked as, so each needs one hardlink and no other machinery.
+# ⚠ Wrappers are followed the same way the entry point was, and anything that
+# is neither an ELF nor a wrapper (a shell helper, a .hook) is left out rather
+# than copied and left broken.
+NEXTRA=0
+for _b in "$ROOT/$BASE"/bin/*; do
+  [ -f "$_b" ] || continue
+  _n=$(basename "$_b")
+  [ "$_n" = "$PROG" ] && continue
+  _r=$(resolve_entry "$ROOT/$BASE" "$_n" 2>/dev/null) || continue
+  [ -n "$_r" ] || continue
+  cp -L "$_r" "$APPDIR/shared/bin/$_n" 2>/dev/null || continue
+  chmod +x "$APPDIR/shared/bin/$_n"
+  NEXTRA=$((NEXTRA + 1))
+done
+[ "$NEXTRA" -gt 0 ] && say "programs    $PROG + $NEXTRA more from the same bin/"
 
 # ⭐ EVERY SHARED OBJECT IN THE CLOSURE, not the ones ldd happens to name.
 # ⛔ A .so IS A NAME ENDING IN .so OR .so.N -- matching the substring also
@@ -722,12 +766,37 @@ fi
 # ---------------------------------------------------------------------------
 need "$SHARUN_URL" "$CACHE/tools/sharun" || die "could not fetch sharun"
 cp "$CACHE/tools/sharun" "$APPDIR/sharun"
-ln -f "$APPDIR/sharun" "$APPDIR/AppRun" 2>/dev/null || cp "$APPDIR/sharun" "$APPDIR/AppRun"
 # ⭐ THE HARDLINK IS THE MECHANISM, NOT A SHORTCUT. sharun looks at the name it
 # was invoked as and runs shared/bin/<that name>, which is how /proc/self/exe
 # ends up naming the application instead of the loader -- the one thing the
 # plain `ld.so --library-path` AppRun in HOW-TO-MAKE-THESE.md cannot fix.
-ln -f "$APPDIR/sharun" "$APPDIR/bin/$PROG" 2>/dev/null || cp "$APPDIR/sharun" "$APPDIR/bin/$PROG"
+for _p in "$APPDIR"/shared/bin/*; do
+  [ -f "$_p" ] || continue
+  _n=$(basename "$_p")
+  ln -f "$APPDIR/sharun" "$APPDIR/bin/$_n" 2>/dev/null || cp "$APPDIR/sharun" "$APPDIR/bin/$_n"
+done
+
+# ⭐ AN AppRun THAT CAN CHOOSE, modelled on Anylinux-AppImages' own
+# (`useful-tools/AppRun.sh` at da7649b9): if argv0 names a program in bin/ run
+# that; else if the FIRST ARGUMENT names one, run that and drop it; else run
+# the main program. ⛔ Without this an artefact carrying six programs could
+# only ever start one of them, because sharun dispatches on argv0 and an
+# AppImage is always invoked by the image's own name.
+cat > "$APPDIR/AppRun" <<APPRUN
+#!/bin/sh
+# generated by pgb nix appimage -- the selector, after Anylinux's AppRun.sh
+APPDIR="\${APPDIR:-\$(dirname "\$(readlink -f "\$0")")}"
+ARG0="\${ARGV0:-\$0}"; unset ARGV0
+export APPDIR PATH="\$APPDIR/bin:\$PATH"
+if [ -f "\$APPDIR/bin/\${ARG0##*/}" ]; then
+  exec "\$APPDIR/bin/\${ARG0##*/}" "\$@"
+elif [ -n "\$1" ] && [ -f "\$APPDIR/bin/\$1" ]; then
+  _p="\$1"; shift; exec "\$APPDIR/bin/\$_p" "\$@"
+else
+  exec "\$APPDIR/bin/$PROG" "\$@"
+fi
+APPRUN
+chmod +x "$APPDIR/AppRun"
 ( cd "$APPDIR" && ./sharun --gen-lib-path >/dev/null 2>&1 ) || warn "sharun --gen-lib-path failed"
 [ -s "$APPDIR/lib/lib.path" ] && say "lib.path    $(wc -l < "$APPDIR/lib/lib.path") entries"
 

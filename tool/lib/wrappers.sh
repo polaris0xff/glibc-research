@@ -570,6 +570,25 @@ make_wrappers() {
 # pgb compiler wrapper -- generated, readable on purpose.
 # Real compiler: $realpath_
 REAL="$realpath_"
+$( [ "$name" = cpp ] && cat <<'CPPNOTE'
+# ⛔ THE PREPROCESSOR IS A QUERY TOOL AND MUST NOT BE DECORATED.
+# `cpp` never links, and this wrapper used to fall through to `mode=link`
+# because a `cpp foo.c` command line contains no -c, -E or -S. It therefore
+# appended $LF -- the runtime OBJECTS and -Wl, flags -- to a preprocessor
+# invocation. What that produced, measured on libX11 1.8.13, was
+#
+#   pgb-nssfix.o:4:457: warning: null character(s) ignored
+#   configure: error: .../cpp defines unix with or without -undef.
+#                     I don't know what to do.
+#
+# -- an object file being PREPROCESSED, and a configure test about predefined
+# macros answering nonsense. ⚠ $CF is dropped here too, and that is deliberate
+# rather than lazy: `-march=` CHANGES the predefined macro set, which is
+# exactly what a preprocessor probe reads.
+# The same rule the -print-*/--version cases already state, one tool over.
+exec "$REAL" "$@"
+CPPNOTE
+)
 CF="$cf"
 LF="$lf"
 BL="$bl"

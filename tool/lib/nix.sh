@@ -651,9 +651,20 @@ PY
   return 0
 }
 
+# ⛔ THE PER-DEPENDENCY DIRECTORIES ARE KEYED ON THE PREFIX, NOT ON THE NAME
+# ALONE, AND THAT IS T-058 ARRIVING IN `pgb nix`. Two `pgb nix deps` runs with
+# DIFFERENT $NIX_PREFIX -- one building nix's closure, one building Qt's X
+# stack -- shared `$PGB_STATE/nix-deps/openssl` and
+# `$PGB_STATE/plans/dep-openssl.json`. What it produced was not an error: one
+# run's openssl tree was rebuilt under the other's feet and the second failed
+# compiling a DEMO with `#include <openssl/err.h>: No such file`, which reads
+# like a broken tarball. Measured here, live, on 2026-09-01e.
+nix_dep_key() { printf '%s' "$NIX_PREFIX" | cksum | cut -d' ' -f1; }
+
 nix_build_dep() {   # drv shortname depth
-  _bd_plan="$PGB_STATE/plans/dep-$2.json"
-  mkdir -p "$PGB_STATE/plans"
+  _bd_k=$(nix_dep_key)
+  _bd_plan="$PGB_STATE/plans/$_bd_k/dep-$2.json"
+  mkdir -p "$PGB_STATE/plans/$_bd_k"
   if [ ! -s "$_bd_plan" ]; then
     # ⭐ THE DEPENDENCY'S OWN .drv IS ALREADY IN THE PARENT'S PLAN, so planning
     # it needs no evaluation and therefore no nix. This used to open with
@@ -684,8 +695,13 @@ nix_build_dep() {   # drv shortname depth
   # nix-deps/linux-pam, and BUILT LIBCAP INTO PAM'S DIRECTORY -- so
   # nix-deps/libcap/build.log was full of pam link errors and named a failure
   # that belonged to another package.
-  _bd_plan="$PGB_STATE/plans/dep-$2.json"
-  _bd_work="$PGB_STATE/nix-deps/$2"
+  # ⚠ RECOMPUTED WITH THE REST OF THEM. `_bd_k` is a `_bd_*` local like every
+  # other one here and the recursion above reassigns it; $NIX_PREFIX does not
+  # change, so the value is the same, but reading a clobbered variable that
+  # happens to hold the right thing is how the libcap/pam bug above worked.
+  _bd_k=$(nix_dep_key)
+  _bd_plan="$PGB_STATE/plans/$_bd_k/dep-$2.json"
+  _bd_work="$PGB_STATE/nix-deps/$_bd_k/$2"
   mkdir -p "$_bd_work/dl" "$_bd_work/build"
   _bd_src=$(nix_fetch_plan "$_bd_plan" "$_bd_work/dl") || {
     warn "dep FAILED  $2 -- its source could not be fetched"; return 1; }
@@ -911,7 +927,15 @@ nix_try_build() {   # srcdir flags log hooks [install]
 
   # ⭐ THE STATIC PREFIX IS ON THE SEARCH PATHS, and pkg-config is pointed at
   # it, so a dependency built by the step above is the one configure finds.
-  _envset="CPPFLAGS=\"-I$NIX_PREFIX/include \${CPPFLAGS:-}\" LDFLAGS=\"-L$NIX_PREFIX/lib \${LDFLAGS:-}\" PKG_CONFIG_PATH=\"$NIX_PREFIX/lib/pkgconfig\" PATH=\"$NIX_PREFIX/bin:\$PATH\""
+  # ⛔ `share/pkgconfig` IS NOT AN EXOTIC LOCATION, IT IS WHERE EVERY
+  # ARCHITECTURE-INDEPENDENT PACKAGE PUTS ITS .pc FILE. xcb-proto, xorgproto,
+  # xtrans, xkeyboard-config and wayland-protocols all install there, and with
+  # only lib/pkgconfig on the path libxcb's configure ended with
+  #   Package 'xcb-proto', required by 'virtual:world', not found
+  # for a package that had just been built and installed one directory over.
+  # That one missing path took out the whole X stack: libxcb, and then every
+  # xcb-util-* that depends on it, and then qtbase's -xcb.
+  _envset="CPPFLAGS=\"-I$NIX_PREFIX/include \${CPPFLAGS:-}\" LDFLAGS=\"-L$NIX_PREFIX/lib \${LDFLAGS:-}\" PKG_CONFIG_PATH=\"$NIX_PREFIX/lib/pkgconfig:$NIX_PREFIX/share/pkgconfig\" PATH=\"$NIX_PREFIX/bin:\$PATH\""
   _instcmd=""
   [ -n "$_in" ] && _instcmd="&& make install"
 
@@ -969,7 +993,7 @@ nix_try_build() {   # srcdir flags log hooks [install]
             elif [ -x ./configure ] && grep -q oconfigure ./configure 2>/dev/null; then
               ./configure PREFIX=$NIX_PREFIX $_fl && make -j $_j $_instcmd;
             elif [ -x ./configure ]; then ./configure --prefix=$NIX_PREFIX --disable-shared --enable-static $_fl && make -j $_j $_instcmd;
-            elif [ -x ./config ] && [ -f ./Configure ]; then ./config no-shared no-tests --prefix=$NIX_PREFIX --openssldir=$NIX_PREFIX/ssl && make -j $_j $_instcmd;
+            elif [ -x ./config ] && [ -f ./Configure ]; then ./config no-shared no-tests --prefix=$NIX_PREFIX --openssldir=$NIX_PREFIX/ssl && make -j $_j build_sw ${_in:+&& make install_sw};
             else $_mk$_mki; fi" ;;
   esac
 

@@ -113,9 +113,12 @@ poc_check "a plan for qtbase was produced" \
 [ -s "$QTPLAN" ] || poc_finish
 
 # What the xcb QPA plugin actually needs, plus TLS for QtNetwork.
+# ⚠ libxml2 is on the list because libxkbcommon's meson REQUIRES it -- it
+# parses xkeyboard-config's XML rulesets -- and leaving it off produced
+# `Dependency "libxml-2.0" not found` on a package nothing else here needs.
 QT_KEEP="libxcb libxcb-util libxcb-image libxcb-keysyms libxcb-render-util \
 libxcb-wm libxcb-cursor libxdmcp libxau libx11 libxext libxrender libxi \
-libxkbcommon openssl xorgproto xcb-proto"
+libxfixes libxkbcommon libxml2 openssl xorgproto xcb-proto"
 SKIP=$(QT_KEEP="$QT_KEEP" QTPLAN="$QTPLAN" python3 "$POC_DIR/skiplist.py")
 poc_note "keeping: $QT_KEEP"
 poc_note "skipping $(printf '%s\n' $SKIP | grep -c .) of qtbase's build inputs"
