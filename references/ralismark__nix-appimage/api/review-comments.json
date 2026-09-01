@@ -1,0 +1,140 @@
+[
+ {
+  "url": "https://api.github.com/repos/ralismark/nix-appimage/pulls/comments/1435815688",
+  "pull_request_review_id": 1795564991,
+  "id": 1435815688,
+  "node_id": "PRRC_kwDOHx8eLM5VlM8I",
+  "diff_hunk": "@@ -91,6 +95,12 @@\n               \"mountroot d 777 0 0\" # TODO permissions?\n             ];\n             extra-args = pkgs.lib.concatMapStrings (x: \" -p \\\"${x}\\\"\") extras;\n+            exclude-args =\n+              let\n+                exclude-prefix = pkgs.lib.lists.optional (exclude != []) \" -wildcards -e\";\n+                exclude-entries = map (x: \" \\\"${x}\\\"\") exclude;\n+              in\n+                pkgs.lib.strings.concatStrings (exclude-prefix ++ exclude-entries);",
+  "path": "flake.nix",
+  "commit_id": "7a27a6c68918bd2d133e1cb8797937e11d9cb98c",
+  "original_commit_id": "ecaffbe33535509cadb198f142849295f4dfeca4",
+  "user": {
+   "login": "ralismark",
+   "id": 13449732,
+   "node_id": "MDQ6VXNlcjEzNDQ5NzMy",
+   "avatar_url": "https://avatars.githubusercontent.com/u/13449732?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/ralismark",
+   "html_url": "https://github.com/ralismark",
+   "followers_url": "https://api.github.com/users/ralismark/followers",
+   "following_url": "https://api.github.com/users/ralismark/following{/other_user}",
+   "gists_url": "https://api.github.com/users/ralismark/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/ralismark/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/ralismark/subscriptions",
+   "organizations_url": "https://api.github.com/users/ralismark/orgs",
+   "repos_url": "https://api.github.com/users/ralismark/repos",
+   "events_url": "https://api.github.com/users/ralismark/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/ralismark/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "```suggestion\r\n            exclude-args = pkgs.lib.optional (exclude != []) \" -wildcards -e ${pkgs.lib.escapeShellArgs exclude}\";\r\n```\r\n\r\nThis is more robust than just wrapping each argument in quotes.\r\n\r\n(also apologies for the delay)",
+  "created_at": "2023-12-24T12:18:23Z",
+  "updated_at": "2023-12-24T12:19:14Z",
+  "html_url": "https://github.com/ralismark/nix-appimage/pull/9#discussion_r1435815688",
+  "pull_request_url": "https://api.github.com/repos/ralismark/nix-appimage/pulls/9",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/ralismark/nix-appimage/pulls/comments/1435815688"
+   },
+   "html": {
+    "href": "https://github.com/ralismark/nix-appimage/pull/9#discussion_r1435815688"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/ralismark/nix-appimage/pulls/9"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/ralismark/nix-appimage/pulls/comments/1435815688/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": 98,
+  "start_side": "RIGHT",
+  "line": null,
+  "original_line": 103,
+  "side": "RIGHT",
+  "author_association": "OWNER",
+  "original_position": 22,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/ralismark/nix-appimage/pulls/comments/2203410700",
+  "pull_request_review_id": 3014181852,
+  "id": 2203410700,
+  "node_id": "PRRC_kwDOHx8eLM6DVWEM",
+  "diff_hunk": "@@ -0,0 +1,70 @@\n+#!/bin/sh\n+set -eu\n+\n+program=$1\n+mkdir extras\n+\n+# get the derivation's root directory\n+\n+IFS=/ read -r _ nix store hash rest <<EOF\n+$program\n+EOF\n+\n+if [ \"$nix\" != nix ] || [ \"$store\" != store ]; then\n+\techo \"entrypoint '${program}' is not in the nix store\" >&2\n+\texit 1\n+fi\n+\n+drv=\"/nix/store/$hash\"\n+\n+# find desktop file\n+\n+desktop=\n+\n+# try find one whose Exec= matches $program\n+for d in \"$drv/share/applications/\"*.desktop; do\n+\tif ! [ -e \"$d\" ]; then\n+\t\t# if we don't match any files then it's whatever\n+\t\tbreak\n+\tfi\n+\n+\tif sed -nEe '/^Exec=/{ s/^Exec= *([^ ]*).*$/\\1/; s#.*/##; p }' \"$d\" |\n+\t\tgrep --fixed-strings --line-regexp --quiet \"$(basename \"$program\")\"\n+\tthen\n+\t\tif [ -z \"$desktop\" ]; then\n+\t\t\tdesktop=$d\n+\t\telse\n+\t\t\techo \"multiple .desktop entries found; giving up\" >&2\n+\t\t\texit\n+\t\tfi\n+\tfi\n+done\n+\n+if [ -z \"$desktop\" ]; then\n+\techo \"no .desktop found; giving up\" >&2\n+\texit\n+fi\n+\n+# copy desktop file and icons\n+\n+cp -L \"$desktop\" extras/\n+if [ -e \"$drv/share/icons/hicolor\" ]; then\n+\tmkdir -p extras/usr/share/icons\n+\tcp -Lr --no-preserve=all \"$drv/share/icons/hicolor\" extras/usr/share/icons\n+fi\n+\n+# create DirIcon\n+\n+grep ^Icon= \"$desktop\" | while IFS=\"=\" read -r _ icon; do\n+\tfor size in 128x128 64x64 scalable; do",
+  "path": "extra-files.sh",
+  "commit_id": "7971c26051ed3e0a24d50842991843c925d2cc41",
+  "original_commit_id": "f63a1ff8d57cf7eeea516af9fe67c67f0ea8c3d5",
+  "user": {
+   "login": "kainctl",
+   "id": 195349592,
+   "node_id": "U_kgDOC6TMWA",
+   "avatar_url": "https://avatars.githubusercontent.com/u/195349592?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/kainctl",
+   "html_url": "https://github.com/kainctl",
+   "followers_url": "https://api.github.com/users/kainctl/followers",
+   "following_url": "https://api.github.com/users/kainctl/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kainctl/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/kainctl/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kainctl/subscriptions",
+   "organizations_url": "https://api.github.com/users/kainctl/orgs",
+   "repos_url": "https://api.github.com/users/kainctl/repos",
+   "events_url": "https://api.github.com/users/kainctl/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/kainctl/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Hey, I tried this out when you first created the PR and bounced off since it didn't work for me and I had no time to check it in-depth.\r\n\r\nTurns out, I think the issue is fairly easy to fix. This should also include `256x256` as per your comment below, as this is the expected output size for `.DirIcon`. As I only have 256x256 and above, it didn't work for me otherwise.\r\n",
+  "created_at": "2025-07-13T14:32:40Z",
+  "updated_at": "2025-07-13T14:32:40Z",
+  "html_url": "https://github.com/ralismark/nix-appimage/pull/26#discussion_r2203410700",
+  "pull_request_url": "https://api.github.com/repos/ralismark/nix-appimage/pulls/26",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/ralismark/nix-appimage/pulls/comments/2203410700"
+   },
+   "html": {
+    "href": "https://github.com/ralismark/nix-appimage/pull/26#discussion_r2203410700"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/ralismark/nix-appimage/pulls/26"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/ralismark/nix-appimage/pulls/comments/2203410700/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 59,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 59,
+  "position": 1,
+  "subject_type": "line"
+ }
+]

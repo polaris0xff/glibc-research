@@ -1,0 +1,12 @@
+[
+ {
+  "name": "bwrap",
+  "zipball_url": "https://api.github.com/repos/pkgforge/nix-appimage/zipball/refs/tags/bwrap",
+  "tarball_url": "https://api.github.com/repos/pkgforge/nix-appimage/tarball/refs/tags/bwrap",
+  "commit": {
+   "sha": "a67ede8840e7b1510fddc4621330207a42809896",
+   "url": "https://api.github.com/repos/pkgforge/nix-appimage/commits/a67ede8840e7b1510fddc4621330207a42809896"
+  },
+  "node_id": "REF_kwDONMqLiK9yZWZzL3RhZ3MvYndyYXA"
+ }
+]

@@ -1,0 +1,55 @@
+name: CI
+
+# This repo produces the file a user actually downloads, and it had no
+# automated gate at all. `nix build` succeeding says an AppImage was created;
+# it says nothing about whether the program inside it starts on a machine that
+# is not the build host — which is the only thing an AppImage is for. The ways
+# it breaks are silent: a payload copied with a glob that skips the launcher's
+# hidden companion ELF, a missing library directory, an interpreter path that
+# does not exist on the target distro. All of those still build, still extract,
+# and only fail in a user's hands.
+#
+# tests/smoke.sh builds two tiny AppImages (one plain binary, one launcher +
+# companion), asserts the payload contract inside the extracted AppDir, and
+# then RUNS each of them in ubuntu and fedora containers.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  smoke:
+    name: appimage contract (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # x86_64 and aarch64 carry DIFFERENT psABI loader paths
+        # (/lib64/ld-linux-x86-64.so.2 vs /lib/ld-linux-aarch64.so.1), and they
+        # come from different AppImage runtime binaries too. A single-arch job
+        # would miss exactly the failure this bump is about, so run both.
+        os: [ubuntu-latest, ubuntu-24.04-arm]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - uses: cachix/cachix-action@v15
+        with:
+          name: logos-co
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        continue-on-error: true   # a fork without the secret still gets to run
+
+      - name: AppImage contract + cross-distro run
+        env:
+          # Pin tags so a moving :latest cannot invent unrelated failures.
+          # Override locally with SMOKE_DISTROS if you want something else.
+          SMOKE_DISTROS: ubuntu:24.04 fedora:42
+        run: |
+          nix shell nixpkgs#patchelf nixpkgs#binutils \
+            -c bash tests/smoke.sh .

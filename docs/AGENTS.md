@@ -5,6 +5,31 @@ in this tree that you can re-run.
 
 ---
 
+## 0. Read these, in this order, then you have everything
+
+⛔ **Six files. Nothing crucial lives outside them.** Each links onward; §11 is
+the full map.
+
+| # | read | why you cannot skip it |
+|---|---|---|
+| 1 | **this file** | the state, the mechanisms, the open problems, the rules |
+| 2 | [`../TODO/PROGRESS.md`](../TODO/PROGRESS.md) | ⭐ **what to do next.** The work order and the open questions live here and nowhere else |
+| 3 | [`../TODO/INDEX.md`](../TODO/INDEX.md) | every entry, and the argument behind the ordering |
+| 4 | [`../TODO/RULES.md`](../TODO/RULES.md) | ⛔ how this repository is worked on — git, the record, no deferral |
+| 5 | [`REQUIREMENTS.md`](REQUIREMENTS.md) | the operator's binding bar, which is **not met** |
+| 6 | [`design/toolchain.md`](design/toolchain.md) | ⭐ what `pgb` is (a toolchain, not a format) and where it is going |
+
+⚠ **Then, before you write an experiment or read somebody else's code**, the
+methodology binding on that work: [`methodology/experiments.md`](methodology/experiments.md),
+[`methodology/references.md`](methodology/references.md),
+[`methodology/vendoring.md`](methodology/vendoring.md). They are vendored, and
+`methodology/PROVENANCE.md` says at which commit.
+
+⭐ **`sh TODO/check.sh` is the gate.** Run it before every commit; it fails if
+the record disagrees with itself.
+
+---
+
 ## 1. The project
 
 Answer, with evidence, whether a **normal Linux ELF** built against glibc can
@@ -134,6 +159,9 @@ scripts/build-libiconv.sh GNU libiconv 1.18, pinned
 experiments/lib.sh        conditions block, assertions, pid-attributed tracing
 experiments/NN-*.sh       numbered; exit 0 matched, 1 did not, 2 could not run
 docs/REQUIREMENTS.md      the operator's acceptance bar, and how far short it is
+docs/methodology/         vendored, pinned; binding on experiments and sweeps
+TODO/                     the work: PROGRESS, INDEX, RULES, per-category entries
+TODO/check.sh             the gate; run before every commit
 poc/common.sh             the POC contract
 poc/NN-*/run.sh           the five proof-of-concept projects
 evidence/                 committed RESULT.txt per experiment and POC
@@ -290,6 +318,10 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 | [`research/prior-art.md`](research/prior-art.md) | the reference sweep, verdicts, provenance |
 | [`design/tiers.md`](design/tiers.md) | ⛔ **design only, nothing built.** The tiered-output plan for the host-plugin class, and what "universal" can honestly mean |
 | [`history/corrections.md`](history/corrections.md) | ⚠ claims measured wrong, instrument defects, evaluated approaches. **Read on demand, not to orient.** ⭐ This is where superseded findings live — keep them out of the pages above |
+| [`research/nix-appimage.md`](research/nix-appimage.md) | ⭐ the sweep of `nix bundle` and friends: why a bundler ends up shipping a container, in the maintainers' own words |
+| [`methodology/`](methodology/) | vendored from `Azathothas/TEMPLATE`, pinned. Binding on experiments, sweeps and vendoring |
+| [`../TODO/`](../TODO/) | ⭐ **the work.** `PROGRESS.md` the record, `INDEX.md` the entries, `RULES.md` how to work, `check.sh` the gate |
+| [`../tmp/START.md`](../tmp/START.md) | the original brief. Read it when a decision turns on what was actually asked for |
 
 ## 12. Provenance
 

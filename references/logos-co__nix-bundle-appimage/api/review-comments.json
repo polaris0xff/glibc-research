@@ -1,0 +1,695 @@
+[
+ {
+  "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/2963191584",
+  "pull_request_review_id": 3978507911,
+  "id": 2963191584,
+  "node_id": "PRRC_kwDORYqjx86wnrcg",
+  "diff_hunk": "@@ -2,14 +2,15 @@\n   description = \"Bundle Nix derivations into AppImages\";\n \n   inputs = {\n-    nixpkgs.url = \"github:NixOS/nixpkgs/nixos-unstable\";\n+    logos-nix.url = \"github:logos-co/logos-nix\";\n+    nixpkgs.follows = \"logos-nix/nixpkgs\";\n     nix-bundle-dir = {\n       url = \"github:logos-co/nix-bundle-dir\";\n       inputs.nixpkgs.follows = \"nixpkgs\";",
+  "path": "flake.nix",
+  "commit_id": "e34950221af6980f7ba4881c08bc91b9c6ff7ee6",
+  "original_commit_id": "e34950221af6980f7ba4881c08bc91b9c6ff7ee6",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "`nix-bundle-dir` now brings in its own `logos-nix` input (see flake.lock), which isn\u2019t being overridden here. This causes duplicate `logos-nix`/`nixpkgs` instances and can lead to inconsistent package sets and larger closures. Consider adding `inputs.logos-nix.follows = \"logos-nix\";` under the `nix-bundle-dir` input (or otherwise wiring it to the same `logos-nix`/`nixpkgs`), then regenerate `flake.lock`.\n```suggestion\n      inputs.nixpkgs.follows = \"nixpkgs\";\n      inputs.logos-nix.follows = \"logos-nix\";\n```",
+  "created_at": "2026-03-19T23:08:32Z",
+  "updated_at": "2026-03-19T23:08:32Z",
+  "html_url": "https://github.com/logos-co/nix-bundle-appimage/pull/2#discussion_r2963191584",
+  "pull_request_url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/2",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/2963191584"
+   },
+   "html": {
+    "href": "https://github.com/logos-co/nix-bundle-appimage/pull/2#discussion_r2963191584"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/2"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/2963191584/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 9,
+  "original_line": 9,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 9,
+  "position": 9,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3100452576",
+  "pull_request_review_id": 4128964045,
+  "id": 3100452576,
+  "node_id": "PRRC_kwDORYqjx864zSbg",
+  "diff_hunk": "@@ -83,8 +83,15 @@ exec \"$APPDIR/usr/bin/${execBasename}\" \"$@\"\n EOF\n     chmod +x AppDir/AppRun\n \n-    # Build AppImage: create squashfs with gzip (broad compatibility), then concatenate with runtime\n-    mksquashfs AppDir appimage.squashfs -root-owned -noappend -comp gzip\n+    # Build AppImage: create squashfs with zstd, then concatenate with runtime.\n+    # zstd decompresses ~5-10x faster than gzip at similar compression ratios,\n+    # which matters because the AppImage runtime FUSE-mounts the squashfs and\n+    # decompresses blocks on every page fault during app startup. Larger blocks\n+    # (-b 256K) compress better and reduce per-block FUSE overhead; zstd handles\n+    # them efficiently. The type2-runtime pinned in fetchAppImageRuntime.nix\n+    # supports zstd natively.\n+    mksquashfs AppDir appimage.squashfs -root-owned -noappend \\\n+      -comp zstd -Xcompression-level 19 -b 256K",
+  "path": "mkAppImage.nix",
+  "commit_id": "f3a8d9bea8aa79877e12933160c4ae4fa3cb09c8",
+  "original_commit_id": "f3a8d9bea8aa79877e12933160c4ae4fa3cb09c8",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "`-Xcompression-level 19` is a very expensive zstd setting (notably higher CPU time and often much higher memory during `mksquashfs`). Since this library is used as a general bundler (see flake outputs), hard-coding the maximum level may cause unexpectedly slow/fragile builds in CI and for users. Consider making the compression level (and possibly block size) configurable with sensible defaults, or using a more moderate default level and allowing callers to override when they explicitly want the extra ratio.",
+  "created_at": "2026-04-17T13:00:13Z",
+  "updated_at": "2026-04-17T13:00:14Z",
+  "html_url": "https://github.com/logos-co/nix-bundle-appimage/pull/3#discussion_r3100452576",
+  "pull_request_url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/3",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3100452576"
+   },
+   "html": {
+    "href": "https://github.com/logos-co/nix-bundle-appimage/pull/3#discussion_r3100452576"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/3"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3100452576/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": 93,
+  "start_side": "RIGHT",
+  "line": null,
+  "original_line": 94,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 14,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3101473720",
+  "pull_request_review_id": 4130113131,
+  "id": 3101473720,
+  "node_id": "PRRC_kwDORYqjx8643Lu4",
+  "diff_hunk": "@@ -83,12 +83,15 @@ exec \"$APPDIR/usr/bin/${execBasename}\" \"$@\"\n EOF\n     chmod +x AppDir/AppRun\n \n-    # Build AppImage: create squashfs with zstd, then concatenate with runtime.\n-    # zstd decompresses ~5-10x faster than gzip, which matters because the\n-    # AppImage runtime FUSE-mounts the squashfs and decompresses blocks on\n-    # every page fault during app startup. The type2-runtime pinned in\n-    # fetchAppImageRuntime.nix supports zstd natively.\n-    mksquashfs AppDir appimage.squashfs -root-owned -noappend -comp zstd\n+    # Build AppImage: create uncompressed squashfs, then concatenate with runtime.\n+    # The AppImage runtime FUSE-mounts the squashfs and reads blocks on every\n+    # page fault during app startup. Any compressor (gzip, zstd, etc.) means\n+    # every dlopen of a Qt library or plugin pays CPU decompression cost on the\n+    # cold launch, which adds up to minutes for large Qt apps. Disabling all\n+    # four compression layers (-noI inode, -noD data, -noF fragment, -noX xattr)\n+    # trades AppImage size for near-native launch performance.\n+    mksquashfs AppDir appimage.squashfs -root-owned -noappend \\\n+      -noI -noD -noF -noX",
+  "path": "mkAppImage.nix",
+  "commit_id": "7cd5b35319c5b7bc88e0228fdeae4d7042ac0ee0",
+  "original_commit_id": "7cd5b35319c5b7bc88e0228fdeae4d7042ac0ee0",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "This changes mkAppImage\u2019s output characteristics (size/compatibility tradeoff) for all downstream consumers, since mkAppImage is exported as a library function. Consider making the squashfs compression behavior configurable (e.g., a boolean/arg list with the previous gzip-compressed behavior as the default) so callers can opt into the uncompressed fast-startup mode without a breaking default change.",
+  "created_at": "2026-04-17T15:34:30Z",
+  "updated_at": "2026-04-17T15:34:31Z",
+  "html_url": "https://github.com/logos-co/nix-bundle-appimage/pull/4#discussion_r3101473720",
+  "pull_request_url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/4",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3101473720"
+   },
+   "html": {
+    "href": "https://github.com/logos-co/nix-bundle-appimage/pull/4#discussion_r3101473720"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/4"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3101473720/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": 86,
+  "original_start_line": 86,
+  "start_side": "RIGHT",
+  "line": 94,
+  "original_line": 94,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 18,
+  "position": 18,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708228952",
+  "pull_request_review_id": 4849171544,
+  "id": 3708228952,
+  "node_id": "PRRC_kwDORYqjx87dBxVY",
+  "diff_hunk": "@@ -0,0 +1,263 @@\n+#!/usr/bin/env bash\n+# Smoke test for the AppImage packaging contract.\n+#\n+# `nix build` proves an AppImage was produced; it proves nothing about whether\n+# the thing inside it can start on someone else's machine, which is the only\n+# reason this repo exists. Everything asserted below is a way that has broken,\n+# or could break invisibly:\n+#\n+#   * the payload is copied with `cp -a ${bundle}/bin/. AppDir/usr/bin/`, and\n+#     `cp -a src/.` vs `cp -a src/*` differ on dotfiles. nix-bundle-dir puts\n+#     the real ELF beside a launcher as `.<name>.elf`, so getting that wrong\n+#     ships an AppImage whose launcher execs a file that is not there \u2014 and it\n+#     still builds, and `--appimage-extract` still succeeds.\n+#   * AppRun does `exec \"$APPDIR/usr/bin/<exec>\"`, which has to work whether\n+#     that entry is a plain binary or a launcher script. Both shapes exist,\n+#     so both are built here.\n+#   * the interpreter baked into the payload is what decides whether the\n+#     AppImage runs on a distro other than the build host. It is per-arch\n+#     (see PSABI below) and a wrong one is invisible until a user reports it.\n+#\n+# Two subjects, deliberately tiny, one per bundle shape:\n+#   hello        via qtCliApp -- plain binaries in bin/, no launcher\n+#   xkbcli       via qtApp    -- libxkbcommon in the closure pulls in the\n+#                               xkeyboard-config data, which is what makes\n+#                               nix-bundle-dir emit a launcher + companion ELF\n+#\n+# Usage:  tests/smoke.sh [flake-ref]     (default: the checkout, \".\")\n+set -uo pipefail\n+\n+FLAKE=\"${1:-.}\"\n+# Absolutise a local flake ref BEFORE cd-ing into the scratch dir, or `.` would\n+# resolve to the scratch dir and nix would report \"could not find a flake.nix\".\n+# A ref containing ':' is a URL (github:, git+https:, path:) and is left alone.\n+case \"$FLAKE\" in\n+  *:*) ;;\n+  *)   FLAKE=\"$(cd \"$FLAKE\" 2>/dev/null && pwd)\" || { echo \"smoke: no such flake dir: ${1:-.}\" >&2; exit 1; }\n+       FLAKE=\"path:$FLAKE\" ;;\n+esac\n+export SMOKE_FLAKE=\"$FLAKE\"\n+\n+WORK=\"$(mktemp -d)\"\n+trap 'chmod -R u+w \"$WORK\" 2>/dev/null; rm -rf \"$WORK\"' EXIT\n+cd \"$WORK\"\n+\n+pass=0; fail=0\n+ok()   { printf '  \\033[32mok\\033[0m   %s\\n' \"$1\"; pass=$((pass+1)); }\n+bad()  { printf '  \\033[31mFAIL\\033[0m %s\\n' \"$1\"; [ -n \"${2:-}\" ] && printf '         %s\\n' \"$2\"; fail=$((fail+1)); }\n+check(){ if eval \"$2\" >/dev/null 2>&1; then ok \"$1\"; else bad \"$1\" \"${3:-}\"; fi; }\n+\n+# The loader path this architecture's psABI mandates. Deliberately not a single\n+# prefix: /lib64/ld-linux-aarch64.so.1 does not exist on current Fedora or\n+# openSUSE, so \"just use /lib64\" breaks arm64.\n+#\n+# Note this one assertion only discriminates on x86_64. The bundler used to set\n+# /lib/<loader>, which is wrong on x86_64 (Fedora keeps the 64-bit loader in\n+# /lib64) but happens to be exactly right on aarch64 -- so on arm it passed\n+# before the fix too. The DT_RPATH, shim and trampoline assertions below are\n+# what carry the arm job.\n+case \"$(uname -m)\" in\n+  x86_64)  PSABI=/lib64/ld-linux-x86-64.so.2 ;;\n+  aarch64) PSABI=/lib/ld-linux-aarch64.so.1  ;;\n+  *) echo \"smoke: unsupported arch $(uname -m); nothing to assert\"; exit 0 ;;\n+esac\n+\n+interp()   { patchelf --print-interpreter \"$1\" 2>/dev/null; }\n+have_tag() { readelf -d \"$1\" 2>/dev/null | grep -q \"($2)\"; }\n+\n+# ---------------------------------------------------------------------------\n+# Subjects. Kept here rather than in a committed test flake so this script\n+# stays runnable against any flake ref, local or remote, with no second lock\n+# file to drift. Each is a tiny derivation carrying the .desktop file and icon\n+# that the bundlers discover.\n+# ---------------------------------------------------------------------------\n+cat > subjects.nix <<'NIX'\n+{ pkgs }:\n+\n+let\n+  # 1x1 PNG. Nothing reads it; the bundler only needs an icon to exist.\n+  icon = pkgs.runCommand \"smoke-icon.png\" { } ''\n+    printf '%s' iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg== \\\n+      | base64 -d > $out\n+  '';\n+\n+  desktop = name: exe: pkgs.writeText \"${name}.desktop\" ''\n+    [Desktop Entry]\n+    Type=Application\n+    Name=${name}\n+    Exec=${exe}\n+    Icon=${name}\n+    Categories=Utility;\n+  '';\n+\n+  # Copy (not symlink) the one binary we care about: the bundler walks bin/,\n+  # and this keeps the subject to a single executable and its closure.\n+  mkSubject = { name, from, exe }: pkgs.runCommand name { } ''\n+    mkdir -p $out/bin $out/share/applications $out/share/icons/hicolor/256x256/apps\n+    cp ${from}/bin/${exe} $out/bin/${exe}\n+    chmod u+w $out/bin/${exe}\n+    cp ${desktop name exe} $out/share/applications/${name}.desktop\n+    cp ${icon} $out/share/icons/hicolor/256x256/apps/${name}.png\n+  '';\n+in\n+{\n+  cli = mkSubject { name = \"smokecli\"; from = pkgs.hello;         exe = \"hello\";  };\n+  gui = mkSubject { name = \"smokegui\"; from = pkgs.libxkbcommon;  exe = \"xkbcli\"; };\n+}\n+NIX\n+\n+cat > build.nix <<'NIX'\n+let\n+  flake  = builtins.getFlake (builtins.getEnv \"SMOKE_FLAKE\");\n+  system = builtins.currentSystem;\n+  pkgs   = flake.inputs.nixpkgs.legacyPackages.${system};\n+  subjects = import ./subjects.nix { inherit pkgs; };\n+in\n+{\n+  cli = flake.bundlers.${system}.qtCliApp subjects.cli;\n+  gui = flake.bundlers.${system}.qtApp    subjects.gui;\n+}\n+NIX\n+\n+echo \"== building AppImages with $FLAKE ==\"\n+built_cli=0; built_gui=0\n+nix build --impure -f build.nix cli -o out-cli && built_cli=1\n+nix build --impure -f build.nix gui -o out-gui && built_gui=1\n+\n+# Extract each AppImage with its own runtime (no FUSE needed) and assert the\n+# payload, then run it. --appimage-extract always lands in ./squashfs-root.\n+extract() {  # extract <appimage> <destdir>\n+  rm -rf \"$2\"; mkdir -p \"$2\"\n+  ( cd \"$2\" && \"$1\" --appimage-extract >/dev/null 2>&1 ) && [ -d \"$2/squashfs-root\" ]\n+}\n+\n+CLI_IMG=\"\"; GUI_IMG=\"\"\n+[ \"$built_cli\" = 1 ] && CLI_IMG=\"$(echo \"$(readlink -f out-cli)\"/*.AppImage)\"\n+[ \"$built_gui\" = 1 ] && GUI_IMG=\"$(echo \"$(readlink -f out-gui)\"/*.AppImage)\"\n+\n+echo\n+echo \"== the artifact is a single self-contained AppImage ==\"\n+for pair in \"cli:$CLI_IMG\" \"gui:$GUI_IMG\"; do\n+  tag=\"${pair%%:*}\"; img=\"${pair#*:}\"\n+  if [ -z \"$img\" ]; then bad \"$tag: AppImage built\"; continue; fi\n+  ok \"$tag: AppImage built\"\n+  check \"$tag: one executable file, $(basename \"$img\")\" \"[ -x '$img' ] && [ -f '$img' ]\"\n+  # ELF magic, then 'AI' + type 2 at offset 8 -- the AppImage magic bytes.",
+  "path": "tests/smoke.sh",
+  "commit_id": "cb56298cf73b622f1524e41c31b42846cb5f9a1c",
+  "original_commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "The script marks \"$tag: AppImage built\" as OK before verifying that the AppImage path actually exists. If the \"*.AppImage\" glob doesn\u2019t match, the variable becomes a literal pattern (non-empty), so this produces a misleading pass followed by later failures.",
+  "created_at": "2026-08-03T22:54:39Z",
+  "updated_at": "2026-08-03T22:54:40Z",
+  "html_url": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708228952",
+  "pull_request_url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708228952"
+   },
+   "html": {
+    "href": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708228952"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708228952/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": 149,
+  "original_start_line": 140,
+  "start_side": "RIGHT",
+  "line": 154,
+  "original_line": 145,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 145,
+  "position": 154,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708228972",
+  "pull_request_review_id": 4849171544,
+  "id": 3708228972,
+  "node_id": "PRRC_kwDORYqjx87dBxVs",
+  "diff_hunk": "@@ -0,0 +1,263 @@\n+#!/usr/bin/env bash\n+# Smoke test for the AppImage packaging contract.\n+#\n+# `nix build` proves an AppImage was produced; it proves nothing about whether\n+# the thing inside it can start on someone else's machine, which is the only\n+# reason this repo exists. Everything asserted below is a way that has broken,\n+# or could break invisibly:\n+#\n+#   * the payload is copied with `cp -a ${bundle}/bin/. AppDir/usr/bin/`, and\n+#     `cp -a src/.` vs `cp -a src/*` differ on dotfiles. nix-bundle-dir puts\n+#     the real ELF beside a launcher as `.<name>.elf`, so getting that wrong\n+#     ships an AppImage whose launcher execs a file that is not there \u2014 and it\n+#     still builds, and `--appimage-extract` still succeeds.\n+#   * AppRun does `exec \"$APPDIR/usr/bin/<exec>\"`, which has to work whether\n+#     that entry is a plain binary or a launcher script. Both shapes exist,\n+#     so both are built here.\n+#   * the interpreter baked into the payload is what decides whether the\n+#     AppImage runs on a distro other than the build host. It is per-arch\n+#     (see PSABI below) and a wrong one is invisible until a user reports it.\n+#\n+# Two subjects, deliberately tiny, one per bundle shape:\n+#   hello        via qtCliApp -- plain binaries in bin/, no launcher\n+#   xkbcli       via qtApp    -- libxkbcommon in the closure pulls in the\n+#                               xkeyboard-config data, which is what makes\n+#                               nix-bundle-dir emit a launcher + companion ELF\n+#\n+# Usage:  tests/smoke.sh [flake-ref]     (default: the checkout, \".\")\n+set -uo pipefail\n+\n+FLAKE=\"${1:-.}\"\n+# Absolutise a local flake ref BEFORE cd-ing into the scratch dir, or `.` would\n+# resolve to the scratch dir and nix would report \"could not find a flake.nix\".\n+# A ref containing ':' is a URL (github:, git+https:, path:) and is left alone.\n+case \"$FLAKE\" in\n+  *:*) ;;\n+  *)   FLAKE=\"$(cd \"$FLAKE\" 2>/dev/null && pwd)\" || { echo \"smoke: no such flake dir: ${1:-.}\" >&2; exit 1; }\n+       FLAKE=\"path:$FLAKE\" ;;\n+esac\n+export SMOKE_FLAKE=\"$FLAKE\"\n+\n+WORK=\"$(mktemp -d)\"\n+trap 'chmod -R u+w \"$WORK\" 2>/dev/null; rm -rf \"$WORK\"' EXIT\n+cd \"$WORK\"\n+\n+pass=0; fail=0\n+ok()   { printf '  \\033[32mok\\033[0m   %s\\n' \"$1\"; pass=$((pass+1)); }\n+bad()  { printf '  \\033[31mFAIL\\033[0m %s\\n' \"$1\"; [ -n \"${2:-}\" ] && printf '         %s\\n' \"$2\"; fail=$((fail+1)); }\n+check(){ if eval \"$2\" >/dev/null 2>&1; then ok \"$1\"; else bad \"$1\" \"${3:-}\"; fi; }\n+\n+# The loader path this architecture's psABI mandates. Deliberately not a single\n+# prefix: /lib64/ld-linux-aarch64.so.1 does not exist on current Fedora or\n+# openSUSE, so \"just use /lib64\" breaks arm64.\n+#\n+# Note this one assertion only discriminates on x86_64. The bundler used to set\n+# /lib/<loader>, which is wrong on x86_64 (Fedora keeps the 64-bit loader in\n+# /lib64) but happens to be exactly right on aarch64 -- so on arm it passed\n+# before the fix too. The DT_RPATH, shim and trampoline assertions below are\n+# what carry the arm job.\n+case \"$(uname -m)\" in\n+  x86_64)  PSABI=/lib64/ld-linux-x86-64.so.2 ;;\n+  aarch64) PSABI=/lib/ld-linux-aarch64.so.1  ;;\n+  *) echo \"smoke: unsupported arch $(uname -m); nothing to assert\"; exit 0 ;;\n+esac\n+\n+interp()   { patchelf --print-interpreter \"$1\" 2>/dev/null; }\n+have_tag() { readelf -d \"$1\" 2>/dev/null | grep -q \"($2)\"; }\n+\n+# ---------------------------------------------------------------------------\n+# Subjects. Kept here rather than in a committed test flake so this script\n+# stays runnable against any flake ref, local or remote, with no second lock\n+# file to drift. Each is a tiny derivation carrying the .desktop file and icon\n+# that the bundlers discover.\n+# ---------------------------------------------------------------------------\n+cat > subjects.nix <<'NIX'\n+{ pkgs }:\n+\n+let\n+  # 1x1 PNG. Nothing reads it; the bundler only needs an icon to exist.\n+  icon = pkgs.runCommand \"smoke-icon.png\" { } ''\n+    printf '%s' iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg== \\\n+      | base64 -d > $out\n+  '';\n+\n+  desktop = name: exe: pkgs.writeText \"${name}.desktop\" ''\n+    [Desktop Entry]\n+    Type=Application\n+    Name=${name}\n+    Exec=${exe}\n+    Icon=${name}\n+    Categories=Utility;\n+  '';\n+\n+  # Copy (not symlink) the one binary we care about: the bundler walks bin/,\n+  # and this keeps the subject to a single executable and its closure.\n+  mkSubject = { name, from, exe }: pkgs.runCommand name { } ''\n+    mkdir -p $out/bin $out/share/applications $out/share/icons/hicolor/256x256/apps\n+    cp ${from}/bin/${exe} $out/bin/${exe}\n+    chmod u+w $out/bin/${exe}\n+    cp ${desktop name exe} $out/share/applications/${name}.desktop\n+    cp ${icon} $out/share/icons/hicolor/256x256/apps/${name}.png\n+  '';\n+in\n+{\n+  cli = mkSubject { name = \"smokecli\"; from = pkgs.hello;         exe = \"hello\";  };\n+  gui = mkSubject { name = \"smokegui\"; from = pkgs.libxkbcommon;  exe = \"xkbcli\"; };\n+}\n+NIX\n+\n+cat > build.nix <<'NIX'\n+let\n+  flake  = builtins.getFlake (builtins.getEnv \"SMOKE_FLAKE\");\n+  system = builtins.currentSystem;\n+  pkgs   = flake.inputs.nixpkgs.legacyPackages.${system};\n+  subjects = import ./subjects.nix { inherit pkgs; };\n+in\n+{\n+  cli = flake.bundlers.${system}.qtCliApp subjects.cli;\n+  gui = flake.bundlers.${system}.qtApp    subjects.gui;\n+}\n+NIX\n+\n+echo \"== building AppImages with $FLAKE ==\"\n+built_cli=0; built_gui=0\n+nix build --impure -f build.nix cli -o out-cli && built_cli=1\n+nix build --impure -f build.nix gui -o out-gui && built_gui=1\n+\n+# Extract each AppImage with its own runtime (no FUSE needed) and assert the\n+# payload, then run it. --appimage-extract always lands in ./squashfs-root.\n+extract() {  # extract <appimage> <destdir>\n+  rm -rf \"$2\"; mkdir -p \"$2\"\n+  ( cd \"$2\" && \"$1\" --appimage-extract >/dev/null 2>&1 ) && [ -d \"$2/squashfs-root\" ]\n+}\n+\n+CLI_IMG=\"\"; GUI_IMG=\"\"\n+[ \"$built_cli\" = 1 ] && CLI_IMG=\"$(echo \"$(readlink -f out-cli)\"/*.AppImage)\"\n+[ \"$built_gui\" = 1 ] && GUI_IMG=\"$(echo \"$(readlink -f out-gui)\"/*.AppImage)\"\n+\n+echo\n+echo \"== the artifact is a single self-contained AppImage ==\"\n+for pair in \"cli:$CLI_IMG\" \"gui:$GUI_IMG\"; do\n+  tag=\"${pair%%:*}\"; img=\"${pair#*:}\"\n+  if [ -z \"$img\" ]; then bad \"$tag: AppImage built\"; continue; fi\n+  ok \"$tag: AppImage built\"\n+  check \"$tag: one executable file, $(basename \"$img\")\" \"[ -x '$img' ] && [ -f '$img' ]\"\n+  # ELF magic, then 'AI' + type 2 at offset 8 -- the AppImage magic bytes.\n+  check \"$tag: carries the type-2 AppImage magic\" \\\n+        \"[ \\\"\\$(od -An -tx1 -j8 -N3 '$img' | tr -d ' ')\\\" = '414902' ]\" \\\n+        \"without it desktop integration and --appimage-* options do not apply\"\n+done\n+\n+[ -n \"$CLI_IMG\" ] && extract \"$CLI_IMG\" ex-cli && C=ex-cli/squashfs-root || C=\"\"\n+[ -n \"$GUI_IMG\" ] && extract \"$GUI_IMG\" ex-gui && G=ex-gui/squashfs-root || G=\"\"\n+\n+echo\n+echo \"== payload: plain path (qtCliApp -> no launcher) ==\"\n+if [ -n \"$C\" ]; then\n+  check \"usr/bin/hello is an ELF, not a script\" \"head -c4 '$C/usr/bin/hello' | grep -q ELF\"",
+  "path": "tests/smoke.sh",
+  "commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "original_commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "This \u201cis an ELF\u201d check only looks for the substring \"ELF\" in the first 4 bytes, which can theoretically pass for non-ELF files that happen to start with those bytes. Since you\u2019re explicitly asserting the ELF magic, compare the full 4-byte header (\\x7fELF) instead.\n\nThis issue also appears on line 181 of the same file.",
+  "created_at": "2026-08-03T22:54:39Z",
+  "updated_at": "2026-08-03T22:54:40Z",
+  "html_url": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708228972",
+  "pull_request_url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708228972"
+   },
+   "html": {
+    "href": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708228972"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708228972/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 157,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 157,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708228992",
+  "pull_request_review_id": 4849171544,
+  "id": 3708228992,
+  "node_id": "PRRC_kwDORYqjx87dBxWA",
+  "diff_hunk": "@@ -0,0 +1,263 @@\n+#!/usr/bin/env bash\n+# Smoke test for the AppImage packaging contract.\n+#\n+# `nix build` proves an AppImage was produced; it proves nothing about whether\n+# the thing inside it can start on someone else's machine, which is the only\n+# reason this repo exists. Everything asserted below is a way that has broken,\n+# or could break invisibly:\n+#\n+#   * the payload is copied with `cp -a ${bundle}/bin/. AppDir/usr/bin/`, and\n+#     `cp -a src/.` vs `cp -a src/*` differ on dotfiles. nix-bundle-dir puts\n+#     the real ELF beside a launcher as `.<name>.elf`, so getting that wrong\n+#     ships an AppImage whose launcher execs a file that is not there \u2014 and it\n+#     still builds, and `--appimage-extract` still succeeds.\n+#   * AppRun does `exec \"$APPDIR/usr/bin/<exec>\"`, which has to work whether\n+#     that entry is a plain binary or a launcher script. Both shapes exist,\n+#     so both are built here.\n+#   * the interpreter baked into the payload is what decides whether the\n+#     AppImage runs on a distro other than the build host. It is per-arch\n+#     (see PSABI below) and a wrong one is invisible until a user reports it.\n+#\n+# Two subjects, deliberately tiny, one per bundle shape:\n+#   hello        via qtCliApp -- plain binaries in bin/, no launcher\n+#   xkbcli       via qtApp    -- libxkbcommon in the closure pulls in the\n+#                               xkeyboard-config data, which is what makes\n+#                               nix-bundle-dir emit a launcher + companion ELF\n+#\n+# Usage:  tests/smoke.sh [flake-ref]     (default: the checkout, \".\")\n+set -uo pipefail\n+\n+FLAKE=\"${1:-.}\"\n+# Absolutise a local flake ref BEFORE cd-ing into the scratch dir, or `.` would\n+# resolve to the scratch dir and nix would report \"could not find a flake.nix\".\n+# A ref containing ':' is a URL (github:, git+https:, path:) and is left alone.\n+case \"$FLAKE\" in\n+  *:*) ;;\n+  *)   FLAKE=\"$(cd \"$FLAKE\" 2>/dev/null && pwd)\" || { echo \"smoke: no such flake dir: ${1:-.}\" >&2; exit 1; }\n+       FLAKE=\"path:$FLAKE\" ;;\n+esac\n+export SMOKE_FLAKE=\"$FLAKE\"\n+\n+WORK=\"$(mktemp -d)\"\n+trap 'chmod -R u+w \"$WORK\" 2>/dev/null; rm -rf \"$WORK\"' EXIT\n+cd \"$WORK\"\n+\n+pass=0; fail=0\n+ok()   { printf '  \\033[32mok\\033[0m   %s\\n' \"$1\"; pass=$((pass+1)); }\n+bad()  { printf '  \\033[31mFAIL\\033[0m %s\\n' \"$1\"; [ -n \"${2:-}\" ] && printf '         %s\\n' \"$2\"; fail=$((fail+1)); }\n+check(){ if eval \"$2\" >/dev/null 2>&1; then ok \"$1\"; else bad \"$1\" \"${3:-}\"; fi; }\n+\n+# The loader path this architecture's psABI mandates. Deliberately not a single\n+# prefix: /lib64/ld-linux-aarch64.so.1 does not exist on current Fedora or\n+# openSUSE, so \"just use /lib64\" breaks arm64.\n+#\n+# Note this one assertion only discriminates on x86_64. The bundler used to set\n+# /lib/<loader>, which is wrong on x86_64 (Fedora keeps the 64-bit loader in\n+# /lib64) but happens to be exactly right on aarch64 -- so on arm it passed\n+# before the fix too. The DT_RPATH, shim and trampoline assertions below are\n+# what carry the arm job.\n+case \"$(uname -m)\" in\n+  x86_64)  PSABI=/lib64/ld-linux-x86-64.so.2 ;;\n+  aarch64) PSABI=/lib/ld-linux-aarch64.so.1  ;;\n+  *) echo \"smoke: unsupported arch $(uname -m); nothing to assert\"; exit 0 ;;\n+esac\n+\n+interp()   { patchelf --print-interpreter \"$1\" 2>/dev/null; }\n+have_tag() { readelf -d \"$1\" 2>/dev/null | grep -q \"($2)\"; }\n+\n+# ---------------------------------------------------------------------------\n+# Subjects. Kept here rather than in a committed test flake so this script\n+# stays runnable against any flake ref, local or remote, with no second lock\n+# file to drift. Each is a tiny derivation carrying the .desktop file and icon\n+# that the bundlers discover.\n+# ---------------------------------------------------------------------------\n+cat > subjects.nix <<'NIX'\n+{ pkgs }:\n+\n+let\n+  # 1x1 PNG. Nothing reads it; the bundler only needs an icon to exist.\n+  icon = pkgs.runCommand \"smoke-icon.png\" { } ''\n+    printf '%s' iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg== \\\n+      | base64 -d > $out\n+  '';\n+\n+  desktop = name: exe: pkgs.writeText \"${name}.desktop\" ''\n+    [Desktop Entry]\n+    Type=Application\n+    Name=${name}\n+    Exec=${exe}\n+    Icon=${name}\n+    Categories=Utility;\n+  '';\n+\n+  # Copy (not symlink) the one binary we care about: the bundler walks bin/,\n+  # and this keeps the subject to a single executable and its closure.\n+  mkSubject = { name, from, exe }: pkgs.runCommand name { } ''\n+    mkdir -p $out/bin $out/share/applications $out/share/icons/hicolor/256x256/apps\n+    cp ${from}/bin/${exe} $out/bin/${exe}\n+    chmod u+w $out/bin/${exe}\n+    cp ${desktop name exe} $out/share/applications/${name}.desktop\n+    cp ${icon} $out/share/icons/hicolor/256x256/apps/${name}.png\n+  '';\n+in\n+{\n+  cli = mkSubject { name = \"smokecli\"; from = pkgs.hello;         exe = \"hello\";  };\n+  gui = mkSubject { name = \"smokegui\"; from = pkgs.libxkbcommon;  exe = \"xkbcli\"; };\n+}\n+NIX\n+\n+cat > build.nix <<'NIX'\n+let\n+  flake  = builtins.getFlake (builtins.getEnv \"SMOKE_FLAKE\");\n+  system = builtins.currentSystem;\n+  pkgs   = flake.inputs.nixpkgs.legacyPackages.${system};\n+  subjects = import ./subjects.nix { inherit pkgs; };\n+in\n+{\n+  cli = flake.bundlers.${system}.qtCliApp subjects.cli;\n+  gui = flake.bundlers.${system}.qtApp    subjects.gui;\n+}\n+NIX\n+\n+echo \"== building AppImages with $FLAKE ==\"\n+built_cli=0; built_gui=0\n+nix build --impure -f build.nix cli -o out-cli && built_cli=1\n+nix build --impure -f build.nix gui -o out-gui && built_gui=1\n+\n+# Extract each AppImage with its own runtime (no FUSE needed) and assert the\n+# payload, then run it. --appimage-extract always lands in ./squashfs-root.\n+extract() {  # extract <appimage> <destdir>\n+  rm -rf \"$2\"; mkdir -p \"$2\"\n+  ( cd \"$2\" && \"$1\" --appimage-extract >/dev/null 2>&1 ) && [ -d \"$2/squashfs-root\" ]\n+}\n+\n+CLI_IMG=\"\"; GUI_IMG=\"\"\n+[ \"$built_cli\" = 1 ] && CLI_IMG=\"$(echo \"$(readlink -f out-cli)\"/*.AppImage)\"\n+[ \"$built_gui\" = 1 ] && GUI_IMG=\"$(echo \"$(readlink -f out-gui)\"/*.AppImage)\"\n+\n+echo\n+echo \"== the artifact is a single self-contained AppImage ==\"\n+for pair in \"cli:$CLI_IMG\" \"gui:$GUI_IMG\"; do\n+  tag=\"${pair%%:*}\"; img=\"${pair#*:}\"\n+  if [ -z \"$img\" ]; then bad \"$tag: AppImage built\"; continue; fi\n+  ok \"$tag: AppImage built\"\n+  check \"$tag: one executable file, $(basename \"$img\")\" \"[ -x '$img' ] && [ -f '$img' ]\"\n+  # ELF magic, then 'AI' + type 2 at offset 8 -- the AppImage magic bytes.\n+  check \"$tag: carries the type-2 AppImage magic\" \\\n+        \"[ \\\"\\$(od -An -tx1 -j8 -N3 '$img' | tr -d ' ')\\\" = '414902' ]\" \\\n+        \"without it desktop integration and --appimage-* options do not apply\"\n+done\n+\n+[ -n \"$CLI_IMG\" ] && extract \"$CLI_IMG\" ex-cli && C=ex-cli/squashfs-root || C=\"\"\n+[ -n \"$GUI_IMG\" ] && extract \"$GUI_IMG\" ex-gui && G=ex-gui/squashfs-root || G=\"\"\n+\n+echo\n+echo \"== payload: plain path (qtCliApp -> no launcher) ==\"\n+if [ -n \"$C\" ]; then\n+  check \"usr/bin/hello is an ELF, not a script\" \"head -c4 '$C/usr/bin/hello' | grep -q ELF\"\n+  check \"no launcher and no hidden companion in usr/bin\" \\\n+        \"! ls -a '$C/usr/bin' | grep -qE '^\\.[^.]'\" \\\n+        \"a headless bundle should ship the binary itself\"\n+  check \"PT_INTERP is the psABI path ($PSABI)\" \\\n+        \"[ \\\"\\$(interp '$C/usr/bin/hello')\\\" = '$PSABI' ]\" \\\n+        \"got: $(interp \"$C/usr/bin/hello\")\"\n+  check \"DT_RPATH is set (bundled libs beat a stale LD_LIBRARY_PATH)\" \\\n+        \"have_tag '$C/usr/bin/hello' RPATH\"\n+  check \"DT_RUNPATH is NOT set (it loses to LD_LIBRARY_PATH)\" \\\n+        \"[ -f '$C/usr/bin/hello' ] && ! have_tag '$C/usr/bin/hello' RUNPATH\"\n+  check \"AppRun execs the bin/ entry we just checked\" \\\n+        \"grep -q 'exec \\\"\\$APPDIR/usr/bin/hello\\\"' '$C/AppRun'\"\n+else\n+  bad \"cli AppImage extracted\"\n+fi\n+\n+echo\n+echo \"== payload: launcher path (qtApp + xkb -> launcher + companion ELF) ==\"\n+if [ -n \"$G\" ]; then\n+  check \"usr/bin/xkbcli is a launcher script\" \"head -c2 '$G/usr/bin/xkbcli' | grep -q '#!'\"\n+  # THE dotfile question: `cp -a src/.` copies hidden entries, `cp -a src/*`\n+  # does not. Get it wrong and AppRun execs a launcher whose companion is\n+  # missing -- a build that succeeds and an AppImage that cannot start.\n+  check \"the companion .xkbcli.elf came across into usr/bin\" \\\n+        \"head -c4 '$G/usr/bin/.xkbcli.elf' | grep -q ELF\" \\\n+        \"cp -a \\${bundle}/bin/. must copy hidden entries; cp -a bin/* would not\"\n+  check \"the launcher exports XKB_CONFIG_ROOT\" \"grep -q XKB_CONFIG_ROOT '$G/usr/bin/xkbcli'\"\n+  check \"the xkb data it points at is in the payload\" \"[ -d '$G/usr/share/X11/xkb' ]\"\n+  check \"companion PT_INTERP is the psABI path ($PSABI)\" \\\n+        \"[ \\\"\\$(interp '$G/usr/bin/.xkbcli.elf')\\\" = '$PSABI' ]\" \\\n+        \"got: $(interp \"$G/usr/bin/.xkbcli.elf\")\"\n+  check \"companion has DT_RPATH\" \"have_tag '$G/usr/bin/.xkbcli.elf' RPATH\"\n+  # Guarded on existence: a `! have_tag` on a missing file passes vacuously,\n+  # which is how a dropped companion could look like a green run.\n+  check \"companion has no DT_RUNPATH\" \\\n+        \"[ -f '$G/usr/bin/.xkbcli.elf' ] && ! have_tag '$G/usr/bin/.xkbcli.elf' RUNPATH\"\n+  # `cp -a ${bundle}/lib/.` is the other half of the payload copy. (The plain\n+  # subject has no lib/ at all -- hello only needs libc, which the bundler\n+  # leaves to the host -- so this is the subject that can prove it happened.)\n+  check \"the library its payload needs is in usr/lib\" \\\n+        \"ls '$G/usr/lib'/libxkbcommon.so* >/dev/null 2>&1\"\n+  check \"AppRun execs the launcher, which resolves the companion itself\" \\\n+        \"grep -q 'exec \\\"\\$APPDIR/usr/bin/xkbcli\\\"' '$G/AppRun'\"\n+else\n+  bad \"gui AppImage extracted\"\n+fi\n+\n+echo\n+echo \"== regressions that have actually happened ==\"\n+for pair in \"cli:$C\" \"gui:$G\"; do\n+  tag=\"${pair%%:*}\"; d=\"${pair#*:}\"\n+  [ -n \"$d\" ] || continue\n+  # nixpkgs' Qt hooks leave `.<name>-wrapped` C wrappers next to their\n+  # binaries; shipping one exports /nix/store paths that do not exist.\n+  check \"$tag: no nixpkgs '-wrapped' wrapper in usr/bin\" \"! ls -a '$d/usr/bin' | grep -q -- '-wrapped'\"\n+  # The LD_PRELOAD shim existed only to fake readlink(\"/proc/self/exe\") for\n+  # binaries run through an ld.so trampoline. No trampoline, no shim.\n+  check \"$tag: no libprocself_fix.so in the payload\" \"! find '$d' -name libprocself_fix.so | grep -q .\"\n+  check \"$tag: no __BUNDLE_REAL_EXE handshake\" \"! grep -rqs __BUNDLE_REAL_EXE '$d/usr/bin' '$d/AppRun'\"\n+done\n+if [ -n \"$G\" ]; then\n+  # A trampoline execs some OTHER program and passes the real binary to it as\n+  # an argument -- `exec \"$p\" \"$REAL\" \"$@\"`, where $p is a loader located at\n+  # runtime. Direct exec puts $REAL first. Matching that shape rather than the\n+  # string \"ld-linux\" matters: the old launcher held the loader path in a\n+  # variable, so grepping for the name passed against it and proved nothing.\n+  check \"the launcher execs the companion, not a loader with it as an argument\" \\\n+        \"! grep -qE 'exec +\\\"\\\\\\$[A-Za-z_]+\\\" +\\\"\\\\\\$REAL\\\"' '$G/usr/bin/xkbcli'\" \\\n+        \"handing the program to ld.so makes /proc/self/exe lie inside the AppImage\"\n+  check \"the launcher has no runtime loader-path probe\" \\\n+        \"! grep -qE '\\\\\\$INTERP_NAME' '$G/usr/bin/xkbcli'\" \\\n+        \"probing for the loader at runtime is what the psABI path replaced\"\n+fi\n+\n+echo\n+echo \"== runs on other distros ==\"\n+# The whole promise of an AppImage is \"runs on a machine that is not the build\n+# host\", so this is the assertion that matters most. APPIMAGE_EXTRACT_AND_RUN\n+# because containers have no FUSE; -w /tmp because that extraction needs a\n+# writable cwd.\n+run_in() {  # run_in <image> <appimage> <args> <expected-regex> <label>\n+  local image=\"$1\" f=\"$2\" args=\"$3\" want=\"$4\" label=\"$5\" out rc\n+  out=\"$(docker run --rm -v \"$f:/app.AppImage:ro\" -w /tmp -e APPIMAGE_EXTRACT_AND_RUN=1 \\\n+           \"$image\" sh -c \"/app.AppImage $args\" 2>&1)\"; rc=$?\n+  if [ \"$rc\" -eq 0 ] && printf '%s' \"$out\" | grep -qE -- \"$want\"; then\n+    ok \"$image: $label\"\n+  else\n+    bad \"$image: $label\" \"exit $rc: $(printf '%s' \"$out\" | tail -2 | tr '\\n' ' ')\"\n+  fi\n+}\n+if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then\n+  for image in ubuntu:latest fedora:latest; do",
+  "path": "tests/smoke.sh",
+  "commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "original_commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Using floating container tags (`ubuntu:latest`, `fedora:latest`) can make CI non-reproducible and introduce sudden failures when the distro images roll forward. Pin to specific versions (and update intentionally) so test results are stable over time.",
+  "created_at": "2026-08-03T22:54:39Z",
+  "updated_at": "2026-08-03T22:54:40Z",
+  "html_url": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708228992",
+  "pull_request_url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708228992"
+   },
+   "html": {
+    "href": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708228992"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708228992/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 249,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 249,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708229012",
+  "pull_request_review_id": 4849171544,
+  "id": 3708229012,
+  "node_id": "PRRC_kwDORYqjx87dBxWU",
+  "diff_hunk": "@@ -0,0 +1,51 @@\n+name: CI\n+\n+# This repo produces the file a user actually downloads, and it had no\n+# automated gate at all. `nix build` succeeding says an AppImage was created;\n+# it says nothing about whether the program inside it starts on a machine that\n+# is not the build host \u2014 which is the only thing an AppImage is for. The ways\n+# it breaks are silent: a payload copied with a glob that skips the launcher's\n+# hidden companion ELF, a missing library directory, an interpreter path that\n+# does not exist on the target distro. All of those still build, still extract,\n+# and only fail in a user's hands.\n+#\n+# tests/smoke.sh builds two tiny AppImages (one plain binary, one launcher +\n+# companion), asserts the payload contract inside the extracted AppDir, and\n+# then RUNS each of them in ubuntu and fedora containers.\n+\n+on:\n+  push:\n+    branches: [main]\n+  pull_request:\n+\n+jobs:\n+  smoke:\n+    name: appimage contract (${{ matrix.os }})\n+    runs-on: ${{ matrix.os }}\n+    strategy:\n+      fail-fast: false\n+      matrix:\n+        # x86_64 and aarch64 carry DIFFERENT psABI loader paths\n+        # (/lib64/ld-linux-x86-64.so.2 vs /lib/ld-linux-aarch64.so.1), and they\n+        # come from different AppImage runtime binaries too. A single-arch job\n+        # would miss exactly the failure this bump is about, so run both.\n+        os: [ubuntu-latest, ubuntu-24.04-arm]\n+\n+    steps:\n+      - uses: actions/checkout@v4\n+\n+      - uses: cachix/install-nix-action@v27\n+        with:\n+          extra_nix_config: |\n+            experimental-features = nix-command flakes\n+\n+      - uses: cachix/cachix-action@v15\n+        with:",
+  "path": ".github/workflows/ci.yml",
+  "commit_id": "cb56298cf73b622f1524e41c31b42846cb5f9a1c",
+  "original_commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "The workflow uses third-party GitHub Actions pinned only to mutable version tags (e.g., `@v27`). For supply-chain hardening, consider pinning actions to an immutable commit SHA (optionally with a comment noting the corresponding tag) so a compromised tag can\u2019t change what runs in CI.",
+  "created_at": "2026-08-03T22:54:39Z",
+  "updated_at": "2026-08-03T22:54:40Z",
+  "html_url": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708229012",
+  "pull_request_url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708229012"
+   },
+   "html": {
+    "href": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708229012"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708229012/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": 35,
+  "original_start_line": 35,
+  "start_side": "RIGHT",
+  "line": 43,
+  "original_line": 43,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 43,
+  "position": 43,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708270606",
+  "pull_request_review_id": 4849216043,
+  "id": 3708270606,
+  "node_id": "PRRC_kwDORYqjx87dB7gO",
+  "diff_hunk": "@@ -0,0 +1,263 @@\n+#!/usr/bin/env bash\n+# Smoke test for the AppImage packaging contract.\n+#\n+# `nix build` proves an AppImage was produced; it proves nothing about whether\n+# the thing inside it can start on someone else's machine, which is the only\n+# reason this repo exists. Everything asserted below is a way that has broken,\n+# or could break invisibly:\n+#\n+#   * the payload is copied with `cp -a ${bundle}/bin/. AppDir/usr/bin/`, and\n+#     `cp -a src/.` vs `cp -a src/*` differ on dotfiles. nix-bundle-dir puts\n+#     the real ELF beside a launcher as `.<name>.elf`, so getting that wrong\n+#     ships an AppImage whose launcher execs a file that is not there \u2014 and it\n+#     still builds, and `--appimage-extract` still succeeds.\n+#   * AppRun does `exec \"$APPDIR/usr/bin/<exec>\"`, which has to work whether\n+#     that entry is a plain binary or a launcher script. Both shapes exist,\n+#     so both are built here.\n+#   * the interpreter baked into the payload is what decides whether the\n+#     AppImage runs on a distro other than the build host. It is per-arch\n+#     (see PSABI below) and a wrong one is invisible until a user reports it.\n+#\n+# Two subjects, deliberately tiny, one per bundle shape:\n+#   hello        via qtCliApp -- plain binaries in bin/, no launcher\n+#   xkbcli       via qtApp    -- libxkbcommon in the closure pulls in the\n+#                               xkeyboard-config data, which is what makes\n+#                               nix-bundle-dir emit a launcher + companion ELF\n+#\n+# Usage:  tests/smoke.sh [flake-ref]     (default: the checkout, \".\")\n+set -uo pipefail\n+\n+FLAKE=\"${1:-.}\"\n+# Absolutise a local flake ref BEFORE cd-ing into the scratch dir, or `.` would\n+# resolve to the scratch dir and nix would report \"could not find a flake.nix\".\n+# A ref containing ':' is a URL (github:, git+https:, path:) and is left alone.\n+case \"$FLAKE\" in\n+  *:*) ;;\n+  *)   FLAKE=\"$(cd \"$FLAKE\" 2>/dev/null && pwd)\" || { echo \"smoke: no such flake dir: ${1:-.}\" >&2; exit 1; }\n+       FLAKE=\"path:$FLAKE\" ;;\n+esac\n+export SMOKE_FLAKE=\"$FLAKE\"\n+\n+WORK=\"$(mktemp -d)\"\n+trap 'chmod -R u+w \"$WORK\" 2>/dev/null; rm -rf \"$WORK\"' EXIT\n+cd \"$WORK\"\n+\n+pass=0; fail=0\n+ok()   { printf '  \\033[32mok\\033[0m   %s\\n' \"$1\"; pass=$((pass+1)); }\n+bad()  { printf '  \\033[31mFAIL\\033[0m %s\\n' \"$1\"; [ -n \"${2:-}\" ] && printf '         %s\\n' \"$2\"; fail=$((fail+1)); }\n+check(){ if eval \"$2\" >/dev/null 2>&1; then ok \"$1\"; else bad \"$1\" \"${3:-}\"; fi; }\n+\n+# The loader path this architecture's psABI mandates. Deliberately not a single\n+# prefix: /lib64/ld-linux-aarch64.so.1 does not exist on current Fedora or\n+# openSUSE, so \"just use /lib64\" breaks arm64.\n+#\n+# Note this one assertion only discriminates on x86_64. The bundler used to set\n+# /lib/<loader>, which is wrong on x86_64 (Fedora keeps the 64-bit loader in\n+# /lib64) but happens to be exactly right on aarch64 -- so on arm it passed\n+# before the fix too. The DT_RPATH, shim and trampoline assertions below are\n+# what carry the arm job.\n+case \"$(uname -m)\" in\n+  x86_64)  PSABI=/lib64/ld-linux-x86-64.so.2 ;;\n+  aarch64) PSABI=/lib/ld-linux-aarch64.so.1  ;;\n+  *) echo \"smoke: unsupported arch $(uname -m); nothing to assert\"; exit 0 ;;\n+esac\n+\n+interp()   { patchelf --print-interpreter \"$1\" 2>/dev/null; }\n+have_tag() { readelf -d \"$1\" 2>/dev/null | grep -q \"($2)\"; }\n+\n+# ---------------------------------------------------------------------------\n+# Subjects. Kept here rather than in a committed test flake so this script\n+# stays runnable against any flake ref, local or remote, with no second lock\n+# file to drift. Each is a tiny derivation carrying the .desktop file and icon\n+# that the bundlers discover.\n+# ---------------------------------------------------------------------------\n+cat > subjects.nix <<'NIX'\n+{ pkgs }:\n+\n+let\n+  # 1x1 PNG. Nothing reads it; the bundler only needs an icon to exist.\n+  icon = pkgs.runCommand \"smoke-icon.png\" { } ''\n+    printf '%s' iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg== \\\n+      | base64 -d > $out\n+  '';\n+\n+  desktop = name: exe: pkgs.writeText \"${name}.desktop\" ''\n+    [Desktop Entry]\n+    Type=Application\n+    Name=${name}\n+    Exec=${exe}\n+    Icon=${name}\n+    Categories=Utility;\n+  '';\n+\n+  # Copy (not symlink) the one binary we care about: the bundler walks bin/,\n+  # and this keeps the subject to a single executable and its closure.\n+  mkSubject = { name, from, exe }: pkgs.runCommand name { } ''\n+    mkdir -p $out/bin $out/share/applications $out/share/icons/hicolor/256x256/apps\n+    cp ${from}/bin/${exe} $out/bin/${exe}\n+    chmod u+w $out/bin/${exe}\n+    cp ${desktop name exe} $out/share/applications/${name}.desktop\n+    cp ${icon} $out/share/icons/hicolor/256x256/apps/${name}.png\n+  '';\n+in\n+{\n+  cli = mkSubject { name = \"smokecli\"; from = pkgs.hello;         exe = \"hello\";  };\n+  gui = mkSubject { name = \"smokegui\"; from = pkgs.libxkbcommon;  exe = \"xkbcli\"; };\n+}\n+NIX\n+\n+cat > build.nix <<'NIX'\n+let\n+  flake  = builtins.getFlake (builtins.getEnv \"SMOKE_FLAKE\");\n+  system = builtins.currentSystem;\n+  pkgs   = flake.inputs.nixpkgs.legacyPackages.${system};\n+  subjects = import ./subjects.nix { inherit pkgs; };\n+in\n+{\n+  cli = flake.bundlers.${system}.qtCliApp subjects.cli;\n+  gui = flake.bundlers.${system}.qtApp    subjects.gui;\n+}\n+NIX\n+\n+echo \"== building AppImages with $FLAKE ==\"\n+built_cli=0; built_gui=0\n+nix build --impure -f build.nix cli -o out-cli && built_cli=1\n+nix build --impure -f build.nix gui -o out-gui && built_gui=1\n+\n+# Extract each AppImage with its own runtime (no FUSE needed) and assert the\n+# payload, then run it. --appimage-extract always lands in ./squashfs-root.\n+extract() {  # extract <appimage> <destdir>\n+  rm -rf \"$2\"; mkdir -p \"$2\"\n+  ( cd \"$2\" && \"$1\" --appimage-extract >/dev/null 2>&1 ) && [ -d \"$2/squashfs-root\" ]\n+}\n+\n+CLI_IMG=\"\"; GUI_IMG=\"\"\n+[ \"$built_cli\" = 1 ] && CLI_IMG=\"$(echo \"$(readlink -f out-cli)\"/*.AppImage)\"\n+[ \"$built_gui\" = 1 ] && GUI_IMG=\"$(echo \"$(readlink -f out-gui)\"/*.AppImage)\"\n+\n+echo\n+echo \"== the artifact is a single self-contained AppImage ==\"\n+for pair in \"cli:$CLI_IMG\" \"gui:$GUI_IMG\"; do\n+  tag=\"${pair%%:*}\"; img=\"${pair#*:}\"\n+  if [ -z \"$img\" ]; then bad \"$tag: AppImage built\"; continue; fi\n+  ok \"$tag: AppImage built\"\n+  check \"$tag: one executable file, $(basename \"$img\")\" \"[ -x '$img' ] && [ -f '$img' ]\"\n+  # ELF magic, then 'AI' + type 2 at offset 8 -- the AppImage magic bytes.",
+  "path": "tests/smoke.sh",
+  "commit_id": "cb56298cf73b622f1524e41c31b42846cb5f9a1c",
+  "original_commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "user": {
+   "login": "dlipicar",
+   "id": 11161531,
+   "node_id": "MDQ6VXNlcjExMTYxNTMx",
+   "avatar_url": "https://avatars.githubusercontent.com/u/11161531?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/dlipicar",
+   "html_url": "https://github.com/dlipicar",
+   "followers_url": "https://api.github.com/users/dlipicar/followers",
+   "following_url": "https://api.github.com/users/dlipicar/following{/other_user}",
+   "gists_url": "https://api.github.com/users/dlipicar/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/dlipicar/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/dlipicar/subscriptions",
+   "organizations_url": "https://api.github.com/users/dlipicar/orgs",
+   "repos_url": "https://api.github.com/users/dlipicar/repos",
+   "events_url": "https://api.github.com/users/dlipicar/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/dlipicar/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Right \u2014 without `nullglob`, an unmatched `*.AppImage` expands to the literal pattern, which is non-empty, so \"AppImage built\" greened and the next check failed for the wrong reason. Fixed in the follow-up: resolve the glob via `set -- \u2026/*.AppImage` and require `[ -f \"$1\" ]` before saying ok.",
+  "created_at": "2026-08-03T23:04:26Z",
+  "updated_at": "2026-08-03T23:04:27Z",
+  "html_url": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708270606",
+  "pull_request_url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708270606"
+   },
+   "html": {
+    "href": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708270606"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708270606/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": 149,
+  "original_start_line": 140,
+  "start_side": "RIGHT",
+  "line": 154,
+  "original_line": 145,
+  "side": "RIGHT",
+  "in_reply_to_id": 3708228952,
+  "author_association": "COLLABORATOR",
+  "original_position": 145,
+  "position": 154,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708270702",
+  "pull_request_review_id": 4849216135,
+  "id": 3708270702,
+  "node_id": "PRRC_kwDORYqjx87dB7hu",
+  "diff_hunk": "@@ -0,0 +1,263 @@\n+#!/usr/bin/env bash\n+# Smoke test for the AppImage packaging contract.\n+#\n+# `nix build` proves an AppImage was produced; it proves nothing about whether\n+# the thing inside it can start on someone else's machine, which is the only\n+# reason this repo exists. Everything asserted below is a way that has broken,\n+# or could break invisibly:\n+#\n+#   * the payload is copied with `cp -a ${bundle}/bin/. AppDir/usr/bin/`, and\n+#     `cp -a src/.` vs `cp -a src/*` differ on dotfiles. nix-bundle-dir puts\n+#     the real ELF beside a launcher as `.<name>.elf`, so getting that wrong\n+#     ships an AppImage whose launcher execs a file that is not there \u2014 and it\n+#     still builds, and `--appimage-extract` still succeeds.\n+#   * AppRun does `exec \"$APPDIR/usr/bin/<exec>\"`, which has to work whether\n+#     that entry is a plain binary or a launcher script. Both shapes exist,\n+#     so both are built here.\n+#   * the interpreter baked into the payload is what decides whether the\n+#     AppImage runs on a distro other than the build host. It is per-arch\n+#     (see PSABI below) and a wrong one is invisible until a user reports it.\n+#\n+# Two subjects, deliberately tiny, one per bundle shape:\n+#   hello        via qtCliApp -- plain binaries in bin/, no launcher\n+#   xkbcli       via qtApp    -- libxkbcommon in the closure pulls in the\n+#                               xkeyboard-config data, which is what makes\n+#                               nix-bundle-dir emit a launcher + companion ELF\n+#\n+# Usage:  tests/smoke.sh [flake-ref]     (default: the checkout, \".\")\n+set -uo pipefail\n+\n+FLAKE=\"${1:-.}\"\n+# Absolutise a local flake ref BEFORE cd-ing into the scratch dir, or `.` would\n+# resolve to the scratch dir and nix would report \"could not find a flake.nix\".\n+# A ref containing ':' is a URL (github:, git+https:, path:) and is left alone.\n+case \"$FLAKE\" in\n+  *:*) ;;\n+  *)   FLAKE=\"$(cd \"$FLAKE\" 2>/dev/null && pwd)\" || { echo \"smoke: no such flake dir: ${1:-.}\" >&2; exit 1; }\n+       FLAKE=\"path:$FLAKE\" ;;\n+esac\n+export SMOKE_FLAKE=\"$FLAKE\"\n+\n+WORK=\"$(mktemp -d)\"\n+trap 'chmod -R u+w \"$WORK\" 2>/dev/null; rm -rf \"$WORK\"' EXIT\n+cd \"$WORK\"\n+\n+pass=0; fail=0\n+ok()   { printf '  \\033[32mok\\033[0m   %s\\n' \"$1\"; pass=$((pass+1)); }\n+bad()  { printf '  \\033[31mFAIL\\033[0m %s\\n' \"$1\"; [ -n \"${2:-}\" ] && printf '         %s\\n' \"$2\"; fail=$((fail+1)); }\n+check(){ if eval \"$2\" >/dev/null 2>&1; then ok \"$1\"; else bad \"$1\" \"${3:-}\"; fi; }\n+\n+# The loader path this architecture's psABI mandates. Deliberately not a single\n+# prefix: /lib64/ld-linux-aarch64.so.1 does not exist on current Fedora or\n+# openSUSE, so \"just use /lib64\" breaks arm64.\n+#\n+# Note this one assertion only discriminates on x86_64. The bundler used to set\n+# /lib/<loader>, which is wrong on x86_64 (Fedora keeps the 64-bit loader in\n+# /lib64) but happens to be exactly right on aarch64 -- so on arm it passed\n+# before the fix too. The DT_RPATH, shim and trampoline assertions below are\n+# what carry the arm job.\n+case \"$(uname -m)\" in\n+  x86_64)  PSABI=/lib64/ld-linux-x86-64.so.2 ;;\n+  aarch64) PSABI=/lib/ld-linux-aarch64.so.1  ;;\n+  *) echo \"smoke: unsupported arch $(uname -m); nothing to assert\"; exit 0 ;;\n+esac\n+\n+interp()   { patchelf --print-interpreter \"$1\" 2>/dev/null; }\n+have_tag() { readelf -d \"$1\" 2>/dev/null | grep -q \"($2)\"; }\n+\n+# ---------------------------------------------------------------------------\n+# Subjects. Kept here rather than in a committed test flake so this script\n+# stays runnable against any flake ref, local or remote, with no second lock\n+# file to drift. Each is a tiny derivation carrying the .desktop file and icon\n+# that the bundlers discover.\n+# ---------------------------------------------------------------------------\n+cat > subjects.nix <<'NIX'\n+{ pkgs }:\n+\n+let\n+  # 1x1 PNG. Nothing reads it; the bundler only needs an icon to exist.\n+  icon = pkgs.runCommand \"smoke-icon.png\" { } ''\n+    printf '%s' iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg== \\\n+      | base64 -d > $out\n+  '';\n+\n+  desktop = name: exe: pkgs.writeText \"${name}.desktop\" ''\n+    [Desktop Entry]\n+    Type=Application\n+    Name=${name}\n+    Exec=${exe}\n+    Icon=${name}\n+    Categories=Utility;\n+  '';\n+\n+  # Copy (not symlink) the one binary we care about: the bundler walks bin/,\n+  # and this keeps the subject to a single executable and its closure.\n+  mkSubject = { name, from, exe }: pkgs.runCommand name { } ''\n+    mkdir -p $out/bin $out/share/applications $out/share/icons/hicolor/256x256/apps\n+    cp ${from}/bin/${exe} $out/bin/${exe}\n+    chmod u+w $out/bin/${exe}\n+    cp ${desktop name exe} $out/share/applications/${name}.desktop\n+    cp ${icon} $out/share/icons/hicolor/256x256/apps/${name}.png\n+  '';\n+in\n+{\n+  cli = mkSubject { name = \"smokecli\"; from = pkgs.hello;         exe = \"hello\";  };\n+  gui = mkSubject { name = \"smokegui\"; from = pkgs.libxkbcommon;  exe = \"xkbcli\"; };\n+}\n+NIX\n+\n+cat > build.nix <<'NIX'\n+let\n+  flake  = builtins.getFlake (builtins.getEnv \"SMOKE_FLAKE\");\n+  system = builtins.currentSystem;\n+  pkgs   = flake.inputs.nixpkgs.legacyPackages.${system};\n+  subjects = import ./subjects.nix { inherit pkgs; };\n+in\n+{\n+  cli = flake.bundlers.${system}.qtCliApp subjects.cli;\n+  gui = flake.bundlers.${system}.qtApp    subjects.gui;\n+}\n+NIX\n+\n+echo \"== building AppImages with $FLAKE ==\"\n+built_cli=0; built_gui=0\n+nix build --impure -f build.nix cli -o out-cli && built_cli=1\n+nix build --impure -f build.nix gui -o out-gui && built_gui=1\n+\n+# Extract each AppImage with its own runtime (no FUSE needed) and assert the\n+# payload, then run it. --appimage-extract always lands in ./squashfs-root.\n+extract() {  # extract <appimage> <destdir>\n+  rm -rf \"$2\"; mkdir -p \"$2\"\n+  ( cd \"$2\" && \"$1\" --appimage-extract >/dev/null 2>&1 ) && [ -d \"$2/squashfs-root\" ]\n+}\n+\n+CLI_IMG=\"\"; GUI_IMG=\"\"\n+[ \"$built_cli\" = 1 ] && CLI_IMG=\"$(echo \"$(readlink -f out-cli)\"/*.AppImage)\"\n+[ \"$built_gui\" = 1 ] && GUI_IMG=\"$(echo \"$(readlink -f out-gui)\"/*.AppImage)\"\n+\n+echo\n+echo \"== the artifact is a single self-contained AppImage ==\"\n+for pair in \"cli:$CLI_IMG\" \"gui:$GUI_IMG\"; do\n+  tag=\"${pair%%:*}\"; img=\"${pair#*:}\"\n+  if [ -z \"$img\" ]; then bad \"$tag: AppImage built\"; continue; fi\n+  ok \"$tag: AppImage built\"\n+  check \"$tag: one executable file, $(basename \"$img\")\" \"[ -x '$img' ] && [ -f '$img' ]\"\n+  # ELF magic, then 'AI' + type 2 at offset 8 -- the AppImage magic bytes.\n+  check \"$tag: carries the type-2 AppImage magic\" \\\n+        \"[ \\\"\\$(od -An -tx1 -j8 -N3 '$img' | tr -d ' ')\\\" = '414902' ]\" \\\n+        \"without it desktop integration and --appimage-* options do not apply\"\n+done\n+\n+[ -n \"$CLI_IMG\" ] && extract \"$CLI_IMG\" ex-cli && C=ex-cli/squashfs-root || C=\"\"\n+[ -n \"$GUI_IMG\" ] && extract \"$GUI_IMG\" ex-gui && G=ex-gui/squashfs-root || G=\"\"\n+\n+echo\n+echo \"== payload: plain path (qtCliApp -> no launcher) ==\"\n+if [ -n \"$C\" ]; then\n+  check \"usr/bin/hello is an ELF, not a script\" \"head -c4 '$C/usr/bin/hello' | grep -q ELF\"",
+  "path": "tests/smoke.sh",
+  "commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "original_commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "user": {
+   "login": "dlipicar",
+   "id": 11161531,
+   "node_id": "MDQ6VXNlcjExMTYxNTMx",
+   "avatar_url": "https://avatars.githubusercontent.com/u/11161531?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/dlipicar",
+   "html_url": "https://github.com/dlipicar",
+   "followers_url": "https://api.github.com/users/dlipicar/followers",
+   "following_url": "https://api.github.com/users/dlipicar/following{/other_user}",
+   "gists_url": "https://api.github.com/users/dlipicar/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/dlipicar/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/dlipicar/subscriptions",
+   "organizations_url": "https://api.github.com/users/dlipicar/orgs",
+   "repos_url": "https://api.github.com/users/dlipicar/repos",
+   "events_url": "https://api.github.com/users/dlipicar/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/dlipicar/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Done \u2014 both the plain binary and the companion now compare the full `\\x7fELF` magic via `od` (same shape as the AppImage-magic check below), instead of grepping the first four bytes for the substring.",
+  "created_at": "2026-08-03T23:04:28Z",
+  "updated_at": "2026-08-03T23:04:28Z",
+  "html_url": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708270702",
+  "pull_request_url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708270702"
+   },
+   "html": {
+    "href": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708270702"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708270702/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 157,
+  "side": "RIGHT",
+  "in_reply_to_id": 3708228972,
+  "author_association": "COLLABORATOR",
+  "original_position": 157,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708270836",
+  "pull_request_review_id": 4849216258,
+  "id": 3708270836,
+  "node_id": "PRRC_kwDORYqjx87dB7j0",
+  "diff_hunk": "@@ -0,0 +1,263 @@\n+#!/usr/bin/env bash\n+# Smoke test for the AppImage packaging contract.\n+#\n+# `nix build` proves an AppImage was produced; it proves nothing about whether\n+# the thing inside it can start on someone else's machine, which is the only\n+# reason this repo exists. Everything asserted below is a way that has broken,\n+# or could break invisibly:\n+#\n+#   * the payload is copied with `cp -a ${bundle}/bin/. AppDir/usr/bin/`, and\n+#     `cp -a src/.` vs `cp -a src/*` differ on dotfiles. nix-bundle-dir puts\n+#     the real ELF beside a launcher as `.<name>.elf`, so getting that wrong\n+#     ships an AppImage whose launcher execs a file that is not there \u2014 and it\n+#     still builds, and `--appimage-extract` still succeeds.\n+#   * AppRun does `exec \"$APPDIR/usr/bin/<exec>\"`, which has to work whether\n+#     that entry is a plain binary or a launcher script. Both shapes exist,\n+#     so both are built here.\n+#   * the interpreter baked into the payload is what decides whether the\n+#     AppImage runs on a distro other than the build host. It is per-arch\n+#     (see PSABI below) and a wrong one is invisible until a user reports it.\n+#\n+# Two subjects, deliberately tiny, one per bundle shape:\n+#   hello        via qtCliApp -- plain binaries in bin/, no launcher\n+#   xkbcli       via qtApp    -- libxkbcommon in the closure pulls in the\n+#                               xkeyboard-config data, which is what makes\n+#                               nix-bundle-dir emit a launcher + companion ELF\n+#\n+# Usage:  tests/smoke.sh [flake-ref]     (default: the checkout, \".\")\n+set -uo pipefail\n+\n+FLAKE=\"${1:-.}\"\n+# Absolutise a local flake ref BEFORE cd-ing into the scratch dir, or `.` would\n+# resolve to the scratch dir and nix would report \"could not find a flake.nix\".\n+# A ref containing ':' is a URL (github:, git+https:, path:) and is left alone.\n+case \"$FLAKE\" in\n+  *:*) ;;\n+  *)   FLAKE=\"$(cd \"$FLAKE\" 2>/dev/null && pwd)\" || { echo \"smoke: no such flake dir: ${1:-.}\" >&2; exit 1; }\n+       FLAKE=\"path:$FLAKE\" ;;\n+esac\n+export SMOKE_FLAKE=\"$FLAKE\"\n+\n+WORK=\"$(mktemp -d)\"\n+trap 'chmod -R u+w \"$WORK\" 2>/dev/null; rm -rf \"$WORK\"' EXIT\n+cd \"$WORK\"\n+\n+pass=0; fail=0\n+ok()   { printf '  \\033[32mok\\033[0m   %s\\n' \"$1\"; pass=$((pass+1)); }\n+bad()  { printf '  \\033[31mFAIL\\033[0m %s\\n' \"$1\"; [ -n \"${2:-}\" ] && printf '         %s\\n' \"$2\"; fail=$((fail+1)); }\n+check(){ if eval \"$2\" >/dev/null 2>&1; then ok \"$1\"; else bad \"$1\" \"${3:-}\"; fi; }\n+\n+# The loader path this architecture's psABI mandates. Deliberately not a single\n+# prefix: /lib64/ld-linux-aarch64.so.1 does not exist on current Fedora or\n+# openSUSE, so \"just use /lib64\" breaks arm64.\n+#\n+# Note this one assertion only discriminates on x86_64. The bundler used to set\n+# /lib/<loader>, which is wrong on x86_64 (Fedora keeps the 64-bit loader in\n+# /lib64) but happens to be exactly right on aarch64 -- so on arm it passed\n+# before the fix too. The DT_RPATH, shim and trampoline assertions below are\n+# what carry the arm job.\n+case \"$(uname -m)\" in\n+  x86_64)  PSABI=/lib64/ld-linux-x86-64.so.2 ;;\n+  aarch64) PSABI=/lib/ld-linux-aarch64.so.1  ;;\n+  *) echo \"smoke: unsupported arch $(uname -m); nothing to assert\"; exit 0 ;;\n+esac\n+\n+interp()   { patchelf --print-interpreter \"$1\" 2>/dev/null; }\n+have_tag() { readelf -d \"$1\" 2>/dev/null | grep -q \"($2)\"; }\n+\n+# ---------------------------------------------------------------------------\n+# Subjects. Kept here rather than in a committed test flake so this script\n+# stays runnable against any flake ref, local or remote, with no second lock\n+# file to drift. Each is a tiny derivation carrying the .desktop file and icon\n+# that the bundlers discover.\n+# ---------------------------------------------------------------------------\n+cat > subjects.nix <<'NIX'\n+{ pkgs }:\n+\n+let\n+  # 1x1 PNG. Nothing reads it; the bundler only needs an icon to exist.\n+  icon = pkgs.runCommand \"smoke-icon.png\" { } ''\n+    printf '%s' iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg== \\\n+      | base64 -d > $out\n+  '';\n+\n+  desktop = name: exe: pkgs.writeText \"${name}.desktop\" ''\n+    [Desktop Entry]\n+    Type=Application\n+    Name=${name}\n+    Exec=${exe}\n+    Icon=${name}\n+    Categories=Utility;\n+  '';\n+\n+  # Copy (not symlink) the one binary we care about: the bundler walks bin/,\n+  # and this keeps the subject to a single executable and its closure.\n+  mkSubject = { name, from, exe }: pkgs.runCommand name { } ''\n+    mkdir -p $out/bin $out/share/applications $out/share/icons/hicolor/256x256/apps\n+    cp ${from}/bin/${exe} $out/bin/${exe}\n+    chmod u+w $out/bin/${exe}\n+    cp ${desktop name exe} $out/share/applications/${name}.desktop\n+    cp ${icon} $out/share/icons/hicolor/256x256/apps/${name}.png\n+  '';\n+in\n+{\n+  cli = mkSubject { name = \"smokecli\"; from = pkgs.hello;         exe = \"hello\";  };\n+  gui = mkSubject { name = \"smokegui\"; from = pkgs.libxkbcommon;  exe = \"xkbcli\"; };\n+}\n+NIX\n+\n+cat > build.nix <<'NIX'\n+let\n+  flake  = builtins.getFlake (builtins.getEnv \"SMOKE_FLAKE\");\n+  system = builtins.currentSystem;\n+  pkgs   = flake.inputs.nixpkgs.legacyPackages.${system};\n+  subjects = import ./subjects.nix { inherit pkgs; };\n+in\n+{\n+  cli = flake.bundlers.${system}.qtCliApp subjects.cli;\n+  gui = flake.bundlers.${system}.qtApp    subjects.gui;\n+}\n+NIX\n+\n+echo \"== building AppImages with $FLAKE ==\"\n+built_cli=0; built_gui=0\n+nix build --impure -f build.nix cli -o out-cli && built_cli=1\n+nix build --impure -f build.nix gui -o out-gui && built_gui=1\n+\n+# Extract each AppImage with its own runtime (no FUSE needed) and assert the\n+# payload, then run it. --appimage-extract always lands in ./squashfs-root.\n+extract() {  # extract <appimage> <destdir>\n+  rm -rf \"$2\"; mkdir -p \"$2\"\n+  ( cd \"$2\" && \"$1\" --appimage-extract >/dev/null 2>&1 ) && [ -d \"$2/squashfs-root\" ]\n+}\n+\n+CLI_IMG=\"\"; GUI_IMG=\"\"\n+[ \"$built_cli\" = 1 ] && CLI_IMG=\"$(echo \"$(readlink -f out-cli)\"/*.AppImage)\"\n+[ \"$built_gui\" = 1 ] && GUI_IMG=\"$(echo \"$(readlink -f out-gui)\"/*.AppImage)\"\n+\n+echo\n+echo \"== the artifact is a single self-contained AppImage ==\"\n+for pair in \"cli:$CLI_IMG\" \"gui:$GUI_IMG\"; do\n+  tag=\"${pair%%:*}\"; img=\"${pair#*:}\"\n+  if [ -z \"$img\" ]; then bad \"$tag: AppImage built\"; continue; fi\n+  ok \"$tag: AppImage built\"\n+  check \"$tag: one executable file, $(basename \"$img\")\" \"[ -x '$img' ] && [ -f '$img' ]\"\n+  # ELF magic, then 'AI' + type 2 at offset 8 -- the AppImage magic bytes.\n+  check \"$tag: carries the type-2 AppImage magic\" \\\n+        \"[ \\\"\\$(od -An -tx1 -j8 -N3 '$img' | tr -d ' ')\\\" = '414902' ]\" \\\n+        \"without it desktop integration and --appimage-* options do not apply\"\n+done\n+\n+[ -n \"$CLI_IMG\" ] && extract \"$CLI_IMG\" ex-cli && C=ex-cli/squashfs-root || C=\"\"\n+[ -n \"$GUI_IMG\" ] && extract \"$GUI_IMG\" ex-gui && G=ex-gui/squashfs-root || G=\"\"\n+\n+echo\n+echo \"== payload: plain path (qtCliApp -> no launcher) ==\"\n+if [ -n \"$C\" ]; then\n+  check \"usr/bin/hello is an ELF, not a script\" \"head -c4 '$C/usr/bin/hello' | grep -q ELF\"\n+  check \"no launcher and no hidden companion in usr/bin\" \\\n+        \"! ls -a '$C/usr/bin' | grep -qE '^\\.[^.]'\" \\\n+        \"a headless bundle should ship the binary itself\"\n+  check \"PT_INTERP is the psABI path ($PSABI)\" \\\n+        \"[ \\\"\\$(interp '$C/usr/bin/hello')\\\" = '$PSABI' ]\" \\\n+        \"got: $(interp \"$C/usr/bin/hello\")\"\n+  check \"DT_RPATH is set (bundled libs beat a stale LD_LIBRARY_PATH)\" \\\n+        \"have_tag '$C/usr/bin/hello' RPATH\"\n+  check \"DT_RUNPATH is NOT set (it loses to LD_LIBRARY_PATH)\" \\\n+        \"[ -f '$C/usr/bin/hello' ] && ! have_tag '$C/usr/bin/hello' RUNPATH\"\n+  check \"AppRun execs the bin/ entry we just checked\" \\\n+        \"grep -q 'exec \\\"\\$APPDIR/usr/bin/hello\\\"' '$C/AppRun'\"\n+else\n+  bad \"cli AppImage extracted\"\n+fi\n+\n+echo\n+echo \"== payload: launcher path (qtApp + xkb -> launcher + companion ELF) ==\"\n+if [ -n \"$G\" ]; then\n+  check \"usr/bin/xkbcli is a launcher script\" \"head -c2 '$G/usr/bin/xkbcli' | grep -q '#!'\"\n+  # THE dotfile question: `cp -a src/.` copies hidden entries, `cp -a src/*`\n+  # does not. Get it wrong and AppRun execs a launcher whose companion is\n+  # missing -- a build that succeeds and an AppImage that cannot start.\n+  check \"the companion .xkbcli.elf came across into usr/bin\" \\\n+        \"head -c4 '$G/usr/bin/.xkbcli.elf' | grep -q ELF\" \\\n+        \"cp -a \\${bundle}/bin/. must copy hidden entries; cp -a bin/* would not\"\n+  check \"the launcher exports XKB_CONFIG_ROOT\" \"grep -q XKB_CONFIG_ROOT '$G/usr/bin/xkbcli'\"\n+  check \"the xkb data it points at is in the payload\" \"[ -d '$G/usr/share/X11/xkb' ]\"\n+  check \"companion PT_INTERP is the psABI path ($PSABI)\" \\\n+        \"[ \\\"\\$(interp '$G/usr/bin/.xkbcli.elf')\\\" = '$PSABI' ]\" \\\n+        \"got: $(interp \"$G/usr/bin/.xkbcli.elf\")\"\n+  check \"companion has DT_RPATH\" \"have_tag '$G/usr/bin/.xkbcli.elf' RPATH\"\n+  # Guarded on existence: a `! have_tag` on a missing file passes vacuously,\n+  # which is how a dropped companion could look like a green run.\n+  check \"companion has no DT_RUNPATH\" \\\n+        \"[ -f '$G/usr/bin/.xkbcli.elf' ] && ! have_tag '$G/usr/bin/.xkbcli.elf' RUNPATH\"\n+  # `cp -a ${bundle}/lib/.` is the other half of the payload copy. (The plain\n+  # subject has no lib/ at all -- hello only needs libc, which the bundler\n+  # leaves to the host -- so this is the subject that can prove it happened.)\n+  check \"the library its payload needs is in usr/lib\" \\\n+        \"ls '$G/usr/lib'/libxkbcommon.so* >/dev/null 2>&1\"\n+  check \"AppRun execs the launcher, which resolves the companion itself\" \\\n+        \"grep -q 'exec \\\"\\$APPDIR/usr/bin/xkbcli\\\"' '$G/AppRun'\"\n+else\n+  bad \"gui AppImage extracted\"\n+fi\n+\n+echo\n+echo \"== regressions that have actually happened ==\"\n+for pair in \"cli:$C\" \"gui:$G\"; do\n+  tag=\"${pair%%:*}\"; d=\"${pair#*:}\"\n+  [ -n \"$d\" ] || continue\n+  # nixpkgs' Qt hooks leave `.<name>-wrapped` C wrappers next to their\n+  # binaries; shipping one exports /nix/store paths that do not exist.\n+  check \"$tag: no nixpkgs '-wrapped' wrapper in usr/bin\" \"! ls -a '$d/usr/bin' | grep -q -- '-wrapped'\"\n+  # The LD_PRELOAD shim existed only to fake readlink(\"/proc/self/exe\") for\n+  # binaries run through an ld.so trampoline. No trampoline, no shim.\n+  check \"$tag: no libprocself_fix.so in the payload\" \"! find '$d' -name libprocself_fix.so | grep -q .\"\n+  check \"$tag: no __BUNDLE_REAL_EXE handshake\" \"! grep -rqs __BUNDLE_REAL_EXE '$d/usr/bin' '$d/AppRun'\"\n+done\n+if [ -n \"$G\" ]; then\n+  # A trampoline execs some OTHER program and passes the real binary to it as\n+  # an argument -- `exec \"$p\" \"$REAL\" \"$@\"`, where $p is a loader located at\n+  # runtime. Direct exec puts $REAL first. Matching that shape rather than the\n+  # string \"ld-linux\" matters: the old launcher held the loader path in a\n+  # variable, so grepping for the name passed against it and proved nothing.\n+  check \"the launcher execs the companion, not a loader with it as an argument\" \\\n+        \"! grep -qE 'exec +\\\"\\\\\\$[A-Za-z_]+\\\" +\\\"\\\\\\$REAL\\\"' '$G/usr/bin/xkbcli'\" \\\n+        \"handing the program to ld.so makes /proc/self/exe lie inside the AppImage\"\n+  check \"the launcher has no runtime loader-path probe\" \\\n+        \"! grep -qE '\\\\\\$INTERP_NAME' '$G/usr/bin/xkbcli'\" \\\n+        \"probing for the loader at runtime is what the psABI path replaced\"\n+fi\n+\n+echo\n+echo \"== runs on other distros ==\"\n+# The whole promise of an AppImage is \"runs on a machine that is not the build\n+# host\", so this is the assertion that matters most. APPIMAGE_EXTRACT_AND_RUN\n+# because containers have no FUSE; -w /tmp because that extraction needs a\n+# writable cwd.\n+run_in() {  # run_in <image> <appimage> <args> <expected-regex> <label>\n+  local image=\"$1\" f=\"$2\" args=\"$3\" want=\"$4\" label=\"$5\" out rc\n+  out=\"$(docker run --rm -v \"$f:/app.AppImage:ro\" -w /tmp -e APPIMAGE_EXTRACT_AND_RUN=1 \\\n+           \"$image\" sh -c \"/app.AppImage $args\" 2>&1)\"; rc=$?\n+  if [ \"$rc\" -eq 0 ] && printf '%s' \"$out\" | grep -qE -- \"$want\"; then\n+    ok \"$image: $label\"\n+  else\n+    bad \"$image: $label\" \"exit $rc: $(printf '%s' \"$out\" | tail -2 | tr '\\n' ' ')\"\n+  fi\n+}\n+if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then\n+  for image in ubuntu:latest fedora:latest; do",
+  "path": "tests/smoke.sh",
+  "commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "original_commit_id": "ef555d52089486b056fd518324a87d2fbafe9d3d",
+  "user": {
+   "login": "dlipicar",
+   "id": 11161531,
+   "node_id": "MDQ6VXNlcjExMTYxNTMx",
+   "avatar_url": "https://avatars.githubusercontent.com/u/11161531?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/dlipicar",
+   "html_url": "https://github.com/dlipicar",
+   "followers_url": "https://api.github.com/users/dlipicar/followers",
+   "following_url": "https://api.github.com/users/dlipicar/following{/other_user}",
+   "gists_url": "https://api.github.com/users/dlipicar/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/dlipicar/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/dlipicar/subscriptions",
+   "organizations_url": "https://api.github.com/users/dlipicar/orgs",
+   "repos_url": "https://api.github.com/users/dlipicar/repos",
+   "events_url": "https://api.github.com/users/dlipicar/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/dlipicar/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Same treatment as nix-bundle-lgx: the list is overridable via `SMOKE_DISTROS`, and the workflow pins `ubuntu:24.04 fedora:42`. Local default stays `:latest`.",
+  "created_at": "2026-08-03T23:04:29Z",
+  "updated_at": "2026-08-03T23:04:29Z",
+  "html_url": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708270836",
+  "pull_request_url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708270836"
+   },
+   "html": {
+    "href": "https://github.com/logos-co/nix-bundle-appimage/pull/5#discussion_r3708270836"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/5"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/logos-co/nix-bundle-appimage/pulls/comments/3708270836/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 249,
+  "side": "RIGHT",
+  "in_reply_to_id": 3708228992,
+  "author_association": "COLLABORATOR",
+  "original_position": 249,
+  "position": 1,
+  "subject_type": "line"
+ }
+]
