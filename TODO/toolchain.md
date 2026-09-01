@@ -614,3 +614,80 @@ stronger statement than the one T-010 could make.
 on the **host**, so `pgb shell` — documented as "an interactive shell inside
 it" — handed the caller a shell on this machine with the wrappers on `PATH`.
 Same class as T-014: a documented capability quietly doing something else.
+
+## T-050 — Plan a nixpkgs package with NO nix, from the `.drv` in the cache
+
+**Source** ⭐ **operator, session of 2026-09-01c**, quoted because the question
+is the finding: *"I think the downloaded nix store files themselves contain
+\*.drv files? so we don't actually need nix installed no?"*
+**Category** toolchain · **Priority** P1 · **Effort** M · **Status** ⚠ partly done
+
+**They are right, and it is measured.** A narinfo names its own producer
+(`Deriver: <hash>-<name>.drv`), that `.drv` is **itself a store path in the
+binary cache** with its own signature and NarHash, and its `References` are the
+`.drv` paths of every input. So the derivation graph is reachable over plain
+HTTPS with no nix and no evaluation.
+
+**Landed.** `tool/nix-drv.py` reads nix's ATerm derivation format (12-check
+selftest, including the two escapes that matter and two refusal cases) and
+emits the same document `nix derivation show` prints, so `tool/nix-plan.py`
+is shared by both routes. `nix_plan_nonix` in `tool/lib/nix.sh` is tried first
+and falls back to evaluation.
+
+⛔ **What is NOT done, and it is the reason this entry stays open:**
+
+1. **The cache does not have every `.drv`.** Sampled with `experiments/83-`:
+   the rate is real, well under 100%, and a route that works for most packages
+   and silently falls back for the rest needs the rate stated wherever the
+   route is claimed.
+2. **Name → store path is still an index lookup, not evaluation.** An
+   override, an overlay, a `pkgsStatic.*` attribute or anything the channel did
+   not build is out of reach by this route, by construction.
+3. The fallback chain (no-nix → evaluation → a committed `--plan`) is not
+   covered by a test that exercises all three.
+
+**Prove.** `experiments/83-drv-without-nix.sh`: the availability rate over a
+sample, a plan built by both routes for the same package **compared field by
+field**, and the no-nix route driven with nix removed from `PATH`.
+
+## T-051 — Enough nix for a host with no root, no docker and no nix
+
+**Source** operator, 2026-09-01c: *"find the least invasive way to 'install'
+enough nix so pgb is usable even on the minimal of hosts like containers that
+can't run docker images or install nix because no root"*.
+**Category** toolchain · **Priority** P1 · **Effort** M · **Status** open
+
+**Problem.** T-050 removes nix from the *planning* step for packages whose
+`.drv` is cached. It does not remove it from the cases T-050 lists as out of
+reach, and `pgb nix build` still wants a build environment.
+
+**What the mining already says.** `references/nix-community__nix-user-chroot`
+(commit `987302aef4e3aa267355cfad00027b730bcb389b`) runs nix as an ordinary
+user in a user namespace — and its own README says Ubuntu 23.10+ gates
+unprivileged user namespaces behind AppArmor and RHEL/CentOS 7 ship them off,
+so it is not a universal answer either. `grigio/docker-nixuser` is the
+container form of the same and needs a container.
+
+**Approach, cheapest first.**
+1. Push T-050 as far as it goes and measure exactly what is left.
+2. For what is left, a static `nix` binary from the cache, run against a store
+   under `$HOME` with `--store`. ⚠ Unverified; it is the obvious first probe.
+3. `nix-user-chroot` where namespaces are available, with the AppArmor case
+   detected and named rather than hit.
+
+⛔ **Not `curl | sh` as root.** That is what this environment did once, on the
+operator's explicit authorisation, and it is not the shape the entry is for.
+
+## T-056 — Port the python helpers to Rust
+
+**Source** operator, 2026-09-01c, explicitly filed as *"far future"*.
+**Category** toolchain · **Priority** P2 · **Effort** L · **Status** open
+
+`tool/nix-plan.py`, `tool/nix-drv.py`, `tool/elf-needed.py` and
+`scripts/common/nix-nar.py` are python, and python is not present on every host
+this project claims. ⚠ `experiments/70-` already settled that a **carried-in**
+static binary runs on 12 of 12, so the language decision is not blocked on
+whether a runtime is present — it is a question of when the churn is worth it.
+⭐ The operator also named `nixie-dev/nixie` as the shape a minimal relocatable
+nix might take. ⛔ Not started, and it must not start before T-050 and T-052
+have settled what these tools actually need to do.

@@ -1,0 +1,18 @@
+experiment 83 - planning with no nix, from the .drv in the cache
+date            : 2026-09-01T17:34:46Z
+
+The route: name -> store-paths.xz -> narinfo Deriver -> the .drv,
+every hop signed and hash-checked, no nix and no evaluation.
+
+deriver .drv availability, BY POPULATION:
+  A    sampled=60   has-drv=2    3%
+  B    sampled=60   has-drv=1    1%
+  C    sampled=19   has-drv=9    47%
+
+  A = any path in the channel index, sampled by stride
+  B = paths with no output suffix
+  C = twenty packages a person would name
+
+⛔ The spread between A and C is the result. The route is worth
+trying first for a named package and is not a general property of
+the cache, and a fallback to evaluation is therefore not optional.

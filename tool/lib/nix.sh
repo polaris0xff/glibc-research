@@ -72,10 +72,83 @@ nix_prefix() {   # the directory nix's own tools live in
 # derivation is what nix actually decided after every override, overlay and
 # conditional in nixpkgs has run; the expression is what somebody wrote. Those
 # differ constantly, and the derivation is the one the build has to match.
+# ⭐ THE NIX-FREE PLAN ROUTE, AND IT IS THE DEFAULT WHERE IT WORKS.
+#
+# The operator asked whether the .drv files in the store make nix unnecessary.
+# They do, over HTTPS, and this is the route:
+#
+#   name --store-paths.xz--> /nix/store/<hash>-<name>
+#        --<hash>.narinfo--> Deriver: <hash>-<name>.drv
+#        --fetch the .drv--> ATerm: src, patches, flags, inputDrvs
+#        --its References--> every input .drv, fetched the same way
+#
+# Every hop is signed and hash-checked by scripts/common/nix-fetch.sh, and no
+# nix runs. tool/nix-drv.py reads the ATerm and emits the same document
+# `nix derivation show` does, so the planner underneath is shared.
+#
+# ⚠ THE ONE THING THIS CANNOT DO is turn an attribute into a store path when
+# nobody built it. The index only lists what the channel built; an override,
+# an overlay or an unbuilt attribute needs an evaluator. `--nix` forces the
+# evaluator route where one is available.
+nix_plan_nonix() {   # name-or-storepath outfile -> 0 on success
+  _np_q="$1"; _np_out="$2"
+  _np_dir="$PGB_STATE/drv"
+  mkdir -p "$_np_dir"
+
+  case "$_np_q" in
+    /nix/store/*|[a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9]*-*) _np_sp="$_np_q" ;;
+    *)
+      # ⛔ ANCHORED AT BOTH ENDS. `resolve bash` unanchored also matches
+      # bash-completion, bashdb and bash-5.3p15-doc, and the first line of
+      # that is whichever sorted first -- a plan for a package nobody asked
+      # for, with no error anywhere.
+      _np_sp=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" resolve                  "/nix/store/[a-z0-9]{32}-$_np_q-[0-9][^/]*$" --limit 5 2>/dev/null | head -1)
+      [ -n "$_np_sp" ] || _np_sp=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" resolve                  "/nix/store/[a-z0-9]{32}-$_np_q$" --limit 5 2>/dev/null | head -1)
+      ;;
+  esac
+  [ -n "$_np_sp" ] || { warn "no store path in the channel index matches '$_np_q'"; return 1; }
+  say "resolved    $_np_sp  (channel index, no nix)"
+
+  _np_drv=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" info "$_np_sp" 2>/dev/null             | sed -n 's/^Deriver: //p')
+  [ -n "$_np_drv" ] || { warn "the narinfo for $_np_sp names no Deriver"; return 1; }
+  say "deriver     $_np_drv  (from the signed narinfo)"
+
+  # The derivation, then every input derivation it names. ⚠ DEPTH 1 IS
+  # ENOUGH and depth 2 would be a different tool: the source, the patches and
+  # the buildInputs are all DIRECT inputs, and their own inputs are only
+  # needed when the dependency walk plans them, which it does one at a time.
+  sh "$PGB_SELF/scripts/common/nix-fetch.sh" fetch "$_np_drv" --out "$_np_dir"      --no-closure >/dev/null 2>&1 || { warn "could not fetch $_np_drv"; return 1; }
+  _np_file="$_np_dir/$(printf '%s' "$_np_drv" | sed 's|^/nix/store/||')"
+  _np_inputs=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" info "$_np_drv" 2>/dev/null                | sed -n 's/^References: //p')
+  _np_n=0
+  for _np_i in $_np_inputs; do
+    case "$_np_i" in *.drv) ;; *) continue ;; esac
+    sh "$PGB_SELF/scripts/common/nix-fetch.sh" fetch "$_np_i" --out "$_np_dir"        --no-closure >/dev/null 2>&1 && _np_n=$((_np_n + 1))
+  done
+  say "derivations $((_np_n + 1)) fetched and verified over HTTPS"
+
+  python3 "$PGB_SELF/tool/nix-drv.py" show "$_np_file" "$_np_dir"/*.drv 2>/dev/null     | python3 "$PGB_SELF/tool/nix-plan.py" "$_np_q" "$_np_file"     > "$_np_out.part" 2>/dev/null || { rm -f "$_np_out.part"; return 1; }
+  [ -s "$_np_out.part" ] || { rm -f "$_np_out.part"; return 1; }
+  mv "$_np_out.part" "$_np_out"
+  return 0
+}
+
 nix_plan() {   # attr [outfile]
   _attr="$1"
   _out="${2:-}"
-  _pfx=$(nix_prefix) || die "pgb nix plan needs nix. Install it, or use --plan with a plan another machine made." 2
+
+  # ⭐ THE NIX-FREE ROUTE IS TRIED FIRST, because it is the one that works on
+  # a host with no root, no docker and no nix -- which is the case this
+  # project exists for. `PGB_NIX_FORCE_EVAL=1` skips it.
+  if [ "${PGB_NIX_FORCE_EVAL:-0}" != 1 ] && [ -n "$_out" ]; then
+    if nix_plan_nonix "$_attr" "$_out"; then
+      say "plan: $_out  (no nix was used)"
+      return 0
+    fi
+    warn "the nix-free route did not resolve '$_attr'; falling back to evaluation"
+  fi
+
+  _pfx=$(nix_prefix) || die "pgb nix plan needs nix, or a name the channel index knows. Install it, or use --plan with a plan another machine made." 2
 
   # ⛔ A MULTI-OUTPUT ATTRIBUTE PRINTS `<drv>!bin`, NOT `<drv>`. jq, sqlite and
   # curl all do, and the first version of this check required the path to END
@@ -830,6 +903,25 @@ nix_diagnose() {   # log srcdir flags -> a fix directive, or nothing
         printf 'drop:%s\n' "$_flag"; return 0 ;; esac
     fi
   done
+
+  # ⭐ THE SECOND GENERAL RULE: THE ERROR NAMES THE LIBRARY, AND THE FLAG THAT
+  # ASKED FOR IT IS SPELLED FROM ITS NAME. curl is the case:
+  #
+  #   configure: error: libzstd was not found where specified!
+  #
+  # and the flag on the command line is `--with-zstd`. Both spellings are
+  # tried, with and without the lib prefix, and the flag is only dropped if it
+  # is actually present -- so this cannot invent a change.
+  _miss=$(grep -oE "configure: error: (lib)?[A-Za-z0-9_+-]+ (was not found|not found)" "$_lg" 2>/dev/null \
+          | head -1 | sed -E 's/configure: error: //; s/ (was not found|not found)//')
+  if [ -n "$_miss" ]; then
+    for _cand in "--with-$_miss" "--with-${_miss#lib}" "--enable-$_miss" "--enable-${_miss#lib}"; do
+      case " $_flags " in
+        *" $_cand "*) printf 'drop:%s\n' "$_cand"; return 0 ;;
+        *" $_cand="*) ;;
+      esac
+    done
+  fi
 
   # ⭐ THE BEST RULE IN THIS FUNCTION, BECAUSE IT IS NOT A RULE ABOUT ANY
   # PARTICULAR PACKAGE. autoconf's own error text very often names the flag
