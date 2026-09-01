@@ -32,7 +32,7 @@ Quoted, because the framing is load-bearing:
 |---|---|---|
 | 1. the builder | T-050, T-051, T-012 | ⚠ **started and working**: six packages built static from nixpkgs plans, two verified 11/11 |
 | 2. the bundler | T-057, T-052, T-053 | ⚠ **started**: a GTK app starting on musl, and ⭐ **the mesa half of the OpenGL problem solved and measured** — `EGL vendor string: Mesa Project`, `driver name: swrast`, on a machine with no GPU and no host GL. NVIDIA, debloat, and any comparison against a hand-built AppImage are all still open |
-| 3. kdenlive | T-054, T-055 | ⛔ **not started.** The ENGINE is already static and proved (POC 80); Qt/KF6 and the application are untouched |
+| 3. kdenlive | T-054, T-055 | ⛔ **not started, and NOT ruled out.** The ENGINE is already static and proved (POC 80, 11 of 11, renders MP4); Qt/KF6 was **never attempted by anybody** — see T-054, which lists why the mechanism this project already has is the one Qt needs |
 
 ## What this session did
 
@@ -137,13 +137,32 @@ set, dlopen'd libraries included.
 
 Nothing half-written. See `RESUME.md`.
 
-## Work order
+## ⛔ THE STOP CONDITION FOR THE NEXT SESSION
 
-    T-052   the OpenGL question    ⛔ it gates goal 2 and goal 3 both
-    T-057   the bundler: debloat, wrapper scripts, a measured comparison
-    T-054   kdenlive static -- the engine is done, Qt/KF6 is the rung
+⭐ **Operator instruction, 2026-09-01c: the next session has LESS BUDGET, and
+it ends when the required POCs are done.** They are these four, in this order,
+and each closes with its `Prove` command run and the output in its entry:
+
+| # | POC | closes | done when |
+|---|---|---|---|
+| 1 | **`poc/90-qt`** — a Qt 6 program, static, through `pgb nix build` | T-054 rung 1 | a Qt widget program runs on 11 of 11 with zero host shared objects, **or** the rung that stopped it is recorded at file and line, the way `evidence/72-.../CPYTHON-FAILURE.txt` already does |
+| 2 | **`experiments/85-opengl`** — the bundled GL stack on all eleven | T-052 | a row per environment for `eglinfo`, with the GPU-less caveat stated in the file |
+| 3 | **`experiments/86-bundler-vs-anylinux`** — our bundle against a hand-built one | T-057 | size, startup and host-object columns for the same application, both artefacts, same day |
+| 4 | **`poc/20` and `poc/30` reruns** — `--embed-terminfo`, `--embed-cacert` | T-032 | both already wired; only the runs are owed |
+
+⛔ **Stop after those four.** Not before — a session that does three has not
+finished. Not after — T-055 (the kdenlive bundle comparison) and T-050/T-051
+are the session after that, and starting them is how the four above end up
+half-done.
+
+⚠ **1 and 2 can run at the same time**: the Qt build is CPU-bound for a long
+time and the GL matrix is not. `scripts/common/bootstrap.sh` exists so setup
+overlaps with reading, too.
+
+## Work order, after the stop condition above
+
     T-050   finish the no-nix route; T-051 the no-root host
-    T-032   two POC runs, both already wired
+    T-055   the kdenlive bundle comparison -- blocked on 1 and 2 above
     then P2 by category
 
 ## Open questions for the operator

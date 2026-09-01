@@ -291,11 +291,46 @@ build system rather than the code:
   ffmpeg (`R_X86_64_PC32 against ff_pw_5`) while **the same objects link into
   a static executable perfectly**.
 
-**What "exhaust" means here.** Qt 6 supports `-static`; KF6 is the open
-question, and so is whether Qt's own plugin system (`QPA`, image formats,
-`libqxcb`) can be served by `--wrap-dlopen`, which POC 70 proved on SQLite's
-open plugin ABI. ⛔ Per `docs/AGENTS.md` §14 this entry does not close as
-"impossible"; it closes with what was tried, at file and line, and what broke.
+## ⛔ "Qt/KF6 are impossible then" — no, and the record does not say that
+
+⚠ **Asked by the operator, 2026-09-01c, and it is worth answering precisely
+because the answer is the opposite.** `poc/80-mlt` writes, in its own output:
+
+```
+Qt 6 / KDE Frameworks    ⛔ NOT ATTEMPTED -- the next rung
+kdenlive                 ⛔ NOT ATTEMPTED
+```
+
+**NOT ATTEMPTED is not a failure.** Nobody has run it. `grep -rn "Qt" poc/
+experiments/` finds four lines and all four are in POC 80's own prose about
+what comes next. There is no error, no log and no rung that stopped.
+
+⭐ **And the evidence points the other way**, which is why this entry is L
+rather than "closed as unreachable":
+
+| | |
+|---|---|
+| Qt 6 supports `-static` upstream | `configure -static` is a supported, documented Qt configuration; this is not a hack somebody would have to invent |
+| **Qt's plugins are the class this project has ALREADY SOLVED TWICE** | QPA (`libqxcb`), image formats and SQL drivers are *the application's own* plugins, `dlopen`'d by name. That is exactly what `--wrap-dlopen` serves: **POC 70 runs SQLite with fifteen of its own extensions out of an EMPTY directory on 11 of 11**, and POC 50 links 49 CPython modules in with `lib-dynload` empty |
+| Qt says so itself | a static Qt build uses `Q_IMPORT_PLUGIN` to link plugins in, which is the same mechanism reached from Qt's side rather than pgb's |
+| the engine below it is done | ffmpeg and MLT, static, 11 of 11, rendering a real MP4 |
+
+⚠ **The honest risks, named rather than hidden:** Qt 6 is a very large build
+(hours, not minutes, and it is the reason this entry is L); KF6 has far less
+static-build practice behind it than Qt does; and MLT's own
+`add_library(mlt SHARED)` shows that a project's BUILD SYSTEM can refuse
+`-static` even when its code is fine. Any of those could stop it.
+
+⛔ **What this entry may NOT do** is close as "impossible", per
+`docs/AGENTS.md` §14. It closes one of two ways: a static Qt program running
+on the matrix, or a written record of the exact rung that stopped it, with the
+error and the file it came from — the shape
+`evidence/72-static-host-plugin-abi/CPYTHON-FAILURE.txt` already uses.
+
+**What "exhaust" means here.** Climb the rungs in order and record each:
+a Qt 6 *widget* program static (this is `poc/90-qt` and it is the next
+session's first required POC), then a Qt program with a QPA platform plugin
+under `--wrap-dlopen`, then KF6, then kdenlive.
 
 **Prove.** `evidence/poc/90-kdenlive/RESULT.txt`, or a written record of the
 rung that stopped it with the error and the file it came from — the shape
