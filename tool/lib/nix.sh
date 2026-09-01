@@ -113,24 +113,74 @@ nix_plan_nonix() {   # name-or-storepath outfile -> 0 on success
   [ -n "$_np_drv" ] || { warn "the narinfo for $_np_sp names no Deriver"; return 1; }
   say "deriver     $_np_drv  (from the signed narinfo)"
 
+  nix_plan_from_drv "$_np_drv" "$_np_q" "$_np_out"
+}
+
+# ⭐ THE SHARED TAIL OF EVERY NIX-FREE ROUTE: a .drv store path, over HTTPS,
+# into a pgb build plan. Both routes above it end here, so a fix to the plan
+# pipeline cannot land in one and miss the other.
+nix_plan_from_drv() {   # drvpath query outfile -> 0 on success
+  _pd_drv="$1"; _pd_q="$2"; _pd_out="$3"
+  _pd_dir="$PGB_STATE/drv"
+  mkdir -p "$_pd_dir"
+
   # The derivation, then every input derivation it names. ⚠ DEPTH 1 IS
   # ENOUGH and depth 2 would be a different tool: the source, the patches and
   # the buildInputs are all DIRECT inputs, and their own inputs are only
   # needed when the dependency walk plans them, which it does one at a time.
-  sh "$PGB_SELF/scripts/common/nix-fetch.sh" fetch "$_np_drv" --out "$_np_dir"      --no-closure >/dev/null 2>&1 || { warn "could not fetch $_np_drv"; return 1; }
-  _np_file="$_np_dir/$(printf '%s' "$_np_drv" | sed 's|^/nix/store/||')"
-  _np_inputs=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" info "$_np_drv" 2>/dev/null                | sed -n 's/^References: //p')
-  _np_n=0
-  for _np_i in $_np_inputs; do
-    case "$_np_i" in *.drv) ;; *) continue ;; esac
-    sh "$PGB_SELF/scripts/common/nix-fetch.sh" fetch "$_np_i" --out "$_np_dir"        --no-closure >/dev/null 2>&1 && _np_n=$((_np_n + 1))
+  sh "$PGB_SELF/scripts/common/nix-fetch.sh" fetch "$_pd_drv" --out "$_pd_dir" \
+     --no-closure >/dev/null 2>&1 || { warn "could not fetch $_pd_drv"; return 1; }
+  _pd_file="$_pd_dir/$(printf '%s' "$_pd_drv" | sed 's|^/nix/store/||')"
+  _pd_inputs=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" info "$_pd_drv" 2>/dev/null \
+               | sed -n 's/^References: //p')
+  _pd_n=0
+  for _pd_i in $_pd_inputs; do
+    case "$_pd_i" in *.drv) ;; *) continue ;; esac
+    sh "$PGB_SELF/scripts/common/nix-fetch.sh" fetch "$_pd_i" --out "$_pd_dir" \
+       --no-closure >/dev/null 2>&1 && _pd_n=$((_pd_n + 1))
   done
-  say "derivations $((_np_n + 1)) fetched and verified over HTTPS"
+  say "derivations $((_pd_n + 1)) fetched and verified over HTTPS"
 
-  python3 "$PGB_SELF/tool/nix-drv.py" show "$_np_file" "$_np_dir"/*.drv 2>/dev/null     | python3 "$PGB_SELF/tool/nix-plan.py" "$_np_q" "$_np_file"     > "$_np_out.part" 2>/dev/null || { rm -f "$_np_out.part"; return 1; }
-  [ -s "$_np_out.part" ] || { rm -f "$_np_out.part"; return 1; }
-  mv "$_np_out.part" "$_np_out"
+  python3 "$PGB_SELF/tool/nix-drv.py" show "$_pd_file" "$_pd_dir"/*.drv 2>/dev/null \
+    | python3 "$PGB_SELF/tool/nix-plan.py" "$_pd_q" "$_pd_file" \
+    > "$_pd_out.part" 2>/dev/null || { rm -f "$_pd_out.part"; return 1; }
+  [ -s "$_pd_out.part" ] || { rm -f "$_pd_out.part"; return 1; }
+  mv "$_pd_out.part" "$_pd_out"
   return 0
+}
+
+# ⭐ THE ROUTE THAT REMOVED THE 3%/47% CEILING. `experiments/83-` measured the
+# narinfo `Deriver:` field -- the only name->derivation link the route above
+# has -- at 3% of paths sampled by stride and 47% of twenty packages a person
+# would name, and concluded that an evaluation fallback was mandatory.
+#
+# ⛔ IT IS NOT THE ONLY FALLBACK. hydra BUILT the channel, so it holds the
+# derivation for every job it ran: `drvpath`, the system, and each output's
+# store path, at
+#
+#   hydra.nixos.org/job/<project>/<jobset>/<attr>.<system>/latest-finished
+#
+# That is an index of BUILDS rather than a field somebody happened to upload
+# with a NAR, so `Deriver:` availability does not bound it. The drvpath it
+# returns for `jq` is byte-identical to the one a local `nix-instantiate`
+# computes -- `experiments/88-` asserts exactly that against evaluation.
+#
+# ⚠ AND IT PINS DIFFERENTLY, which is stated rather than hidden: hydra answers
+# for its latest FINISHED eval and the channel is an older tested revision, so
+# `ChannelPinAgrees` is usually `no`. That matters for fetching a prebuilt
+# binary and not for planning, because a plan is source URLs and configure
+# flags, and sources are fixed-output paths that do not move with the revision.
+nix_plan_hydra() {   # attr outfile -> 0 on success
+  _ph_q="$1"; _ph_out="$2"
+  case "$_ph_q" in /nix/store/*) return 1 ;; esac   # a store path, not an attr
+
+  _ph_info=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" drv "$_ph_q" \
+             --system "${PGB_NIX_SYSTEM:-x86_64-linux}" 2>/dev/null) || return 1
+  _ph_drv=$(printf '%s\n' "$_ph_info" | sed -n 's/^Drv: //p')
+  [ -n "$_ph_drv" ] || return 1
+  say "resolved    $_ph_drv  (hydra $(printf '%s\n' "$_ph_info" | sed -n 's/^Job: //p'), no nix)"
+  say "revision    $(printf '%s\n' "$_ph_info" | sed -n 's/^Revision: //p')  channel pin agrees: $(printf '%s\n' "$_ph_info" | sed -n 's/^ChannelPinAgrees: //p')"
+  nix_plan_from_drv "$_ph_drv" "$_ph_q" "$_ph_out"
 }
 
 nix_plan() {   # attr [outfile]
@@ -141,11 +191,19 @@ nix_plan() {   # attr [outfile]
   # a host with no root, no docker and no nix -- which is the case this
   # project exists for. `PGB_NIX_FORCE_EVAL=1` skips it.
   if [ "${PGB_NIX_FORCE_EVAL:-0}" != 1 ] && [ -n "$_out" ]; then
-    if nix_plan_nonix "$_attr" "$_out"; then
-      say "plan: $_out  (no nix was used)"
+    # ⭐ TWO NIX-FREE ROUTES, CHEAPEST-CORRECT FIRST. hydra is tried first
+    # because it answers for every job it built rather than for the fraction
+    # of paths whose narinfo carries a `Deriver:`; the channel-index route is
+    # kept because it needs one endpoint fewer and works for a bare store path.
+    if [ "${PGB_NIX_NO_HYDRA:-0}" != 1 ] && nix_plan_hydra "$_attr" "$_out"; then
+      say "plan: $_out  (no nix was used -- hydra route)"
       return 0
     fi
-    warn "the nix-free route did not resolve '$_attr'; falling back to evaluation"
+    if nix_plan_nonix "$_attr" "$_out"; then
+      say "plan: $_out  (no nix was used -- channel index route)"
+      return 0
+    fi
+    warn "no nix-free route resolved '$_attr'; falling back to evaluation"
   fi
 
   _pfx=$(nix_prefix) || die "pgb nix plan needs nix, or a name the channel index knows. Install it, or use --plan with a plan another machine made." 2

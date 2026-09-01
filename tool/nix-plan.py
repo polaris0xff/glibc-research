@@ -120,6 +120,23 @@ def main(argv):
     #
     # ⚠ The document writes output paths as BASENAMES and buildInputs as full
     # /nix/store paths. Matching without normalising finds nothing, silently.
+    # ⛔ A DEPENDENCY DERIVATION HAS structuredAttrs TOO, AND READING ONLY
+    # `env` LOSES THEM. The top-level derivation is normalised above; every
+    # OTHER derivation in the document -- which is where every fetchurl lives
+    # -- was read straight out of `env`, and a modern nixpkgs fetchurl keeps
+    # `urls` in the structured attribute set. So `src.urls` came out EMPTY for
+    # every package, on BOTH routes, and nothing said so: the cache route
+    # covers the source by store path, so the upstream-URL fallback was simply
+    # never exercised. That fallback is the one that still works when a path
+    # was never uploaded or has been garbage-collected.
+    def env_of(d):
+        sa = d.get("structuredAttrs")
+        if isinstance(sa, dict) and sa:
+            merged = dict(d.get("env") or {})
+            merged.update(sa)
+            return merged
+        return d.get("env") or {}
+
     out_index = {}
     for path, d in drvs.items():
         for oname, o in (d.get("outputs") or {}).items():
@@ -134,10 +151,10 @@ def main(argv):
     for path, d in drvs.items():
         outs = d.get("outputs", {})
         out = outs.get("out", {})
-        h = out.get("hash") or d.get("env", {}).get("outputHash")
+        e = env_of(d)
+        h = out.get("hash") or e.get("outputHash")
         if not h:
             continue
-        e = d.get("env", {})
         urls = split_ws(e.get("urls")) or split_ws(e.get("url"))
         rec = {"drv": full_store(path), "outputHash": h, "urls": urls}
         by_name.setdefault(d.get("name") or e.get("name") or "", []).append(rec)
@@ -161,7 +178,7 @@ def main(argv):
             drv = sh([os.path.join(nixpfx, "nix-store"), "-q", "--deriver", store_path])
         if drv and os.path.basename(drv) in drvs:
             d = drvs[os.path.basename(drv)]
-            e = d.get("env", {})
+            e = env_of(d)
             rec["urls"] = split_ws(e.get("urls")) or split_ws(e.get("url"))
             rec["outputHash"] = (
                 d.get("outputs", {}).get("out", {}).get("hash")
