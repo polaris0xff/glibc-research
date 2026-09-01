@@ -648,6 +648,13 @@ cmd_verify() {
 }
 
 # Report shared objects and gconv/NSS data the binary itself opened.
+#
+# ⛔ A SHARED OBJECT ENDS IN .so OR .so.N. Matching the substring ".so"
+# anywhere in the path also matches `/etc/ld.so.cache`, which is an index and
+# not an object -- and the caller turns a non-empty result here into a FAILED
+# verify. A binary that opened the cache and loaded nothing would have been
+# reported as not portable because of a file it only read.
+# docs/history/corrections.md, instrument defects.
 trace_host_objects() {
   root="$1"; inner="$2"; shift 2
   command -v strace >/dev/null 2>&1 || { printf ''; return; }
@@ -658,7 +665,7 @@ trace_host_objects() {
     { pid = $1 }
     $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }
     seen && pid == target && /open(at)?\(/ && !/ENOENT|= -1/ { print }
-  ' "$t" | grep -oE '"[^"]*\.so[^"]*"' | tr -d '"' | sort -u | tr '\n' ' '
+  ' "$t" | grep -oE '"[^"]*\.so(\.[0-9]+)*"' | tr -d '"' | sort -u | tr '\n' ' '
   rm -f "$t"
 }
 

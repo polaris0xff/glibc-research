@@ -133,10 +133,20 @@ exp_trace_opens() {  # rootfs in-root-path tracefile [extra rootfs-run args...]
 }
 
 # The same, reduced to the shared objects and gconv/NSS data the target opened.
+#
+# ⛔ A SHARED OBJECT ENDS IN .so OR .so.N -- IT IS NOT ANY PATH CONTAINING
+# ".so". The first version matched the substring, so `/etc/ld.so.cache` -- an
+# index, not an object, opened by every glibc process that reaches dlopen --
+# was reported as a loaded shared object. It reached committed evidence:
+# `evidence/poc/10-gawk/RESULT.txt` lists it on all seven glibc rows. No
+# verdict was wrong there, because a real object sat beside it on every such
+# row, but the same expression in `pgb verify` decides pass/fail, and a binary
+# that opened the cache and loaded nothing would have been failed for it.
+# docs/history/corrections.md, instrument defects.
 exp_trace_libs() {   # rootfs in-root-path tracefile [extra args...]
   exp_trace_opens "$@" \
     | grep -vE 'ENOENT|= -1' \
-    | grep -oE '"[^"]*\.so[^"]*"|"[^"]*gconv[^"]*"|"[^"]*/locale[^"]*"' \
+    | grep -oE '"[^"]*\.so(\.[0-9]+)*"|"[^"]*gconv[^"]*"|"[^"]*/locale[^"]*"' \
     | tr -d '"' | sort -u
 }
 

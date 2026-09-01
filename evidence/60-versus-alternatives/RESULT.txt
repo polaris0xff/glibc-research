@@ -1,0 +1,109 @@
+===============================================================
+60 - head to head against the alternatives (REQUIREMENTS.md part 2)
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-01T09:52:20Z
+host kernel  : Linux 6.18.44-fc-v22
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/60-versus-alternatives
+--------------------------------------------------------------
+
+  ok    arm N built (native dynamic)                   = yes
+  ok    arm S built (plain gcc -static)                = yes
+  ok    arm P built (pgb)                              = yes
+  ok    arm M built (static musl)                      = built
+  ok    arm A built (AppImage)                         = built
+  ok    arm O built (onelf)                            = built
+  ok    arm F built (Flatpak)                          = built
+  ok    arm K built (snap)                             = built
+
+-- per environment ------------------------------------------------
+  ENVIRONMENT         LIBC   N          S          P          M          A          O         
+  alpine-3.22         musl   exit127/0  exit1/0    ok/0       ok/0       exit127/0  exit1/0   
+  alpine-3.20         musl   exit127/0  exit1/0    ok/0       ok/0       exit127/0  exit1/0   
+  alpine-3.10         musl   exit127/0  exit1/0    ok/0       ok/0       exit127/0  exit1/0   
+  voidlinux-musl      musl   exit127/0  exit1/0    ok/0       ok/0       exit127/0  exit1/0   
+  debian-11           glibc  exit1/1    SIG6/3     ok/0       ok/0       exit1/1    ok/3      
+  debian-12           glibc  ok/4       ok/5       ok/0       ok/0       ok/4       ok/3      
+  ubuntu-20.04        glibc  exit1/1    SIG6/3     ok/0       ok/0       exit1/1    ok/3      
+  rockylinux-8        glibc  exit1/1    exit1/0    ok/0       ok/0       exit1/1    exit1/0   
+  opensuse-leap-15.6  glibc  exit1/2    SIG8/3     ok/0       ok/0       exit1/2    exit1/0   
+  fedora-42           glibc  exit1/2    exit1/0    ok/0       ok/0       exit1/2    exit1/0   
+  archlinux-latest    glibc  ok/4       exit1/0    ok/0       ok/0       ok/4       exit1/0   
+
+  cell is EXITSTATUS/H, H = host shared objects the payload process
+  itself opened. ok/0 is the success criterion of docs/AGENTS.md §3.
+
+-- host prerequisites, probed on the unmodified images -------------
+  ENVIRONMENT         flatpak   snap      fusermount   /dev/fuse
+  alpine-3.22         no        no        no           no
+  alpine-3.20         no        no        no           no
+  alpine-3.10         no        no        no           no
+  voidlinux-musl      no        no        no           no
+  debian-11           no        no        no           no
+  debian-12           no        no        no           no
+  ubuntu-20.04        no        no        no           no
+  rockylinux-8        no        no        no           no
+  opensuse-leap-15.6  no        no        no           no
+  fedora-42           no        no        no           no
+  archlinux-latest    no        no        no           no
+
+-- what it costs on this machine ----------------------------------
+  conditions: 100 execs x 3 rounds, best round; ⚠ one machine, one day
+
+  ARM ARTEFACT              SHIP (B)  PER EXEC (us)   RSS (KiB)  ALSO NEEDED ON TARGET
+  N   native dynamic           16368           1040        5568  nothing
+  S   plain gcc -static       949568            950        5568  nothing
+  P   pgb                    2097824            980        5552  nothing
+  M   static musl             447264            160        5504  nothing
+  A   AppImage                948728           4610        5480  nothing; FUSE only for the mount mode, else it extracts
+  O   onelf                  1761241           3650        5504  nothing
+  F   Flatpak                   4228              -           -  flatpak + org.freedesktop.Platform//24.08 (623352581 B)
+  K   snap                      4096              -           -  snapd, which needs systemd, + the core24 base snap
+
+-- coverage, out of 11 environments ---------------------------------
+  ARM ARTEFACT                RUNS  PAYLOAD CLEAN   TREE CLEAN
+  N   native dynamic          2/11           4/11         4/11
+  S   plain gcc -static       1/11           7/11         7/11
+  P   pgb                    11/11          11/11        11/11
+  M   static musl            11/11          11/11        11/11
+  A   AppImage                2/11           4/11          0/7
+  O   onelf                   3/11           8/11         8/11
+  F   Flatpak                0/11*              -            -
+  K   snap                   0/11*              -            -
+
+  * F and K were BUILT here and could not be RUN on any target: 0 of 11
+    images ship flatpak and 0 of 11 ship snap, so an untouched target
+    has nothing to execute them with. That is a measurement of the
+    images -- see the prerequisite table above -- not an estimate.
+
+  ok    pgb ran on every environment                   = 11
+  ok    pgb loaded no host shared object               = 11
+        READ THE TWO CLEAN COLUMNS SEPARATELY. 'payload clean' is the §3
+          criterion: no host object in the process the program runs in.
+          'tree clean' also counts what the delivery mechanism loaded to get
+          there. A format can be clean by the first and not the second.
+        
+        ⚠ THE BED CANNOT GIVE onelf ITS PREFERRED MODES. Its fuse and tmpfs
+          modes both call unshare(CLONE_NEWUSER|CLONE_NEWNS), which returns
+          EPERM inside this chroot, so every onelf row here is its LAST
+          fallback -- cache mode, which extracts to disk. Outside the bed, on
+          this same host, fuse and tmpfs both work. ⛔ Do not read the onelf
+          rows as onelf failing to mount; read them as onelf's worst mode.
+        
+        ⚠ F and K were built and never run. flatpak run needs a D-Bus session
+          bus and dbus-daemon cannot start in this container (cap_sys_resource
+          is dropped, so it cannot raise its fd limit); snapd needs systemd.
+          Neither blocker touches the coverage row, which is decided by the
+          targets shipping no flatpak and no snap at all.
+        
+        ⚠ One machine, one day. See the conditions block at the top.
+
+-- result ----------------------------------------------------
+pass=10 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

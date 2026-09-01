@@ -185,6 +185,12 @@ poc_unstage_extras() { # rootfs [src:dst ...]
 poc_observe() {  # binary-path label [extra files: src:dst ...]
   _bin="$1"; _label="$2"; shift 2
   _base=$(basename "$_bin")
+  # ⛔ TRUNCATE, DO NOT APPEND. The rows below are written with >>, so before
+  # this line a second run of the POC left observation.txt holding BOTH runs
+  # back to back -- 22 rows for an 11-environment matrix, the older half
+  # describing a binary that no longer exists. Same defect class as the POCs
+  # that appended to the target's /etc/hosts. docs/history/corrections.md.
+  : > "$POC_OUT/observation.txt"
   printf '\n  OBSERVATION -- %s (measured, not asserted):\n' "$_label"
   printf '    %-20s %-6s %-10s %s\n' ENVIRONMENT LIBC OUTCOME 'HOST OBJECTS PULLED IN'
   while read -r ref name libc digest; do
@@ -204,6 +210,15 @@ poc_observe() {  # binary-path label [extra files: src:dst ...]
 }
 
 # Shared objects and gconv data the binary itself opened, attributed by pid.
+#
+# ⛔ A SHARED OBJECT ENDS IN .so OR .so.N. Matching ".so" anywhere in the path
+# also matches `/etc/ld.so.cache`, which is an index and not an object, and
+# poc_matrix ASSERTS on this value -- so a binary that opened the cache and
+# loaded nothing would have failed a POC over a file it only read. The wrong
+# expression reached committed evidence: `evidence/poc/10-gawk/RESULT.txt`
+# lists /etc/ld.so.cache on all seven glibc rows of the observation table. No
+# verdict there was wrong, because a real object sits beside it on every one of
+# those rows. docs/history/corrections.md, instrument defects.
 poc_trace() { # rootfs in-root-binary script-name
   command -v strace >/dev/null 2>&1 || { printf ''; return; }
   _t=$(mktemp) || { printf ''; return; }
@@ -214,7 +229,7 @@ poc_trace() { # rootfs in-root-binary script-name
     { pid = $1 }
     $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }
     seen && pid == target && /open(at)?\(/ && !/ENOENT|= -1/ { print }
-  ' "$_t" | grep -oE '"[^"]*\.so[^"]*"' | tr -d '"' | sort -u | tr '\n' ' '
+  ' "$_t" | grep -oE '"[^"]*\.so(\.[0-9]+)*"' | tr -d '"' | sort -u | tr '\n' ' '
   rm -f "$_t"
 }
 

@@ -6,7 +6,7 @@ version       : 5.3.1
 sha256        : fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e
 normal build  : ./configure && make
 stresses      : locale (LC_CTYPE, LC_NUMERIC), iconv, dlopen extension API
-date (UTC)    : 2026-09-01T06:34:37Z
+date (UTC)    : 2026-09-01T10:06:07Z
 evidence      : /home/user/glibc-research/evidence/poc/10-gawk
 ---------------------------------------------------------------
   ok    built                                        = yes
@@ -49,13 +49,13 @@ evidence      : /home/user/glibc-research/evidence/poc/10-gawk
     alpine-3.20          musl   refused    /pgb-ext/filefuncs.so 
     alpine-3.10          musl   refused    /pgb-ext/filefuncs.so 
     voidlinux-musl       musl   refused    /pgb-ext/filefuncs.so 
-    debian-11            glibc  refused    /etc/ld.so.cache /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
-    debian-12            glibc  LOADED     /etc/ld.so.cache /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
-    ubuntu-20.04         glibc  refused    /etc/ld.so.cache /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
-    rockylinux-8         glibc  refused    /etc/ld.so.cache /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
-    opensuse-leap-15.6   glibc  refused    /etc/ld.so.cache /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
-    fedora-42            glibc  refused    /etc/ld.so.cache /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
-    archlinux-latest     glibc  LOADED     /etc/ld.so.cache /pgb-ext/filefuncs.so /usr/lib/ld-linux-x86-64.so.2 /usr/lib/libc.so.6 
+    debian-11            glibc  refused    /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
+    debian-12            glibc  LOADED     /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
+    ubuntu-20.04         glibc  refused    /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
+    rockylinux-8         glibc  refused    /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
+    opensuse-leap-15.6   glibc  refused    /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
+    fedora-42            glibc  refused    /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
+    archlinux-latest     glibc  LOADED     /pgb-ext/filefuncs.so /usr/lib/ld-linux-x86-64.so.2 /usr/lib/libc.so.6 
 
 ---------------------------------------------------------------
 pass=12 fail=0 skip=0
