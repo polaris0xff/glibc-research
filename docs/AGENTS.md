@@ -15,22 +15,29 @@ significant overhead — and ship the tool that does it.
 [`REQUIREMENTS.md`](REQUIREMENTS.md).** It carries the operator's binding
 acceptance bar — *works everywhere, or strictly better than every existing
 format and technique* — which this project **does not meet**, and it tracks
-which half of that bar each piece of work discharges. ⚠ Not "does not yet":
-half of that bar has now been **measured false**, not merely left undone, and
-the page says which half and by how much.
+what each piece of work does about that.
 
 The tool is [`../pgb`](../pgb) (portable glibc build): a POSIX-sh driver plus
 three small C runtime pieces. Output is an ordinary statically linked
 executable. No launcher, no AppDir, no loader, nothing beside it.
 
 **The answer reached: yes, for programs that do not need to load host
-plugins.** Five real projects prove it; §7 states the limits.
+plugins.** Five real projects prove it; §7 has the open problems and the route
+to each.
 
-⭐ **What that is worth, measured on the axis that matters.** `tmp/START.md`
-asks for static binaries "using GLIBC **rather than MUSL** … while avoiding the
-usual drawbacks", so musl is the thing being avoided, not a rival to beat on
-its own ground. `experiments/61-` measures the ground that is actually
-contested — steady-state throughput, same machine, same compiler, libc the only
+⛔ **`pgb` is a TOOLCHAIN, not a delivery format**, and comparing it to one
+gets the next step wrong. AppImage, Flatpak, snap and onelf answer *how does
+this reach a machine*. `pgb` answers *how does a developer get from source to a
+binary that runs*, and its output is deliberately not a format — it is an
+ordinary ELF. The target shape is `pgb build <url-or-package>`, with the tool
+resolving the source, working out dependencies, linking statically what it can,
+and bundling only what is left. [`design/toolchain.md`](design/toolchain.md)
+is the design and the language decision.
+
+⭐ **Why glibc, measured.** `tmp/START.md` asks for static binaries "using
+GLIBC **rather than MUSL** … while avoiding the usual drawbacks", so musl is
+the drawback being avoided rather than a rival. `experiments/61-` measures the
+contested ground — steady state, same machine, same compiler, libc the only
 variable:
 
 | | glibc static | musl static |
@@ -39,22 +46,17 @@ variable:
 | qsort | **93.20 ns/op** | 921.49 ns/op |
 | strlen/strchr/strstr | **149.14 ns/op** | 1051.09 ns/op |
 
-⭐ **And the row that is this project's actual product:** on **Alpine**, where
-the ordinary choice is a musl build, a `pgb` binary does that 4-thread
-allocator workload in **4.68 ns/op** against musl's **592**. Same glibc
-numbers, on a machine that ships no glibc — and `pgb` costs nothing to get
-them: 0.99×–1.05× against plain `gcc -static` on the same workloads.
+⭐ **The product, in one row:** on **Alpine**, where the ordinary choice is a
+musl build, a `pgb` binary does that 4-thread allocator workload in
+**4.68 ns/op** against musl's **592**. glibc's numbers on a machine that ships
+no glibc — and `pgb` costs nothing to carry them: 0.99×–1.05× against plain
+`gcc -static` on the same workloads.
 
-⚠ **A previous revision of this page said the opposite** — that static musl
-"ties pgb and beats it" — from an experiment that measured startup and size,
-the two axes musl wins by construction. `history/corrections.md` C7 has what
-went wrong and why. ⛔ Do not reintroduce that framing.
-
-The alternative that genuinely competes is **`Anylinux-AppImages`**, not musl
-and not vanilla AppImage: it bundles glibc, its loader and its gconv tree, and
-`experiments/62-` measures it running on 11 of 11 at glibc's speed too. What
-separates `pgb` from it is shape and reach, not portability or performance —
-[`comparison.md`](comparison.md) has both sides of that.
+The stack to measure against is **`Anylinux-AppImages`**: it bundles glibc, its
+loader and its gconv tree, and `experiments/62-` has it running on 11 of 11 at
+glibc's speed too. It automates dependency bundling well and this project
+should learn from it. What differs is what the developer has to assemble —
+[`comparison.md`](comparison.md).
 
 ## 2. The problem
 
@@ -168,25 +170,28 @@ static musl), `mksquashfs` (snap), and `flatpak` with
 itself — the AppImage arm times out under `strace -f` on every row by design;
 the script explains why.
 
-## 7. Limits — measured, not guessed
+## 7. Open problems — measured, with the route to each
 
 Full detail with reproductions: [`limitations.md`](limitations.md).
 
+⭐ **These are the work, not the boundary.** Every one has a named next
+experiment; none has been shown to be unreachable.
+
 1. **`dlopen` of a *host* object is host-dependent, and success is the worse
    outcome.** gawk's own extension **loads** on Debian 12 and Arch (dragging in
-   the host loader and libc), is refused on the other nine.
-   ⛔ **`experiments/50-` settles whether prior art can fix this: it cannot.**
-   Porting cross-libc-dlopen's symbol-version rewrite into a static binary
-   changes the outcome on **zero of 11** environments, because no environment
-   fails on symbol versions — they die inside glibc's loader
-   (`_dl_call_libc_early_init` assertion, `elf_machine_rela_relative`
-   assertion, SIGFPE). A static binary has no loader, so `dlopen` borrows the
-   host's `ld.so` and `libc.so.6`, and *that pairing* is the failure. Fixing it
-   requires the process to carry its own loader and libc — a bundled-glibc
-   **dynamic** binary, which is a second output mode, not a patch to this one.
-   §13 item 3.
-   **The class this tool serves is: programs that do not need host plugins.** A
-   program loading its *own* plugins is fine — build them in, as POC 50 does.
+   the host loader and libc) and is refused on the other nine. The failures are
+   inside glibc's loader — `_dl_call_libc_early_init` assertion,
+   `elf_machine_rela_relative` assertion, SIGFPE — because a static binary has
+   no loader of its own, so `dlopen` borrows the host's `ld.so` and
+   `libc.so.6`, and *that pairing* breaks.
+   ⭐ **Three untried routes, in order of cost** — §13 item 4 has the detail:
+   port cross-libc-dlopen's *full* rewrite rather than the one function
+   `experiments/50-` tried (it drops the foreign-libc dependency edge, which is
+   exactly the failure above); `--wrap` on `dlopen` against a compiled-in table,
+   which `allyourcodebase/pipewire` already does; or carry a loader.
+   **The class served today is: programs that do not need host plugins.** A
+   program loading its *own* plugins is already fine — build them in, as POC 50
+   does, and §13 item 4 covers automating that.
 2. **NSS beyond `files`/`dns` is gone**: no LDAP, SSSD, NIS, mDNS,
    systemd-resolved. Measured cost: on Fedora 42 a plain static binary resolves
    the machine's own hostname via `libnss_myhostname` and the pgb binary does
@@ -228,7 +233,7 @@ one kernel is not "works on Linux".
 | `experiments/21-glibc-version-floor.sh` | **COMPLETE** — confirms the ≥2.34 pin |
 | `experiments/30-gconv-and-locale.sh` | **COMPLETE** — 24 assertions |
 | `experiments/40-overhead.sh` | **COMPLETE** — §10 |
-| `experiments/50-host-plugin-feasibility.sh` | **COMPLETE** — settles §13 item 3 |
+| `experiments/50-host-plugin-feasibility.sh` | **COMPLETE** — one function of cross-libc-dlopen's rewrite, ported into a static binary. §13 item 4 route B |
 | `experiments/60-versus-alternatives.sh` | **COMPLETE** — 8 arms head to head, `REQUIREMENTS.md` part 2. ⚠ Its AppImage arm used **vanilla** `appimagetool` and its performance columns were startup and size only; both are corrected by 62- and 61-. `history/corrections.md` C7 |
 | `experiments/61-libc-throughput.sh` | **COMPLETE** — the axis 60- got wrong. glibc vs musl at steady state, and whether the gap travels to a musl host |
 | `experiments/62-anylinux-appimage.sh` | **COMPLETE** — `pgb` against `Anylinux-AppImages`, the AppImage that actually competes |
@@ -279,11 +284,12 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 |---|---|
 | this file | current state; read to orient |
 | [`REQUIREMENTS.md`](REQUIREMENTS.md) | ⛔ **the operator's binding acceptance bar, and how far short of it the project is.** Read before choosing work |
-| [`limitations.md`](limitations.md) | what it cannot do, each with a reproduction |
-| [`comparison.md`](comparison.md) | ⭐ **the head-to-head, now measured**: eight ways to ship the same program across the same 11 environments, and where `pgb` loses |
+| [`design/toolchain.md`](design/toolchain.md) | ⭐ **what `pgb` is and where it is going**: the `pgb build <spec>` shape, static-first/bundle-last, the bar a `pgb` bundle would have to clear, and the language decision |
+| [`limitations.md`](limitations.md) | the open problems, each with a reproduction and a route |
+| [`comparison.md`](comparison.md) | the head-to-head: several ways to ship the same program across the same 11 environments, and what actually separates them |
 | [`research/prior-art.md`](research/prior-art.md) | the reference sweep, verdicts, provenance |
-| [`design/tiers.md`](design/tiers.md) | ⛔ **design only, nothing built.** The tiered-output plan for covering the host-plugin class, and what "universal" can honestly mean |
-| [`history/corrections.md`](history/corrections.md) | ⚠ claims measured wrong, instrument defects, refused approaches. **Read on demand, not to orient.** |
+| [`design/tiers.md`](design/tiers.md) | ⛔ **design only, nothing built.** The tiered-output plan for the host-plugin class, and what "universal" can honestly mean |
+| [`history/corrections.md`](history/corrections.md) | ⚠ claims measured wrong, instrument defects, evaluated approaches. **Read on demand, not to orient.** ⭐ This is where superseded findings live — keep them out of the pages above |
 
 ## 12. Provenance
 
@@ -311,79 +317,72 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 
 ## 13. Next steps, in order
 
-0. **Decide what this tool is for, now that the comparison exists.**
-   `experiments/60-` measured what `REQUIREMENTS.md` part 2 asked for, and the
-   answer removes a claim rather than adding one: **static musl ties `pgb` on
-   coverage and beats it on startup and size.** ⛔ This is not a defect to fix
-   and it is not work an agent can close. Either a column is found where `pgb`
-   wins outright, or the operator replaces "strictly better than every existing
-   technique" with the class-restricted claim `comparison.md` now leads with.
-   Everything below is worth doing either way; this decides what the project
-   says about itself while it happens.
-
-1. **Run CI.** `.github/workflows/portability.yml` and `ci/probe.c` are written
+1. **Build the toolchain: `pgb build <url-or-package>`.** ⭐ **This is the
+   project, and everything below is support for it.** Today a developer runs
+   `pgb env create` then `pgb build -- make`, which already means no dependency
+   list, no `.desktop` file and no runtime to choose — but they still have to
+   know how to build the project. The target is that they do not:
+   resolve the spec to a source tree, find the build instructions, plan the
+   dependency graph, link statically as far up the brief's preference order as
+   each dependency will go, and report what landed where.
+   [`design/toolchain.md`](design/toolchain.md) is the design, the
+   static-first/bundle-last rule, and the language decision.
+   ⛔ **Split `pgb` into `tool/lib/*.sh` before writing the planner** — it is
+   one file near a thousand lines already and the planner is the part that
+   grows.
+2. **Run CI.** `.github/workflows/portability.yml` and `ci/probe.c` are written
    and have **never executed on a runner**. Locally the probe passes on all 11
    and the plain control fails on all 11, so the workflow should be green on
    the portable arm — but that is a prediction, not a result. Running it is
    also the only way the **UNTESTED** docker/podman engines get exercised, and
    the workflow needs its first push to prove its own YAML.
-2. **aarch64.** `oci-pull.sh --arch arm64` and `fetch-rootfs.sh --arch arm64`
+3. **aarch64.** `oci-pull.sh --arch arm64` and `fetch-rootfs.sh --arch arm64`
    exist and re-resolve by tag, which trades the digest pin away and says so.
    Nothing has been run. Expect IFUNC and CPU-baseline questions that x86_64
    did not raise.
-3. **A second output mode, for the host-plugin class — the one thing that
-   would broaden this beyond its current class.** Full plan and the honest
-   limits of the idea: [`design/tiers.md`](design/tiers.md). `experiments/50-`
-   has already done the feasibility work and the answer is precise:
+4. **Reach the host-plugin class.** Three routes, cheapest first. None has been
+   tried to exhaustion and none has been shown to be closed.
 
-   - ⚠ **"Do not port cross-libc-dlopen into the static output" was stated
-     more broadly than the measurement supports, and is downgraded.**
-     `experiments/50-` ported **one function out of roughly forty**
-     (`cld_strip_versions`, 7 lines) from a 2015-line file, and found no effect
-     on 11 of 11. The rewrite in `cross-libc-dlopen.c:1857` is three
-     coordinated steps, and 50- tested only the first:
+   - ⭐ **Route A — `--wrap` on `dlopen`, against a compiled-in table.** The
+     cheapest by far, and it is already proven prior art:
+     `allyourcodebase/pipewire`'s `src/wrap/dlfcn.zig` exports `__wrap_dlopen`,
+     `__wrap_dlsym` and `__wrap_dlclose` and resolves against a table of
+     libraries baked into the binary. That is the same delivery mechanism
+     `pgb` already uses for `iconv_open`. It serves every program that loads
+     its *own* plugins — POC 50 does this by hand for CPython — and generalises
+     it into a `--wrap-dlopen` mode with a generated table.
+   - ⭐ **Route B — port cross-libc-dlopen's rewrite properly.**
+     `experiments/50-` ported **one function of roughly forty**
+     (`cld_strip_versions`, 7 lines of a 2015-line file) and found no effect.
+     The rewrite at `cross-libc-dlopen.c:1857` is three coordinated steps:
      ```
-     cld_strip_versions(&e);                      // ported by 50-
-     e.dyn[drop_idx[i]].d_tag = CLD_NEUTRAL_TAG;  // NOT ported: drops the
-                                                  // DT_NEEDED edges that pull
-                                                  // a foreign libc in
-     cld_apply_renames(&e, dry_run);              // NOT ported
+     cld_strip_versions(&e);                      // what 50- tried
+     e.dyn[drop_idx[i]].d_tag = CLD_NEUTRAL_TAG;  // drops the DT_NEEDED edges
+                                                  // that pull a foreign libc in
+     cld_apply_renames(&e, dry_run);              // rebinds the imports left
      ```
-     ⛔ The failures 50- recorded — `_dl_call_libc_early_init: Assertion
-     'sym != NULL' failed` and friends — are what happens when the host object
-     drags the **host libc** in, which is exactly what step two removes. So the
-     untested part is the part most likely to matter. ⭐ And upstream's own
-     `docs/limits.md`, which this project's sweep never read, says the static
-     glibc case is one where `dlopen` **works** and that "the real blocker is
-     more likely the preload path" — a static binary has no `LD_PRELOAD`. It
-     also labels all three static cases **UNVERIFIED** upstream. Re-test with
-     the full rewrite and `CROSS_LIBC_DLOPEN_DRYRUN` before concluding again.
-   - ⭐ **Do build a bundled-glibc dynamic mode**, where cross-libc-dlopen
-     applies **as designed and unmodified** — it is an `LD_PRELOAD` for a
-     process that already carries a libc and a loader, which is exactly what
-     that mode provides. The corpus is already in `references/`; its
-     `scripts/build.sh` builds it, and `docs/integrating.md` covers wiring it
-     into a bundle.
-   - ⛔ **And a second cost, measured since this item was written:
-     `experiments/60-` ran onelf, which is already exactly this shape — bundled
-     glibc plus its own loader in one file.** The bundling half works
-     everywhere: no host object on any of the 11, musl included. But it fails
-     the encoding assertions on **8 of 11**, because bundling glibc does not
-     bundle gconv — and on the 3 it passes it is reaching the *host's* gconv
-     modules to do it. **Tier 2 is not a superset of tier 1.** Whatever builds
-     it must carry the `--wrap` onto static libiconv across, or it will trade
-     the host-plugin class for the gconv result tier 1 already has.
-   - The cost is the property the current mode exists for: one normal ELF, no
-     interpreter. So it is a **mode**, chosen per project, not a replacement —
-     and `pgb verify` should report which mode a binary is.
-   - Sequence: (a) teach `pgb` to emit a bundled-glibc dynamic binary with its
-     own loader; (b) verify the two-libc invariant holds via
-     `cross-libc-dlopen`'s own `tests/invariants.c`; (c) re-run POC 10's
-     observation arm in that mode — the gawk extension loading on 11 of 11
-     instead of 2 of 11 is the acceptance test.
-   - ⚠ Read `references/pkgforge-dev__cross-libc-dlopen/tree/docs/limits.md`
-     first: it is that project's own measured list of what its approach cannot
-     do, and it was **not** read during this project's sweep.
+     ⛔ The failures 50- recorded are what happens when a host object drags the
+     **host libc** in — exactly what step two removes. The untested steps are
+     the ones aimed at the observed failure. Upstream's `docs/limits.md` also
+     says the static-glibc case is one where `dlopen` *works*, that "the real
+     blocker is more likely the preload path", and that all three static cases
+     are **unverified upstream**. `CROSS_LIBC_DLOPEN_DRYRUN` makes the whole
+     rewrite path testable with no GPU and no Alpine.
+     ⚠ A static binary has no `LD_PRELOAD`, so the interposer has to arrive by
+     being linked in — which `--wrap` does. Routes A and B share machinery.
+   - **Route C — carry a loader**, i.e. tier 2 of
+     [`design/tiers.md`](design/tiers.md). Highest cost: it gives up the single
+     ordinary ELF, so it is a **mode** chosen per project rather than a
+     replacement, and `pgb verify` should report which mode a binary is.
+     `experiments/60-` and `62-` measured two existing implementations of this
+     shape, so the design questions are answered — including that a bundle must
+     carry gconv or the `--wrap` onto static libiconv, since bundling a libc
+     alone loses the encoding result tier 1 already has.
+     ⛔ Before building it, read [`design/toolchain.md`](design/toolchain.md)'s
+     bar for a `pgb` bundle. Two good bundlers exist; a third that is merely
+     comparable is not worth shipping, and emitting an anylinux AppImage is a
+     legitimate answer.
+
 4. **`--embed-terminfo`.** The mechanism is already proven by `--embed-locale`
    and ncurses reads `TERMINFO` from the environment, so it is the same shape.
    Decide first whether a *glibc* portability tool should own a terminal
@@ -395,32 +394,66 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
    sharun, userland-execve-rust, ppkg and elftool were read at README/file-list
    depth. See `research/prior-art.md` for what that does and does not support.
 
-## 14. Do not redo these
+## 14. Rules, and things not to redo
+
+⭐ **On language.** "Impossible" is not a finding this project accepts. Every
+open problem in §7 and §13 has at least one untried route, and the reference
+this project leans on hardest — `cross-libc-dlopen` — exists because someone
+did not accept a widely repeated "you cannot do that". ⛔ **Do not write
+"cannot", "impossible" or "out of scope" about a technical problem.** Write
+what was measured, what it rules out, and the next thing to try. If every route
+is genuinely exhausted, say which ones were tried and how — that is a different
+sentence and a much rarer one.
+
+⭐ **On history.** The pages in §11 above state the **current** answer. When a
+finding is superseded, replace it — do not leave "an earlier revision said" in
+place. Superseded findings, wrong claims and instrument defects go in
+[`history/corrections.md`](history/corrections.md), which exists for exactly
+that and is read on demand.
+
+⭐ **On what `pgb` is.** A toolchain, not a delivery format. Comparisons that
+treat it as a format ask the wrong question — see
+[`design/toolchain.md`](design/toolchain.md).
+
+**Do not redo these:**
 
 - **Do not try to make host NSS modules load correctly.** Keeping them out is
   the fix and it is measured.
-- **Do not bundle glibc's gconv modules.** They carry `DT_NEEDED libc.so.6`,
-  so bundling reintroduces the second libc on every musl host.
+- **Do not bundle glibc's gconv modules into a STATIC binary.** They carry
+  `DT_NEEDED libc.so.6`, so bundling reintroduces the second libc on every musl
+  host. ⚠ This does **not** apply to a bundle that carries its own libc and
+  loader — there the edge resolves inside the bundle, which is how the anylinux
+  stack solves gconv. `design/tiers.md`.
 - **Do not use `ldd`/`file` output as a test.** §3.
 - **Do not build below glibc 2.34** — `experiments/21` measures the override
   merely *moving* the dlopen there.
 - **Do not write a new OCI puller or reference fetcher.** Both exist with
   selftests.
+- **Do not write a new ELF or dependency analyser before checking
+  `references/`.** `leleliu008/elftool` is vendored and manipulates ELF files;
+  `ppkg/core/wrappers/` are compiler wrappers solving the problem `pgb`'s shell
+  wrappers solve. The brief says reuse and patch before reinventing.
 - **Do not assert a limitation without measuring it.** `history/corrections.md`
   C1 is what that cost.
-- **Do not rebuild the head-to-head from scratch.**
-  `experiments/60-versus-alternatives.sh` already builds all eight arms,
-  including a real Flatpak bundle and a real `.snap`. Re-run it; do not start
-  a new comparison.
-- **Do not write "strictly better than the alternatives" anywhere.** It was
-  measured and it is false — static musl ties `pgb` on coverage and beats it on
-  startup and size. `comparison.md` has the claim that *is* supported.
+- **Do not rebuild the head-to-head from scratch.** `experiments/60-`, `61-`
+  and `62-` already build every arm, including a real Flatpak bundle, a real
+  `.snap`, and an `Anylinux-AppImages` build through `quick-sharun`. Re-run
+  them.
+- **Do not benchmark portability with startup time and size alone.** They are
+  the axes a smaller libc wins by construction, and they are not what the brief
+  asks for. Measure steady state too — `experiments/61-`.
+- **Do not build an AppImage arm with vanilla `appimagetool`.** It bundles no
+  glibc and cannot start on musl, so it measures a strawman.
+  `Anylinux-AppImages` is the one that competes.
+- **Do not write "strictly better than the alternatives" anywhere** without a
+  measurement behind it. `comparison.md` has the claims that are supported.
 - **Do not match `.so` as a substring** when deciding what a binary loaded:
   `/etc/ld.so.cache` is an index, not an object, and both `poc_matrix` and
   `pgb verify` assert on that value. Require `.so` or `.so.N` at the end.
-- **Do not attribute a bundle format's trace to one pid**, and do not reduce
-  traced paths to basenames. Both make a bundling format look clean when it is
-  not, or the reverse. `experiments/60-`'s `classify_trace` is the working
-  instrument; `history/corrections.md` says why.
-- **Do not reap test processes with `pkill -f`.** The pattern appears in the
-  runner's own command line, so it kills the experiment. `pkill -x` by name.
+- **Do not attribute a bundle format's trace to one pid**, do not reduce traced
+  paths to basenames, and do not count objects opened before the last `execve`.
+  Each one makes a bundling format look clean when it is not, or the reverse.
+  `experiments/62-`'s `classify_trace` is the working instrument.
+- **Do not reap test processes by name or with `pkill -f`.** `-f` matches the
+  runner's own command line and kills the experiment; a name match misses the
+  FUSE daemons a bundle format leaves behind. Match `/proc/PID/root`.

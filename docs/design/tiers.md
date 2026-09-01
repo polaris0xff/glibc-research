@@ -37,7 +37,7 @@ and its own libc.** That is precisely the setting `cross-libc-dlopen` was
 built for — an `LD_PRELOAD` for a process that already has both — so in tier 2
 it applies **unmodified**. `../limitations.md` §1 has the full table.
 
-## ⛔ Tier 2 is not a superset of tier 1, and that is now measured
+## ⛔ Tier 2 is not a superset of tier 1
 
 `experiments/60-versus-alternatives.sh` did not set out to test this page, but
 it did: **onelf is already exactly the tier-2 shape** — bundled glibc plus its
@@ -62,11 +62,11 @@ told not to.** Tier 1 solved gconv with `-Wl,--wrap` onto static GNU libiconv,
 and that mechanism is independent of which libc is in the process, so carrying
 it across is one option.
 
-⛔ **The other option is bundling the gconv modules, and this page previously
-said that was refused. That refusal does not apply at tier 2.** `../AGENTS.md`
-§14 rules it out because each module carries `DT_NEEDED libc.so.6` and would
-pull a second libc in — which is true **for a static binary**, where there is
-no bundled libc for that edge to bind to. A tier-2 process already carries its
+⛔ **The other option is bundling the gconv modules, and the refusal in
+`../AGENTS.md` §14 does not apply at tier 2.** That rule exists because each
+module carries `DT_NEEDED libc.so.6` and would pull a second libc in — true
+**for a static binary**, where there is no bundled libc for that edge to bind
+to. A tier-2 process already carries its
 own libc *and* its own loader, so the edge resolves inside the bundle and no
 second libc enters.
 
@@ -81,7 +81,7 @@ gconv but because onelf does not bundle it.
 
 ⚠ **So tier 2 has two working answers for gconv and must pick one
 deliberately**: carry tier 1's `--wrap`, or bundle the modules the way sharun
-does. What it cannot do is inherit tier 1's refusal, which was reasoned about
+does. What it must not do is inherit tier 1's refusal, which was reasoned about
 a different situation.
 
 `../comparison.md` has the numbers and `evidence/60-versus-alternatives/per-environment.txt`
@@ -102,10 +102,13 @@ operator's, not the tool's.
 
 ## The hard part is selection, not mechanism
 
-⛔ **"Does this program need host plugins?" is not statically decidable.** A
-`dlopen` on a code path no test exercises is invisible to any amount of ELF
-analysis. The brief lists this under dependencies that are
-"difficult/impossible to discover statically", and it is right.
+⛔ **"Does this program need host plugins?" is not decidable from the ELF
+alone.** A `dlopen` on a code path no test exercises is invisible to static
+analysis, which is why the brief files it under dependencies that are
+"difficult/impossible to discover statically". ⭐ It is decidable from a
+*run*, and that is what the selection procedure below uses — `quick-sharun`
+reaches the same conclusion and traces the program to find its `dlopen`ed
+libraries.
 
 So selection must be **evidence-driven and conservative**:
 
@@ -151,5 +154,5 @@ Not the tier machinery. **Read
 `references/pkgforge-dev__cross-libc-dlopen/tree/docs/limits.md`** — that
 project's own measured list of what its approach cannot do. It was **not** read
 during this project's sweep, and it is the cheapest available check on whether
-tier 2 delivers what this page assumes. Then `../AGENTS.md` §13 item 3 has the
+tier 2 delivers what this page assumes. Then `../AGENTS.md` §13 item 4 has the
 build sequence and the acceptance test.

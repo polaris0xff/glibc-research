@@ -48,17 +48,17 @@ exists upstream at the commit named there.
 
 | reference | commit | depth | verdict |
 |---|---|---|---|
-| `pkgforge-dev/cross-libc-dlopen` | `1cecf50e` | 3 passes, `src/` in full | **adopt an idea, refuse the architecture** |
-| `pkgforge-dev/Anylinux-AppImages` | `da7649b9` | `useful-tools/lib/anylinux.c` in full | **adopt**, at file and line |
+| `pkgforge-dev/cross-libc-dlopen` | `1cecf50e` | `src/` in full, `docs/limits.md`, `docs/overview.md` | **adopt an idea; the full rewrite is untried here** |
+| `pkgforge-dev/Anylinux-AppImages` | `da7649b9` | `lib/anylinux.c`, `HOW-TO-MAKE-THESE.md`, `quick-sharun.sh` | **adopt the mechanism; measure against the architecture** |
 | `QaidVoid/onelf` | `74b4c9a4` | README + `docs/guide/cross-libc.md` | **refused**, with the reason |
 | `VHSgunzo/sharun` | `b1ef7449` | README + `src/main.rs` structure | **refused** for this goal |
 | `pkgforge-dev/userland-execve-rust` | `ce431314` | `src/` file list, `loader.rs` skim | **refused**, not applicable |
 | `pkgforge-dev/Anylinux-sharun` | — | README | **filed elsewhere** |
 | `leleliu008/elftool` | `037310b7` | `src/` file list | **confirms** |
 | `leleliu008/ppkg`, `leleliu008/patches` | — | tree structure | **filed elsewhere** |
-| `a2flo/standalone_musl` | `368cf49f` | tree structure | **refused**: musl, not glibc |
+| `a2flo/standalone_musl` | `368cf49f` | tree structure + README | **not a libc to adopt; unweighed prior art for the plugin problem** |
 | `altipla-consulting/distroless-glibc` | `88e4453c` | README + Dockerfile | **anti-pattern exhibit** |
-| `allyourcodebase/pipewire` | `5b4930b8` | fetched, not read | **not reached** |
+| `allyourcodebase/pipewire` | `5b4930b8` | `src/wrap/dlfcn.zig` | ⭐ **adopt**: `--wrap` on `dlopen` against a compiled-in table |
 
 
 
@@ -216,17 +216,12 @@ ship glibc.
 
 ---
 
-## ⛔ Second pass: four verdicts above were taken too early, and one of them cost a wrong headline
+## Per-reference detail for the four rows that carry the most weight
 
-⚠ **The sweep's own depth column said which rows were shallow, and the plan
-above still leaned on them as if they were not.** Read this section before
-citing any row in the verdict table.
+### `pkgforge-dev/Anylinux-AppImages` — the architecture, not just `anylinux.c`
 
-### `pkgforge-dev/Anylinux-AppImages` — the mechanism was read, the architecture was not
-
-The sweep read `useful-tools/lib/anylinux.c` in full and took the NSS override
-from it, which was the right thing to take. What it did **not** read is
-`HOW-TO-MAKE-THESE.md` or `useful-tools/quick-sharun.sh`, and those carry the
+`useful-tools/lib/anylinux.c` is where this project's NSS override came from.
+`HOW-TO-MAKE-THESE.md` and `useful-tools/quick-sharun.sh` carry the rest of the
 architecture:
 
 - ⭐ **bundle everything, including libc and the dynamic loader**, then run the
@@ -242,10 +237,10 @@ architecture:
 - it also bundles `libnss_*` and preloads `anylinux.so`, so NSS is pinned *and*
   the pinned modules are present.
 
-⛔ **The cost of missing this**: `experiments/60-` built its AppImage arm with
-**vanilla `appimagetool`**, which bundles no glibc, and scored AppImage 2 of
-11. Rebuilt as this project documents (`experiments/62-`) the same program
-runs on **11 of 11**, musl included, with zero host objects in the payload.
+⛔ **Measure against this stack, not against vanilla AppImage.** Vanilla
+bundles no glibc and scores 2 of 11 (`experiments/60-`); built as this project
+documents, the same program runs on **11 of 11**, musl included, with zero host
+objects in the payload (`experiments/62-`).
 
 ⚠ **Its own criticism of this project deserves quoting rather than
 paraphrasing**, from "The solution": *"Compile statically! Sure, that works, go
@@ -253,7 +248,7 @@ and compile all of kdenlive statically and get back to me once you get it
 done."* That is the real boundary between the two approaches, and it is about
 what can be built, not about what runs.
 
-### `pkgforge-dev/cross-libc-dlopen` — `docs/limits.md` was never read, and it answers a question this project asked
+### `pkgforge-dev/cross-libc-dlopen` — what `docs/limits.md` says about the static case
 
 That page has a section titled **"Static binaries: three cases, not one"**:
 
@@ -263,13 +258,12 @@ That page has a section titled **"Static binaries: three cases, not one"**:
 | **static glibc** | `dlopen` **works**. ⭐ "The real blocker is more likely the preload path than `dlopen`: a fully static binary has no `LD_PRELOAD` mechanism, because there is no dynamic loader to honour it" |
 | mostly static, libc dynamic | squarely in scope, the easiest |
 
-⛔ **And it labels all three UNVERIFIED**: "No measurement of any of them has
-been taken in this repository." So `experiments/50-` measured something its
-upstream had not — which is worth reporting back — but it also means the
-sweep's verdict was formed without the page that scopes the question.
+⛔ **It labels all three UNVERIFIED**: "No measurement of any of them has been
+taken in this repository." ⭐ So `experiments/50-` measured something its
+upstream had not, which is worth reporting back.
 
-⛔ **`experiments/50-` ported one function out of roughly forty, and its
-conclusion is stated more broadly than that supports.** `cross-libc-dlopen.c`
+⛔ **`experiments/50-` ported one function out of roughly forty, so what it
+rules out is narrower than a verdict on the approach.** `cross-libc-dlopen.c`
 is 2015 lines; 50- ported `cld_strip_versions()` alone. The rewrite in
 `cross-libc-dlopen.c:1857` is three coordinated steps, and the other two are
 the ones aimed at the failure 50- actually saw:
@@ -283,16 +277,15 @@ cld_apply_renames(&e, dry_run);               // NOT ported
 
 The failures 50- recorded — `_dl_call_libc_early_init: Assertion 'sym != NULL'
 failed`, and friends — are what happens when the host object drags the **host
-libc** in. Dropping that edge is exactly step two. ⚠ **So "prior art cannot fix
-this: measured, zero of 11" overstates what was tested.** What was tested is
-that one function of forty has no effect on its own. `limitations.md` §1 and
-`AGENTS.md` §13 item 3 are corrected accordingly.
+libc** in. Dropping that edge is exactly step two, so the untested steps are
+the ones aimed at the observed failure. ⭐ Porting the full rewrite is
+`AGENTS.md` §13 item 4, route B.
 
 ⭐ It also ships `CROSS_LIBC_DLOPEN_DRYRUN`, which "makes the whole rewrite
 path testable with no GPU and no Alpine" — a cheaper instrument than the one
 50- built.
 
-### `allyourcodebase/pipewire` — was "fetched, not read", and it is the closest prior art to pgb's own mechanism
+### `allyourcodebase/pipewire` — the closest prior art to pgb's own mechanism
 
 `src/wrap/dlfcn.zig`, in its own header comment: *"since it ships with the
 necessary plugins, there's no reason we can't just bake these into the
@@ -304,20 +297,19 @@ resolves against a compiled-in table of libraries and symbols.
 mechanism pgb already uses for `iconv_open`.** It is the missing automation
 behind `AGENTS.md` §7's "a program loading its *own* plugins is fine — build
 them in": POC 50 does this by hand for CPython, and this shows the generic
-shape. **Verdict changed to: adopt, as the design for a `--wrap-dlopen`
-mode.**
+shape. It is route A of `AGENTS.md` §13 item 4, and the cheapest of the three.
 
-### `a2flo/standalone_musl` — "refused: musl, not glibc" was decided from the tree listing
+### `a2flo/standalone_musl` — an integrated loader in a static binary
 
-Its README says what the tree could not: it is a musl fork whose **goals** are
+Its README: a musl fork whose **goals** are
 *"'semi-static' binaries, i.e. statically linked binaries that integrate the
 dynamic loader, allowing the use of `dlopen()`, `dlsym()`"*, plus *"ABI and API
 compatibility with glibc, as far as necessary"*.
 
-⚠ **That is a third route to the host-plugin class**, alongside this project's
-tier 2 and cross-libc-dlopen, and it was dismissed on a one-line premise that
-its own README contradicts. ⛔ It is still not a glibc, and its README concedes
-*"GNU indirect function support ('ifunc') is not fully supported"* — which
-`experiments/61-` shows is exactly where musl's throughput goes. **Verdict
-changed to: not adoptable as a libc, but its integrated-loader design is prior
-art for the host-plugin problem and was not weighed.**
+⚠ **That is a fourth route to the host-plugin class**, alongside the three in
+`AGENTS.md` §13 item 4 — and it is an existence proof that a *statically
+linked* binary can carry a working loader, which is the thing route C assumes
+costs the single-ELF property. ⛔ It is not adoptable as a libc here: it is
+musl, and its README concedes *"GNU indirect function support ('ifunc') is not
+fully supported"* — which `experiments/61-` shows is exactly where musl's
+throughput goes. **What is worth taking is the design, not the libc.**

@@ -1,8 +1,15 @@
 # portable static glibc
 
-Build a **normal Linux ELF executable** against glibc that runs unchanged on
-glibc *and* musl distributions. No launcher, no AppDir, no packaging format,
-nothing beside it — one file you copy and run.
+A **toolchain** for building a normal Linux ELF against glibc that runs
+unchanged on glibc *and* musl distributions. No launcher, no AppDir, no
+packaging format, nothing beside it — one file you copy and run.
+
+⭐ **`pgb` is not a packaging format.** AppImage, Flatpak and snap answer *how
+does this reach a machine*. `pgb` answers *how does a developer get from source
+to a binary that runs* — and the answer it hands back is an ordinary
+executable. [`docs/design/toolchain.md`](docs/design/toolchain.md) is where it
+is going: `pgb build <url-or-package>`, with the tool resolving the source,
+planning the dependencies and linking statically as far as each one allows.
 
 ```sh
 sh pgb env create             # a pinned Debian 12 build environment
@@ -64,36 +71,50 @@ host shared objects:
 for p in poc/*/run.sh; do sh "$p"; done
 ```
 
-## Honest limits
+## Why glibc, and not just build against musl
 
-⛔ **If your program can be statically linked at all.** That is the real
-boundary, and the [Anylinux-AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages)
-project puts it best: *"Compile statically! Sure, that works, go and compile
-all of kdenlive statically and get back to me once you get it done."* For
-software with a large dynamic dependency graph — desktop applications, GPU
-stacks, anything loading host plugins — bundling every library is the approach
-that works, and that project is the one to use. `pgb` serves the class that
-*can* be linked statically, and hands it back as one ordinary ELF.
+A static musl binary is also portable — it is smaller and starts faster. What
+it is not is glibc, and that shows up the moment the program does work. Same
+machine, same compiler, libc the only variable
+([`experiments/61-`](experiments/61-libc-throughput.sh)), ns per operation:
 
-⚠ **`pgb` is not faster than an anylinux AppImage and does not run in more
-places.** Measured on the same 11 environments, both run everywhere and both
-deliver glibc's throughput. What differs is shape: `pgb` is one file with no
-interpreter that mounts nothing and writes nothing;
-[`docs/comparison.md`](docs/comparison.md) has both columns.
+| | glibc static | musl static |
+|---|---|---|
+| malloc, 4 threads | **4.53** | 584.71 |
+| qsort | **93.20** | 921.49 |
+| strlen/strchr/strstr | **149.14** | 1051.09 |
 
-⛔ **`dlopen` of a *host* shared object is host-dependent, and success is the
+⭐ On **Alpine**, where the ordinary choice is a musl build, a `pgb` binary does
+that 4-thread allocator workload in **4.68 ns** against musl's **592**. glibc's
+throughput on a machine that ships no glibc, and `pgb` costs nothing over a
+plain static build to carry it.
+
+## Open problems
+
+⚠ **`pgb` does not beat an anylinux AppImage and does not run in more places.**
+On the same 11 environments both run everywhere and both deliver glibc's
+throughput. `pgb` is smaller and simpler in shape — one file, no mount, no
+extraction, nothing written — and
+[Anylinux-AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages)
+reaches software `pgb` does not yet: as its own guide puts it, *"Compile
+statically! Sure, that works, go and compile all of kdenlive statically and get
+back to me once you get it done."* Closing that is the work, not the boundary —
+[`docs/comparison.md`](docs/comparison.md) has both columns and
+[`docs/AGENTS.md`](docs/AGENTS.md) §13 has the routes.
+
+⚠ **`dlopen` of a *host* shared object is host-dependent, and success is the
 worse outcome.** gawk's own extension loads on Debian 12 and Arch — dragging
 the host loader and libc into the process — and is refused on the other nine.
-A program whose core function is loading host plugins is outside the class this
-tool serves.
+Three untried routes to fixing it are listed in `docs/AGENTS.md` §13 item 4;
+none has been shown to be closed.
 
-⛔ **Static linking says nothing about data.** Five distinct host data
-dependencies were found: gconv (solved), locale (solved), **terminfo** and
-**CA bundles** (unsolved, distro-specific paths), and a runtime's own library
-tree.
+⚠ **Static linking says nothing about data.** Five distinct host data
+dependencies were found: gconv ✅ and locale ✅ are solved; **terminfo** and
+**CA bundles** are open, and both have the same proven shape waiting
+(`--embed-locale`'s mechanism plus `TERMINFO`/`SSL_CERT_FILE`).
 
-Everything measured, everything not measured, and what a previous revision got
-wrong: [`docs/limitations.md`](docs/limitations.md) and
+Everything measured, everything not measured, and every claim that was made
+and then disproved: [`docs/limitations.md`](docs/limitations.md) and
 [`docs/history/corrections.md`](docs/history/corrections.md).
 
 ## Where things are
@@ -101,9 +122,10 @@ wrong: [`docs/limitations.md`](docs/limitations.md) and
 | | |
 |---|---|
 | [`docs/AGENTS.md`](docs/AGENTS.md) | ⭐ **the standalone handoff.** Read this first if you are picking the project up |
-| [`docs/limitations.md`](docs/limitations.md) | what it cannot do, with the measurement behind each |
+| [`docs/limitations.md`](docs/limitations.md) | the open problems, with the measurement behind each and the route out |
 | [`docs/REQUIREMENTS.md`](docs/REQUIREMENTS.md) | the operator's acceptance bar, and how far short of it this is |
-| [`docs/comparison.md`](docs/comparison.md) | ⭐ **the head-to-head**: eight ways to ship the same program, same 11 environments, and where `pgb` loses |
+| [`docs/design/toolchain.md`](docs/design/toolchain.md) | ⭐ **what `pgb` is and where it is going**, and the language decision |
+| [`docs/comparison.md`](docs/comparison.md) | the head-to-head: every way to ship the same program, same 11 environments |
 | [`docs/research/prior-art.md`](docs/research/prior-art.md) | the reference sweep, verdicts and provenance |
 | `experiments/` | numbered, re-runnable. Exit 0 matched, 1 did not, 2 could not run |
 | `poc/` | the five projects |

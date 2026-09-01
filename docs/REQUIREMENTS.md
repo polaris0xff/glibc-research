@@ -59,14 +59,13 @@ experiment — `experiments/60-versus-alternatives.sh` — is part 2.
 
 ## Status against the bar
 
-⛔ **The bar is NOT met, and part 2 is now not-met as a MEASURED RESULT rather
-than as a gap.** That is a different and worse answer than "unmeasured", and it
-is the honest one.
+⛔ **The bar is NOT met**, and both parts are now not-met as measured results
+rather than as unmeasured gaps.
 
 | part | state | why |
 |---|---|---|
-| **1. No known environment where it fails** | ⛔ **not met** | A known, unfixed failure is measured: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). Tier 2 in [`design/tiers.md`](design/tiers.md) is the route and nothing of it is built. Two host **data** dependencies — terminfo and the TLS CA bundle — are also unsolved ([`limitations.md`](limitations.md) §3). |
-| **2. Strictly better than the alternatives** | ⛔ **measured, and FALSE** | `experiments/60-versus-alternatives.sh` built the same program eight ways and ran every runnable one on the same 11 environments. **A static musl binary ties `pgb` on coverage and beats it on startup and size.** Details below. |
+| **1. No known environment where it fails** | ⛔ **not met** | One measured, unfixed failure: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ Three untried routes to it, none exhausted — `AGENTS.md` §13 item 4. Two host **data** dependencies, terminfo and the TLS CA bundle, are also open, and both have a proven mechanism waiting (`--embed-locale`'s shape) rather than an unknown. |
+| **2. Strictly better than the alternatives** | ⛔ **measured, and not met** | `experiments/60-`, `61-` and `62-` built the same program every way that competes and ran each on the same 11 environments. `pgb` is not beaten on portability or on throughput by anything measured — it **ties** the anylinux AppImage on both. It does not *beat* it, and it is behind on the class of software each can serve. Details below. |
 
 ### Part 2: what the measurement actually says
 
@@ -75,11 +74,6 @@ onelf and static musl were all built, plus the two controls, and the AppImage
 arm was then rebuilt against `Anylinux-AppImages` because the vanilla one is
 not the competitor. [`comparison.md`](comparison.md) carries the table.
 
-⚠ **A previous revision of this section answered this from the wrong
-measurement** — startup and size, where musl wins by construction — and
-concluded that static musl beat `pgb`. `history/corrections.md` C7 has the
-error. The corrected picture:
-
 | | `pgb` | anylinux AppImage | static musl |
 |---|---|---|---|
 | ran correctly, 11 environments | 11 / 11 | 11 / 11 | 11 / 11 |
@@ -87,28 +81,30 @@ error. The corrected picture:
 | malloc, 4 threads, on Alpine | **4.3 ns** | **3.7 ns** | 592 ns |
 | artefact size | **2.1 MB** | 3.7 MB | 447 KB |
 | target does nothing but execute it | ✅ | ⛔ mounts or extracts | ✅ |
-| serves programs that cannot be linked statically | ⛔ | ✅ | ⛔ |
+| serves a large dynamic dependency graph today | ⛔ not yet | ✅ | ⛔ |
 
 ⛔ **"Strictly better and/or faster than every existing format and technique"
-is still false, but for a completely different reason than the one recorded
-before.** `pgb` is not beaten on portability or on speed by anything measured.
+is not met.** `pgb` is not beaten on portability or on speed by anything
+measured.
 It is **tied** with the anylinux AppImage on both, ahead of it on artefact size
 and on shape — one ELF, nothing mounted, nothing written — and **behind it on
-reach**: bundling serves software that cannot be statically linked at all, and
-static linking never will.
+reach**: bundling serves software with a dependency graph static linking has
+not yet been pushed hard enough to absorb. ⭐ That last one is work, not a
+verdict — `AGENTS.md` §13 item 4 has three untried routes.
 
 ⭐ **What the evidence does support**, and it is a real claim:
 
 > Built at tier 1, ran correctly and loaded no host shared object on these 11
 > named environments, at glibc's throughput including on musl hosts, as one
 > ordinary ELF that mounts nothing and writes nothing — for programs that can
-> be statically linked.
+> be statically linked today.
 
-**What would move part 2 to met.** Either `pgb` grows to serve the
-bundling class as well (that is [`design/tiers.md`](design/tiers.md), and
-⭐ the anylinux stack is now the reference implementation to measure against
-rather than a rival to beat), or the operator agrees that "strictly better than
-every existing format" was the wrong bar and replaces it with the claim above.
+**What would move part 2 to met.** Either `pgb` grows to reach the class it
+does not yet — [`design/toolchain.md`](design/toolchain.md) for the plan,
+`AGENTS.md` §13 item 4 for the routes, and ⭐ the anylinux stack as the
+reference implementation to measure against rather than a rival to beat — or
+the operator agrees that "strictly better than every existing format" was the
+wrong bar and replaces it with the claim above.
 ⛔ That second one is the operator's call and not an agent's: do not rewrite
 this requirement to match the result.
 

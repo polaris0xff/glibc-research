@@ -3,11 +3,10 @@
 ⛔ **Every cell is either a measurement taken in this repository, or a dash.**
 A dash means *not measured here* and never "probably fine".
 
-⚠ **An earlier revision of this page led with "static musl ties pgb and beats
-it".** That came from measuring startup and size — the two axes musl wins by
-construction — and from building the AppImage arm with the wrong tool. Both are
-corrected below; [`history/corrections.md`](history/corrections.md) C7 records
-what went wrong, because the mistake is more instructive than the fix.
+⚠ **`pgb` is a toolchain, and half of this page compares it to formats.** That
+comparison is worth having — it establishes that the output holds up against
+what people ship today — but it is not the axis `pgb` is developed along. See
+[`design/toolchain.md`](design/toolchain.md), and the last section here.
 
 Evidence: `evidence/60-versus-alternatives/`, `evidence/61-libc-throughput/`,
 `evidence/62-anylinux-appimage/`.
@@ -24,7 +23,7 @@ reason the brief specifies glibc.
 
 ⛔ **Vanilla AppImage is not the AppImage that competes.** It deliberately does
 not bundle glibc; its documented practice is to build against the oldest glibc
-you support. It cannot start on a musl host at all. The competitive one is
+you support, so it does not start on a musl host. The one that competes is
 [`Anylinux-AppImages`](https://github.com/pkgforge-dev/Anylinux-AppImages),
 which bundles the libc, the loader, the gconv tree and the NSS modules.
 
@@ -120,16 +119,22 @@ Neither wins on portability or on speed. They differ in **shape** and in
 | writes to the filesystem | **nothing** | a mount point or an extraction directory |
 | `PT_INTERP` / `DT_NEEDED` | **absent / zero** | a bundled loader, invoked explicitly |
 | host objects in the *delivery* | **none** | the host `/bin/sh` and its libraries, where `/bin/sh` is dynamic |
-| serves programs that cannot be statically linked | ⛔ **no** | ✅ **yes** |
+| serves programs with a large dynamic dependency graph | ⛔ **not yet** | ✅ **today** |
 
-⛔ **The last row is the one that matters most, and it is not in `pgb`'s
-favour.** From that project's own HOW-TO: *"Compile statically! Sure, that
-works, go and compile all of kdenlive statically and get back to me once you
-get it done."* Anything with a large dynamic dependency graph — desktop
-toolkits, GPU stacks, host plugins — is served by bundling, not by static
-linking. That is a class `pgb` does not reach and the anylinux stack does.
+⛔ **The last row is the open problem, and it is not in `pgb`'s favour.** From
+that project's own HOW-TO: *"Compile statically! Sure, that works, go and
+compile all of kdenlive statically and get back to me once you get it done."*
+Desktop toolkits, GPU stacks and host plugins are served by bundling today.
 
-⭐ **What `pgb` has instead** is that its output is not a package. No runtime,
+⭐ **That is a target, not a boundary.** `pgb`'s answer is to push each
+dependency as far up the brief's preference order as it will go — link it,
+build a static library for it, wrap its `dlopen` against a compiled-in table —
+and bundle only what survives all of that.
+[`design/toolchain.md`](design/toolchain.md) has the plan and the bar a `pgb`
+bundle would have to clear; `AGENTS.md` §13 item 4 has the three untried routes
+to the plugin case.
+
+⭐ **What `pgb` has meanwhile** is that its output is not a package. No runtime,
 no mount, no extraction, nothing written, no shell in the delivery path, and
 nothing on the target that has to cooperate. For a program that *can* be linked
 statically, that is a smaller and simpler artefact for the same coverage and
@@ -141,6 +146,34 @@ its own bundle. What the tree picks up is the `AppRun` shell, and only on
 distributions whose `/bin/sh` is dynamically linked. That is the delivery
 mechanism, not the program, and no second libc enters the program's address
 space: `execve` replaces it before the payload runs.
+
+## The axis this page mostly leaves out: what the developer does
+
+⛔ **Everything above compares artefacts. `pgb` is a toolchain, so the axis it
+is actually developed along is what a developer has to know and assemble** —
+and no experiment measures that yet. `experiments/63-` is where it should be.
+
+What can be stated now, from building both routes in this repository:
+
+| | `pgb` | anylinux AppImage |
+|---|---|---|
+| external binaries to fetch and pin | **0** — the environment is one pinned OCI digest | 5, across 4 upstreams: `sharun`, a forked `appimagetool`, `uruntime`, `mkdwarfs`, `cross-libc-dlopen` |
+| driver script | the tool | plus a 121 KB `quick-sharun.sh` |
+| files the developer authors | **none** | a `.desktop` entry and an icon |
+| environment variables to set | **none** | ~9 for a non-default layout |
+| build host | any, with root — the environment is pinned and unpacked | upstream guidance says Arch Linux specifically |
+| commands | `pgb env create` once, then `pgb build` | install to `/usr`, deploy, then make the image |
+
+⭐ **This is not a criticism of `quick-sharun`, which automates the hard part
+well** — it finds a program's entire library closure including `dlopen`ed
+libraries, and deploys the libc, loader, gconv tree and NSS modules without
+being told to. `pgb` has nothing equivalent and should learn from it. The
+difference is that a `pgb` user never learns what an AppDir is.
+
+⚠ **And `pgb` does not yet close its own half of this.** `pgb build -- make`
+still requires the developer to know how to build the project. `pgb build
+<url-or-package>` is the target, and until it exists this table describes an
+intention on one side and a shipped tool on the other. Read it that way.
 
 ## Startup and size
 
