@@ -127,6 +127,26 @@ need() {   # url dest -- fetch once, keep
 # attribute is ordinary, but the two cases are now separated: a name the
 # CALLER asked for is a requirement and is refused when it is not there; a
 # name pgb DERIVED from the store path is a guess and says so when it misses.
+# ⛔ A SYMLINK IN A CLOSURE POINTS AT AN ABSOLUTE /nix/store PATH THAT IS NOT
+# HERE. Every `share/` tree in a multi-output package is a farm of them, and
+# `cp -L` on one fails with "cannot stat" -- which the desktop-file step then
+# reported as a SUCCESS, printing `desktop mpv.desktop (Icon=, Exec rewritten)`
+# for a file it had not copied. Measured on mpv-with-scripts-0.41.0.
+store_resolve() {   # path -> a path that exists under $ROOT, or nothing
+  _sr_p="$1"; _sr_n=0
+  while [ "$_sr_n" -lt 10 ]; do
+    _sr_n=$((_sr_n + 1))
+    [ -L "$_sr_p" ] || { [ -e "$_sr_p" ] && printf '%s\n' "$_sr_p"; return 0; }
+    _sr_t=$(readlink "$_sr_p")
+    case "$_sr_t" in
+      /nix/store/*) _sr_p="$ROOT/${_sr_t#/nix/store/}" ;;
+      /*)           _sr_p="$_sr_t" ;;
+      *)            _sr_p="$(dirname "$_sr_p")/$_sr_t" ;;
+    esac
+  done
+  return 0
+}
+
 resolve_entry() {   # storedir progname -> prints the ELF to run
   _re_bin="$1/bin/$2"
   if [ ! -e "$_re_bin" ]; then
@@ -427,12 +447,27 @@ find "$ROOT" -type f -name '*.so' -o -type f -name '*.so.*' 2>/dev/null \
       esac
     done
 # Symlinks too: libfoo.so.6 -> libfoo.so.6.0.1 is how a DT_NEEDED resolves.
-find "$ROOT" -type l -name '*.so*' 2>/dev/null | while IFS= read -r sl; do
-  _t=$(readlink "$sl")
-  _b=$(basename "$sl")
-  [ -e "$APPDIR/lib/$_b" ] && continue
-  [ -e "$APPDIR/lib/$(basename "$_t")" ] || continue
-  ln -sf "$(basename "$_t")" "$APPDIR/lib/$_b"
+# ⛔ AND THE PASS HAS TO REPEAT, because a closure has symlinks TO SYMLINKS and
+# one pass is order-dependent. vulkan-loader ships
+#   libvulkan.so -> libvulkan.so.1 -> libvulkan.so.1.4.357
+# and `find` handed back `libvulkan.so` before `libvulkan.so.1` existed in
+# lib/, so the target check refused it and the bundle was left with a
+# DT_NEEDED on `libvulkan.so` that resolved nowhere. Caught by the integrity
+# check below on the first real application run through this bundler; before
+# that check existed it would have been a runtime failure on somebody's
+# machine. Repeat until a pass creates nothing.
+_slround=0
+while [ "$_slround" -lt 6 ]; do
+  _slround=$((_slround + 1))
+  _slmade=0
+  for sl in $(find "$ROOT" -type l -name '*.so*' 2>/dev/null); do
+    _t=$(readlink "$sl")
+    _b=$(basename "$sl")
+    [ -e "$APPDIR/lib/$_b" ] && continue
+    [ -e "$APPDIR/lib/$(basename "$_t")" ] || continue
+    ln -sf "$(basename "$_t")" "$APPDIR/lib/$_b" && _slmade=$((_slmade + 1))
+  done
+  [ "$_slmade" = 0 ] && break
 done
 # ⛔ SOME LIBRARY TREES ARE DIRECTORIES AND FLATTENING THEM BREAKS THEM.
 # mesa's DRI drivers live in `lib/dri/`, its GBM backends in `lib/gbm/`, GTK's
@@ -526,10 +561,16 @@ _nicd=$(find "$APPDIR/share/glvnd" "$APPDIR/share/vulkan" -name '*.json' 2>/dev/
 [ "${_nicd:-0}" -gt 0 ] && say "icd json    $_nicd rewritten to bare sonames"
 
 DESKTOP=$(find "$ROOT/$BASE/share/applications" -name '*.desktop' 2>/dev/null | head -1)
+[ -n "$DESKTOP" ] && DESKTOP=$(store_resolve "$DESKTOP")
 [ -n "$DESKTOP" ] || DESKTOP=$(find "$APPDIR/share/applications" -name "$PROG.desktop" 2>/dev/null | head -1)
 [ -n "$DESKTOP" ] || DESKTOP=$(find "$APPDIR/share/applications" -name "*$PROG*.desktop" 2>/dev/null | head -1)
+# ⛔ AND THE COPY IS CHECKED. `cp -L` on a dangling store symlink fails, and
+# the block below then printed a success line for a file that is not there.
+if [ -n "$DESKTOP" ] && ! cp -L "$DESKTOP" "$APPDIR/$PROG.desktop" 2>/dev/null; then
+  warn "the .desktop entry $DESKTOP could not be copied; generating one instead"
+  DESKTOP=""
+fi
 if [ -n "$DESKTOP" ]; then
-  cp -L "$DESKTOP" "$APPDIR/$PROG.desktop"
   ICONNAME=$(awk -F= '/^Icon=/{print $2; exit}' "$DESKTOP")
   # ⛔ Exec= IS REWRITTEN TO THE NAME WE ACTUALLY HARDLINKED. sharun resolves
   # the program from the desktop entry, so an Exec naming a binary that is not
@@ -561,16 +602,22 @@ ICON=""
 for _d in "$ROOT/$BASE/share/icons" "$ROOT/$BASE/share/pixmaps" \
           "$APPDIR/share/icons" "$APPDIR/share/pixmaps"; do
   [ -d "$_d" ] || continue
-  ICON=$(find "$_d" \( -name "$ICONNAME.png" -o -name "$ICONNAME.svg" \) 2>/dev/null \
+  ICON=$(find -L "$_d" \( -name "$ICONNAME.png" -o -name "$ICONNAME.svg" \) 2>/dev/null \
          | sed -E 's|.*/([0-9]+)x[0-9]+/.*|\1 &|; t; s|^|0 |' \
          | sort -rn | awk 'NR==1{ $1=""; sub(/^ /,""); print }')
   [ -n "$ICON" ] && break
 done
-if [ -n "$ICON" ]; then
-  cp -L "$ICON" "$APPDIR/$(basename "$ICON")"
-  cp -L "$ICON" "$APPDIR/.DirIcon"
+# ⛔ AND THE SAME DANGLING-SYMLINK TRAP AS THE .desktop ENTRY, one step later.
+# `find -L` follows links while descending but still PRINTS the link's own
+# path, so `cp -L` fails on it -- and the block below printed `icon mpv.png`
+# for a file it had not copied. Resolved through the store, and the copy is
+# checked.
+[ -n "$ICON" ] && ICON=$(store_resolve "$ICON")
+if [ -n "$ICON" ] && cp -L "$ICON" "$APPDIR/$(basename "$ICON")" 2>/dev/null; then
+  cp -L "$ICON" "$APPDIR/.DirIcon" 2>/dev/null || true
   say "icon        $(basename "$ICON")"
 else
+  [ -n "$ICON" ] && warn "the icon $ICON could not be copied"
   warn "no icon named '$ICONNAME' in the closure; the AppImage will have none"
 fi
 

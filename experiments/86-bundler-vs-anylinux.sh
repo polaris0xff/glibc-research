@@ -187,11 +187,11 @@ A_VER=$("$A_IMG" --version 2>/dev/null | head -1)
 printf '\n-- size ----------------------------------------------------------\n'
 printf '  payload versions: P %s (nixpkgs)   A %s (Arch)\n' "${P_VER:-?}" "${A_VER:-?}"
 printf '  %-28s %12s  %s\n' ARTEFACT BYTES NOTE
-printf '  %-28s %12s  %s\n' "P  ours (nixpkgs closure)" "$P_SZ" "${P_PATHS:-?} store paths, nothing debloated"
+printf '  %-28s %12s  %s\n' "P  ours (nixpkgs closure)" "$P_SZ" "${P_PATHS:-?} store paths, --debloat ${PGB_APPIMAGE_DEBLOAT:-safe}"
 printf '  %-28s %12s  %s\n' "A  hand-built (Arch)"      "$A_SZ" "$A_LIBS libraries deployed"
 printf '  %-28s %12s  %s\n' "   ratio P/A" \
   "$(awk -v p="$P_SZ" -v a="$A_SZ" 'BEGIN{printf "%.2fx", p/a}')" \
-  "⛔ ours is bigger and T-057 item 1 is why: no debloating at all"
+  "⚠ ours is bigger; the debloat level this run used is printed above"
 
 # ---------------------------------------------------------------------------
 # the trace classifier, verbatim from experiments/62-
@@ -225,6 +225,30 @@ count() { n=$(grep -c . 2>/dev/null) || n=0; printf '%s' "$n"; }
 # A bundle that starts and then cannot reach its own libonig is exactly the
 # failure this experiment is looking for.
 write_test() {  # rootfs
+  # ⛔ THE FUNCTIONAL TEST IS PER SUBJECT, and adding a second subject is what
+  # forced this to stop being one hardcoded jq script. The operator's ruling
+  # on 2026-09-01e: *"jq is two shared libraries. Comparing bundlers on jq
+  # measures nothing about bundling."* ⭐ So `PGB_VS_APP=mpv` runs a subject
+  # whose closure is **291 store paths and 1.2 GB** -- ffmpeg, libplacebo,
+  # libass, mesa, and a NIXPKGS WRAPPER around the real ELF.
+  case "$APP" in
+  mpv)
+    # A real decode, not --version: ffmpeg's lavfi generates a test pattern,
+    # libavcodec decodes it and the video output layer reports the format it
+    # got. A bundle that starts and cannot reach its own libavcodec fails here
+    # and passes --version.
+    cat > "$1/vs-test.sh" <<'SH'
+#!/bin/sh
+HOME=/tmp; export HOME
+TMPDIR=/tmp; export TMPDIR
+out=$(/vs-arm --no-config --vo=null --ao=null --frames=5 --msg-level=all=info \
+      'av://lavfi:testsrc=size=64x48:rate=10:duration=1' 2>&1) || exit 20
+case "$out" in *"64x48"*) ;; *) exit 21 ;; esac
+case "$out" in *"VO: [null]"*) ;; *) exit 22 ;; esac
+exit 0
+SH
+    ;;
+  *)
   cat > "$1/vs-test.sh" <<'SH'
 #!/bin/sh
 HOME=/tmp; export HOME
@@ -235,6 +259,8 @@ re=$(/vs-arm -rn '"abc" | test("^a.c$")' 2>/dev/null) || exit 22
 [ "$re" = true ] || exit 23
 exit 0
 SH
+    ;;
+  esac
   # ⛔ A SEPARATE PAYLOAD FOR THE STARTUP COLUMN, and `--version` is the right
   # thing to run in it. This column is the START cost, which is what T-057's
   # `Prove` asks for; the functional column above is measured separately and
