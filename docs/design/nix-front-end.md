@@ -63,12 +63,12 @@ pre-installed via `pkgforge/devscripts`' `install_nix.sh`, and
 > *"tooling has evolved since then and we don't need to install nix to use
 > nix."*
 
-**The reading list, in the operator's order.** ⛔ None of these has been
-fetched, read, or run:
+**The reading list, in the operator's order.** ⛔ Only one has been fetched,
+and **none has been read or run**:
 
 | reference | what it is claimed to be |
 |---|---|
-| `nix-community/nix-user-chroot` | run nix without root, in a user namespace |
+| `nix-community/nix-user-chroot` | run nix without root, in a user namespace. ⚠ **MINED AND NOT READ** — the corpus is in `references/nix-community__nix-user-chroot/` at commit `987302aef4e3aa267355cfad00027b730bcb389b`, because the fetch had already completed when the operator stopped the sweep. A tree in `references/` that nobody has opened is exactly the thing `methodology/references.md` warns is not a finding |
 | `grigio/docker-nixuser` | the containerised form of the same |
 | `yasunori0418/nput` | (unread) |
 | `nix-community/nix-ld` | run unpatched dynamic binaries on NixOS |
@@ -92,7 +92,7 @@ about `TODO` T-033's route D.
 ⛔ **Mine before writing.** `docs/methodology/references.md` is binding:
 
 ```sh
-sh scripts/common/mine-repo.sh nix-community/nix-user-chroot --out references
+# nix-user-chroot is ALREADY mined (unread) -- re-mine only per trap 7
 sh scripts/common/mine-repo.sh nix-community/nix-ld         --out references
 sh scripts/common/mine-repo.sh yasunori0418/nput            --out references
 sh scripts/common/mine-repo.sh simonfxr/nix-download        --out references

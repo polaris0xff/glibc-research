@@ -32,7 +32,11 @@ times**, which is the debt the previous session recorded against itself.
 1. **`docs/design/nix-front-end.md`** — the operator's ruling, quoted, plus the
    six repositories to mine and the questions the mining must answer. ⛔ **The
    mining is the first task; nothing on that page is verified.**
-   ⚠ `pkgforge/soarpkgs` is already in `references/` — check which commit
+   ⚠ **`nix-community/nix-user-chroot` is already mined and UNREAD** — its
+   fetch completed before the operator stopped the sweep. A tree in
+   `references/` nobody has opened is not a finding; read it or re-mine it,
+   but do not treat its presence as work done.
+   ⚠ `pkgforge/soarpkgs` is also already in `references/` — check which commit
    before re-mining, because the operator's pin
    `55c774a5e24d9f17af69911a4d70884dfb566626` is what makes it useful (newer
    commits abandoned the approach).
