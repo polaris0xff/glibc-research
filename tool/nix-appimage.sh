@@ -48,6 +48,7 @@
 #
 # Usage:
 #   sh tool/nix-appimage.sh ATTR-OR-STOREPATH [--out FILE] [--name NAME]
+#                           [--debloat none|safe|aggressive] [--keep-locales LIST]
 #   sh tool/nix-appimage.sh --selftest
 #
 # Exit codes: 0 built, 1 did not, 2 could not run.
@@ -68,6 +69,11 @@ SHARUN_URL="${SHARUN_URL:-https://github.com/pkgforge-dev/Anylinux-sharun/releas
 DWARFS_URL="${DWARFS_URL:-https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-$ARCH}"
 
 TARGET=""; OUT=""; NAME=""; SELFTEST=0; KEEP=0; EXTRA=""; NOGL=0
+# ⭐ safe by default: every rule below removes something with a stated reason
+# and a control behind it. `none` reproduces the pre-debloat bundle exactly,
+# which is what experiments/85- and 86- measured.
+DEBLOAT="${PGB_APPIMAGE_DEBLOAT:-safe}"
+KEEP_LOCALES="${PGB_APPIMAGE_KEEP_LOCALES:-}"
 while [ $# -gt 0 ]; do
   case "$1" in
     --out)      shift; OUT="${1:-}" ;;
@@ -75,6 +81,8 @@ while [ $# -gt 0 ]; do
     --keep)     KEEP=1 ;;
     --extra)    shift; EXTRA="$EXTRA ${1:-}" ;;
     --no-gl)    NOGL=1 ;;
+    --debloat)  shift; DEBLOAT="${1:-safe}" ;;
+    --keep-locales) shift; KEEP_LOCALES="${1:-}" ;;
     --selftest) SELFTEST=1 ;;
     -h|--help)  awk 'NR>1 { if (/^#/) { sub(/^# ?/, ""); print } else exit }' "$0"; exit 0 ;;
     -*)         printf 'nix-appimage: unknown option: %s\n' "$1" >&2; exit 2 ;;
@@ -133,20 +141,40 @@ resolve_entry() {   # storedir progname -> prints the ELF to run
   fi
   [ -n "$_re_bin" ] && [ -e "$_re_bin" ] || return 1
   _re_hops=0
+  : > "${WRAPENV:-/dev/null}"
   while [ "$_re_hops" -lt 5 ]; do
     _re_hops=$((_re_hops + 1))
+    # ⛔ THE ELF TEST HAS TO COME SECOND, AND THAT USED TO BE A BUG THAT
+    # SHIPPED A BROKEN BUNDLE. nixpkgs' current `makeWrapper` produces
+    # `makeBinaryWrapper` output -- a COMPILED C PROGRAM. Measured on
+    # mpv-with-scripts-0.41.0, whose bin/mpv is a 16,560-byte ELF. Testing the
+    # magic first declared the wrapper to be the program, packed it, and the
+    # bundle then exec'd an absolute /nix/store path that is not in it. So:
+    # ask whether it is a WRAPPER before asking whether it is an ELF.
+    _re_recs=$(python3 "$SELF/nix-wrapper.py" read "$_re_bin" 2>/dev/null) || _re_recs=""
+    if [ -n "$_re_recs" ]; then
+      _re_tgt=$(printf '%s\n' "$_re_recs" | awk -F'\t' '$1=="target"{print $4; exit}')
+      # Everything but the target is environment, and it is kept.
+      printf '%s\n' "$_re_recs" | awk -F'\t' '$1!="target"' >> "${WRAPENV:-/dev/null}"
+      if [ -n "$_re_tgt" ] && [ -e "$ROOT/${_re_tgt#/nix/store/}" ]; then
+        warn "bin/$2 is a nixpkgs wrapper -> $(basename "$_re_tgt")"
+        warn "   its environment is read out of it: $(printf '%s\n' "$_re_recs" | grep -c . ) record(s)"
+        _re_bin="$ROOT/${_re_tgt#/nix/store/}"
+        continue
+      fi
+    fi
     case "$(od -An -N4 -tx1 "$_re_bin" 2>/dev/null | tr -d ' \n')" in
       7f454c46) printf '%s\n' "$_re_bin"; return 0 ;;
     esac
-    # A nixpkgs wrapper's last line is `exec <store path> "$@"`, or it sets
-    # variables and then execs. Take the last store path it names that exists.
+    # A wrapper shape nix-wrapper.py does not recognise. Take the last store
+    # path it names that exists, and say the environment was NOT read.
     _re_next=$(grep -oE '/nix/store/[a-z0-9]{32}-[^" ]*' "$_re_bin" 2>/dev/null \
                | while IFS= read -r c; do
                    [ -x "$ROOT/${c#/nix/store/}" ] && printf '%s\n' "$ROOT/${c#/nix/store/}"
                  done | tail -1)
     [ -n "$_re_next" ] || { warn "bin/$2 is a script and no ELF in it could be resolved"; return 1; }
-    warn "bin/$2 is a wrapper script -> $(basename "$_re_next")"
-    warn "⚠ the wrapper's ENVIRONMENT is not reproduced; see this file's header"
+    warn "bin/$2 is a wrapper of a shape nix-wrapper.py does not read -> $(basename "$_re_next")"
+    warn "⚠ its ENVIRONMENT is NOT reproduced. T-053."
     _re_bin="$_re_next"
   done
   return 1
@@ -274,6 +302,9 @@ say "program     $PROG"
 WORK="$CACHE/$PROG"
 ROOT="$WORK/store"
 APPDIR="$WORK/AppDir"
+# Where resolve_entry writes what it read out of a nixpkgs wrapper. ⚠ It runs
+# in a command substitution, so a variable cannot carry this back.
+WRAPENV="$WORK/wrapper-env.tsv"
 mkdir -p "$ROOT" "$CACHE/tools"
 
 # ---------------------------------------------------------------------------
@@ -371,10 +402,29 @@ chmod +x "$APPDIR/shared/bin/$PROG"
 # ⛔ A .so IS A NAME ENDING IN .so OR .so.N -- matching the substring also
 # matches /etc/ld.so.cache and a directory called `libexec/foo.sources`.
 # docs/AGENTS.md §14 carries what that has already cost this project.
+# ⛔ AND A 32-BIT OBJECT DOES NOT GO IN lib/. The Anylinux layout has `lib32`
+# beside `lib` and this bundler had no 32-bit path at all -- T-057 item 4. A
+# closure that carries both (anything with a 32-bit compatibility half: wine,
+# steam, a 32-bit plugin host) would put an i386 libfoo.so.1 and an x86_64
+# libfoo.so.1 in ONE flat directory, where the second `cp -n` silently loses
+# and the loader gets whichever landed first. The ELF class is byte 5 of the
+# header: 1 = 32-bit, 2 = 64-bit.
+elfclass() {   # path -> 32 | 64 | ""
+  case "$(od -An -N5 -tx1 "$1" 2>/dev/null | tr -d ' \n')" in
+    7f454c4601) printf 32 ;;
+    7f454c4602) printf 64 ;;
+    *)          printf '' ;;
+  esac
+}
+N32=0
 find "$ROOT" -type f -name '*.so' -o -type f -name '*.so.*' 2>/dev/null \
   | grep -E '\.so(\.[0-9]+)*$' \
   | while IFS= read -r so; do
-      cp -n "$so" "$APPDIR/lib/$(basename "$so")" 2>/dev/null || true
+      case "$(elfclass "$so")" in
+        32) mkdir -p "$APPDIR/lib32"
+            cp -n "$so" "$APPDIR/lib32/$(basename "$so")" 2>/dev/null || true ;;
+        *)  cp -n "$so" "$APPDIR/lib/$(basename "$so")" 2>/dev/null || true ;;
+      esac
     done
 # Symlinks too: libfoo.so.6 -> libfoo.so.6.0.1 is how a DT_NEEDED resolves.
 find "$ROOT" -type l -name '*.so*' 2>/dev/null | while IFS= read -r sl; do
@@ -407,6 +457,18 @@ LD=$(find "$ROOT" -name 'ld-linux-*.so.*' -o -name 'ld-musl-*.so.*' 2>/dev/null 
 [ -n "$LD" ] || die "the closure carries no dynamic loader"
 cp -L "$LD" "$APPDIR/lib/$(basename "$LD")"
 say "loader      $(basename "$LD") (the closure's own, never the host's)"
+if [ -d "$APPDIR/lib32" ]; then
+  # The 32-bit half needs its OWN loader, and it is a different file with a
+  # different name (ld-linux.so.2, not ld-linux-x86-64.so.2).
+  LD32=$(find "$ROOT" -name 'ld-linux.so.2' -o -name 'ld-linux-armhf.so.3' 2>/dev/null | head -1)
+  if [ -n "$LD32" ]; then
+    cp -L "$LD32" "$APPDIR/lib32/$(basename "$LD32")"
+    say "loader32    $(basename "$LD32")  ($(find "$APPDIR/lib32" -maxdepth 1 -name '*.so*' | wc -l | tr -d ' ') objects in lib32)"
+  else
+    warn "the closure has 32-bit objects but no 32-bit loader; lib32 will not run"
+  fi
+  ln -sfn ../lib32 "$APPDIR/shared/lib32" 2>/dev/null || true
+fi
 
 # ⛔ ABSOLUTE DT_NEEDED ENTRIES ARE REWRITTEN TO BASENAMES, and without this
 # the bundle does not start. nixpkgs links some libraries by absolute path, so
@@ -513,6 +575,102 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# 4b. ⭐ DEBLOATING, WITH A REASON PER RULE AND A CONTROL AFTER IT
+#
+# `experiments/85-` gives the number to beat: on a GL application the
+# undebloated mesa is **95 MiB of a 163 MB bundle**. Measured on
+# `mesa-26.2.1` itself, that 95 MiB is not the GL driver:
+#
+#   libgallium-26.2.1.so      58.2 MiB   the actual GL/gallium driver -- KEPT
+#   libvulkan_intel.so        27.2 MiB   \
+#   libvulkan_nouveau.so      21.4 MiB    | Vulkan ICDs, ~194 MiB across 12
+#   libvulkan_radeon.so       20.0 MiB    | files, EACH dlopen'd through a
+#   libvulkan_panfrost.so     17.7 MiB    | JSON in share/vulkan/icd.d
+#   libvulkan_freedreno.so    16.3 MiB    |
+#   libvulkan_asahi.so        15.8 MiB    /
+#   libteflon.so              12.1 MiB   an NPU delegate, not a GL driver
+#
+# ⛔ SEVEN OF THOSE TWELVE ARE FOR GPUs THAT CANNOT EXIST ON THIS
+# ARCHITECTURE: panfrost is ARM Mali, freedreno is Adreno, broadcom is a
+# Raspberry Pi, asahi is Apple silicon, powervr is Imagination, dzn is
+# Direct3D 12 on Windows, gfxstream is an Android emulator transport. Dropping
+# them is not a size/function trade -- there is no function to lose on an
+# x86_64 Linux host.
+#
+# ⭐ AND NOTHING IS DROPPED WITHOUT ITS REFERENCE. A Vulkan driver is found
+# through `share/vulkan/icd.d/<name>.json`; removing the library and leaving
+# the JSON gives a loader that tries to open a file that is gone. Both go.
+#
+# ⚠ THE CONTROL IS THE POINT, and it runs after every rule: every DT_NEEDED of
+# every ELF left in the bundle must resolve inside lib/. A debloat that breaks
+# that is a smaller bundle that does not run, which is the failure mode this
+# whole step invites.
+# ---------------------------------------------------------------------------
+debloat_size() { du -sb "$APPDIR" 2>/dev/null | cut -f1; }
+DB_BEFORE=$(debloat_size)
+db_rule() {   # label  <paths on stdin>
+  _dr_n=0; _dr_b=0
+  while IFS= read -r _dr_p; do
+    [ -e "$_dr_p" ] || continue
+    _dr_s=$(du -sb "$_dr_p" 2>/dev/null | cut -f1)
+    rm -rf "$_dr_p" && _dr_n=$((_dr_n + 1)) && _dr_b=$((_dr_b + ${_dr_s:-0}))
+  done
+  [ "$_dr_n" -gt 0 ] && say "  debloat   $(printf '%7.1f MiB' "$(echo "$_dr_b" | awk '{print $1/1048576}')")  $_dr_n  $1"
+  return 0
+}
+
+if [ "$DEBLOAT" != none ]; then
+  say ""
+  say "debloating (level: $DEBLOAT)"
+
+  # 1. Documentation. A bundle is not a development environment.
+  find "$APPDIR/share" -maxdepth 1 \( -name doc -o -name man -o -name info \
+       -o -name gtk-doc -o -name devhelp -o -name bash-completion \
+       -o -name zsh -o -name fish \) 2>/dev/null | db_rule "documentation and shell completions"
+
+  # 2. Anything only a COMPILER would open.
+  { find "$APPDIR" \( -name '*.a' -o -name '*.la' -o -name '*.pc' \) -type f 2>/dev/null
+    find "$APPDIR" -maxdepth 3 \( -name include -o -name pkgconfig -o -name cmake \
+         -o -name aclocal \) -type d 2>/dev/null; } | db_rule "static archives, headers and build metadata"
+
+  # 3. Locales. ⚠ THIS IS A REAL TRADE AND IT IS STATED AS ONE: the
+  # application's own translations go with them. --keep-locales names the ones
+  # to keep; the Anylinux flow's chromium recipe instead symlinks the
+  # directory back to the HOST, which is a deliberate reintroduction of a host
+  # dependency and is NOT copied here.
+  if [ -d "$APPDIR/share/locale" ]; then
+    find "$APPDIR/share/locale" -mindepth 1 -maxdepth 1 -type d 2>/dev/null \
+      | while IFS= read -r _l; do
+          case ",$KEEP_LOCALES," in
+            *",$(basename "$_l"),"*) ;;
+            *) printf '%s\n' "$_l" ;;
+          esac
+        done | db_rule "locale catalogues (kept: ${KEEP_LOCALES:-none})"
+  fi
+
+  # 4. GPU drivers for hardware this architecture does not have, and the ICD
+  # JSON that names each one.
+  case "$ARCH" in
+    x86_64|i686|i386) FOREIGN="panfrost freedreno broadcom asahi powervr dzn gfxstream v3dv imagination" ;;
+    aarch64)          FOREIGN="dzn gfxstream intel_hasvk" ;;
+    *)                FOREIGN="" ;;
+  esac
+  [ "$DEBLOAT" = aggressive ] && FOREIGN="$FOREIGN intel intel_hasvk radeon nouveau virtio swrast_no"
+  for _f in $FOREIGN; do
+    { find "$APPDIR/lib" -maxdepth 1 -name "libvulkan_$_f*.so*" 2>/dev/null
+      find "$APPDIR/share/vulkan" -name "*$_f*.json" 2>/dev/null
+    } | db_rule "vulkan driver '$_f' (no such GPU on $ARCH)"
+  done
+  # An NPU delegate is not a graphics driver and nothing in a GL closure
+  # references it.
+  find "$APPDIR/lib" -maxdepth 1 -name 'libteflon.so*' 2>/dev/null \
+    | db_rule "libteflon (an NPU delegate, not a GPU driver)"
+
+  DB_AFTER=$(debloat_size)
+  say "  debloat   $(awk -v a="$DB_BEFORE" -v b="$DB_AFTER" 'BEGIN{printf "%.1f MiB -> %.1f MiB (%.1f%% off)", a/1048576, b/1048576, (a-b)*100/a}')"
+fi
+
+# ---------------------------------------------------------------------------
 # 5. sharun as AppRun, and the lib.path it reads
 # ---------------------------------------------------------------------------
 need "$SHARUN_URL" "$CACHE/tools/sharun" || die "could not fetch sharun"
@@ -525,6 +683,36 @@ ln -f "$APPDIR/sharun" "$APPDIR/AppRun" 2>/dev/null || cp "$APPDIR/sharun" "$APP
 ln -f "$APPDIR/sharun" "$APPDIR/bin/$PROG" 2>/dev/null || cp "$APPDIR/sharun" "$APPDIR/bin/$PROG"
 ( cd "$APPDIR" && ./sharun --gen-lib-path >/dev/null 2>&1 ) || warn "sharun --gen-lib-path failed"
 [ -s "$APPDIR/lib/lib.path" ] && say "lib.path    $(wc -l < "$APPDIR/lib/lib.path") entries"
+
+# ⭐ THE CONTROL ON THE WHOLE ASSEMBLY, AND ESPECIALLY ON THE DEBLOAT. Every
+# DT_NEEDED of every ELF left in the bundle has to resolve inside it. A
+# debloat that breaks this produces a smaller bundle that does not start, and
+# the failure arrives on somebody else's machine as
+# "cannot open shared object file" -- which reads like a broken build.
+# ⚠ It is a REPORT, not a refusal: a closure legitimately contains libraries
+# that dlopen things nothing links against, and stopping the build on that
+# would be a false alarm. An unresolved DT_NEEDED is a real defect and is
+# printed with the file that wants it.
+MISSING=$(
+  { printf '%s\n' "$APPDIR/shared/bin/$PROG"
+    find "$APPDIR/lib" -maxdepth 2 -type f -name '*.so*' 2>/dev/null; } \
+  | while IFS= read -r _e; do
+      python3 "$SELF/elf-needed.py" print "$_e" 2>/dev/null
+    done \
+  | awk -F'\t' '{print $2}' | sort -u \
+  | while IFS= read -r _n; do
+      [ -n "$_n" ] || continue
+      case "$_n" in ld-linux*|ld-musl*|/*) continue ;; esac
+      [ -e "$APPDIR/lib/$_n" ] || [ -e "$APPDIR/lib32/$_n" ] || printf '%s\n' "$_n"
+    done
+)
+NMISS=$(printf '%s' "$MISSING" | grep -c . || true)
+if [ "${NMISS:-0}" -gt 0 ]; then
+  warn "⛔ $NMISS DT_NEEDED name(s) do not resolve inside the bundle:"
+  printf '%s\n' "$MISSING" | sed 's/^/             /' >&2
+else
+  say "integrity   every DT_NEEDED in the bundle resolves inside it"
+fi
 
 # ---------------------------------------------------------------------------
 # 5b. ⭐ THE ENVIRONMENT, AND THE OpenGL HALF OF IT IS THE INTERESTING PART
@@ -565,6 +753,55 @@ ln -f "$APPDIR/sharun" "$APPDIR/bin/$PROG" 2>/dev/null || cp "$APPDIR/sharun" "$
   [ -d "$APPDIR/share/vulkan/icd.d" ] &&
     printf 'VK_DRIVER_FILES=${SHARUN_DIR}/share/vulkan/icd.d\n'
 } > "$APPDIR/.env"
+
+# ---------------------------------------------------------------------------
+# 5c. ⭐ THE WRAPPER'S ENVIRONMENT -- T-053, and the answer to "why not patsh"
+#
+# `tool/nix-wrapper.py` read the assignments out of the wrapper that `bin/<x>`
+# turned out to be. They name absolute store paths, which do not exist in the
+# bundle, so each referenced path is copied into `AppDir/store/<name>/` --
+# keeping its INTERNAL layout, because a variable like LUA_CPATH names a
+# sub-path (`lib/lua/5.2/?.so`) and flattening it into lib/ would break it --
+# and the value is rewritten to ${SHARUN_DIR}/store/<name>/...
+#
+# ⛔ WHY NOT patsh, stated where the decision lives. patsh patches store paths
+# in shell SCRIPTS so the script keeps working. Two things are wrong with that
+# here, and both are measured: nixpkgs' current wrapper is a COMPILED C
+# program (mpv's bin/mpv is a 16,560-byte ELF), so there is no script to
+# patch; and a bundle does not run the wrapper at all -- sharun runs the real
+# ELF and reads .env -- so the job is to LIFT the assignments out, not to keep
+# a script alive.
+# ---------------------------------------------------------------------------
+NWENV=0
+if [ -s "$WRAPENV" ]; then
+  mkdir -p "$APPDIR/store"
+  # Copy every store path the wrapper's environment refers to.
+  for _sp in $(grep -oE '/nix/store/[a-z0-9]{32}-[^:; ]*' "$WRAPENV" 2>/dev/null \
+               | sed -E 's|(/nix/store/[a-z0-9]{32}-[^/]*).*|\1|' | sort -u); do
+    _b=$(basename "$_sp")
+    _n=$(printf '%s' "$_b" | cut -c34-)
+    if [ ! -d "$ROOT/$_b" ]; then
+      sh "$FETCH" fetch "$_sp" --out "$ROOT" >/dev/null 2>&1 \
+        || { warn "wrapper env names $_b, which is not in the closure and could not be fetched"; continue; }
+    fi
+    [ -d "$APPDIR/store/$_n" ] || cp -aL "$ROOT/$_b" "$APPDIR/store/$_n" 2>/dev/null || true
+  done
+  # ⭐ prefix/suffix/set become sharun .env lines with the SAME semantics.
+  # sharun expands ${SHARUN_DIR} and ${VAR}, so a prefix is `V=new${SEP}${V}`.
+  while IFS="$(printf '\t')" read -r _op _var _sep _val; do
+    [ -n "$_var" ] || continue
+    _v=$(printf '%s' "$_val" | sed -E 's|/nix/store/[a-z0-9]{32}-([^/:; ]*)|${SHARUN_DIR}/store/\1|g')
+    case "$_op" in
+      set)    printf '%s=%s\n' "$_var" "$_v" ;;
+      prefix) printf '%s=%s%s${%s}\n' "$_var" "$_v" "${_sep:-:}" "$_var" ;;
+      suffix) printf '%s=${%s}%s%s\n' "$_var" "$_var" "${_sep:-:}" "$_v" ;;
+      *)      continue ;;
+    esac
+    NWENV=$((NWENV + 1))
+  done < "$WRAPENV" >> "$APPDIR/.env"
+  say "wrapper env $NWENV variable(s) lifted out of the wrapper into .env"
+  sed -n '1,8p' "$WRAPENV" | sed 's/^/            /'
+fi
 
 # ---------------------------------------------------------------------------
 # 6. pack: uruntime + dwarfs, the Anylinux way

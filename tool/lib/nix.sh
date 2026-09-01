@@ -172,7 +172,15 @@ nix_plan_from_drv() {   # drvpath query outfile -> 0 on success
 # flags, and sources are fixed-output paths that do not move with the revision.
 nix_plan_hydra() {   # attr outfile -> 0 on success
   _ph_q="$1"; _ph_out="$2"
-  case "$_ph_q" in /nix/store/*) return 1 ;; esac   # a store path, not an attr
+  # ⭐ A .drv PATH NEEDS NO INDEX AT ALL: it already names the derivation, so
+  # it goes straight to the shared tail. This is how a component of a
+  # multi-derivation package is reached -- nixpkgs' `nix` is an aggregate with
+  # no `src`, and the thing that actually compiles is `nix-cli-2.34.8.drv`,
+  # named in the aggregate's own References.
+  case "$_ph_q" in
+    /nix/store/*.drv) nix_plan_from_drv "$_ph_q" "$_ph_q" "$_ph_out"; return $? ;;
+    /nix/store/*)     return 1 ;;
+  esac
 
   _ph_info=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" drv "$_ph_q" \
              --system "${PGB_NIX_SYSTEM:-x86_64-linux}" 2>/dev/null) || return 1
@@ -317,6 +325,7 @@ cmd_nix() {
   [ $# -gt 0 ] && shift
   case "$_sub" in
     plan)   nix_cmd_plan "$@" ;;
+    deps)   nix_cmd_deps "$@" ;;
     build)  nix_cmd_build "$@" ;;
     fetch)  nix_cmd_fetch "$@" ;;
     ""|help|-h|--help) nix_usage ;;
@@ -332,6 +341,13 @@ pgb nix -- use nixpkgs as the dependency planner, and build with glibc
         Evaluate a nixpkgs attribute and write a build plan: the source, its
         upstream URL and hash, the patches, the configure flags, the
         dependency names. ⛔ This is the only step that needs nix.
+
+  pgb nix deps  ATTR|--plan FILE
+        Build the plan's DEPENDENCIES into the shared static prefix and stop.
+        ⭐ For a package whose own build is driven by hand -- a source tree
+        with several components, or one this tool cannot configure yet -- the
+        dependency closure is still the expensive part and nixpkgs still knows
+        it. $NIX_PREFIX selects the prefix.
 
   pgb nix fetch ATTR|--plan FILE [--out DIR]
         Fetch the plan's source and patches. cache.nixos.org first (signed,
@@ -475,6 +491,24 @@ nix_fetch_plan() {   # planfile destdir
 # and its `_work` the ncurses work directory, so `pgb nix build htop` went on
 # to unpack, configure and build ncurses a SECOND time and reported it as the
 # result. The run looked plausible and produced the wrong package.
+# ⭐ THE DEPENDENCY CLOSURE ON ITS OWN. `pgb nix build` plans a package, builds
+# its dependencies into the shared static prefix and then builds the package.
+# This is the first half, exposed, because a package can be worth planning for
+# its dependencies alone: nixpkgs' `nix` is SEVEN component derivations over
+# ONE source tree, so no single plan describes the build -- but the union of
+# those plans is exactly the library closure a static nix needs. T-060.
+nix_cmd_deps() {
+  nix_parse_common "$@"
+  NIXD_PF=$(nix_resolve_plan) || return 1
+  say "attr        $(plan_get "$NIXD_PF" attr)"
+  say "prefix      $NIX_PREFIX"
+  nix_build_deps "$NIXD_PF" 1 || return 1
+  say ""
+  say "built into  $NIX_PREFIX"
+  ls "$NIX_PREFIX/.built" 2>/dev/null | sed 's/^/  ok    /'
+  return 0
+}
+
 nix_cmd_build() {
   nix_parse_common "$@"
   NIXB_PF=$(nix_resolve_plan) || return 1
