@@ -1,0 +1,65 @@
+===============================================================
+85 - the bundled OpenGL stack, on all eleven
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-01T18:50:56Z
+host kernel  : Linux 6.18.44-fc-v22
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/85-opengl
+--------------------------------------------------------------
+
+-- the two bundles -----------------------------------------------
+  ok    arm A built (bundled mesa)                     = yes
+  ok    arm B built (--no-gl)                          = yes
+        A 170610343 bytes    B 70568698 bytes
+        the difference is the GL stack: 95 MiB
+
+-- eglinfo on the eleven, one row per environment -----------------
+  ENVIRONMENT         LIBC   | A:exit   A:EGL vendor   A:driver  | B:exit   B:EGL vendor
+        the build host, same artefact: exit 3, vendor 'Mesa Project'
+  alpine-3.22         musl   | exit3    Mesa Project   swrast    | exit1    -
+  alpine-3.20         musl   | exit3    Mesa Project   swrast    | exit1    -
+  alpine-3.10         musl   | exit3    Mesa Project   swrast    | exit1    -
+  voidlinux-musl      musl   | exit3    Mesa Project   swrast    | exit1    -
+  debian-11           glibc  | exit3    Mesa Project   swrast    | exit1    -
+  debian-12           glibc  | exit3    Mesa Project   swrast    | exit1    -
+  ubuntu-20.04        glibc  | exit3    Mesa Project   swrast    | exit1    -
+  rockylinux-8        glibc  | exit3    Mesa Project   swrast    | exit1    -
+  opensuse-leap-15.6  glibc  | exit3    Mesa Project   swrast    | exit1    -
+  fedora-42           glibc  | exit3    Mesa Project   swrast    | exit1    -
+  archlinux-latest    glibc  | exit3    Mesa Project   swrast    | exit1    -
+
+  ⚠ A:exit is eglinfo's own convention -- the NUMBER OF PLATFORMS
+    THAT FAILED to initialise. 3 here, on every row and on the build
+    host: GBM, Wayland and X11, none of which exists in a rootfs with
+    no display and no DRM node. Surfaceless is the one that can work
+    and it is the one the vendor and driver columns read.
+
+  ok    arm A: surfaceless EGL reports Mesa on every environment = 11
+  ok    arm A: a driver is named on every environment  = 11
+  ok    arm A: every target agrees with the build host's exit = 11
+  ok    arm A loaded no host shared object             = 11
+  ok    arm B (no bundled mesa) reported NO vendor anywhere = 0
+
+-- ⛔ read this before quoting any row above ----------------------
+  no GPU        this machine has none. Every row is software
+                rasterisation (swrast). That is a real, complete GL
+                implementation and it is NOT evidence about anybody's
+                iris, radeonsi, amdvlk or NVIDIA path.
+  no display    none of the eleven has an X server, a wayland
+                compositor or a GBM device, so EGL_PLATFORM is
+                surfaceless. This measures the GL STACK loading and
+                initialising, not anything being drawn to a screen.
+  NVIDIA        untouched. The userspace half must match the running
+                kernel module; nixGL fetches a matching driver
+                (nixGL.nix:69) and a bundle cannot. T-052 stays open.
+  size          nothing is debloated -- T-057 owns that.
+
+-- result ----------------------------------------------------
+pass=7 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

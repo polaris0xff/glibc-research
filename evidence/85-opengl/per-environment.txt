@@ -1,0 +1,121 @@
+== alpine-3.22 (musl)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: EGL client extensions string:
+== alpine-3.20 (musl)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: EGL client extensions string:
+== alpine-3.10 (musl)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: EGL client extensions string:
+== voidlinux-musl (musl)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: EGL client extensions string:
+== debian-11 (glibc)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: WARNING: Cannot find CA Certificates in host!
+== debian-12 (glibc)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: WARNING: Cannot find CA Certificates in host!
+== ubuntu-20.04 (glibc)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: WARNING: Cannot find CA Certificates in host!
+== rockylinux-8 (glibc)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: EGL client extensions string:
+== opensuse-leap-15.6 (glibc)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: EGL client extensions string:
+== fedora-42 (glibc)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=41
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: EGL client extensions string:
+== archlinux-latest (glibc)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: EGL client extensions string:

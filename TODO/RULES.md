@@ -175,3 +175,26 @@ recorded in the entry.** A closed entry with no output is an opinion.
 ⚠ **Experiments are binding on `../docs/methodology/experiments.md`; sweeps on
 `references.md`; vendoring on `vendoring.md`.** All three are vendored under
 `../docs/methodology/`.
+
+## ⛔ ONE THING AT A TIME ON THE BED, AND ONE `pgb build` AT A TIME
+
+⚠ **Both were learned the expensive way in the session of 2026-09-01d**, on a
+4-core machine where the temptation to overlap is strongest.
+
+**The test bed is shared, and the reaper is a blunt instrument.**
+`experiments/62-`, `85-` and `86-` all reap by walking `/proc/PID/root` and
+killing every process chrooted into the rootfs they are using — which is the
+*correct* reaper, because a dwarfs FUSE daemon is called `memfd:dwarfs` and a
+`pkill -f` matches the runner's own command line. ⛔ **But it cannot tell one
+experiment's process from another's.** Two runs touching the same rootfs kill
+each other's subjects, and what that produces is not an error: it is a row
+that says `SIG9` or `timeout` in a table that otherwise looks fine.
+
+**And `pgb build` is not concurrency-safe** — `TODO/toolchain.md` T-058. Two
+builds share one wrapper directory and one set of option-dependent flags, so
+the second one's `--embed-terminfo` silently becomes the first one's too.
+
+⭐ **What CAN overlap**, and it is worth using: a `pgb build` and anything that
+does not touch the bed or the wrappers. `tool/nix-appimage.sh` is closure
+fetching and dwarfs packing, so a bundle builds happily beside a compile. The
+serialisation only binds where the shared resource is.
