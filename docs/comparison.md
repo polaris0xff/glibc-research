@@ -37,24 +37,24 @@ touches*, not on the distribution alone. There is no set of distributions on
 which a plain static glibc binary is safe; there is a set on which a
 *particular program* has not yet hit the path that breaks.
 
-## What is NOT measured, and must not be quoted
+## What is and is not measured
 
 | column | state |
 |---|---|
-| startup time, RSS, steady-state runtime | ⛔ **nothing measured.** No number exists. `docs/AGENTS.md` §21 item 3 is the plan. |
-| binary size | partially: 940 KiB with no iconv use, 2.1 MiB with it, for one program. Not a general figure. |
-| build time | not measured |
+| startup time, peak RSS | **measured** (`experiments/40-overhead.sh`) and the answer is **no measurable difference** between plain `-static` and `pgb`. Two runs put `pgb` 42 µs then 28 µs per exec above plain static, and its RSS 56 KiB above then 28 KiB **below** — a sign change, so both sit at or under this instrument's noise floor. ⛔ Do not quote either as a figure. |
+| binary size | **measured**: 1,057,760 B plain static vs 2,138,296 B `pgb` for a program that calls `iconv`; 940 KiB vs 2.1 MiB for the same source with and without an `iconv` call. Static libiconv is the whole difference and only programs that use it pay. |
+| steady-state runtime | not measured. `pgb` changes no application code, so there is no mechanism by which it would differ, but that is an argument from structure. |
+| build time | measured but **not comparable**: `pgb`'s 247 ms includes entering the chroot build environment, which the other arms do not pay. |
 | every non-`pgb` row's behaviour columns | **not run.** Read from design, marked with dashes. |
 
-⭐ **The one overhead statement that can be made now** is structural rather
-than measured: `pgb` adds no process, no loader, no extraction step and no
-supervising runtime. The output is an ordinary `ET_EXEC` with no `PT_INTERP`
-and zero `DT_NEEDED`, so at run time there is nothing to be slower than a
-plain static binary *except* the constructor that calls
-`__nss_configure_lookup` fourteen times, and — only with `--embed-locale`, and
-only when the host cannot answer a UTF-8 `setlocale` — one directory of files
-written once. ⚠ That is an argument from structure. It is not a measurement,
-and it is labelled as an estimate everywhere it appears.
+⭐ **Why "no measurable difference" is the expected result**, which is what
+makes the measurement credible rather than surprising: `pgb` adds no process,
+no loader, no extraction step and no supervising runtime. The output is an
+ordinary `ET_EXEC` with no `PT_INTERP` and zero `DT_NEEDED`, so at run time
+there is nothing to be slower than a plain static binary *except* the
+constructor that calls `__nss_configure_lookup` fourteen times, and — only
+with `--embed-locale`, and only when the host cannot answer a UTF-8
+`setlocale` — one directory of files written once.
 
 ## Where each row's evidence lives
 

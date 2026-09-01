@@ -1,410 +1,283 @@
-# AGENTS.md — the standalone handoff for this repository
+# AGENTS.md — read this first, and you can work
 
-⭐ **You can read only this file and be able to both check the existing work
-and continue it.** It assumes no conversation history and no memory of a
-previous session. Everything it claims is backed by a script in this tree that
-you can re-run.
-
-⚠ **Read [§20 Known-weak claims](#20-known-weak-claims-read-these-before-the-conclusions)
-before you read any conclusion.** A previous revision of this document would
-have had four claims wrong; that section is where the current ones are kept
-honest.
+Standalone. Assumes no prior context. Every claim here is produced by a script
+in this tree that you can re-run.
 
 ---
 
-## 1. What this project is
+## 1. The project
 
-A **research project with a working tool** that answers one question:
+Answer, with evidence, whether a **normal Linux ELF** built against glibc can
+run reliably on both glibc and musl systems with no packaging format and no
+significant overhead — and ship the tool that does it.
 
-> Can a normal Linux ELF binary be built with GLIBC such that it runs
-> reliably on both GLIBC and MUSL systems, without a separate packaging
-> format and without significant runtime overhead?
+The tool is [`../pgb`](../pgb) (portable glibc build): a POSIX-sh driver plus
+three small C runtime pieces. Output is an ordinary statically linked
+executable. No launcher, no AppDir, no loader, nothing beside it.
 
-The answer this repository establishes, with evidence, is in [§6](#6-the-answer-so-far).
+**The answer reached: yes, for programs that do not need to load host
+plugins.** Five real projects prove it; §7 states the limits.
 
-The tool is [`pgb`](../pgb) (**p**ortable **g**libc **b**uild). It produces an
-ordinary statically linked ELF executable — no launcher, no AppDir, no
-loader, no directory beside it.
+## 2. The problem
 
-## 2. The exact problem
+`gcc -static` against glibc is **not** self-contained, though `file` and `ldd`
+say otherwise. glibc's NSS and gconv are plugin systems: the plugin is named in
+**host** configuration and loaded with `dlopen` at run time. Static linking
+links the dispatcher, never the plugins. Each host plugin carries
+`DT_NEEDED libc.so.6`, so a second libc and the dynamic loader enter the
+process.
 
-`gcc -static` against glibc does **not** produce a self-contained binary.
-`file` says "statically linked" and `ldd` says "not a dynamic executable", and
-both are misleading. Measured across 11 pinned distributions
-([§13](#13-test-environments)):
+glibc 2.34 made the `files` and `dns` NSS services builtin. That removed the
+*default* dlopen only; `resolve`, `myhostname`, `mymachines`, `mdns4_minimal`,
+`compat`, `sss` and `systemd` remain external and are named by default on
+modern distributions.
 
-| what the binary still reaches for | what happens | measured in |
-|---|---|---|
-| host `/etc/nsswitch.conf` and the `libnss_*.so` it names | loaded on 5 of 11; **SIGFPE on Arch Linux and openSUSE Leap 15.6** | `experiments/20-` |
-| host gconv modules for character conversion | **SIGFPE/SIGABRT on Debian 11, Debian 12, Ubuntu 20.04**; 11 of 12 encodings silently unavailable everywhere else | `experiments/30-` |
-| host glibc locale data | `setlocale(C.UTF-8)` → NULL and codeset → `ANSI_X3.4-1968` on all 4 musl hosts | `experiments/30-` |
-
-Each of those is a **`dlopen` of a host shared object from inside a "static"
-process**, and each host object carries `DT_NEEDED libc.so.6`, so a second
-libc and the dynamic loader enter the process.
-
-## 3. Why the problem exists
-
-glibc's NSS and gconv are **plugin architectures**. The service to use is named
-in host configuration at run time and loaded with `dlopen`. Static linking
-links the *dispatcher*, never the *plugins*, and cannot: which plugin is wanted
-is not known until the program runs on a particular host.
-
-glibc 2.34 built the `files` and `dns` NSS services into libc. That removed the
-*default* dlopen and nothing else: `resolve`, `myhostname`, `mymachines`,
-`mdns4_minimal`, `compat`, `sss` and `systemd` are all still external, and
-modern distributions name them by default.
-
-## 4. What "portable static GLIBC" means here
-
-A binary qualifies when **all** of these hold, on every environment in
-[§13](#13-test-environments):
-
-1. it runs, exit status is the program's own, no signal;
-2. it loads **no host shared object** — checked by syscall trace attributed to
-   its own pid, not by `ldd`;
-3. its **functionality** works, exercised by real assertions, not `--version`.
-
-⚠ **Criterion 2 is about SHARED OBJECTS, not about host data, and an earlier
-version of this file had that wrong.** It said "no host shared object *and no
-host gconv/NSS data*", which is both unachievable and undesirable:
-
-- glibc still **opens** `/etc/nsswitch.conf` under the NSS override. It does
-  not *use* what the file names, which is the property that matters.
-- a program that finds and honours the host's locale where the host has one is
-  behaving **correctly**. CPython reads Debian's `C.utf8` tree and is right to.
-
-⭐ **The property is INDEPENDENCE, not abstinence: the binary must work whether
-or not the host data exists.** The matrix demonstrates that directly, because
-the four musl environments have no glibc locale data, no gconv tree and (on
-Alpine) no terminfo, and the same binaries pass there. Host data reads are
-therefore *reported* in their own column and never asserted; a host `.so` load
-is a failure.
-
-⛔ **`file`, `ldd` and `readelf` are not the criterion.** A binary that
-satisfies all three and dies on Arch has failed; a binary those tools call
-"dynamic" that works everywhere has passed.
-
-## 5. What does NOT count as success
-
-- passing on one glibc and one musl distribution and calling it universal;
-- a `--version` check standing in for a functional test;
-- an empty strace with no positive control proving the probe can see anything;
-- a build whose toolchain came from the developer's own machine.
-
-## 6. The answer so far
-
-**Yes, for a well-defined and large class of programs**, and the class is
-defined by one property: *the program does not need to load host plugins.*
-
-Five real projects ([§12](#12-proof-of-concept-projects)) build unmodified and
-pass full functional tests on all 11 environments, loading zero host objects.
-
-**The limits are real and are not hidden** — [§11](#11-known-limitations).
-The sharpest one: `dlopen` of a host object from a static glibc binary
-**sometimes works**, which is worse than never working. Measured: gawk's own
-extension loads on Debian 12 and Arch, is refused on the other nine.
-
-## 7. Architecture
-
-Three mechanisms, all at tier 2–3 of the brief's preference order (automatic
-toolchain change / generic runtime technique). **No application source is
-patched by any of them.**
-
-| mechanism | how | file |
-|---|---|---|
-| **NSS** | a constructor calls `__nss_configure_lookup()` — a public `GLIBC_2.2.5` symbol present in `libc.a` — pinning every database to services glibc ≥ 2.34 implements *inside* libc. Nothing named in the host's nsswitch.conf can then be dlopen'd. | `tool/runtime/pgb-nssfix.c` |
-| **iconv** | `-Wl,--wrap=iconv_open,--wrap=iconv,--wrap=iconv_close` redirects the three public entry points to statically linked GNU libiconv. `--wrap` acts at the final link, so it catches calls from any object including archives built before this tool existed. | `tool/runtime/pgb-iconv.c` |
-| **locale** (opt-in) | `-Wl,--wrap=setlocale`; the C.UTF-8 tree is embedded and materialised **only** if the host cannot answer a UTF-8 request. | `tool/runtime/pgb-locale.c` |
-
-⭐ **Why the iconv shim lives in an archive and nssfix does not.** An archive
-member is pulled in only when a symbol it defines is referenced. Nothing
-references `__wrap_iconv_open` unless the program calls `iconv_open`, so a
-program that does no conversion links none of libiconv. Measured: 940 KiB
-versus 2.1 MiB for the same source. The nssfix constructor has no referenced
-symbol at all, so it is passed as a plain object with `-Wl,-u,pgb_runtime_anchor`.
-
-**Delivery is compiler wrappers on `PATH`** plus `CC`/`CXX`. autotools, CMake,
-meson and plain make all pick them up with no knowledge of `pgb`. Each wrapper
-inspects its own argv: `-c`/`-E`/`-S`/`-M` is a compile, `-shared` is passed
-through untouched (a `./configure` shared-library probe must keep working), and
-anything else is an executable link that gets the portable flags.
-
-## 8. Repository structure
-
-```
-pgb                       the tool. POSIX sh. Start at its header comment
-tool/runtime/*.c          the three runtime mechanisms
-scripts/common/
-  oci-pull.sh             pull an OCI image to a rootfs with no daemon
-  rootfs-run.sh           chroot into one, private mount namespace
-  fetch-rootfs.sh         materialise the pinned test bed
-  rootfs-images.txt       ⭐ the 11 environments, pinned by manifest digest
-  mine-repo.sh            the reference-sweep fetcher (vendored, see §17)
-scripts/build-libiconv.sh GNU libiconv, pinned
-experiments/              numbered, re-runnable, each answers one question
-  lib.sh                  conditions block, assertions, pid-attributed tracing
-poc/                      the five proof-of-concept projects
-  common.sh               the POC contract: build, inspect, matrix, observe
-evidence/                 RESULT.txt per experiment and POC, committed
-references/               ⭐ the corpus: 12 upstream trees + trackers, tracked
-docs/                     this file and the write-ups
-tmp/START.md              the original brief this project answers
-```
-
-## 9. How to run everything
-
-```sh
-# 0. prerequisites: root + CAP_SYS_ADMIN (for chroot), curl, python3, a C
-#    toolchain, strace. `sh pgb doctor` tells you what is missing.
-sh pgb doctor
-
-# 1. the test bed, ~1.5 GiB, pinned by digest
-sh scripts/common/fetch-rootfs.sh
-sh scripts/common/fetch-rootfs.sh --list      # what is pinned vs on disk
-
-# 2. the experiments, in order. Exit 0 matched expectation, 1 did not,
-#    2 could not run.
-sh experiments/10-probe-the-host.sh
-sh experiments/20-static-glibc-nss-dlopen.sh
-sh experiments/30-gconv-and-locale.sh
-
-# 3. the build environment (pinned Debian 12, glibc 2.36) and libiconv
-sh pgb env create
-sh pgb env info
-
-# 4. build something and check it
-sh pgb build -- make
-sh pgb verify ./your-binary
-
-# 5. the POCs. Each fetches, verifies a sha256, builds, and runs the matrix.
-for p in poc/*/run.sh; do sh "$p"; done
-```
-
-`sh pgb explain` prints every injected flag and the experiment behind it.
-
-## 10. Status of every piece
-
-| item | status | note |
-|---|---|---|
-| chroot/OCI test bed, 11 environments | **COMPLETE** | x86_64 only |
-| `oci-pull.sh`, `rootfs-run.sh` selftests | **COMPLETE** | both carry positive controls |
-| experiment 10 (host probe) | **COMPLETE** | |
-| experiment 20 (NSS) | **COMPLETE** | 37 assertions |
-| experiment 30 (gconv + locale) | **COMPLETE** | 24 assertions |
-| `pgb`, chroot engine | **COMPLETE** | the engine everything was measured with |
-| `pgb`, host engine | **COMPLETE** | works; warns that it is uncontrolled |
-| `pgb`, docker/podman engine | **UNTESTED** | no daemon on the development machine. Code exists, has never run. |
-| NSS mechanism | **COMPLETE** | zero host NSS modules on 11 of 11 |
-| iconv mechanism | **COMPLETE** | 12 of 12 encodings on 11 of 11 |
-| locale mechanism (`--embed-locale`) | **COMPLETE** | UTF-8 on 11 of 11 |
-| POC 10 gawk | **COMPLETE** | |
-| POC 20 nano (+ncurses) | **COMPLETE** | |
-| POC 30 curl (+OpenSSL, zlib) | **COMPLETE** | |
-| POC 40 jq (+oniguruma) | **COMPLETE** | |
-| POC 50 CPython | **IN PROGRESS** | see §21 |
-| host `dlopen` of plugins | **FAILED / KNOWN LIMITATION** | §11, and it is host-dependent |
-| terminfo, CA bundle | **KNOWN LIMITATION** | data, not libc. §11 |
-| aarch64 | **UNTESTED** | §14 |
-| glibc version floor (< 2.34) | **UNTESTED** | §21, experiment 21 is planned not written |
-| performance / overhead | **UNTESTED** | §21 |
-| CI | **PLANNED** | §21 |
-
-## 11. Known limitations
-
-⛔ **These are measured, not guessed, and they are the honest cost of the
-approach.**
-
-1. **`dlopen` of a host shared object is host-dependent, and success is the
-   worse outcome.** gawk's own `filefuncs.so`, built by the same build:
-   **loads** on Debian 12 and Arch Linux, **refused** on Ubuntu 20.04,
-   Rocky 8, openSUSE Leap, Fedora 42, Debian 11 and all four musl hosts. Where
-   it loads, the trace shows the host's `ld-linux` and `libc.so.6` entering the
-   process. A program whose *core function* is loading host plugins is outside
-   the class this tool serves. Evidence: `evidence/poc/10-gawk/observation.txt`.
-2. **NSS data from LDAP, SSSD, NIS, mDNS and systemd-resolved is gone.**
-   Keeping those modules out *is* the fix; losing them is its price.
-3. **Data dependencies are not libc dependencies and are not solved by static
-   linking.** Five found so far, each with its own path convention:
-   gconv (solved by static libiconv), locale (solved, opt-in), **terminfo**
-   (unsolved: no database on Alpine, wrong entry on Void), **CA bundles**
-   (unsolved: one compiled-in path works on 5 of 11), and a language runtime's
-   own library tree (CPython's stdlib, handled by shipping it).
-4. **`-static` pulls whole archives**, so an optional dependency that is not
-   fully static fails the link. Not a defect in any project: dynamic linking
-   defers those symbols to a library never loaded, static linking resolves them
-   and they are absent. Seen in CPython's `nis` module via `libtirpc`.
-5. **A private-prefix dependency build can bake the build prefix into runtime
-   search paths.** ncurses compiles its terminfo search path from `--prefix`;
-   without `--with-terminfo-dirs` the binary looked for terminal descriptions
-   under the build prefix and `setupterm()` failed on **all 11** — including
-   the seven with a perfectly good `/usr/share/terminfo`. It still passed a
-   `--version` test.
-6. **The kernel is not abstracted.** A chroot bed shares the host kernel, so
-   nothing here tests behaviour that depends on the target's kernel version.
-7. **Only x86_64 has been run.** §14.
-
-## 12. Proof-of-concept projects
-
-Chosen to stress *different* failure areas, none of them Rust, Go, or C that
-trivially links statically.
-
-| # | project | version | stresses | status |
-|---|---|---|---|---|
-| 10 | GNU awk | 5.3.1 | locale (LC_CTYPE/LC_NUMERIC), iconv, **dlopen extension API** | COMPLETE |
-| 20 | GNU nano + ncurses 6.5 | 8.2 | **terminfo data**, static dependency chain, iconv, multibyte | COMPLETE |
-| 30 | curl + OpenSSL 3.0.15 + zlib | 8.11.0 | **getaddrinfo/NSS**, real DNS, real TLS, **CA bundle data**, 3-package chain | COMPLETE |
-| 40 | jq + oniguruma 6.9.9 | 1.7.1 | Unicode round-trip, surrogate pairs, optional-dependency detection | COMPLETE |
-| 50 | CPython | 3.12.7 | **dlopen extension modules**, large data tree, NSS via socket/pwd, locale | IN PROGRESS |
-
-Every one builds from a stock tarball with a stock `./configure`. **No source
-patch exists in this repository** — see [§16](#16-patches).
-
-## 13. Test environments
-
-Pinned by manifest digest in `scripts/common/rootfs-images.txt`. ⛔ Re-pulling
-a tag without updating that file silently changes what every result describes —
-`archlinux:latest` in particular is a rolling tag.
-
-**musl (4):** Alpine 3.22, Alpine 3.20, Alpine 3.10, Void Linux musl
-**glibc (7):** Debian 11, Debian 12, Ubuntu 20.04, Rocky 8, openSUSE Leap 15.6,
-Fedora 42, Arch Linux
-
-Compatibility is stated only for these. ⚠ **This is not "works on Linux".** It
-is eleven filesystems on one kernel on one machine.
-
-## 14. Architecture coverage
+Measured, plain `gcc -static`, across the 11 pinned environments:
 
 | | |
 |---|---|
-| **x86_64** | every result in this repository |
-| **aarch64** | **UNTESTED.** `oci-pull.sh --arch arm64` and `fetch-rootfs.sh --arch arm64` exist and re-resolve by tag, which trades the digest pin away and says so. Nothing has been run. |
+| host NSS modules loaded | 5 of 11; **SIGFPE on Arch and openSUSE Leap** (openSUSE's via `passwd: compat`, not DNS) |
+| `iconv_open` | **SIGFPE/SIGABRT on Debian 11/12 and Ubuntu 20.04** where the host gconv path matches the build's; 11 of 12 encodings silently unavailable where it does not. **There is no working case.** |
+| `setlocale` UTF-8 | `ANSI_X3.4-1968` on all 4 musl environments |
 
-The CPU baseline is `-march=x86-64` (or `armv8-a`), never `-march=native`.
+A probe exercising NSS **and** iconv (`ci/probe.c`) fails on **all 11**.
 
-## 15. Vendored components
+## 3. Success criterion
 
-| what | upstream | revision | why |
-|---|---|---|---|
-| `scripts/common/mine-repo.sh` | `Azathothas/TEMPLATE` | `main`, fetched 2026-09-01 | the methodology mandates it and forbids writing your own fetcher |
-| GNU libiconv 1.18 | ftp.gnu.org | pinned in `scripts/build-libiconv.sh` | fetched and built, not committed |
+On every environment in §8:
 
-`references/` holds 12 upstream trees with a `PROVENANCE.md` each, naming the
-commit, the route, and what could not be fetched. ⛔ One deliberate deletion:
-`references/pkgforge-dev__cross-libc-dlopen/tree/docs/AGENTS.md`, removed
-because the vendoring methodology forbids carrying a third party's agent
-instruction file into this tree. Recorded in that repository's `PROVENANCE.md`.
+1. runs — the program's own exit status, no signal;
+2. loads **no host shared object**, checked by syscall trace attributed to its
+   own pid, never by `ldd`;
+3. real functional assertions pass, not `--version`.
 
-## 16. Patches
+⭐ **Criterion 2 is about shared objects, not host data.** glibc still *opens*
+`/etc/nsswitch.conf` under the override, and honouring the host's locale where
+one exists is correct. The property is **independence** — working whether or
+not host data is present — and the musl rows, which have none of it,
+demonstrate it. Data reads are reported in their own column, never asserted.
 
-**There are none.** No file under `references/` or in any POC's upstream source
-is modified. Two POCs pass *configuration*, which is not a patch and is
-recorded here:
+## 4. How it works
 
-| project | configuration | why it is not a patch |
+Three mechanisms, no application source changed by any of them:
+
+| | mechanism | file |
 |---|---|---|
-| CPython | `Modules/Setup.local` generated from configure's own `Modules/Setup.stdlib` with `*shared*` → `*static*` | CPython's own file documents exactly this (`ln -sfr Modules/Setup.stdlib Modules/Setup.local`). No source file changes. |
-| CPython | `py_cv_module_nis=n/a`, `--disable-test-modules` | both are supported configure inputs |
-| ncurses | `--with-terminfo-dirs=...` | a configure flag, and required for correctness — see §11.5 |
+| **NSS** | constructor calls `__nss_configure_lookup()` (public `GLIBC_2.2.5`, present in `libc.a`), pinning all 14 databases to services glibc ≥ 2.34 implements inside libc. Passed as a plain object with `-Wl,-u,pgb_runtime_anchor`, because a constructor with no referenced symbol is dropped from an archive. | [`../tool/runtime/pgb-nssfix.c`](../tool/runtime/pgb-nssfix.c) |
+| **iconv** | `-Wl,--wrap=iconv_open,--wrap=iconv,--wrap=iconv_close` onto static GNU libiconv. Acts at the final link, so it catches calls from any object including archives built before this tool existed. Lives in an archive, so a program that never calls `iconv_open` links none of it — 940 KiB vs 2.1 MiB, same source. | [`../tool/runtime/pgb-iconv.c`](../tool/runtime/pgb-iconv.c) |
+| **locale** (opt-in `--embed-locale`) | `-Wl,--wrap=setlocale`; C.UTF-8 embedded, written out only when the host cannot answer a UTF-8 request. The only mechanism that touches the filesystem, hence opt-in. | [`../tool/runtime/pgb-locale.c`](../tool/runtime/pgb-locale.c) |
 
-## 17. Methodology this project follows
+**Delivery:** compiler wrappers on `PATH` plus `CC`/`CXX`. autotools, CMake,
+meson and make pick them up unmodified. Each wrapper reads its own argv:
+`-c`/`-E`/`-S`/`-M` = compile; `-shared` = **passed through untouched**, which
+is what lets `./configure`'s shared-library probes still work; anything else =
+executable link. `sh pgb explain` prints every injected flag.
 
-Three documents, fetched from `Azathothas/TEMPLATE`:
-`docs/methodology/{experiments,references,vendoring}.md`. The obligations that
-actually shaped this tree:
+**Build environment:** pinned `debian:12` (glibc 2.36) by manifest digest,
+unpacked by `oci-pull.sh` and entered by `chroot`. Verified not to be host
+contamination: output `.comment` reads `GCC: (Debian 12.2.0-14+deb12u1)` where
+a host build reads `Ubuntu 13.3.0`.
 
-- an experiment is **a script in the tree**, numbered, with the question in its
-  header, pinned inputs, conditions printed, and exit codes that mean 0/1/2 —
-  never a transcript;
-- **a negative result is committed**;
-- **measure from outside**, and check whether the instrument perturbed the
-  measurement (it did, twice — §20);
-- **an absence is not a zero** without a positive control that the probe finds;
-- **keep the corpus**, tracked, with provenance;
-- **never fabricate a number**.
+## 5. Repository layout
 
-## 18. Evidence
+```
+pgb                       the tool; its header comment is the manual
+tool/runtime/*.c          the three mechanisms
+ci/probe.c                the binary CI runs on 11 distributions
+scripts/common/
+  oci-pull.sh             OCI image -> rootfs, no daemon      (--selftest)
+  rootfs-run.sh           chroot into one, private mount ns   (--selftest)
+  fetch-rootfs.sh         materialise the test bed
+  rootfs-images.txt       the 11 environments, pinned by digest
+  mine-repo.sh            reference-sweep fetcher, vendored    (--selftest)
+scripts/build-libiconv.sh GNU libiconv 1.18, pinned
+experiments/lib.sh        conditions block, assertions, pid-attributed tracing
+experiments/NN-*.sh       numbered; exit 0 matched, 1 did not, 2 could not run
+poc/common.sh             the POC contract
+poc/NN-*/run.sh           the five proof-of-concept projects
+evidence/                 committed RESULT.txt per experiment and POC
+references/               12 upstream trees + trackers, tracked, PROVENANCE.md each
+.github/workflows/portability.yml
+docs/                     see §11
+tmp/START.md              the original brief
+```
 
-`evidence/<name>/RESULT.txt` is the committed output of each experiment and
-POC, with its conditions block. Raw traces and build trees are regenerated by
-re-running and are `.gitignore`d — the script is the reproduction path.
+## 6. Running it
 
-## 19. Key findings, each with where to check it
+```sh
+sh pgb doctor                        # what this machine can do
+sh scripts/common/fetch-rootfs.sh    # the test bed, ~1.5 GiB, digest-pinned
+sh pgb env create                    # pinned build env + static libiconv
 
-1. **`__nss_configure_lookup` works from a static link and closes the NSS
-   hole completely.** Zero host NSS modules on 11 of 11, DNS still resolving.
-   `experiments/20-`.
-2. **glibc still *opens* `/etc/nsswitch.conf` under the override.** It does not
-   *use* what the file names. Stating it the other way round would be wrong.
-3. **The openSUSE crash arrives through `passwd: compat`, not through DNS.** A
-   hosts-only fix would have missed it, which is why the override covers all 14
-   databases.
-4. **Static glibc iconv has no working configuration.** Path matches → crash;
-   path differs → silent loss. There is no third column.
-5. **Static GNU libiconv removes the whole class**, with no data directory and
-   no source change, at ~900 KiB and only for programs that call `iconv`.
-6. **glibc's C.UTF-8 is files on disk, not code in libc.**
-7. **A glibc locale is a tree, not a directory** — `LC_MESSAGES` is itself a
-   directory. Missing one category fails the whole `LC_ALL` composite silently.
-8. **`dlopen` from a static glibc binary is host-dependent** — §11.1.
-9. **Five distinct host *data* dependencies exist**, of which two remain
-   unsolved — §11.3.
+for e in experiments/*.sh; do case $e in */lib.sh) ;; *) sh "$e";; esac; done
+for p in poc/*/run.sh; do sh "$p"; done
 
-## 20. Known-weak claims, read these before the conclusions
+sh pgb build -- make                 # your project, unmodified
+sh pgb verify ./yourprogram          # run it on all 11
+```
 
-⛔ **This revision corrected four claims that earlier versions of this work got
-wrong.** That is the only honest estimate of how many are still wrong.
+Requires root + `CAP_SYS_ADMIN` (the bed is `unshare --mount` + `chroot`),
+`curl`, `python3`, `strace`, a C toolchain. First POC run builds OpenSSL and
+CPython; budget ~30 minutes.
 
-1. *"A static binary cannot dlopen an extension."* **Reversed by measurement.**
-   It can, on 2 of 11. The POC that asserted it had also been built with
-   `--disable-extensions`, which made the assertion pass for the wrong reason.
-2. *"The nano binary handles terminals."* **False for all 11** until
-   `--with-terminfo-dirs` was added; `--version` never initialises curses so
-   the functional test could not see it.
-3. *"curl verifies TLS on Debian/Ubuntu."* **An artefact of the harness.** This
-   environment exports `CURL_CA_BUNDLE` for its proxy and `rootfs-run.sh`
-   replicates it; the probe was measuring itself. It now unsets those.
-4. *"`--embed-locale` works."* **It silently did nothing** for two rounds:
-   first the option was dropped crossing into the chroot, then the data symbols
-   were weak `const` definitions in the file that read them, so GCC
-   constant-folded the count to 0.
+## 7. Limits — measured, not guessed
 
-⚠ **Assume more remain.** In particular, nothing here has been run on a second
-machine, on a second kernel, or on a second architecture.
+Full detail with reproductions: [`limitations.md`](limitations.md).
 
-## 21. TODO, in the order worth doing
+1. **`dlopen` of a *host* object is host-dependent, and success is the worse
+   outcome.** gawk's own extension **loads** on Debian 12 and Arch (dragging in
+   the host loader and libc), is refused on the other nine. **The class this
+   tool serves is: programs that do not need host plugins.** A program loading
+   its *own* plugins is fine — build them in, as POC 50 does.
+2. **NSS beyond `files`/`dns` is gone**: no LDAP, SSSD, NIS, mDNS,
+   systemd-resolved. Measured cost: on Fedora 42 a plain static binary resolves
+   the machine's own hostname via `libnss_myhostname` and the pgb binary does
+   not.
+3. **Five host *data* dependencies exist and static linking touches none of
+   them.** gconv ✅ solved (static libiconv), locale ✅ solved (opt-in),
+   **terminfo ⛔ unsolved**, **CA bundle ⛔ unsolved**, a runtime's own library
+   tree ⚠ shipped (CPython's 98 MiB stdlib).
+4. **`-static` resolves what dynamic linking defers**, so an
+   incompletely-static optional dependency fails the link (CPython's `nis` via
+   `libtirpc`/GSSAPI).
+5. **A private-prefix dependency build can bake the build prefix into runtime
+   search paths** (ncurses/terminfo).
+6. **The kernel is not abstracted**: the bed shares the host kernel
+   (Linux 6.18.44). It can falsify "runs on musl"; it cannot test kernel-version
+   behaviour. It is also not a security boundary.
+7. **x86_64 only. One machine, one day.**
 
-1. **Finish POC 50 (CPython).** In progress; the build is long. State: the
-   static-module mechanism and the two configure inputs are settled (§16); the
-   last observed failure was `_testinternalcapi` linking into
-   `Programs/_freeze_module`, addressed with `--disable-test-modules`.
-2. **Write `experiments/21-glibc-version-floor.sh`.** The claim that glibc
-   ≥ 2.34 is required (because `files`/`dns` became builtin there) is currently
-   *reasoned*, not measured. Build the experiment-20 probe inside the
-   `debian-11` rootfs (glibc 2.31) and check whether the override still leaves
-   `libnss_files.so.2` being dlopen'd. **This is the highest-value missing
-   measurement** — it is the justification for the pinned build image.
-3. **Overhead.** Startup time, RSS, binary size and build time, for: native
-   dynamic, plain `gcc -static`, and `pgb`. Nothing is measured yet and no
-   number should be quoted until it is.
-4. **CI.** A workflow that runs experiments 10/20/30 and the POC matrix. It
-   must exercise the portability objective, not merely compile the tool.
-   ⚠ GitHub runners are unprivileged, so `rootfs-run.sh`'s chroot will not work
-   there — CI needs the container engines instead, which is also how the
-   **UNTESTED** docker/podman engine finally gets exercised.
-5. **aarch64**, per §14.
-6. **`--embed-terminfo`**, if the terminfo limitation matters. The mechanism is
-   already proven by `--embed-locale`; ncurses reads `TERMINFO` from the
-   environment, so it is the same shape.
+## 8. Test environments
 
-## 22. Things a future session should NOT redo
+Pinned by manifest digest in `scripts/common/rootfs-images.txt`. ⛔ Re-pulling
+a tag without updating that file silently changes what every result describes;
+`archlinux:latest` is a rolling tag.
 
-- **Do not try to make host NSS modules load correctly.** The goal is to keep
-  them out; that is the fix, and §19.1 shows it works.
-- **Do not bundle glibc's gconv modules.** They carry `DT_NEEDED libc.so.6`, so
-  bundling them reintroduces the second libc on every musl host. Static
-  libiconv is the answer and it is measured.
-- **Do not use `ldd`/`file` output as a test.** §4.
-- **Do not write a new OCI puller or reference fetcher.** Both exist and carry
+- **musl (4):** Alpine 3.22, 3.20, 3.10; Void Linux musl
+- **glibc (7):** Debian 11, 12; Ubuntu 20.04; Rocky 8; openSUSE Leap 15.6;
+  Fedora 42; Arch Linux
+
+⚠ Compatibility is claimed for these and nothing else. Eleven filesystems on
+one kernel is not "works on Linux".
+
+## 9. Status
+
+| item | status |
+|---|---|
+| test bed, 11 environments, 3 selftests | **COMPLETE** |
+| `experiments/10-probe-the-host.sh` | **COMPLETE** |
+| `experiments/20-static-glibc-nss-dlopen.sh` | **COMPLETE** — 37 assertions |
+| `experiments/21-glibc-version-floor.sh` | **COMPLETE** — confirms the ≥2.34 pin |
+| `experiments/30-gconv-and-locale.sh` | **COMPLETE** — 24 assertions |
+| `experiments/40-overhead.sh` | **COMPLETE** — §10 |
+| `pgb` chroot engine, host engine | **COMPLETE** |
+| `pgb` docker/podman engines | **UNTESTED** — no daemon here; code exists, never run. CI is where it first runs. |
+| NSS / iconv / locale mechanisms | **COMPLETE** — 11 of 11 each |
+| POCs 10 gawk, 20 nano, 30 curl, 40 jq, 50 CPython | **COMPLETE** — all 11 environments each |
+| CI workflow | **WRITTEN, NEVER RUN** — no push has happened from a runner yet |
+| aarch64 | **UNTESTED** |
+| host `dlopen`, terminfo, CA bundle | **KNOWN LIMITATION** — §7 |
+
+**POCs**, all stock tarballs, stock `./configure`, **no source patches**:
+
+| | project | stresses |
+|---|---|---|
+| 10 | GNU awk 5.3.1 | locale, iconv, `dlopen` extension API |
+| 20 | GNU nano 8.2 + ncurses 6.5 | terminfo data, static dependency chain, multibyte |
+| 30 | curl 8.11.0 + OpenSSL 3.0.15 + zlib 1.3.1 | `getaddrinfo`/NSS, real DNS, real TLS, CA bundle |
+| 40 | jq 1.7.1 + oniguruma 6.9.9 | Unicode round trip, surrogate pairs, optional-dep detection |
+| 50 | CPython 3.12.7 | 49 extension modules linked **in**, `lib-dynload` empty, NSS via `socket`/`pwd` |
+
+## 10. Overhead
+
+`evidence/40-overhead/RESULT.txt`. Same source, three ways; 400 execs × 7
+rounds, best round; peak RSS via `os.wait4`. **One machine, one day.**
+
+| arm | size | per exec | peak RSS |
+|---|---|---|---|
+| native dynamic | 16,304 B | 1275 µs | 5356 KiB |
+| plain `gcc -static` | 1,057,760 B | 1177 µs | 5380 KiB |
+| **`pgb`** | **2,138,296 B** | **1205 µs** | **5352 KiB** |
+
+⛔ **Only the size column is a real difference.** Two runs of this experiment
+on the same machine put `pgb`'s per-exec cost 42 µs then 28 µs above plain
+static, and its peak RSS 56 KiB above then **28 KiB below** — a sign change.
+⭐ **Startup and memory differences here are at or under this instrument's
+noise floor, and must be reported as "no difference measurable", never as a
+figure.** Anyone wanting a real number needs a lower-noise instrument and more
+rounds.
+
+The size cost is unambiguous and attributable: static GNU libiconv roughly
+doubles a small binary, **and only for programs that call `iconv`** — a
+program that does not links none of it (940 KiB vs 2.1 MiB, same source).
+
+## 11. Documents
+
+| file | what it is |
+|---|---|
+| this file | current state; read to orient |
+| [`limitations.md`](limitations.md) | what it cannot do, each with a reproduction |
+| [`comparison.md`](comparison.md) | approaches table; dashes where nothing was measured |
+| [`research/prior-art.md`](research/prior-art.md) | the reference sweep, verdicts, provenance |
+| [`history/corrections.md`](history/corrections.md) | ⚠ claims measured wrong, instrument defects, refused approaches. **Read on demand, not to orient.** |
+
+## 12. Provenance
+
+- `references/` — 12 upstream trees at captured commits, each with
+  `PROVENANCE.md` naming commit, route, and what could not be fetched
+  (discussions are GraphQL-only and were **not** fetched for any repository).
+  Re-fetch: `sh scripts/common/mine-repo.sh OWNER/REPO --out references`.
+- **One deliberate deletion:**
+  `references/pkgforge-dev__cross-libc-dlopen/tree/docs/AGENTS.md`, removed
+  because the vendoring methodology forbids carrying a third party's agent
+  instruction file into this tree. Recorded in that repo's `PROVENANCE.md`.
+- **Vendored:** `scripts/common/mine-repo.sh` from `Azathothas/TEMPLATE`.
+  GNU libiconv 1.18 is fetched and built, not committed.
+- ⚠ **Licensing consequence of the iconv mechanism.** GNU libiconv is **LGPL**,
+  and `pgb` links it **statically** into binaries that call `iconv`. The LGPL's
+  relinking obligations therefore attach to those binaries. This repository
+  does not redistribute libiconv, and `--no-iconv` produces a binary without
+  it (at the cost of §2's gconv failures). Anyone shipping `pgb` output should
+  check this against their own requirements; see `LICENSE`.
+- **No patches exist.** Two POCs pass *configuration*: CPython's
+  `Modules/Setup.local` generated from configure's own `Modules/Setup.stdlib`
+  with `*shared*` → `*static*` (CPython's own documented mechanism), plus
+  `py_cv_module_nis=n/a` and `--disable-test-modules`; and ncurses'
+  `--with-terminfo-dirs`.
+
+## 13. Next steps, in order
+
+1. **Run CI.** `.github/workflows/portability.yml` and `ci/probe.c` are written
+   and have **never executed on a runner**. Locally the probe passes on all 11
+   and the plain control fails on all 11, so the workflow should be green on
+   the portable arm — but that is a prediction, not a result. Running it is
+   also the only way the **UNTESTED** docker/podman engines get exercised, and
+   the workflow needs its first push to prove its own YAML.
+2. **aarch64.** `oci-pull.sh --arch arm64` and `fetch-rootfs.sh --arch arm64`
+   exist and re-resolve by tag, which trades the digest pin away and says so.
+   Nothing has been run. Expect IFUNC and CPU-baseline questions that x86_64
+   did not raise.
+3. **`--embed-terminfo`.** The mechanism is already proven by `--embed-locale`
+   and ncurses reads `TERMINFO` from the environment, so it is the same shape.
+   Decide first whether a *glibc* portability tool should own a terminal
+   database — §7.3 argues both ways.
+4. **A CA-bundle answer.** Same shape again (`SSL_CERT_FILE`). One compiled-in
+   path works on 5 of 11.
+5. **Second machine, second kernel.** Every number here is one machine.
+6. **Sweep depth.** `allyourcodebase/pipewire` was fetched and never read;
+   sharun, userland-execve-rust, ppkg and elftool were read at README/file-list
+   depth. See `research/prior-art.md` for what that does and does not support.
+
+## 14. Do not redo these
+
+- **Do not try to make host NSS modules load correctly.** Keeping them out is
+  the fix and it is measured.
+- **Do not bundle glibc's gconv modules.** They carry `DT_NEEDED libc.so.6`,
+  so bundling reintroduces the second libc on every musl host.
+- **Do not use `ldd`/`file` output as a test.** §3.
+- **Do not build below glibc 2.34** — `experiments/21` measures the override
+  merely *moving* the dlopen there.
+- **Do not write a new OCI puller or reference fetcher.** Both exist with
   selftests.
-- **Do not assert a limitation without measuring it.** §20.1 is what that costs.
+- **Do not assert a limitation without measuring it.** `history/corrections.md`
+  C1 is what that cost.

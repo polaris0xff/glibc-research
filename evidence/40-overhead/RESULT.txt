@@ -1,0 +1,35 @@
+===============================================================
+40 - what portability costs: size, startup, memory, build time
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-01T06:41:39Z
+host kernel  : Linux 6.18.44-fc-v22
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/40-overhead
+--------------------------------------------------------------
+
+  ok    arm N built                                    = yes
+  ok    arm S built                                    = yes
+  ok    arm P built                                    = yes
+
+  conditions: 400 iterations x 7 rounds, best round reported
+  ARM                        SIZE (B)   STARTUP (ms) PER EXEC (us)   RSS (KiB)  BUILD (ms)
+  N native dynamic              16304            510          1275        5356          59
+  S plain gcc -static         1057760            471          1177        5380          94
+  P pgb                       2138296            482          1205        5352         247
+
+        STARTUP is the total for 400 execs, so per-exec cost is that
+          number divided by 400. Arm P's extra work at startup is one
+          constructor making 14 __nss_configure_lookup calls.
+        BUILD (ms) for arm P includes entering the chroot build environment,
+          which arms N and S do not pay. It is not compiler time.
+        ⚠ One machine, one day. See the conditions block above.
+
+-- result ----------------------------------------------------
+pass=3 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

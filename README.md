@@ -79,7 +79,7 @@ tree.
 
 Everything measured, everything not measured, and what a previous revision got
 wrong: [`docs/limitations.md`](docs/limitations.md) and
-[`docs/AGENTS.md`](docs/AGENTS.md) §20.
+[`docs/history/corrections.md`](docs/history/corrections.md).
 
 ## Where things are
 
@@ -103,4 +103,4 @@ Docker and Podman engines exist in the tool and are **untested**.
 
 ## Licence
 
-MIT. Vendored components keep their own; see `docs/AGENTS.md` §15.
+MIT. Vendored components keep their own; see [`docs/AGENTS.md`](docs/AGENTS.md) §12.

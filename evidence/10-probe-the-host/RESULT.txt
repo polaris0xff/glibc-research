@@ -2,7 +2,7 @@
 10 - probe the host
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-01T05:33:29Z
+date (UTC)   : 2026-09-01T06:41:51Z
 host kernel  : Linux 6.18.44-fc-v22
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS

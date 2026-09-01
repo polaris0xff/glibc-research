@@ -1,0 +1,4 @@
+build glibc 2.31 plain   : libnss_dns.so.2,libnss_files.so.2
+build glibc 2.31 +nssfix : libnss_dns.so.2,libnss_files.so.2
+build glibc 2.36 plain   : none
+build glibc 2.36 +nssfix : none

@@ -193,8 +193,8 @@ namespaces are shared unless `--private-net` is passed.
 
 | | |
 |---|---|
-| **architecture** | x86_64 only. aarch64 is **untested** — `docs/AGENTS.md` §14. |
+| **architecture** | x86_64 only. aarch64 is **untested** — `docs/AGENTS.md` §9 and §13 item 2. |
 | **machines** | one. Every result is one machine, one kernel, one day. |
 | **glibc floor** | the build image is pinned at glibc 2.36 because `files`/`dns` became builtin in 2.34. ⚠ That the override *fails* below 2.34 is **reasoned, not measured** — `experiments/21-` is planned and unwritten, and it is the highest-value missing measurement in the project. |
 | **container engines** | `pgb --engine docker` and `--engine podman` are **written and never run**: this machine has no daemon. |
-| **overhead** | ⛔ **not measured at all.** No startup, memory or runtime figure exists. Do not quote one. |
+| **overhead** | measured (`experiments/40-overhead.sh`): **no measurable startup or memory difference** from plain `gcc -static` — two runs disagreed on the sign of the RSS delta, so both sit at the instrument's noise floor. ⛔ Do not quote a figure for either. Binary size is real: static libiconv roughly doubles a small binary, and only for programs that call `iconv`. |
