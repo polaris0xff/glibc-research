@@ -10,3 +10,211 @@ dep build   find-xml-catalogs-hook  (depth 2)
 derivations 3 fetched and verified over HTTPS
 pgb: the plan has no source
 pgb: dep FAILED  find-xml-catalogs-hook -- its source could not be fetched
+patches     1 applied (-p1)
+pgb: dropped shared-library flag: --enable-shared
+build system: autoreconf pkg-config 
+round 1: configure --exec-prefix=/02qcpld1y6xhs5gz9bchpxaw0xdhmsp5dv88lh25r2ss44kh8dxz --disable-static --without-icu --without-python --without-http --without-zlib --without-docs  
+round 1: built
+dep ok      libxml2 -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep skip    libxslt-1.1.45-dev (in NIX_DEP_SKIP)
+dep build   openssl  (depth 1)
+patches     3 applied (-p1)
+build system:  
+round 1: configure shared --libdir=lib --openssldir=etc/ssl enable-ec_nistp_64_gcc_128 enable-ktls  
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  pgb: build root is ./demos (found Makefile there, not at the top)
+  sh: 24: man: not found
+  make[1]: Entering directory '/root/.local/state/pgb/nix-deps/1052447777/openssl/build/openssl-3.6.3/demos/bio'
+  /root/.local/state/pgb/bin-3966734765/cc -I../../include -g -Wall -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include   -c -o client-arg.o client-arg.c
+  /root/.local/state/pgb/bin-3966734765/cc -I../../include -g -Wall -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include   -c -o client-conf.o client-conf.c
+  /root/.local/state/pgb/bin-3966734765/cc -I../../include -g -Wall -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include   -c -o saccept.o saccept.c
+  /root/.local/state/pgb/bin-3966734765/cc -I../../include -g -Wall -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include   -c -o sconnect.o sconnect.c
+  client-arg.c:11:10: fatal error: openssl/err.h: No such file or directory
+     11 | #include <openssl/err.h>
+        |          ^~~~~~~~~~~~~~~
+  client-conf.c:11:10: fatal error: openssl/err.h: No such file or directory
+     11 | #include <openssl/err.h>
+        |          ^~~~~~~~~~~~~~~
+  compilation terminated.
+  compilation terminated.
+  make[1]: *** [<builtin>: client-arg.o] Error 1
+  make[1]: *** Waiting for unfinished jobs....
+  make[1]: *** [<builtin>: client-conf.o] Error 1
+  saccept.c:23:10: fatal error: openssl/err.h: No such file or directory
+     23 | #include <openssl/err.h>
+        |          ^~~~~~~~~~~~~~~
+  compilation terminated.
+  sconnect.c:21:10: fatal error: openssl/err.h: No such file or directory
+     21 | #include <openssl/err.h>
+        |          ^~~~~~~~~~~~~~~
+  compilation terminated.
+  make[1]: *** [<builtin>: saccept.o] Error 1
+  make[1]: *** [<builtin>: sconnect.o] Error 1
+  make[1]: Leaving directory '/root/.local/state/pgb/nix-deps/1052447777/openssl/build/openssl-3.6.3/demos/bio'
+  make: *** [Makefile:18: all] Error 2
+pgb: dep FAILED  openssl -- the parent will have to do without it
+dep skip    sqlite-3.53.3-dev (in NIX_DEP_SKIP)
+dep skip    zlib-1.3.2-dev (in NIX_DEP_SKIP)
+dep skip    libglvnd-1.7.0-dev (in NIX_DEP_SKIP)
+dep skip    vulkan-headers-1.4.357.0 (in NIX_DEP_SKIP)
+dep skip    vulkan-loader-1.4.357.0-dev (in NIX_DEP_SKIP)
+dep skip    harfbuzz-13.2.1-dev (in NIX_DEP_SKIP)
+dep skip    icu4c-78.3-dev (in NIX_DEP_SKIP)
+dep skip    libjpeg-turbo-3.1.4.1-dev (in NIX_DEP_SKIP)
+dep skip    libpng-apng-1.6.58-dev (in NIX_DEP_SKIP)
+dep skip    pcre2-10.47-dev (in NIX_DEP_SKIP)
+dep skip    zstd-1.5.7-dev (in NIX_DEP_SKIP)
+dep skip    libb2-0.98.1 (in NIX_DEP_SKIP)
+dep skip    md4c-0.5.3-dev (in NIX_DEP_SKIP)
+dep skip    double-conversion-3.4.0-dev (in NIX_DEP_SKIP)
+dep skip    libproxy-0.5.12-dev (in NIX_DEP_SKIP)
+dep skip    dbus-1.16.2-dev (in NIX_DEP_SKIP)
+dep skip    glib-2.88.3-dev (in NIX_DEP_SKIP)
+dep skip    unixodbc-2.3.14 (in NIX_DEP_SKIP)
+dep skip    psqlodbc-18.00.0002 (in NIX_DEP_SKIP)
+dep skip    sqlite-connector-odbc-0.99991 (in NIX_DEP_SKIP)
+dep skip    mariadb-connector-odbc-3.2.6 (in NIX_DEP_SKIP)
+dep skip    systemd-261.1-dev (in NIX_DEP_SKIP)
+dep skip    util-linux-2.42.2-dev (in NIX_DEP_SKIP)
+dep skip    mtdev-1.1.7 (in NIX_DEP_SKIP)
+dep skip    lksctp-tools-1.0.21 (in NIX_DEP_SKIP)
+dep skip    libselinux-3.10-dev (in NIX_DEP_SKIP)
+dep skip    libsepol-3.11-dev (in NIX_DEP_SKIP)
+dep skip    lttng-ust-2.15.1-dev (in NIX_DEP_SKIP)
+dep skip    libthai-0.1.30-dev (in NIX_DEP_SKIP)
+dep skip    libdrm-2.4.134-dev (in NIX_DEP_SKIP)
+dep skip    mesa-libgbm-26.1.3 (in NIX_DEP_SKIP)
+dep skip    libdatrie-2019-12-20-dev (in NIX_DEP_SKIP)
+dep skip    systemd-minimal-libs-261.1-dev (in NIX_DEP_SKIP)
+dep skip    fontconfig-2.18.2-dev (in NIX_DEP_SKIP)
+dep skip    freetype-2.14.3-dev (in NIX_DEP_SKIP)
+dep build   libx11  (depth 1)
+dep have    xorgproto
+dep have    libpthread-stubs
+dep have    libxcb
+dep have    xtrans
+dep have    xorgproto
+patches     0 applied (-p1)
+build system: pkg-config 
+round 1: configure  
+round 1: built
+dep ok      libx11 -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep skip    libxcomposite-0.4.7-dev (in NIX_DEP_SKIP)
+dep build   libxext  (depth 1)
+dep have    libx11
+dep have    xorgproto
+dep have    xorgproto
+dep have    libxau
+patches     0 applied (-p1)
+build system: pkg-config 
+round 1: configure  
+round 1: built
+dep ok      libxext -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxi  (depth 1)
+dep have    xorgproto
+dep have    libx11
+dep have    libxext
+dep build   libxfixes  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config 
+round 1: configure  
+round 1: built
+dep ok      libxfixes -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep have    xorgproto
+dep have    libx11
+dep have    libxext
+dep have    libxfixes
+patches     0 applied (-p1)
+build system: pkg-config 
+round 1: configure  
+round 1: built
+dep ok      libxi -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxrender  (depth 1)
+dep have    xorgproto
+dep have    libx11
+dep have    xorgproto
+dep have    libx11
+patches     0 applied (-p1)
+build system: pkg-config 
+round 1: configure  
+round 1: built
+dep ok      libxrender -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep have    libxcb
+dep build   libxkbcommon  (depth 1)
+dep have    xkeyboard-config
+dep have    libxcb
+dep have    libxml2
+dep skip    wayland-1.26.0-dev (in NIX_DEP_SKIP)
+dep skip    wayland-protocols-1.49 (in NIX_DEP_SKIP)
+patches     0 applied (-p1)
+build system: meson ninja pkg-config 
+round 1: configure  
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  Run-time dependency xkeyboard-config-4 found: NO (tried pkgconfig and cmake)
+  Run-time dependency xkeyboard-config-3 found: NO (tried pkgconfig and cmake)
+  Dependency xkeyboard-config-2 found: YES 2.48 (cached)
+  Has header "unistd.h" : YES 
+  Has header "dirent.h" : YES 
+  Checking if "__builtin_expect" links: YES 
+  Header "unistd.h" has symbol "eaccess" : YES 
+  Header "unistd.h" has symbol "euidaccess" : YES 
+  Header "sys/mman.h" has symbol "mmap" : YES 
+  Header "stdlib.h" has symbol "mkostemp" : YES 
+  Header "fcntl.h" has symbol "posix_fallocate" : YES 
+  Header "string.h" has symbol "strndup" : YES 
+  Header "stdio.h" has symbol "asprintf" : YES 
+  Header "stdio.h" has symbol "open_memstream" : YES 
+  Header "stdlib.h" has symbol "secure_getenv" : YES 
+  Header "stdlib.h" has symbol "realpath" : YES 
+  Header "limits.h" has symbol "PATH_MAX" : YES 
+  Checking for function "gnu_get_libc_version" : YES 
+  Header "locale.h" has symbol "newlocale" : YES 
+  Checking if "newlocale fails on invalid locales" runs: YES
+  Checking if "-Wl,--version-script" links: YES 
+  Program scripts/map-to-def found: YES (/root/.local/state/pgb/nix-deps/1052447777/libxkbcommon/build/j59gh2hrsflxda2csxfbdkzfm3dj8400-source/scripts/map-to-def)
+  Program bison found: YES 3.8.2 3.8.2 (/usr/bin/bison)
+  Run-time dependency xcb found: YES 1.17.0
+  Run-time dependency xcb-xkb found: YES 1.17.0
+  Run-time dependency libxml-2.0 found: NO (tried pkgconfig and cmake)
+  
+  meson.build:532:17: ERROR: Dependency "libxml-2.0" not found, tried pkgconfig and cmake
+  
+  A full log can be found at /root/.local/state/pgb/nix-deps/1052447777/libxkbcommon/build/j59gh2hrsflxda2csxfbdkzfm3dj8400-source/_pgbbuild/meson-logs/meson-log.txt
+pgb: dep FAILED  libxkbcommon -- the parent will have to do without it
+dep have    libxcb-util
+dep have    libxcb-image
+dep have    libxcb-keysyms
+dep have    libxcb-render-util
+dep have    libxcb-wm
+dep have    libxdmcp
+dep skip    libxtst-1.2.5 (in NIX_DEP_SKIP)
+dep have    libxcb-cursor
+dep skip    libepoxy-1.5.10-dev (in NIX_DEP_SKIP)
+dep skip    cups-2.4.19-dev (in NIX_DEP_SKIP)
+dep skip    wayland-1.26.0-dev (in NIX_DEP_SKIP)
+dep skip    wayland-scanner-1.26.0-dev (in NIX_DEP_SKIP)
+
+built into  /var/tmp/pgb-poc/91-qt-xcb/prefix
+  ok    libpthread-stubs
+  ok    libx11
+  ok    libxau
+  ok    libxcb
+  ok    libxcb-cursor
+  ok    libxcb-image
+  ok    libxcb-keysyms
+  ok    libxcb-render-util
+  ok    libxcb-util
+  ok    libxcb-wm
+  ok    libxdmcp
+  ok    libxext
+  ok    libxfixes
+  ok    libxi
+  ok    libxml2
+  ok    libxrender
+  ok    xcb-proto
+  ok    xkeyboard-config
+  ok    xorgproto
+  ok    xtrans
+ninja: error: loading 'build.ninja': No such file or directory

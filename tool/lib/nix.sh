@@ -818,6 +818,31 @@ nix_build_tree() {   # srcdir planfile workdir [install]
   # makes configure fail on a path rather than on the real question.
   _flags=""
   for _f in $(plan_get "$_pf" configureFlags); do
+    # ⛔ nixpkgs WRITES ITS OUTPUT PATHS AS PLACEHOLDERS, AND A PLACEHOLDER IS
+    # A VALID-LOOKING DIRECTORY. Two spellings turn up in configureFlags:
+    #
+    #   --includedir=$(dev)/include   a Make variable nixpkgs' setup hooks
+    #   --libdir=$(out)/lib           expand; `configure` takes it literally
+    #   --libdir=/02qcpld...52chars/lib  `builtins.placeholder "out"`, an
+    #                                    absolute path that does not exist
+    #
+    # Passed through, libxml2 configured happily and INSTALLED ITSELF into
+    # `/02qcpld1y6xhs5gz9bchpxaw0xdhmsp5dv88lh25r2ss44kh8dxz/lib` -- so
+    # `.built/libxml2` was written, the prefix had nothing in it, and
+    # libxkbcommon then failed with `Dependency "libxml-2.0" not found` about
+    # a library that had just "built". Same shape for boost's
+    # `--includedir=$(dev)/include`.
+    #
+    # ⭐ Repointed at OUR prefix rather than dropped: the flag says where the
+    # package should install, and that answer is $NIX_PREFIX.
+    _rf=$(printf '%s' "$_f" | sed -E \
+      -e "s#\\\$\\((out|dev|bin|lib|man|doc|info|devdoc)\\)#$NIX_PREFIX#g" \
+      -e "s#\\\$\\{(out|dev|bin|lib|man|doc|info|devdoc)\\}#$NIX_PREFIX#g" \
+      -e "s#/[0-9a-df-np-sv-z]{52}#$NIX_PREFIX#g")
+    if [ "$_rf" != "$_f" ]; then
+      say "repointed $_f -> $_rf"
+      _f="$_rf"
+    fi
     case "$_f" in
       # ⭐ A STORE-PATH FLAG IS REPOINTED AT OUR PREFIX BEFORE IT IS DROPPED,
       # and that is a better answer than dropping it. `--with-openssl=/nix/
@@ -1015,7 +1040,11 @@ nix_try_build() {   # srcdir flags log hooks [install]
     [ -f "./$_w" ] && { printf %s .; return 0; }
   done
   for _w in "$@"; do
-    _c=$(find . -mindepth 2 -maxdepth 4 -name "$_w" -not -path "*/_pgbbuild/*" 2>/dev/null \
+    _c=$(find . -mindepth 2 -maxdepth 4 -name "$_w" -not -path "*/_pgbbuild/*" \
+         -not -path "./demos/*" -not -path "./demo/*" -not -path "./examples/*" \
+         -not -path "./example/*" -not -path "./test/*" -not -path "./tests/*" \
+         -not -path "./doc/*" -not -path "./docs/*" -not -path "./contrib/*" \
+         -not -path "./fuzz/*" -not -path "./samples/*" -not -path "./benchmarks/*" 2>/dev/null \
          | awk "{ n = gsub(/\//, \"/\"); print n, \$0 }" | sort -n -k1,1 | head -1 | cut -d" " -f2-)
     if [ -n "$_c" ]; then
       echo "pgb: build root is $(dirname "$_c") (found $_w there, not at the top)" >&2

@@ -171,7 +171,14 @@ QT_CONFIGURE_LINE="-static -release -force-bundled-libs \
 -no-feature-testlib -qpa xcb -default-qpa xcb -nomake examples -nomake tests"
 
 if [ ! -x "$INST/bin/qmake" ]; then
-  if [ ! -f "$BLD/CMakeCache.txt" ]; then
+  # ⛔ `CMakeCache.txt` IS NOT A CONFIGURE-SUCCEEDED MARKER, and treating it as
+  # one cost a whole run. A configure that dies part way still leaves one, so a
+  # rerun SKIPPED configure, went straight to `cmake --build .` and reported
+  # `ninja: error: loading 'build.ninja': No such file or directory` -- an
+  # error about a missing file that is really a stale directory. `build.ninja`
+  # is written last, so it is the marker.
+  if [ ! -f "$BLD/build.ninja" ]; then
+    rm -rf "$BLD"; mkdir -p "$BLD"
     POC_PGB_FLAGS="--bind $PREFIX" \
     poc_in_env "cd $BLD && PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig \
        CFLAGS=-I$PREFIX/include CXXFLAGS=-I$PREFIX/include LDFLAGS=-L$PREFIX/lib \
@@ -181,7 +188,7 @@ if [ ! -x "$INST/bin/qmake" ]; then
            rung_failed "qtbase configure -xcb" "./configure refused" "$LOG"; poc_finish; }
   fi
   poc_check "qtbase configures with xcb" \
-    "$([ -f "$BLD/CMakeCache.txt" ] && echo ok || echo failed)" ok
+    "$([ -f "$BLD/build.ninja" ] && echo ok || echo failed)" ok
   POC_PGB_FLAGS="--bind $PREFIX" \
   poc_in_env "cd $BLD && cmake --build . --parallel \$(nproc)" >>"$LOG" 2>&1 \
     || { poc_check "qtbase builds" failed ok
