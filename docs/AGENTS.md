@@ -13,7 +13,7 @@ the full map.
 | # | read | why you cannot skip it |
 |---|---|---|
 | 1 | **this file** | the state, the mechanisms, the open problems, the rules |
-| 2 | [`../TODO/PROGRESS.md`](../TODO/PROGRESS.md) | ⭐ **what to do next.** The work order and the open questions live here and nowhere else |
+| 2 | [`../TODO/PROGRESS.md`](../TODO/PROGRESS.md) | ⭐ **what to do next, and ⛔ THE STOP CONDITION.** The work order, the required POCs and the open questions live here and nowhere else |
 | 3 | [`../TODO/INDEX.md`](../TODO/INDEX.md) | every entry, and the argument behind the ordering |
 | 4 | [`../TODO/RULES.md`](../TODO/RULES.md) | ⛔ how this repository is worked on — git, the fetch routes, the record, no deferral |
 | 5 | [`REQUIREMENTS.md`](REQUIREMENTS.md) | the operator's binding bar, which is **not met** |
@@ -160,13 +160,28 @@ tool/lib/*.sh             the tool's body. SOURCED, so `pgb build` and
 tool/runtime/*.c          the four mechanisms, and pgb-trace.c, the
                           carried-in tracer `pgb verify` uses where strace
                           cannot follow the subject
+tool/lib/nix.sh           `pgb nix`: nixpkgs plans, pgb builds static glibc
+tool/nix-plan.py          a nixpkgs derivation -> a pgb build plan
+tool/nix-drv.py           nix's ATerm .drv format               (selftest)
+tool/elf-needed.py        rewrite an absolute DT_NEEDED         (selftest)
+tool/nix-appimage.sh      the bundler: uruntime+dwarfs+sharun (--selftest)
+tool/lib/nix.sh           `pgb nix`: nixpkgs plans, pgb builds
+tool/nix-plan.py          a nixpkgs derivation -> a pgb build plan
+tool/nix-drv.py           nix's ATerm .drv format               (selftest)
+tool/elf-needed.py        rewrite an absolute DT_NEEDED         (selftest)
+tool/nix-appimage.sh      the bundler: uruntime+dwarfs+sharun (--selftest)
 ci/probe.c                the binary CI runs on 11 distributions
 scripts/common/
+  bootstrap.sh            ⭐ a fresh machine, in parallel      (--selftest)
   oci-pull.sh             OCI image -> rootfs, no daemon      (--selftest)
   rootfs-run.sh           chroot into one, private mount ns   (--selftest)
   fetch-rootfs.sh         materialise the test bed
   rootfs-images.txt       the 11 environments, pinned by digest
   mine-repo.sh            reference-sweep fetcher, vendored    (--selftest)
+  nix-fetch.sh            nixpkgs closures with NO nix         (--selftest)
+  nix-nar.py              NAR, nix-base32, ed25519, narinfo      (selftest)
+  nix-fetch.sh            nixpkgs closures with NO nix         (--selftest)
+  nix-nar.py              NAR, nix-base32, ed25519, narinfo    (selftest)
 scripts/build-libiconv.sh GNU libiconv 1.18, pinned
 experiments/lib.sh        conditions block, assertions, pid-attributed tracing
 experiments/NN-*.sh       numbered; exit 0 matched, 1 did not, 2 could not run
@@ -185,9 +200,30 @@ tmp/START.md              the original brief
 
 ## 6. Running it
 
+⭐ **On a fresh machine, ONE command, and read this file while it runs:**
+
+```sh
+sh scripts/common/bootstrap.sh --detach   # nix + build env + 11 rootfs, PARALLEL
+sh scripts/common/bootstrap.sh --check    # is it ready yet
+```
+
+⛔ **Serially those steps are ~25 minutes of watching** — nix ~7, `pgb env
+create` ~8, `fetch-rootfs.sh` ~10 — and nothing in them depends on anything
+else in them. **Two sessions paid that** before the script existed. It is
+resumable (each step skipped when its artefact is on disk, checked by looking
+at the disk rather than at a marker it wrote), and `--check` changes nothing.
+
+⛔ **It also starts dockerd AND builds the docker environment, together,
+because starting the daemon alone breaks every build.** `pick_engine` prefers
+docker the moment `docker info` succeeds, so a started daemon with no docker
+environment makes `pgb build` refuse — reproduced here, which is why the two
+are one step and not two. `--no-docker` leaves the daemon alone.
+
+The steps it runs, if you ever need them by hand:
+
 ```sh
 sh pgb doctor                        # what this machine can do
-sh scripts/common/fetch-rootfs.sh    # the test bed, ~1.5 GiB, digest-pinned
+sh scripts/common/fetch-rootfs.sh    # the test bed, ~2.3 GiB, digest-pinned
 sh pgb env create                    # pinned build env + static libiconv
 
 for e in experiments/*.sh; do case $e in */lib.sh) ;; *) sh "$e";; esac; done
@@ -195,11 +231,14 @@ for p in poc/*/run.sh; do sh "$p"; done
 
 sh pgb build -- make                 # your project, unmodified
 sh pgb verify ./yourprogram          # run it on all 11
+sh pgb nix build jq                  # or: let nixpkgs plan it
 ```
 
 Requires root + `CAP_SYS_ADMIN` (the bed is `unshare --mount` + `chroot`),
-`curl`, `python3`, `strace`, a C toolchain. First POC run builds OpenSSL and
-CPython; budget ~30 minutes.
+`curl`, `python3`, `strace`, a C toolchain, and **about 10 GiB free** —
+`bootstrap.sh` checks every one of those before starting anything and refuses
+with the number, rather than failing halfway through a 2.3 GiB download. First
+POC run builds OpenSSL and CPython; budget ~30 minutes.
 
 ⚠ **`experiments/60-` needs more than the others**, and skips the arms it
 cannot build rather than failing: `cargo` plus `musl-gcc` and the

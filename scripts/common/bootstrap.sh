@@ -5,8 +5,8 @@
 #
 # Nothing this project needs survives the container. Every session starts with
 # 0 of 11 rootfs, no build environment, no static libiconv and no nix, and the
-# first hour goes on setup. ⚠ Both previous sessions did it SERIALLY, and
-# worse, INTERACTIVELY -- each step waited for the last while the agent
+# first part of the session goes on setup. ⚠ Both previous sessions did it
+# SERIALLY and INTERACTIVELY -- each step waited for the last while the agent
 # watched. Measured here on 2026-09-01c, wall clock:
 #
 #     nix install (pkgforge install_nix.sh)   ~7 min
@@ -15,20 +15,36 @@
 #     ---------------------------------------------
 #     serial                                 ~25 min
 #
-# ⭐ They are independent and mostly network-bound, so they run TOGETHER here,
-# and the caller reads the documentation while they do. The wall clock becomes
-# roughly the longest one.
+# ⭐ They are independent and mostly network-bound, so they run TOGETHER here
+# and the caller reads the documentation while they do.
 #
-# ⭐ AND IT IS RESUMABLE. Each step is skipped when its artefact is already
-# there, so re-running after a failure costs only what actually failed.
+# ⭐ RESUMABLE. Each step is skipped when its artefact is already on disk --
+# checked by looking at the disk, never at a marker this script wrote -- so a
+# re-run after a failure costs only what actually failed.
+#
+# -- ⛔ THE DOCKER TRAP, WHICH IS WHY THIS SCRIPT TOUCHES DOCKER AT ALL -------
+#
+# `pick_engine` in tool/lib/common.sh prefers docker over chroot the moment
+# `docker info` succeeds. So MERELY STARTING dockerd silently switches every
+# `pgb build` and `pgb verify` onto an engine whose environment does not
+# exist. Reproduced here, immediately after starting the daemon:
+#
+#     pgb: engine docker has no build environment.
+#          chosen engine: docker
+#          but these engines DO have one: chroot
+#
+# T-017's guard catches it with a good message, and a session that just
+# started dockerd would still hit it on its first build. ⭐ So this script
+# does not start dockerd without ALSO building the docker environment: after
+# it runs, whichever engine `pick_engine` picks is one that works.
+# `--no-docker` leaves the daemon alone entirely.
 #
 # Usage:
-#   sh scripts/common/bootstrap.sh              # everything, in parallel
-#   sh scripts/common/bootstrap.sh --check      # what is present, exit 1 if not ready
-#   sh scripts/common/bootstrap.sh --no-nix     # skip nix (planning falls back)
-#   sh scripts/common/bootstrap.sh --no-bed     # skip the 11 rootfs (~2.3 GiB)
-#   sh scripts/common/bootstrap.sh --wait       # run in parallel and WAIT (default)
+#   sh scripts/common/bootstrap.sh              # everything, in parallel, wait
 #   sh scripts/common/bootstrap.sh --detach     # start and return; --check later
+#   sh scripts/common/bootstrap.sh --check      # what is present; exit 1 if not ready
+#   sh scripts/common/bootstrap.sh --selftest   # the logic, offline, no side effects
+#   sh scripts/common/bootstrap.sh --no-nix --no-bed --no-env --no-docker
 #
 # Exit: 0 ready, 1 something failed, 2 could not run.
 
@@ -39,28 +55,38 @@ REPO=$(dirname "$(dirname "$SELF")")
 LOGDIR="${PGB_BOOTSTRAP_LOGS:-/var/tmp/pgb-bootstrap}"
 ROOTFS_DIR="${PGB_ROOTFS_DIR:-/var/lib/pgb-rootfs}"
 ENV_NAME="${PGB_ENV_NAME:-pgb-env-debian12}"
-DO_NIX=1; DO_BED=1; DO_ENV=1; MODE=wait; CHECK=0
+IMAGES="$SELF/rootfs-images.txt"
+
+# ⛔ THE FLOOR IS MEASURED, NOT GUESSED: the bed is 2.3 GiB, /nix reaches
+# 1.4 GiB, the chroot environment about 1.5 GiB, and a POC build wants several
+# more. Refusing early with the number beats failing halfway through a
+# 2.3 GiB download with ENOSPC, which is the failure this catches.
+MIN_FREE_GIB="${PGB_MIN_FREE_GIB:-10}"
+
+DO_NIX=1; DO_BED=1; DO_ENV=1; DO_DOCKER=1; MODE=wait; CHECK=0; SELFTEST=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --check)   CHECK=1 ;;
-    --no-nix)  DO_NIX=0 ;;
-    --no-bed)  DO_BED=0 ;;
-    --no-env)  DO_ENV=0 ;;
-    --wait)    MODE=wait ;;
-    --detach)  MODE=detach ;;
-    -h|--help) awk 'NR>1 { if (/^#/) { sub(/^# ?/, ""); print } else exit }' "$0"; exit 0 ;;
-    *)         printf 'bootstrap: unknown argument: %s\n' "$1" >&2; exit 2 ;;
+    --check)     CHECK=1 ;;
+    --selftest)  SELFTEST=1 ;;
+    --no-nix)    DO_NIX=0 ;;
+    --no-bed)    DO_BED=0 ;;
+    --no-env)    DO_ENV=0 ;;
+    --no-docker) DO_DOCKER=0 ;;
+    --wait)      MODE=wait ;;
+    --detach)    MODE=detach ;;
+    -h|--help)   awk 'NR>1 { if (/^#/) { sub(/^# ?/, ""); print } else exit }' "$0"; exit 0 ;;
+    *)           printf 'bootstrap: unknown argument: %s\n' "$1" >&2; exit 2 ;;
   esac
   shift
 done
 
-say() { printf '%s\n' "$*"; }
+say()  { printf '%s\n' "$*"; }
+warn() { printf 'bootstrap: %s\n' "$*" >&2; }
 
 # ---------------------------------------------------------------------------
-# What "ready" means, and each answer is a FILE ON DISK rather than a flag this
-# script wrote. ⛔ A bootstrap that trusts its own marker reports success after
-# a step that half-ran.
+# What "present" means. ⛔ EVERY ANSWER IS A FILE ON DISK. A bootstrap that
+# trusts a marker it wrote itself reports success after a step that half-ran.
 # ---------------------------------------------------------------------------
 have_nix() {
   for c in nix /nix/var/nix/profiles/default/bin/nix "$HOME/.nix-profile/bin/nix"; do
@@ -69,30 +95,111 @@ have_nix() {
   done
   return 1
 }
-have_env() { [ -s "$ROOTFS_DIR/$ENV_NAME/.pgb-env-stamp" ]; }
+have_env()        { [ -s "$ROOTFS_DIR/$ENV_NAME/.pgb-env-stamp" ]; }
+have_dockerd()    { command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; }
+have_docker_env() {
+  have_dockerd || return 1
+  docker image inspect "pgb-env:$(sed -n 's/^PGB_VERSION="\(.*\)"/\1/p' "$REPO/pgb" | head -1)" \
+    >/dev/null 2>&1
+}
 bed_count() {
   _n=0
   while read -r ref name libc digest; do
     case "$ref" in ''|\#*) continue ;; esac
     [ -d "$ROOTFS_DIR/$name" ] && _n=$((_n + 1))
-  done < "$SELF/rootfs-images.txt"
+  done < "$IMAGES"
   printf '%s' "$_n"
 }
-bed_total() { grep -cvE '^\s*(#|$)' "$SELF/rootfs-images.txt"; }
+bed_total() { grep -cvE '^[[:space:]]*(#|$)' "$IMAGES"; }
+
+# ⛔ THE ONE GUARD THAT PROTECTS SOMEBODY ELSE'S DATA. pkgforge's installer
+# opens with `sudo rm -rf /nix /etc/nix ~/.nix-profile ~/.nix-channels ...`.
+# That is correct for a machine with no nix and DESTRUCTIVE for a machine with
+# a half-installed one or a store another session is using. So: run it only
+# when there is no /nix at all.
+nix_install_is_safe() {
+  have_nix && return 1          # already working: nothing to do, not "safe to wipe"
+  [ -e /nix ] && return 1       # a store exists but nix does not run: DO NOT WIPE
+  return 0
+}
+
+free_gib() {
+  df -Pk "${1:-/}" 2>/dev/null | awk 'NR==2 { printf "%d", $4/1024/1024 }'
+}
 
 report() {
   _b=$(bed_count); _t=$(bed_total)
-  printf '  %-22s %s\n' "nix"            "$(have_nix && echo present || echo ABSENT)"
-  printf '  %-22s %s\n' "build environment" "$(have_env && echo present || echo ABSENT)"
-  printf '  %-22s %s\n' "test bed"       "$_b of $_t rootfs"
-  [ -d /var/tmp/pgb-nix-cache ] &&
-    printf '  %-22s %s\n' "nix fetch cache" "$(du -sh /var/tmp/pgb-nix-cache 2>/dev/null | cut -f1)"
+  printf '  %-22s %s\n' "nix"               "$(have_nix && echo present || echo absent)"
+  printf '  %-22s %s\n' "build env (chroot)" "$(have_env && echo present || echo ABSENT)"
+  printf '  %-22s %s\n' "test bed"          "$_b of $_t rootfs"
+  printf '  %-22s %s\n' "dockerd"           "$(have_dockerd && echo running || echo 'not running')"
+  printf '  %-22s %s\n' "build env (docker)" "$(have_docker_env && echo present || echo absent)"
+  printf '  %-22s %s GiB\n' "free disk"     "$(free_gib /)"
   # ⚠ READY DOES NOT REQUIRE NIX. `pgb nix plan` has a nix-free route for a
-  # package whose .drv is cached (47% of named packages, experiments/83-), and
-  # a committed plan needs none at all. Saying "not ready" without nix would
-  # be wrong and would send a session installing something it may not need.
-  have_env && [ "$_b" = "$_t" ]
+  # package whose .drv is cached, and a committed plan needs none at all.
+  # Demanding nix here would send a session installing something it may not
+  # need. It DOES require that the engine pick_engine will choose has an
+  # environment, which is the docker trap in the header.
+  have_env || return 1
+  [ "$_b" = "$_t" ] || return 1
+  if have_dockerd && ! have_docker_env; then
+    printf '\n'
+    # ⛔ SINGLE QUOTES, AND THE REASON IS THAT THE FIRST VERSION HAD BACKTICKS
+    # HERE. `warn "... every `pgb build` will refuse."` is a command
+    # substitution: the shell ran `pgb build`, printed
+    # `bootstrap.sh: 1: pgb: not found`, and spliced the empty result into the
+    # middle of the sentence. It is the same defect the header of
+    # mine-repo.sh documents -- a prose payload the shell reached into.
+    warn '⛔ dockerd is RUNNING and the docker environment is MISSING.'
+    warn '   pick_engine prefers docker, so every pgb build will refuse.'
+    warn '   Fix it with either:'
+    warn '     sh pgb env create --engine docker'
+    warn '     sh pgb build --engine chroot ...   (per invocation)'
+    return 1
+  fi
+  return 0
 }
+
+# ---------------------------------------------------------------------------
+# --selftest: the decisions, offline, with no side effects
+# ---------------------------------------------------------------------------
+if [ "$SELFTEST" = 1 ]; then
+  bad=0
+  chk() {
+    if [ "$2" = "$3" ]; then printf '  ok    %-44s = %s\n' "$1" "$2"
+    else printf '  FAIL  %-44s = %s, expected %s\n' "$1" "$2" "$3"; bad=1; fi
+  }
+  t=$(mktemp -d) || exit 2
+
+  # bed_count must count only the rootfs that exist, and must not be fooled by
+  # a comment line or a blank line in the image list.
+  IMAGES="$t/images.txt"
+  printf '# a comment\n\nrepo:tag  alpha  musl  sha256:x\nrepo:tag  beta  glibc  sha256:y\n' > "$IMAGES"
+  ROOTFS_DIR="$t/roots"; mkdir -p "$ROOTFS_DIR/alpha"
+  chk "bed_total ignores comments and blanks" "$(bed_total)" 2
+  chk "bed_count counts what is on disk" "$(bed_count)" 1
+  mkdir -p "$ROOTFS_DIR/beta"
+  chk "bed_count after the second appears" "$(bed_count)" 2
+
+  # have_env must want the STAMP, not merely the directory: an environment
+  # that half-built has the directory and no stamp, and treating it as present
+  # is how a session builds against a rootfs with no compiler in it.
+  ENV_NAME=e; mkdir -p "$ROOTFS_DIR/e"
+  chk "half-built environment is not 'present'" "$(have_env && echo yes || echo no)" no
+  printf 'stamp\n' > "$ROOTFS_DIR/e/.pgb-env-stamp"
+  chk "environment with a stamp is present" "$(have_env && echo yes || echo no)" yes
+
+  # ⛔ THE DESTRUCTIVE-INSTALL GUARD, which is the only check here that
+  # protects data rather than a result.
+  chk "installer refused when /nix already exists" \
+      "$( [ -e /nix ] && { nix_install_is_safe && echo run || echo refuse; } || echo 'n/a' )" \
+      "$( [ -e /nix ] && echo refuse || echo 'n/a' )"
+
+  rm -rf "$t"
+  printf 'bootstrap --selftest: %s\n' \
+    "$([ "$bad" = 0 ] && echo 'all checks pass.' || echo 'FAILURES above.')"
+  exit "$bad"
+fi
 
 if [ "$CHECK" = 1 ]; then
   say "pgb bootstrap: what this machine has"
@@ -100,18 +207,59 @@ if [ "$CHECK" = 1 ]; then
   else say "  VERDICT: NOT ready. Run: sh scripts/common/bootstrap.sh"; exit 1; fi
 fi
 
-mkdir -p "$LOGDIR" || { printf 'bootstrap: cannot write %s\n' "$LOGDIR" >&2; exit 2; }
+# ---------------------------------------------------------------------------
+# Preflight. ⛔ EVERYTHING THAT WOULD FAIL LATER IS CHECKED HERE, because a
+# missing tool found ten minutes into a 2.3 GiB download costs the download.
+# ---------------------------------------------------------------------------
+say "pgb bootstrap: preparing a fresh machine"
+say ""
+fatal=0
+for t in curl python3 git tar xz; do
+  command -v "$t" >/dev/null 2>&1 || { warn "missing: $t"; fatal=1; }
+done
+[ -r "$IMAGES" ] || { warn "missing: $IMAGES"; fatal=1; }
+if [ "$DO_ENV" = 1 ] || [ "$DO_BED" = 1 ]; then
+  [ "$(id -u)" = 0 ] || { warn "the chroot bed needs root (id -u = $(id -u))"; fatal=1; }
+  command -v unshare >/dev/null 2>&1 || { warn "missing: unshare"; fatal=1; }
+fi
+_free=$(free_gib /)
+if [ -n "$_free" ] && [ "$_free" -lt "$MIN_FREE_GIB" ]; then
+  warn "only ${_free} GiB free on /; this needs about ${MIN_FREE_GIB}."
+  warn "the bed is 2.3 GiB, /nix reaches 1.4, the chroot env about 1.5,"
+  warn "and a POC build wants several more. Set PGB_MIN_FREE_GIB to override."
+  fatal=1
+fi
+[ "$fatal" = 0 ] || { warn "refusing to start. Nothing was changed."; exit 2; }
+say "  preflight ok: ${_free} GiB free, root, unshare, curl, python3"
+
+mkdir -p "$LOGDIR" || { warn "cannot write $LOGDIR"; exit 2; }
 
 # ---------------------------------------------------------------------------
-# The three steps, started together.
-#
-# ⚠ nix's installer is a THIRD PARTY SCRIPT RUN AS ROOT and it is here only
-# because the operator authorised it by name, with the URL, in the session of
-# 2026-09-01c. ⛔ Do not add another installer to this file on your own
-# authority.
+# dockerd first: it takes seconds, and whether it comes up decides whether the
+# docker environment is one of the parallel jobs.
+# ---------------------------------------------------------------------------
+if [ "$DO_DOCKER" = 1 ] && command -v docker >/dev/null 2>&1 && ! have_dockerd; then
+  say "  starting dockerd  (log: $LOGDIR/dockerd.log)"
+  ( dockerd >"$LOGDIR/dockerd.log" 2>&1 & ) 2>/dev/null
+  _w=0
+  while [ "$_w" -lt 30 ]; do
+    have_dockerd && break
+    _w=$((_w + 1)); sleep 1
+  done
+  if have_dockerd; then say "  dockerd up after ${_w}s"
+  else
+    # ⚠ NOT FATAL, and the reason is in the log. A container without the right
+    # capabilities cannot run dockerd, and the chroot engine is the one every
+    # committed number in this repository was measured through anyway.
+    warn "dockerd did not come up in 30s -- continuing with the chroot engine"
+    tail -3 "$LOGDIR/dockerd.log" 2>/dev/null | sed 's/^/      /' >&2
+  fi
+fi
+
+# ---------------------------------------------------------------------------
+# The parallel phase.
 # ---------------------------------------------------------------------------
 PIDS=""; NAMES=""
-
 start() {   # name command...
   _n="$1"; shift
   say "  starting $_n  (log: $LOGDIR/$_n.log)"
@@ -122,7 +270,7 @@ start() {   # name command...
 install_nix() {
   d=$(mktemp -d) || return 2
   curl -qfsSL "https://raw.githubusercontent.com/pkgforge/devscripts/refs/heads/main/Linux/install_nix.sh" \
-    -o "$d/install_nix.sh" || return 1
+    -o "$d/install_nix.sh" || { rm -rf "$d"; return 1; }
   chmod +x "$d/install_nix.sh"
   bash "$d/install_nix.sh"
   _rc=$?
@@ -130,23 +278,47 @@ install_nix() {
   return $_rc
 }
 
-say "pgb bootstrap: preparing a fresh machine"
-say ""
-if [ "$DO_NIX" = 1 ] && ! have_nix; then start nix install_nix
-elif [ "$DO_NIX" = 1 ]; then say "  nix already present, skipping"
+if [ "$DO_NIX" = 1 ]; then
+  if have_nix; then
+    say "  nix already present, skipping"
+  elif nix_install_is_safe; then
+    # ⚠ SAID OUT LOUD BEFORE IT RUNS. This is a third-party script fetched
+    # over the network and run as root, and it is here only because the
+    # operator authorised it by name with this URL in the session of
+    # 2026-09-01c. ⛔ Do not add a second installer to this file on your own
+    # authority.
+    say "  starting nix     ⚠ third-party installer, run as ROOT:"
+    say "                   pkgforge/devscripts Linux/install_nix.sh"
+    start nix install_nix
+  else
+    warn "/nix exists but nix does not run: NOT running the installer."
+    warn "  its first action is 'sudo rm -rf /nix', which would destroy a"
+    warn "  store this script did not create. Remove /nix by hand if that is"
+    warn "  really what you want, then re-run."
+  fi
 fi
-if [ "$DO_ENV" = 1 ] && ! have_env; then start env sh "$REPO/pgb" env create
-elif [ "$DO_ENV" = 1 ]; then say "  build environment already present, skipping"
+
+if [ "$DO_ENV" = 1 ]; then
+  if have_env; then say "  chroot environment already present, skipping"
+  else start env sh "$REPO/pgb" env create; fi
 fi
-if [ "$DO_BED" = 1 ] && [ "$(bed_count)" != "$(bed_total)" ]; then
-  start bed sh "$SELF/fetch-rootfs.sh"
-elif [ "$DO_BED" = 1 ]; then say "  test bed already complete, skipping"
+
+if [ "$DO_BED" = 1 ]; then
+  if [ "$(bed_count)" = "$(bed_total)" ]; then say "  test bed already complete, skipping"
+  else start bed sh "$SELF/fetch-rootfs.sh"; fi
+fi
+
+# ⛔ AND THE DOCKER ENVIRONMENT, whenever the daemon is up, because starting
+# the daemon is what makes pick_engine choose docker. See the header.
+if [ "$DO_DOCKER" = 1 ] && have_dockerd; then
+  if have_docker_env; then say "  docker environment already present, skipping"
+  else start env-docker sh "$REPO/pgb" env create --engine docker; fi
 fi
 
 if [ -z "$PIDS" ]; then
   say ""
   say "nothing to do -- this machine is already set up."
-  report >/dev/null; exit 0
+  if report; then exit 0; else exit 1; fi
 fi
 
 if [ "$MODE" = detach ]; then
@@ -176,6 +348,7 @@ done
 say ""
 if report; then
   say "  VERDICT: ready to build and verify."
+  say "  engine pgb will pick: $(have_dockerd && echo docker || echo chroot)"
 else
   say "  VERDICT: NOT ready. The logs above say which step, and re-running"
   say "  this script repeats only what is missing."
