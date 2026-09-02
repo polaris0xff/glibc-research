@@ -1,6 +1,6 @@
 # runtime — the four mechanisms, and reaching the plugin class
 
-`tool/runtime/*.c`. Routes: [`../docs/AGENTS.md`](../docs/AGENTS.md) §13 item 4.
+`tool/runtime/*.c`. Routes: [../docs/AGENTS.md`](../docs/AGENTS.md) §7.
 
 ---
 
@@ -17,7 +17,7 @@
 `__wrap_dlopen`/`__wrap_dlsym`/`__wrap_dlclose` against a compiled-in table.
 That is the same delivery mechanism `pgb` already uses for `iconv_open`.
 
-**Approach.** Cheapest of the three routes. Generate the table from the plugins
+**Approach.** Cheapest of the four routes. Generate the table from the plugins
 the build produced; wrap at the final link as `pgb-iconv.c` does.
 
 **Prove.** POC 50's CPython rebuilt with `--wrap-dlopen` instead of hand-written
@@ -229,7 +229,7 @@ failure.
 - ⚠ `docs/design/tiers.md`'s bar applies: this stays tier 1 — one ordinary ELF,
   nothing mounted, nothing written — or it is route C wearing a different name.
 
-⭐ **Relation to the other three routes**, `docs/AGENTS.md` §13 item 4:
+⭐ **Relation to the other three routes**, `docs/AGENTS.md` §7:
 route A is built and serves a program's own plugins; route B is **weakened** by
 `73-`'s second control (stripping versions off the object named in
 `DT_VERNEED` makes glibc's loader assert, `dl-lookup.c:106`); route C gives up

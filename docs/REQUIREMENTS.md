@@ -106,7 +106,7 @@ rather than as unmeasured gaps.
 
 | part | state | why |
 |---|---|---|
-| **1. No known environment where it fails** | ⛔ **not met** | One measured, unfixed failure, and it is now the **only** one: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ **Four** routes to it, none exhausted — `AGENTS.md` §13 item 4. Route D is best-evidenced: `experiments/73-` measures 90.8%–97.8% of every glibc-versioned import of 5,807 real host shared objects as already definable by the pinned static glibc, with **zero** unexplained residue. T-033. ⭐ The two host **data** dependencies that used to sit on this row, terminfo and the TLS CA bundle, are **closed** as of 2026-09-01d. |
+| **1. No known environment where it fails** | ⛔ **not met** | One measured, unfixed failure, and it is now the **only** one: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ **Four** routes to it, none exhausted — `AGENTS.md` §7. Route D is best-evidenced: `experiments/73-` measures 90.8%–97.8% of every glibc-versioned import of 5,807 real host shared objects as already definable by the pinned static glibc, with **zero** unexplained residue. T-033. ⭐ The two host **data** dependencies that used to sit on this row, terminfo and the TLS CA bundle, are **closed** as of 2026-09-01d. |
 | **2. A static glibc binary with none of the issues** | ⛔ **not met, and now countable** | ⭐ **Eight of nine** enumerated issues are closed on all eleven environments — it was six of nine before 2026-09-01d. **One** is open: host plugins. The table above is the whole of it; there is no unenumerated remainder, so the distance to the bar is one named problem with four untried routes rather than an unknown quantity. |
 
 ### The head-to-head, which is now evidence rather than the test
@@ -136,7 +136,7 @@ measured. It is **tied** with the anylinux AppImage on both, ahead of it on
 artefact size and on shape — one ELF, nothing mounted, nothing written — and
 **behind it on reach**: bundling serves software with a dependency graph
 static linking has not yet been pushed hard enough to absorb. ⭐ That last one
-is work, not a verdict — `AGENTS.md` §13 item 4 now has **four** routes, and
+is work, not a verdict — `AGENTS.md` §7 now has **four** routes, and
 `experiments/73-` measures the newest one's demand at 90.8%–97.8% already met.
 
 ⭐ **What the evidence does support**, and it is a real claim:

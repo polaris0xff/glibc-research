@@ -60,7 +60,7 @@ exists upstream at the commit named there.
 | `altipla-consulting/distroless-glibc` | `88e4453c` | README + Dockerfile | **anti-pattern exhibit** |
 | `allyourcodebase/pipewire` | `5b4930b8` | `src/wrap/dlfcn.zig` | ⭐ **adopt**: `--wrap` on `dlopen` against a compiled-in table |
 | `leleliu008/python-distribution` | `987e937a` | `build.sh` CPython recipe, `linux-portable.sh` in full | ⭐ **corroborates `limitations.md` §0, and is the smallest tier-2 implementation seen** |
-| ⭐ **`pg83/solo`** | `79451211` | four passes; `dlfcn.cpp` and `elf_loader.h` in full, `elf_loader.cpp` at the resolver/provider/TLS sites, `musl_tls.c`, `dev/`, CI; three build attempts, all failed | ⭐ **adopt the mechanism, refuse the implementation.** A `.so` loader compiled INTO a static binary — §13 item 4 **route D**. Its 5,948-line glibc→musl bridge is exactly what a static-glibc host does not need, and `experiments/73-` measures why. Own page: [`solo.md`](solo.md) |
+| ⭐ **`pg83/solo`** | `79451211` | four passes; `dlfcn.cpp` and `elf_loader.h` in full, `elf_loader.cpp` at the resolver/provider/TLS sites, `musl_tls.c`, `dev/`, CI; three build attempts, all failed | ⭐ **adopt the mechanism, refuse the implementation.** A `.so` loader compiled INTO a static binary — §7 **route D**. Its 5,948-line glibc→musl bridge is exactly what a static-glibc host does not need, and `experiments/73-` measures why. Own page: [`solo.md`](solo.md) |
 
 
 
@@ -338,7 +338,7 @@ The failures 50- recorded — `_dl_call_libc_early_init: Assertion 'sym != NULL'
 failed`, and friends — are what happens when the host object drags the **host
 libc** in. Dropping that edge is exactly step two, so the untested steps are
 the ones aimed at the observed failure. ⭐ Porting the full rewrite is
-`AGENTS.md` §13 item 4, route B.
+`AGENTS.md` §7, route B.
 
 ⭐ It also ships `CROSS_LIBC_DLOPEN_DRYRUN`, which "makes the whole rewrite
 path testable with no GPU and no Alpine" — a cheaper instrument than the one
@@ -356,7 +356,7 @@ resolves against a compiled-in table of libraries and symbols.
 mechanism pgb already uses for `iconv_open`.** It is the missing automation
 behind `AGENTS.md` §7's "a program loading its *own* plugins is fine — build
 them in": POC 50 does this by hand for CPython, and this shows the generic
-shape. It is route A of `AGENTS.md` §13 item 4, and the cheapest of the three.
+shape. It is route A of `AGENTS.md` §7, and the cheapest of the three.
 
 ### `a2flo/standalone_musl` — an integrated loader in a static binary
 
@@ -366,7 +366,7 @@ dynamic loader, allowing the use of `dlopen()`, `dlsym()`"*, plus *"ABI and API
 compatibility with glibc, as far as necessary"*.
 
 ⚠ **That is a fourth route to the host-plugin class**, alongside the three in
-`AGENTS.md` §13 item 4 — and it is an existence proof that a *statically
+`AGENTS.md` §7 — and it is an existence proof that a *statically
 linked* binary can carry a working loader, which is the thing route C assumes
 costs the single-ELF property. ⛔ It is not adoptable as a libc here: it is
 musl, and its README concedes *"GNU indirect function support ('ifunc') is not

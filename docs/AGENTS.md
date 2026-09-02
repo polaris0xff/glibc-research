@@ -195,7 +195,7 @@ are on by default; the last two are opt-in:
 | **NSS** | constructor calls `__nss_configure_lookup()` (public `GLIBC_2.2.5`, present in `libc.a`), pinning all 14 databases to services glibc ≥ 2.34 implements inside libc. Passed as a plain object with `-Wl,-u,pgb_runtime_anchor`, because a constructor with no referenced symbol is dropped from an archive. | [`../tool/runtime/pgb-nssfix.c`](../tool/runtime/pgb-nssfix.c) |
 | **iconv** | `-Wl,--wrap=iconv_open,--wrap=iconv,--wrap=iconv_close` onto static GNU libiconv. Acts at the final link, so it catches calls from any object including archives built before this tool existed. Lives in an archive, so a program that never calls `iconv_open` links none of it — 940 KiB vs 2.1 MiB, same source. | [`../tool/runtime/pgb-iconv.c`](../tool/runtime/pgb-iconv.c) |
 | **locale** (opt-in `--embed-locale`) | `-Wl,--wrap=setlocale`; C.UTF-8 embedded, written out only when the host cannot answer a UTF-8 request. The only mechanism that touches the filesystem, hence opt-in. | [`../tool/runtime/pgb-locale.c`](../tool/runtime/pgb-locale.c) |
-| **own plugins** (opt-in `--wrap-dlopen`) | `-Wl,--wrap=dlopen,--wrap=dlsym,--wrap=dlclose,--wrap=dlerror` onto a table `pgb` **generates** with `nm` from the objects the build produced. ⭐ A program loading its *own* plugins never needs a loader — the code is in the link and `dlopen` is only doing a name lookup. Nothing is mapped, so no second libc can enter. 11 of 11, zero host objects, +544 B. ⚠ Not for **host** plugins — §13 item 4. | [`../tool/runtime/pgb-dlopen.c`](../tool/runtime/pgb-dlopen.c) |
+| **own plugins** (opt-in `--wrap-dlopen`) | `-Wl,--wrap=dlopen,--wrap=dlsym,--wrap=dlclose,--wrap=dlerror` onto a table `pgb` **generates** with `nm` from the objects the build produced. ⭐ A program loading its *own* plugins never needs a loader — the code is in the link and `dlopen` is only doing a name lookup. Nothing is mapped, so no second libc can enter. 11 of 11, zero host objects, +544 B. ⚠ Not for **host** plugins — §7. | [`../tool/runtime/pgb-dlopen.c`](../tool/runtime/pgb-dlopen.c) |
 
 **Delivery:** compiler wrappers on `PATH` plus `CC`/`CXX`. autotools, CMake,
 meson and make pick them up unmodified. Each wrapper reads its own argv:
@@ -338,15 +338,15 @@ experiment; none has been shown to be unreachable.
    `elf_machine_rela_relative` assertion, SIGFPE — because a static binary has
    no loader of its own, so `dlopen` borrows the host's `ld.so` and
    `libc.so.6`, and *that pairing* breaks.
-   ⭐ **Four routes, none exhausted** — §13 item 4 has the detail, and
-   ⭐ **route D is new and best-evidenced**: compile an ELF loader in and
-   resolve the host object against our own static glibc, which
-   `experiments/73-` measures as 90.8%–97.8% already served with zero
-   unexplained residue. The other three:
-   port cross-libc-dlopen's *full* rewrite rather than the one function
-   `experiments/50-` tried (it drops the foreign-libc dependency edge, which is
-   exactly the failure above); `--wrap` on `dlopen` against a compiled-in table,
-   which `allyourcodebase/pipewire` already does; or carry a loader.
+   ⛔ **This is T-064, a P0**, and the four routes are these. None has been
+   tried to exhaustion; none has been shown closed.
+
+   | | route | where it stands |
+   |---|---|---|
+   | **D** | ⭐ **compile an ELF loader IN** and resolve the host object against **our own** static glibc | ⭐ **best-evidenced, and T-064 takes it.** `experiments/73-` measures 90.8%–97.8% of every versioned import of 5,807 real host objects as already definable, residue **zero**; `experiments/72-` measures why the host loader can never work — a static binary's dynamic symbol table is empty. Read [`research/solo.md`](research/solo.md); `references/pg83__solo`'s `elf_loader.cpp` is 2,707 lines and most of it is musl translation a glibc host does not need |
+   | **A** | `--wrap` on `dlopen` against a compiled-in table | ⭐ already shipped for a program's **own** plugins as `--wrap-dlopen`; `allyourcodebase/pipewire`'s `src/wrap/dlfcn.zig` does the same for host libraries |
+   | **B** | port cross-libc-dlopen's **full** rewrite, not the one function `experiments/50-` tried | ⚠ **T-031**, and the measurement so far is no effect. It lets host objects *in*, which is the opposite direction to D |
+   | **C** | carry a loader beside the binary | ⛔ refused by the brief — the output must be one ordinary ELF |
    **The class served today is: programs that do not need host plugins.**
    ⭐ **A program loading its *own* plugins is now served by a mechanism rather
    than by hand, and it is proved on a real project.** `--wrap-dlopen`
@@ -475,7 +475,7 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 | [`limitations.md`](limitations.md) | the open problems, each with a reproduction and a route |
 | [`comparison.md`](comparison.md) | the head-to-head: several ways to ship the same program across the same 11 environments, and what actually separates them |
 | [`research/prior-art.md`](research/prior-art.md) | the reference sweep, verdicts, provenance |
-| [`research/solo.md`](research/solo.md) | ⭐ **the `pg83/solo` sweep, and the route it opened.** A `.so` loader compiled *into* a static binary — §13 item 4 route D — with the measurement that says the symbols are there, the four mechanisms worth taking at file and line, and what must not be ported |
+| [`research/solo.md`](research/solo.md) | ⭐ **the `pg83/solo` sweep, and the route it opened.** A `.so` loader compiled *into* a static binary — §7 route D — with the measurement that says the symbols are there, the four mechanisms worth taking at file and line, and what must not be ported |
 | [`design/tiers.md`](design/tiers.md) | ⛔ **design only, nothing built.** The tiered-output plan for the host-plugin class, and what "universal" can honestly mean |
 | [`history/corrections.md`](history/corrections.md) | ⚠ claims measured wrong, instrument defects, evaluated approaches. **Read on demand, not to orient.** ⭐ This is where superseded findings live — keep them out of the pages above |
 | [`research/nix.md`](research/nix.md) | ⭐ **THE NIX SWEEP AND THE FRONT END.** Ten references, `pgb nix`, and the three findings: nixpkgs' `pkgsStatic` is **musl**; a package can be resolved, planned AND fetched with **no nix** (with the availability rate that limits it); and a nixpkgs binary is location-locked, which is why every bundler ships a store. Opens with what it did NOT establish |
@@ -519,11 +519,13 @@ classes and the entry that owns each; it is not a second work order.
 | class | owner | where it stands |
 |---|---|---|
 | **`pgb build <url-or-package>`** — the toolchain the project is for | T-012 | the design and the static-first/bundle-last rule are in [`design/toolchain.md`](design/toolchain.md) |
-| **host `dlopen`** — §7's limitation | T-031, T-033 | ⭐ four routes, none tried to exhaustion and none shown closed. [`research/solo.md`](research/solo.md) is the read for route D, the best-evidenced |
-| **the bundle is bigger and slower than the field** | T-055, T-057 | measured in [`comparison.md`](comparison.md); the reachability sweep exists and ⛔ nothing consumes it, which is the largest unused lever |
+| ⛔ **host `dlopen`** — §7's limitation, and the reason `REQUIREMENTS.md` part 1 is not met | ⛔ **T-064 (P0)** | ⭐ build **our own** ELF loader and resolve against our own static glibc. `experiments/73-` measured 90.8–97.8% of host imports already definable by it, residue **zero**; `experiments/72-` measured why the host loader can never be the answer. [`research/solo.md`](research/solo.md) is the read; T-033 is the research note behind it |
+| ⛔ **the bundle is bigger and slower than the field** | ⛔ **T-066 (P0)** | 2.86× on `jq`, 2.49× and ~3× slower on kdenlive. ⭐ Iterate on a **CLI**, not kdenlive. The reachability sweep exists and ⛔ nothing consumes it — the largest unused lever. T-055 folds into this |
+| ⛔ **what a bundle may take from the HOST** | ⛔ **T-065 (P0)** | anylinux defers to the host **deliberately** for drivers, bundled-first with a documented lowest-priority fallback. "Zero host objects" is right for a static ELF and wrong for a bundle |
 | **a host with no compiler** | T-051, T-060 | `pgb nix` already works with no nix installed; the C toolchain is the last crutch |
 | **aarch64** | T-041 | `pgb rootfs pull --arch arm64` re-resolves by tag, trading the digest pin away. ⚠ Nothing has been run — expect IFUNC and CPU-baseline questions x86_64 did not raise |
-| **a real GPU** | T-059 | every GL row is `swrast`; NVIDIA is untouched |
+| **a real GPU** | T-059, and T-065 decides what it may use | every GL row is `swrast`; NVIDIA is untouched |
+| **is C enough for `tool/runtime/`?** | ⛔ **T-067 (P0)** | a question, not a migration — a measured "C is adequate" closes it |
 
 ## 14. Rules, and things not to redo
 

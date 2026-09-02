@@ -198,14 +198,14 @@ is now recorded as untested rather than as settled.
 
 ⚠ **Carrying a loader is a second output mode, not a patch to this one**, and
 it costs the property that makes the current one worth having: a single normal
-ELF with no interpreter. It is the most expensive of the three routes in
-`docs/AGENTS.md` §13 item 4, which is why it is listed last.
+ELF with no interpreter. It is the most expensive of the four routes in
+`docs/AGENTS.md` §7, which is why it is listed last.
 
 **The class served today is: programs that do not need to load host plugins.**
 A program whose core function is loading them — a browser using system codecs,
 a desktop application needing the host's GPU driver — is served right now by
 one of the bundling approaches in `docs/comparison.md`, and is the target of
-that §13 item.
+that §7 route.
 
 ⭐ **A program that loads its OWN plugins is a different case and can be
 served**: build them into the binary. POC 50 does exactly that, turning 49
@@ -389,9 +389,9 @@ namespaces are shared unless `--private-net` is passed.
 
 | | |
 |---|---|
-| **the program has to be statically linkable today** | ⛔ **The open problem, and not one any matrix here measures — it is a property of the software being packaged.** `Anylinux-AppImages`' own guidance puts it: *"Compile statically! Sure, that works, go and compile all of kdenlive statically and get back to me once you get it done."* A large dynamic dependency graph — desktop toolkits, GPU stacks, anything loading host plugins — is served by bundling every library today. ⭐ The route is to push each dependency up the brief's preference order until only the irreducible remainder is left: `docs/design/toolchain.md`, and `docs/AGENTS.md` §13 item 4. |
+| **the program has to be statically linkable today** | ⛔ **The open problem, and not one any matrix here measures — it is a property of the software being packaged.** `Anylinux-AppImages`' own guidance puts it: *"Compile statically! Sure, that works, go and compile all of kdenlive statically and get back to me once you get it done."* A large dynamic dependency graph — desktop toolkits, GPU stacks, anything loading host plugins — is served by bundling every library today. ⭐ The route is to push each dependency up the brief's preference order until only the irreducible remainder is left: `docs/design/toolchain.md`, and `docs/AGENTS.md` §7. |
 | **startup and size, against musl** | ⚠ A static **musl** binary starts about 6× faster (160 µs vs 980 µs per exec) and ships 447 KB against 2.1 MB — real advantages for short-lived processes. ⛔ They are not a reason to prefer musl generally: at steady state glibc is 3–129× faster on the same workloads (`experiments/61-`), which is why the brief asks for glibc. |
-| **architecture** | x86_64 only. aarch64 is **untested** — `docs/AGENTS.md` §9 and §13 item 3. |
+| **architecture** | x86_64 only. aarch64 is **untested** — `docs/AGENTS.md` §9 and §13. |
 | **machines** | one. Every result is one machine, one kernel, one day. |
 | **glibc floor** | the build image is pinned at glibc 2.36 because `files`/`dns` became builtin in 2.34. ✅ **Measured**, not reasoned: `experiments/21-glibc-version-floor.sh` builds the same source at 2.31 and at 2.36 against the same target, and below the floor the override **moves** the `dlopen` rather than removing it — `libnss_files.so.2` and `libnss_dns.so.2` are opened with and without it. `docs/history/corrections.md` C6 has the table. ⚠ This row said "reasoned, not measured — planned and unwritten" for most of the project's life and was left stale after the experiment landed. |
 | **container engines** | ✅ **docker is measured**: every CI run does `pgb verify --engine docker` on both a portable and a deliberately failing control binary, and `pgb bootstrap` builds the docker environment. ⚠ `--engine podman` shares that code path and is **still untested** — no podman here. |

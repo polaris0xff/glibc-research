@@ -246,9 +246,8 @@ Five items total. ⭐ Two paid, and one is a finding this project can use.
 
 ## What this changes about the plan
 
-⭐ **`docs/AGENTS.md` §13 item 4 lists three routes to the host-plugin class.
-This is a fourth, it is cheaper than route C, and it is now the best-evidenced
-of the four.**
+⭐ **This is route D in `docs/AGENTS.md` §7, and it is the one T-064 takes.**
+It is cheaper than route C and the best-evidenced of the four.
 
 | route | status after this sweep |
 |---|---|

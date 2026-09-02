@@ -131,7 +131,7 @@ dependency as far up the brief's preference order as it will go — link it,
 build a static library for it, wrap its `dlopen` against a compiled-in table —
 and bundle only what survives all of that.
 [`design/toolchain.md`](design/toolchain.md) has the plan and the bar a `pgb`
-bundle would have to clear; `AGENTS.md` §13 item 4 has the three untried routes
+bundle would have to clear; `AGENTS.md` §7 has the four untried routes
 to the plugin case.
 
 ⭐ **What `pgb` has meanwhile** is that its output is not a package. No runtime,

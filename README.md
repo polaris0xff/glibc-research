@@ -123,7 +123,7 @@ about**: ours loads **zero host shared objects on 11 of 11**, the competitor on
 ⚠ **`dlopen` of a *host* shared object is host-dependent, and success is the
 worse outcome.** gawk's own extension loads on Debian 12 and Arch — dragging
 the host loader and libc into the process — and is refused on the other nine.
-Three untried routes to fixing it are listed in `docs/AGENTS.md` §13 item 4;
+Four untried routes to fixing it are listed in `docs/AGENTS.md` §7;
 none has been shown to be closed.
 
 ⭐ **Static linking says nothing about data, and all five are now closed.**

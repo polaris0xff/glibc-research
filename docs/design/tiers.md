@@ -184,5 +184,5 @@ Not the tier machinery. **Read
 `references/pkgforge-dev__cross-libc-dlopen/tree/docs/limits.md`** — that
 project's own measured list of what its approach cannot do. It was **not** read
 during this project's sweep, and it is the cheapest available check on whether
-tier 2 delivers what this page assumes. Then `../AGENTS.md` §13 item 4 has the
+tier 2 delivers what this page assumes. Then `../AGENTS.md` §7 has the
 build sequence and the acceptance test.
