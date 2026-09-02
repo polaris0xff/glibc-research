@@ -1689,6 +1689,20 @@ cross-check.
 | alignment | the array needs an explicit `aligned()` at least as large as any module `p_align` it serves — 64 observed here |
 | threads | unchanged from today: the init image is seeded in the loading thread, and threads created later see zero |
 
+### ⚠ And it explains a number this tree quotes two different ways
+
+`docs/limitations.md` says the surplus is **3,456** bytes; this entry's body and
+`docs/design/glibc-versions.md` say `_dl_tls_static_size = 3264`. ⭐ **Both are
+right, and the probe above is why:** `_dl_tls_static_size` is the program's own
+`PT_TLS` **plus** the surplus, so it moves with the binary — 3,264 for the
+probe, 68,864 for the padded one. ⛔ **It is not the surplus**, and quoting it
+as one invites the reader to conclude that a bigger binary has more room, which
+is the opposite of true.
+
+⭐ **The stable quantity is the headroom, `size − used`:** 3,168 bytes measured
+today, 3,176 recorded previously. Where a number is quoted, that is the one to
+quote.
+
 ⛔ **D IS DESIGNED AND MEASURED, NOT IMPLEMENTED.** `pgb-elfload.c` is
 unchanged: what exists is the probe above and the reading of it. ⚠ Landing D
 means a new `__thread` reserve, a flag to size it, and `experiments/76-` re-run

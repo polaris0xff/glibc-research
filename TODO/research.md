@@ -815,8 +815,16 @@ and every rewrite is a place the format can change under us.
    debloated one. Folds into T-066's "where the closure comes from".
 4. **NVIDIA.** `docs/design/host-fallback.md` rules it host-always and never
    bundled. ⚠ Untested against nixpkgs' libglvnd, which is the dispatcher that
-   would have to find a host vendor while its own vendors are bundled. The
-   `PGB_HOST_MESA` opt-in is likewise implemented and unexercised.
+   would have to find a host vendor while its own vendors are bundled.
+   ⭐ **SPLIT 2026-09-02d, because the two halves have different owners.** The
+   half that is decidable here — that the opt-in *changes the environment
+   correctly* — is now asserted offline: `PGB_HOST_MESA` drops
+   `LIBGL_DRIVERS_PATH` **and** releases
+   `__EGL_VENDOR_LIBRARY_FILENAMES`, which it previously would not have,
+   because pinning the bundle's own vendor list under an opt-in that says "use
+   the host's mesa" makes the opt-in do the opposite of what it says. ⛔ The
+   half that needs a card — that a host NVIDIA vendor is then actually found
+   and renders — is **T-059's**, and no assertion here can stand in for it.
 5. ⛔ **`__EGL_VENDOR_LIBRARY_DIRS` vs `__EGL_VENDOR_LIBRARY_FILENAMES`.**
    ✅ **DONE 2026-09-02d, and the semantics were READ rather than assumed** —
    libglvnd v1.7.0 `src/EGL/libeglvendor.c`, `LoadVendors()`:
