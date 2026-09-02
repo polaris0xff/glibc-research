@@ -78,3 +78,121 @@
    payload : host=0 bundled=0
    objects :  
    tree    : none
+== opensuse-leap-15.6  arm A
+   status  : ok
+   payload : host=0 bundled=6
+   objects : bundled <mount>/lib/anylinux.so bundled <mount>/lib/gconv/EUC-JP.so bundled <mount>/lib/gconv/ISO8859-1.so bundled <mount>/lib/gconv/libJIS.so bundled <mount>/lib/ld-linux-x86-64.so.2 bundled <mount>/lib/libc.so.6 
+   tree    : libc.so.6 libtinfo.so.6 
+== opensuse-leap-15.6  arm P
+   status  : ok
+   payload : host=0 bundled=0
+   objects :  
+   tree    : none
+== fedora-42  arm A
+   status  : ok
+   payload : host=0 bundled=6
+   objects : bundled <mount>/lib/anylinux.so bundled <mount>/lib/gconv/EUC-JP.so bundled <mount>/lib/gconv/ISO8859-1.so bundled <mount>/lib/gconv/libJIS.so bundled <mount>/lib/ld-linux-x86-64.so.2 bundled <mount>/lib/libc.so.6 
+   tree    : libc.so.6 libtinfo.so.6 
+== fedora-42  arm P
+   status  : ok
+   payload : host=0 bundled=0
+   objects :  
+   tree    : none
+== archlinux-latest  arm A
+   status  : ok
+   payload : host=0 bundled=6
+   objects : bundled <mount>/lib/anylinux.so bundled <mount>/lib/gconv/EUC-JP.so bundled <mount>/lib/gconv/ISO8859-1.so bundled <mount>/lib/gconv/libJIS.so bundled <mount>/lib/ld-linux-x86-64.so.2 bundled <mount>/lib/libc.so.6 
+   tree    : libc.so.6 libncursesw.so.6 libreadline.so.8 
+== archlinux-latest  arm P
+   status  : ok
+   payload : host=0 bundled=0
+   objects :  
+   tree    : none
+THROUGHPUT alpine-3.22 libc=musl
+  malloc1   anylinux=9.11       pgb=12.74      musl=33.62
+  malloc4   anylinux=5.02       pgb=5.64       musl=839.46
+  memcpy    anylinux=825.74     pgb=823.79     musl=906.77
+  strops    anylinux=172.76     pgb=149.42     musl=1043.31
+  qsort     anylinux=61.82      pgb=74.24      musl=817.43
+  snprintf  anylinux=221.48     pgb=271.71     musl=876.26
+  math      anylinux=19.15      pgb=20.19      musl=27.34
+THROUGHPUT alpine-3.20 libc=musl
+  malloc1   anylinux=9.22       pgb=8.91       musl=29.35
+  malloc4   anylinux=4.62       pgb=3.82       musl=746.43
+  memcpy    anylinux=841.45     pgb=823.72     musl=914.70
+  strops    anylinux=217.04     pgb=156.57     musl=778.03
+  qsort     anylinux=80.71      pgb=78.22      musl=681.00
+  snprintf  anylinux=288.44     pgb=288.28     musl=748.71
+  math      anylinux=24.32      pgb=23.71      musl=23.63
+THROUGHPUT alpine-3.10 libc=musl
+  malloc1   anylinux=8.06       pgb=11.87      musl=37.31
+  malloc4   anylinux=3.25       pgb=4.13       musl=893.05
+  memcpy    anylinux=827.01     pgb=866.65     musl=918.00
+  strops    anylinux=180.45     pgb=211.30     musl=911.55
+  qsort     anylinux=62.09      pgb=77.34      musl=836.38
+  snprintf  anylinux=224.31     pgb=240.14     musl=849.02
+  math      anylinux=19.10      pgb=19.52      musl=22.05
+THROUGHPUT voidlinux-musl libc=musl
+  malloc1   anylinux=9.27       pgb=10.56      musl=35.63
+  malloc4   anylinux=3.77       pgb=3.89       musl=715.81
+  memcpy    anylinux=860.81     pgb=826.76     musl=893.13
+  strops    anylinux=218.34     pgb=239.14     musl=752.26
+  qsort     anylinux=80.64      pgb=88.49      musl=658.33
+  snprintf  anylinux=294.75     pgb=309.70     musl=687.53
+  math      anylinux=24.68      pgb=25.47      musl=21.64
+THROUGHPUT debian-11 libc=glibc
+  malloc1   anylinux=8.14       pgb=11.63      musl=37.92
+  malloc4   anylinux=5.35       pgb=6.41       musl=737.59
+  memcpy    anylinux=867.58     pgb=850.71     musl=995.09
+  strops    anylinux=239.18     pgb=159.64     musl=728.20
+  qsort     anylinux=79.22      pgb=82.21      musl=652.03
+  snprintf  anylinux=270.42     pgb=295.40     musl=786.50
+  math      anylinux=24.41      pgb=23.17      musl=21.65
+THROUGHPUT debian-12 libc=glibc
+  malloc1   anylinux=9.77       pgb=11.63      musl=29.55
+  malloc4   anylinux=6.01       pgb=3.68       musl=1026.57
+  memcpy    anylinux=822.88     pgb=828.16     musl=902.90
+  strops    anylinux=176.09     pgb=161.95     musl=911.88
+  qsort     anylinux=61.96      pgb=81.70      musl=749.48
+  snprintf  anylinux=222.94     pgb=305.51     musl=688.81
+  math      anylinux=19.44      pgb=26.38      musl=21.36
+THROUGHPUT ubuntu-20.04 libc=glibc
+  malloc1   anylinux=8.68       pgb=9.06       musl=37.44
+  malloc4   anylinux=5.59       pgb=3.80       musl=951.38
+  memcpy    anylinux=843.71     pgb=826.26     musl=890.67
+  strops    anylinux=206.21     pgb=132.61     musl=869.90
+  qsort     anylinux=74.74      pgb=68.29      musl=832.75
+  snprintf  anylinux=270.79     pgb=266.57     musl=856.37
+  math      anylinux=19.41      pgb=19.37      musl=29.06
+THROUGHPUT rockylinux-8 libc=glibc
+  malloc1   anylinux=9.97       pgb=11.95      musl=33.06
+  malloc4   anylinux=5.77       pgb=3.91       musl=913.14
+  memcpy    anylinux=857.81     pgb=846.36     musl=916.98
+  strops    anylinux=211.18     pgb=158.48     musl=728.91
+  qsort     anylinux=79.57      pgb=83.83      musl=666.68
+  snprintf  anylinux=282.63     pgb=297.79     musl=699.55
+  math      anylinux=24.43      pgb=24.40      musl=21.57
+THROUGHPUT opensuse-leap-15.6 libc=glibc
+  malloc1   anylinux=8.85       pgb=8.97       musl=30.20
+  malloc4   anylinux=2.99       pgb=3.43       musl=977.41
+  memcpy    anylinux=826.47     pgb=813.61     musl=918.86
+  strops    anylinux=167.37     pgb=128.32     musl=895.00
+  qsort     anylinux=62.25      pgb=63.28      musl=816.63
+  snprintf  anylinux=239.57     pgb=238.92     musl=864.42
+  math      anylinux=23.57      pgb=20.16      musl=27.17
+THROUGHPUT fedora-42 libc=glibc
+  malloc1   anylinux=8.09       pgb=16.49      musl=39.73
+  malloc4   anylinux=3.12       pgb=4.57       musl=967.38
+  memcpy    anylinux=837.80     pgb=852.38     musl=885.11
+  strops    anylinux=213.71     pgb=167.03     musl=737.52
+  qsort     anylinux=75.48      pgb=81.33      musl=671.03
+  snprintf  anylinux=266.38     pgb=301.92     musl=730.40
+  math      anylinux=19.47      pgb=24.00      musl=26.61
+THROUGHPUT archlinux-latest libc=glibc
+  malloc1   anylinux=7.20       pgb=12.83      musl=36.06
+  malloc4   anylinux=2.99       pgb=4.25       musl=961.34
+  memcpy    anylinux=830.14     pgb=837.86     musl=885.97
+  strops    anylinux=204.62     pgb=156.74     musl=845.16
+  qsort     anylinux=75.59      pgb=80.68      musl=792.63
+  snprintf  anylinux=275.16     pgb=302.08     musl=862.79
+  math      anylinux=25.27      pgb=24.23      musl=26.53

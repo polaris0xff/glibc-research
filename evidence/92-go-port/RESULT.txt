@@ -126,16 +126,31 @@ calls. rc=0 and the verdict line is the row.
   50-python                  0    123s  builds and works across the matrix
   80-mlt                     0    183s  builds and works across the matrix
   90-qt                      0    594s  builds and works across the matrix
-  91-qt-xcb                          -  RE-RUNNING from a cold prefix when
-                                        the session was checkpointed; see below
+  91-qt-xcb                          -  ⚠ the cold re-run RAN OUT OF DISK at
+                                        Qt object 1,538 of 1,644; see below
 
   ⛔ 91-qt-xcb FAILED FIRST, ON A COLD PREFIX, AND THE DEFECT WAS OURS.
   `pgb nix deps` stops recursing at NIX_DEP_DEPTH, so libxcb was attempted
   before xcb-proto was in the prefix and took libx11, libxext, libxfixes,
   libxi and libxrender down with it. Running the command a second time would
   have fixed it, which is not convergence. The walk now repeats passes while
-  one is still landing something (commit 25a86348), and the row above is
-  filled in from a run that started from `rm -rf` of the prefix.
+  one is still landing something (commit 25a86348).
+
+  ⭐ THE FIX IS CONFIRMED, ON THE PART THIS POC MEASURES ABOUT pgb. The
+  re-run started from `rm -rf` of the prefix and built all 22 packages,
+  libx11, libxext, libxfixes, libxi and libxrender among them:
+
+    rung 1  a plan for qtbase                          ok
+    rung 1  static libxcb / libxkbcommon / openssl     ok, ok, ok
+    rung 2  qtbase source                              ok
+    rung 2b a static xcb + xkbcommon-x11 program links ok, and it is static
+    rung 3  qtbase configures with xcb                 ok
+    rung 3  qtbase builds                              FAILED
+
+  ⚠ AND THE FAILURE IS THIS MACHINE, NOT THE TOOL. Verbatim, at Qt object
+  1,538 of 1,644: `fatal error: cannot write PCH file: No space left on
+  device`. The session's disk allowance was spent. The row stays blank
+  rather than being called a pass: nothing was measured past that point.
 
 
 GATE 5 - the experiment suite, against the Go pgb
@@ -152,6 +167,7 @@ GATE 5 - the experiment suite, against the Go pgb
                                  machine has neither flatpak nor mksquashfs)
   61-libc-throughput          0  matched expectation (4 cases; needed
                                  musl-tools, which was installed)
+  62-anylinux-appimage        0  matched expectation (6 cases)
   70-carried-helper           0  matched expectation (12 of 12 targets)
   71-wrap-dlopen              0  matched expectation (2 cases)
   72-static-host-plugin-abi   0  matched expectation
@@ -161,13 +177,16 @@ GATE 5 - the experiment suite, against the Go pgb
   80-nix-without-nix          0  matched expectation (16 cases)
   83-drv-without-nix          0  matched expectation
   85-opengl                   0  matched expectation (7 cases, Go bundler)
+  89-debloat                  0  matched expectation (10 cases, Go bundler
+                                 and debloater; safe and aggressive arms both
+                                 agree with the undebloated one on 11 of 11)
   87-concurrent-build-options 0  matched expectation
   88-nonix-end-to-end         0  matched expectation (25 cases)
 
-  ⛔ STILL RUNNING WHEN THE SESSION WAS CHECKPOINTED, so there is no row:
-    62-anylinux-appimage, 86-bundler-vs-anylinux, 89-debloat and
-    90-kdenlive-vs-enhanced, and poc/91-qt-xcb from a cold prefix. Nothing
-    below is extrapolated from them.
+  ⛔ NO ROW YET: 86-bundler-vs-anylinux and 90-kdenlive-vs-enhanced were
+    never started -- both build a kdenlive-sized closure and the session's
+    disk allowance ran out on poc/91-qt-xcb first. Nothing here is
+    extrapolated from them.
 
   ⚠ Three of these failed on their first run against the Go pgb and each
     failure was a real defect, not a harness difference:

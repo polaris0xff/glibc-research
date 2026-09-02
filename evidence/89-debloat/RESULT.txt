@@ -3,28 +3,28 @@
 subject: mesa-demos eglinfo, the same subject experiments/85- used
 
                                AppDir bytes AppImage bytes
-  N  --debloat none               878044217      170610180
-  S  --debloat safe               676429749      147196846
-  A  --debloat aggressive         580947048      132874316
-     ratio A/N                        0.66x          0.78x
-     ratio S/N                        0.77x          0.86x
+  N  --debloat none              1210126677      175344884
+  S  --debloat safe               989408989      152154332
+  A  --debloat aggressive         893926288      137565974
+     ratio A/N                        0.74x          0.78x
+     ratio S/N                        0.82x          0.87x
 
 rules that fired:
-  debloat       1.7 MiB  5  documentation and shell completions
-  debloat       0.0 MiB  7  static archives, headers and build metadata
-  debloat      87.5 MiB  188  locale catalogues (kept: none)
-  debloat      17.7 MiB  2  vulkan driver 'panfrost' (no such GPU on x86_64)
-  debloat      16.3 MiB  2  vulkan driver 'freedreno' (no such GPU on x86_64)
-  debloat      12.6 MiB  2  vulkan driver 'broadcom' (no such GPU on x86_64)
-  debloat      15.8 MiB  2  vulkan driver 'asahi' (no such GPU on x86_64)
-  debloat      13.0 MiB  2  vulkan driver 'powervr' (no such GPU on x86_64)
-  debloat      12.6 MiB  2  vulkan driver 'dzn' (no such GPU on x86_64)
-  debloat       3.0 MiB  2  vulkan driver 'gfxstream' (no such GPU on x86_64)
-  debloat      12.1 MiB  1  libteflon (an NPU delegate, not a GPU driver)
-  debloat   837.2 MiB -> 644.9 MiB (23.0% off)
+  debloat      1.7 MiB    8  documentation and shell completions
+  debloat     13.5 KiB    2  static archives, headers and build metadata
+  debloat    105.7 MiB  188  locale catalogues (kept: none)
+  debloat     17.7 MiB    2  vulkan driver 'panfrost' (no such GPU on x86_64)
+  debloat     16.3 MiB    2  vulkan driver 'freedreno' (no such GPU on x86_64)
+  debloat     12.6 MiB    2  vulkan driver 'broadcom' (no such GPU on x86_64)
+  debloat     15.8 MiB    2  vulkan driver 'asahi' (no such GPU on x86_64)
+  debloat     13.0 MiB    2  vulkan driver 'powervr' (no such GPU on x86_64)
+  debloat     12.6 MiB    2  vulkan driver 'dzn' (no such GPU on x86_64)
+  debloat      3.0 MiB    2  vulkan driver 'gfxstream' (no such GPU on x86_64)
+  debloat     12.1 MiB    1  libteflon (an NPU delegate, not a GPU driver)
+  debloat   1.13 GiB -> 942.6 MiB (18.3% off)
 
 on the eleven: Mesa Project 11/11, swrast 11/11, zero host objects 11/11,
 and identical to the undebloated arm on 11/11 rows.
 the aggressive arm is identical to the undebloated one on 11/11 rows.
 
-conditions: 2026-09-01T22:48:08Z, Linux 6.18.44-fc-v22
+conditions: 2026-09-02T05:39:57Z, Linux 6.18.44-fc-v22
