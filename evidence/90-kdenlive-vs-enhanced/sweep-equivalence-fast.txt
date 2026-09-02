@@ -1,0 +1,47 @@
+roots            2586
+plugin dirs      33
+library files    1633, 1.49 GiB
+unreachable      43 files, 14258744 bytes (13.6 MiB, 0.9%)
+  lib/composition.so
+  lib/db2.so
+  lib/dns.cpython-314-x86_64-linux-gnu.so
+  lib/encoding.so
+  lib/ldb.cpython-314-x86_64-linux-gnu.so
+  lib/libCNS.so
+  lib/libGB.so
+  lib/libISOIR165.so
+  lib/libJIS.so
+  lib/libJISX0213.so
+  lib/libKSC.so
+  lib/libRPC-SERVER-LOOP-private-samba.so
+  lib/libauth4-private-samba.so
+  lib/libcmdline-contexts-private-samba.so
+  lib/libcmdline-private-samba.so
+  lib/libdb-4.8.so
+  lib/libdnsserver-common-private-samba.so
+  lib/libgettextlib-1.0.so
+  lib/libgpo-private-samba.so
+  lib/libgsm.so
+  lib/libgss-preauth-private-samba.so
+  lib/libhdb-private-samba.so
+  lib/libkactivitymanagerd_plugin.so
+  lib/libkuriikwsfiltereng_private.so
+  lib/libnss-info-private-samba.so
+  lib/liboss-util.so
+  lib/libposix-eadb-private-samba.so
+  lib/libprotocol-cli.so
+  lib/libprotocol-http.so
+  lib/libprotocol-native.so
+  lib/libprotocol-simple.so
+  lib/libregistry-private-samba.so
+  lib/librtp.so
+  lib/libsamba-net-join.cpython-314-x86-64-linux-gnu-private-samba.so
+  lib/libsamba-policy-private-samba.so
+  lib/libsystemd-shared-261.so
+  lib/libtalloc-report-private-samba.so
+  lib/libutil-crypt-private-samba.so
+  lib/libxattr-tdb-private-samba.so
+  lib/man.so
+  lib/rid.so
+  lib/screen.so
+  lib/tdb.cpython-314-x86_64-linux-gnu.so

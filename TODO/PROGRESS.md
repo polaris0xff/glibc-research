@@ -114,10 +114,11 @@ compressing what got deleted. ⛔ Closing 426 MB → 192 MB by deletion alone
 would need **~1.65 GiB** more of provably-dead AppDir, out of the ~1.85 GiB
 that remains: **89% of what is left**.
 
-⛔ **And the sweep was quadratic**: the bundle advanced at **2.8 MiB/s**,
-~12 minutes on kdenlive against ~8 for the whole of the rest of the build.
-Replaced with a single-pass scan, exactly equivalent by construction, with the
-original kept as the control its selftest compares against.
+⛔ **And the sweep was quadratic**: **838 s** on the real kdenlive AppDir,
+against ~8 minutes for the whole of the rest of the build. ⭐ Replaced with a
+single-pass scan: **7.07 s, and the two outputs are byte-for-byte identical**
+on 1,633 real libraries and 2,586 real roots. ⚠ The naive arm carried
+concurrent load, so "about 100×" is the honest claim and 118× the arithmetic.
 
 ### 4. ⚠ T-071 — items 1, 2 and 5 done
 

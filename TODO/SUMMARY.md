@@ -14,7 +14,7 @@ measurement.** Everything else in this session came out of getting there.
 | **the three sweep fixes** | committed, **never exercised end to end** | ⭐ **proved**: 1,712 objects and 227.4 MiB deleted, and `melt` still rendered 4,149 bytes |
 | **the kdenlive size figure** | 1.39×, quoted from a bundle that **did not render** | ⭐ **2.45× at `safe`, 2.22× at `aggressive`**, both from runs that rendered |
 | **the artefact cache** | keyed on the bundler's mtime only | ⭐ keyed on the **build options** too — it caught its own case on the next run |
-| **the soname scan** | ⛔ quadratic: the bundle advanced at **2.8 MiB/s**, ~12 min on kdenlive | ⭐ single pass, **exactly** equivalent by construction, with the original kept as its control |
+| **the soname scan** | ⛔ quadratic: **838 s** on the real kdenlive AppDir | ⭐ **7.07 s — 118×**, and the two outputs are **byte-for-byte identical** on 1,633 real libraries |
 | **the glibc pin** | ⛔ 2.36, a floor set two releases above its own floor, ceiling widening yearly | ⭐ **three of four costs measured at zero**; the move is *indicated*, `cfg.go` untouched |
 | **class B** | 20 distinct symbols, 14 at `GLIBC_2.38` | ⭐ **5 at glibc 2.41**, all on the one rolling distribution |
 | **class C (what a move COSTS)** | unknown | ⭐ **empty on all 11 rows at both pins** |
@@ -110,3 +110,14 @@ transcript rather than the tree. Run 6's is preserved as
   a same-day `safe` vs `aggressive` timing comparison has not been done.
 - **The pin has not moved.** `cfg.go` is untouched and the POC row is open.
 - **`experiments/91-`, `93-` and `85-`'s new arm are written and NOT RUN.**
+
+## ⭐ The loose end closed after the summary was first written
+
+    pgb bundle sweep <kdenlive AppDir> --env .env --list
+      naive   838 s     exit 0, 47 lines
+      fast      7.07 s  exit 0, 47 lines
+      diff    IDENTICAL
+
+⭐ **118×, with identical output on a real bundle** — 1,633 libraries, 1.49
+GiB, 2,586 roots — which is the control the fixture selftest cannot be.
+⚠ The naive arm carried concurrent load, so "about 100×" is the honest claim.

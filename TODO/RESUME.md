@@ -37,21 +37,19 @@ minutes. `./pgb bootstrap --detach` does all of it in parallel;
 
     (nothing running)
 
-⚠ **One measurement was left unfinished and it is the only loose end.** The
-naive-vs-fast sweep **equivalence diff** on the real kdenlive AppDir: the fast
-arm is done (7.07 s, `/var/tmp/sweep-fast.txt`), the naive arm takes >10
-minutes and was still running at session end. ⭐ **The speedup itself is
-measured; what is missing is the output diff on a real bundle**, which is a
-stronger control than the fixture selftest and is worth completing:
+⭐ **The loose end from earlier in this session is CLOSED.** The naive-vs-fast
+sweep equivalence, on the real kdenlive AppDir — 1,633 libraries, 1.49 GiB,
+2,586 roots:
 
-    A=/var/tmp/pgb-appimage-kden/kdenlive/AppDir
-    /var/tmp/pgb-naive-sweep bundle sweep "$A" --env "$A/.env" --list \
-      > /var/tmp/sweep-naive.txt        # ~12 min
-    ./pgb bundle sweep "$A" --env "$A/.env" --list > /var/tmp/sweep-fast.txt
-    diff /var/tmp/sweep-naive.txt /var/tmp/sweep-fast.txt && echo IDENTICAL
+    naive   838 s     exit 0, 47 lines
+    fast      7.07 s  exit 0, 47 lines
+    diff    IDENTICAL
 
-⚠ `/var/tmp/pgb-naive-sweep` is the pre-speedup binary, kept for exactly this.
-⛔ It is a **timing** measurement too, so nothing heavy may run beside it.
+Both outputs are kept:
+`evidence/90-kdenlive-vs-enhanced/sweep-equivalence-naive.txt` and
+`evidence/90-kdenlive-vs-enhanced/sweep-equivalence-fast.txt`.
+⚠ The naive arm carried concurrent load, so "about 100×" is the honest claim
+and 118× is the arithmetic.
 
 ## ⛔ WHAT IS LEFT, IN ORDER — and every one of these is READY TO RUN
 
@@ -79,8 +77,8 @@ stronger control than the fixture selftest and is worth completing:
   shipped a stale loader through a whole 11-environment run.
 - ⛔ **DISK IS THE BINDING CONSTRAINT**, and the lesson is LEFTOVERS not
   allowance: delete the previous build tree before the next big one.
-  `/var/tmp/pgb-appimage-kden` is **7 GB** and holds the kdenlive AppDir the
-  loose end above needs — delete it only after that diff.
+  `/var/tmp/pgb-appimage-kden` is **7 GB** and is now free to delete: the
+  equivalence diff it was being kept for is done.
 - **Absent on a fresh container:** nix, zstd, musl-gcc, podman, codegraph, gh.
   `docker` IS present. `sh scripts/common/install-codegraph.sh`.
 - ⚠ **`musl-gcc` is the one remaining blocker on `experiments/90-`'s arm O.**

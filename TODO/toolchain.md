@@ -1366,14 +1366,22 @@ then re-measure the big subjects once.
 
    ```
    pgb bundle sweep AppDir --env AppDir/.env --list
-     naive   > 600 s   (killed at a ten-minute limit; ~12 min observed
-                        in run 6's build log)
-     fast      7.07 s
+     naive   838 s      exit 0, 47 lines
+     fast      7.07 s   exit 0, 47 lines
+     diff    IDENTICAL
    ```
 
-   ⛔ **At least 85×, and the honest figure is nearer 100×.** ⚠ The naive arm is
-   a lower bound rather than a time: it was cut off, so what is recorded is
-   "longer than ten minutes", not a number.
+   ⭐ **118×, and the outputs are byte-for-byte identical on a real bundle** —
+   which is a far stronger control than the fixture selftest, because it is
+   1,633 real libraries and 2,586 real roots rather than five files written to
+   have a known answer.
+
+   ⚠ **The ratio is approximate in one direction and it is worth saying which.**
+   The naive arm ran with other work on the box (a `go build`, two `pgb
+   selftest`s, the gates), so 838 s is if anything generous to the fast path;
+   the fast arm was measured on an idle machine. An earlier reading during run
+   6's own build put the sweep at ~12 minutes, also under load. ⛔ So "about
+   100×" is the honest claim and 118× is the arithmetic.
 2. `store/` is 405 MB of the kdenlive bundle and duplicates what is already in
    `lib/`.
 3. `share/` is 368 MB, most of it one icon theme shipping every size.
