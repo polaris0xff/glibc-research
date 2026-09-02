@@ -225,9 +225,10 @@ func decoders(r *selftest.Report) {
 	}
 
 	// zstd is what cache.nixos.org serves today and xz is what it served
-	// before, so both are exercised rather than reported present. Compressing
-	// needs the same tool: when it is absent the case reports skipped rather
-	// than passing vacuously.
+	// before, so both are exercised rather than reported present. Producing
+	// the input needs the corresponding tool; when it is absent the case
+	// reports skipped rather than passing vacuously. Decoding zstd does not:
+	// `pgb selftest zstd` covers that offline against carried frames.
 	for _, c := range []struct{ name, tool string }{{"zstd", "zstd"}, {"xz", "xz"}} {
 		blob, err := compressWith(c.tool, payload)
 		if err != nil {

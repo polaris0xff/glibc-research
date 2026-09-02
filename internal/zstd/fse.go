@@ -106,16 +106,21 @@ func readNCount(src []byte, maxSymbol, maxLog int) ([]int16, int, int, error) {
 	charnum := 0
 	previous0 := false
 
+	// The padding gives the reader four readable bytes past the header; going
+	// beyond that means the counts never closed, which is corruption rather
+	// than a position to clamp to.
+	overrun := false
 	reload := func() {
 		ip += bitCount >> 3
 		bitCount &= 7
 		if ip+4 > len(buf) {
-			ip = len(buf) - 4
+			overrun = true
+			return
 		}
 		stream = read32(ip) >> bitCount
 	}
 
-	for remaining > 1 && charnum <= maxSymbol {
+	for remaining > 1 && charnum <= maxSymbol && !overrun {
 		if previous0 {
 			// Each 0b11 pair is another run of three zero-probability
 			// symbols; the first pair that is not 0b11 ends the run and its
@@ -175,6 +180,9 @@ func readNCount(src []byte, maxSymbol, maxLog int) ([]int16, int, int, error) {
 		}
 		reload()
 	}
+	if overrun {
+		return nil, 0, 0, errCorrupt("FSE header runs past its section")
+	}
 	if remaining != 1 {
 		return nil, 0, 0, errCorrupt("FSE counts do not sum to the table size")
 	}
@@ -191,23 +199,20 @@ func (t *fseTable) decompress(src []byte, max int) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	s1 := int(br.read(t.log))
-	s2 := int(br.read(t.log))
+	state := [2]int{int(br.read(t.log)), int(br.read(t.log))}
 	out := make([]byte, 0, max)
-	for {
-		if len(out)+2 > max {
+	// The two states take turns. When the stream runs out, the state whose
+	// turn it is still holds a symbol, and that symbol is the last one.
+	for i := 0; ; i++ {
+		if len(out) == max {
 			return nil, errCorrupt("FSE output longer than the table allows")
 		}
-		out = append(out, t.step(&s1, br))
+		cur := &state[i&1]
 		if br.over {
-			out = append(out, t.symbol[s2])
+			out = append(out, t.symbol[*cur])
 			break
 		}
-		out = append(out, t.step(&s2, br))
-		if br.over {
-			out = append(out, t.symbol[s1])
-			break
-		}
+		out = append(out, t.step(cur, br))
 	}
 	return out, nil
 }
