@@ -13,6 +13,7 @@ import (
 	"github.com/polaris0xff/glibc-research/internal/fail"
 	"github.com/polaris0xff/glibc-research/internal/logx"
 	"github.com/polaris0xff/glibc-research/internal/nixx"
+	"github.com/polaris0xff/glibc-research/internal/proc"
 )
 
 func nixCommand(c *cfg.Config, args []string) error {
@@ -50,8 +51,10 @@ func nixCommand(c *cfg.Config, args []string) error {
 			return fail.Cannot("pgb nix drv needs a .drv file")
 		}
 		return drvCommand(rest)
+	case "plan":
+		return planCommand(rest)
 	}
-	return fail.Cannot("unknown: pgb nix %s (nar, index, hydra, drv)", sub)
+	return fail.Cannot("unknown: pgb nix %s (nar, index, hydra, drv, plan)", sub)
 }
 
 func narCommand(c *cfg.Config, args []string) error {
@@ -106,6 +109,55 @@ func narCommand(c *cfg.Config, args []string) error {
 		return nil
 	}
 	return fail.Cannot("unknown: pgb nix nar %s", sub)
+}
+
+// planCommand reads a `nix derivation show --recursive` document on stdin and
+// writes one build plan.
+func planCommand(args []string) error {
+	var positional []string
+	nixPrefix, nixpkgsVersion := "", ""
+	for i := 0; i < len(args); i++ {
+		switch args[i] {
+		case "--nix-prefix":
+			i++
+			if i < len(args) {
+				nixPrefix = args[i]
+			}
+		case "--nixpkgs-version":
+			i++
+			if i < len(args) {
+				nixpkgsVersion = args[i]
+			}
+		default:
+			if strings.HasPrefix(args[i], "-") {
+				return fail.Cannot("pgb nix plan: unknown argument: %s", args[i])
+			}
+			positional = append(positional, args[i])
+		}
+	}
+	attr, drvPath := "?", ""
+	if len(positional) > 0 {
+		attr = positional[0]
+	}
+	if len(positional) > 1 {
+		drvPath = positional[1]
+	}
+	if nixPrefix != "" && nixpkgsVersion == "" {
+		out, code := proc.CaptureAllowFail(filepath.Join(nixPrefix, "nix-instantiate"),
+			"--eval", "--expr", "(import <nixpkgs> {}).lib.version")
+		if code == 0 {
+			nixpkgsVersion = strings.Trim(strings.TrimSpace(out), `"`)
+		}
+	}
+	var doc nixx.ShowRecursive
+	if err := json.NewDecoder(os.Stdin).Decode(&doc); err != nil {
+		return fail.Ran("the derivation document is not JSON: %v", err)
+	}
+	plan, err := nixx.BuildPlan(doc, attr, drvPath, nixpkgsVersion, nixPrefix)
+	if err != nil {
+		return fail.Ran("%v", err)
+	}
+	return nixx.WritePlan(os.Stdout, plan)
 }
 
 func drvCommand(args []string) error {

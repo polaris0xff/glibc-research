@@ -126,3 +126,50 @@ THE CARRIED-IN SELFTESTS
 
 GATE 1 - nix-index on the real ~400 MB packages.json:  NOT YET RUN
 GATE 3 - doctor / env info / nix plan / verify parity: NOT YET RUN
+
+
+GATE 3 (part) - `nix plan`, differential against the python planner
+---------------------------------------------------------------------------
+Input: `nix derivation show --recursive` for each attribute, from the nix on
+this machine. Both planners read the SAME document.
+
+  tmux      IDENTICAL   5,664 bytes
+  htop      IDENTICAL   5,591
+  ncurses   IDENTICAL   4,134
+  zlib      IDENTICAL   1,554
+  bash      IDENTICAL   6,273
+  jq        IDENTICAL   1,380
+  curl      IDENTICAL   4,543
+  python3   IDENTICAL  12,421
+  openssl   IDENTICAL   2,351
+  git       DIFFERS in exactly one field, and the difference is a DEFECT the
+            port found in the python planner. See below.
+
+⭐ THE DEFECT: A PLAN THAT IS NOT A PROPERTY OF THE GRAPH
+---------------------------------------------------------------------------
+An output store path can be claimed by MORE THAN ONE derivation — two .drv
+files that build to the same output are equivalent, and a real graph has
+several. In git's graph, 14 output basenames are claimed twice, among them
+
+  /nix/store/anri00q3zrwkxdnch0vic10yy9kykgfp-perl-5.42.0
+      out  bgz1mxqdhjymq3cabdhavp0s3hqjqn3h-perl-5.42.0.drv
+      out  fql06jx5r03zc8zc2sxgy3km0r1vikhp-perl-5.42.0.drv
+
+`nix-plan.py` builds its output index with last-writer-wins over the
+document's own key order, so which of the two lands in `deps[].drv` depends
+on the order nix happened to print them in.
+
+THE CONTROL, and it is what turns this from a choice into a defect. The same
+graph, its `derivations` object shuffled ten ways, content identical:
+
+  python3 tool/nix-plan.py git ... :  4 of 10 -> plan A
+                                      6 of 10 -> plan B
+  pgb nix plan git ...             : 10 of 10 -> plan A
+
+⭐ The Go planner sorts the claimants and takes the lowest store path, so the
+plan is a property of the graph. `--log debug` reports how many output paths
+had more than one claimant; `--log trace` names each.
+
+⚠ Both answers are BUILDABLE — the two derivations produce the same output —
+so nothing built from either plan was wrong. What was wrong is that one
+attribute had two plans and nothing said so.
