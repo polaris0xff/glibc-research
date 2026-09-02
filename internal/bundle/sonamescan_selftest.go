@@ -68,10 +68,20 @@ func SonameScanSelftest() *selftest.Report {
 	objects := map[string]string{
 		"caller-a.so.1": "\x00\x7f\x01ELF\x00libplain.so.0\x00some other string\x00",
 		"caller-b.so.1": "\x00/nix/store/aaaa-x/lib/libinpath.so.2\x00",
-		// ⛔ The adjacency case: the needle is a substring of a longer run of
-		// name characters. A scan that only compared WHOLE tokens would miss
-		// it, and `bytes.Contains` does not.
-		"caller-c.so.1": "\x00xxlibtight.soyy\x00",
+		// ⛔ THE ADJACENCY CASE, AND THE PADDING BYTES ARE THE WHOLE POINT.
+		// The needle must be a substring of a longer run of ALPHABET
+		// characters, so a scan comparing whole tokens misses it while
+		// `bytes.Contains` does not.
+		//
+		// ⚠ THE FIRST VERSION OF THIS FIXTURE PADDED WITH `xx`/`yy` AND
+		// TESTED NOTHING. No needle here contains `x` or `y`, so those bytes
+		// are not in the derived alphabet, so they SPLIT the run -- and what
+		// the fast path actually saw was the bare `libtight.so`. Both
+		// implementations agreed, the assertion went green, and a deliberate
+		// whole-token regression planted to test this very guard passed all
+		// seven cases. The padding is now `aa`/`bb`, which every `lib*` needle
+		// puts in the alphabet.
+		"caller-c.so.1": "\x00aalibtight.sobb\x00",
 		"caller-d.so.1": "\x00libinlist.so.1 libplain.so.0\x00",
 		// ⚠ Mentions its own name only: the rule is that an object naming
 		// itself is not evidence anything loads it.

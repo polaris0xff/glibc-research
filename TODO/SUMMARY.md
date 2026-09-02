@@ -31,7 +31,7 @@ measurement.** Everything else in this session came out of getting there.
 | **T-055 / goal 3** | ⭐ **the comparison exists and is honest** | ours renders on 11 of 11 with **zero host shared objects**; the competitor renders on 11 of 11 with **4 of 11 clean**. ⛔ **The operator's bar — smaller, loads faster, runs faster — is NOT met**: 2.22× the size, and the timing columns of the run that would have settled them are contaminated |
 | **T-070** | ⚠ **advanced, open** | kernel floor unchanged (3.2.0 → 3.2.0 at glibc 2.41, two instruments); class B 20 → 5; class C empty at both pins; NSS floor holds with its below-floor control firing. ⛔ The ten POCs at 2.41 are the one row left |
 | **T-071** | ⚠ **advanced, open** | items 1, 2 and 5 done. Items 3 and 4 remain, and 4's untestable half is T-059's |
-| **T-066** | ⚠ **advanced, open** | ⭐ **the gap is the direction the pipeline runs in** — theirs is additive from an allowlist, ours subtractive from a closure — and deletion is worth ~1/6 on the packed artefact |
+| **T-066** | ⚠ **advanced, open** | ⭐ **the gap is the direction the pipeline runs in** — theirs is additive from an allowlist, ours subtractive from a closure — and deletion is worth **~1/8** on the packed artefact (7.5 : 1, corroborated two ways) |
 | **T-072** | ⚠ **advanced, open** | route B **refuted** by measurement, route D opened and costed, neither implemented |
 | **T-068** | ⚠ **advanced, open** | the harness exists; the sweep it was built on turned out to be unreproducible |
 
@@ -64,6 +64,45 @@ measurement.** Everything else in this session came out of getting there.
    Prove could not be carried out.
 10. ⛔ **A `while read` loop whose child reads stdin truncates itself** —
     demonstrated at 1 of 5 rather than asserted.
+
+## The review, three lenses, three distinct findings
+
+⭐ `docs/methodology/reviews.md`: *"A pass that reports nothing means that pass
+was too shallow."* Each pass names what it looked at that the others did not.
+
+**1. The door sweep — "what other door reaches this code?"** `codegraph
+callers` on all six changed functions. ⚠ **Finding:** `rewriteManifestPaths` is
+reachable only through `desktopAndIcon` — a method named for something else —
+so the coupling is invisible to a reader. Verified it survives the gate that
+matters: `desktopAndIcon` is unconditional (`appimage.go:165`) while
+`debloat()` is skipped at `--debloat none`, so the rewrite still runs there,
+and `manifestIntegrity()` is unconditional too.
+
+**2. The guard mutation — "can my new guard actually fail?"** ⛔ **The biggest
+finding of the session, and it was in my own new guard.** A whole-token-match
+regression was planted in the fast soname scan — `strings.Contains(r, n)`
+replaced with `n == r`, a genuinely different rule — and
+`bundle-soname-scan` **passed all seven cases**, including the one named *"a
+soname with name bytes either side is found"*.
+
+⭐ **Why:** that fixture padded the needle with `xx`/`yy`, and **no needle in
+the fixture contains `x` or `y`**, so those bytes were not in the derived
+alphabet and acted as *separators*. The fast path never saw an adjacency case
+at all; it saw a bare `libtight.so`, and both implementations agreed by
+coincidence. ⚠ Exactly reviews.md's named shape: *a test whose name claims more
+than it checks*. Padding changed to `aa`/`bb`; with the same mutation planted
+the selftest now fails **2 of 7**, and reverting it returns 7 of 7.
+
+**3. The claim audit — "which sentence is not backed by an artefact?"**
+⛔ **Two findings.** The AppDir-to-artefact ratio was published as "about a
+sixth" from a 250 MiB delta that **omitted `aggressive`'s extra Vulkan rules**;
+the delta is **319.6 MiB** and the ratio **7.5 : 1**, corroborated by summing
+the individual rules (91.1 MiB against 92.2 implied). The conclusion held, the
+denominator did not. ⛔ And the numbers behind it print to
+`evidence/*/build/build-ours.log`, which **`.gitignore:15` excludes** — so run
+5's copy is already gone and its `2.53 GiB → 2.16 GiB` is cited from a
+transcript rather than the tree. Run 6's is preserved as
+`run6-build-summary.txt`.
 
 ## ⛔ What the next session must not read as settled
 

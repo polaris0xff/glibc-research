@@ -107,10 +107,12 @@ We start from nixpkgs' complete 2.53 GiB closure and subtract.
 ⛔ **Subtractive cannot win against additive**, because `sweep.go`'s own rule
 is *"anything a rule cannot classify counts as REACHABLE"*.
 
-⭐ **And the arithmetic agrees independently:** `aggressive` deletes 250 MiB of
-AppDir for **42.4 MiB of artefact** — about **6 to 1**, because dwarfs was
-already compressing what got deleted. Closing 426 MB → 192 MB by deletion alone
-would need ~1.4 GiB more of provably-dead AppDir.
+⭐ **And the arithmetic agrees independently:** `aggressive` removes **319.6
+MiB** of AppDir — 92.2 of extra debloat plus 227.4 of sweep — for **42.4 MiB of
+artefact**. That is **7.5 to 1**, because dwarfs at `zstd:19` was already
+compressing what got deleted. ⛔ Closing 426 MB → 192 MB by deletion alone
+would need **~1.65 GiB** more of provably-dead AppDir, out of the ~1.85 GiB
+that remains: **89% of what is left**.
 
 ⛔ **And the sweep was quadratic**: the bundle advanced at **2.8 MiB/s**,
 ~12 minutes on kdenlive against ~8 for the whole of the rest of the build.
@@ -194,8 +196,8 @@ measured.
     T-066   ⚠ P0. ⭐ The next lever is NAMED and is not another debloat rule:
             mine pkgforge-dev/archlinux-pkgs-debloated (NOT in references/),
             then make `pgb bundle appimage` take an ALLOWLIST rather than a
-            closure. Deletion is worth ~1/6 on the artefact; it cannot close
-            2.22x.
+            closure. Deletion is worth ~1/8 on the artefact (7.5:1); it
+            cannot close 2.22x.
 
     ---- then, unchanged in relative order ----
 

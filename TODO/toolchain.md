@@ -1274,22 +1274,43 @@ the bundle slower. `RULES.md` §"the shared resource is sometimes the clock".
 
 ### ⛔ AppDir bytes are NOT artefact bytes, and the ratio is about 6 to 1
 
-The two runs differ by roughly **250 MiB of AppDir** — the sweep's 227.4 MiB
-plus `aggressive`'s extra Vulkan drivers, `nouveau` 21.4 MiB and `virtio`
-1.9 MiB — and by **42.4 MiB of artefact**:
-
     safe        AppDir 2.53 GiB -> 2.16 GiB      artefact 471,033,944 B
     aggressive  AppDir 2.53 GiB -> 2.07 GiB      artefact 426,528,098 B
                 then the sweep: -227.4 MiB       delta      44,505,846 B
 
-⭐ **So a debloat rule is worth about a sixth of its raw size on the thing a
+    AppDir removed, extra   92.2 MiB (debloat) + 227.4 MiB (sweep) = 319.6 MiB
+    artefact removed                                              =  42.4 MiB
+    ⭐ ratio                                                       = 7.5 : 1
+
+⭐ **Corroborated by a second route:** `aggressive`'s extra rules are the
+Vulkan drivers `intel` 47.8, `radeon` 20.0, `nouveau` 21.4 and `virtio` 1.9
+MiB — **91.1 MiB**, against the 92.2 MiB the two totals imply. The logs round
+to two decimals, so the AppDir delta is 319.6 MiB ± ~20; the ratio is 7 to 8,
+not a constant.
+
+⭐ **So a debloat rule is worth about an EIGHTH of its raw size on the thing a
 user downloads**, because dwarfs at `zstd:level=19` was already compressing
-what got deleted. ⚠ **This reframes the whole lever**: "489 MB of kdenlive's
-`lib/` is unreachable", the number that opened this entry, is worth ~80 MB of
-artefact, not 489. ⛔ It does not make debloating pointless — it means the
-remaining 2.22× cannot be closed by deletion alone, which is the same
-conclusion the "where the closure comes from" argument reaches by another
-route.
+what got deleted. ⚠ **This reframes the lever this entry opened on**: "489 MB
+of kdenlive's `lib/` is unreachable" is worth **~65 MB** of artefact, not 489.
+
+⛔ **And it makes the arithmetic decisive.** Closing 426,528,098 → 191,900,604
+means removing **223.8 MiB of artefact**, which at 7.5:1 is **~1.65 GiB of
+AppDir** — out of the ~1.85 GiB that remains after the sweep. **You would have
+to prove 89% of what is left is dead.** Deletion is not the route; where the
+closure comes from is.
+
+⚠ **A correction, and lens 3 of the review is what caught it.** This paragraph
+first said "about a sixth" and "~1.4 GiB", computed from an AppDir delta of
+250 MiB that omitted `aggressive`'s extra Vulkan rules. The conclusion did not
+change; the denominator did.
+
+⛔ **AND THE NUMBERS ABOVE LIVE IN A LOG `.gitignore` DISCARDS.** `debloat`,
+the sweep total and `icd json N rewritten` are printed to
+`evidence/*/build/build-ours.log`, which `.gitignore:15` excludes — so the next
+run overwrites the only copy. `evidence/90-kdenlive-vs-enhanced/run6-build-summary.txt`
+is that copy, kept deliberately; ⚠ **run 5's equivalent is already gone**, which
+is why its `2.53 GiB -> 2.16 GiB` is cited from a transcript rather than from
+the tree.
 
 ⛔ **THE kdenlive ROWS ARE RUN 5's (2026-09-02d, `safe`) AND THEY SUPERSEDE
 WHAT WAS HERE.** The previous figures — 477,191,058 B, 3,559 ms, 181 ms — came
@@ -1386,7 +1407,8 @@ afternoon.
 ⭐ **And the arithmetic already said so.** `aggressive` deletes 250 MiB of
 AppDir for 42.4 MiB of artefact — about **6 to 1**, because dwarfs was already
 compressing what got deleted. Closing 426 MB → 192 MB by deletion alone would
-need roughly **1.4 GiB** more of provably-dead AppDir. There is not that much
+need roughly **1.65 GiB** more of provably-dead AppDir, out of the ~1.85 GiB
+that remains after the sweep — **89% of what is left**. There is not that much
 left to prove.
 
 ⭐ **And the corpus names exactly the packages that dominate OUR bundle.**

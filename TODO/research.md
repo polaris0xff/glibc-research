@@ -810,6 +810,16 @@ and every rewrite is a place the format can change under us.
    **from `manifestGlobs`**, so a glob added to the list gets an assertion
    automatically; a second hand-maintained list would be this same defect one
    level up.
+
+   ⭐ **And the widening is measured, on the same subject, one run apart.**
+   kdenlive's build log, `icd json N rewritten to bare sonames`:
+
+       run 5, three globs   16 files
+       run 6, five globs    20 files
+
+   ⚠ **Four files that were being kept as reachability roots while their own
+   `library_path` still pointed into `/nix/store`** — which is the half-fix
+   stated as a count rather than as a worry.
 3. **Size.** The GL stack is **95 MiB of a 163 MB bundle** (`experiments/85-`),
    because nixpkgs' mesa is 273 MB unstripped and the Anylinux flow ships a
    debloated one. Folds into T-066's "where the closure comes from".

@@ -1,0 +1,24 @@
+icd json    20 rewritten to bare sonames
+debloating (level: aggressive)
+  debloat     20.5 MiB    8  documentation and shell completions
+  debloat    135.5 KiB    5  static archives, headers and build metadata
+  debloat    244.1 MiB  210  locale catalogues (kept: none)
+  debloat     17.7 MiB    2  vulkan driver 'panfrost' (no such GPU on x86_64)
+  debloat     16.3 MiB    2  vulkan driver 'freedreno' (no such GPU on x86_64)
+  debloat     12.6 MiB    2  vulkan driver 'broadcom' (no such GPU on x86_64)
+  debloat     15.8 MiB    2  vulkan driver 'asahi' (no such GPU on x86_64)
+  debloat     13.0 MiB    2  vulkan driver 'powervr' (no such GPU on x86_64)
+  debloat     12.6 MiB    2  vulkan driver 'dzn' (no such GPU on x86_64)
+  debloat      3.0 MiB    2  vulkan driver 'gfxstream' (no such GPU on x86_64)
+  debloat     47.8 MiB    4  vulkan driver 'intel' (no such GPU on x86_64)
+  debloat     20.0 MiB    2  vulkan driver 'radeon' (no such GPU on x86_64)
+  debloat     21.4 MiB    2  vulkan driver 'nouveau' (no such GPU on x86_64)
+  debloat      1.9 MiB    2  vulkan driver 'virtio' (no such GPU on x86_64)
+  debloat     12.1 MiB    1  libteflon (an NPU delegate, not a GPU driver)
+  debloat     15.0 MiB    1  share/i18n (locale SOURCES; nothing here compiles locales)
+  debloat   2.53 GiB -> 2.07 GiB (18.3% off)
+wrapper env 226 variable(s) lifted out of the wrapper into .env
+env         17649 -> 4629 bytes after folding (19 keys)
+  debloat    227.4 MiB  1712  unreachable by DT_NEEDED from any program or plugin dir
+integrity   every DT_NEEDED in the bundle resolves inside it
+manifests   8 name only libraries present in the bundle
