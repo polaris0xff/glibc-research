@@ -23,6 +23,12 @@ bundler. `CGO_ENABLED=0`. The shell and Python are retired under
     124 carried selftests          all pass
     sh TODO/check.sh               green
     sh scripts/common/check-docs.sh  green
+    CI                             ⭐ repaired. It had been RED for every
+                                   commit of the port: pgb is a built binary
+                                   and is not committed, so three jobs ran
+                                   ./pgb against nothing. A `toolchain` job
+                                   builds it and hands it over as an artefact.
+                                   ⚠ Confirm the latest run is green.
     gates 1, 2, 3, 4, 6            met, with output
     gate 5                         9 of 10 POCs, 21 of 23 experiments; 3 rows left
 

@@ -10,11 +10,11 @@ thing was not measured this says so rather than giving a number.
 | row | before | after |
 |---|---|---|
 | **Elapsed** | 2026-09-02T04:0xZ | 2026-09-02T05:5xZ — **≈2h**, ended by an operator checkpoint rather than by the work finishing |
-| **Commits** | `184b1c56` | `894bfaec` — **19 commits**, every one on `main` |
-| **Work** | T-061 open, nothing written | ⭐ **the whole toolchain ported to Go**, 5 defects found in code that had been trusted, gates 1/2/3/4/6 met, gate 5 at 9 of 10 POCs and 21 of 23 experiments |
-| **Changes** | — | **166 files**, 30,540 insertions(+), 1,353 deletions(-) |
+| **Commits** | `184b1c56` | `fe62869d` — **24 commits**, every one on `main` |
+| **Work** | T-061 open, nothing written | ⭐ **the whole toolchain ported to Go**, 7 defects found in code that had been trusted, gates 1/2/3/4/6 met, gate 5 at 9 of 10 POCs and 21 of 23 experiments |
+| **Changes** | — | **169 files**, 30,681 insertions(+), 1,429 deletions(-) |
 | **Size** | — | **17,690 lines** of Go replacing **8,343** of shell and Python, which are retired under `HISTORY/` rather than deleted |
-| **Checks** | both gates green | green. ⭐ **124 carried selftests**, up from 72 |
+| **Checks** | both gates green, ⛔ **CI red and unnoticed** | both gates green, ⭐ **124 carried selftests** (up from 72), and ⭐ **CI repaired** — it had been failing since the first port commit |
 | **Cost** | — | ⚠ **not metered.** What can be pointed at: the real 399,356,002-byte `packages.json` fetched once, a 648,570-byte `cache.nixos.org` NAR, mesa and Qt closures for the bundler experiments. ⛔ **The session's disk allowance ran out**, which is what stopped `poc/91-qt-xcb`. No paid service used |
 | **Health** | 34 entries, 16 open | **34 entries, 15 open.** ⭐ **T-056 closed** — superseded by T-061, which took the Python helpers to Go rather than Rust. T-061 stays open for its remainder. Tree clean, `main` pushed |
 
@@ -30,7 +30,7 @@ The shell and Python were moved with `git mv` into `HISTORY/<commit>/<original
 path>`, per the operator's ruling, and every gate was measured against them
 rather than against a claim.
 
-## The five defects, all found by a measurement disagreeing
+## The seven defects, all found by something disagreeing
 
 ⛔ **None of these was found by reading the code.**
 
@@ -49,6 +49,15 @@ rather than against a claim.
    the columns, the parser and the heartbeat, and nothing called
    `NewStamper`: `pgb --ts build` printed no timestamps at all.
 5. **`pgb selftest <typo>` printed "0 cases, all pass".**
+6. ⛔ **CI had been red for every commit of the port.** `pgb` is a built
+   binary and is not committed, so three jobs did `actions/checkout` and then
+   ran `./pgb` against nothing, and a fourth ran `sh -n` over it. A
+   `toolchain` job now builds one static pgb and hands it to the others as an
+   artefact — the distribution claim under test, since that binary is then
+   used inside the pinned Debian 12 container with nothing installed for it.
+7. **A skip counted as a failure**, found by the repaired CI within minutes:
+   the runner is not root, `rootfs-run` needs root, and `Report.Write`
+   returned 1 for it. It returns 0 / 1 / 2 now, like everything else here.
 
 ## zstd, because the environment has none
 

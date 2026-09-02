@@ -65,7 +65,7 @@ byte-identical to the host build. Gate 5 is nine POCs and eighteen
 experiments; the rows are in the evidence file and the rest are named under
 "In progress".
 
-### 2. The defects the port found, in code that had been trusted
+### 2. The seven defects the port found, in code that had been trusted
 
 Each was found by a measurement disagreeing, not by reading:
 
@@ -88,6 +88,13 @@ Each was found by a measurement disagreeing, not by reading:
    `NewStamper`: `pgb --ts build` printed no timestamps at all.
 5. ⛔ **`pgb selftest <typo>` printed "0 cases, all pass".** A name that
    matches nothing selected nothing and reported success.
+6. ⛔ **CI had been red for every commit of the port and nobody had looked.**
+   `pgb` is a built binary now and is not committed, so three jobs did
+   `actions/checkout` and then ran `./pgb` against nothing. A `toolchain` job
+   builds one static pgb and hands it to the rest as an artefact.
+7. ⛔ **A skip counted as a failure**, found by the repaired CI within
+   minutes. The runner is not root, `rootfs-run` needs root, and the report
+   returned 1 for it. It returns 0 / 1 / 2 now, like everything else here.
 
 ### 3. zstd, decoded in Go
 
