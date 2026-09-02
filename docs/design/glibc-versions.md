@@ -35,8 +35,13 @@ already produced, because that binary does not contain a reference to one.**
 
 ## 2. So why pin at all? A FLOOR, and it is measured
 
-`internal/cfg/cfg.go` pins `debian:12` (glibc 2.36) by manifest digest. Two
+`internal/cfg/cfg.go` pins `debian:13` (glibc 2.41) by manifest digest. Two
 reasons, and neither is backward compatibility.
+
+⭐ **The pin was `debian:12` (glibc 2.36) until 2026-09-02**, and §3 below is
+the argument that moved it. What follows in §2a is the FLOOR, which is why
+there is a pin at all; §3 is the CEILING, which is what decides where above the
+floor it sits.
 
 ### 2a. ⛔ glibc 2.34 is a hard floor for the NSS mechanism
 
@@ -55,8 +60,19 @@ built against glibc 2.31 and against 2.36, run on the *same* target root:
 | 2.36 plain | 0 | none |
 | 2.36 + nssfix | 0 | none |
 
-⛔ **The override is cosmetic below 2.34.** That is the floor, and `debian:12`
-is the pin that clears it.
+⛔ **The override is cosmetic below 2.34.** That is the floor, and the pin
+clears it. ⭐ **Re-measured at the new pin**, same target, same method, with the
+2.31 rows kept because they are the control that makes a `none` mean anything:
+
+| build glibc / arm | host NSS modules opened |
+|---|---|
+| **2.41 plain** | **none** |
+| **2.41 + nssfix** | **none** |
+
+⚠ **A "none" from an instrument that cannot see modules looks exactly the
+same**, which is not hypothetical: a first attempt at this measurement had an
+unquoted shell variable, read a trace file that did not exist, and printed
+`none` for every arm. The 2.31 rows are what distinguish the two readings.
 
 ### 2b. Reproducibility
 
@@ -83,29 +99,46 @@ pin satisfies both ends** — `docs/research/solo.md` says so, and it is worth
 restating with its consequence:
 
 ⚠ **Class B is not a fixed cost. It WIDENS with every glibc release the pin
-does not follow.** Today it is 20 symbols against hosts running 2.38–2.43. A
-pin left at 2.36 for three more years faces every symbol added in between. ⭐
-**Nothing else in this project degrades merely by the passage of time; this
-does.**
+does not follow.** At the 2.36 pin it was 20 symbols against hosts running
+2.38–2.43. ⭐ **Nothing else in this project degrades merely by the passage of
+time; this does.**
 
-### ⭐ And the pin is lower than it needs to be
+### ⭐ The pin was lower than it needed to be, and T-070 moved it
 
-The floor is **2.34**. The pin is **2.36**. The output is static, so there is
+The floor is **2.34**. The pin was **2.36**. The output is static, so there is
 **no upward pressure at all** — nothing forces the pin to stay near the floor.
 Meanwhile the ceiling argues for the newest glibc available.
 
-⛔ **So the pin is at 2.36 for no measured reason**, and moving it to a glibc
-≥ 2.38 would close the majority of class B by construction — 14 of 20 symbols
-are `__isoc23_*` at exactly `GLIBC_2.38`. `TODO` **T-070** is that measurement,
-and it is a measurement rather than a change because the cost has to be checked
-first, not assumed:
+⛔ **So the pin sat at 2.36 for no measured reason.** T-070 costed the move
+before making it — the cost had to be checked, not assumed — and **all four
+costs came back zero**, `experiments/91-glibc-pin-candidates.sh`:
 
-| what must be measured before moving the pin | why |
-|---|---|
-| the **kernel floor** the newer glibc's static binaries declare | a static binary's only host requirement is the kernel. If a newer glibc raises `for GNU/Linux 3.2.0`, that trades a real property for a symbol-coverage one |
-| that the **NSS override still works** | 21- is the gate, re-run against the new pin |
-| that **all ten POCs still build** | a newer glibc deprecates as well as adds |
-| the **class B residue afterwards** | 73- re-run; the point is the number moving |
+| what the move could have cost | measured | verdict |
+|---|---|---|
+| the **kernel floor** a static binary declares. If a newer glibc raises `for GNU/Linux 3.2.0`, that trades a real property for a symbol-coverage one | `.note.ABI-tag` **3.2.0** at both pins, `readelf -n` and `file(1)` agreeing | no cost |
+| **class C** — a symbol the newer glibc REMOVED | **empty on all 11 rows at BOTH pins** | no cost |
+| that the **NSS override still works** — `experiments/21-` re-run at the new pin | **`none`**, with the 2.31 arm firing as the control | holds |
+| that **all ten POCs still build**, under gcc 12.2.0 → 14.2.0 | ⭐ **10 of 10 build and pass their full matrices** | no cost |
+
+⭐ **And what it buys, `experiments/73-` at both pins, same day, same eleven:**
+
+| environment | class B @ 2.36 | class B @ 2.41 | symbols served |
+|---|---|---|---|
+| opensuse-leap-15.6 | 13 | **0** | 993 → **1005** |
+| fedora-42 | 15 | **0** | 961 → **976** |
+| archlinux-latest | 20 | **5** | 1198 → **1213** |
+| debian-11 / ubuntu-20.04 / rockylinux-8 | 0 | 0 | unchanged |
+| debian-12 | 0 | 0 | 851 → **849** ⚠ the one cost |
+
+    class B, distinct symbols   20 at 2.36  ->  5 at 2.41
+
+⭐ **The whole `__isoc23_*` family at `GLIBC_2.38` is gone.** The five that
+remain are at `GLIBC_2.42`/`2.43` on `archlinux-latest` alone —
+`__memset_explicit_chk`, `free_sized`, `free_aligned_sized`, `__inet_pton_chk`,
+`__inet_ntop_chk`. ⚠ **Which restates the section's own point: a rolling
+distribution is always ahead of any pin.** Moving to 2.41 does not end class B;
+it empties it for every fixed-release environment measured and leaves the
+rolling one, which is the residue that regrows.
 
 ## 4. What a future glibc CAN break, by dependency class
 
@@ -171,3 +204,12 @@ corrupted memory.**
 4. ⛔ **Any new dependency on a glibc internal needs a public-fact guard**
    before it is merged, on the model of §4. An internal that fails loudly is
    acceptable; one that can fail quietly is not.
+5. ⛔ **The pin is three constants in `internal/cfg/cfg.go` and nowhere else.**
+   `TODO/check.sh` fails if a copy appears in `experiments/`, `poc/`,
+   `scripts/`, `internal/`, `cmd/` or `.github/`. ⚠ The move of 2026-09-02
+   found **nine** copies of the name and **two** of the digest — one of the
+   latter an `env.BUILD_IMAGE` in CI that nothing had ever read, because the
+   `env` context is unavailable in a job's `container.image`.
+6. ⭐ **The move is cheap and the ceiling regrows, so re-cost it periodically**
+   rather than waiting for a failure. `experiments/91-` runs the whole veto —
+   kernel floor, class B, class C, NSS floor — before anything expensive.

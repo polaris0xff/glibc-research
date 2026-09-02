@@ -3,8 +3,8 @@
 arm 1, option-keyed directories (the fix), engine=chroot:
   --embed-terminfo build : pgb_terminfo symbols = 2
   plain build            : pgb_terminfo symbols = 0
-  cc-dir plain           : /root/.local/state/pgb/bin-3121117560
-  cc-dir --embed-terminfo: /root/.local/state/pgb/bin-312257160
+  cc-dir plain           : /root/.local/state/pgb/bin-2365515579
+  cc-dir --embed-terminfo: /root/.local/state/pgb/bin-771666190
 
 arm 2, one shared directory (the old behaviour, reproduced):
   the two builds agreed on one option set at least once: yes
@@ -12,4 +12,4 @@ arm 2, one shared directory (the old behaviour, reproduced):
 arm 3, docker engine with the same control:
   --embed-terminfo=2 plain=0  -> the container boundary isolates them
 
-conditions: 2026-09-02T04:17:45Z, Linux 6.18.44-fc-v22
+conditions: 2026-09-02T23:20:27Z, Linux 6.18.44-fc-v24

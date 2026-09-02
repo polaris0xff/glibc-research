@@ -54,11 +54,13 @@ on:
 permissions:
   contents: read
 
-env:
-  # glibc 2.36. At or above 2.34 the `files` and `dns` NSS services are
-  # implemented inside libc, which is what leaves the NSS override with
-  # nothing to dlopen. This is the same pin as pgb's own default.
-  BUILD_IMAGE: debian@sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929
+# ⛔ THE BUILD IMAGE IS NOT WRITTEN HERE EITHER. It used to be, twice: an
+# `env.BUILD_IMAGE` that nothing read, and a digest retyped into the `build`
+# job's `container.image` — because the `env` context is not available in that
+# key, so the "single source" was silently a second copy. T-070 moved the pin
+# and found both; the `matrix` job now derives the image from
+# internal/cfg/cfg.go and hands it over as a job output, which `container.image`
+# does support. TODO/check.sh fails if a copy comes back.
 
 jobs:
   # ---------------------------------------------------------------------------
@@ -66,8 +68,8 @@ jobs:
   #    handed to every job that needs it as an artefact.
   #
   # ⭐ THAT IS ALSO THE PRODUCT'S OWN CLAIM, TESTED. One statically linked
-  # file is built on the runner and then used inside a Debian 12 container by
-  # the `build` job, with nothing installed for it there.
+  # file is built on the runner and then used inside the PINNED build image's
+  # container by the `build` job, with nothing installed for it there.
   # ---------------------------------------------------------------------------
   toolchain:
     runs-on: ubuntu-latest
@@ -120,8 +122,28 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       targets: ${{ steps.gen.outputs.targets }}
+      build_image: ${{ steps.pin.outputs.build_image }}
     steps:
       - uses: actions/checkout@v4
+      - id: pin
+        name: Read the pinned build image out of internal/cfg/cfg.go
+        # ⛔ DERIVED, NEVER RETYPED, for the same reason the target matrix is.
+        # A digest copied into this file does not follow a pin move: CI keeps
+        # building against the old glibc while the tool builds the new one, and
+        # nothing in a green run says so. T-070.
+        run: |
+          set -eu
+          cfg=internal/cfg/cfg.go
+          img=$(sed -n 's/^[[:space:]]*DefaultEnvImage[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "$cfg" | head -1)
+          dig=$(sed -n 's/^[[:space:]]*DefaultEnvDigest[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' "$cfg" | head -1)
+          # ⛔ An empty value here would become the bare repository name, which
+          # pulls `latest` — a rolling tag standing in for a digest pin, and the
+          # exact drift this step exists to prevent. Fail instead.
+          case "$img" in *:*) ;; *) echo "no DefaultEnvImage in $cfg" >&2; exit 1 ;; esac
+          case "$dig" in sha256:*) ;; *) echo "no DefaultEnvDigest in $cfg" >&2; exit 1 ;; esac
+          repo=${img%:*}
+          echo "build_image=$repo@$dig" >> "$GITHUB_OUTPUT"
+          echo "build image: $repo@$dig  (tag $img, for the record)"
       - id: gen
         name: Generate the target matrix from scripts/common/rootfs-images.txt
         run: |
@@ -145,10 +167,10 @@ jobs:
   #    different binaries and prove nothing about portability.
   # ---------------------------------------------------------------------------
   build:
-    needs: toolchain
+    needs: [toolchain, matrix]
     runs-on: ubuntu-latest
     container:
-      image: debian@sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929
+      image: ${{ needs.matrix.outputs.build_image }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4

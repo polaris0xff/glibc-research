@@ -105,39 +105,54 @@ else
   note "codegraph absent or not indexed; run: sh scripts/common/install-codegraph.sh"
 fi
 
-# 8. ⛔ THE PINNED BUILD ENVIRONMENT'S NAME HAS ONE SOURCE, AND IT IS cfg.go.
+# 8. ⛔ THE PINNED BUILD ENVIRONMENT HAS ONE SOURCE, AND IT IS cfg.go.
 #
 # T-070 measured the glibc pin move and found that changing `cfg.go` alone
-# would leave eight experiments looking at the OLD environment: gone from disk
-# they skip (exit 2, which nobody reads as a regression), still on disk they
-# measure the old glibc and say nothing. `experiments/lib.sh` now reads the
-# name out of `cfg.go`; this is what stops a ninth copy being typed.
+# would leave EIGHT experiments and TWO CI jobs pinned to the old one: gone
+# from disk they skip (exit 2, which nobody reads as a regression), still on
+# disk they measure the old glibc and say nothing. `experiments/lib.sh` reads
+# the name out of `cfg.go` and the `matrix` CI job reads the image and digest
+# out of it; this is what stops the next copy being typed.
 #
-# ⚠ Prose is exempt: TODO/ and docs/ quote the name as evidence of what was
-# measured, and rewriting history is not the fix. Only code is checked.
+# ⚠ Prose is exempt: TODO/ and docs/ quote these values as evidence of what
+# was measured, and rewriting history is not the fix. Only code is checked.
 #
 # ⚠ AND SO ARE WHOLE-LINE COMMENTS INSIDE CODE, which is not a loophole but the
 # thing that makes the check usable: the block explaining WHY a file no longer
-# hardcodes the name has to be allowed to say what it no longer hardcodes. A
-# name on the right of live code is still caught — the filter is anchored.
-env_name=$(sed -n 's/^[[:space:]]*DefaultEnvName[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' \
-           "$D/../internal/cfg/cfg.go" 2>/dev/null | head -1)
-if [ -z "$env_name" ]; then
-  bad "internal/cfg/cfg.go defines no DefaultEnvName"
-else
-  copies=$(grep -rnF "$env_name" \
+# hardcodes a value has to be allowed to say what it no longer hardcodes. A
+# value on the right of live code is still caught — the filter is anchored.
+#
+# ⚠ AND scripts/common/rootfs-images.txt IS EXEMPT FOR THE IMAGE AND DIGEST,
+# because a Debian release can be BOTH the build environment and one of the
+# eleven TARGETS, and that file is the target list. It is not exempt for the
+# name: an environment name has no business there.
+cfg_const() {
+  sed -n 's/^[[:space:]]*'"$1"'[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' \
+    "$D/../internal/cfg/cfg.go" 2>/dev/null | head -1
+}
+for k in DefaultEnvName DefaultEnvImage DefaultEnvDigest; do
+  v=$(cfg_const "$k")
+  if [ -z "$v" ]; then
+    bad "internal/cfg/cfg.go defines no $k"
+    continue
+  fi
+  exempt='/internal/cfg/cfg\.go:'
+  case "$k" in
+    DefaultEnvImage|DefaultEnvDigest) exempt="$exempt|/scripts/common/rootfs-images\.txt:" ;;
+  esac
+  copies=$(grep -rnF "$v" \
              "$D/../experiments" "$D/../poc" "$D/../scripts" "$D/../internal" \
              "$D/../cmd" "$D/../.github" 2>/dev/null \
-           | grep -v '/internal/cfg/cfg\.go:' \
+           | grep -vE "$exempt" \
            | grep -vE ':[0-9]+:[[:space:]]*(#|//|\*|/\*)' || true)
   if [ -n "$copies" ]; then
     printf '%s\n' "$copies" | while IFS= read -r c; do
-      bad "hardcodes the environment name '$env_name': ${c#"$D"/../} (read it from cfg.go — lib.sh does)"
+      bad "hardcodes $k '$v': ${c#"$D"/../} (derive it from cfg.go)"
     done
   else
-    ok "the environment name '$env_name' is defined once, in cfg.go"
+    ok "$k '$v' is defined once, in cfg.go"
   fi
-fi
+done
 
 fail=$(grep -c . "$FAILS")
 printf '\n'

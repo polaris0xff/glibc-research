@@ -1952,9 +1952,67 @@ hit today with `PGB_ENV_NAME`, wearing different clothes.
    `evidence/` says `pinned build glibc : 2.36`** and would describe an
    environment the tool no longer builds.
 
-⛔ **Step 1 requires editing `experiments/lib.sh`, which `experiments/85-` is
-sourcing right now**, and this tree's rule is that a running shell script is
-not edited. The ruling is recorded; the edit is the next thing to land.
+### ⭐ STEP 1 LANDED, 2026-09-02f — and the eight were nine, two of them dead
+
+`experiments/lib.sh` now derives `ENV_NAME` and `ENV_ROOT` from `cfg.go`'s
+`DefaultEnvName`. `PGB_ENV_NAME` still overrides, which is how `experiments/91-`
+measures a candidate pin. `60- 61- 62- 70- 73- 80- 87- 88-` read them.
+
+⛔ **An empty name is exit 2, not an empty string.** `"$ROOTFS_DIR/"` with no
+name is the **rootfs directory itself** — it exists, so every `[ -d ... ]`
+guard downstream passes and the experiment chroots into a tree holding eleven
+distributions. ⚠ And `exp_cfg_const` **returns** rather than calling `exit`,
+because it runs inside `$(...)`, which is a subshell: an `exit` there ends the
+subshell and leaves the caller running with exactly the empty variable being
+guarded against. The caller checks.
+
+⭐ **Two of the nine copies could never have matched.** `experiments/80-` looked
+for `$ROOTFS_DIR/debian12` and `$ROOTFS_DIR/alpine322`; the local names in
+`rootfs-images.txt` are `debian-12` and `alpine-3.22`. Two of that arm's three
+candidates were dead and it rested entirely on the third. The list is read out
+of the images file now.
+
+**The controls, each run:**
+
+    DefaultEnvName renamed in cfg.go     exit 2, "defines no DefaultEnvName"
+    cfg.go moved away                    exit 2, "cannot read"
+    ⚠ cfg.go chmod 000                   NOT a control -- we run as root
+    a hardcoded name put back in 87-     check.sh FAILs, naming file and line
+    experiments/87- end to end           8 of 8, and it selected `chroot`,
+                                         which is the ENV_ROOT code path
+
+### ⭐ STEP 2 LANDED, 2026-09-02f — the pin is `debian:13`, glibc 2.41
+
+    DefaultEnvImage   debian:12  ->  debian:13
+    DefaultEnvDigest  2f65600e…  ->  6788062a…
+    DefaultEnvName    pgb-env-debian12 -> pgb-env-debian13
+
+⚠ **`debian:13` and `debian:trixie` are the same release**, and the digest
+resolver in `experiments/91-` returned the **same manifest digest** for both on
+2026-09-02, with its own control passing (the method reproduces the pinned
+`debian:12` digest). The numbered tag is pinned to match `debian:12`'s form; the
+digest is what identifies the image, so the arm-5 evidence measured under the
+name `pgb-env-debian-trixie` describes this image.
+
+    debian:12       sha256:2f65600e…   <- the control: matches cfg.go's old pin
+    debian:13       sha256:6788062a…
+    debian:trixie   sha256:6788062a…
+
+⛔ **AND CI HAD TWO MORE COPIES, ONE OF WHICH WAS ALREADY DEAD.**
+`.github/workflows/portability.yml` carried an `env.BUILD_IMAGE` that **nothing
+read**, and the `build` job's `container.image` retyped the same digest —
+because the `env` context is not available in that key, so the "single source"
+had silently been a second copy since it was written. The `matrix` job now
+derives the image from `cfg.go` and hands it over as a job output, which
+`container.image` does support. ⚠ The job count is unchanged at 16: the pin
+step folded into the job that already derives the target matrix, rather than
+becoming a seventeenth.
+
+`TODO/check.sh` gains the gate for all three constants — prose and whole-line
+comments exempt, `rootfs-images.txt` exempt for image and digest because a
+Debian release can be both the build environment and one of the eleven targets.
+Its control: a digest put back into the workflow makes the gate FAIL with the
+file and line, and removing it makes it pass.
 
 ---
 

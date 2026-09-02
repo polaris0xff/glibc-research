@@ -34,13 +34,38 @@ const (
 	EngineHost   Engine = "host"
 )
 
-// Defaults for the pinned build environment. glibc 2.36: at or above 2.34 the
-// `files` and `dns` NSS services are implemented inside libc, which is what
-// leaves the NSS override with nothing to dlopen.
+// Defaults for the pinned build environment.
+//
+// ⛔ THE PIN IS A FLOOR AND A CEILING, AND THEY POINT IN OPPOSITE DIRECTIONS.
+//
+//	FLOOR    glibc 2.34 made the `files` and `dns` NSS services builtin.
+//	         Below it __nss_configure_lookup only MOVES the dlopen, which
+//	         experiments/21- measures against a 2.31 build.
+//	CEILING  --host-dlopen needs a HOST object's imports satisfiable by OUR
+//	         glibc. Every release the pin does not follow widens the set that
+//	         are not: experiments/73-'s class B.
+//
+// ⭐ Nothing forces the pin to sit near the floor, and T-070 moved it off
+// there: 2.36 -> 2.41, debian:12 -> debian:13. All four measured costs were
+// zero -- the kernel floor a static binary declares stays at 3.2.0, class C
+// (a symbol the newer glibc REMOVED) is empty on all eleven rows at both
+// pins, the NSS floor still reports `none` with 21-'s 2.31 arm firing as the
+// control, and all ten POCs build and pass under gcc 12.2.0 -> 14.2.0. What
+// it buys is class B going 20 -> 5 distinct symbols, the whole __isoc23_*
+// family at GLIBC_2.38 among them.
+//
+// ⚠ debian:13 and debian:trixie are the same release and resolved to this
+// same manifest digest on 2026-09-02; the numbered tag is pinned to match
+// debian:12's form. Nothing here is resolved at run time -- the digest is.
+//
+// ⛔ THESE THREE ARE THE ONLY COPIES IN THE TREE. TODO/check.sh asserts it,
+// because the previous move found eight experiments and two CI jobs carrying
+// their own, and a copy that does not follow measures the old glibc and says
+// nothing.
 const (
-	DefaultEnvImage  = "debian:12"
-	DefaultEnvDigest = "sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929"
-	DefaultEnvName   = "pgb-env-debian12"
+	DefaultEnvImage  = "debian:13"
+	DefaultEnvDigest = "sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1"
+	DefaultEnvName   = "pgb-env-debian13"
 )
 
 // DefaultEnvPackages is what an autotools, CMake or meson tarball needs beyond
