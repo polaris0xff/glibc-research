@@ -730,6 +730,49 @@ extern size_t _dl_tls_static_align __attribute__((weak));
  * it, which is stated here and asserted in experiments/76- rather than
  * discovered by a user.
  */
+/* ⛔ VALIDATE AN INTERNAL VARIABLE WITH A PUBLIC FACT, ONCE.
+ *
+ * _dl_tls_static_size/_used/_align are glibc INTERNALS. They are not in
+ * libc.so.6's dynamic symbol table at all -- they exist only in libc.a -- so
+ * nothing versions them, nothing promises them, and a future glibc may rename
+ * them, change their units, or change what they are measured from.
+ *
+ * ⚠ A RENAME IS THE SAFE FAILURE and it is already handled: the references are
+ * weak, so the addresses come back NULL and the caller refuses by name. The
+ * DANGEROUS change is a silent one -- same names, different meaning -- which
+ * would have this loader compute a plausible-looking offset and hand a module
+ * thread storage that overlaps somebody else's.
+ *
+ * ⭐ So the internals are cross-checked against something PUBLIC: errno is
+ * thread-local, its address is ordinary API, and it must lie inside the static
+ * TLS block that _dl_tls_static_size describes. Measured on the build host:
+ *
+ *     &errno              tp -64
+ *     _dl_tls_static_size 3264      -> errno is inside [tp-3264, tp): CONSISTENT
+ *
+ * If that ever stops holding, this loader's understanding of the layout is
+ * wrong and initial-exec TLS is refused rather than guessed at.
+ */
+static int el_tls_bookkeeping_sane(void)
+{
+    static int v = -1;
+    long eoff;
+
+    if (v >= 0)
+        return v;
+    v = 0;
+    if (&_dl_tls_static_used == NULL || &_dl_tls_static_size == NULL)
+        return v;
+    if (_dl_tls_static_size == 0 || _dl_tls_static_used > _dl_tls_static_size)
+        return v;
+    eoff = (char *)&errno - (char *)el_tp();
+    /* errno must be BELOW the thread pointer and inside the block. */
+    if (eoff >= 0 || -eoff > (long)_dl_tls_static_size)
+        return v;
+    v = 1;
+    return v;
+}
+
 static int el_static_tls(struct el_obj *o)
 {
     size_t align, used, newused;
@@ -740,6 +783,15 @@ static int el_static_tls(struct el_obj *o)
     if (&_dl_tls_static_used == NULL || &_dl_tls_static_size == NULL) {
         el_err("pgb-elfload: %s: glibc's static-TLS bookkeeping is not linked "
                "in, so initial-exec TLS cannot be placed", o->soname);
+        return -1;
+    }
+    if (!el_tls_bookkeeping_sane()) {
+        el_err("pgb-elfload: %s: glibc's static-TLS bookkeeping does not "
+               "describe this thread's layout (size=%zu used=%zu, errno at "
+               "tp%+ld) -- refusing to place initial-exec TLS rather than "
+               "guess", o->soname, (size_t)_dl_tls_static_size,
+               (size_t)_dl_tls_static_used,
+               (long)((char *)&errno - (char *)el_tp()));
         return -1;
     }
     if (!o->tls_memsz) {
