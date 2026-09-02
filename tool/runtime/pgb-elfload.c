@@ -275,6 +275,30 @@ static void *el_tls_provider(const char *name)
  * ⚠ A NULL addr is a name the generator listed and the LINK did not pull in
  * -- see the weak-reference note in pgb-elfload.h. It is a miss here, and the
  * caller reports it by name rather than guessing. */
+/* ⛔ THE LENGTH IS COMPUTED ONCE, and computing it per lookup was measured to
+ * cost an order of magnitude. The first version walked the whole table to find
+ * its NULL terminator before every binary search: 7,216 iterations per
+ * undefined symbol, and a small object has dozens. Time to first symbol for
+ * libz.so.1, best of 200 cold loads, fork per iteration:
+ *
+ *   before   673,989 ns        after   see experiments/76-
+ *   ld.so     64,484 ns        (the host's own loader, same object)
+ *
+ * The table is a link-time constant, so one pass on first use is all it can
+ * ever need. */
+static size_t el_provider_count(void)
+{
+    static size_t n;
+    static int done;
+
+    if (!done) {
+        while (pgb_provider_syms[n].name)
+            n++;
+        done = 1;
+    }
+    return n;
+}
+
 static void *el_provider(const char *name)
 {
     size_t lo = 0, hi;
@@ -287,8 +311,7 @@ static void *el_provider(const char *name)
     if (&pgb_provider_syms[0] == NULL)
         return NULL;
 
-    for (hi = 0; pgb_provider_syms[hi].name; hi++)
-        ;
+    hi = el_provider_count();
     while (lo < hi) {
         size_t mid = lo + (hi - lo) / 2;
         int c = strcmp(pgb_provider_syms[mid].name, name);

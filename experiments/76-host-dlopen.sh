@@ -118,6 +118,7 @@ cat > "$WORK/host.c" <<'EOF'
 #include <dlfcn.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 /* ⛔ dlerror() CLEARS ON READ. Calling it twice in one expression -- once to
  * test, once to print -- returns the message and then NULL, so a real failure
@@ -128,9 +129,46 @@ static const char *err_once(void)
     return e ? e : "(no error was set)";
 }
 
+/* ⛔ TWO LOADS IN ONE PROCESS, NOT A FORK PER ITERATION. The first version of
+ * this measurement forked for every sample so each load would be cold, and it
+ * reported the compiled-in loader at 673,989 ns against ld.so's 64,484 ns --
+ * ten times slower. That number was the harness, not the loader: forking a
+ * 4.4 MB static image with a 7,216-entry provider table in .data.rel.ro costs
+ * copy-on-write faults that a 16 KB dynamic binary never pays, and the clock
+ * was started after the fork but the faults land inside the timed region.
+ * Loading two DIFFERENT objects in one process separates the mechanism's
+ * one-off cost from its per-load cost and compares like with like. */
+static void bench(const char *a, const char *asym, const char *b, const char *bsym)
+{
+    struct timespec t0, t1, t2, t3;
+    void *h1, *h2;
+
+    clock_gettime(CLOCK_MONOTONIC, &t0);
+    h1 = dlopen(a, RTLD_NOW);
+    if (h1) (void)dlsym(h1, asym);
+    clock_gettime(CLOCK_MONOTONIC, &t1);
+
+    clock_gettime(CLOCK_MONOTONIC, &t2);
+    h2 = dlopen(b, RTLD_NOW);
+    if (h2) (void)dlsym(h2, bsym);
+    clock_gettime(CLOCK_MONOTONIC, &t3);
+
+    printf("BENCH first %ld %s\n",
+           (t1.tv_sec-t0.tv_sec)*1000000000L + (t1.tv_nsec-t0.tv_nsec),
+           h1 ? "ok" : "FAIL");
+    printf("BENCH second %ld %s\n",
+           (t3.tv_sec-t2.tv_sec)*1000000000L + (t3.tv_nsec-t2.tv_nsec),
+           h2 ? "ok" : "FAIL");
+}
+
 int main(int argc, char **argv)
 {
     const char *path = argc > 1 ? argv[1] : "libdemo.so";
+
+    if (argc > 5 && strcmp(argv[1], "--bench") == 0) {
+        bench(argv[2], argv[3], argv[4], argv[5]);
+        return 0;
+    }
     /* ⛔ argv[2] SELECTS THE ARM, and the first run of this experiment is why
      * it exists: without it the native arm asserted demo_answer() against the
      * target's own libz, which no host object could ever export. It read as
@@ -381,6 +419,52 @@ done < "$REPO_DIR/scripts/common/rootfs-images.txt"
 [ "$n_t" -gt 0 ] || { printf 'no rootfs fetched\n'; exit 2; }
 printf '\n'
 
+# ---------------------------------------------------------------------------
+# Time to first symbol, on one glibc row, subject against the host's own ld.so.
+#
+# ⚠ solo IS NOT AN ARM HERE and cannot be: docs/research/solo.md records three
+# build attempts on this machine, all failed, so nothing in this tree has ever
+# executed it. ld.so is a better reference anyway -- it is the implementation
+# this loader has to be worth replacing.
+# ---------------------------------------------------------------------------
+printf -- '-- time to first symbol --------------------------------------\n'
+BENCH_ROOT=$(exp_rootfs debian-12)
+bench_line=""
+if [ -n "$BENCH_ROOT" ] && [ -f "$BENCH_ROOT/lib/x86_64-linux-gnu/libz.so.1" ]; then
+  cp "$WORK/host-loader" "$BENCH_ROOT/host-loader" 2>/dev/null
+  ours=$("$PGB" rootfs run "$BENCH_ROOT" -- /host-loader --bench \
+         /lib/x86_64-linux-gnu/libz.so.1 zlibVersion \
+         /lib/x86_64-linux-gnu/libbz2.so.1 BZ2_bzlibVersion 2>/dev/null \
+         | awk '/^BENCH/ {printf "%s=%s ", $2, $3}')
+  rm -f "$BENCH_ROOT/host-loader"
+  if [ -f "$WORK/host-plain" ]; then
+    cp "$WORK/host-plain" "$BENCH_ROOT/host-plain" 2>/dev/null
+    ctl=$("$PGB" rootfs run "$BENCH_ROOT" -- /host-plain --bench \
+          /lib/x86_64-linux-gnu/libz.so.1 zlibVersion \
+          /lib/x86_64-linux-gnu/libbz2.so.1 BZ2_bzlibVersion 2>/dev/null \
+          | awk '/^BENCH/ {printf "%s=%s ", $2, $3}')
+    rm -f "$BENCH_ROOT/host-plain"
+  else
+    ctl="not-built"
+  fi
+  printf '  ours (compiled-in loader) : %s\n' "${ours:-no reading}"
+  printf '  control (host ld.so)      : %s\n' "${ctl:-no reading}"
+  bench_line=$(printf 'time to first symbol, debian-12, ns -- ONE SAMPLE EACH\n  ours    %s\n  ld.so   %s\n%s' \
+               "${ours:-no reading}" "${ctl:-no reading}" \
+'  ⚠ one sample, and ours second > ours first in at least one run, so the
+  per-load figures are at this instrument noise floor and must not be
+  quoted as a difference. What IS outside the noise is the FIRST column:
+  the control has to bring in the host ld.so and libc.so.6 before it can
+  load anything, and that is the cost --host-dlopen removes.')
+else
+  exp_note "debian-12 is not fetched; the timing arm did not run"
+fi
+printf '\n'
+
+# ⚠ Recorded, NOT asserted. A wall-clock figure from one machine on one day is
+# not a threshold anything should fail on, and docs/AGENTS.md §10 already says
+# what this instrument's noise floor does to small differences.
+
 printf -- '-- assertions ------------------------------------------------\n'
 exp_check "carried: nine assertions pass, every environment" "$n_carried" "$n_t"
 exp_check "carried: loaded no host shared object, every environment" "$n_clean" "$n_t"
@@ -406,6 +490,7 @@ printf '\n'
   printf 'native   = dlopen a shared object already present on the target.\n'
   printf '           Refused by design on musl: it needs musl.\n'
   printf 'control  = the same source with no --host-dlopen. Reaches ld.so.\n'
+  printf '\n%s\n' "$bench_line"
 } >> "$RESULT"
 
 printf 'full table: %s\n' "$RESULT"
