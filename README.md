@@ -12,9 +12,9 @@ is going: `pgb build <url-or-package>`, with the tool resolving the source,
 planning the dependencies and linking statically as far as each one allows.
 
 ```sh
-sh pgb env create             # a pinned Debian 12 build environment
-sh pgb build -- make          # your project's own build, unmodified
-sh pgb verify ./yourprogram   # run it on 11 real distributions
+./pgb env create             # a pinned Debian 12 build environment
+./pgb build -- make          # your project's own build, unmodified
+./pgb verify ./yourprogram   # run it on 11 real distributions
 ```
 
 ---
@@ -51,7 +51,7 @@ Four mechanisms, none of which changes a line of application source:
 | **own plugins** | opt-in `--wrap-dlopen`: `dlopen`, `dlsym`, `dlclose` and `dlerror` answered from a table `pgb` generates with `nm` from the objects your build produced. A program loading its *own* plugins never needed a loader — the code is already in the link and `dlopen` is only doing a name lookup. Nothing is mapped, so no second libc can enter. ⚠ Not for **host** plugins; see the limitations. |
 
 Delivery is compiler wrappers on `PATH`. autotools, CMake, meson and plain
-make pick them up without knowing `pgb` exists. `sh pgb explain` prints every
+make pick them up without knowing `pgb` exists. `pgb explain` prints every
 injected flag and the experiment behind it.
 
 ## Evidence
@@ -137,7 +137,7 @@ and then disproved: [`docs/limitations.md`](docs/limitations.md) and
 
 root and `CAP_SYS_ADMIN` (the test bed is `unshare --mount` + `chroot`, because
 this was developed on a machine with no container daemon), plus `curl`,
-`python3`, `strace` and a C toolchain. `sh pgb doctor` reports what is missing.
+`python3`, `strace` and a C toolchain. `pgb doctor` reports what is missing.
 Docker and Podman engines exist in the tool and are **untested**.
 
 ## Licence

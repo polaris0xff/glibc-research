@@ -61,9 +61,10 @@ runtime sources and nothing else now.
 
 ⭐ **Gates 1, 2, 3, 4 and 6 are met with output**, and requirement 2's second
 half with them: pgb built by pgb inside the pinned environment is
-byte-identical to the host build. Gate 5 is nine POCs and eighteen
-experiments; the rows are in the evidence file and the rest are named under
-"In progress".
+byte-identical to the host build. ⭐ **Gate 5 is now TEN of ten POCs and
+twenty-two experiments** — `poc/91-qt-xcb` and `experiments/86-` landed in the
+session of 2026-09-02b. The rows are in the evidence file; the one still
+missing is named under "In progress".
 
 ### 2. The eight defects the port found, in code that had been trusted
 

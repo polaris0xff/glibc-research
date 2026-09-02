@@ -142,7 +142,7 @@ a plain static toolchain first and made portable by `pgb` second.
 Split before starting: spec resolution (URL or package name → source tree),
 build-system detection, and the dependency planner are separate.
 
-**Prove.** `sh pgb build <a git URL>` produces a binary that `pgb verify`
+**Prove.** `pgb build <a git URL>` produces a binary that `pgb verify`
 passes on 11 of 11, with no other input from the operator.
 
 ## T-013 — Measure developer friction
@@ -339,7 +339,7 @@ bed that starts exporting `LANG` changes what every locale-sensitive result
 describes, so the change lands with the affected experiments re-run, or it
 lands behind a flag.
 
-**Prove.** `sh pgb verify --engine chroot` and `--engine docker` on the same
+**Prove.** `pgb verify --engine chroot` and `--engine docker` on the same
 binary produce the same HOST DATA column on all eleven rows, and
 `experiments/30-gconv-and-locale.sh` is re-run and its result compared before
 and after.

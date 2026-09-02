@@ -102,12 +102,14 @@ is no longer a comparison against bundles but *a static glibc binary with none
 of the issues*, and the issues are an enumerated list of nine, six closed and
 three open. `history/corrections.md` C13.
 
-The tool is [`../pgb`](../pgb) (portable glibc build): a POSIX-sh driver plus
-four small C runtime pieces. Output is an ordinary statically linked
-executable. No launcher, no AppDir, no loader, nothing beside it.
+The tool is [`../pgb`](../pgb) (portable glibc build): ⭐ **one statically
+linked Go binary**, built `CGO_ENABLED=0`, carrying the four small C runtime
+pieces it compiles. ⚠ It is a BUILD PRODUCT and is not committed — run `make`.
+Output is an ordinary statically linked executable. No launcher, no AppDir, no
+loader, nothing beside it.
 
 **The answer reached: yes, for programs that do not need to load host
-plugins.** ⭐ **Nine real projects prove it, and the largest is Qt 6** — a
+plugins.** ⭐ **Ten real projects prove it, and the largest is Qt 6** — a
 static Qt 6.11.1 widget program runs on 11 of 11 with zero host shared
 objects, which is the rung `poc/80-mlt` named as untried and nobody had
 attempted. §7 has the open problems and the route to each.
@@ -201,7 +203,7 @@ are on by default; the last two are opt-in:
 meson and make pick them up unmodified. Each wrapper reads its own argv:
 `-c`/`-E`/`-S`/`-M` = compile; `-shared` = **passed through untouched**, which
 is what lets `./configure`'s shared-library probes still work; anything else =
-executable link. `sh pgb explain` prints every injected flag.
+executable link. `pgb explain` prints every injected flag.
 
 **Build environment:** pinned `debian:12` (glibc 2.36) by manifest digest,
 unpacked by `internal/ociimg` (`pgb rootfs pull`) and entered by `chroot`.
