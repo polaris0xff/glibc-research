@@ -1,0 +1,1527 @@
+/usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so	not-an-object	pgb-elfload: /usr/lib/gcc/x86_64-linux-gnu/13/libgcc_s.so is not an x86-64 ELF shared object
+/usr/lib/gcc/x86_64-linux-gnu/13/plugin/libcc1plugin.so.0.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/gcc/x86_64-linux-gnu/13/plugin/libcp1plugin.so.0.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libattach.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libawt.so	missing-dep	pgb-elfload: libawt.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libawt_headless.so	missing-dep	pgb-elfload: libawt.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libawt_xawt.so	missing-dep	pgb-elfload: libawt.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libdt_socket.so	undefined	pgb-elfload: libdt_socket.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libextnet.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libfontmanager.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libinstrument.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libj2gss.so	ok	
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libj2pcsc.so	ok	
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libj2pkcs11.so	ok	
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libjaas.so	ok	
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libjava.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libjavajpeg.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libjawt.so	missing-dep	pgb-elfload: libawt.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libjdwp.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libjimage.so	missing-dep	pgb-elfload: libjimage.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libjli.so	undefined	pgb-elfload: libjli.so: undefined symbol: __isoc23_sscanf@GLIBC_2.38
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libjsig.so	ok	
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libjsound.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libjsvml.so	ok	
+/usr/lib/jvm/java-21-openjdk-amd64/lib/liblcms.so	missing-dep	pgb-elfload: libawt.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/lible.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libmanagement.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libmanagement_agent.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libmanagement_ext.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libmlib_image.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libnet.so	missing-dep	pgb-elfload: libnet.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libnio.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libprefs.so	missing-dep	pgb-elfload: libprefs.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/librmi.so	missing-dep	pgb-elfload: librmi.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libsaproc.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libsctp.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libsplashscreen.so	missing-dep	pgb-elfload: libjava.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libsyslookup.so	other	pgb-elfload: libsyslookup.so: relocation names symbol 1 of 1
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libverify.so	missing-dep	pgb-elfload: libverify.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/libzip.so	missing-dep	pgb-elfload: libzip.so: cannot find libjvm.so
+/usr/lib/jvm/java-21-openjdk-amd64/lib/server/libjsig.so	ok	
+/usr/lib/jvm/java-21-openjdk-amd64/lib/server/libjvm.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libLanguageToollo.so	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libacclo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libaffine_uno_uno.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libavmediagst.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/libreoffice/program/libbiblo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libbinaryurplo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libbootstraplo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libcached1.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libcairocanvaslo.so	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/libreoffice/program/libchartcontrollerlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libchartcorelo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libclewlo.so	ok	
+/usr/lib/libreoffice/program/libcmdmaillo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libcollator_data.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libcuilo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libdeploymentgui.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libdesktop_detectorlo.so	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/libreoffice/program/libdict_ja.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libdict_zh.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libdlgprovlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libembobj.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libemboleobj.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libfilelo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libgcc3_uno.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libi18nlangtag.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libicglo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libindex_data.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libintrospectionlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libinvocadaptlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libinvocationlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libiolo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libjavaloaderlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libjavavmlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libjvmaccesslo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libjvmfwklo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libldapbe2lo.so	undefined	pgb-elfload: liblber.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/libreoffice/program/liblocaledata_en.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/liblocaledata_es.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/liblocaledata_euro.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/liblocaledata_others.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/liblog_uno_uno.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libloglo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libmergedlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libmigrationoo2lo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libmigrationoo3lo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libmozbootstraplo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libmsformslo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libnamingservicelo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libooxlo.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/libreoffice/program/libpcrlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libpdffilterlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libpdfimportlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libpdfiumlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libprotocolhandlerlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libproxyfaclo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libpythonloaderlo.so	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/libreoffice/program/libpyuno.so	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/libreoffice/program/libreflectionlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libreglo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libsal_textenclo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libscnlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libscriptframe.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libsdbtlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libskialo.so	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/libreoffice/program/libstaroffice-0.0-lo.so.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libstocserviceslo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libstoragefdlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libstorelo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libtextconv_dict.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libtextconversiondlgslo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libucpchelp1.so	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/libreoffice/program/libucpcmis1lo.so	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libucpdav1.so	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libucppkg1.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libuno_cppu.so.3	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libuno_cppuhelpergcc3.so.3	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libuno_purpenvhelpergcc3.so.3	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libuno_sal.so.3	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libuno_salhelpergcc3.so.3	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libunoidllo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libunopkgapp.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libunsafe_uno_uno.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libuuresolverlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libvclplug_genlo.so	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/libreoffice/program/libwriterperfectlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libxmlreaderlo.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libxmlsecurity.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/libreoffice/program/libxsec_xmlsec.so	undefined	pgb-elfload: libgpg-error.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/libreoffice/program/pyuno.so	ok	
+/usr/lib/libreoffice/share/numbertext/Roman.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/Roman.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/Suzhou.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/Suzhou.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/af.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/af.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/bg.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/bg.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/ca.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/ca.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/cs.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/cs.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/da.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/da.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/de.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/de.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/el.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/el.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/en.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/en.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/eo.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/eo.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/es.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/es.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/et.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/et.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/fa.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/fa.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/fi.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/fi.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/fr.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/fr.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/ga.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/ga.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/gl.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/gl.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/he.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/he.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/hr.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/hr.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/hu.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/hu.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/hu_Hung.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/hu_Hung.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/id.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/id.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/is.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/is.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/it.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/it.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/ja.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/ja.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/ko.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/ko.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/lb.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/lb.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/lg.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/lg.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/lt.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/lt.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/lv.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/lv.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/mr.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/mr.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/ms.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/ms.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/mt.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/mt.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/nl.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/nl.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/no.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/no.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/pl.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/pl.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/pt.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/pt.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/ro.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/ro.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/ru.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/ru.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/sh.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/sh.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/sl.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/sl.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/sq.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/sq.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/sr.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/sr.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/sv.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/sv.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/th.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/th.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/tr.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/tr.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/uk.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/uk.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/vi.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/vi.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/numbertext/zh.sor	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/numbertext/zh.sor is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/arrowhd.soe	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/arrowhd.soe is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/chart-palettes.soc	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/chart-palettes.soc is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/classic.sog	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/classic.sog is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/compatibility.soc	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/compatibility.soc is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/freecolour-hlc.soc	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/freecolour-hlc.soc is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/hatching.soh	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/hatching.soh is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/html.soc	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/html.soc is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/libreoffice.soc	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/libreoffice.soc is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/material.soc	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/material.soc is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/modern.sog	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/modern.sog is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/standard.sob	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/standard.sob is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/standard.soc	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/standard.soc is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/standard.sod	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/standard.sod is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/standard.soe	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/standard.soe is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/standard.sog	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/standard.sog is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/standard.soh	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/standard.soh is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/standard.sop	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/standard.sop is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/styles.sod	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/styles.sod is not an x86-64 ELF shared object
+/usr/lib/libreoffice/share/palette/tonal.soc	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/tonal.soc is not an x86-64 ELF shared object
+/usr/lib/llvm-18/lib/LLVMPolly.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/llvm-18/lib/LLVMgold.so	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/llvm-18/lib/libLLVM.so.1	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/llvm-18/lib/libLTO.so.18.1	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/llvm-18/lib/libclang-cpp.so.18.1	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/llvm-18/lib/liblldbIntelFeatures.so.18.1	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/php/20240924/calendar.so	undefined	pgb-elfload: calendar.so: undefined symbol: add_assoc_zval_ex
+/usr/lib/php/20240924/ctype.so	undefined	pgb-elfload: ctype.so: undefined symbol: zend_zval_type_name
+/usr/lib/php/20240924/curl.so	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/php/20240924/dom.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/php/20240924/exif.so	undefined	pgb-elfload: exif.so: undefined symbol: php_stream_stdio_ops
+/usr/lib/php/20240924/ffi.so	undefined	pgb-elfload: ffi.so: undefined symbol: OnUpdateString
+/usr/lib/php/20240924/fileinfo.so	undefined	pgb-elfload: fileinfo.so: undefined symbol: file_globals
+/usr/lib/php/20240924/ftp.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/php/20240924/gd.so	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/php/20240924/gettext.so	undefined	pgb-elfload: gettext.so: undefined symbol: php_info_print_table_row
+/usr/lib/php/20240924/iconv.so	undefined	pgb-elfload: iconv.so: undefined symbol: zend_known_strings
+/usr/lib/php/20240924/igbinary.so	undefined	pgb-elfload: igbinary.so: undefined symbol: OnUpdateBool
+/usr/lib/php/20240924/intl.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/php/20240924/mbstring.so	undefined	pgb-elfload: mbstring.so: undefined symbol: zend_ini_boolean_displayer_cb
+/usr/lib/php/20240924/mysqli.so	undefined	pgb-elfload: mysqli.so: undefined symbol: OnUpdateLong
+/usr/lib/php/20240924/mysqlnd.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/php/20240924/opcache.so	undefined	pgb-elfload: opcache.so: undefined symbol: zend_ini_boolean_displayer_cb
+/usr/lib/php/20240924/pdo.so	undefined	pgb-elfload: pdo.so: undefined symbol: zend_ce_exception
+/usr/lib/php/20240924/pdo_mysql.so	undefined	pgb-elfload: pdo_mysql.so: undefined symbol: OnUpdateStringUnempty
+/usr/lib/php/20240924/pdo_pgsql.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/php/20240924/pdo_sqlite.so	undefined	pgb-elfload: pdo_sqlite.so: undefined symbol: zend_known_strings
+/usr/lib/php/20240924/pgsql.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/php/20240924/phar.so	undefined	pgb-elfload: phar.so: undefined symbol: zend_ini_boolean_displayer_cb
+/usr/lib/php/20240924/posix.so	undefined	pgb-elfload: posix.so: undefined symbol: _php_stream_cast
+/usr/lib/php/20240924/readline.so	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/php/20240924/redis.so	undefined	pgb-elfload: redis.so: undefined symbol: sapi_module
+/usr/lib/php/20240924/shmop.so	undefined	pgb-elfload: shmop.so: undefined symbol: compiler_globals
+/usr/lib/php/20240924/simplexml.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/php/20240924/sockets.so	undefined	pgb-elfload: sockets.so: undefined symbol: file_globals
+/usr/lib/php/20240924/sqlite3.so	undefined	pgb-elfload: sqlite3.so: undefined symbol: OnUpdateString
+/usr/lib/php/20240924/sysvmsg.so	undefined	pgb-elfload: sysvmsg.so: undefined symbol: zend_objects_not_comparable
+/usr/lib/php/20240924/sysvsem.so	undefined	pgb-elfload: sysvsem.so: undefined symbol: zend_objects_not_comparable
+/usr/lib/php/20240924/sysvshm.so	undefined	pgb-elfload: sysvshm.so: undefined symbol: zend_objects_not_comparable
+/usr/lib/php/20240924/tokenizer.so	undefined	pgb-elfload: tokenizer.so: undefined symbol: compiler_globals
+/usr/lib/php/20240924/xml.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/php/20240924/xmlreader.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/php/20240924/xmlwriter.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/php/20240924/xsl.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/php/20240924/zip.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/postgresql/16/lib/_int.so	undefined	pgb-elfload: _int.so: undefined symbol: pg_number_of_ones
+/usr/lib/postgresql/16/lib/adminpack.so	undefined	pgb-elfload: adminpack.so: undefined symbol: Log_directory
+/usr/lib/postgresql/16/lib/amcheck.so	undefined	pgb-elfload: amcheck.so: undefined symbol: LocalBufferBlockPointers
+/usr/lib/postgresql/16/lib/auth_delay.so	undefined	pgb-elfload: auth_delay.so: undefined symbol: ClientAuthentication_hook
+/usr/lib/postgresql/16/lib/auto_explain.so	undefined	pgb-elfload: auto_explain.so: undefined symbol: error_context_stack
+/usr/lib/postgresql/16/lib/autoinc.so	undefined	pgb-elfload: autoinc.so: undefined symbol: nextval
+/usr/lib/postgresql/16/lib/basebackup_to_shell.so	undefined	pgb-elfload: basebackup_to_shell.so: undefined symbol: bbsink_forward_begin_backup
+/usr/lib/postgresql/16/lib/basic_archive.so	undefined	pgb-elfload: basic_archive.so: undefined symbol: error_context_stack
+/usr/lib/postgresql/16/lib/bloom.so	undefined	pgb-elfload: bloom.so: undefined symbol: old_snapshot_threshold
+/usr/lib/postgresql/16/lib/btree_gin.so	undefined	pgb-elfload: btree_gin.so: undefined symbol: btfloat4cmp
+/usr/lib/postgresql/16/lib/btree_gist.so	undefined	pgb-elfload: btree_gist.so: undefined symbol: interval_lt
+/usr/lib/postgresql/16/lib/citext.so	undefined	pgb-elfload: citext.so: undefined symbol: pg_detoast_datum_packed
+/usr/lib/postgresql/16/lib/cube.so	undefined	pgb-elfload: cube.so: undefined symbol: palloc0
+/usr/lib/postgresql/16/lib/cyrillic_and_mic.so	undefined	pgb-elfload: cyrillic_and_mic.so: undefined symbol: mic2latin
+/usr/lib/postgresql/16/lib/dblink.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/postgresql/16/lib/dict_int.so	undefined	pgb-elfload: dict_int.so: undefined symbol: palloc0
+/usr/lib/postgresql/16/lib/dict_snowball.so	undefined	pgb-elfload: dict_snowball.so: undefined symbol: CurrentMemoryContext
+/usr/lib/postgresql/16/lib/dict_xsyn.so	undefined	pgb-elfload: dict_xsyn.so: undefined symbol: palloc0
+/usr/lib/postgresql/16/lib/earthdistance.so	ok	
+/usr/lib/postgresql/16/lib/euc2004_sjis2004.so	undefined	pgb-elfload: euc2004_sjis2004.so: undefined symbol: pg_encoding_verifymbchar
+/usr/lib/postgresql/16/lib/euc_cn_and_mic.so	undefined	pgb-elfload: euc_cn_and_mic.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/euc_jp_and_sjis.so	undefined	pgb-elfload: euc_jp_and_sjis.so: undefined symbol: pg_encoding_verifymbchar
+/usr/lib/postgresql/16/lib/euc_kr_and_mic.so	undefined	pgb-elfload: euc_kr_and_mic.so: undefined symbol: pg_encoding_verifymbchar
+/usr/lib/postgresql/16/lib/euc_tw_and_big5.so	undefined	pgb-elfload: euc_tw_and_big5.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/file_fdw.so	undefined	pgb-elfload: file_fdw.so: undefined symbol: error_context_stack
+/usr/lib/postgresql/16/lib/fuzzystrmatch.so	undefined	pgb-elfload: fuzzystrmatch.so: undefined symbol: CurrentMemoryContext
+/usr/lib/postgresql/16/lib/hstore.so	undefined	pgb-elfload: hstore.so: undefined symbol: CurrentMemoryContext
+/usr/lib/postgresql/16/lib/insert_username.so	undefined	pgb-elfload: insert_username.so: undefined symbol: GetUserNameFromId
+/usr/lib/postgresql/16/lib/isn.so	undefined	pgb-elfload: isn.so: undefined symbol: errsave_finish
+/usr/lib/postgresql/16/lib/latin2_and_win1250.so	undefined	pgb-elfload: latin2_and_win1250.so: undefined symbol: mic2latin
+/usr/lib/postgresql/16/lib/latin_and_mic.so	undefined	pgb-elfload: latin_and_mic.so: undefined symbol: mic2latin
+/usr/lib/postgresql/16/lib/libpqwalreceiver.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/postgresql/16/lib/llvmjit.so	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/postgresql/16/lib/lo.so	undefined	pgb-elfload: lo.so: undefined symbol: be_lo_unlink
+/usr/lib/postgresql/16/lib/ltree.so	undefined	pgb-elfload: ltree.so: undefined symbol: pg_number_of_ones
+/usr/lib/postgresql/16/lib/moddatetime.so	undefined	pgb-elfload: moddatetime.so: undefined symbol: timestamp_in
+/usr/lib/postgresql/16/lib/old_snapshot.so	undefined	pgb-elfload: old_snapshot.so: undefined symbol: old_snapshot_threshold
+/usr/lib/postgresql/16/lib/pageinspect.so	undefined	pgb-elfload: pageinspect.so: undefined symbol: LocalBufferBlockPointers
+/usr/lib/postgresql/16/lib/passwordcheck.so	undefined	pgb-elfload: passwordcheck.so: undefined symbol: check_password_hook
+/usr/lib/postgresql/16/lib/pg_buffercache.so	undefined	pgb-elfload: pg_buffercache.so: undefined symbol: CurrentMemoryContext
+/usr/lib/postgresql/16/lib/pg_freespacemap.so	undefined	pgb-elfload: pg_freespacemap.so: undefined symbol: errmsg
+/usr/lib/postgresql/16/lib/pg_prewarm.so	undefined	pgb-elfload: pg_prewarm.so: undefined symbol: procsignal_sigusr1_handler
+/usr/lib/postgresql/16/lib/pg_stat_statements.so	undefined	pgb-elfload: pg_stat_statements.so: undefined symbol: post_parse_analyze_hook
+/usr/lib/postgresql/16/lib/pg_surgery.so	undefined	pgb-elfload: pg_surgery.so: undefined symbol: LocalBufferBlockPointers
+/usr/lib/postgresql/16/lib/pg_trgm.so	undefined	pgb-elfload: pg_trgm.so: undefined symbol: pg_number_of_ones
+/usr/lib/postgresql/16/lib/pg_visibility.so	undefined	pgb-elfload: pg_visibility.so: undefined symbol: LocalBufferBlockPointers
+/usr/lib/postgresql/16/lib/pg_walinspect.so	undefined	pgb-elfload: pg_walinspect.so: undefined symbol: read_local_xlog_page_no_wait
+/usr/lib/postgresql/16/lib/pgcrypto.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/postgresql/16/lib/pgoutput.so	undefined	pgb-elfload: pgoutput.so: undefined symbol: CurrentMemoryContext
+/usr/lib/postgresql/16/lib/pgrowlocks.so	undefined	pgb-elfload: pgrowlocks.so: undefined symbol: tidout
+/usr/lib/postgresql/16/lib/pgstattuple.so	undefined	pgb-elfload: pgstattuple.so: undefined symbol: LocalBufferBlockPointers
+/usr/lib/postgresql/16/lib/pgxml.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/postgresql/16/lib/plpgsql.so	undefined	pgb-elfload: plpgsql.so: undefined symbol: error_context_stack
+/usr/lib/postgresql/16/lib/postgres_fdw.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/postgresql/16/lib/refint.so	undefined	pgb-elfload: refint.so: undefined symbol: SPI_result
+/usr/lib/postgresql/16/lib/seg.so	undefined	pgb-elfload: seg.so: undefined symbol: errmsg_internal
+/usr/lib/postgresql/16/lib/sepgsql.so	undefined	pgb-elfload: libselinux.so.1: undefined symbol: __isoc23_sscanf@GLIBC_2.38
+/usr/lib/postgresql/16/lib/sslinfo.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/postgresql/16/lib/tablefunc.so	undefined	pgb-elfload: tablefunc.so: undefined symbol: SPI_processed
+/usr/lib/postgresql/16/lib/tcn.so	undefined	pgb-elfload: tcn.so: undefined symbol: SPI_getvalue
+/usr/lib/postgresql/16/lib/test_decoding.so	undefined	pgb-elfload: test_decoding.so: undefined symbol: CurrentMemoryContext
+/usr/lib/postgresql/16/lib/tsm_system_rows.so	undefined	pgb-elfload: tsm_system_rows.so: undefined symbol: CurrentMemoryContext
+/usr/lib/postgresql/16/lib/tsm_system_time.so	undefined	pgb-elfload: tsm_system_time.so: undefined symbol: CurrentMemoryContext
+/usr/lib/postgresql/16/lib/unaccent.so	undefined	pgb-elfload: unaccent.so: undefined symbol: error_context_stack
+/usr/lib/postgresql/16/lib/utf8_and_big5.so	undefined	pgb-elfload: utf8_and_big5.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_cyrillic.so	undefined	pgb-elfload: utf8_and_cyrillic.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_euc2004.so	undefined	pgb-elfload: utf8_and_euc2004.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_euc_cn.so	undefined	pgb-elfload: utf8_and_euc_cn.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_euc_jp.so	undefined	pgb-elfload: utf8_and_euc_jp.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_euc_kr.so	undefined	pgb-elfload: utf8_and_euc_kr.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_euc_tw.so	undefined	pgb-elfload: utf8_and_euc_tw.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_gb18030.so	undefined	pgb-elfload: utf8_and_gb18030.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_gbk.so	undefined	pgb-elfload: utf8_and_gbk.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_iso8859.so	undefined	pgb-elfload: utf8_and_iso8859.so: undefined symbol: errmsg
+/usr/lib/postgresql/16/lib/utf8_and_iso8859_1.so	undefined	pgb-elfload: utf8_and_iso8859_1.so: undefined symbol: pg_utf_mblen
+/usr/lib/postgresql/16/lib/utf8_and_johab.so	undefined	pgb-elfload: utf8_and_johab.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_sjis.so	undefined	pgb-elfload: utf8_and_sjis.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_sjis2004.so	undefined	pgb-elfload: utf8_and_sjis2004.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_uhc.so	undefined	pgb-elfload: utf8_and_uhc.so: undefined symbol: check_encoding_conversion_args
+/usr/lib/postgresql/16/lib/utf8_and_win.so	undefined	pgb-elfload: utf8_and_win.so: undefined symbol: errmsg
+/usr/lib/postgresql/16/lib/uuid-ossp.so	undefined	pgb-elfload: libuuid.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3.10/lib-dynload/_asyncio.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _asyncio.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_KeyboardInterrupt
+/usr/lib/python3.10/lib-dynload/_bz2.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _bz2.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3.10/lib-dynload/_codecs_cn.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_cn.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.10/lib-dynload/_codecs_hk.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_hk.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.10/lib-dynload/_codecs_iso2022.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_iso2022.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.10/lib-dynload/_codecs_jp.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_jp.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.10/lib-dynload/_codecs_kr.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_kr.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.10/lib-dynload/_codecs_tw.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_tw.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.10/lib-dynload/_contextvars.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _contextvars.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyContextVar_Type
+/usr/lib/python3.10/lib-dynload/_crypt.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _crypt.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.10/lib-dynload/_ctypes.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _ctypes.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyTuple_Type
+/usr/lib/python3.10/lib-dynload/_ctypes_test.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _ctypes_test.cpython-310-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.10/lib-dynload/_curses.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _curses.cpython-310-x86_64-linux-gnu.so: undefined symbol: _PyRuntime
+/usr/lib/python3.10/lib-dynload/_curses_panel.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _curses_panel.cpython-310-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.10/lib-dynload/_dbm.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: libdb-5.3.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3.10/lib-dynload/_decimal.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _decimal.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.10/lib-dynload/_hashlib.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.10/lib-dynload/_json.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _json.cpython-310-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.10/lib-dynload/_lsprof.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _lsprof.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyModule_Type
+/usr/lib/python3.10/lib-dynload/_lzma.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _lzma.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_MemoryError
+/usr/lib/python3.10/lib-dynload/_multibytecodec.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _multibytecodec.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_RuntimeError
+/usr/lib/python3.10/lib-dynload/_multiprocessing.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _multiprocessing.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.10/lib-dynload/_opcode.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _opcode.cpython-310-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.10/lib-dynload/_posixshmem.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _posixshmem.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_OSError
+/usr/lib/python3.10/lib-dynload/_queue.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _queue.cpython-310-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.10/lib-dynload/_sqlite3.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _sqlite3.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.10/lib-dynload/_ssl.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.10/lib-dynload/_testbuffer.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _testbuffer.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.10/lib-dynload/_testcapi.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _testcapi.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3.10/lib-dynload/_testclinic.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _testclinic.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.10/lib-dynload/_testimportmultiple.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _testimportmultiple.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyModule_Create2
+/usr/lib/python3.10/lib-dynload/_testinternalcapi.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _testinternalcapi.cpython-310-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.10/lib-dynload/_testmultiphase.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _testmultiphase.cpython-310-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.10/lib-dynload/_uuid.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: libuuid.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3.10/lib-dynload/_xxsubinterpreters.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _xxsubinterpreters.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyMem_Free
+/usr/lib/python3.10/lib-dynload/_xxtestfuzz.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _xxtestfuzz.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_RecursionError
+/usr/lib/python3.10/lib-dynload/_zoneinfo.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: _zoneinfo.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyTuple_Type
+/usr/lib/python3.10/lib-dynload/audioop.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: audioop.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.10/lib-dynload/mmap.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: mmap.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_BufferError
+/usr/lib/python3.10/lib-dynload/ossaudiodev.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: ossaudiodev.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.10/lib-dynload/readline.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: libreadline.so.8: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.10/lib-dynload/resource.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: resource.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.10/lib-dynload/termios.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: termios.cpython-310-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.10/lib-dynload/xxlimited.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: xxlimited.cpython-310-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.10/lib-dynload/xxlimited_35.cpython-310-x86_64-linux-gnu.so	undefined	pgb-elfload: xxlimited_35.cpython-310-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.11/lib-dynload/_asyncio.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _asyncio.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_KeyboardInterrupt
+/usr/lib/python3.11/lib-dynload/_bz2.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _bz2.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3.11/lib-dynload/_codecs_cn.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_cn.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.11/lib-dynload/_codecs_hk.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_hk.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.11/lib-dynload/_codecs_iso2022.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_iso2022.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.11/lib-dynload/_codecs_jp.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_jp.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.11/lib-dynload/_codecs_kr.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_kr.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.11/lib-dynload/_codecs_tw.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_tw.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.11/lib-dynload/_contextvars.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _contextvars.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyContextVar_Type
+/usr/lib/python3.11/lib-dynload/_crypt.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _crypt.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.11/lib-dynload/_ctypes.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _ctypes.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyTuple_Type
+/usr/lib/python3.11/lib-dynload/_ctypes_test.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _ctypes_test.cpython-311-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.11/lib-dynload/_curses.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _curses.cpython-311-x86_64-linux-gnu.so: undefined symbol: _PyRuntime
+/usr/lib/python3.11/lib-dynload/_curses_panel.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _curses_panel.cpython-311-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.11/lib-dynload/_dbm.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: libdb-5.3.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3.11/lib-dynload/_decimal.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _decimal.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.11/lib-dynload/_hashlib.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.11/lib-dynload/_json.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _json.cpython-311-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.11/lib-dynload/_lsprof.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _lsprof.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyModule_Type
+/usr/lib/python3.11/lib-dynload/_lzma.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _lzma.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_MemoryError
+/usr/lib/python3.11/lib-dynload/_multibytecodec.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _multibytecodec.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_RuntimeError
+/usr/lib/python3.11/lib-dynload/_multiprocessing.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _multiprocessing.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.11/lib-dynload/_posixshmem.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _posixshmem.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.11/lib-dynload/_queue.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _queue.cpython-311-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.11/lib-dynload/_sqlite3.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _sqlite3.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.11/lib-dynload/_ssl.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.11/lib-dynload/_testbuffer.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _testbuffer.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.11/lib-dynload/_testcapi.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _testcapi.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3.11/lib-dynload/_testclinic.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _testclinic.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.11/lib-dynload/_testimportmultiple.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _testimportmultiple.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyModule_Create2
+/usr/lib/python3.11/lib-dynload/_testinternalcapi.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _testinternalcapi.cpython-311-x86_64-linux-gnu.so: undefined symbol: _PyRuntime
+/usr/lib/python3.11/lib-dynload/_testmultiphase.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _testmultiphase.cpython-311-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.11/lib-dynload/_typing.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _typing.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyModuleDef_Init
+/usr/lib/python3.11/lib-dynload/_uuid.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: libuuid.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3.11/lib-dynload/_xxsubinterpreters.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _xxsubinterpreters.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyMem_Free
+/usr/lib/python3.11/lib-dynload/_xxtestfuzz.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _xxtestfuzz.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_RecursionError
+/usr/lib/python3.11/lib-dynload/_zoneinfo.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: _zoneinfo.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyTuple_Type
+/usr/lib/python3.11/lib-dynload/audioop.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: audioop.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.11/lib-dynload/mmap.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: mmap.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_BufferError
+/usr/lib/python3.11/lib-dynload/ossaudiodev.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: ossaudiodev.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.11/lib-dynload/readline.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: libreadline.so.8: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.11/lib-dynload/resource.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: resource.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.11/lib-dynload/termios.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: termios.cpython-311-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.11/lib-dynload/xxlimited.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: xxlimited.cpython-311-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.11/lib-dynload/xxlimited_35.cpython-311-x86_64-linux-gnu.so	undefined	pgb-elfload: xxlimited_35.cpython-311-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.12/lib-dynload/_asyncio.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _asyncio.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyTraceBack_Type
+/usr/lib/python3.12/lib-dynload/_bz2.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _bz2.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3.12/lib-dynload/_codecs_cn.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_cn.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.12/lib-dynload/_codecs_hk.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_hk.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.12/lib-dynload/_codecs_iso2022.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_iso2022.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.12/lib-dynload/_codecs_jp.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_jp.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.12/lib-dynload/_codecs_kr.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_kr.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.12/lib-dynload/_codecs_tw.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_tw.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.12/lib-dynload/_contextvars.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _contextvars.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyContextVar_Type
+/usr/lib/python3.12/lib-dynload/_crypt.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _crypt.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.12/lib-dynload/_ctypes.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _ctypes.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyTuple_Type
+/usr/lib/python3.12/lib-dynload/_ctypes_test.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _ctypes_test.cpython-312-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.12/lib-dynload/_curses.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _curses.cpython-312-x86_64-linux-gnu.so: undefined symbol: _PyRuntime
+/usr/lib/python3.12/lib-dynload/_curses_panel.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _curses_panel.cpython-312-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.12/lib-dynload/_dbm.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: libdb-5.3.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3.12/lib-dynload/_decimal.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _decimal.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.12/lib-dynload/_hashlib.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.12/lib-dynload/_json.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _json.cpython-312-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.12/lib-dynload/_lsprof.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _lsprof.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyModule_Type
+/usr/lib/python3.12/lib-dynload/_lzma.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _lzma.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_MemoryError
+/usr/lib/python3.12/lib-dynload/_multibytecodec.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _multibytecodec.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_RuntimeError
+/usr/lib/python3.12/lib-dynload/_multiprocessing.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _multiprocessing.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_RuntimeError
+/usr/lib/python3.12/lib-dynload/_posixshmem.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _posixshmem.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.12/lib-dynload/_queue.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _queue.cpython-312-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.12/lib-dynload/_sqlite3.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _sqlite3.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.12/lib-dynload/_ssl.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.12/lib-dynload/_testbuffer.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _testbuffer.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.12/lib-dynload/_testcapi.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _testcapi.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3.12/lib-dynload/_testclinic.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _testclinic.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.12/lib-dynload/_testimportmultiple.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _testimportmultiple.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyModule_Create2
+/usr/lib/python3.12/lib-dynload/_testinternalcapi.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _testinternalcapi.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_NotImplementedError
+/usr/lib/python3.12/lib-dynload/_testmultiphase.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _testmultiphase.cpython-312-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.12/lib-dynload/_testsinglephase.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _testsinglephase.cpython-312-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.12/lib-dynload/_xxinterpchannels.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _xxinterpchannels.cpython-312-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.12/lib-dynload/_xxsubinterpreters.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _xxsubinterpreters.cpython-312-x86_64-linux-gnu.so: undefined symbol: _PyInterpreterID_Type
+/usr/lib/python3.12/lib-dynload/_xxtestfuzz.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _xxtestfuzz.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_RecursionError
+/usr/lib/python3.12/lib-dynload/_zoneinfo.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _zoneinfo.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyTuple_Type
+/usr/lib/python3.12/lib-dynload/audioop.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: audioop.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.12/lib-dynload/mmap.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: mmap.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_BufferError
+/usr/lib/python3.12/lib-dynload/ossaudiodev.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: ossaudiodev.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.12/lib-dynload/readline.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: libreadline.so.8: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.12/lib-dynload/resource.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: resource.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.12/lib-dynload/termios.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: termios.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.12/lib-dynload/xxlimited.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: xxlimited.cpython-312-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.12/lib-dynload/xxlimited_35.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: xxlimited_35.cpython-312-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.12/lib-dynload/xxsubtype.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: xxsubtype.cpython-312-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.13/lib-dynload/_asyncio.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _asyncio.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyTraceBack_Type
+/usr/lib/python3.13/lib-dynload/_bz2.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _bz2.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3.13/lib-dynload/_codecs_cn.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_cn.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.13/lib-dynload/_codecs_hk.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_hk.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.13/lib-dynload/_codecs_iso2022.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_iso2022.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.13/lib-dynload/_codecs_jp.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_jp.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.13/lib-dynload/_codecs_kr.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_kr.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.13/lib-dynload/_codecs_tw.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _codecs_tw.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.13/lib-dynload/_contextvars.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _contextvars.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyContextVar_Type
+/usr/lib/python3.13/lib-dynload/_ctypes.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _ctypes.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3.13/lib-dynload/_ctypes_test.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _ctypes_test.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyModuleDef_Init
+/usr/lib/python3.13/lib-dynload/_curses.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _curses.cpython-313-x86_64-linux-gnu.so: undefined symbol: _PyRuntime
+/usr/lib/python3.13/lib-dynload/_curses_panel.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _curses_panel.cpython-313-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.13/lib-dynload/_dbm.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: libdb-5.3.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3.13/lib-dynload/_decimal.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _decimal.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.13/lib-dynload/_hashlib.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.13/lib-dynload/_interpchannels.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _interpchannels.cpython-313-x86_64-linux-gnu.so: undefined symbol: _Py_NotImplementedStruct
+/usr/lib/python3.13/lib-dynload/_interpqueues.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _interpqueues.cpython-313-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.13/lib-dynload/_interpreters.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _interpreters.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_InterpreterError
+/usr/lib/python3.13/lib-dynload/_json.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _json.cpython-313-x86_64-linux-gnu.so: undefined symbol: _Py_TrueStruct
+/usr/lib/python3.13/lib-dynload/_lsprof.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _lsprof.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyModule_Type
+/usr/lib/python3.13/lib-dynload/_lzma.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _lzma.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_MemoryError
+/usr/lib/python3.13/lib-dynload/_multibytecodec.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _multibytecodec.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_RuntimeError
+/usr/lib/python3.13/lib-dynload/_multiprocessing.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _multiprocessing.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.13/lib-dynload/_posixshmem.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _posixshmem.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.13/lib-dynload/_queue.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _queue.cpython-313-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.13/lib-dynload/_sqlite3.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _sqlite3.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.13/lib-dynload/_ssl.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.13/lib-dynload/_testbuffer.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _testbuffer.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.13/lib-dynload/_testcapi.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _testcapi.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3.13/lib-dynload/_testclinic.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _testclinic.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyFloat_Type
+/usr/lib/python3.13/lib-dynload/_testclinic_limited.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _testclinic_limited.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.13/lib-dynload/_testexternalinspection.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _testexternalinspection.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_RuntimeError
+/usr/lib/python3.13/lib-dynload/_testimportmultiple.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _testimportmultiple.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyModuleDef_Init
+/usr/lib/python3.13/lib-dynload/_testinternalcapi.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _testinternalcapi.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_InterpreterError
+/usr/lib/python3.13/lib-dynload/_testlimitedcapi.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _testlimitedcapi.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3.13/lib-dynload/_testmultiphase.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _testmultiphase.cpython-313-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.13/lib-dynload/_testsinglephase.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _testsinglephase.cpython-313-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.13/lib-dynload/_uuid.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: libuuid.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3.13/lib-dynload/_xxtestfuzz.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _xxtestfuzz.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_RecursionError
+/usr/lib/python3.13/lib-dynload/_zoneinfo.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: _zoneinfo.cpython-313-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.13/lib-dynload/mmap.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: mmap.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_BufferError
+/usr/lib/python3.13/lib-dynload/readline.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: libreadline.so.8: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3.13/lib-dynload/resource.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: resource.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_ValueError
+/usr/lib/python3.13/lib-dynload/termios.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: termios.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyExc_TypeError
+/usr/lib/python3.13/lib-dynload/xxlimited.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: xxlimited.cpython-313-x86_64-linux-gnu.so: undefined symbol: PyUnicode_Type
+/usr/lib/python3.13/lib-dynload/xxlimited_35.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: xxlimited_35.cpython-313-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3.13/lib-dynload/xxsubtype.cpython-313-x86_64-linux-gnu.so	undefined	pgb-elfload: xxsubtype.cpython-313-x86_64-linux-gnu.so: undefined symbol: _Py_NoneStruct
+/usr/lib/python3/dist-packages/_cffi_backend.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _cffi_backend.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/python3/dist-packages/_dbus_bindings.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3/dist-packages/_dbus_glib_bindings.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3/dist-packages/apt_inst.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3/dist-packages/apt_pkg.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/python3/dist-packages/cryptography/hazmat/bindings/_rust.abi3.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/python3/dist-packages/gi/_gi.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/python3/dist-packages/yaml/_yaml.cpython-312-x86_64-linux-gnu.so	undefined	pgb-elfload: _yaml.cpython-312-x86_64-linux-gnu.so: undefined symbol: PyExc_SystemError
+/usr/lib/systemd/system/dbus.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/dbus.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/docker.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/docker.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/syslog.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/syslog.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-fsckd.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-fsckd.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-initctl.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-initctl.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-journald-audit.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-journald-audit.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-journald-dev-log.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-journald-dev-log.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-journald-varlink@.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-journald-varlink@.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-journald.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-journald.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-journald@.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-journald@.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-networkd.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-networkd.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-pcrextend.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-pcrextend.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-rfkill.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-rfkill.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/system/systemd-sysext.socket	not-an-object	pgb-elfload: /usr/lib/systemd/system/systemd-sysext.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/user/dbus.socket	not-an-object	pgb-elfload: /usr/lib/systemd/user/dbus.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/user/dirmngr.socket	not-an-object	pgb-elfload: /usr/lib/systemd/user/dirmngr.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/user/gpg-agent-browser.socket	not-an-object	pgb-elfload: /usr/lib/systemd/user/gpg-agent-browser.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/user/gpg-agent-extra.socket	not-an-object	pgb-elfload: /usr/lib/systemd/user/gpg-agent-extra.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/user/gpg-agent-ssh.socket	not-an-object	pgb-elfload: /usr/lib/systemd/user/gpg-agent-ssh.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/user/gpg-agent.socket	not-an-object	pgb-elfload: /usr/lib/systemd/user/gpg-agent.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/user/keyboxd.socket	not-an-object	pgb-elfload: /usr/lib/systemd/user/keyboxd.socket is not an x86-64 ELF shared object
+/usr/lib/systemd/user/pk-debconf-helper.socket	not-an-object	pgb-elfload: /usr/lib/systemd/user/pk-debconf-helper.socket is not an x86-64 ELF shared object
+/usr/lib/x86_64-linux-gnu/audit/sotruss-lib.so	undefined	pgb-elfload: sotruss-lib.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/bfd-plugins/libdep.so	undefined	pgb-elfload: libdep.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/cryptsetup/libcryptsetup-token-systemd-fido2.so	undefined	pgb-elfload: libacl.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/cryptsetup/libcryptsetup-token-systemd-pkcs11.so	undefined	pgb-elfload: libacl.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/cryptsetup/libcryptsetup-token-systemd-tpm2.so	undefined	pgb-elfload: libacl.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/dri/libdril_dri.so	undefined	pgb-elfload: libdrm.so.2: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/engines-3/afalg.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/engines-3/loader_attic.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/engines-3/padlock.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gbm/dri_gbm.so	undefined	pgb-elfload: libdrm.so.2: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gconv/ANSI_X3.110.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ARMSCII-8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ASMO_449.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/BIG5.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/BIG5HKSCS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/BRF.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP10007.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1125.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1250.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1251.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1252.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1253.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1254.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1255.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1256.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1257.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1258.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP737.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP770.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP771.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP772.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP773.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP774.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP775.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP932.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CSN_369103.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CWI.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/DEC-MCS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-AT-DE-A.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-AT-DE.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-CA-FR.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-DK-NO-A.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-DK-NO.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-ES-A.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-ES-S.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-ES.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-FI-SE-A.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-FI-SE.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-FR.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-IS-FRISS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-IT.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-PT.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-UK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-US.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ECMA-CYRILLIC.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-CN.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-JISX0213.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-JP-MS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-JP.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-KR.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-TW.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GB18030.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GBBIG5.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GBGBK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GBK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GEORGIAN-ACADEMY.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GEORGIAN-PS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GOST_19768-74.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GREEK-CCITT.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GREEK7-OLD.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GREEK7.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/HP-GREEK8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/HP-ROMAN8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/HP-ROMAN9.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/HP-THAI8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/HP-TURKISH8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM037.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM038.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1004.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1008.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1008_420.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1025.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1026.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1046.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1047.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1097.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1112.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1122.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1123.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1124.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1129.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1130.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1132.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1133.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1137.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1140.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1141.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1142.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1143.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1144.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1145.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1146.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1147.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1148.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1149.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1153.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1154.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1155.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1156.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1157.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1158.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1160.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1161.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1162.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1163.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1164.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1166.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1167.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM12712.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1364.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1371.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1388.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1390.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1399.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM16804.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM256.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM273.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM274.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM275.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM277.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM278.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM280.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM281.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM284.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM285.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM290.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM297.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM420.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM423.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM424.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM437.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM4517.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM4899.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM4909.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM4971.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM500.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM5347.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM803.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM850.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM851.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM852.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM855.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM856.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM857.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM858.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM860.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM861.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM862.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM863.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM864.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM865.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM866.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM866NAV.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM868.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM869.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM870.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM871.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM874.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM875.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM880.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM891.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM901.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM902.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM903.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM9030.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM904.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM905.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM9066.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM918.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM921.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM922.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM930.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM932.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM933.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM935.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM937.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM939.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM943.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM9448.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IEC_P27-1.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/INIS-8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/INIS-CYRILLIC.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/INIS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISIRI-3342.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-CN-EXT.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-CN.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-JP-3.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-JP.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-KR.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-IR-197.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-IR-209.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO646.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-10.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-11.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-13.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-14.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-15.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-16.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-2.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-3.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-4.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-5.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-6.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-7.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-9.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-9E.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_10367-BOX.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_11548-1.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_2033.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_5427-EXT.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_5427.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_5428.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_6937-2.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_6937.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/JOHAB.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/KOI-8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/KOI8-R.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/KOI8-RU.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/KOI8-T.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/KOI8-U.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/LATIN-GREEK-1.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/LATIN-GREEK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MAC-CENTRALEUROPE.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MAC-IS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MAC-SAMI.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MAC-UK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MACINTOSH.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MIK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/NATS-DANO.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/NATS-SEFI.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/PT154.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/RK1048.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/SAMI-WS2.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/SHIFT_JISX0213.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/SJIS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/T.61.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/TCVN5712-1.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/TIS-620.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/TSCII.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/UHC.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/UNICODE.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/UTF-16.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/UTF-32.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/UTF-7.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/VISCII.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/libCNS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/libGB.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/libISOIR165.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/libJIS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/libJISX0213.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/libKSC.so	ok	
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-ani.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-bmp.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-gif.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-icns.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-ico.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-pnm.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-qtif.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-tga.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-tiff.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-xbm.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-xpm.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gio/modules/libdconfsettings.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gprofng/libgp-collector.so	crash	
+/usr/lib/x86_64-linux-gnu/gprofng/libgp-collectorAPI.so	ok	
+/usr/lib/x86_64-linux-gnu/gprofng/libgp-heap.so	ok	
+/usr/lib/x86_64-linux-gnu/gprofng/libgp-iotrace.so	ok	
+/usr/lib/x86_64-linux-gnu/gprofng/libgp-sync.so	ok	
+/usr/lib/x86_64-linux-gnu/gstreamer-1.0/libgstcoreelements.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gstreamer-1.0/libgstcoretracers.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-am-et.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-broadway.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-cedilla.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-cyrillic-translit.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-inuktitut.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-ipa.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-multipress.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-thai.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-ti-er.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-ti-et.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-viqr.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-wayland.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/immodules/im-xim.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/printbackends/libprintbackend-cups.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/gtk-3.0/3.0.0/printbackends/libprintbackend-file.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/krb5/plugins/preauth/spake.so	undefined	pgb-elfload: libkrb5support.so.0: undefined symbol: strlcpy@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2	served-by-image	pgb-elfload: ld-linux-x86-64.so.2 is already served by this image's own static glibc; loading it would put a second libc in the process
+/usr/lib/x86_64-linux-gnu/libBrokenLocale.so.1	served-by-image	pgb-elfload: libBrokenLocale.so.1 is already served by this image's own static glibc; loading it would put a second libc in the process
+/usr/lib/x86_64-linux-gnu/libGL.so.1.7.0	undefined	pgb-elfload: libGLdispatch.so.0: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libGLX.so.0.0.0	undefined	pgb-elfload: libGLdispatch.so.0: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0	undefined	pgb-elfload: libdrm.so.2: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0	undefined	pgb-elfload: libGLdispatch.so.0: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libICE.so.6.3.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libLLVM-17.so.1	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libLerc.so.4	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libSM.so.6.0.1	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libSvtAv1Enc.so.1.7.0	ok	
+/usr/lib/x86_64-linux-gnu/libX11-xcb.so.1.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libX11.so.6.4.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXau.so.6.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libXaw7.so.7.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXcomposite.so.1.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXcursor.so.1.0.2	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXdamage.so.1.1.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXdmcp.so.6.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXext.so.6.4.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXfixes.so.3.1.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXfont2.so.2.0.0	undefined	pgb-elfload: libfontenc.so.1: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXi.so.6.1.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXinerama.so.1.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXmu.so.6.2.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXmuu.so.1.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXpm.so.4.11.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXrandr.so.2.2.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXrender.so.1.3.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXt.so.6.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXtst.so.6.1.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libXxf86vm.so.1.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libabsl_bad_any_cast_impl.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_bad_optional_access.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_bad_variant_access.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_base.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_city.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_civil_time.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_cord.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_cord_internal.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_cordz_functions.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_cordz_handle.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_cordz_info.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_cordz_sample_token.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_debugging_internal.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_demangle_internal.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_examine_stack.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_exponential_biased.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_failure_signal_handler.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_flags_commandlineflag.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_flags_commandlineflag_internal.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_flags_config.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_flags_internal.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_flags_marshalling.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_flags_parse.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_flags_private_handle_accessor.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_flags_program_name.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_flags_reflection.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_flags_usage.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_flags_usage_internal.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_graphcycles_internal.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_hash.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_hashtablez_sampler.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_int128.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_leak_check.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_log_severity.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_low_level_hash.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_malloc_internal.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_periodic_sampler.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_random_distributions.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_random_internal_distribution_test_util.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_random_internal_platform.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_random_internal_pool_urbg.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_random_internal_randen.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_random_internal_randen_hwaes.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_random_internal_randen_hwaes_impl.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_random_internal_randen_slow.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_random_internal_seed_material.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_random_seed_gen_exception.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_random_seed_sequences.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_raw_hash_set.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_raw_logging_internal.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_scoped_set_env.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_spinlock_wait.so.20220623.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libabsl_stacktrace.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_status.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_statusor.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_str_format_internal.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_strerror.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_strings.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_strings_internal.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_symbolize.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_synchronization.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_throw_delegate.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_time.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libabsl_time_zone.so.20220623.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libacl.so.1.1.2302	undefined	pgb-elfload: libacl.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libanl.so.1	served-by-image	pgb-elfload: libanl.so.1 is already served by this image's own static glibc; loading it would put a second libc in the process
+/usr/lib/x86_64-linux-gnu/libaom.so.3.8.2	ok	
+/usr/lib/x86_64-linux-gnu/libapparmor.so.1.17.1	undefined	pgb-elfload: libapparmor.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libappstream.so.1.0.2	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libapt-pkg.so.6.0.0	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libapt-private.so.0.0.0	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libarchive.so.13.7.2	undefined	pgb-elfload: libacl.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libargon2.so.1	ok	
+/usr/lib/x86_64-linux-gnu/libasan.so.8.0.0	refused-interposer	pgb-elfload: libasan.so.8.0.0 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libasound.so.2.0.0	undefined	pgb-elfload: libasound.so.2: undefined symbol: __isoc23_vfscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libassuan.so.0.8.6	undefined	pgb-elfload: libgpg-error.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libatk-1.0.so.0.25209.1	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libatk-bridge-2.0.so.0.0.0	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libatomic.so.1.2.0	ok	
+/usr/lib/x86_64-linux-gnu/libatspi.so.0.0.1	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libattr.so.1.1.2502	ok	
+/usr/lib/x86_64-linux-gnu/libaudit.so.1.0.0	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libavahi-client.so.3.2.9	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libavahi-common.so.3.5.4	undefined	pgb-elfload: libavahi-common.so.3: undefined symbol: __isoc23_strtoll@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libavif.so.16.0.4	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libbabeltrace-ctf-metadata.so.1.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libbabeltrace-ctf-text.so.1.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libbabeltrace-ctf.so.1.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libbabeltrace-dummy.so.1.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libbabeltrace-lttng-live.so.1.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libbabeltrace.so.1.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libbfd-2.42-system.so	undefined	pgb-elfload: libbfd-2.42-system.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libblkid.so.1.1.0	undefined	pgb-elfload: libblkid.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libboost_iostreams.so.1.83.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libboost_locale.so.1.83.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libboost_thread.so.1.83.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libbrotlicommon.so.1.1.0	ok	
+/usr/lib/x86_64-linux-gnu/libbrotlidec.so.1.1.0	ok	
+/usr/lib/x86_64-linux-gnu/libbrotlienc.so.1.1.0	ok	
+/usr/lib/x86_64-linux-gnu/libbsd.so.0.12.1	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libbz2.so.1.0.4	ok	
+/usr/lib/x86_64-linux-gnu/libc.so	not-an-object	pgb-elfload: /usr/lib/x86_64-linux-gnu/libc.so is not an x86-64 ELF shared object
+/usr/lib/x86_64-linux-gnu/libc.so.6	served-by-image	pgb-elfload: libc.so.6 is already served by this image's own static glibc; loading it would put a second libc in the process
+/usr/lib/x86_64-linux-gnu/libc_malloc_debug.so.0	undefined	pgb-elfload: libc_malloc_debug.so.0: undefined symbol: __malloc_initialize_hook@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libcairo-gobject.so.2.11800.0	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcairo-script-interpreter.so.2.11800.0	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcairo.so.2.11800.0	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcap-ng.so.0.0.0	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcap.so.2.66	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcc1.so.0.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libclang-18.so.18	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libclucene-contribs-lib.so.2.3.3.4	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libclucene-core.so.2.3.3.4	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libclucene-shared.so.2.3.3.4	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libcolord.so.2.0.5	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcolordprivate.so.2.0.5	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcom_err.so.2.1	undefined	pgb-elfload: libcom_err.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0	undefined	pgb-elfload: libcrypt.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcrypto.so.3	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcryptsetup.so.12.10.0	undefined	pgb-elfload: libuuid.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libctf-nobfd.so.0.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libctf.so.0.0.0	undefined	pgb-elfload: libbfd-2.42-system.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcups.so.2	undefined	pgb-elfload: libkrb5support.so.0: undefined symbol: strlcpy@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libcurl-gnutls.so.4.8.0	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libcurl.so.4.8.0	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libdatrie.so.1.4.0	ok	
+/usr/lib/x86_64-linux-gnu/libdav1d.so.7.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libdb-5.3.so	undefined	pgb-elfload: libdb-5.3.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libdbus-1.so.3.32.4	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libdconf.so.1.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libde265.so.0.1.8	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libdebconfclient.so.0.0.0	undefined	pgb-elfload: libdebconfclient.so.0: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libdebuginfod-0.190.so	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libdeflate.so.0	ok	
+/usr/lib/x86_64-linux-gnu/libdevmapper.so.1.02.1	undefined	pgb-elfload: libselinux.so.1: undefined symbol: __isoc23_sscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libdl.so.2	served-by-image	pgb-elfload: libdl.so.2 is already served by this image's own static glibc; loading it would put a second libc in the process
+/usr/lib/x86_64-linux-gnu/libdrm.so.2.125.0	undefined	pgb-elfload: libdrm.so.2: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libdrm_amdgpu.so.1.125.0	undefined	pgb-elfload: libdrm.so.2: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libdrm_intel.so.1.125.0	undefined	pgb-elfload: libdrm.so.2: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libdrop_ambient.so.0.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libduktape.so.207	undefined	pgb-elfload: libduktape.so.207: undefined symbol: __isoc23_sscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libdw-0.190.so	undefined	pgb-elfload: libelf.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libe2p.so.2.3	undefined	pgb-elfload: libe2p.so.2: undefined symbol: __isoc23_strtoull@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libedit.so.2.0.72	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libelf-0.190.so	undefined	pgb-elfload: libelf.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libeot.so.0.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libepoxy.so.0.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libevent_core-2.1.so.7.0.1	undefined	pgb-elfload: libevent_core-2.1.so.7: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libexpat.so.1.9.1	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libexpatw.so.1.9.1	undefined	pgb-elfload: libexpatw.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libexslt.so.0.8.21	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libext2fs.so.2.4	undefined	pgb-elfload: libcom_err.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libexttextcat-2.0.so.0.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libfdisk.so.1.1.0	undefined	pgb-elfload: libuuid.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4	ok	
+/usr/lib/x86_64-linux-gnu/libfontconfig.so.1.12.1	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libfontenc.so.1.0.0	undefined	pgb-elfload: libfontenc.so.1: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libform.so.6.4	ok	
+/usr/lib/x86_64-linux-gnu/libformw.so.6.4	ok	
+/usr/lib/x86_64-linux-gnu/libfreebl3.so	ok	
+/usr/lib/x86_64-linux-gnu/libfreeblpriv3.so	ok	
+/usr/lib/x86_64-linux-gnu/libfreetype.so.6.20.1	ok	
+/usr/lib/x86_64-linux-gnu/libfribidi.so.0.4.0	ok	
+/usr/lib/x86_64-linux-gnu/libgallium-25.2.8-0ubuntu0.24.04.1.so	undefined	pgb-elfload: libdrm.so.2: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgav1.so.1.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libgbm.so.1.0.0	undefined	pgb-elfload: libdrm.so.2: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgc.so.1.5.3	undefined	pgb-elfload: libgc.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgcc_s.so.1	ok	
+/usr/lib/x86_64-linux-gnu/libgccpp.so.1.5.0	undefined	pgb-elfload: libgc.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgcrypt.so.20.4.3	undefined	pgb-elfload: libgpg-error.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgctba.so.1.5.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libgd.so.3.0.11	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgdbm.so.6.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libgdbm_compat.so.4.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libgdk-3.so.0.2409.32	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so.0.4200.10	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgif.so.7.2.0	ok	
+/usr/lib/x86_64-linux-gnu/libgio-2.0.so.0.8000.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgirepository-1.0.so.1.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgirepository-2.0.so.0.8000.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0.8000.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgmodule-2.0.so.0.8000.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0	undefined	pgb-elfload: libgmp.so.10: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgnutls.so.30.37.1	undefined	pgb-elfload: libp11-kit.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0.8000.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0	undefined	pgb-elfload: libgomp.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgpg-error.so.0.34.0	undefined	pgb-elfload: libgpg-error.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgpgme.so.11.27.0	undefined	pgb-elfload: libgpg-error.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgpgmepp.so.6.15.0	undefined	pgb-elfload: libgpg-error.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgpm.so.2	undefined	pgb-elfload: libgpm.so.2: undefined symbol: __isoc23_sscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgprofng.so.0.0.0	undefined	pgb-elfload: libbfd-2.42-system.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgraphite2.so.3.2.1	ok	
+/usr/lib/x86_64-linux-gnu/libgssapi_krb5.so.2.2	undefined	pgb-elfload: libkrb5support.so.0: undefined symbol: strlcpy@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstallocators-1.0.so.0.2402.0	undefined	pgb-elfload: libdrm.so.2: undefined symbol: __isoc23_fscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstapp-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstaudio-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstbase-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstcheck-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstcontroller-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstfft-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstnet-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstpbutils-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstreamer-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstriff-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstrtp-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstrtsp-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstsdp-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgsttag-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgstvideo-1.0.so.0.2402.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgthread-2.0.so.0.8000.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libgtk-3.so.0.2409.32	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libharfbuzz-icu.so.0.60830.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libharfbuzz.so.0.60830.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libheif.so.1.17.6	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libheif/plugins/libheif-aomdec.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libheif/plugins/libheif-libde265.so	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libhistory.so.8.2	undefined	pgb-elfload: libhistory.so.8: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libhogweed.so.6.8	undefined	pgb-elfload: libgmp.so.10: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libhunspell-1.7.so.0.0.1	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libhwasan.so.0.0.0	refused-interposer	pgb-elfload: libhwasan.so.0.0.0 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libhyphen.so.0.3.0	ok	
+/usr/lib/x86_64-linux-gnu/libicudata.so.74.2	ok	
+/usr/lib/x86_64-linux-gnu/libicui18n.so.74.2	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libicuio.so.74.2	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libicutest.so.74.2	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libicutu.so.74.2	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libicuuc.so.74.2	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libidn2.so.0.4.0	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libimagequant.so.0	undefined	pgb-elfload: libgomp.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libip4tc.so.2.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libip6tc.so.2.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libipt.so.2.0.6	ok	
+/usr/lib/x86_64-linux-gnu/libisl.so.23.3.0	undefined	pgb-elfload: libgmp.so.10: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libitm.so.1.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libjansson.so.4.14.0	undefined	pgb-elfload: libjansson.so.4: undefined symbol: __isoc23_strtoll@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libjbig.so.0	ok	
+/usr/lib/x86_64-linux-gnu/libjemalloc.so.2	refused-interposer	pgb-elfload: libjemalloc.so.2 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libjpeg.so.8.2.2	ok	
+/usr/lib/x86_64-linux-gnu/libjq.so.1.0.4	undefined	pgb-elfload: libjq.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libjson-c.so.5.3.0	undefined	pgb-elfload: libjson-c.so.5: undefined symbol: __isoc23_strtoull@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libjsoncpp.so.1.9.5	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libk5crypto.so.3.1	undefined	pgb-elfload: libkrb5support.so.0: undefined symbol: strlcpy@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libkeyutils.so.1.10	ok	
+/usr/lib/x86_64-linux-gnu/libkmod.so.2.4.1	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libkrb5.so.3.3	undefined	pgb-elfload: libkrb5support.so.0: undefined symbol: strlcpy@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libkrb5support.so.0.1	undefined	pgb-elfload: libkrb5support.so.0: undefined symbol: strlcpy@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libksba.so.8.14.6	undefined	pgb-elfload: libgpg-error.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/liblangtag.so.1.4.1	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/liblber.so.2.0.200	undefined	pgb-elfload: liblber.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/liblcms2.so.2.0.14	ok	
+/usr/lib/x86_64-linux-gnu/libldap.so.2.0.200	undefined	pgb-elfload: liblber.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/liblldb-18.so.1	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/liblsan.so.0.0.0	refused-interposer	pgb-elfload: liblsan.so.0.0.0 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libltdl.so.7.3.2	undefined	pgb-elfload: libltdl.so.7: undefined symbol: strlcpy@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/liblz4.so.1.9.4	ok	
+/usr/lib/x86_64-linux-gnu/liblzf.so.1.5	ok	
+/usr/lib/x86_64-linux-gnu/liblzma.so.5.4.5	ok	
+/usr/lib/x86_64-linux-gnu/liblzo2.so.2.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libm.so	not-an-object	pgb-elfload: /usr/lib/x86_64-linux-gnu/libm.so is not an x86-64 ELF shared object
+/usr/lib/x86_64-linux-gnu/libm.so.6	served-by-image	pgb-elfload: libm.so.6 is already served by this image's own static glibc; loading it would put a second libc in the process
+/usr/lib/x86_64-linux-gnu/libmagic.so.1.0.0	undefined	pgb-elfload: libmagic.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libmd.so.0.1.0	ok	
+/usr/lib/x86_64-linux-gnu/libmemusage.so	refused-interposer	pgb-elfload: libmemusage.so is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libmenu.so.6.4	ok	
+/usr/lib/x86_64-linux-gnu/libmenuw.so.6.4	ok	
+/usr/lib/x86_64-linux-gnu/libmhash.so.2.0.1	undefined	pgb-elfload: libmhash.so.2: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libmnl.so.0.2.0	ok	
+/usr/lib/x86_64-linux-gnu/libmount.so.1.1.0	undefined	pgb-elfload: libblkid.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libmpc.so.3.3.1	undefined	pgb-elfload: libgmp.so.10: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libmpfr.so.6.2.1	undefined	pgb-elfload: libgmp.so.10: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libmvec.so.1	undefined	pgb-elfload: libmvec.so.1: undefined symbol: _rtld_global_ro@GLIBC_PRIVATE
+/usr/lib/x86_64-linux-gnu/libmythes-1.2.so.0.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libncurses.so	not-an-object	pgb-elfload: /usr/lib/x86_64-linux-gnu/libncurses.so is not an x86-64 ELF shared object
+/usr/lib/x86_64-linux-gnu/libncurses.so.6.4	ok	
+/usr/lib/x86_64-linux-gnu/libncursesw.so	not-an-object	pgb-elfload: /usr/lib/x86_64-linux-gnu/libncursesw.so is not an x86-64 ELF shared object
+/usr/lib/x86_64-linux-gnu/libncursesw.so.6.4	ok	
+/usr/lib/x86_64-linux-gnu/libnetfilter_conntrack.so.3.8.0	ok	
+/usr/lib/x86_64-linux-gnu/libnettle.so.8.8	ok	
+/usr/lib/x86_64-linux-gnu/libnfnetlink.so.0.2.0	ok	
+/usr/lib/x86_64-linux-gnu/libnftables.so.1.1.0	undefined	pgb-elfload: libjansson.so.4: undefined symbol: __isoc23_strtoll@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libnftnl.so.11.6.0	ok	
+/usr/lib/x86_64-linux-gnu/libnghttp2.so.14.26.0	ok	
+/usr/lib/x86_64-linux-gnu/libnpth.so.0.1.2	ok	
+/usr/lib/x86_64-linux-gnu/libnsl.so.1	undefined	pgb-elfload: libnsl.so.1: undefined symbol: xdr_void@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libnspr4.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libnss3.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libnss_compat.so.2	refused-nss	pgb-elfload: libnss_compat.so.2 is an NSS module; this image pins every database to a service glibc implements inside libc
+/usr/lib/x86_64-linux-gnu/libnss_dns.so.2	refused-nss	pgb-elfload: libnss_dns.so.2 is an NSS module; this image pins every database to a service glibc implements inside libc
+/usr/lib/x86_64-linux-gnu/libnss_files.so.2	refused-nss	pgb-elfload: libnss_files.so.2 is an NSS module; this image pins every database to a service glibc implements inside libc
+/usr/lib/x86_64-linux-gnu/libnss_hesiod.so.2	refused-nss	pgb-elfload: libnss_hesiod.so.2 is an NSS module; this image pins every database to a service glibc implements inside libc
+/usr/lib/x86_64-linux-gnu/libnssckbi.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libnssdbm3.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libnssutil3.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libobjc.so.4.0.0	undefined	pgb-elfload: libobjc.so.4: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libobjc_gc.so.4.0.0	undefined	pgb-elfload: libgc.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libonig.so.5.4.0	ok	
+/usr/lib/x86_64-linux-gnu/libopcodes-2.42-system.so	undefined	pgb-elfload: libbfd-2.42-system.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libopenjp2.so.2.5.0	ok	
+/usr/lib/x86_64-linux-gnu/liborc-0.4.so.0.38.0	undefined	pgb-elfload: liborc-0.4.so.0: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/liborc-test-0.4.so.0.38.0	undefined	pgb-elfload: liborc-0.4.so.0: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/liborcus-0.18.so.0.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/liborcus-parser-0.18.so.0.0.0	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libp11-kit.so.0.3.1	undefined	pgb-elfload: libp11-kit.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpackagekit-glib2.so.18.1.3	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpam.so.0.85.1	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpam_misc.so.0.82.1	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpamc.so.0.82.1	ok	
+/usr/lib/x86_64-linux-gnu/libpanel.so.6.4	ok	
+/usr/lib/x86_64-linux-gnu/libpanelw.so.6.4	ok	
+/usr/lib/x86_64-linux-gnu/libpango-1.0.so.0.5200.1	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so.0.5200.1	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpangoft2-1.0.so.0.5200.1	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1	undefined	pgb-elfload: libpciaccess.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpcprofile.so	refused-interposer	pgb-elfload: libpcprofile.so is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libpcre2-16.so.0.11.2	ok	
+/usr/lib/x86_64-linux-gnu/libpcre2-32.so.0.11.2	ok	
+/usr/lib/x86_64-linux-gnu/libpcre2-8.so.0.11.2	ok	
+/usr/lib/x86_64-linux-gnu/libpcre2-posix.so.3.0.4	ok	
+/usr/lib/x86_64-linux-gnu/libpcsclite.so.1.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libperl.so.5.38.2	ok	
+/usr/lib/x86_64-linux-gnu/libpfm.so.4.13.0	ok	
+/usr/lib/x86_64-linux-gnu/libpixman-1.so.0.42.2	ok	
+/usr/lib/x86_64-linux-gnu/libpkgconf.so.3.0.0	undefined	pgb-elfload: libpkgconf.so.3: undefined symbol: strlcat@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libplc4.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libplds4.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpng16.so.16.43.0	ok	
+/usr/lib/x86_64-linux-gnu/libpolkit-agent-1.so.0.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpolkit-gobject-1.so.0.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpoppler.so.134.0.0	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpq.so.5.16	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libproc2.so.0.0.2	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpsl.so.5.3.4	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libpsx.so.2.66	ok	
+/usr/lib/x86_64-linux-gnu/libpthread.so.0	served-by-image	pgb-elfload: libpthread.so.0 is already served by this image's own static glibc; loading it would put a second libc in the process
+/usr/lib/x86_64-linux-gnu/libpython3.10.so.1.0	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpython3.11.so.1.0	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpython3.12.so.1.0	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libpython3.13.so.1.0	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libquadmath.so.0.0.0	undefined	pgb-elfload: libquadmath.so.0: undefined symbol: __isoc23_strtoull@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libraptor2.so.0.0.0	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/librasqal.so.3.0.0	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/librav1e.so.0.7.1	ok	
+/usr/lib/x86_64-linux-gnu/librdf.so.0.0.0	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libreadline.so.8.2	undefined	pgb-elfload: libreadline.so.8: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libresolv.so.2	served-by-image	pgb-elfload: libresolv.so.2 is already served by this image's own static glibc; loading it would put a second libc in the process
+/usr/lib/x86_64-linux-gnu/librevenge-0.0.so.0.0.5	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/librevenge-generators-0.0.so.0.0.5	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/librevenge-stream-0.0.so.0.0.5	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/librhash.so.0	ok	
+/usr/lib/x86_64-linux-gnu/librt.so.1	served-by-image	pgb-elfload: librt.so.1 is already served by this image's own static glibc; loading it would put a second libc in the process
+/usr/lib/x86_64-linux-gnu/librtmp.so.1	undefined	pgb-elfload: libp11-kit.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libsasl2.so.2.0.25	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libseccomp.so.2.5.5	ok	
+/usr/lib/x86_64-linux-gnu/libselinux.so.1	undefined	pgb-elfload: libselinux.so.1: undefined symbol: __isoc23_sscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libsemanage.so.2	undefined	pgb-elfload: libsepol.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libsensors.so.5.0.0	undefined	pgb-elfload: libsensors.so.5: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libsepol.so.2	undefined	pgb-elfload: libsepol.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libsframe.so.1.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libsharpyuv.so.0.0.1	ok	
+/usr/lib/x86_64-linux-gnu/libsmartcols.so.1.1.0	undefined	pgb-elfload: libsmartcols.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libsmime3.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libsodium.so.23.3.0	ok	
+/usr/lib/x86_64-linux-gnu/libsoftokn3.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libsource-highlight.so.4.0.1	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6	ok	
+/usr/lib/x86_64-linux-gnu/libss.so.2.0	undefined	pgb-elfload: libcom_err.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libssh.so.4.9.6	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libssl.so.3	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libssl3.so	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libstemmer.so.0d.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libsystemd.so.0.38.0	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libtasn1.so.6.6.3	undefined	pgb-elfload: libtasn1.so.6: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libthai.so.0.3.1	ok	
+/usr/lib/x86_64-linux-gnu/libthread_db.so.1	undefined	pgb-elfload: libthread_db.so.1: undefined symbol: ps_pdwrite
+/usr/lib/x86_64-linux-gnu/libtic.so.6.4	ok	
+/usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libtinfo.so.6.4	ok	
+/usr/lib/x86_64-linux-gnu/libtirpc.so.3.0.0	undefined	pgb-elfload: libkrb5support.so.0: undefined symbol: strlcpy@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libtsan.so.2.0.0	refused-interposer	pgb-elfload: libtsan.so.2.0.0 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libubsan.so.1.0.0	refused-interposer	pgb-elfload: libubsan.so.1.0.0 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libudev.so.1.7.8	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libunistring.so.5.0.0	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libunwind-coredump.so.0.0.0	undefined	pgb-elfload: libunwind-coredump.so.0: undefined symbol: _Ux86_64_dwarf_find_unwind_table
+/usr/lib/x86_64-linux-gnu/libunwind-ptrace.so.0.0.0	undefined	pgb-elfload: libunwind-ptrace.so.0: undefined symbol: lzma_stream_buffer_decode
+/usr/lib/x86_64-linux-gnu/libunwind-x86_64.so.8.0.1	ok	
+/usr/lib/x86_64-linux-gnu/libunwind.so.8.0.1	ok	
+/usr/lib/x86_64-linux-gnu/libutempter.so.1.2.1	ok	
+/usr/lib/x86_64-linux-gnu/libutil.so.1	served-by-image	pgb-elfload: libutil.so.1 is already served by this image's own static glibc; loading it would put a second libc in the process
+/usr/lib/x86_64-linux-gnu/libuuid.so.1.3.0	undefined	pgb-elfload: libuuid.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libuv.so.1.0.0	undefined	pgb-elfload: libuv.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libvulkan.so.1.3.275	undefined	pgb-elfload: libvulkan.so.1: undefined symbol: __isoc23_sscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libwayland-client.so.0.22.0	undefined	pgb-elfload: libwayland-client.so.0: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libwayland-cursor.so.0.22.0	undefined	pgb-elfload: libwayland-client.so.0: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libwayland-egl.so.1.22.0	ok	
+/usr/lib/x86_64-linux-gnu/libwebp.so.7.1.8	ok	
+/usr/lib/x86_64-linux-gnu/libxcb-dri3.so.0.1.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxcb-glx.so.0.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxcb-render.so.0.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxcb.so.1.1.0	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxkbcommon.so.0.0.0	undefined	pgb-elfload: libxkbcommon.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxkbfile.so.1.0.2	undefined	pgb-elfload: libbsd.so.0: undefined symbol: __isoc23_strtoimax@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxml2.so.2.9.14	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libxmlb.so.2.0.0	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxmlsec1-nss.so.1.2.39	undefined	pgb-elfload: libnspr4.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libxmlsec1.so.1.2.39	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libxshmfence.so.1.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libxslt.so.1.1.39	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libxtables.so.12.7.0	ok	
+/usr/lib/x86_64-linux-gnu/libxxhash.so.0.8.2	ok	
+/usr/lib/x86_64-linux-gnu/libyajl.so.2.1.0	ok	
+/usr/lib/x86_64-linux-gnu/libyaml-0.so.2.0.9	ok	
+/usr/lib/x86_64-linux-gnu/libyuv.so.0.0.1883	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libz.so.1.3	ok	
+/usr/lib/x86_64-linux-gnu/libzip.so.4.0	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.5	ok	
+/usr/lib/x86_64-linux-gnu/ossl-modules/legacy.so	undefined	pgb-elfload: libcrypto.so.3: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/packagekit-backend/libpk_backend_apt.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/packagekit-backend/libpk_backend_test_fail.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/packagekit-backend/libpk_backend_test_nop.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/packagekit-backend/libpk_backend_test_spawn.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/packagekit-backend/libpk_backend_test_succeed.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/packagekit-backend/libpk_backend_test_thread.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/perl-base/auto/Cwd/Cwd.so	undefined	pgb-elfload: Cwd.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl-base/auto/Fcntl/Fcntl.so	undefined	pgb-elfload: Fcntl.so: undefined symbol: Perl_croak_nocontext
+/usr/lib/x86_64-linux-gnu/perl-base/auto/File/Glob/Glob.so	undefined	pgb-elfload: Glob.so: undefined symbol: PL_charclass
+/usr/lib/x86_64-linux-gnu/perl-base/auto/Hash/Util/Util.so	undefined	pgb-elfload: Util.so: undefined symbol: PL_sv_placeholder
+/usr/lib/x86_64-linux-gnu/perl-base/auto/IO/IO.so	undefined	pgb-elfload: IO.so: undefined symbol: PL_ppaddr
+/usr/lib/x86_64-linux-gnu/perl-base/auto/List/Util/Util.so	undefined	pgb-elfload: Util.so: undefined symbol: PL_memory_wrap
+/usr/lib/x86_64-linux-gnu/perl-base/auto/POSIX/POSIX.so	undefined	pgb-elfload: POSIX.so: undefined symbol: PL_csighandler1p
+/usr/lib/x86_64-linux-gnu/perl-base/auto/Socket/Socket.so	undefined	pgb-elfload: Socket.so: undefined symbol: Perl_sv_2iv_flags
+/usr/lib/x86_64-linux-gnu/perl-base/auto/attributes/attributes.so	undefined	pgb-elfload: attributes.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl-base/auto/re/re.so	undefined	pgb-elfload: re.so: undefined symbol: Perl_regexec_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/B/B.so	undefined	pgb-elfload: B.so: undefined symbol: PL_No
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Compress/Raw/Bzip2/Bzip2.so	undefined	pgb-elfload: Bzip2.so: undefined symbol: Perl_sv_setref_pv
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Compress/Raw/Zlib/Zlib.so	undefined	pgb-elfload: Zlib.so: undefined symbol: Perl_sv_setref_pv
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Cwd/Cwd.so	undefined	pgb-elfload: Cwd.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/DB_File/DB_File.so	undefined	pgb-elfload: libdb-5.3.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Data/Dumper/Dumper.so	undefined	pgb-elfload: Dumper.so: undefined symbol: PL_No
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Devel/Peek/Peek.so	undefined	pgb-elfload: Peek.so: undefined symbol: Perl_runops_debug
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Digest/MD5/MD5.so	undefined	pgb-elfload: MD5.so: undefined symbol: Perl_sv_2uv_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Digest/SHA/SHA.so	undefined	pgb-elfload: SHA.so: undefined symbol: Perl_sv_setref_pv
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Encode/Byte/Byte.so	undefined	pgb-elfload: Byte.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Encode/CN/CN.so	undefined	pgb-elfload: CN.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Encode/EBCDIC/EBCDIC.so	undefined	pgb-elfload: EBCDIC.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Encode/Encode.so	undefined	pgb-elfload: Encode.so: undefined symbol: PL_strict_utf8_dfa_tab
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Encode/JP/JP.so	undefined	pgb-elfload: JP.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Encode/KR/KR.so	undefined	pgb-elfload: KR.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Encode/Symbol/Symbol.so	undefined	pgb-elfload: Symbol.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Encode/TW/TW.so	undefined	pgb-elfload: TW.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Encode/Unicode/Unicode.so	undefined	pgb-elfload: Unicode.so: undefined symbol: PL_strict_utf8_dfa_tab
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Fcntl/Fcntl.so	undefined	pgb-elfload: Fcntl.so: undefined symbol: Perl_croak_nocontext
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/File/DosGlob/DosGlob.so	undefined	pgb-elfload: DosGlob.so: undefined symbol: Perl_newXS_deffile
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/File/Glob/Glob.so	undefined	pgb-elfload: Glob.so: undefined symbol: PL_charclass
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Filter/Util/Call/Call.so	undefined	pgb-elfload: Call.so: undefined symbol: Perl_save_sptr
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/GDBM_File/GDBM_File.so	undefined	pgb-elfload: GDBM_File.so: undefined symbol: Perl_save_sptr
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Hash/Util/FieldHash/FieldHash.so	undefined	pgb-elfload: FieldHash.so: undefined symbol: Perl_sv_2iv_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Hash/Util/Util.so	undefined	pgb-elfload: Util.so: undefined symbol: PL_sv_placeholder
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/I18N/Langinfo/Langinfo.so	undefined	pgb-elfload: Langinfo.so: undefined symbol: Perl_sv_2iv_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/IO/IO.so	undefined	pgb-elfload: IO.so: undefined symbol: PL_ppaddr
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/IPC/SysV/SysV.so	undefined	pgb-elfload: SysV.so: undefined symbol: Perl_sv_2iv_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/List/Util/Util.so	undefined	pgb-elfload: Util.so: undefined symbol: PL_memory_wrap
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/MIME/Base64/Base64.so	undefined	pgb-elfload: Base64.so: undefined symbol: PL_charclass
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Math/BigInt/FastCalc/FastCalc.so	undefined	pgb-elfload: FastCalc.so: undefined symbol: Perl_sv_2iv_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/NDBM_File/NDBM_File.so	undefined	pgb-elfload: NDBM_File.so: undefined symbol: Perl_save_sptr
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/ODBM_File/ODBM_File.so	undefined	pgb-elfload: ODBM_File.so: undefined symbol: Perl_save_sptr
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Opcode/Opcode.so	undefined	pgb-elfload: Opcode.so: undefined symbol: PL_op_name
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/POSIX/POSIX.so	undefined	pgb-elfload: POSIX.so: undefined symbol: PL_csighandler1p
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/PerlIO/encoding/encoding.so	undefined	pgb-elfload: encoding.so: undefined symbol: PerlIOBuf_open
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/PerlIO/mmap/mmap.so	undefined	pgb-elfload: mmap.so: undefined symbol: PerlIOBuf_pushed
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/PerlIO/scalar/scalar.so	undefined	pgb-elfload: scalar.so: undefined symbol: PerlIOBase_binmode
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/PerlIO/via/via.so	undefined	pgb-elfload: via.so: undefined symbol: Perl_sv_2iv_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/SDBM_File/SDBM_File.so	undefined	pgb-elfload: SDBM_File.so: undefined symbol: Perl_save_sptr
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Socket/Socket.so	undefined	pgb-elfload: Socket.so: undefined symbol: Perl_sv_2iv_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Storable/Storable.so	undefined	pgb-elfload: Storable.so: undefined symbol: PL_No
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Sys/Hostname/Hostname.so	undefined	pgb-elfload: Hostname.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Sys/Syslog/Syslog.so	undefined	pgb-elfload: Syslog.so: undefined symbol: Perl_sv_2iv_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Time/HiRes/HiRes.so	undefined	pgb-elfload: HiRes.so: undefined symbol: PL_ppaddr
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Time/Piece/Piece.so	undefined	pgb-elfload: Piece.so: undefined symbol: Perl_sv_2iv_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Unicode/Collate/Collate.so	undefined	pgb-elfload: Collate.so: undefined symbol: PL_hexdigit
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Unicode/Normalize/Normalize.so	undefined	pgb-elfload: Normalize.so: undefined symbol: PL_strict_utf8_dfa_tab
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/attributes/attributes.so	undefined	pgb-elfload: attributes.so: undefined symbol: Perl_stack_grow
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/mro/mro.so	undefined	pgb-elfload: mro.so: undefined symbol: PL_memory_wrap
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/re/re.so	undefined	pgb-elfload: re.so: undefined symbol: Perl_regexec_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/threads/shared/shared.so	undefined	pgb-elfload: shared.so: undefined symbol: PL_thr_key
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/threads/threads.so	undefined	pgb-elfload: threads.so: undefined symbol: PL_thr_key
+/usr/lib/x86_64-linux-gnu/sasl2/libsasldb.so.2.0.25	undefined	pgb-elfload: libdb-5.3.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_access.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_debug.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_deny.so	ok	
+/usr/lib/x86_64-linux-gnu/security/pam_echo.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_env.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_exec.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_extrausers.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_faildelay.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_faillock.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_filter.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_ftp.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_group.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_issue.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_keyinit.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_limits.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_listfile.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_localuser.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_loginuid.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_mail.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_mkhomedir.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_motd.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_namespace.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_nologin.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_permit.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_pwhistory.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_rhosts.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_rootok.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_securetty.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_selinux.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_sepermit.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_setquota.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_shells.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_stress.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_succeed_if.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_systemd.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_systemd_loadkey.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_time.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_timestamp.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_tty_audit.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_umask.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_unix.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_userdb.so	undefined	pgb-elfload: libdb-5.3.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_usertype.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_warn.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_wheel.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/security/pam_xauth.so	undefined	pgb-elfload: libcap-ng.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/systemd/libsystemd-core-255.so	undefined	pgb-elfload: libacl.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/systemd/libsystemd-shared-255.so	undefined	pgb-elfload: libacl.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/xtables/libarpt_mangle.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_802_3.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_among.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_arp.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_arpreply.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_dnat.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_ip.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_ip6.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_log.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_mark.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_mark_m.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_nflog.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_pkttype.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_redirect.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_snat.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_stp.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libebt_vlan.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_DNPT.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_HL.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_NETMAP.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_REJECT.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_SNPT.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_ah.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_dst.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_eui64.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_frag.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_hbh.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_hl.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_icmp6.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_ipv6header.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_mh.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_rt.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libip6t_srh.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libipt_CLUSTERIP.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libipt_ECN.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libipt_NETMAP.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libipt_REJECT.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libipt_TTL.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libipt_ULOG.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libipt_ah.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libipt_icmp.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libipt_realm.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libipt_ttl.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_AUDIT.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_CHECKSUM.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_CLASSIFY.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_CONNMARK.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_CONNSECMARK.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_CT.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_DSCP.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_HMARK.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_IDLETIMER.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_LED.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_LOG.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_MARK.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_NAT.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_NFLOG.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_NFQUEUE.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_RATEEST.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_SECMARK.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_SET.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_SYNPROXY.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_TCPMSS.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_TCPOPTSTRIP.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_TEE.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_TOS.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_TPROXY.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_TRACE.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_addrtype.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_bpf.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_cgroup.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_cluster.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_comment.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_connbytes.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_connlabel.so	undefined	pgb-elfload: libxt_connlabel.so: undefined symbol: __isoc23_strtoul@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/xtables/libxt_connlimit.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_connmark.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_conntrack.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_cpu.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_dccp.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_devgroup.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_dscp.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_ecn.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_esp.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_hashlimit.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_helper.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_ipcomp.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_iprange.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_ipvs.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_length.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_limit.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_mac.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_mark.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_multiport.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_nfacct.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_osf.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_owner.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_physdev.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_pkttype.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_policy.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_quota.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_rateest.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_recent.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_rpfilter.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_sctp.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_set.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_socket.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_standard.so	crash	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_statistic.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_string.so	undefined	pgb-elfload: libxt_string.so: undefined symbol: __isoc23_sscanf@GLIBC_2.38
+/usr/lib/x86_64-linux-gnu/xtables/libxt_tcp.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_tcpmss.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_time.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_tos.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_u32.so	ok	
+/usr/lib/x86_64-linux-gnu/xtables/libxt_udp.so	ok	
