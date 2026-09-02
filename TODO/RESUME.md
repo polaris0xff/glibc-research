@@ -71,10 +71,34 @@ Then: T-063, T-062, T-060, T-054, T-057, T-051, then P2.
 
 ## In flight right now
 
-    experiments/90- kdenlive, log /var/tmp/exp90-final.log, started with all
-    three sweep fixes in. ⛔ IT WILL NOT HAVE FINISHED. Check the log, then
-    re-run: `sh experiments/90-kdenlive-vs-enhanced.sh` (~25 min, needs the
-    bed to itself; it now rebuilds when ./pgb is newer than the artefact).
+    (nothing running)
+
+⛔ **KDENLIVE IS STILL UNVALIDATED — FOUR RUNS, AND RUN 4 WAS SPOILED BY ME.**
+
+    run 1  the sweep ran BEFORE writeEnv wrote .env, so MLT's modules were
+           deleted. `ours rendered 0 of 11`. Fixed by ordering.
+    run 2  the experiment REUSED the cached artefact, so the fix was never
+           exercised -- it reported 267,390,365 B to the digit. Fixed: it
+           now rebuilds when ./pgb is newer than the artefact.
+    run 3  `melt`: "Failed loading SDL3 library." libSDL3.so.0 is dlopen'd
+           BY NAME from inside an MLT module. Fixed: soname-string roots,
+           and sweep deletion moved to `aggressive`.
+    run 4  ⛔ INVALID, AND THE CAUSE WAS MINE. I killed the run to clean the
+           tree at session end and the kill landed mid-pack:
+           build-ours.log ends "packing with uruntime + dwarfs" / "Terminated".
+           The 471,020,146-byte artefact was a TRUNCATED AppImage, which is
+           why melt rendered 0 bytes and startup read -1 ms. ⭐ It says
+           NOTHING about the code. The corrupt artefact has been deleted --
+           it was non-empty and OLDER than ./pgb, so the staleness rule
+           would have reused it.
+
+⭐ **So run 3's fixes have never been tested.** First thing: re-run
+`sh experiments/90-kdenlive-vs-enhanced.sh` (~25 min, bed to itself) and let
+it finish. ⛔ Do not kill it; if you must stop, delete
+`/var/tmp/pgb-appimage-kden/kdenlive/*.AppImage` afterwards.
+
+⚠ Note the default level is `safe`, and sweep deletion is now `aggressive`
+only — so a default run no longer exercises the sweep at all. Test both.
 
 ⛔ **THE SWEEP MISSED THREE CLASSES OF RUNTIME-LOADED LIBRARY IN ONE DAY** and
 that is the headline of the 2026-09-02c reviews:
