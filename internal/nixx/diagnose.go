@@ -32,6 +32,11 @@ var (
 	// The error names the library and the flag that asked for it is spelled
 	// from its name.
 	configureMissing = regexp.MustCompile(`configure: error: ((?:lib)?[A-Za-z0-9_+-]+) (?:was not found|not found)`)
+	// ⛔ The flag is not always spellable from the thing reported missing.
+	// postgres reports `llvm-config not found` for the flag `--with-llvm`, so
+	// spelling it gives --with-llvm-config and the drop misses. When the fatal
+	// line NAMES the option, that name is the answer and no spelling is needed.
+	configureNamesFlag = regexp.MustCompile(`configure: error:[^\n]*?(--(?:with|enable)-[A-Za-z0-9_+-]+)`)
 )
 
 // optionalDep maps a fatal configure message to the flag nixpkgs used to turn
@@ -87,6 +92,11 @@ func diagnose(logFile string, flags []string) string {
 		if rule.Pattern.MatchString(text) && has(rule.Flag) {
 			return "drop:" + rule.Flag
 		}
+	}
+
+	// Before spelling a flag from a library name, take one the message states.
+	if m := configureNamesFlag.FindStringSubmatch(text); m != nil && has(m[1]) {
+		return "drop:" + m[1]
 	}
 
 	if m := configureMissing.FindStringSubmatch(text); m != nil {

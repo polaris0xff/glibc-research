@@ -268,6 +268,7 @@ func selftestSuites(c *cfg.Config) []suite {
 		{"nix-nar", func() *selftest.Report { return nixx.Selftest(nixFixtureDir(c)) }},
 		{"nix-drv", nixx.DrvSelftest},
 		{"nix-index", nixx.IndexSelftest},
+		{"nix-diagnose", nixx.DiagnoseSelftest},
 		{"bootstrap", func() *selftest.Report { return bootstrapx.Selftest(c) }},
 		{"bundle-sweep", bundle.Selftest},
 		{"bundle-appimage", func() *selftest.Report { return bundle.AppImageSelftest(c) }},
