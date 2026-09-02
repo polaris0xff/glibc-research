@@ -5,8 +5,8 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-02, at session start (recovery session)
-    TREE           main, clean, at e44a6519
+    LAST WRITTEN   2026-09-02, refreshed mid-session (recovery session)
+    TREE           main, clean, at 5e8b79fc or later
     BRANCH         ⛔ main. The harness named `claude/glibc-pgb-recovery-6dleai`;
                    RULES.md §Git outranks it, as the operator has ruled twice.
                    That branch already exists on the remote at the same commit
@@ -34,7 +34,7 @@ container came up with `/var/tmp` **empty**, `/var/lib/pgb-rootfs` absent, no
 build environment, no `/nix`, and dockerd not running.
 
     make                            ✅ builds ./pgb, 15 s
-    ./pgb selftest                  ✅ 123 pass, 1 could not run (no zstd), exit 0
+    ./pgb selftest                  ✅ 123 pass, 1 could not run (no zstd), exit 2
     sh TODO/check.sh                ✅ exit 0 (codegraph absent — install it)
     sh scripts/common/check-docs.sh ✅ exit 0
     disk                            30 GiB available at session start
@@ -43,22 +43,30 @@ build environment, no `/nix`, and dockerd not running.
 
 The work order is `PROGRESS.md`; this is only the short form.
 
-1. **Gate 5's three missing rows** — `poc/91-qt-xcb`, `experiments/86-`,
-   `experiments/90-`. All three need the bed and several GiB of free disk.
-   ⛔ Never two Qt- or kdenlive-sized builds at once.
+1. **Gate 5's three missing rows.** ⭐ `poc/91-qt-xcb` is **DONE** — rc=0,
+   1,429 s, 27 assertions, 11 of 11 (commit 5e8b79fc). `experiments/86-` is
+   running. `experiments/90-` has not started and is the kdenlive-sized one.
+   ⛔ Never two Qt- or kdenlive-sized builds at once, and delete the previous
+   build tree first — Qt's alone was 6.5 GiB.
 2. **`experiments/90-`'s onelf row is the wrong one.** Its argv[0] defect was
-   fixed and the three-arm run has not been repeated since.
-3. **The operator's post-port instruction.** Codegraph is wired into the gates
-   and the rules (e44a6519) but is **not installed in this container**: run
-   `sh scripts/common/install-codegraph.sh`. Then the deprecation sweep of the
-   Go tree, two deep reviews of code and docs, unreferenced documents retired
-   to `HISTORY/`, and a `docs/AGENTS.md` a session with no memory can start
-   from alone.
+   fixed and the three-arm run has not been repeated since. Running 90 once
+   covers both this and gate 5's third row.
+3. **The operator's post-port instruction.** ⭐ Codegraph installed and the
+   gate reports the index current. ⭐ Deprecation sweep done (aa3b7474,
+   4376c735). ⭐ Documents retired: answered — nothing qualifies, `tmp/README.md`
+   says why. ⭐ `docs/AGENTS.md` §0b is the cold start. ⚠ The two deep reviews
+   are PARTLY done: pass 1 over the Go tree found T-062 and eight defects'
+   worth of dead code; the docs pass repointed every retired tool name.
 4. **The miniflux proof** — miniflux plus an embedded PostgreSQL, its
    `dlopen`'d extensions and its share tree, against onelf's ~70 MB. It lands
-   as POC 92 and a new `TODO/` entry.
+   as POC 92 and a new `TODO/` entry. ⚠ Take **T-063**; T-062 is used.
 5. Then the backlog: T-055, T-060 rungs 2–3, T-054 rungs 3–4, T-057 item 2,
    T-051, then P2 by category.
+
+⚠ **Gate 4's byte-identity is still owed a re-measurement.** The modernize pass
+touched `internal/wrapper`, which no carried selftest covers (that is T-062).
+Rebuild `ci/probe.c` through both toolchains and compare sha256 against
+`251cec64…` before trusting the wrapper path.
 
 ## ⛔ Machine notes a fresh session cannot infer
 
@@ -79,6 +87,9 @@ The work order is `PROGRESS.md`; this is only the short form.
 
 ## In flight right now
 
-    ./pgb bootstrap --detach     started at session start
-                                 log: /var/tmp/pgb-bootstrap/bootstrap.log
-                                 check: ./pgb bootstrap --check
+    experiments/86-              RUNNING, both arms built, on the eleven now
+                                 evidence/86-bundler-vs-anylinux/RESULT.txt
+                                 status file: /var/tmp/exp86-status
+
+    bootstrap                    ⭐ COMPLETE: nix, chroot env, docker env,
+                                 11 of 11 rootfs, dockerd up

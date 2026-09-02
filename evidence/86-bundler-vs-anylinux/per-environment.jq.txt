@@ -1,0 +1,10 @@
+== alpine-3.22 (musl) arm P
+   status  : ok
+   startup : cold 138 ms, warm 15 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=6
+   host .so: 
+== alpine-3.22 (musl) arm A
+   status  : ok
+   startup : cold 62 ms, warm 9 ms (mean of 5 with the mount alive)
+   objects : host=0 bundled=6
+   host .so: 
