@@ -347,6 +347,52 @@ static int el_foreign_libc(const char *soname)
            strncmp(soname, "libpthread.", 11) == 0;
 }
 
+/* ⛔ OBJECTS NO STATIC IMAGE SHOULD EVER LOAD, refused by class.
+ *
+ * ⚠ MEASURED, not guessed at. Sweeping every shared object on the build host
+ * -- 904 of them, one fork each -- left 30 crashes, and almost all of them
+ * were these two families. They do not crash because the loader is wrong;
+ * they crash because loading them into this process is meaningless:
+ *
+ *   libnss_*    ⛔ docs/AGENTS.md §14: "Do not try to make host NSS modules
+ *               load correctly. Keeping them out is the fix and it is
+ *               measured." pgb-nssfix.c pins every database to a service
+ *               glibc implements inside libc, so nothing in this image wants
+ *               one, and each carries DT_NEEDED libc.so.6 anyway.
+ *
+ *   sanitizer   libasan, libtsan, libhwasan, libjemalloc, libmemusage and
+ *   and         friends interpose on malloc and are designed to arrive by
+ *   allocator   LD_PRELOAD BEFORE libc initialises. Loading one into a
+ *   interposers running process is undefined under any loader, ld.so
+ *               included -- glibc's allocator is already initialised and
+ *               holding memory the new one knows nothing about.
+ *
+ * ⭐ A NAMED REFUSAL IS THE PRODUCT HERE, not a workaround. solo's mechanism
+ * 4: fail loudly and per object rather than crash. TODO T-068.
+ */
+static int el_refused_class(const char *soname, const char **why)
+{
+    static const char *const interposers[] = {
+        "libasan.", "libtsan.", "libhwasan.", "liblsan.", "libubsan.",
+        "libjemalloc.", "libtcmalloc", "libmemusage.", "libpcprofile.",
+        "libSegFault.", "libdislocator.", "libmimalloc.", NULL
+    };
+    const char *const *p;
+
+    if (strncmp(soname, "libnss_", 7) == 0) {
+        *why = "an NSS module; this image pins every database to a service "
+               "glibc implements inside libc";
+        return 1;
+    }
+    for (p = interposers; *p; p++)
+        if (strncmp(soname, *p, strlen(*p)) == 0) {
+            *why = "an allocator or sanitizer interposer; it must be present "
+                   "before libc initialises, and libc here already has";
+            return 1;
+        }
+    return 0;
+}
+
 /* ⭐ solo's mechanism 3, and the mechanism that keeps a foreign libc OUT.
  * Before touching the disk, a DT_NEEDED is checked against the sonames this
  * executable already satisfies. A plugin needing libc.so.6 gets the glibc in
@@ -1319,6 +1365,14 @@ static int el_load_needed(struct el_obj *o)
                    o->soname, nm);
             return -1;
         }
+        {
+            const char *why = NULL;
+            if (el_refused_class(nm, &why)) {
+                el_err("pgb-elfload: %s needs %s, which is %s",
+                       o->soname, nm, why);
+                return -1;
+            }
+        }
         if (!el_search(found, sizeof found, nm, o)) {
             el_err("pgb-elfload: %s: cannot find %s", o->soname, nm);
             return -1;
@@ -1492,10 +1546,15 @@ void *pgb_elf_dlopen(const char *path, int flags)
     {
         const char *b = strrchr(found, '/');
         b = b ? b + 1 : found;
+        const char *why = NULL;
         if (el_soname_served(b)) {
             el_err("pgb-elfload: %s is already served by this image's own "
                    "static glibc; loading it would put a second libc in the "
                    "process", b);
+            return NULL;
+        }
+        if (el_refused_class(b, &why)) {
+            el_err("pgb-elfload: %s is %s", b, why);
             return NULL;
         }
     }

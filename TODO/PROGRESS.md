@@ -3,7 +3,7 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log
 and the entries.
 
-    STATE     2026-09-02b (recovery session)
+    STATE     2026-09-02c
     COUNTS    41 entries, 17 open, 24 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN; selftests 138 pass, 1 could not run (no zstd)
@@ -46,76 +46,109 @@ Quoted, because the framing is load-bearing:
 | 2. the bundler | T-057 ⚠started, T-052 ✅, T-053 ✅ | ⭐ **items 1, 3 and 4 landed**: debloating with a three-arm control (`experiments/89-`), wrapper environments lifted into `.env`, and the lib32 path. ⛔ **item 2, a 32-bit application, is still untried** |
 | 3. kdenlive | T-054, T-055 | ⭐ **rung 2 climbed**: `poc/91-qt-xcb` — a static Qt 6 opening a **real xcb window**, 26 assertions, 11/11, zero host objects. ⛔ **T-055's bar is NOT met**: ours 395,294,317 B against 191,900,604 B |
 
-## What the last session did (2026-09-02b, a recovery session)
+## What this session did (2026-09-02c)
 
-The session before this one terminated itself when `poc/91-qt-xcb` filled the
-disk. It had pushed everything; nothing was lost. ⚠ The clone comes up SHALLOW,
-grafted at `21e7dc06`, which makes local `main` look like an unrelated history
-with 22 orphan commits — it is not, and the recovery is `fetch --unshallow`
-then a fast-forward, never a force-push.
+⭐ **THREE OF THE FOUR P0s ARE CLOSED. T-066 is significantly advanced and
+stays open**, because 1.22× the field is not parity.
 
-### 1. ⭐ GATE 5 IS COMPLETE — T-061's last gap
+### 1. ⭐ T-064 — static glibc's `dlopen`, REALLY solved
 
-    poc/91-qt-xcb            rc=0  1,429 s  27 assertions, 11 of 11
-    experiments/86-          rc=0           7 cases, both arms 11 of 11
-    experiments/90-          rc=0           10 cases, ⭐ 0 SKIPPED
+`tool/runtime/pgb-elfload.c` is an ELF loader compiled INTO the binary;
+`pgb build --host-dlopen` turns it on. It maps the object, walks `DT_NEEDED`,
+relocates (`DT_RELA` **and** `DT_RELR`), honours symbol versioning, places
+initial-exec TLS in glibc's own reserved surplus, runs the initialisers, and
+binds every undefined symbol to the static glibc already in the executable. A
+`DT_NEEDED` naming a library the image already contains is **answered, not
+opened**.
 
-⚠ **Qt cleared the wall for a reason worth carrying**: not more disk. The
-failing session had run nine POCs and twenty-one experiments into
-`/var/tmp/pgb-poc` before starting Qt; this one started clean. Peak was 6.5 GiB
-for the qtbase build tree alone.
+`experiments/76-`, exit 0, four of four:
 
-⭐ **`experiments/90-`'s onelf arm ran for the first time**, and the defect
-blocking it was ours for the second time — the staging step copied
-`shared/bin/*`, a shell glob never matches a leading dot, and a nixpkgs wrapper
-leaves the payload ELF beside itself as `.NAME-wrapped`.
-`../docs/history/corrections.md` C16.
+    TARGET               LIBC   CARRIED  NATIVE  CONTROL  HOST .so LOADED
+    alpine-3.22          musl   ok       exit1   exit1    none
+    alpine-3.20          musl   ok       exit1   exit1    none
+    alpine-3.10          musl   ok       exit1   exit1    none
+    voidlinux-musl       musl   ok       exit1   exit1    none
+    debian-11            glibc  ok       ok      SIG6     none
+    debian-12            glibc  ok       ok      SIG11    none
+    ubuntu-20.04         glibc  ok       ok      SIG6     none
+    rockylinux-8         glibc  ok       ok      SIG6     none
+    opensuse-leap-15.6   glibc  ok       ok      SIG8     none
+    fedora-42            glibc  ok       ok      SIG8     none
+    archlinux-latest     glibc  ok       ok      SIG11    none
 
-### 2. The operator's post-port instruction
+      carried: nine assertions, every environment  = 11 of 11
+      carried: loaded no host shared object        = 11 of 11
+      native:  a REAL host .so on every glibc row  =  7 of 7
+      native:  refuses CLEANLY on musl, no signal  =  4 of 4
+      control: ran                                 =  0 of 11
 
-Codegraph installed and the gate reports the index current. The deprecation
-sweep ran with tools rather than by reading — **six import-silencing hacks**
-(`var _ = pkg.Symbol`) that neither `go build` nor staticcheck can flag by
-construction, two dead functions, and **71 modernize rewrites** across 38
-files. Documents to retire: **answered — nothing qualifies**, and
-`../tmp/README.md` says why so it is not re-litigated a third time.
-`../docs/AGENTS.md` §0b is the cold start, and it now links
-`methodology/sessions.md`, which the entry point had never referenced.
+⭐ **On the four musl rows that is a GLIBC shared object being `dlopen`'d on a
+machine that ships no glibc**, from one ordinary static ELF —
+`PT_INTERP=0 DT_NEEDED=0` — with nothing beside it. ⭐ **1,093 code lines
+against `pg83/solo`'s 2,332** for the loader alone; solo's other 5,948
+translate glibc onto musl and a glibc host needs none of them.
 
-### 3. Defects found, each by something disagreeing
+⛔ **The musl refusal is the mechanism working, not a gap**: every object there
+carries `DT_NEEDED libc.musl-x86_64.so.1`, and musl's libc IS its loader.
 
-1. ⛔ **`make check` never reached either record gate** on a machine without
-   zstd. `pgb selftest` exits 2 for "could not run"; make treats non-zero as
-   failure. The documented command claimed to run gates it never reached.
-2. ⛔ **`README.md`'s first code block could not run.** `sh pgb env create` is
-   a syntax error — pgb has been a Go binary since `4ef2acc7`. `AGENTS.md` §1
-   still described it as "a POSIX-sh driver plus four small C runtime pieces".
-3. ⛔ **`pgb nix build --configure` reached every dependency**, not the package
-   named; numactl's configure said `unrecognized options: --without-icu`.
-4. ⛔ **Five defects in the adaptation loop**, all found by T-063's arm S — it
-   could remove NONE of the fifteen optional features nixpkgs' postgres plan
-   enables, and removes thirteen now. Its default round budget of 8 reports
-   `gave up after 8 rounds`, which reads as "cannot be built" and is not that.
-5. ⛔ **`internal/nixx`'s adaptation logic had no selftest at all**, which is
-   T-062: `pgb selftest` prints 138 cases and reaches 7 of 17 packages.
+### 2. ⭐ T-065 — what a bundle may take from the HOST
 
-### 4. T-063 — a static PostgreSQL that runs on Alpine
+[`../docs/design/host-fallback.md`](../docs/design/host-fallback.md) is the
+write-up; `internal/bundle/hostpolicy.go` the mechanism; 29 offline selftest
+cases the assertion. ⛔ **"Zero host objects" is right for a static ELF and
+wrong for a bundle**, and the difference had never been written down. Four
+classes, search order adopted from `Anylinux-sharun` rather than invented, and
+**NVIDIA is host-always and not an opt-in** — its driver links a 10+ year old
+glibc and it cannot be bundled at all.
 
-  `pgb rootfs run alpine-3.22 -- /postgres --version` → `PostgreSQL 18.6`,
-  63,889,168 B, no `PT_INTERP`, no `DT_NEEDED`. ⚠ `src/interfaces` (libpq,
-  ecpg) does not build yet, so initdb/pg_ctl/psql do not exist and nothing
-  claims the miniflux stack runs.
+### 3. ⚠ T-066 — 2.86× the field to 1.22×, on `jq`
 
-⭐ **Gate 4 was re-measured** after the modernisation touched
-`internal/wrapper` — byte-identical, sha256 `251cec64…`.
+`experiments/78-` is the harness and the subject is a CLI, which is what made
+four measured iterations fit where one kdenlive build goes. Two levers, both
+structural:
 
-## In progress
+    the reachability sweep NOTHING consumed   277 objects, 12.0 MiB
+    share/i18n, glibc's locale SOURCES        15.0 MiB of a 22 MiB bundle
 
-⛔ **Nothing is running.** Every job this session started finished and its row
-is in the evidence file.
+Debloat went from 12.7% off to 86.9% off; the bundle from 11,471,610 B to
+4,890,913 B against the field's 4,006,916.
 
-⚠ **T-060 rung 1's `/var/tmp` build tree is gone with an old container.** The
-run is idempotent; treat it as never started.
+### 4. ⭐ T-067 — C is adequate, and the defect log is the argument
+
+[`../docs/design/runtime-language.md`](../docs/design/runtime-language.md).
+0 UBSan findings running the loader over **904 real host shared objects**; the
+5 gcc warnings are one false positive (`-Waddress` does not model weak
+linkage). zig is **not packaged** in the pinned `debian:12` and would be a
+53,733,924 B fetch and a *second* toolchain. ⭐ And the seven defects below are
+the real argument: **not one is a C-language defect.**
+
+### 5. ⛔ Seven defects, every one found by something disagreeing
+
+1. **`libm.a` is a GNU ld script, not an archive.** Read as `ar` it yields zero
+   symbols in silence; the provider table had 4,891 names instead of 7,216.
+   ⚠ Second time this trap has fired in this tree.
+2. **`__tls_get_addr` is in no archive** — `ld.so` exports it. 398 of 492
+   undefined-symbol failures were that one name.
+3. ⛔ **`DT_RELR` was ignored.** Fedora and Arch pack relative relocations into
+   a bitmap, so the loader "succeeded" and left pointers unrelocated — a
+   **silent wrong answer**, caught only because a constructor was called
+   through one: `init_array[0] 0x670`.
+4. ⛔ **`make` did not depend on the `go:embed`'d C**, so editing the loader
+   printed "Nothing to be done" and the next build used the PREVIOUS loader.
+   It cost a full eleven-environment run. Fixed in the `Makefile`.
+5. ⛔ **My own benchmark forked per sample** and reported the loader 10×
+   slower than `ld.so`; that was copy-on-write faults on a 4.4 MB static image.
+6. ⛔ **The reachability sweep had no consumer** — `codegraph callers Sweep`.
+7. ⛔ **The sweep then ran before `.env` existed** and deleted kdenlive's MLT
+   modules. ⭐ `jq` did not catch this and COULD NOT: a CLI with no plugin
+   directories has nothing at risk. The fast subject is for iterating; the
+   plugin-heavy one is the control.
+
+### 6. T-068 opened, so the residue is carried rather than rounded off
+
+86 of 904 host objects do not load. 30 crash and almost all are objects no
+static image should load — NSS modules, sanitizer and allocator interposers.
+`../docs/limitations.md` §1 classifies every one.
 
 ## ⭐ Work order
 
