@@ -6,18 +6,25 @@ version       : 8.11.0
 sha256        : 264537d90e58d2b09dddc50944baf3c38e7089151c8986715e2aaeaaf2b8118f
 normal build  : ./configure --with-openssl && make
 stresses      : getaddrinfo/NSS, DNS, TLS, CA bundle data, 3-package dependency chain
-date (UTC)    : 2026-09-01T18:54:35Z
+date (UTC)    : 2026-09-02T23:43:54Z
 evidence      : /home/user/glibc-research/evidence/poc/30-curl
+build env     : /var/lib/pgb-rootfs/pgb-env-debian13
+build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
+build gcc     : gcc (Debian 14.2.0-19) 14.2.0
+build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
 ---------------------------------------------------------------
         dependencies: OpenSSL 3.0.15 and zlib 1.3.1, both built static in the same environment
+curl: (22) The requested URL returned error: 502
   ok    built                                        = yes
 
   the binary:
-    size                   7422288 bytes
+    size                   7502248 bytes
     file                   ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, BuildID
     PT_INTERP              absent
     DT_NEEDED              0
-    pgb runtime linked     yes
+    pgb runtime linked     NO
+    .comment gcc           14.2.0
+  ok    built by the environment's own gcc           = 14.2.0
 
   functional test across the pinned matrix:
     ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
@@ -25,7 +32,7 @@ evidence      : /home/user/glibc-research/evidence/poc/30-curl
   ok    alpine-3.22: functional test                 = ok
     alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
   ok    alpine-3.20: functional test                 = ok
-    alpine-3.10          musl   ok         none                         /etc/nsswitch.conf 
+    alpine-3.10          musl   ok         none                         none
   ok    alpine-3.10: functional test                 = ok
     voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
   ok    voidlinux-musl: functional test              = ok
@@ -59,5 +66,5 @@ evidence      : /home/user/glibc-research/evidence/poc/30-curl
     archlinux-latest     glibc  host-ca-bundle=/etc/ssl/certs/ca-certificates.crt host-only-verify=verified none
 
 ---------------------------------------------------------------
-pass=12 fail=0 skip=0
+pass=13 fail=0 skip=0
 VERDICT: 30-curl builds and works across the matrix.

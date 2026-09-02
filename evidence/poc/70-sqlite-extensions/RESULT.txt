@@ -6,8 +6,12 @@ version       : SQLite 3.47.0 + 15 extensions from sqlite/sqlite ext/misc @ vers
 sha256        : 83eb21a6f6a649f506df8bd3aab85a08f7556ceed5dbd8dea743ea003fc3a957
 normal build  : cc shell.c sqlite3.c -ldl -lm; each extension: cc -shared -fPIC ext.c
 stresses      : dlopen by user-supplied path, dlsym by derived name, 15 plugins in one link, per-plugin symbol namespaces
-date (UTC)    : 2026-09-01T15:26:24Z
+date (UTC)    : 2026-09-02T23:46:56Z
 evidence      : /home/user/glibc-research/evidence/poc/70-sqlite-extensions
+build env     : /var/lib/pgb-rootfs/pgb-env-debian13
+build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
+build gcc     : gcc (Debian 14.2.0-19) 14.2.0
+build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
 ---------------------------------------------------------------
 -- fetching ---------------------------------------------------
   ok    extension sources fetched and verified       = 16
@@ -15,8 +19,8 @@ evidence      : /home/user/glibc-research/evidence/poc/70-sqlite-extensions
 -- building ---------------------------------------------------
   ok    extensions built (object and shared object)  = 15
   ok    wrapped binary exists                        = yes
-        control  2443224 bytes
-        wrapped  2542776 bytes, 15 plugins compiled in
+        control  2508568 bytes
+        wrapped  3764712 bytes, 15 plugins compiled in
 
 -- inspection -------------------------------------------------
   ok    PT_INTERP absent                             = 0
@@ -58,12 +62,12 @@ evidence      : /home/user/glibc-research/evidence/poc/70-sqlite-extensions
     alpine-3.10          musl   refused: Error: libc.so.6: cannot open shared object fi /pgb-ext/series.so 
     voidlinux-musl       musl   refused: Error: libc.so.6: cannot open shared object fi /pgb-ext/series.so 
     debian-11            glibc  SIG6       /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/series.so 
-    debian-12            glibc  loaded and worked /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/series.so 
+    debian-12            glibc  SIG8       /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/series.so 
     ubuntu-20.04         glibc  SIG6       /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/series.so 
-    rockylinux-8         glibc  SIG6       /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
+    rockylinux-8         glibc  loaded and worked /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
     opensuse-leap-15.6   glibc  SIG8       /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
-    fedora-42            glibc  SIG8       /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
-    archlinux-latest     glibc  loaded and worked /pgb-ext/series.so /usr/lib/ld-linux-x86-64.so.2 /usr/lib/libc.so.6 
+    fedora-42            glibc  loaded and worked /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/series.so 
+    archlinux-latest     glibc  SIG8       /pgb-ext/series.so /usr/lib/ld-linux-x86-64.so.2 /usr/lib/libc.so.6 
 
 -- the collision this POC found, still checked -----------------
         sqlite derives an entry point from the filename keeping only letters,

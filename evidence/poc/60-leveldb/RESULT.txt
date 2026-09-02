@@ -6,17 +6,23 @@ version       : 1.23
 sha256        : 9a37f8a6174f09bd622bc723b55881dc541cd50747cbd08831c2a82d620f6d76
 normal build  : cmake -S . -B build && cmake --build build
 stresses      : C++ static init, exceptions, RTTI, iostreams/locale, CMake, a static C++ dependency
-date (UTC)    : 2026-09-01T13:42:29Z
+date (UTC)    : 2026-09-02T23:43:36Z
 evidence      : /home/user/glibc-research/evidence/poc/60-leveldb
+build env     : /var/lib/pgb-rootfs/pgb-env-debian13
+build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
+build gcc     : gcc (Debian 14.2.0-19) 14.2.0
+build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
 ---------------------------------------------------------------
   ok    built                                        = yes
 
   the binary:
-    size                   3919464 bytes
+    size                   4070160 bytes
     file                   ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, BuildID
     PT_INTERP              absent
     DT_NEEDED              0
     pgb runtime linked     yes
+    .comment gcc           14.2.0
+  ok    built by the environment's own gcc           = 14.2.0
 
   functional test across the pinned matrix:
     ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
@@ -58,5 +64,5 @@ evidence      : /home/user/glibc-research/evidence/poc/60-leveldb
     archlinux-latest     glibc  exit=0     none
 
 ---------------------------------------------------------------
-pass=12 fail=0 skip=0
+pass=13 fail=0 skip=0
 VERDICT: 60-leveldb builds and works across the matrix.

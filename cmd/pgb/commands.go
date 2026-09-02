@@ -265,6 +265,7 @@ func selftestSuites(c *cfg.Config) []suite {
 		{"rootfs-run", rootfs.Selftest},
 		{"elf", elfSelftest},
 		{"env-stamp", envx.StampSelftest},
+		{"wrapper-flags", wrapper.FlagsSelftest},
 		{"zstd", zstd.Selftest},
 		{"nix-nar", func() *selftest.Report { return nixx.Selftest(nixFixtureDir(c)) }},
 		{"nix-drv", nixx.DrvSelftest},

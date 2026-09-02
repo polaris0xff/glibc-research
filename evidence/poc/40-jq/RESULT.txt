@@ -6,18 +6,24 @@ version       : 1.7.1
 sha256        : 478c9ca129fd2e3443fe27314b455e211e0d8c60bc8ff7df703873deeee580c2
 normal build  : ./configure --with-oniguruma && make
 stresses      : Unicode round-trip, surrogate pairs, optional static dependency detection
-date (UTC)    : 2026-09-01T06:35:10Z
+date (UTC)    : 2026-09-02T23:41:12Z
 evidence      : /home/user/glibc-research/evidence/poc/40-jq
+build env     : /var/lib/pgb-rootfs/pgb-env-debian13
+build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
+build gcc     : gcc (Debian 14.2.0-19) 14.2.0
+build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
 ---------------------------------------------------------------
         dependency: oniguruma 6.9.9, built static in the same environment
   ok    built                                        = yes
 
   the binary:
-    size                   4032984 bytes
+    size                   4209120 bytes
     file                   ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, BuildID
     PT_INTERP              absent
     DT_NEEDED              0
     pgb runtime linked     yes
+    .comment gcc           14.2.0
+  ok    built by the environment's own gcc           = 14.2.0
 
   functional test across the pinned matrix:
     ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
@@ -59,5 +65,5 @@ evidence      : /home/user/glibc-research/evidence/poc/40-jq
     archlinux-latest     glibc  LANG=unset codepoint-length-of-cafe=4 none
 
 ---------------------------------------------------------------
-pass=12 fail=0 skip=0
+pass=13 fail=0 skip=0
 VERDICT: 40-jq builds and works across the matrix.

@@ -47,7 +47,29 @@ func LinkFlags(c *cfg.Config, rd string, cxx bool) []string {
 		// -lpgbruntime, so their __wrap_iconv* references would arrive with the
 		// defining archive already behind the linker. -u pulls the member in at
 		// -lpgbruntime instead.
-		if cxx || len(c.WrapDlopen) > 0 {
+		//
+		// ⛔ AND --host-dlopen NEEDS IT FOR A DIFFERENT REASON, MEASURED
+		// 2026-09-02f ON REAL HOST OBJECTS. The generated provider table
+		// declares every glibc symbol as
+		//
+		//	extern char iconv_open[] __attribute__((weak));
+		//
+		// which is an UNDEFINED reference, so --wrap rewrites it to
+		// __wrap_iconv_open -- and a WEAK undefined reference does not pull a
+		// member out of an archive, so it stayed unresolved and the table
+		// entry held NULL. Every host object importing iconv then failed to
+		// load, naming the UNWRAPPED symbol:
+		//
+		//	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
+		//
+		// Found by running LibreOffice's libuno_sal.so.3 and libmergedlo.so
+		// through the loader; the control is the same probe built --no-iconv,
+		// which loads libuno_sal.so.3 and carries libmergedlo.so past iconv to
+		// an unrelated limit. ⚠ The other wrapped symbols do NOT have this
+		// problem, and the difference is where the wrapper lives: __wrap_dlopen
+		// and __wrap_setlocale are in object files that are always linked, and
+		// only the iconv trio sits in an archive.
+		if cxx || len(c.WrapDlopen) > 0 || c.HostDlopen {
 			out = append(out,
 				"-Wl,-u,__wrap_iconv_open",
 				"-Wl,-u,__wrap_iconv",
