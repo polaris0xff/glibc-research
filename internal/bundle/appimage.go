@@ -191,6 +191,11 @@ func (b *Builder) Build() error {
 		b.DropUnreachable()
 	}
 	b.integrity()
+	// ⛔ AFTER the sweep, for the same reason integrity() is: the manifests
+	// have to be checked against what actually ships, not against what the
+	// AppDir held before anything was deleted. It reads the half of the
+	// bundle that is DATA, which is where all four of T-071's failures were.
+	b.manifestIntegrity()
 	return b.pack()
 }
 

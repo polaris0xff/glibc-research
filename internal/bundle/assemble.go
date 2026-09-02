@@ -360,6 +360,53 @@ func copyTreeNoClobber(src, dst string) error {
 // icdLibraryPath matches the absolute store path an ICD JSON names.
 var icdLibraryPath = regexp.MustCompile(`("library_path"\s*:\s*")/nix/store/[^"]*/([^/"]+)"`)
 
+// storePathLine matches a whole line that is nothing but an absolute store
+// path. An OpenCL vendor .icd is not JSON at all: it is one library per line,
+// and nixpkgs writes the store path there.
+var storePathLine = regexp.MustCompile(`(?m)^[ \t]*(/nix/store/\S*/([^/\s]+))[ \t]*$`)
+
+// rewriteManifestPaths turns every absolute store path inside the bundle's
+// vendor and ICD manifests into the bare soname beside it, and returns how
+// many files it looked at.
+//
+// ⛔ IT ITERATES THE SWEEP'S OWN manifestGlobs, AND THAT IS THE POINT. These
+// two lists were separate and had drifted: the sweep knew about
+// share/vulkan/explicit_layer.d and etc/OpenCL/vendors and the rewrite did
+// not, so a layer's library was correctly kept as a reachability root and
+// then kept a `/nix/store` path inside the file that named it. ⚠ That is
+// worse than either mistake alone — the bundle carries the library, the
+// manifest points somewhere that does not exist on the target, and the
+// integrity check sees nothing wrong because no DT_NEEDED is involved. One
+// list means the two rules cannot disagree about which files matter.
+func rewriteManifestPaths(appDir string) int {
+	n := 0
+	for _, pat := range manifestGlobs {
+		files, _ := filepath.Glob(filepath.Join(appDir, pat))
+		for _, f := range files {
+			data, err := os.ReadFile(f)
+			if err != nil {
+				continue
+			}
+			out := icdLibraryPath.ReplaceAll(data, []byte(`${1}${2}"`))
+			// A bare-path line is rewritten only when what it names looks
+			// like a shared object; a manifest that lists a data file by
+			// path is left exactly as it was.
+			out = storePathLine.ReplaceAllFunc(out, func(m []byte) []byte {
+				g := storePathLine.FindSubmatch(m)
+				if g == nil || !IsSharedObject(string(g[2])) {
+					return m
+				}
+				return g[2]
+			})
+			if string(out) != string(data) {
+				_ = os.WriteFile(f, out, 0o644)
+			}
+			n++
+		}
+	}
+	return n
+}
+
 func (b *Builder) desktopAndIcon() error {
 	// Every share/ tree in the closure, merged.
 	matches, _ := filepath.Glob(filepath.Join(b.Root, "*", "share"))
@@ -367,30 +414,11 @@ func (b *Builder) desktopAndIcon() error {
 		_ = copyTreeNoClobber(d, filepath.Join(b.AppDir, "share"))
 	}
 
-	// The ICD JSONs name an absolute store path, which is the last hop of the
+	// The manifests name an absolute store path, which is the last hop of the
 	// OpenGL problem: libglvnd finds the vendor file, opens the path it names
 	// and fails, on a bundle that has the library sitting in lib/ beside it.
 	// Rewritten to the bare soname, which the loader resolves.
-	n := 0
-	for _, pat := range []string{
-		"share/glvnd/egl_vendor.d/*.json",
-		"share/vulkan/icd.d/*.json",
-		"share/vulkan/implicit_layer.d/*.json",
-	} {
-		files, _ := filepath.Glob(filepath.Join(b.AppDir, pat))
-		for _, f := range files {
-			data, err := os.ReadFile(f)
-			if err != nil {
-				continue
-			}
-			out := icdLibraryPath.ReplaceAll(data, []byte(`${1}${2}"`))
-			if string(out) != string(data) {
-				_ = os.WriteFile(f, out, 0o644)
-			}
-			n++
-		}
-	}
-	if n > 0 {
+	if n := rewriteManifestPaths(b.AppDir); n > 0 {
 		logx.Say("icd json    %d rewritten to bare sonames", n)
 	}
 
@@ -563,6 +591,88 @@ func (b *Builder) integrity() {
 	logx.Warnf("%d DT_NEEDED name(s) do not resolve inside the bundle:", len(names))
 	for _, n := range names {
 		logx.Warnf("             %s", n)
+	}
+}
+
+// manifestIntegrity checks the half of the bundle that is DATA rather than
+// code: every vendor and ICD manifest must name a library that is IN the
+// bundle, by a name the loader can resolve there.
+//
+// ⛔ THE GAP IT CLOSES, AND FOUR FAILURES WENT THROUGH IT. `integrity()` above
+// walks DT_NEEDED, which is the graph the linker wrote. The GL stack is not on
+// that graph at all: libglvnd finds its vendor by reading a JSON file and
+// `dlopen`ing the string inside it, so a manifest naming
+// `/nix/store/…/libEGL_mesa.so.0` produces a bundle where every DT_NEEDED
+// resolves, every file is present, every check passes — and `eglInitialize`
+// fails on the target because that path does not exist there. `TODO` T-071
+// lists four distinct failures of this stack and every one of them was in
+// data; this is the first check that reads data.
+//
+// ⚠ A REPORT, not a refusal, for the same reason `integrity()` is one: a
+// closure can legitimately carry a manifest for a vendor it did not bundle.
+// What must not happen is that it goes unsaid.
+func (b *Builder) manifestIntegrity() {
+	provided := map[string]bool{}
+	for _, d := range []string{"lib", "lib32"} {
+		entries, err := os.ReadDir(filepath.Join(b.AppDir, d))
+		if err != nil {
+			continue
+		}
+		for _, e := range entries {
+			provided[e.Name()] = true
+		}
+	}
+	var outside, absent []string
+	n := 0
+	for _, g := range manifestGlobs {
+		files, _ := filepath.Glob(filepath.Join(b.AppDir, g))
+		for _, f := range files {
+			data, err := os.ReadFile(f)
+			if err != nil {
+				continue
+			}
+			n++
+			rel, _ := filepath.Rel(b.AppDir, f)
+			// The same two forms librariesNamedInManifests reads: a JSON
+			// "library_path", and — for an OpenCL .icd, which is not JSON —
+			// one library per line.
+			var named []string
+			for _, m := range manifestLibrary.FindAllSubmatch(data, -1) {
+				named = append(named, string(m[1]))
+			}
+			if strings.HasSuffix(f, ".icd") {
+				for _, line := range strings.Fields(string(data)) {
+					if IsSharedObject(line) {
+						named = append(named, line)
+					}
+				}
+			}
+			for _, v := range named {
+				// An absolute path is the failure mode by itself: it can only
+				// resolve on the machine the closure was built on.
+				if strings.HasPrefix(v, "/") {
+					outside = append(outside, rel+" -> "+v)
+				}
+				if !provided[filepath.Base(v)] {
+					absent = append(absent, rel+" -> "+filepath.Base(v))
+				}
+			}
+		}
+	}
+	if n == 0 {
+		return
+	}
+	if len(outside) == 0 && len(absent) == 0 {
+		logx.Say("manifests   %d name only libraries present in the bundle", n)
+		return
+	}
+	sortStrings(outside)
+	sortStrings(absent)
+	for _, s := range outside {
+		logx.Warnf("a manifest still names a path OUTSIDE the bundle: %s", s)
+	}
+	for _, s := range absent {
+		logx.Warnf("a manifest names a library the bundle does not have: %s", s)
 	}
 }
 

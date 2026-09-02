@@ -1057,7 +1057,7 @@ one any more.
 ### ⭐ WHERE IT STANDS — ALL SIX GATES MET
 
 **The tool is Go.** One static binary; the shell and Python are retired under
-`HISTORY/` and are the oracle. 138 carried selftests pass and 1 cannot run here
+`HISTORY/` and are the oracle. 187 carried selftests pass and 1 cannot run here
 (no `zstd` binary), `sh TODO/check.sh` and `sh scripts/common/check-docs.sh`
 are green, and CI is green at 16 of 16 jobs.
 
@@ -1510,6 +1510,63 @@ take away.**
 residue, class C residue, POCs building, `21-` verdict — and a ruling: move the
 pin, or record why the floor-adjacent pin is right after all. ⛔ Not "it built".
 
+### ⭐ MEASURED 2026-09-02d — `experiments/91-glibc-pin-candidates.sh`
+
+⛔ **The veto clears, and it is the half that could have ended this.** A static
+binary's only host requirement is the kernel, so the question was whether a
+newer glibc's crt files declare a higher one. They do not:
+
+| image | glibc | gcc | `.note.ABI-tag` | `file(1)` |
+|---|---|---|---|---|
+| `debian:12` (incumbent) | 2.36 | 12.2.0 | **3.2.0** | `for GNU/Linux 3.2.0` |
+| `debian:trixie` | **2.41** | 14.2.0 | **3.2.0** | `for GNU/Linux 3.2.0` |
+| `ubuntu:24.04` | — | — | ⚠ **could not run** | registry answered `429` |
+
+⭐ **Two instruments that could have disagreed, and did not.** `readelf -n` reads
+the note glibc encoded; `file` prints its own interpretation of the same bytes.
+
+**And the ceiling collapses.** `experiments/73-` run once per pin, same day,
+same eleven environments, `PGB_ENV_NAME` the only variable:
+
+| environment | class B @ 2.36 | class B @ 2.41 | symbols served |
+|---|---|---|---|
+| debian-11 | 0 | 0 | 905 → 905 |
+| debian-12 | 0 | 0 | 851 → **849** |
+| ubuntu-20.04 | 0 | 0 | 893 → 893 |
+| rockylinux-8 | 0 | 0 | 1049 → 1049 |
+| opensuse-leap-15.6 | **13** | **0** | 993 → **1005** |
+| fedora-42 | **15** | **0** | 961 → **976** |
+| archlinux-latest | **20** | **5** | 1198 → **1213** |
+
+    class B, distinct symbols   20 at 2.36  ->  5 at 2.41
+    class C (the pin REMOVED it) empty on all 11 rows at BOTH pins
+
+⭐ **The whole `__isoc23_*` family at `GLIBC_2.38` is gone**, and the five that
+remain are at `GLIBC_2.42`/`2.43` on `archlinux-latest` alone —
+`__memset_explicit_chk`, `free_sized`, `free_aligned_sized`, `__inet_pton_chk`,
+`__inet_ntop_chk`. ⚠ **Which is the entry's own point restated: a rolling
+distribution is always ahead of any pin.** Moving to 2.41 does not end class B;
+it empties it for every fixed-release environment measured and leaves the
+rolling one, which is the residue that regrows.
+
+⚠ **THE ONE COST, REPORTED RATHER THAN ROUNDED OFF.** `debian-12` serves **two
+fewer** symbols at 2.41 — 851 → 849, class A 5→6 and class S 41→42. Net across
+the seven glibc rows is **+40 served, −2**. ⛔ Class C being empty is the
+stronger statement: nothing a host object wants was *removed* by the newer
+glibc, on any row.
+
+**⛔ What is NOT yet measured, and the ruling waits on it.**
+
+| | |
+|---|---|
+| the NSS floor at 2.41 | ⚠ the probes are BUILT against 2.41 and were not RUN: the target is `debian-11`, which is in the bed, and the bed was occupied. **This is the one that can still veto** — the pin exists for it |
+| the ten POCs at 2.41 | `pgb-env-debian-trixie` exists and carries the full package list; ⚠ a newer glibc deprecates as well as adds, and gcc goes 12.2.0 → 14.2.0 with it, which is the larger of the two changes |
+
+⛔ **So the pin has NOT moved and `cfg.go` is untouched.** On the evidence so
+far the move is indicated — the cost side is a kernel floor that did not move
+and a class C that is empty — but "indicated" is not "measured", and the two
+rows above are what stands between them.
+
 ---
 
 ## T-072 — the static TLS surplus is 3,456 bytes and one real library wants 56,248
@@ -1530,13 +1587,51 @@ environment (`GLIBC_TUNABLES`) at exec time — which a library cannot arrange
 for itself, and which `docs/design/host-fallback.md`'s AT_SECURE discipline
 says must be ignored for a set-uid process anyway.
 
-**Routes, none tried.**
+**Routes.**
 
 | | |
 |---|---|
 | A | re-exec once with `GLIBC_TUNABLES=glibc.rtld.optional_static_tls=N` when a module needs more than the surplus. ⛔ Costs a re-exec and changes `/proc/self/exe` semantics; `pg83/solo` PR #5's ruling on intercepting routes-to-a-value is the read |
-| B | link the binary so its OWN `PT_TLS` is padded, making `memsz` larger and the block bigger. ⭐ Cheapest if it works: a dummy `__thread` array in the runtime, sized by a flag |
+| B | link the binary so its OWN `PT_TLS` is padded, making `memsz` larger and the block bigger. ⛔ **MEASURED AND REFUTED — see below** |
 | C | refuse, as now, and record the class. ⚠ 2 of 904 is the measured cost of doing nothing |
+| D | ⭐ **NEW, and the same measurement that refuted B is what opens it:** hand out slices of the runtime's OWN `__thread` array instead of glibc's surplus |
+
+### ⭐ MEASURED 2026-09-02d — B is refuted and D is opened by one probe
+
+A static probe reads glibc's own `_dl_tls_static_size`/`_used`/`_align` and the
+offsets of `errno` and of a padding array from the thread pointer. Built twice
+in `pgb-env-debian12` (glibc 2.36, gcc 12.2.0), the only difference `-DPADSZ`:
+
+    no pad     : size=3264  used=96     align=64  headroom=3168
+    64 KiB pad : size=68864  used=65648  align=64  headroom=3216
+                 pad at tp-65616
+
+⛔ **Route B does not work.** Padding the executable's own `PT_TLS` raises
+`_dl_tls_static_size` by 65,600 **and** `_dl_tls_static_used` by 65,552. The
+headroom moves 3,168 → 3,216: **+48 bytes**, which is alignment rounding. The
+surplus is a constant and does not scale with the program's own TLS, so "a
+dummy `__thread` array sized by a flag" buys nothing *as a way of enlarging the
+surplus*.
+
+⭐ **But the same numbers show why D works.** The pad IS allocated, in every
+thread, at a **stable offset from the thread pointer** — it is simply accounted
+as `used` rather than as surplus. A loader that allocates initial-exec modules
+out of **its own** `__thread` array therefore gets exactly what it reserved:
+65,536 bytes against 3,168, and the one measured library wanting 56,248 fits.
+
+⭐ **And D removes a dependency rather than adding one.** Placing a module in
+our own array needs no `_dl_tls_static_used`/`_size`/`_align` at all; those
+three glibc internals — the ones `docs/design/glibc-versions.md` §4 flags as
+unversioned and unpromised — stay only for `el_tls_bookkeeping_sane()`'s
+cross-check.
+
+**Costs D must state, not discover.**
+
+| | |
+|---|---|
+| every thread pays it | the reserve is in the executable's `PT_TLS`, so it is allocated per thread whether or not anything dlopens. ⛔ Sized by a flag, defaulting to not reserved |
+| alignment | the array needs an explicit `aligned()` at least as large as any module `p_align` it serves — 64 observed here |
+| threads | unchanged from today: the init image is seeded in the loading thread, and threads created later see zero |
 
 **Prove.** The surplus measured before and after, and the two objects that
 fail today either loading or refused with the number they needed.

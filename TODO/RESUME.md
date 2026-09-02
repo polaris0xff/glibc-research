@@ -29,51 +29,114 @@ minutes. `./pgb bootstrap --detach` does all of it in parallel;
 `./pgb bootstrap --check` says when it is ready.
 
     make                            builds ./pgb, ~15 s
-    ./pgb selftest                  138 pass, 1 could not run (no zstd), exit 2
+    ./pgb selftest                  187 pass, 1 could not run (no zstd), exit 2
     make check                      selftests + both record gates, exits 0
     disk                            30 GiB free at session start
 
 ## In flight right now
 
-    (session start — bootstrap and codegraph install running in background)
+    (nothing running)
 
-## ⛔ FIRST: kdenlive is STILL UNVALIDATED, FOUR RUNS IN
+    the trixie build environment      READY, glibc 2.41, full package list, at
+                                      /var/lib/pgb-rootfs/pgb-env-debian-trixie
+    T-070 NSS probes                  BUILT against 2.41, not yet run:
+                                      /var/tmp/t070/debian-trixie/nss-{fix,plain}
 
-`sh experiments/90-kdenlive-vs-enhanced.sh` (~25 min, needs the bed to itself).
+## ⭐ KDENLIVE IS VALIDATED — RUN 5, `safe`, exit 0, pass=8 fail=0 skip=1
+
+⛔ **The first bundle in five runs that renders.** `evidence/90-.../RESULT.txt`:
+
+    ours rendered on every environment    11 of 11
+    the competitor did too                11 of 11
+    zero host shared objects              ours 11/11, the competitor 4/11
+
+    ours   471,033,944 B   render 4,947 ms   startup 300 ms cold / 239 warm
+    enh    191,900,604 B   render 2,033 ms   startup  61 ms cold /  82 warm
+    ratio          2.45x          2.43x slower
+
+⛔ **So the operator's bar is NOT met on any of the three columns**, and the
+1.39× that was quoted before was a size for a bundle that did not render.
+⭐ What ours does win: **0 host shared objects on every row**, against the
+competitor's 1 on each glibc row and **10 on rockylinux-8**.
+
+⚠ **Run 5 is `safe`, so it did NOT exercise the sweep** — `DropUnreachable` is
+gated on `aggressive` (`internal/bundle/appimage.go`). Run 6 must set
+`PGB_APPIMAGE_DEBLOAT=aggressive`.
+
+⛔ **AND THE ARTEFACT CACHE IS KEYED ON THE BUNDLER'S MTIME, NOT ON THE BUILD
+OPTIONS** — so a re-run at `aggressive` would silently re-measure the `safe`
+artefact. That is the run-2 defect in a new costume. Fix it in
+`experiments/90-` before run 6.
+
+## T-070: the veto is measured and it CLEARS
+
+    debian:12  glibc 2.36  gcc 12.2.0  kernel floor 3.2.0   (incumbent)
+    debian:13  glibc 2.41  gcc 14.2.0  kernel floor 3.2.0   ⭐ SAME
+    ubuntu:24.04                        could not run: registry 429
+
+Both instruments agree on both rows — `readelf -n` `.note.ABI-tag` and
+`file(1)`. ⭐ **So moving the pin past GLIBC_2.38 costs nothing on the one
+property the entry named as the thing a move could take away.**
+
+**And the ceiling collapses** (`experiments/73-`, once per pin, same day):
+
+    ENVIRONMENT            B@2.36   B@2.41   SERVED
+    opensuse-leap-15.6     13       0        993  -> 1005
+    fedora-42              15       0        961  -> 976
+    archlinux-latest       20       5        1198 -> 1213
+    debian-12              0        0        851  -> 849     ⚠ the one cost
+    the other four         0        0        unchanged
+
+    class B distinct   20 -> 5     class C   empty at BOTH pins, all 11 rows
+
+⚠ The five left are at `GLIBC_2.42`/`2.43` on `archlinux-latest` alone — a
+rolling distribution is ahead of any pin, which is the residue that regrows.
+
+⚠ **`debian:13` 429s at the registry while `debian:trixie` resolves**, and
+`pgb rootfs pull` succeeds where `docker pull` is rate-limited — pgb does the
+anonymous-token dance, dockerd's HEAD does not.
+
+## T-072: route B is refuted and route D is opened, by one measurement
+
+    no pad     : size=3264  used=96    headroom=3168
+    64 KiB pad : size=68864 used=65648 headroom=3216   pad at tp-65616
+
+Padding the binary's own `PT_TLS` raises `_dl_tls_static_size` **and**
+`_dl_tls_static_used` together: +48 bytes of headroom, which is alignment
+noise. ⭐ But the pad IS allocated in every thread at a stable offset, so a
+loader handing out slices of **its own** `__thread` array gets what it reserved
+— 65,536 against 3,168 — and needs none of glibc's internals to place them.
+
+## ⛔ WHY RUNS 1–4 FAILED, KEPT SO IT IS NOT RE-DERIVED
 
     run 1  the sweep ran BEFORE writeEnv wrote .env, so MLT's modules were
            deleted. `ours rendered 0 of 11`. Fixed by ordering.
     run 2  the experiment REUSED the cached artefact, so the fix was never
            exercised -- it reported 267,390,365 B to the digit. Fixed: it
-           now rebuilds when ./pgb is newer than the artefact.
+           rebuilds when ./pgb is newer than the artefact.
     run 3  `melt`: "Failed loading SDL3 library." libSDL3.so.0 is dlopen'd
            BY NAME from inside an MLT module. Fixed: soname-string roots,
            and sweep deletion moved to `aggressive`.
-    run 4  ⛔ INVALID, AND THE CAUSE WAS THE AGENT'S OWN KILL. The run was
-           stopped mid-pack; build-ours.log ends "packing with uruntime +
-           dwarfs" / "Terminated", so the 471,020,146-byte artefact was a
-           TRUNCATED AppImage. It says NOTHING about the code.
+    run 4  ⛔ INVALID, AND THE CAUSE WAS THE AGENT'S OWN KILL, mid-pack.
+    run 5  ⭐ VALID. 11/11 render, 11/11 zero host objects.
 
-⭐ **Run 3's fixes have never been tested end to end.** ⛔ Do not kill the run;
-if you must stop, delete `/var/tmp/pgb-appimage-kden/kdenlive/*.AppImage`
-afterwards, because the staleness rule reuses a non-empty artefact older than
-`./pgb`.
+⛔ **Do not kill a run.** If you must stop one, delete
+`/var/tmp/pgb-appimage-kden/kdenlive/*.AppImage` afterwards — the staleness
+rule reuses a non-empty artefact that is older than `./pgb`.
 
 ## ⛔ WHAT IS LEFT, IN ORDER (reordered 2026-09-02c by the operator)
 
-    T-070  P0  ⛔ THE GLIBC PIN. The only thing here that gets WORSE by being
-               left alone: class B is 20 symbols, 14 at exactly GLIBC_2.38,
-               and it widens each release. Pin 2.36, floor 2.34, output
-               STATIC so there is no upward pressure. ⛔ Measure the kernel
-               floor a newer glibc declares BEFORE moving.
-    T-071  P0  EGL from a nixpkgs closure. Four failures, every one in DATA.
-               ⛔ Known half-fix: implicit_layer.d/explicit_layer.d are in
-               the SWEEP's globs but not the REWRITE's.
+    T-070  P0  ⭐ VETO CLEARED and class B measured at both pins (above).
+               ⛔ NOT YET: the NSS floor at 2.41 (probes built, bed was busy)
+               and the ten POCs at 2.41. cfg.go is UNTOUCHED.
+    T-071  P0  EGL from a nixpkgs closure. ⭐ The half-fix is CLOSED: the
+               rewrite now iterates the sweep's own manifestGlobs, and
+               manifestIntegrity() is the first check in this tree that reads
+               DATA rather than DT_NEEDED. Items 3, 4 and 5 remain.
     T-068  P1  the loader residue, 86 of 904; crashes 30 -> 10 and the 10 are
                ONE family, large C++ libraries. libLLVM dies in the 605th
                static constructor.
-    T-072  P1  static TLS surplus: 3,176 bytes of headroom, one real library
-               wants 56,248. Three untried routes.
+    T-072  P1  ⭐ route B REFUTED, route D opened and costed (above).
     T-066  P0  the bundler. Remaining gap is WHERE THE CLOSURE COMES FROM.
     then   T-063, T-062, T-060, T-054, T-057, T-051, T-012, then P2.
 

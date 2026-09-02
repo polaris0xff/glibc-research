@@ -212,10 +212,15 @@ func containsString(list []string, want string) bool {
 // left still resolves inside the bundle, so a mistake here is a build failure
 // rather than a bundle that dies on someone's machine.
 //
-// ⚠ It runs at `safe` as well as `aggressive`. A structural proof that nothing
-// can reach an object is not a size/function trade of the kind `--debloat
-// aggressive` exists to gate; the locale rule above is one of those and this
-// is not.
+// ⛔ IT RUNS AT `aggressive` ONLY, AND THIS COMMENT USED TO SAY THE OPPOSITE.
+// The argument for running it at `safe` was that a structural proof of
+// unreachability is not a size/function trade of the kind `--debloat
+// aggressive` exists to gate. ⚠ Three misses in one afternoon retired that
+// argument — MLT's modules, libglvnd's vendor libraries and a libSDL3.so.0
+// dlopen'd by name from inside an MLT module — and the gate moved in
+// `appimage.go`. The comment did not move with it, so for a day the code and
+// its own documentation disagreed about which level deletes files. The gate
+// and its reasoning live at the call site; this is a pointer to it.
 func (b *Builder) DropUnreachable() {
 	res, err := Sweep(SweepOptions{
 		Dir:      b.AppDir,
