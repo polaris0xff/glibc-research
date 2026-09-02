@@ -5,55 +5,18 @@ dep skip    gtk+3-3.24.52-dev (in NIX_DEP_SKIP)
 dep skip    mariadb-connector-c-3.3.5-dev (in NIX_DEP_SKIP)
 dep skip    libpq-18.4-dev (in NIX_DEP_SKIP)
 dep build   libxml2  (depth 1)
-derivations 8 fetched and verified over HTTPS
 dep build   find-xml-catalogs-hook  (depth 2)
-derivations 3 fetched and verified over HTTPS
 pgb: the plan has no source
 pgb: dep FAILED  find-xml-catalogs-hook -- its source could not be fetched
 patches     1 applied (-p1)
+repointed --exec-prefix=/02qcpld1y6xhs5gz9bchpxaw0xdhmsp5dv88lh25r2ss44kh8dxz -> --exec-prefix=/var/tmp/pgb-poc/91-qt-xcb/prefix
 pgb: dropped shared-library flag: --enable-shared
 build system: autoreconf pkg-config 
-round 1: configure --exec-prefix=/02qcpld1y6xhs5gz9bchpxaw0xdhmsp5dv88lh25r2ss44kh8dxz --disable-static --without-icu --without-python --without-http --without-zlib --without-docs  
+round 1: configure --exec-prefix=/var/tmp/pgb-poc/91-qt-xcb/prefix --disable-static --without-icu --without-python --without-http --without-zlib --without-docs  
 round 1: built
 dep ok      libxml2 -> /var/tmp/pgb-poc/91-qt-xcb/prefix
 dep skip    libxslt-1.1.45-dev (in NIX_DEP_SKIP)
-dep build   openssl  (depth 1)
-patches     3 applied (-p1)
-build system:  
-round 1: configure shared --libdir=lib --openssldir=etc/ssl enable-ec_nistp_64_gcc_128 enable-ktls  
-
-pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
-  pgb: build root is ./demos (found Makefile there, not at the top)
-  sh: 24: man: not found
-  make[1]: Entering directory '/root/.local/state/pgb/nix-deps/1052447777/openssl/build/openssl-3.6.3/demos/bio'
-  /root/.local/state/pgb/bin-3966734765/cc -I../../include -g -Wall -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include   -c -o client-arg.o client-arg.c
-  /root/.local/state/pgb/bin-3966734765/cc -I../../include -g -Wall -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include   -c -o client-conf.o client-conf.c
-  /root/.local/state/pgb/bin-3966734765/cc -I../../include -g -Wall -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include   -c -o saccept.o saccept.c
-  /root/.local/state/pgb/bin-3966734765/cc -I../../include -g -Wall -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include   -c -o sconnect.o sconnect.c
-  client-arg.c:11:10: fatal error: openssl/err.h: No such file or directory
-     11 | #include <openssl/err.h>
-        |          ^~~~~~~~~~~~~~~
-  client-conf.c:11:10: fatal error: openssl/err.h: No such file or directory
-     11 | #include <openssl/err.h>
-        |          ^~~~~~~~~~~~~~~
-  compilation terminated.
-  compilation terminated.
-  make[1]: *** [<builtin>: client-arg.o] Error 1
-  make[1]: *** Waiting for unfinished jobs....
-  make[1]: *** [<builtin>: client-conf.o] Error 1
-  saccept.c:23:10: fatal error: openssl/err.h: No such file or directory
-     23 | #include <openssl/err.h>
-        |          ^~~~~~~~~~~~~~~
-  compilation terminated.
-  sconnect.c:21:10: fatal error: openssl/err.h: No such file or directory
-     21 | #include <openssl/err.h>
-        |          ^~~~~~~~~~~~~~~
-  compilation terminated.
-  make[1]: *** [<builtin>: saccept.o] Error 1
-  make[1]: *** [<builtin>: sconnect.o] Error 1
-  make[1]: Leaving directory '/root/.local/state/pgb/nix-deps/1052447777/openssl/build/openssl-3.6.3/demos/bio'
-  make: *** [Makefile:18: all] Error 2
-pgb: dep FAILED  openssl -- the parent will have to do without it
+dep have    openssl
 dep skip    sqlite-3.53.3-dev (in NIX_DEP_SKIP)
 dep skip    zlib-1.3.2-dev (in NIX_DEP_SKIP)
 dep skip    libglvnd-1.7.0-dev (in NIX_DEP_SKIP)
@@ -89,57 +52,11 @@ dep skip    libdatrie-2019-12-20-dev (in NIX_DEP_SKIP)
 dep skip    systemd-minimal-libs-261.1-dev (in NIX_DEP_SKIP)
 dep skip    fontconfig-2.18.2-dev (in NIX_DEP_SKIP)
 dep skip    freetype-2.14.3-dev (in NIX_DEP_SKIP)
-dep build   libx11  (depth 1)
-dep have    xorgproto
-dep have    libpthread-stubs
-dep have    libxcb
-dep have    xtrans
-dep have    xorgproto
-patches     0 applied (-p1)
-build system: pkg-config 
-round 1: configure  
-round 1: built
-dep ok      libx11 -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep have    libx11
 dep skip    libxcomposite-0.4.7-dev (in NIX_DEP_SKIP)
-dep build   libxext  (depth 1)
-dep have    libx11
-dep have    xorgproto
-dep have    xorgproto
-dep have    libxau
-patches     0 applied (-p1)
-build system: pkg-config 
-round 1: configure  
-round 1: built
-dep ok      libxext -> /var/tmp/pgb-poc/91-qt-xcb/prefix
-dep build   libxi  (depth 1)
-dep have    xorgproto
-dep have    libx11
 dep have    libxext
-dep build   libxfixes  (depth 2)
-patches     0 applied (-p1)
-build system: pkg-config 
-round 1: configure  
-round 1: built
-dep ok      libxfixes -> /var/tmp/pgb-poc/91-qt-xcb/prefix
-dep have    xorgproto
-dep have    libx11
-dep have    libxext
-dep have    libxfixes
-patches     0 applied (-p1)
-build system: pkg-config 
-round 1: configure  
-round 1: built
-dep ok      libxi -> /var/tmp/pgb-poc/91-qt-xcb/prefix
-dep build   libxrender  (depth 1)
-dep have    xorgproto
-dep have    libx11
-dep have    xorgproto
-dep have    libx11
-patches     0 applied (-p1)
-build system: pkg-config 
-round 1: configure  
-round 1: built
-dep ok      libxrender -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep have    libxi
+dep have    libxrender
 dep have    libxcb
 dep build   libxkbcommon  (depth 1)
 dep have    xkeyboard-config
@@ -152,17 +69,6 @@ build system: meson ninja pkg-config
 round 1: configure  
 
 pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
-  Run-time dependency xkeyboard-config-4 found: NO (tried pkgconfig and cmake)
-  Run-time dependency xkeyboard-config-3 found: NO (tried pkgconfig and cmake)
-  Dependency xkeyboard-config-2 found: YES 2.48 (cached)
-  Has header "unistd.h" : YES 
-  Has header "dirent.h" : YES 
-  Checking if "__builtin_expect" links: YES 
-  Header "unistd.h" has symbol "eaccess" : YES 
-  Header "unistd.h" has symbol "euidaccess" : YES 
-  Header "sys/mman.h" has symbol "mmap" : YES 
-  Header "stdlib.h" has symbol "mkostemp" : YES 
-  Header "fcntl.h" has symbol "posix_fallocate" : YES 
   Header "string.h" has symbol "strndup" : YES 
   Header "stdio.h" has symbol "asprintf" : YES 
   Header "stdio.h" has symbol "open_memstream" : YES 
@@ -177,9 +83,20 @@ pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
   Program bison found: YES 3.8.2 3.8.2 (/usr/bin/bison)
   Run-time dependency xcb found: YES 1.17.0
   Run-time dependency xcb-xkb found: YES 1.17.0
-  Run-time dependency libxml-2.0 found: NO (tried pkgconfig and cmake)
+  Run-time dependency libxml-2.0 found: YES 2.15.3
+  Header "libxml/parser.h" has symbol "xmlCtxtSetErrorHandler" with dependency libxml-2.0: YES 
+  Header "libxml/parser.h" has symbol "xmlCtxtParseDtd" with dependency libxml-2.0: YES 
+  Run-time dependency icu-uc found: NO (tried pkgconfig and cmake)
+  Header "getopt.h" has symbol "getopt_long" : YES 
+  Run-time dependency bash-completion found: NO (tried pkgconfig and cmake)
+  Has header "linux/input.h" : YES 
+  Run-time dependency wayland-client found: NO (tried pkgconfig and cmake)
+  Run-time dependency wayland-protocols found: NO (tried pkgconfig and cmake)
+  Found CMake: /usr/bin/cmake (3.25.1)
+  Build-time dependency wayland-scanner found: NO (tried pkgconfig and cmake)
   
-  meson.build:532:17: ERROR: Dependency "libxml-2.0" not found, tried pkgconfig and cmake
+  meson.build:757:12: ERROR: Problem encountered: The Wayland xkbcli programs require wayland-client and wayland-protocols which were not found.
+  You can disable the Wayland xkbcli programs with -Denable-wayland=false.
   
   A full log can be found at /root/.local/state/pgb/nix-deps/1052447777/libxkbcommon/build/j59gh2hrsflxda2csxfbdkzfm3dj8400-source/_pgbbuild/meson-logs/meson-log.txt
 pgb: dep FAILED  libxkbcommon -- the parent will have to do without it
@@ -213,8 +130,97 @@ built into  /var/tmp/pgb-poc/91-qt-xcb/prefix
   ok    libxi
   ok    libxml2
   ok    libxrender
+  ok    openssl
   ok    xcb-proto
   ok    xkeyboard-config
   ok    xorgproto
   ok    xtrans
-ninja: error: loading 'build.ninja': No such file or directory
+'/usr/bin/cmake' '-DQT_INTERNAL_CALLED_FROM_CONFIGURE:BOOL=TRUE' '-DFEATURE_testlib=OFF' '-DCMAKE_INSTALL_PREFIX=/var/tmp/pgb-poc/91-qt-xcb/inst' '-DQT_QPA_PLATFORMS=xcb' '-DQT_QPA_DEFAULT_PLATFORM=xcb' '-DBUILD_SHARED_LIBS=OFF' '-DQT_BUILD_EXAMPLES=FALSE' '-DQT_BUILD_TESTS=FALSE' '-DCMAKE_BUILD_TYPE=Release' '-DFEATURE_force_bundled_libs=ON' '-DFEATURE_xcb=ON' '-DFEATURE_xkbcommon=ON' '-DINPUT_bundled_xcb_xinput=yes' '-DINPUT_opengl=no' '-DFEATURE_dbus=OFF' '-DFEATURE_glib=OFF' '-DFEATURE_icu=OFF' '-DINPUT_openssl=linked' '-DFEATURE_sql_sqlite=ON' '-DFEATURE_system_sqlite=OFF' '-DFEATURE_cups=OFF' '-DFEATURE_fontconfig=OFF' '-DFEATURE_libudev=OFF' '-G' 'Ninja' '/var/tmp/pgb-poc/91-qt-xcb/qtbase'
+-- The CXX compiler identification is GNU 12.2.0
+-- The C compiler identification is GNU 12.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /root/.local/state/pgb/bin-3966734765/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /root/.local/state/pgb/bin-3966734765/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- The ASM compiler identification is GNU
+-- Found assembler: /root/.local/state/pgb/bin-3966734765/cc
+-- CMAKE_BUILD_TYPE was already explicitly set to: 'Release'
+CMake Error at cmake/QtBuildInformation.cmake:559 (message):
+  Feature "xcb": Forcing to "ON" breaks its condition:
+
+      QT_FEATURE_thread AND TARGET XCB::XCB AND TEST_xcb_syslibs AND QT_FEATURE_xkbcommon_x11
+
+  Condition values dump:
+
+      QT_FEATURE_thread = "ON"
+      TARGET XCB::XCB not found
+      TEST_xcb_syslibs = ""
+      QT_FEATURE_xkbcommon_x11 not evaluated
+
+Call Stack (most recent call first):
+  cmake/QtFeature.cmake:831 (qt_configure_add_report_error)
+  cmake/QtFeature.cmake:968 (qt_feature_check_and_save_internal_value)
+  cmake/QtFeature.cmake:1249 (qt_evaluate_feature)
+  cmake/QtFeature.cmake:1213 (qt_feature_module_end)
+  src/CMakeLists.txt:13 (qt_feature_evaluate_features)
+
+
+CMake Error at cmake/QtBuildInformation.cmake:559 (message):
+  Feature "xkbcommon": Forcing to "ON" breaks its condition:
+
+      XKB_FOUND
+
+  Condition values dump:
+
+      XKB_FOUND = "FALSE"
+
+Call Stack (most recent call first):
+  cmake/QtFeature.cmake:831 (qt_configure_add_report_error)
+  cmake/QtFeature.cmake:968 (qt_feature_check_and_save_internal_value)
+  cmake/QtFeature.cmake:1249 (qt_evaluate_feature)
+  cmake/QtFeature.cmake:1213 (qt_feature_module_end)
+  src/CMakeLists.txt:13 (qt_feature_evaluate_features)
+
+
+
+-- Configuration summary has been written to /var/tmp/pgb-poc/91-qt-xcb/build/config.summary
+
+Note: Using static linking will disable the use of dynamically loaded plugins. Make sure to import all needed static plugins, or compile needed modules into the library.
+Note: Disabling X11 Accessibility Bridge: D-Bus or AT-SPI is missing.
+
+ERROR: Feature "xcb": Forcing to "ON" breaks its condition:
+    QT_FEATURE_thread AND TARGET XCB::XCB AND TEST_xcb_syslibs AND QT_FEATURE_xkbcommon_x11
+Condition values dump:
+    QT_FEATURE_thread = "ON"
+    TARGET XCB::XCB not found
+    TEST_xcb_syslibs = ""
+    QT_FEATURE_xkbcommon_x11 not evaluated
+
+ERROR: Feature "xkbcommon": Forcing to "ON" breaks its condition:
+    XKB_FOUND
+Condition values dump:
+    XKB_FOUND = "FALSE"
+
+
+CMake Error at cmake/QtBuildInformation.cmake:245 (message):
+  Check the configuration messages for an error that has occurred.
+Call Stack (most recent call first):
+  cmake/QtBuildInformation.cmake:64 (qt_configure_print_summary)
+  cmake/QtBuildRepoHelpers.cmake:397 (qt_print_feature_summary)
+  cmake/QtBaseHelpers.cmake:295 (qt_build_repo_end)
+  CMakeLists.txt:36 (qt_internal_qtbase_build_repo)
+
+
+-- Configuring incomplete, errors occurred!
+See also "/var/tmp/pgb-poc/91-qt-xcb/build/CMakeFiles/CMakeOutput.log".
+See also "/var/tmp/pgb-poc/91-qt-xcb/build/CMakeFiles/CMakeError.log".
+CMake Error at /var/tmp/pgb-poc/91-qt-xcb/qtbase/cmake/QtProcessConfigureArgs.cmake:1500 (message):
+  CMake exited with code 1.
+
+

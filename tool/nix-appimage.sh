@@ -49,6 +49,7 @@
 # Usage:
 #   sh tool/nix-appimage.sh ATTR-OR-STOREPATH [--out FILE] [--name NAME]
 #                           [--debloat none|safe|aggressive] [--keep-locales LIST]
+#                           [--with-program NAME]...
 #   sh tool/nix-appimage.sh --selftest
 #
 # Exit codes: 0 built, 1 did not, 2 could not run.
@@ -73,6 +74,11 @@ TARGET=""; OUT=""; NAME=""; SELFTEST=0; KEEP=0; EXTRA=""; NOGL=0
 # and a control behind it. `none` reproduces the pre-debloat bundle exactly,
 # which is what experiments/85- and 86- measured.
 DEBLOAT="${PGB_APPIMAGE_DEBLOAT:-safe}"
+# ⭐ Extra programs to carry, by name, found anywhere in the CLOSURE rather
+# than only in the entry package's own bin/. kdenlive is the case: it renders
+# by running `melt`, which lives in the mlt store path, and a bundle that
+# cannot render is not comparable to one that can.
+WITH_PROGRAMS="${PGB_APPIMAGE_WITH_PROGRAMS:-}"
 KEEP_LOCALES="${PGB_APPIMAGE_KEEP_LOCALES:-}"
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -82,6 +88,7 @@ while [ $# -gt 0 ]; do
     --extra)    shift; EXTRA="$EXTRA ${1:-}" ;;
     --no-gl)    NOGL=1 ;;
     --debloat)  shift; DEBLOAT="${1:-safe}" ;;
+    --with-program) shift; WITH_PROGRAMS="$WITH_PROGRAMS ${1:-}" ;;
     --keep-locales) shift; KEEP_LOCALES="${1:-}" ;;
     --selftest) SELFTEST=1 ;;
     -h|--help)  awk 'NR>1 { if (/^#/) { sub(/^# ?/, ""); print } else exit }' "$0"; exit 0 ;;
@@ -460,7 +467,27 @@ for _b in "$ROOT/$BASE"/bin/*; do
   chmod +x "$APPDIR/shared/bin/$_n"
   NEXTRA=$((NEXTRA + 1))
 done
-[ "$NEXTRA" -gt 0 ] && say "programs    $PROG + $NEXTRA more from the same bin/"
+# ⭐ AND ANY PROGRAM NAMED WITH --with-program, FOUND ANYWHERE IN THE CLOSURE.
+# An application's helper often lives in a DEPENDENCY's store path: kdenlive
+# renders by running `melt`, which is mlt's binary, not kdenlive's. ⚠ The
+# shallowest match wins and the path it came from is printed, because two
+# store paths can carry the same program name.
+for _w in $WITH_PROGRAMS; do
+  [ -n "$_w" ] || continue
+  [ -e "$APPDIR/shared/bin/$_w" ] && continue
+  _wp=$(find "$ROOT" -mindepth 3 -maxdepth 3 -path "*/bin/$_w" -type f 2>/dev/null | head -1)
+  [ -n "$_wp" ] || _wp=$(find "$ROOT" -maxdepth 4 -name "$_w" -type f -perm -u+x 2>/dev/null | head -1)
+  if [ -z "$_wp" ]; then
+    warn "--with-program $_w: no such program in the closure"
+    continue
+  fi
+  _wr=$(resolve_entry "$(dirname "$(dirname "$_wp")")" "$_w" 2>/dev/null) || _wr="$_wp"
+  cp -L "${_wr:-$_wp}" "$APPDIR/shared/bin/$_w" 2>/dev/null || continue
+  chmod +x "$APPDIR/shared/bin/$_w"
+  say "program     $_w  <- $(basename "$(dirname "$(dirname "$_wp")")")"
+  NEXTRA=$((NEXTRA + 1))
+done
+[ "$NEXTRA" -gt 0 ] && say "programs    $PROG + $NEXTRA more"
 
 # ⭐ EVERY SHARED OBJECT IN THE CLOSURE, not the ones ldd happens to name.
 # ⛔ A .so IS A NAME ENDING IN .so OR .so.N -- matching the substring also
@@ -947,7 +974,14 @@ say "packing with uruntime + dwarfs"
   --no-history --no-create-timestamp \
   --header "$CACHE/tools/uruntime" \
   --input "$APPDIR" --output "$OUT" \
-  -C zstd:level=19 -S26 >/dev/null 2>&1 || die "mkdwarfs failed"
+  -C zstd:level=19 -S26 >"$WORK/mkdwarfs.log" 2>&1 || {
+    # ⛔ ITS OWN ERROR, NOT OURS. `die "mkdwarfs failed"` with the output on
+    # /dev/null is a message with no information in it: measured here when the
+    # disk filled during a kdenlive pack and the run said only "mkdwarfs
+    # failed" for twenty minutes of work.
+    tail -12 "$WORK/mkdwarfs.log" >&2 2>/dev/null
+    die "mkdwarfs failed (its output is above, and in $WORK/mkdwarfs.log)"
+  }
 chmod +x "$OUT"
 say ""
 say "built  $OUT  ($(du -h "$OUT" | cut -f1))"

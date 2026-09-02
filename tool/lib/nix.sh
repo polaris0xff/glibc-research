@@ -816,8 +816,21 @@ nix_build_tree() {   # srcdir planfile workdir [install]
   # nixpkgs' configure flags, minus the ones naming a /nix/store path: those
   # point at a dependency that does not exist outside nix, and keeping them
   # makes configure fail on a path rather than on the real question.
+  # ⛔ THE FLAG LIST DEPENDS ON THE BUILD SYSTEM, AND ONLY ONE OF THE THREE WAS
+  # EVER READ. `configureFlags` was used for every package, so a cmake or meson
+  # package got NONE of the options nixpkgs had chosen for it -- and nix's own
+  # components are meson with `-Dgc=enabled`, `-Dcpuid=enabled`,
+  # `-Dseccomp-sandboxing=enabled` in the plan, every one of them silently
+  # dropped. The plan carries all three lists; this picks the one the hooks
+  # name.
+  _hooks=$(plan_get "$_pf" buildSystemHooks | tr '\n' ' ')
+  case " $_hooks " in
+    *" cmake "*) _flagkey=cmakeFlags ;;
+    *" meson "*) _flagkey=mesonFlags ;;
+    *)           _flagkey=configureFlags ;;
+  esac
   _flags=""
-  for _f in $(plan_get "$_pf" configureFlags); do
+  for _f in $(plan_get "$_pf" "$_flagkey"); do
     # ⛔ nixpkgs WRITES ITS OUTPUT PATHS AS PLACEHOLDERS, AND A PLACEHOLDER IS
     # A VALID-LOOKING DIRECTORY. Two spellings turn up in configureFlags:
     #
@@ -884,8 +897,7 @@ nix_build_tree() {   # srcdir planfile workdir [install]
     NIX_MAKE_FLAGS="$NIX_MAKE_FLAGS $_f"
   done
 
-  _hooks=$(plan_get "$_pf" buildSystemHooks | tr '\n' ' ')
-  [ -n "$_hooks" ] && say "build system: $_hooks"
+  [ -n "$_hooks" ] && say "build system: $_hooks ($_flagkey)"
 
   _round=0
   while [ "$_round" -lt "$NIX_MAX_ROUNDS" ]; do
@@ -966,10 +978,10 @@ nix_try_build() {   # srcdir flags log hooks [install]
 
   case " $_hk " in
     *" cmake "*)
-      _cmd="cd \"\$(pgb_build_root CMakeLists.txt)\" && cmake -S . -B _pgbbuild -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$NIX_PREFIX -DCMAKE_PREFIX_PATH=$NIX_PREFIX && cmake --build _pgbbuild -j $_j"
+      _cmd="cd \"\$(pgb_build_root CMakeLists.txt)\" && cmake -S . -B _pgbbuild -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$NIX_PREFIX -DCMAKE_PREFIX_PATH=$NIX_PREFIX $_fl && cmake --build _pgbbuild -j $_j"
       [ -n "$_in" ] && _cmd="$_cmd && cmake --install _pgbbuild" ;;
     *" meson "*)
-      _cmd="cd \"\$(pgb_build_root meson.build)\" && meson setup _pgbbuild --default-library=static --prefer-static --prefix=$NIX_PREFIX && ninja -C _pgbbuild"
+      _cmd="cd \"\$(pgb_build_root meson.build)\" && meson setup _pgbbuild --default-library=static --prefer-static --prefix=$NIX_PREFIX $_fl && ninja -C _pgbbuild"
       [ -n "$_in" ] && _cmd="$_cmd && ninja -C _pgbbuild install" ;;
     *)
       # ⛔ NOT EVERY PACKAGE HAS A ./configure, AND THE FALL-THROUGH USED TO
@@ -1073,6 +1085,27 @@ nix_try_build() {   # srcdir flags log hooks [install]
 # comment says which package and what it printed.
 nix_diagnose() {   # log srcdir flags -> a fix directive, or nothing
   _lg="$1"; _flags="${3:-}"
+
+  # ⭐ MESON SAYS WHAT TO DO, IN THE ERROR, IN ITS OWN WORDS, and taking it
+  # literally is not a guess. libxkbcommon 1.13.2:
+  #
+  #   meson.build:757:12: ERROR: Problem encountered: The Wayland xkbcli
+  #   programs require wayland-client and wayland-protocols which were not
+  #   found. You can disable the Wayland xkbcli programs with
+  #   -Denable-wayland=false.
+  #
+  # A project that prints the option to turn a feature off has already made
+  # the decision this loop would otherwise have to search for.
+  # ⚠ Only `-Dname=false|disabled` is taken. A suggestion to ENABLE something
+  # is a different sentence and is not acted on.
+  _mopt=$(grep -oE 'with -D[A-Za-z0-9_-]+=(false|disabled)' "$_lg" 2>/dev/null \
+          | head -1 | sed 's/^with //')
+  if [ -n "$_mopt" ]; then
+    case " $_flags " in
+      *" $_mopt "*) : ;;
+      *) printf '%s\n' "add:$_mopt"; return 0 ;;
+    esac
+  fi
 
   # bash 5.3. nixpkgs passes --with-installed-readline because it builds
   # against nixpkgs' readline; there is no static readline in the pgb
