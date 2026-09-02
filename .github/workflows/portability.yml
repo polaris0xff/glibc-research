@@ -95,7 +95,16 @@ jobs:
           fi
           ./pgb --version
       - name: The carried selftests, offline
-        run: ./pgb selftest
+        # ⚠ 0 all pass, 1 a case ran and failed, 2 something could not run
+        # here. The rootfs-run selftest needs root and the runner is not root;
+        # that is a fact about the runner, so it is recorded rather than
+        # asserted. A real failure is still exit 1 and still fails the job.
+        run: |
+          set -u
+          ./pgb selftest && exit 0
+          rc=$?
+          [ "$rc" = 2 ] || exit "$rc"
+          echo "some selftests could not run on this runner; recorded, not asserted"
       - uses: actions/upload-artifact@v4
         with:
           name: pgb

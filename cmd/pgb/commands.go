@@ -304,8 +304,9 @@ func selftestCommand(c *cfg.Config, args []string) error {
 			report.Merge(s.run())
 		}
 	}
-	if report.Print() != 0 {
-		return fail.Exit(1)
+	// 0 all pass, 1 a case ran and failed, 2 something could not run here.
+	if code := report.Print(); code != 0 {
+		return fail.Exit(code)
 	}
 	return nil
 }

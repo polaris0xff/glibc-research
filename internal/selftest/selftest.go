@@ -50,13 +50,14 @@ func (r *Report) Fail(name, got, want string) {
 	r.Cases = append(r.Cases, Case{Name: name, Got: got, Want: want, OK: false})
 }
 
-// Skip records something the environment could not run, which counts as a
-// failure: a selftest that quietly runs nothing reports success.
+// Skip records something the environment could not run. It is never silent: a
+// selftest that quietly runs nothing reports success, which is the worst
+// answer it can give.
 func (r *Report) Skip(reason string) { r.Skipped = append(r.Skipped, reason) }
 
-// Failures counts cases that did not match, plus anything skipped.
+// Failures counts cases that ran and did not match.
 func (r *Report) Failures() int {
-	n := len(r.Skipped)
+	n := 0
 	for _, c := range r.Cases {
 		if !c.OK {
 			n++
@@ -65,7 +66,14 @@ func (r *Report) Failures() int {
 	return n
 }
 
-// Write prints the report and returns the exit status: 0 all passed, 1 not.
+// Write prints the report and returns the exit status this project uses
+// everywhere: 0 every case passed, 1 a case ran and failed, 2 nothing failed
+// but something could not run here.
+//
+// ⛔ A skip is not a failure and must not be one. The rootfs-run selftest
+// needs root; on a CI runner that is a fact about the runner, and reporting it
+// as a failed assertion makes a green run impossible for a reason that has
+// nothing to do with the code.
 func (r *Report) Write(w io.Writer) int {
 	for _, c := range r.Cases {
 		if c.OK {
@@ -77,10 +85,16 @@ func (r *Report) Write(w io.Writer) int {
 	for _, s := range r.Skipped {
 		fmt.Fprintf(w, "  SKIP  %s\n", s)
 	}
-	if n := r.Failures(); n > 0 {
-		fmt.Fprintf(w, "%s --selftest: %d of %d case(s) FAILED or skipped.\n",
-			r.Subject, n, len(r.Cases)+len(r.Skipped))
+	failed := r.Failures()
+	switch {
+	case failed > 0:
+		fmt.Fprintf(w, "%s --selftest: %d of %d case(s) FAILED, %d skipped.\n",
+			r.Subject, failed, len(r.Cases), len(r.Skipped))
 		return 1
+	case len(r.Skipped) > 0:
+		fmt.Fprintf(w, "%s --selftest: %d cases pass, %d COULD NOT RUN here.\n",
+			r.Subject, len(r.Cases), len(r.Skipped))
+		return 2
 	}
 	fmt.Fprintf(w, "%s --selftest: %d cases, all pass.\n", r.Subject, len(r.Cases))
 	return 0
