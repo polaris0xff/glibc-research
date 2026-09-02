@@ -630,7 +630,20 @@ func (b *Builder) depPass(p *Plan, depth, pass int) (built, missing int) {
 	return built, missing
 }
 
+// buildDep builds one dependency into the shared static prefix.
+//
+// ⛔ `--configure` EXTRAS BELONG TO THE PACKAGE THE CALLER NAMED, NOT TO ITS
+// DEPENDENCIES. They were reaching every dependency's configure because a
+// dependency is built through this same Builder: `--without-icu`, given for
+// postgres, reached numactl, whose configure answered `unrecognized options:
+// --without-icu`. A flag meant for one package is noise in another's configure
+// and can silently mean something else in it.
 func (b *Builder) buildDep(drv, short string, depth int) error {
+	if len(b.ConfigureExtra) > 0 {
+		sub := *b
+		sub.ConfigureExtra = nil
+		b = &sub
+	}
 	key := b.depKey()
 	planPath := filepath.Join(b.C.State, "plans", key, "dep-"+short+".json")
 	if err := os.MkdirAll(filepath.Dir(planPath), 0o755); err != nil {
