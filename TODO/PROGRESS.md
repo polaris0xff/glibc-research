@@ -5,32 +5,29 @@ and the entries.
 
     STATE     2026-09-02
     COUNTS    34 entries, 16 open, 18 done
-    BASELINE  pgb: 11/11 run, 11/11 no host object, NINE POCs
+    BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN, 15 jobs, and it asserts criterion 2
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
-    NEW       ⛔ T-061 IS P0 AND IT IS THE NEXT SESSION'S ONLY WORK
+    NEW       ⭐ T-061 IS SUBSTANTIALLY LANDED. The toolchain is Go. What is
+              left of it is listed under "In progress" and is NOT the whole
+              entry: gate 5 has rows still running.
 
-## ⛔ READ THIS BEFORE ANYTHING ELSE: the next session ports the tooling to Go
+## ⛔ READ THIS FIRST: the toolchain is Go now, and the shell is the oracle
 
-⭐ **Operator ruling, 2026-09-02**, and it is not a suggestion about ordering:
+⭐ **`pgb` is one statically linked Go binary.** The driver, the compiler
+wrappers, the planner, the verifier and the bundler are the same executable,
+built `CGO_ENABLED=0`, carrying the C runtime sources it compiles. The shell
+and Python it replaced are under `HISTORY/<commit>/`, unedited, and are the
+oracle every gate is measured against.
 
-> *"when some backticks in some comments inside a shell script break everything
-> and lead to hours of wasted time, i think it's time we rewrite the tooling
-> properly … create a P0 XL task to port everything to go in next session and
-> pass all tests/experiments, reach current feature parity … After the next
-> session ports the whole thing to go, the next session after that will return
-> back to usual tasks."*
-
-**The entry is [`T-061`](toolchain.md), and it carries the whole brief**: the
-reading order, the six operator requirements beyond "port it", and the six
-workload gates that stand in for "done". ⛔ **Do not start from this file's
-summary of it.** Read the entry, then
+**Read [`toolchain.md`](toolchain.md) §T-061 for what was required, then
 [`../docs/design/toolchain.md`](../docs/design/toolchain.md) "Language and
-structure", which is where the decision and the gates now live.
+structure" for the decision, the architecture and the six gates.** The
+measurements are in `evidence/92-go-port/RESULT.txt`, per row, as they landed.
 
-⚠ **Everything else in this file is context for the session AFTER that one.**
-An entry below that touches shell or Python under `tool/` or `scripts/` is work
-that the port will throw away.
+⛔ **The experiments and the POCs stay shell** and are the acceptance harness.
+An entry below that proposes editing shell under `tool/` or `scripts/` is
+describing files that no longer exist; check `HISTORY/` before acting on it.
 
 ## ⭐ The operator's three goals
 
@@ -52,102 +49,86 @@ Quoted, because the framing is load-bearing:
 
 ## What the last session did
 
-### 1. T-054 rung 2 — a static Qt 6 application, with a real display
+### 1. T-061 — the whole toolchain ported to Go
 
-⛔ **The operator refused the previous rung as too narrow**: `poc/90-qt` built
-Qt with `-no-xcb -no-opengl -no-network -no-sql` and an **offscreen** QPA —
-*"not a Qt application, a Qt library that links."* `poc/91-qt-xcb` answers it:
-the X stack built static from the qtbase plan, `TEST_xcb_syslibs` overridden
-**with the static link proved first as the evidence**, `Q_IMPORT_PLUGIN` on the
-real platform plugin, and a probe that asserts an xcb connection, a screen, an
-**exposed** window, `QWidget::grab()`, OpenSSL linked and `QSQLITE`.
+~9,300 lines of POSIX shell and Python became one static binary. Every retired
+file was moved with `git mv` to `HISTORY/<commit>/<its original path>`, per the
+operator's ruling — the shell driver, the six sourced shell modules, the seven
+Python helpers, the bundler, the libiconv builder and the whole of the old
+`scripts/common`. Two commits hold them, one per retirement wave; `HISTORY/`
+lists both and `HISTORY/README.md` says why they are kept. ⭐ `tool/` is C
+runtime sources and nothing else now.
 
-    47,188,344 B static, no PT_INTERP, 0 DT_NEEDED
-    11 of 11 pass; host shared objects loaded: none, on every row
+⭐ **Gates 1, 2, 3, 4 and 6 are met with output**, and requirement 2's second
+half with them: pgb built by pgb inside the pinned environment is
+byte-identical to the host build. Gate 5 is nine POCs and eighteen
+experiments; the rows are in the evidence file and the rest are named under
+"In progress".
 
-### 2. T-055 — the kdenlive comparison exists, and the bar is not met
+### 2. The defects the port found, in code that had been trusted
 
-| | ours | kdenlive-AppImage-Enhanced | onelf, our payload |
-|---|---|---|---|
-| size | 395,294,317 B | **191,900,604 B** | 500,644,533 B |
-| render (melt → MP4) | 2,698 ms | **551 ms** | ⚠ not re-measured |
-| cold / warm start | 1,725 / 114 ms | **972 / 37 ms** | ⚠ not re-measured |
-| runs on the eleven | **11 of 11** | 11 of 11 | ⚠ |
-| **host objects loaded** | ⭐ **0 on all 11** | 1–10 on every glibc row | ⚠ |
+Each was found by a measurement disagreeing, not by reading:
 
-⭐ **One column is ours and it is the one the project is about**: the
-competitor loads host shared objects on all seven glibc rows and we load none
-anywhere. ⛔ **Three columns are theirs** and the entry says so in its own
-words rather than around them.
+1. ⛔ **`nix-plan.py` was not deterministic.** An output store path can be
+   claimed by more than one derivation — 14 of them in git's graph — and the
+   Python was last-writer-wins over document order. Ten shuffles of the same
+   graph gave 4 of one plan and 6 of another; the Go planner sorts the
+   claimants and gives one plan 10 times out of 10.
+2. ⛔ **The shell bootstrap built the wrong environment.** It called
+   `pgb env create` with no engine after starting dockerd, so the "chroot
+   environment" it made was a second docker one. `pgb bootstrap` names the
+   engine.
+3. ⛔ **`pgb nix deps` did not converge from a cold prefix.** It stops
+   recursing at `NIX_DEP_DEPTH`, so a dependency whose inputs sit below the
+   cut fails until a sibling has built them. `poc/91-qt-xcb` was five X
+   libraries short and a second run would have fixed it. The walk repeats
+   passes now while one is still landing something.
+4. ⛔ **Requirement 3 was written and never wired.** `internal/logx/stamp.go`
+   had the columns, the parser and the heartbeat, and nothing called
+   `NewStamper`: `pgb --ts build` printed no timestamps at all.
+5. ⛔ **`pgb selftest <typo>` printed "0 cases, all pass".** A name that
+   matches nothing selected nothing and reported success.
 
-⭐ **The route to the bar is measured, not guessed**: a reachability sweep from
-the four programs and every plugin directory says **488,934,276 bytes of
-`AppDir/lib` — 2,300 files, 39% — is not reachable by anything.** ⚠ The sweep
-was a scratch script and **was not committed**; T-061 carries rewriting it in
-Go, where requirement 6 (no hardcoded layout) applies to it.
+### 3. zstd, decoded in Go
 
-### 3. T-058, T-050 and T-053 closed, with controls
+cache.nixos.org serves NARs as `.nar.zst` and the pinned build environment
+carries no `zstd` binary, so `pgb nix build` inside it stopped dead — the
+retired Python reached `libzstd.so.1` through ctypes and `CGO_ENABLED=0` has
+no equivalent. `internal/zstd` decodes RFC 8878 with nothing outside the
+standard library, measured byte-identical against the reference encoder over
+120 frames at levels 1 to 22. ⚠ **xz still shells out**; the build environment
+has it and a target rootfs does not.
 
-- **T-058**: `pgb build` is concurrency-safe — a wrapper directory keyed on the
-  options themselves. ⭐ `experiments/87-` carries the **control that
-  reproduces the old defect 5 times out of 5**.
-- **T-050**: `experiments/88-`, 25 assertions. The route needed an **index of
-  what was built**, not a field somebody uploaded — `packages.json.br` plus
-  hydra's `latest-finished`.
-- **T-053**: patchelf and patsh, used or refused with the reason.
+### 4. The documentation
 
-### 4. The defects, and the one that caused T-061
-
-⛔ **A comment inside a double-quoted string is a command substitution.**
-`internal/nixx/build.go` named a file as `` `.built` `` in a comment inside a
-`_cmd="..."` assignment; the composing shell ran it and printed
-`pgb: 1: .built: not found` as boost's round 1 began. An hour went into a boost
-build that was never failing. ⭐ **That defect is the whole argument for
-T-061**, and the scan that would have caught it is one line:
-
-```sh
-awk '/^ *_cmd=/,/;; *$/' tool/lib/nix.sh | grep -c '`'      # must be 0
-```
-
-⛔ **onelf was reported as unable to run our payload. It runs it.** The arm
-invoked the bundle through a symlink named `melt-onelf`; onelf dispatches on
-argv[0]'s basename, matched no entrypoint, and **silently ran the package
-default** — kdenlive, which needs a display and died in `QMessageLogger::fatal`
-inside `QApplicationPrivate::init`. Through a symlink named `melt` the same
-bundle answers in 0.4 s. ⭐ **The control that settles it**: a 141 MB,
-188-library onelf package of the same nixpkgs ffmpeg runs on this machine. ⚠
-`experiments/90-` is fixed and **has not been re-run**.
-
-Eleven more, each a class rather than a quirk, are in the entries and in
-`docs/history/corrections.md`.
-
-### 5. The documentation, and a second gate for it
-
-⛔ **`docs/` went thirteen commits without an edit while five entries changed
-state**, and the way that was noticed was the operator saying so.
-⭐ **`scripts/common/check-docs.sh` is the fix**: dead links, backticked repo
-paths, cited evidence, referenced experiment numbers, quoted entry counts, and
-the vendored set's own unresolved-link list — all derived, none typed in. It
-found six real defects on its first green run, including a **wrong job count**
-in `docs/research/solo.md` (nine, not six) that no reading had caught.
-
-⭐ **`gate.md` and `reviews.md` are vendored now.** `sessions.md` §Ending said
-*"Run the gate. All three parts"* and named a file this tree did not have, for
-a whole session.
+`docs/design/toolchain.md` "Language and structure" was still asserting that
+the driver stays POSIX `sh`, and listing a sourced-shell-module layout that no
+longer exists. It records the Go decision now, with the ranked comparison,
+what "single binary" can and cannot mean, the package layout and the six
+gates folded in from the commissioned porting analysis, which is deleted as
+the operator asked.
 
 ## In progress
 
-⚠ **One thing, and it is a background build that survives being ignored.**
-T-060 rung 1: `sh /var/tmp/pgb-t060/rung1.sh` → `/var/tmp/pgb-t060/rung1e.log`,
-31 of nix's external dependencies built into `/var/tmp/pgb-t060/prefix`,
-idempotent on re-run. ⛔ **It is on `/var/tmp` and the machine is ephemeral**;
-treat it as gone.
+⛔ **These were running when the session was checkpointed and their rows are
+NOT in the evidence file.** Each is a shell script that can simply be re-run;
+none of them holds state that must be preserved.
+
+    poc/91-qt-xcb          from a COLD prefix, the proof of the fixed-point
+                           dependency walk. Was at 1,256 of 1,644 Qt objects.
+    experiments/89-        the debloater's three arms, Go bundler
+    experiments/60-        versus the alternatives
+
+⚠ **T-060 rung 1's `/var/tmp` build tree is gone with an old container.** The
+run is idempotent; treat it as never started.
 
 ## ⭐ Work order
 
-    T-061   ⛔ THE PORT. The only work of the next session. Everything below
-            waits, including anything that would edit shell under tool/.
-    ---- and then, in the session after ----
+    T-061   ⚠ FINISH IT. Gate 5's remaining rows (91-qt-xcb, 86, 89, 90, 60,
+            62), then the operator's post-port instruction: codegraph, the
+            deprecation sweep, two deep reviews, and a docs/AGENTS.md a fresh
+            session can start from alone.
+    ---- and then ----
     T-055   the bundle size: 489 MB of lib/ is unreachable and that is the cut
     T-060   rungs 2 and 3, the static nix
     T-054   rungs 3 (KF6) and 4 (kdenlive static)

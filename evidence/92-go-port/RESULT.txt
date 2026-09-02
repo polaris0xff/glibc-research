@@ -126,7 +126,8 @@ calls. rc=0 and the verdict line is the row.
   50-python                  0    123s  builds and works across the matrix
   80-mlt                     0    183s  builds and works across the matrix
   90-qt                      0    594s  builds and works across the matrix
-  91-qt-xcb                          -  see below
+  91-qt-xcb                          -  RE-RUNNING from a cold prefix when
+                                        the session was checkpointed; see below
 
   ⛔ 91-qt-xcb FAILED FIRST, ON A COLD PREFIX, AND THE DEFECT WAS OURS.
   `pgb nix deps` stops recursing at NIX_DEP_DEPTH, so libxcb was attempted
@@ -146,6 +147,11 @@ GATE 5 - the experiment suite, against the Go pgb
   30-gconv-and-locale         0  matched expectation
   40-overhead                 0  matched expectation
   50-host-plugin-feasibility  0  matched expectation
+  60-versus-alternatives      0  matched expectation (8 cases, 3 skipped:
+                                 onelf needs the rust musl target, and this
+                                 machine has neither flatpak nor mksquashfs)
+  61-libc-throughput          0  matched expectation (4 cases; needed
+                                 musl-tools, which was installed)
   70-carried-helper           0  matched expectation (12 of 12 targets)
   71-wrap-dlopen              0  matched expectation (2 cases)
   72-static-host-plugin-abi   0  matched expectation
@@ -157,6 +163,11 @@ GATE 5 - the experiment suite, against the Go pgb
   85-opengl                   0  matched expectation (7 cases, Go bundler)
   87-concurrent-build-options 0  matched expectation
   88-nonix-end-to-end         0  matched expectation (25 cases)
+
+  ⛔ STILL RUNNING WHEN THE SESSION WAS CHECKPOINTED, so there is no row:
+    62-anylinux-appimage, 86-bundler-vs-anylinux, 89-debloat and
+    90-kdenlive-vs-enhanced, and poc/91-qt-xcb from a cold prefix. Nothing
+    below is extrapolated from them.
 
   ⚠ Three of these failed on their first run against the Go pgb and each
     failure was a real defect, not a harness difference:

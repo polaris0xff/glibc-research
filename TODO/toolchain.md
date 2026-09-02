@@ -1046,6 +1046,35 @@ current feature parity … After the next session ports the whole thing to go,
 the next session after that will return back to usual tasks."* Every other open
 entry waits.
 
+### ⭐ WHERE IT STANDS, 2026-09-02
+
+**The port is written and the tool is Go.** One static binary; the shell and
+Python are retired under `HISTORY/` and are the oracle. 124 carried selftests
+pass, `sh TODO/check.sh` and `sh scripts/common/check-docs.sh` are green.
+
+| gate | state |
+|---|---|
+| 1 nix-index | ⭐ met — identical TSV from the real 399,356,002-byte input; python 5.10 s / 88,756 KiB, go 3.50 s / 12,284 KiB |
+| 2 nix-nar | ⭐ met — byte-identical NARs, identical nix-base32 hashes, identical signature decisions, on fixtures and a real cache.nixos.org object |
+| 3 parity | ⭐ met — doctor, env info, attr, info, closure, hydra drv and a whole nix-free plan, all identical |
+| 4 wrappers | ⭐ met in its strongest form — the same source through both toolchains is BYTE-IDENTICAL |
+| 5 the matrix | ⚠ **partial**: nine POCs and eighteen experiments pass; `poc/91-qt-xcb` and experiments 62, 86, 89, 90 had not finished when the session was checkpointed |
+| 6 the artefact | ⭐ met — statically linked, no `PT_INTERP`, no `DT_NEEDED` |
+
+Requirement 2's second half is met too: pgb built by pgb inside the pinned
+environment is byte-identical to the host build.
+
+⚠ **What is left, and it is the entry's remainder, not a new entry**: gate 5's
+unfinished rows, and the operator's post-port instruction — install codegraph
+and wire it into the gates and the rules, sweep the Go tree for deprecated
+practice, two deep reviews of code and docs, and a `docs/AGENTS.md` a session
+with no memory can start from alone.
+
+⚠ Requirement 6 is only partly discharged: the reachability sweep exists in
+Go with a 12-case selftest, but nothing consumes it — `--debloat` still has
+its own rules and the sweep is a reporting command. Wiring it in is T-055's
+cut, not this entry's.
+
 ### The defect that caused it, in one paragraph
 
 `internal/nixx/build.go` composed a build command as a double-quoted assignment with a

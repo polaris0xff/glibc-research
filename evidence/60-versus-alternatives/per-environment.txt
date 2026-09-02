@@ -4,7 +4,7 @@
    host, payload : 
    host, tree    : 
    bundled       :  (0 objects)
-   output        : chroot: failed to run command '/pgb-vs-arm': No such file or directory 
+   output        : pgb: cannot run /pgb-vs-arm inside /var/lib/pgb-rootfs/alpine-3.22: no such file or directory 
 == alpine-3.22  arm S (plain gcc -static)
    status        : exit1
    trace         : full
@@ -33,20 +33,13 @@
    host, tree    : not measured: -f had to be dropped for this cell
    bundled       :  (0 objects)
    output        : Error: No suitable fusermount binary found on the $PATH execv error: No such file or directory 
-== alpine-3.22  arm O (onelf)
-   status        : exit1
-   trace         : full
-   host, payload : 
-   host, tree    : 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare
 == alpine-3.20  arm N (native dynamic)
    status        : exit127
    trace         : full
    host, payload : 
    host, tree    : 
    bundled       :  (0 objects)
-   output        : chroot: failed to run command '/pgb-vs-arm': No such file or directory 
+   output        : pgb: cannot run /pgb-vs-arm inside /var/lib/pgb-rootfs/alpine-3.20: no such file or directory 
 == alpine-3.20  arm S (plain gcc -static)
    status        : exit1
    trace         : full
@@ -70,25 +63,18 @@
    output        : 
 == alpine-3.20  arm A (AppImage)
    status        : exit127
-   trace         : nofork
-   host, payload : 
-   host, tree    : not measured: -f had to be dropped for this cell
-   bundled       :  (0 objects)
-   output        : Error: No suitable fusermount binary found on the $PATH execv error: No such file or directory 
-== alpine-3.20  arm O (onelf)
-   status        : exit1
    trace         : full
    host, payload : 
    host, tree    : 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare
+   bundled       :  (0 objects)
+   output        : Error: No suitable fusermount binary found on the $PATH execv error: No such file or directory 
 == alpine-3.10  arm N (native dynamic)
    status        : exit127
    trace         : full
    host, payload : 
    host, tree    : 
    bundled       :  (0 objects)
-   output        : chroot: failed to run command '/pgb-vs-arm': No such file or directory 
+   output        : pgb: cannot run /pgb-vs-arm inside /var/lib/pgb-rootfs/alpine-3.10: no such file or directory 
 == alpine-3.10  arm S (plain gcc -static)
    status        : exit1
    trace         : full
@@ -112,25 +98,18 @@
    output        : 
 == alpine-3.10  arm A (AppImage)
    status        : exit127
-   trace         : nofork
-   host, payload : 
-   host, tree    : not measured: -f had to be dropped for this cell
-   bundled       :  (0 objects)
-   output        : Error: No suitable fusermount binary found on the $PATH execv error: No such file or directory 
-== alpine-3.10  arm O (onelf)
-   status        : exit1
    trace         : full
    host, payload : 
    host, tree    : 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare
+   bundled       :  (0 objects)
+   output        : Error: No suitable fusermount binary found on the $PATH execv error: No such file or directory 
 == voidlinux-musl  arm N (native dynamic)
    status        : exit127
    trace         : full
    host, payload : 
    host, tree    : 
    bundled       :  (0 objects)
-   output        : chroot: failed to run command '/pgb-vs-arm': No such file or directory 
+   output        : pgb: cannot run /pgb-vs-arm inside /var/lib/pgb-rootfs/voidlinux-musl: no such file or directory 
 == voidlinux-musl  arm S (plain gcc -static)
    status        : exit1
    trace         : full
@@ -154,18 +133,11 @@
    output        : 
 == voidlinux-musl  arm A (AppImage)
    status        : exit127
-   trace         : nofork
-   host, payload : 
-   host, tree    : not measured: -f had to be dropped for this cell
-   bundled       :  (0 objects)
-   output        : Error: No suitable fusermount binary found on the $PATH execv error: No such file or directory 
-== voidlinux-musl  arm O (onelf)
-   status        : exit1
    trace         : full
    host, payload : 
    host, tree    : 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare
+   bundled       :  (0 objects)
+   output        : Error: No suitable fusermount binary found on the $PATH execv error: No such file or directory 
 == debian-11  arm N (native dynamic)
    status        : exit1
    trace         : full
@@ -179,7 +151,7 @@
    host, payload : /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so 
    host, tree    : /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so 
    bundled       :  (0 objects)
-   output        : pgb-vs-arm: dl-call-libc-early-init.c:37: _dl_call_libc_early_init: Assertion `sym != NULL' failed. Aborted 
+   output        : pgb-vs-arm: dl-call-libc-early-init.c:37: _dl_call_libc_early_init: Assertion `sym != NULL' failed. 
 == debian-11  arm P (pgb)
    status        : ok
    trace         : full
@@ -196,18 +168,11 @@
    output        : 
 == debian-11  arm A (AppImage)
    status        : exit1
-   trace         : full
-   host, payload : /lib/x86_64-linux-gnu/libc.so.6 
-   host, tree    : /lib/x86_64-linux-gnu/libc.so.6 
+   trace         : nofork
+   host, payload : 
+   host, tree    : not measured: -f had to be dropped for this cell
    bundled       :  (0 objects)
    output        : Error: No suitable fusermount binary found on the $PATH /pgb-vs-arm: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by /pgb-vs-arm) 
-== debian-11  arm O (onelf)
-   status        : ok
-   trace         : full
-   host, payload : /usr/lib/x86_64-linux-gnu/gconv/EUC-JP.so /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so /usr/lib/x86_64-linux-gnu/gconv/libJIS.so 
-   host, tree    : /usr/lib/x86_64-linux-gnu/gconv/EUC-JP.so /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so /usr/lib/x86_64-linux-gnu/gconv/libJIS.so 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare
 == debian-12  arm N (native dynamic)
    status        : ok
    trace         : full
@@ -243,13 +208,6 @@
    host, tree    : /lib/x86_64-linux-gnu/libc.so.6 /usr/lib/x86_64-linux-gnu/gconv/EUC-JP.so /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so /usr/lib/x86_64-linux-gnu/gconv/libJIS.so 
    bundled       :  (0 objects)
    output        : Error: No suitable fusermount binary found on the $PATH 
-== debian-12  arm O (onelf)
-   status        : ok
-   trace         : full
-   host, payload : /usr/lib/x86_64-linux-gnu/gconv/EUC-JP.so /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so /usr/lib/x86_64-linux-gnu/gconv/libJIS.so 
-   host, tree    : /usr/lib/x86_64-linux-gnu/gconv/EUC-JP.so /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so /usr/lib/x86_64-linux-gnu/gconv/libJIS.so 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare
 == ubuntu-20.04  arm N (native dynamic)
    status        : exit1
    trace         : full
@@ -263,7 +221,7 @@
    host, payload : /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so 
    host, tree    : /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so 
    bundled       :  (0 objects)
-   output        : pgb-vs-arm: dl-call-libc-early-init.c:37: _dl_call_libc_early_init: Assertion `sym != NULL' failed. Aborted 
+   output        : pgb-vs-arm: dl-call-libc-early-init.c:37: _dl_call_libc_early_init: Assertion `sym != NULL' failed. 
 == ubuntu-20.04  arm P (pgb)
    status        : ok
    trace         : full
@@ -285,13 +243,6 @@
    host, tree    : /lib/x86_64-linux-gnu/libc.so.6 
    bundled       :  (0 objects)
    output        : Error: No suitable fusermount binary found on the $PATH /pgb-vs-arm: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by /pgb-vs-arm) 
-== ubuntu-20.04  arm O (onelf)
-   status        : ok
-   trace         : full
-   host, payload : /usr/lib/x86_64-linux-gnu/gconv/EUC-JP.so /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so /usr/lib/x86_64-linux-gnu/gconv/libJIS.so 
-   host, tree    : /usr/lib/x86_64-linux-gnu/gconv/EUC-JP.so /usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so /usr/lib/x86_64-linux-gnu/gconv/libJIS.so 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare
 == rockylinux-8  arm N (native dynamic)
    status        : exit1
    trace         : full
@@ -327,13 +278,6 @@
    host, tree    : /lib64/libc.so.6 
    bundled       :  (0 objects)
    output        : Error: No suitable fusermount binary found on the $PATH /pgb-vs-arm: /lib64/libc.so.6: version `GLIBC_2.34' not found (required by /pgb-vs-arm) 
-== rockylinux-8  arm O (onelf)
-   status        : exit1
-   trace         : full
-   host, payload : 
-   host, tree    : 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare
 == opensuse-leap-15.6  arm N (native dynamic)
    status        : exit1
    trace         : full
@@ -347,7 +291,7 @@
    host, payload : /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /lib64/libnss_compat.so.2 
    host, tree    : /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /lib64/libnss_compat.so.2 
    bundled       :  (0 objects)
-   output        : Floating point exception 
+   output        : 
 == opensuse-leap-15.6  arm P (pgb)
    status        : ok
    trace         : full
@@ -364,18 +308,11 @@
    output        : 
 == opensuse-leap-15.6  arm A (AppImage)
    status        : exit1
-   trace         : full
-   host, payload : /lib64/libc.so.6 /lib64/libnss_compat.so.2 
-   host, tree    : /lib64/libc.so.6 /lib64/libnss_compat.so.2 
+   trace         : nofork
+   host, payload : 
+   host, tree    : not measured: -f had to be dropped for this cell
    bundled       :  (0 objects)
    output        : Error: No suitable fusermount binary found on the $PATH FAIL iconv.open ISO-8859-1 FAIL iconv.open EUC-JP 
-== opensuse-leap-15.6  arm O (onelf)
-   status        : exit1
-   trace         : full
-   host, payload : 
-   host, tree    : 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare
 == fedora-42  arm N (native dynamic)
    status        : exit1
    trace         : full
@@ -411,13 +348,6 @@
    host, tree    : /lib64/libc.so.6 /usr/lib64/gconv/ISO8859-1.so 
    bundled       :  (0 objects)
    output        : Error: No suitable fusermount binary found on the $PATH FAIL iconv.open EUC-JP 
-== fedora-42  arm O (onelf)
-   status        : exit1
-   trace         : full
-   host, payload : 
-   host, tree    : 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare
 == archlinux-latest  arm N (native dynamic)
    status        : ok
    trace         : full
@@ -453,10 +383,3 @@
    host, tree    : /usr/lib/gconv/EUC-JP.so /usr/lib/gconv/ISO8859-1.so /usr/lib/gconv/libJIS.so /usr/lib/libc.so.6 
    bundled       :  (0 objects)
    output        : Error: No suitable fusermount binary found on the $PATH 
-== archlinux-latest  arm O (onelf)
-   status        : exit1
-   trace         : full
-   host, payload : 
-   host, tree    : 
-   bundled       : ld-linux-x86-64.so.2 libc.so.6 libonelf-env.so  (3 objects)
-   output        : onelf-rt: fuse: namespace mount failed: unshare: Operation not permitted (os error 1) onelf-rt: fuse: fusermount3 not available either; cannot continue onelf-rt: tmpfs: enter_namespace failed: unshare

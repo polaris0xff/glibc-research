@@ -1,13 +1,13 @@
 environments=11 iterations=100 rounds=3
 musl toolchain=musl-1.2.5-r12 description:
 appimagetool sha256=a6d71e2b6cd66f8e8d16c37ad164658985e0cf5fcaa950c90a482890cb9d13e0
-flatpak runtime bytes=623352581
+flatpak runtime bytes=-
 targets shipping flatpak=0 snap=0 fusermount=0
 arm N built=yes size=16368 runs=2/11 payload_clean=4
 arm S built=yes size=949568 runs=1/11 payload_clean=7
-arm P built=yes size=2097824 runs=11/11 payload_clean=11
+arm P built=yes size=2110232 runs=11/11 payload_clean=11
 arm M built=yes size=447264 runs=11/11 payload_clean=11
-arm A built=yes size=948728 runs=2/11 payload_clean=4
-arm O built=yes size=1761241 runs=3/11 payload_clean=8
-arm F built=yes size=4236 runs=-/- payload_clean=-
-arm K built=yes size=4096 runs=-/- payload_clean=-
+arm A built=yes size=948728 runs=2/11 payload_clean=6
+arm O built=no size=- runs=0/0 payload_clean=0
+arm F built=no size=- runs=-/- payload_clean=-
+arm K built=no size=- runs=-/- payload_clean=-

@@ -1,70 +1,72 @@
 POC 91-qt-xcb -- THE RUNG THAT STOPPED IT
 =========================================
 
-rung      : static xcb link
-summary   : the xcb archives do not link even in a group
-date (UTC): 2026-09-02T04:39:06Z
+rung      : qtbase build
+summary   : cmake --build failed
+date (UTC): 2026-09-02T05:39:40Z
 configure : -static -release -force-bundled-libs -xcb -xkbcommon -bundled-xcb-xinput -no-opengl -no-dbus -no-glib -no-icu -openssl-linked -sql-sqlite -qt-sqlite -no-cups -no-fontconfig -no-libudev -no-feature-testlib -qpa xcb -default-qpa xcb -nomake examples -nomake tests
 
 -- the error, verbatim, with the file it came from --------------
 
-107:  configure: error: Package requirements (xcb-proto >= 1.17.0) were not met:
-151:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
-191:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
-236:  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.1.99) were not met:
-275:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
-312:  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.1.99) were not met:
-349:  configure: error: Package requirements (xproto >= 7.0.22 fixesproto >= 6.0 xextproto x11 >= 1.6) were not met:
-387:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
-424:  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.1.99) were not met:
-461:  configure: error: Package requirements (xproto >= 7.0.22 fixesproto >= 6.0 xextproto x11 >= 1.6) were not met:
-496:  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.0.3 xext >= 1.0.99.1 inputproto >= 2.3.99.1) were not met:
-537:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
-575:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
-611:  configure: error: Package requirements (x11 >= 1.6 renderproto >= 0.9) were not met:
-747:xcbprobe.c:4:10: fatal error: X11/Xlib.h: No such file or directory
+96:  configure: error: Package requirements (xcb-proto >= 1.17.0) were not met:
+139:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+178:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+222:  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.1.99) were not met:
+261:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+298:  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.1.99) were not met:
+335:  configure: error: Package requirements (xproto >= 7.0.22 fixesproto >= 6.0 xextproto x11 >= 1.6) were not met:
+373:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+410:  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.1.99) were not met:
+447:  configure: error: Package requirements (xproto >= 7.0.22 fixesproto >= 6.0 xextproto x11 >= 1.6) were not met:
+482:  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.0.3 xext >= 1.0.99.1 inputproto >= 2.3.99.1) were not met:
+522:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+560:  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+596:  configure: error: Package requirements (x11 >= 1.6 renderproto >= 0.9) were not met:
+2577:/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/util/qvalidator.h:164:2: fatal error: cannot write PCH file: No space left on device
+2588:/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/util/qvalidator.h:164:2: fatal error: cannot write PCH file: No space left on device
+2600:/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/util/qvalidator.h:164:2: fatal error: cannot write PCH file: No space left on device
 
 -- the last 40 lines of the log --------------------------------
 
-dep have    libxdmcp
-dep skip    libxtst-1.2.5 (in the skip list)
-dep build   libxcb-cursor  (depth 1)
-dep have    libxcb
-dep have    libxcb-image
-dep have    libxcb-render-util
-dep have    xorgproto
-dep have    libxcb
-patches     0 applied (-p1)
-build system: pkg-config (configureFlags)
-round 1: configure 
-round 1: built
-dep ok      libxcb-cursor -> /var/tmp/pgb-poc/91-qt-xcb/prefix
-dep skip    libepoxy-1.5.10-dev (in the skip list)
-dep skip    cups-2.4.19-dev (in the skip list)
-dep skip    wayland-1.26.0-dev (in the skip list)
-dep skip    wayland-scanner-1.26.0-dev (in the skip list)
-
-built into  /var/tmp/pgb-poc/91-qt-xcb/prefix
-  ok    libpthread-stubs
-  ok    libxau
-  ok    libxcb
-  ok    libxcb-cursor
-  ok    libxcb-image
-  ok    libxcb-keysyms
-  ok    libxcb-render-util
-  ok    libxcb-util
-  ok    libxcb-wm
-  ok    libxdmcp
-  ok    libxkbcommon
-  ok    libxml2
-  ok    openssl
-  ok    xcb-proto
-  ok    xkeyboard-config
-  ok    xorgproto
-  ok    xtrans
-xcbprobe.c:4:10: fatal error: X11/Xlib.h: No such file or directory
-    4 | #include <X11/Xlib.h>
-      |          ^~~~~~~~~~~~
+[1533/1644] Generating version linker script for target QEvdevKeyboardPlugin
+[1534/1644] Automatic MOC for target QEvdevKeyboardPlugin
+[1535/1644] Generating prl file for target QEvdevKeyboardPlugin
+[1536/1644] Running AUTOMOC file extraction for target QEvdevKeyboardPlugin
+[1537/1644] Running moc --collect-json for target QEvdevKeyboardPlugin
+[1538/1644] Building CXX object src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.gch
+FAILED: src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.gch 
+/root/.local/state/pgb/bin-2814651800/c++ -DQT_CORE_LIB -DQT_DEPRECATED_WARNINGS -DQT_EXPLICIT_QFILE_CONSTRUCTION_FROM_PATH -DQT_GUI_LIB -DQT_LEAN_HEADERS=1 -DQT_NO_DEBUG -DQT_NO_EXCEPTIONS -DQT_NO_FOREACH -DQT_NO_JAVA_STYLE_ITERATORS -DQT_NO_NARROWING_CONVERSIONS_IN_CONNECT -DQT_NO_QASCONST -DQT_NO_QEXCHANGE -DQT_NO_QSNPRINTF -DQT_NO_SINGLE_ARGUMENT_QHASH_OVERLOAD=1 -DQT_NO_STD_FORMAT_SUPPORT -DQT_PLUGIN -DQT_STATICPLUGIN -DQT_USE_QSTRINGBUILDER -D_GLIBCXX_ASSERTIONS -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/imageformats/gif/QGifPlugin_autogen/include -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/plugins/imageformats/gif -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/imageformats/gif -I/var/tmp/pgb-poc/91-qt-xcb/build/include -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/mkspecs/linux-g++ -I/var/tmp/pgb-poc/91-qt-xcb/build/src/gui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/src/corelib -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include -DNDEBUG -O2 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wno-expansion-to-defined -fPIC -ffunction-sections -fdata-sections -U_FORTIFY_SOURCE -Wsuggest-override -fcf-protection=full -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fstack-clash-protection -fno-exceptions -std=gnu++17 -Winvalid-pch -x c++-header -include /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx -MD -MT src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.gch -MF src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.gch.d -o src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.gch -c /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.cxx
+In file included from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/qvalidator.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/QtGui:124,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx:5,
+                 from <command-line>:
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/util/qvalidator.h:164:2: fatal error: cannot write PCH file: No space left on device
+  164 | };
+      |  ^
 compilation terminated.
+[1539/1644] Building CXX object src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.gch
+FAILED: src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.gch 
+/root/.local/state/pgb/bin-2814651800/c++ -DQT_CORE_LIB -DQT_DEPRECATED_WARNINGS -DQT_DEVICEDISCOVERY_SUPPORT_LIB -DQT_EXPLICIT_QFILE_CONSTRUCTION_FROM_PATH -DQT_GUI_LIB -DQT_INPUT_SUPPORT_LIB -DQT_LEAN_HEADERS=1 -DQT_NO_DEBUG -DQT_NO_EXCEPTIONS -DQT_NO_FOREACH -DQT_NO_JAVA_STYLE_ITERATORS -DQT_NO_NARROWING_CONVERSIONS_IN_CONNECT -DQT_NO_QASCONST -DQT_NO_QEXCHANGE -DQT_NO_QSNPRINTF -DQT_NO_SINGLE_ARGUMENT_QHASH_OVERLOAD=1 -DQT_NO_STD_FORMAT_SUPPORT -DQT_PLUGIN -DQT_STATICPLUGIN -DQT_USE_QSTRINGBUILDER -D_GLIBCXX_ASSERTIONS -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevmouse/QEvdevMousePlugin_autogen/include -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/plugins/generic/evdevmouse -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevmouse -I/var/tmp/pgb-poc/91-qt-xcb/build/include -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/mkspecs/linux-g++ -I/var/tmp/pgb-poc/91-qt-xcb/build/src/corelib -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/src/gui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport -I/var/tmp/pgb-poc/91-qt-xcb/build/src/platformsupport/input -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport/6.11.1/QtInputSupport -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport -I/var/tmp/pgb-poc/91-qt-xcb/build/src/platformsupport/devicediscovery -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport/6.11.1/QtDeviceDiscoverySupport -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include -DNDEBUG -O2 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wno-expansion-to-defined -fPIC -ffunction-sections -fdata-sections -U_FORTIFY_SOURCE -Wsuggest-override -fcf-protection=full -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fstack-clash-protection -fno-exceptions -std=gnu++17 -Winvalid-pch -x c++-header -include /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx -MD -MT src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.gch -MF src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.gch.d -o src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.gch -c /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.cxx
+In file included from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/qvalidator.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/QtGui:124,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx:6,
+                 from <command-line>:
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/util/qvalidator.h:164:2: fatal error: cannot write PCH file: No space left on device
+  164 | };
+      |  ^
+compilation terminated.
+[1540/1644] Building CXX object src/plugins/generic/evdevtouch/CMakeFiles/QEvdevTouchScreenPlugin.dir/cmake_pch.hxx.gch
+[1541/1644] Building CXX object src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.gch
+FAILED: src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.gch 
+/root/.local/state/pgb/bin-2814651800/c++ -DQT_CORE_LIB -DQT_DEPRECATED_WARNINGS -DQT_DEVICEDISCOVERY_SUPPORT_LIB -DQT_EXPLICIT_QFILE_CONSTRUCTION_FROM_PATH -DQT_GUI_LIB -DQT_INPUT_SUPPORT_LIB -DQT_LEAN_HEADERS=1 -DQT_NO_DEBUG -DQT_NO_EXCEPTIONS -DQT_NO_FOREACH -DQT_NO_JAVA_STYLE_ITERATORS -DQT_NO_NARROWING_CONVERSIONS_IN_CONNECT -DQT_NO_QASCONST -DQT_NO_QEXCHANGE -DQT_NO_QSNPRINTF -DQT_NO_SINGLE_ARGUMENT_QHASH_OVERLOAD=1 -DQT_NO_STD_FORMAT_SUPPORT -DQT_PLUGIN -DQT_STATICPLUGIN -DQT_USE_QSTRINGBUILDER -D_GLIBCXX_ASSERTIONS -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevkeyboard/QEvdevKeyboardPlugin_autogen/include -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/plugins/generic/evdevkeyboard -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevkeyboard -I/var/tmp/pgb-poc/91-qt-xcb/build/include -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/mkspecs/linux-g++ -I/var/tmp/pgb-poc/91-qt-xcb/build/src/corelib -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/src/gui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport -I/var/tmp/pgb-poc/91-qt-xcb/build/src/platformsupport/input -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport/6.11.1/QtInputSupport -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport -I/var/tmp/pgb-poc/91-qt-xcb/build/src/platformsupport/devicediscovery -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport/6.11.1/QtDeviceDiscoverySupport -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include -DNDEBUG -O2 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wno-expansion-to-defined -fPIC -ffunction-sections -fdata-sections -U_FORTIFY_SOURCE -Wsuggest-override -fcf-protection=full -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fstack-clash-protection -fno-exceptions -std=gnu++17 -Winvalid-pch -x c++-header -include /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx -MD -MT src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.gch -MF src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.gch.d -o src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.gch -c /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.cxx
+In file included from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/qvalidator.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/QtGui:124,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx:6,
+                 from <command-line>:
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/util/qvalidator.h:164:2: fatal error: cannot write PCH file: No space left on device
+  164 | };
+      |  ^
+compilation terminated.
+ninja: build stopped: subcommand failed.
 
 full log: /home/user/glibc-research/evidence/poc/91-qt-xcb/build.log

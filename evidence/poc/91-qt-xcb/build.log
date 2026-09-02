@@ -2251,3 +2251,354 @@ for more information.
 [1243/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qabstractscrollarea.cpp.o
 [1244/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qframe.cpp.o
 [1245/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qwidgetanimator.cpp.o
+[1246/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/effects/qpixmapfilter.cpp.o
+[1247/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qaction_widgets.cpp.o
+[1248/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/effects/qgraphicseffect.cpp.o
+[1249/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qwidgetaction.cpp.o
+[1250/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qformlayout.cpp.o
+[1251/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/styles/qstyleanimation.cpp.o
+[1252/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qshortcut_widgets.cpp.o
+[1253/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qtooltip.cpp.o
+[1254/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qwhatsthis.cpp.o
+[1255/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/styles/qstylesheetstyle_default.cpp.o
+[1256/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qabstractbutton.cpp.o
+[1257/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/styles/qwindowsstyle.cpp.o
+[1258/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/styles/qfusionstyle.cpp.o
+[1259/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qabstractslider.cpp.o
+[1260/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qbuttongroup.cpp.o
+[1261/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qcheckbox.cpp.o
+[1262/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qcalendarwidget.cpp.o
+[1263/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/styles/qstylesheetstyle.cpp.o
+[1264/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qcommandlinkbutton.cpp.o
+[1265/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qdial.cpp.o
+[1266/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qcombobox.cpp.o
+[1267/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qdatetimeedit.cpp.o
+[1268/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qeffects.cpp.o
+[1269/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qdockwidget.cpp.o
+[1270/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qdockarealayout.cpp.o
+[1271/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qfontcombobox.cpp.o
+[1272/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qgroupbox.cpp.o
+[1273/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qkeysequenceedit.cpp.o
+[1274/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qlcdnumber.cpp.o
+[1275/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qlabel.cpp.o
+[1276/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qlineedit_p.cpp.o
+[1277/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qlineedit.cpp.o
+[1278/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qmainwindow.cpp.o
+[1279/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qwidgetlinecontrol.cpp.o
+[1280/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qmdisubwindow.cpp.o
+[1281/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qmainwindowlayout.cpp.o
+[1282/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qmdiarea.cpp.o
+[1283/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qmenu.cpp.o
+[1284/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qradiobutton.cpp.o
+[1285/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qprogressbar.cpp.o
+[1286/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qpushbutton.cpp.o
+[1287/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qmenubar.cpp.o
+[1288/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qwidgetresizehandler.cpp.o
+[1289/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qrubberband.cpp.o
+[1290/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qdialogbuttonbox.cpp.o
+[1291/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qscrollarea.cpp.o
+[1292/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qscrollbar.cpp.o
+[1293/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qsizegrip.cpp.o
+[1294/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qslider.cpp.o
+[1295/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qabstractspinbox.cpp.o
+[1296/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qsplashscreen.cpp.o
+[1297/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qspinbox.cpp.o
+[1298/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qstackedwidget.cpp.o
+[1299/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qsplitter.cpp.o
+[1300/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qstatusbar.cpp.o
+[1301/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qplaintextedit.cpp.o
+[1302/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtabbar.cpp.o
+[1303/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtextbrowser.cpp.o
+[1304/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtextedit.cpp.o
+[1305/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtabwidget.cpp.o
+[1306/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtoolbar.cpp.o
+[1307/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtoolbarseparator.cpp.o
+[1308/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtoolbarextension.cpp.o
+[1309/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtoolbarlayout.cpp.o
+[1310/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtoolbararealayout.cpp.o
+[1311/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtoolbox.cpp.o
+[1312/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qtoolbutton.cpp.o
+[1313/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/dialogs/qcolordialog.cpp.o
+[1314/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/dialogs/qdialog.cpp.o
+[1315/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/widgets/qwidgettextcontrol.cpp.o
+[1316/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/dialogs/qerrormessage.cpp.o
+[1317/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/dialogs/qsidebar.cpp.o
+[1318/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/dialogs/qfontdialog.cpp.o
+[1319/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/dialogs/qinputdialog.cpp.o
+[1320/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/dialogs/qmessagebox.cpp.o
+[1321/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/dialogs/qfiledialog.cpp.o
+[1322/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/dialogs/qprogressdialog.cpp.o
+[1323/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/accessible/qaccessiblecolorwell.cpp.o
+[1324/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/accessible/complexwidgets.cpp.o
+[1325/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/dialogs/qwizard.cpp.o
+[1326/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/accessible/qaccessiblemenu.cpp.o
+[1327/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/accessible/qaccessiblewidget.cpp.o
+[1328/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/accessible/rangecontrols.cpp.o
+[1329/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/accessible/qaccessiblewidgetfactory.cpp.o
+[1330/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/accessible/qaccessiblewidgets.cpp.o
+[1331/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/accessible/simplewidgets.cpp.o
+[1332/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qbsptree.cpp.o
+[1333/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qabstractitemdelegate.cpp.o
+[1334/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/accessible/itemviews.cpp.o
+[1335/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qitemdelegate.cpp.o
+[1336/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qitemeditorfactory.cpp.o
+[1337/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qstyleditemdelegate.cpp.o
+[1338/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qcolumnview.cpp.o
+[1339/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qheaderview.cpp.o
+[1340/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qcolumnviewgrip.cpp.o
+[1341/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qabstractitemview.cpp.o
+[1342/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qdatawidgetmapper.cpp.o
+[1343/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qlistwidget.cpp.o
+[1344/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qlistview.cpp.o
+[1345/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qtableview.cpp.o
+[1346/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qtablewidget.cpp.o
+[1347/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsanchorlayout.cpp.o
+[1348/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qtreeview.cpp.o
+[1349/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qtreewidgetitemiterator.cpp.o
+[1350/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsgridlayout.cpp.o
+[1351/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsgridlayoutengine.cpp.o
+[1352/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qtreewidget.cpp.o
+[1353/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicslayout_p.cpp.o
+[1354/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsanchorlayout_p.cpp.o
+[1355/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicslayout.cpp.o
+[1356/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicslayoutstyleinfo.cpp.o
+[1357/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicslinearlayout.cpp.o
+[1358/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicslayoutitem.cpp.o
+[1359/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsproxywidget.cpp.o
+[1360/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsscene_bsp.cpp.o
+[1361/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicssceneevent.cpp.o
+[1362/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsitem.cpp.o
+[1363/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsscenebsptreeindex.cpp.o
+[1364/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicssceneindex.cpp.o
+[1365/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsscenelinearindex.cpp.o
+[1366/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicstransform.cpp.o
+[1367/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsscene.cpp.o
+[1368/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qsimplex_p.cpp.o
+[1369/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicswidget_p.cpp.o
+[1370/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicswidget.cpp.o
+[1371/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsitemanimation.cpp.o
+[1372/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/graphicsview/qgraphicsview.cpp.o
+[1373/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/util/qflickgesture.cpp.o
+[1374/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/util/qscrollerproperties.cpp.o
+[1375/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/util/qscroller.cpp.o
+[1376/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/util/qsystemtrayicon_x11.cpp.o
+[1377/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/evdevtablet/qevdevtablethandler.cpp.o
+[1378/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/shared/qevdevutil.cpp.o
+[1379/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/shared/qfdcontainer.cpp.o
+[1380/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/util/qundoview.cpp.o
+[1381/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/util/qcompleter.cpp.o
+[1382/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/shared/qoutputmapping.cpp.o
+[1383/1644] Linking CXX static library lib/libQt6Widgets.a
+[1384/1644] Building CXX object src/plugins/platforms/minimal/CMakeFiles/QMinimalIntegrationPlugin.dir/QMinimalIntegrationPlugin_autogen/mocs_compilation.cpp.o
+[1385/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/evdevtablet/qevdevtabletmanager.cpp.o
+[1386/1644] Linking CXX static library lib/libQt6InputSupport.a
+[1387/1644] Building CXX object src/plugins/platforms/minimal/CMakeFiles/QMinimalIntegrationPlugin.dir/main.cpp.o
+[1388/1644] Automatic MOC and UIC for target PrintSupport
+AutoUic: Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+AutoUic: Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+AutoUic: Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+AutoUic: Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[1389/1644] Running rcc for resource qprintdialog
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[1390/1644] Running rcc for resource qprintdialog1
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[1391/1644] Generating prl file for target PrintSupport
+[1392/1644] Running AUTOMOC file extraction for target PrintSupport
+[1393/1644] Running moc --collect-json for target PrintSupport
+[1394/1644] Automatic MOC for target QOffscreenIntegrationPlugin
+[1395/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/.qt/rcc/qrc_qprintdialog.cpp.o
+[1396/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/.qt/rcc/qrc_qprintdialog1.cpp.o
+[1397/1644] Generating prl file for target QOffscreenIntegrationPlugin
+[1398/1644] Running AUTOMOC file extraction for target QOffscreenIntegrationPlugin
+[1399/1644] Running moc --collect-json for target QOffscreenIntegrationPlugin
+[1400/1644] Building CXX object src/plugins/platforms/minimal/CMakeFiles/QMinimalIntegrationPlugin.dir/qminimalbackingstore.cpp.o
+[1401/1644] Building CXX object src/plugins/platforms/minimal/CMakeFiles/QMinimalIntegrationPlugin.dir/qminimalintegration.cpp.o
+[1402/1644] Linking CXX static library plugins/platforms/libqminimal.a
+[1403/1644] Automatic MOC for target QLinuxFbIntegrationPlugin
+[1404/1644] Generating prl file for target QLinuxFbIntegrationPlugin
+[1405/1644] Running AUTOMOC file extraction for target QLinuxFbIntegrationPlugin
+[1406/1644] Running moc --collect-json for target QLinuxFbIntegrationPlugin
+[1407/1644] Automatic MOC for target XcbQpaPrivate
+[1408/1644] Generating prl file for target XcbQpaPrivate
+[1409/1644] Running AUTOMOC file extraction for target XcbQpaPrivate
+[1410/1644] Running moc --collect-json for target XcbQpaPrivate
+[1411/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/XcbQpaPrivate_autogen/mocs_compilation.cpp.o
+[1412/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/gl_integrations/qxcbglintegration.cpp.o
+[1413/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/gl_integrations/qxcbglintegrationfactory.cpp.o
+[1414/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/gl_integrations/qxcbnativeinterfacehandler.cpp.o
+[1415/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbatom.cpp.o
+[1416/1644] Building CXX object src/plugins/platforms/offscreen/CMakeFiles/QOffscreenIntegrationPlugin.dir/cmake_pch.hxx.gch
+[1417/1644] Building CXX object src/plugins/platforms/linuxfb/CMakeFiles/QLinuxFbIntegrationPlugin.dir/cmake_pch.hxx.gch
+[1418/1644] Building CXX object src/plugins/platforms/offscreen/CMakeFiles/QOffscreenIntegrationPlugin.dir/QOffscreenIntegrationPlugin_autogen/mocs_compilation.cpp.o
+[1419/1644] Building CXX object src/plugins/platforms/offscreen/CMakeFiles/QOffscreenIntegrationPlugin.dir/main.cpp.o
+[1420/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/cmake_pch.hxx.gch
+[1421/1644] Building CXX object src/plugins/platforms/offscreen/CMakeFiles/QOffscreenIntegrationPlugin.dir/qoffscreencommon.cpp.o
+[1422/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbbackingstore.cpp.o
+[1423/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/PrintSupport_autogen/mocs_compilation.cpp.o
+[1424/1644] Building CXX object src/plugins/platforms/offscreen/CMakeFiles/QOffscreenIntegrationPlugin.dir/qoffscreenintegration.cpp.o
+[1425/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qplatformprintdevice.cpp.o
+[1426/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qplatformprintersupport.cpp.o
+[1427/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qpaintengine_alpha.cpp.o
+[1428/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qprint.cpp.o
+[1429/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qplatformprintplugin.cpp.o
+[1430/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qprintdevice.cpp.o
+[1431/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qprintengine.cpp.o
+[1432/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qpaintengine_preview.cpp.o
+[1433/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qprinterinfo.cpp.o
+[1434/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qprintengine_pdf.cpp.o
+[1435/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/kernel/qprinter.cpp.o
+[1436/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/dialogs/qpagesetupdialog.cpp.o
+[1437/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/dialogs/qabstractprintdialog.cpp.o
+[1438/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/widgets/qprintpreviewwidget.cpp.o
+[1439/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/dialogs/qpagesetupdialog_unix.cpp.o
+[1440/1644] Building CXX object src/plugins/platforms/offscreen/CMakeFiles/QOffscreenIntegrationPlugin.dir/qoffscreenwindow.cpp.o
+[1441/1644] Linking CXX static library plugins/platforms/libqoffscreen.a
+[1442/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/dialogs/qprintpreviewdialog.cpp.o
+[1443/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport.dir/dialogs/qprintdialog_unix.cpp.o
+[1444/1644] Linking CXX static library lib/libQt6PrintSupport.a
+[1445/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbconnection_basic.cpp.o
+[1446/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbclipboard.cpp.o
+[1447/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbconnection_screens.cpp.o
+[1448/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbconnection.cpp.o
+[1449/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbeventdispatcher.cpp.o
+[1450/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbeventqueue.cpp.o
+[1451/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbcursor.cpp.o
+[1452/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbconnection_xi2.cpp.o
+[1453/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbscrollingdevice.cpp.o
+[1454/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbimage.cpp.o
+[1455/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbintegration.cpp.o
+[1456/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbkeyboard.cpp.o
+[1457/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbmime.cpp.o
+[1458/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbnativeinterface.cpp.o
+[1459/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbsystemtraytracker.cpp.o
+[1460/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbscreen.cpp.o
+[1461/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbwmsupport.cpp.o
+[1462/1644] Building C object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qt_xlib_wrapper.c.o
+[1463/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbxsettings.cpp.o
+[1464/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbwindow.cpp.o
+[1465/1644] Building CXX object src/plugins/platforms/linuxfb/CMakeFiles/QLinuxFbIntegrationPlugin.dir/QLinuxFbIntegrationPlugin_autogen/mocs_compilation.cpp.o
+[1466/1644] Building C object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/__/__/__/3rdparty/xcb/libxcb/xinput.c.o
+[1467/1644] Building CXX object src/plugins/platforms/linuxfb/CMakeFiles/QLinuxFbIntegrationPlugin.dir/main.cpp.o
+[1468/1644] Automatic MOC for target QVncIntegrationPlugin
+[1469/1644] Generating prl file for target QVncIntegrationPlugin
+[1470/1644] Running AUTOMOC file extraction for target QVncIntegrationPlugin
+[1471/1644] Running moc --collect-json for target QVncIntegrationPlugin
+[1472/1644] Building CXX object src/plugins/platforms/linuxfb/CMakeFiles/QLinuxFbIntegrationPlugin.dir/qlinuxfbintegration.cpp.o
+[1473/1644] Building CXX object src/plugins/platforms/linuxfb/CMakeFiles/QLinuxFbIntegrationPlugin.dir/qlinuxfbscreen.cpp.o
+[1474/1644] Linking CXX static library plugins/platforms/libqlinuxfb.a
+[1475/1644] Automatic MOC for target QComposePlatformInputContextPlugin
+[1476/1644] Generating prl file for target QComposePlatformInputContextPlugin
+[1477/1644] Running AUTOMOC file extraction for target QComposePlatformInputContextPlugin
+[1478/1644] Running moc --collect-json for target QComposePlatformInputContextPlugin
+[1479/1644] Automatic MOC for target QICOPlugin
+[1480/1644] Generating prl file for target QICOPlugin
+[1481/1644] Running AUTOMOC file extraction for target QICOPlugin
+[1482/1644] Running moc --collect-json for target QICOPlugin
+[1483/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/XcbQpaPrivate.dir/qxcbdrag.cpp.o
+[1484/1644] Linking CXX static library lib/libQt6XcbQpa.a
+[1485/1644] Automatic MOC for target QXcbIntegrationPlugin
+[1486/1644] Generating prl file for target QXcbIntegrationPlugin
+[1487/1644] Running AUTOMOC file extraction for target QXcbIntegrationPlugin
+[1488/1644] Running moc --collect-json for target QXcbIntegrationPlugin
+[1489/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/QXcbIntegrationPlugin.dir/QXcbIntegrationPlugin_autogen/mocs_compilation.cpp.o
+[1490/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/QXcbIntegrationPlugin.dir/qxcbmain.cpp.o
+[1491/1644] Linking CXX static library plugins/platforms/libqxcb.a
+[1492/1644] Automatic MOC for target QJpegPlugin
+[1493/1644] Generating prl file for target QJpegPlugin
+[1494/1644] Running AUTOMOC file extraction for target QJpegPlugin
+[1495/1644] Running moc --collect-json for target QJpegPlugin
+[1496/1644] Building CXX object src/plugins/imageformats/ico/CMakeFiles/QICOPlugin.dir/cmake_pch.hxx.gch
+[1497/1644] Building CXX object src/plugins/platforms/vnc/CMakeFiles/QVncIntegrationPlugin.dir/cmake_pch.hxx.gch
+[1498/1644] Building CXX object src/plugins/platforminputcontexts/compose/CMakeFiles/QComposePlatformInputContextPlugin.dir/cmake_pch.hxx.gch
+[1499/1644] Building CXX object src/plugins/imageformats/ico/CMakeFiles/QICOPlugin.dir/QICOPlugin_autogen/mocs_compilation.cpp.o
+[1500/1644] Building CXX object src/plugins/platforms/vnc/CMakeFiles/QVncIntegrationPlugin.dir/QVncIntegrationPlugin_autogen/mocs_compilation.cpp.o
+[1501/1644] Building CXX object src/plugins/platforms/vnc/CMakeFiles/QVncIntegrationPlugin.dir/main.cpp.o
+[1502/1644] Building CXX object src/plugins/platforms/vnc/CMakeFiles/QVncIntegrationPlugin.dir/qvnc.cpp.o
+[1503/1644] Building CXX object src/plugins/platforms/vnc/CMakeFiles/QVncIntegrationPlugin.dir/qvncclient.cpp.o
+[1504/1644] Building CXX object src/plugins/platforms/vnc/CMakeFiles/QVncIntegrationPlugin.dir/qvncscreen.cpp.o
+[1505/1644] Building CXX object src/plugins/platforminputcontexts/compose/CMakeFiles/QComposePlatformInputContextPlugin.dir/QComposePlatformInputContextPlugin_autogen/mocs_compilation.cpp.o
+[1506/1644] Building CXX object src/plugins/platforms/vnc/CMakeFiles/QVncIntegrationPlugin.dir/qvncintegration.cpp.o
+[1507/1644] Linking CXX static library plugins/platforms/libqvnc.a
+[1508/1644] Building CXX object src/plugins/platforminputcontexts/compose/CMakeFiles/QComposePlatformInputContextPlugin.dir/qcomposeplatforminputcontextmain.cpp.o
+[1509/1644] Building CXX object src/plugins/platforminputcontexts/compose/CMakeFiles/QComposePlatformInputContextPlugin.dir/qcomposeplatforminputcontext.cpp.o
+[1510/1644] Linking CXX static library plugins/platforminputcontexts/libcomposeplatforminputcontextplugin.a
+[1511/1644] Building CXX object src/plugins/imageformats/ico/CMakeFiles/QICOPlugin.dir/main.cpp.o
+[1512/1644] Automatic MOC for target QGifPlugin
+[1513/1644] Generating prl file for target QGifPlugin
+[1514/1644] Running AUTOMOC file extraction for target QGifPlugin
+[1515/1644] Running moc --collect-json for target QGifPlugin
+[1516/1644] Automatic MOC for target QEvdevMousePlugin
+[1517/1644] Generating prl file for target QEvdevMousePlugin
+[1518/1644] Running AUTOMOC file extraction for target QEvdevMousePlugin
+[1519/1644] Running moc --collect-json for target QEvdevMousePlugin
+[1520/1644] Building CXX object src/plugins/imageformats/ico/CMakeFiles/QICOPlugin.dir/qicohandler.cpp.o
+[1521/1644] Linking CXX static library plugins/imageformats/libqico.a
+[1522/1644] Generating version linker script for target QEvdevTouchScreenPlugin
+[1523/1644] Building CXX object src/plugins/imageformats/jpeg/CMakeFiles/QJpegPlugin.dir/cmake_pch.hxx.gch
+[1524/1644] Automatic MOC for target QEvdevTouchScreenPlugin
+[1525/1644] Building CXX object src/plugins/imageformats/jpeg/CMakeFiles/QJpegPlugin.dir/QJpegPlugin_autogen/mocs_compilation.cpp.o
+[1526/1644] Building CXX object src/plugins/imageformats/jpeg/CMakeFiles/QJpegPlugin.dir/main.cpp.o
+[1527/1644] Generating prl file for target QEvdevTouchScreenPlugin
+[1528/1644] Running AUTOMOC file extraction for target QEvdevTouchScreenPlugin
+[1529/1644] Running moc --collect-json for target QEvdevTouchScreenPlugin
+[1530/1644] Building CXX object src/plugins/imageformats/jpeg/CMakeFiles/QJpegPlugin.dir/qjpeghandler.cpp.o
+[1531/1644] Linking CXX static library plugins/imageformats/libqjpeg.a
+[1532/1644] Building CXX object src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin_init.dir/QEvdevKeyboardPlugin_init.cpp.o
+[1533/1644] Generating version linker script for target QEvdevKeyboardPlugin
+[1534/1644] Automatic MOC for target QEvdevKeyboardPlugin
+[1535/1644] Generating prl file for target QEvdevKeyboardPlugin
+[1536/1644] Running AUTOMOC file extraction for target QEvdevKeyboardPlugin
+[1537/1644] Running moc --collect-json for target QEvdevKeyboardPlugin
+[1538/1644] Building CXX object src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.gch
+FAILED: src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.gch 
+/root/.local/state/pgb/bin-2814651800/c++ -DQT_CORE_LIB -DQT_DEPRECATED_WARNINGS -DQT_EXPLICIT_QFILE_CONSTRUCTION_FROM_PATH -DQT_GUI_LIB -DQT_LEAN_HEADERS=1 -DQT_NO_DEBUG -DQT_NO_EXCEPTIONS -DQT_NO_FOREACH -DQT_NO_JAVA_STYLE_ITERATORS -DQT_NO_NARROWING_CONVERSIONS_IN_CONNECT -DQT_NO_QASCONST -DQT_NO_QEXCHANGE -DQT_NO_QSNPRINTF -DQT_NO_SINGLE_ARGUMENT_QHASH_OVERLOAD=1 -DQT_NO_STD_FORMAT_SUPPORT -DQT_PLUGIN -DQT_STATICPLUGIN -DQT_USE_QSTRINGBUILDER -D_GLIBCXX_ASSERTIONS -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/imageformats/gif/QGifPlugin_autogen/include -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/plugins/imageformats/gif -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/imageformats/gif -I/var/tmp/pgb-poc/91-qt-xcb/build/include -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/mkspecs/linux-g++ -I/var/tmp/pgb-poc/91-qt-xcb/build/src/gui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/src/corelib -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include -DNDEBUG -O2 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wno-expansion-to-defined -fPIC -ffunction-sections -fdata-sections -U_FORTIFY_SOURCE -Wsuggest-override -fcf-protection=full -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fstack-clash-protection -fno-exceptions -std=gnu++17 -Winvalid-pch -x c++-header -include /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx -MD -MT src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.gch -MF src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.gch.d -o src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.gch -c /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx.cxx
+In file included from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/qvalidator.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/QtGui:124,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/imageformats/gif/CMakeFiles/QGifPlugin.dir/cmake_pch.hxx:5,
+                 from <command-line>:
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/util/qvalidator.h:164:2: fatal error: cannot write PCH file: No space left on device
+  164 | };
+      |  ^
+compilation terminated.
+[1539/1644] Building CXX object src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.gch
+FAILED: src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.gch 
+/root/.local/state/pgb/bin-2814651800/c++ -DQT_CORE_LIB -DQT_DEPRECATED_WARNINGS -DQT_DEVICEDISCOVERY_SUPPORT_LIB -DQT_EXPLICIT_QFILE_CONSTRUCTION_FROM_PATH -DQT_GUI_LIB -DQT_INPUT_SUPPORT_LIB -DQT_LEAN_HEADERS=1 -DQT_NO_DEBUG -DQT_NO_EXCEPTIONS -DQT_NO_FOREACH -DQT_NO_JAVA_STYLE_ITERATORS -DQT_NO_NARROWING_CONVERSIONS_IN_CONNECT -DQT_NO_QASCONST -DQT_NO_QEXCHANGE -DQT_NO_QSNPRINTF -DQT_NO_SINGLE_ARGUMENT_QHASH_OVERLOAD=1 -DQT_NO_STD_FORMAT_SUPPORT -DQT_PLUGIN -DQT_STATICPLUGIN -DQT_USE_QSTRINGBUILDER -D_GLIBCXX_ASSERTIONS -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevmouse/QEvdevMousePlugin_autogen/include -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/plugins/generic/evdevmouse -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevmouse -I/var/tmp/pgb-poc/91-qt-xcb/build/include -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/mkspecs/linux-g++ -I/var/tmp/pgb-poc/91-qt-xcb/build/src/corelib -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/src/gui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport -I/var/tmp/pgb-poc/91-qt-xcb/build/src/platformsupport/input -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport/6.11.1/QtInputSupport -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport -I/var/tmp/pgb-poc/91-qt-xcb/build/src/platformsupport/devicediscovery -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport/6.11.1/QtDeviceDiscoverySupport -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include -DNDEBUG -O2 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wno-expansion-to-defined -fPIC -ffunction-sections -fdata-sections -U_FORTIFY_SOURCE -Wsuggest-override -fcf-protection=full -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fstack-clash-protection -fno-exceptions -std=gnu++17 -Winvalid-pch -x c++-header -include /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx -MD -MT src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.gch -MF src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.gch.d -o src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.gch -c /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx.cxx
+In file included from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/qvalidator.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/QtGui:124,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin.dir/cmake_pch.hxx:6,
+                 from <command-line>:
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/util/qvalidator.h:164:2: fatal error: cannot write PCH file: No space left on device
+  164 | };
+      |  ^
+compilation terminated.
+[1540/1644] Building CXX object src/plugins/generic/evdevtouch/CMakeFiles/QEvdevTouchScreenPlugin.dir/cmake_pch.hxx.gch
+[1541/1644] Building CXX object src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.gch
+FAILED: src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.gch 
+/root/.local/state/pgb/bin-2814651800/c++ -DQT_CORE_LIB -DQT_DEPRECATED_WARNINGS -DQT_DEVICEDISCOVERY_SUPPORT_LIB -DQT_EXPLICIT_QFILE_CONSTRUCTION_FROM_PATH -DQT_GUI_LIB -DQT_INPUT_SUPPORT_LIB -DQT_LEAN_HEADERS=1 -DQT_NO_DEBUG -DQT_NO_EXCEPTIONS -DQT_NO_FOREACH -DQT_NO_JAVA_STYLE_ITERATORS -DQT_NO_NARROWING_CONVERSIONS_IN_CONNECT -DQT_NO_QASCONST -DQT_NO_QEXCHANGE -DQT_NO_QSNPRINTF -DQT_NO_SINGLE_ARGUMENT_QHASH_OVERLOAD=1 -DQT_NO_STD_FORMAT_SUPPORT -DQT_PLUGIN -DQT_STATICPLUGIN -DQT_USE_QSTRINGBUILDER -D_GLIBCXX_ASSERTIONS -D_LARGEFILE64_SOURCE -D_LARGEFILE_SOURCE -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevkeyboard/QEvdevKeyboardPlugin_autogen/include -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/plugins/generic/evdevkeyboard -I/var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevkeyboard -I/var/tmp/pgb-poc/91-qt-xcb/build/include -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/qtbase/mkspecs/linux-g++ -I/var/tmp/pgb-poc/91-qt-xcb/build/src/corelib -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/6.11.1/QtCore -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/src/gui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/6.11.1/QtGui -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport -I/var/tmp/pgb-poc/91-qt-xcb/build/src/platformsupport/input -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtInputSupport/6.11.1/QtInputSupport -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport -I/var/tmp/pgb-poc/91-qt-xcb/build/src/platformsupport/devicediscovery -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport/6.11.1 -I/var/tmp/pgb-poc/91-qt-xcb/build/include/QtDeviceDiscoverySupport/6.11.1/QtDeviceDiscoverySupport -I/var/tmp/pgb-poc/91-qt-xcb/prefix/include -DNDEBUG -O2 -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -Wall -Wextra -Wno-expansion-to-defined -fPIC -ffunction-sections -fdata-sections -U_FORTIFY_SOURCE -Wsuggest-override -fcf-protection=full -D_FORTIFY_SOURCE=2 -fstack-protector-strong -fstack-clash-protection -fno-exceptions -std=gnu++17 -Winvalid-pch -x c++-header -include /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx -MD -MT src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.gch -MF src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.gch.d -o src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.gch -c /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx.cxx
+In file included from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/qvalidator.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtGui/QtGui:124,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/src/plugins/generic/evdevkeyboard/CMakeFiles/QEvdevKeyboardPlugin.dir/cmake_pch.hxx:6,
+                 from <command-line>:
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/util/qvalidator.h:164:2: fatal error: cannot write PCH file: No space left on device
+  164 | };
+      |  ^
+compilation terminated.
+ninja: build stopped: subcommand failed.
