@@ -122,7 +122,7 @@ Then, and only then:
 1. **Desktop files, icons and MIME data.** ✅ **Automatic, and no patching.**
    A nixpkgs derivation installs them where the freedesktop spec says, so
    finding them is a `find` and not a rule per application.
-   `tool/nix-appimage.sh` does it, and so does the soarpkgs chromium recipe
+   `internal/bundle/appimage.go` does it, and so does the soarpkgs chromium recipe
    this page pointed at.
    ⛔ **With one trap, paid for here:** a closure carries every dependency's
    `share/` too, so the first `.desktop` in the merged tree was **GTK's own**

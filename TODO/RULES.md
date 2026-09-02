@@ -198,6 +198,6 @@ shows the two builds agreeing on one option set in **5 of 5** attempts.
 touching the same rootfs may not.
 
 ⭐ **What CAN overlap**, and it is worth using: a `pgb build` and anything that
-does not touch the bed or the wrappers. `tool/nix-appimage.sh` is closure
+does not touch the bed or the wrappers. `internal/bundle/appimage.go` is closure
 fetching and dwarfs packing, so a bundle builds happily beside a compile. The
 serialisation only binds where the shared resource is.

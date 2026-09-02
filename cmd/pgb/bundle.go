@@ -5,7 +5,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/polaris0xff/glibc-research/internal/bundle"
@@ -20,6 +22,12 @@ func bundleCommand(c *cfg.Config, args []string) error {
 	sub, rest := args[0], args[1:]
 	switch sub {
 	case "appimage":
+		if len(rest) == 1 && (rest[0] == "--selftest" || rest[0] == "selftest") {
+			if bundle.AppImageSelftest(c).Print() != 0 {
+				return fail.Exit(1)
+			}
+			return nil
+		}
 		return bundleAppImage(c, rest)
 	case "fold-env":
 		if len(rest) == 0 {
@@ -31,6 +39,28 @@ func bundleCommand(c *cfg.Config, args []string) error {
 		}
 		fmt.Printf("env-fold: %d keys, %d -> %d bytes\n", keys, before, after)
 		return nil
+	case "onelf-recipe":
+		if len(rest) < 2 {
+			return fail.Cannot("pgb bundle onelf-recipe needs APPDIR and the main program")
+		}
+		level := 19
+		var pos []string
+		for i := 0; i < len(rest); i++ {
+			if rest[i] == "--level" && i+1 < len(rest) {
+				i++
+				n, err := strconv.Atoi(rest[i])
+				if err != nil {
+					return fail.Cannot("--level wants a number, got %q", rest[i])
+				}
+				level = n
+				continue
+			}
+			pos = append(pos, rest[i])
+		}
+		if len(pos) < 2 {
+			return fail.Cannot("pgb bundle onelf-recipe needs APPDIR and the main program")
+		}
+		return bundle.WriteOnelfRecipe(os.Stdout, pos[0], pos[1], level)
 	case "sweep":
 		if len(rest) == 1 && (rest[0] == "--selftest" || rest[0] == "selftest") {
 			if bundle.Selftest().Print() != 0 {
@@ -40,7 +70,7 @@ func bundleCommand(c *cfg.Config, args []string) error {
 		}
 		return bundleSweep(rest)
 	}
-	return fail.Cannot("unknown: pgb bundle %s (appimage, sweep, fold-env)", sub)
+	return fail.Cannot("unknown: pgb bundle %s (appimage, sweep, fold-env, onelf-recipe)", sub)
 }
 
 // bundleSweep reports which shared objects in a bundle nothing can reach.

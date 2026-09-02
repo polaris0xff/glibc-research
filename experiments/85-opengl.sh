@@ -24,7 +24,7 @@
 #                        __EGL_VENDOR_LIBRARY_DIRS, and the ICD JSONs rewritten
 #                        off their absolute /nix/store library_path.
 #   B  no bundled mesa   the same closure with `--no-gl`, so libglvnd is there
-#                        and no driver is. This is what a nix-appimage of a GL
+#                        and no driver is. This is what a bundle of a GL
 #                        program IS today.
 #
 # ⭐ Arm B is a control and it is the whole argument. Without it, arm A's
@@ -45,7 +45,7 @@ set -u
 exp_begin "85 - the bundled OpenGL stack, on all eleven"
 
 RR="$REPO_DIR/pgb"
-BUNDLER="$REPO_DIR/tool/nix-appimage.sh"
+BUNDLER="$REPO_DIR/pgb"
 CACHE="${PGB_APPIMAGE_CACHE:-/var/tmp/pgb-appimage}"
 RUN_TIMEOUT="${PGB_GL_TIMEOUT:-90}"
 
@@ -96,12 +96,12 @@ B_IMG="$B_CACHE/eglinfo/eglinfo-nogl-x86_64.AppImage"
 
 if [ ! -s "$A_IMG" ]; then
   exp_note "building arm A (bundled mesa) -- several minutes, ~400 MB of closure"
-  PGB_APPIMAGE_CACHE="$A_CACHE" "$BUNDLER" mesa-demos \
+  PGB_APPIMAGE_CACHE="$A_CACHE" "$BUNDLER" bundle appimage mesa-demos \
     --out "$A_IMG" --name eglinfo >"$B/build-A.log" 2>&1 || true
 fi
 if [ ! -s "$B_IMG" ]; then
   exp_note "building arm B (--no-gl control)"
-  PGB_APPIMAGE_CACHE="$B_CACHE" "$BUNDLER" mesa-demos --no-gl \
+  PGB_APPIMAGE_CACHE="$B_CACHE" "$BUNDLER" bundle appimage mesa-demos --no-gl \
     --out "$B_IMG" --name eglinfo >"$B/build-B.log" 2>&1 || true
 fi
 [ -s "$A_IMG" ] || { exp_note "arm A did not build; see $B/build-A.log"; exit 2; }

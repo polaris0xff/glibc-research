@@ -689,7 +689,7 @@ library on the host**, and carries per attribute:
 | | |
 |---|---|
 | `Name` | `bash` → **`bash-interactive-5.3p15`**, which `docs/research/nix.md` finding 3b says no name match can know |
-| `OutputName` | `jq` → **`bin`**, which is the case `tool/nix-appimage.sh` got wrong once |
+| `OutputName` | `jq` → **`bin`**, which is the case `internal/bundle/appimage.go` got wrong once |
 | `System` | **x86_64-linux**, which is the defect below |
 | `Pname` | so `sed` can reach an attribute at all |
 
@@ -1090,7 +1090,7 @@ Each is a gate, not a preference. Quoted, then what it means here.
 | 3 | *"the pgb builder looks like docker build … live logs with `ts` like timestamp, configurable"* | two references are vendored for it: `references/pkgforge__tss/main.rs` (the Rust `ts`) and `references/Azathothas__ToolKit/stamp.ps1`. ⚠ **The PowerShell one carries the part a naive port drops** — a HEARTBEAT when the stream is silent, so a four-minute link does not look like a hang |
 | 4 | *"best in class debugger/verbose loggers"* | levels, per-subsystem selection, and ⛔ **the composed command printed before it runs**. The defect above was invisible for an hour because nothing printed what was about to be executed; `PGB_NIX_DEBUG_CMD` was added by hand mid-session to do exactly that. That must be a first-class facility, not an ad-hoc `printf` |
 | 5 | *"all our crooked hacks must be written into safe, proper, ultra redundant functions"* | every construct whose failure mode is a plausible-looking wrong answer. The tree already lists them: `docs/history/corrections.md` is the inventory |
-| 6 | *"our nix debloater should work today but also in the future if nix changes the tree/structure — do not rely on hardcoded values or rely on them as little as possible"* | ⛔ **the sharpest one, and the one with the most existing debt.** `tool/nix-appimage.sh`'s debloat rules, `store_resolve`, the baked-path table and the wrapper-env lifting all pattern-match nixpkgs' CURRENT layout. Each rule must state what it is looking for structurally (an ELF that nothing needs, a directory no environment variable names) and fall back to doing nothing rather than to guessing |
+| 6 | *"our nix debloater should work today but also in the future if nix changes the tree/structure — do not rely on hardcoded values or rely on them as little as possible"* | ⛔ **the sharpest one, and the one with the most existing debt.** `internal/bundle/appimage.go`'s debloat rules, `store_resolve`, the baked-path table and the wrapper-env lifting all pattern-match nixpkgs' CURRENT layout. Each rule must state what it is looking for structurally (an ELF that nothing needs, a directory no environment variable names) and fall back to doing nothing rather than to guessing |
 
 ### ⛔ Do not lose these, they are this session's unrecorded measurements
 

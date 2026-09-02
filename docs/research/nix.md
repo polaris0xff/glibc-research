@@ -238,7 +238,7 @@ script had no way to express one.
 - `packages/chromium/nixappimage.nixpkgs.stable.yaml` — the bundle shape, and
   ⭐ **it answers the operator's open question about desktop files**: the
   `.desktop` and the icon are **found in the closure** with `find`
-  (`:99-120`), never patched in. `tool/nix-appimage.sh` does the same.
+  (`:99-120`), never patched in. `internal/bundle/appimage.go` does the same.
   ⚠ Its `#Purge Bloatware` section deletes locale directories and then
   **symlinks them back to the host** (`:127-132`) — a trade to take or reject
   deliberately.
@@ -255,7 +255,7 @@ operator names it as the thing that "killed the dream of a universal builder".
 Commits `7688b17c18d16f67fa8d5a82a2404c2e3a18648d` and
 `4e105d962bbce8a85e7ed2feffaddb52d127c87d`. Mined, **not read**. `patsh`
 patches store paths in shell scripts, which is precisely the hole
-`tool/nix-appimage.sh` names and does not fill.
+`internal/bundle/appimage.go` names and does not fill.
 
 ### `pkgforge-dev/kdenlive-AppImage-Enhanced` — **filed elsewhere** (T-055)
 
@@ -304,7 +304,7 @@ is nix-user-chroot in a container, and needing a container is the condition
 | `internal/nixx/drv.go` | the ATerm derivation reader — 12 checks including both nix escapes and two refusals |
 | `internal/nixx/plan.go` | derivation → build plan, shared by both routes |
 | `internal/elfx/needed.go` | the one ELF edit the bundler needs, with a toolchain-built fixture |
-| `tool/nix-appimage.sh` | the bundler, with `--selftest` for the wrapper-following logic |
+| `internal/bundle/appimage.go` | the bundler, with `--selftest` for the wrapper-following logic |
 | `experiments/80-` | nixpkgs with no nix, oracle-checked against a real nix |
 | `experiments/83-` | the `.drv` route, its availability rate, and the reader against the evaluator |
 

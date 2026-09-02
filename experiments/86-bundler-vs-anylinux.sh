@@ -9,7 +9,7 @@
 # `experiments/62-` compares **pgb's static output** against an anylinux
 # AppImage; nothing compared **our bundle** against one. This does.
 #
-#   arm P   `sh tool/nix-appimage.sh <attr>` -- ONE command, from a package
+#   arm P   `pgb bundle appimage <attr>` -- ONE command, from a package
 #           name. nixpkgs resolves the closure, our script packs it with
 #           uruntime + dwarfs + sharun.
 #   arm A   the hand-built route: install the distribution's package on Arch,
@@ -44,7 +44,7 @@ set -u
 exp_begin "86 - our bundler against a hand-built Anylinux AppImage"
 
 RR="$REPO_DIR/pgb"
-BUNDLER="$REPO_DIR/tool/nix-appimage.sh"
+BUNDLER="$REPO_DIR/pgb"
 ARCH_ROOT="$ROOTFS_DIR/archlinux-latest"
 QS="$REPO_DIR/references/pkgforge-dev__Anylinux-AppImages/tree/useful-tools/quick-sharun.sh"
 ANYLINUX_C="$REPO_DIR/references/pkgforge-dev__Anylinux-AppImages/tree/useful-tools/lib/anylinux.c"
@@ -99,12 +99,12 @@ trap 'reap_all' EXIT INT TERM
 printf -- '-- arm P: our bundler, one command --------------------------------\n'
 # ⛔ NO `--name`. It names the PROGRAM inside the closure's bin/, not the
 # artefact, and asking for one that is not there is now refused outright
-# (tool/nix-appimage.sh, and the selftest that keeps it refused). The artefact
+# (internal/bundle, and the selftest that keeps it refused). The artefact
 # name comes from --out; the work directory is separated by its own cache.
 P_IMG="${PGB_APPIMAGE_CACHE:-/var/tmp/pgb-appimage}/$APP/$APP-pgb-x86_64.AppImage"
 if [ ! -s "$P_IMG" ]; then
-  exp_note "sh tool/nix-appimage.sh $APP     <- the whole of arm P"
-  "$BUNDLER" "$APP" --out "$P_IMG" >"$B/build-P.log" 2>&1 || true
+  exp_note "./pgb bundle appimage $APP     <- the whole of arm P"
+  "$BUNDLER" bundle appimage "$APP" --out "$P_IMG" >"$B/build-P.log" 2>&1 || true
 fi
 exp_check "arm P built from the package name alone" \
   "$([ -s "$P_IMG" ] && echo yes || echo no)" yes

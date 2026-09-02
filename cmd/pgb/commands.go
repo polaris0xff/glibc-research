@@ -283,6 +283,9 @@ func selftestCommand(c *cfg.Config, args []string) error {
 	if want("bundle-sweep") {
 		all.Merge(bundle.Selftest())
 	}
+	if want("bundle-appimage") {
+		all.Merge(bundle.AppImageSelftest(c))
+	}
 	if all.Print() != 0 {
 		return fail.Exit(1)
 	}

@@ -53,7 +53,7 @@ set -u
 exp_begin "89 - debloating, and the control that says nothing was lost"
 
 RR="$REPO_DIR/pgb"
-BUNDLER="$REPO_DIR/tool/nix-appimage.sh"
+BUNDLER="$REPO_DIR/pgb"
 RUN_TIMEOUT="${PGB_GL_TIMEOUT:-120}"
 
 B="$EXP_OUT/build"
@@ -102,18 +102,18 @@ seed_cache() {  # from to
 
 if [ ! -s "$N_IMG" ]; then
   exp_note "building arm N (--debloat none) -- several minutes, ~400 MB of closure"
-  PGB_APPIMAGE_CACHE="$N_CACHE" "$BUNDLER" mesa-demos --debloat none \
+  PGB_APPIMAGE_CACHE="$N_CACHE" "$BUNDLER" bundle appimage mesa-demos --debloat none \
     --out "$N_IMG" --name eglinfo >"$B/build-N.log" 2>&1 || true
 fi
 if [ ! -s "$S_IMG" ]; then
   exp_note "building arm S (--debloat safe)"
-  PGB_APPIMAGE_CACHE="$S_CACHE" "$BUNDLER" mesa-demos --debloat safe \
+  PGB_APPIMAGE_CACHE="$S_CACHE" "$BUNDLER" bundle appimage mesa-demos --debloat safe \
     --out "$S_IMG" --name eglinfo >"$B/build-S.log" 2>&1 || true
 fi
 if [ ! -s "$A_IMG" ]; then
   exp_note "building arm A (--debloat aggressive)"
   seed_cache "$N_CACHE" "$A_CACHE"
-  PGB_APPIMAGE_CACHE="$A_CACHE" "$BUNDLER" mesa-demos --debloat aggressive \
+  PGB_APPIMAGE_CACHE="$A_CACHE" "$BUNDLER" bundle appimage mesa-demos --debloat aggressive \
     --out "$A_IMG" --name eglinfo >"$B/build-A.log" 2>&1 || true
 fi
 [ -s "$N_IMG" ] || { exp_note "arm N did not build; see $B/build-N.log"; exit 2; }

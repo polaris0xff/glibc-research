@@ -35,7 +35,7 @@ set -u
 exp_begin "90 - our kdenlive bundle against kdenlive-AppImage-Enhanced AND onelf"
 
 RR="$REPO_DIR/pgb"
-BUNDLER="$REPO_DIR/tool/nix-appimage.sh"
+BUNDLER="$REPO_DIR/pgb"
 WORK="${PGB_KDEN_WORK:-/var/tmp/t055}"
 CACHE="${PGB_KDEN_CACHE:-/var/tmp/pgb-appimage-kden}"
 RUN_TIMEOUT="${PGB_KDEN_TIMEOUT:-300}"
@@ -82,8 +82,8 @@ if [ ! -s "$ENH" ]; then
   chmod +x "$ENH"
 fi
 if [ ! -s "$OURS" ]; then
-  exp_note "building ours: sh tool/nix-appimage.sh kdenlive --with-program melt"
-  PGB_APPIMAGE_CACHE="$CACHE" "$BUNDLER" kdenlive \
+  exp_note "building ours: ./pgb bundle appimage kdenlive --with-program melt"
+  PGB_APPIMAGE_CACHE="$CACHE" "$BUNDLER" bundle appimage kdenlive \
     --with-program melt --with-program ffmpeg >"$B/build-ours.log" 2>&1 || true
 fi
 [ -s "$OURS" ] || { exp_note "ours did not build; see $B/build-ours.log"; exit 2; }
@@ -254,14 +254,14 @@ else
     [ -d "$OURDIR/share" ] && { cp -al "$OURDIR/share" "$D/share" 2>/dev/null || cp -a "$OURDIR/share" "$D/share"; }
     [ -d "$OURDIR/store" ] && { cp -al "$OURDIR/store" "$D/store" 2>/dev/null || cp -a "$OURDIR/store" "$D/store"; }
     # ⭐ ONELF GETS THE SAME INFORMATION sharun GETS, and at the same
-    # compression. `tool/onelf-recipe.py` turns our `.env` into `[env]` --
+    # compression. `pgb bundle onelf-recipe` turns our `.env` into `[env]` --
     # ${SHARUN_DIR} becomes ${ONELF_DIR}, a live ${VAR} becomes $${VAR}, and
     # repeated keys are folded because TOML cannot repeat one -- and sets
     # `[compression] level = 19` to match the dwarfs zstd level our own packer
     # uses. onelf's default is 12; comparing those would measure a default.
     # ⛔ Without the environment this arm fails the way OURS did before T-053:
     # melt starts, answers -version, and cannot find its modules.
-    python3 "$REPO_DIR/tool/onelf-recipe.py" "$OURDIR" kdenlive --level 19 \
+    "$REPO_DIR/pgb" bundle onelf-recipe "$OURDIR" kdenlive --level 19 \
       > "$D/onelf.toml" 2>>"$B/onelf-pack.log" || true
     cp "$D/onelf.toml" "$B/onelf.toml"
     exp_note "packing $(ls "$D/lib" | wc -l) libraries and $(ls "$D/bin" | wc -l) programs with onelf"
@@ -385,7 +385,7 @@ exp_check "the competitor did too"                 "$E_RUNS"  "$ENVS"
 # `kdenlive-AppImage-Enhanced` ships `AppRun.sh` for exactly the same reason.
 # ⭐ So what is asserted is that OURS IS NO WORSE THAN THE COMPETITOR on every
 # row, and the four musl rows -- which have no glibc for a shell to load --
-# come out at zero for both. `tool/nix-appimage.sh` now takes the shell only
+# come out at zero for both. `pgb bundle appimage` now takes the shell only
 # when there is more than one program, so the single-program bundles
 # `experiments/85-`, `86-` and `89-` measure are unaffected.
 exp_check "ours is no worse than the competitor on host objects" \

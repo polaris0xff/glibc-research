@@ -525,7 +525,7 @@ opened 1–4 host shared objects on every glibc row and none on the four musl
 ones. ⭐ **The competitor pays exactly the same price** — its `AppRun.sh` is a
 shell script too, and on Rocky 8 it opened **10** where ours opened 3. So the
 column is asserted as a comparison rather than an absolute, and
-`tool/nix-appimage.sh` now takes the shell **only when there is more than one
+`internal/bundle/appimage.go` now takes the shell **only when there is more than one
 program**, leaving 85-, 86- and 89-'s zero-host-object rows untouched.
 
 ### ⭐ The route to the bar, in the order the numbers say

@@ -88,7 +88,7 @@ answers it the same way this project now does: for the mesa case it does NOT
 use the host's GL, it points nixpkgs' own mesa at itself with
 `LIBGL_DRIVERS_PATH`, `GBM_BACKENDS_PATH` and `__EGL_VENDOR_LIBRARY_*`.
 
-**Landed in `tool/nix-appimage.sh`**, in three parts, each because a real run
+**Landed in `internal/bundle/appimage.go`**, in three parts, each because a real run
 failed:
 
 1. **mesa is pulled into the closure** when libglvnd is present and no driver
@@ -193,7 +193,7 @@ patchelf & patsh here?"*
 
 **Where it stands.** `internal/elfx/needed.go` does ONE edit — rewrite an absolute
 `DT_NEEDED` to its basename, in place, at the same `.dynstr` offset — because
-that is the single edit `tool/nix-appimage.sh` needed and patchelf is not on
+that is the single edit `internal/bundle/appimage.go` needed and patchelf is not on
 this machine. That is a reason for the sixty lines, not an argument against
 patchelf.
 
@@ -207,7 +207,7 @@ longer a blocker for either tool.
   break in subtle ways when it has to grow a section, which is exactly why
   `elf-needed.py` refuses to move anything. Decide per edit, not per tool.
 - **patsh** patches store paths in **shell scripts**, which is the gap
-  `tool/nix-appimage.sh` currently *names and does not fill*: a nixpkgs
+  `internal/bundle/appimage.go` currently *names and does not fill*: a nixpkgs
   `bin/x` that is a wrapper script is followed to its ELF and the wrapper's
   environment is dropped. ⭐ That is a real hole in the bundler and patsh is
   aimed straight at it.
@@ -248,8 +248,8 @@ nixpkgs embeds the generating command in the binary's own data:
         --prefix 'LUA_CPATH' ';' '/nix/store/...-lua-5.2.4-env/lib/lua/5.2/?.so' \
         --suffix 'PATH'     ':' '/nix/store/...-yt-dlp-2026.08.19/bin'
 
-`tool/nix-wrapper.py` reads both shapes (11-check selftest, including two
-refusal cases), and `tool/nix-appimage.sh` copies each referenced store path
+`internal/bundle/wrapper.go` reads both shapes (11-check selftest, including two
+refusal cases), and `internal/bundle/appimage.go` copies each referenced store path
 into `AppDir/store/<name>/` — keeping its internal layout, because `LUA_CPATH`
 names a sub-path — and writes `.env` lines with the same prefix/suffix/set
 semantics.
@@ -277,7 +277,7 @@ tooling, iterating/improving them, and debloating nixappimages, correctly
 packing them, and also solving the opengl problem"*.
 **Category** research · **Priority** P1 · **Effort** L · **Status** ⚠started
 
-**Landed already.** `tool/nix-appimage.sh` builds one: uruntime + dwarfs +
+**Landed already.** `internal/bundle/appimage.go` builds one: uruntime + dwarfs +
 sharun instead of appimage-type2-runtime + mksquashfs + a bwrap AppRun, with
 the nixpkgs **closure** replacing sharun's ldd-and-strace library discovery.
 galculator 2.1.4 reaches GTK's own "cannot open display" on alpine 3.22,
@@ -413,8 +413,8 @@ thing to measure.
 
 nixpkgs' current `makeWrapper` emits a **compiled C program** — mpv's `bin/mpv`
 is a 16,560-byte ELF — so patsh has no script to patch, and a bundle does not
-run the wrapper anyway. `tool/nix-wrapper.py` reads the environment out of both
-wrapper shapes and `tool/nix-appimage.sh` re-expresses it against the bundle.
+run the wrapper anyway. `internal/bundle/wrapper.go` reads the environment out of both
+wrapper shapes and `internal/bundle/appimage.go` re-expresses it against the bundle.
 Full write-up in T-053.
 
 ### Item 4, lib32
