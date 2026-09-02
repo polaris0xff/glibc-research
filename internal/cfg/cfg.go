@@ -82,6 +82,7 @@ type Config struct {
 	ArchBaseline  string
 	ExtraBinds    []string
 	WrapDlopen    []string
+	HostDlopen    bool
 
 	// SharedWrappers reproduces the pre-T-058 single wrapper directory. Only
 	// experiments/87- sets it; nothing in pgb does.
@@ -112,6 +113,7 @@ func Load(self string) *Config {
 		ArchBaseline:  os.Getenv("PGB_OPT_BASELINE"),
 		ExtraBinds:    strings.Fields(os.Getenv("PGB_OPT_BINDS")),
 		WrapDlopen:    strings.Fields(os.Getenv("PGB_OPT_WRAP_DLOPEN")),
+		HostDlopen:    logx.EnvBool("PGB_OPT_HOST_DLOPEN", false),
 
 		SharedWrappers: os.Getenv("PGB_T058_SHARED_WRAPPERS") != "",
 	}
@@ -123,7 +125,7 @@ func Load(self string) *Config {
 var OptVars = []string{
 	"PGB_OPT_VERBOSE", "PGB_OPT_EMBED_LOCALE", "PGB_OPT_EMBED_CACERT",
 	"PGB_OPT_EMBED_TERMINFO", "PGB_OPT_USE_ICONV", "PGB_OPT_BASELINE",
-	"PGB_OPT_BINDS", "PGB_OPT_WRAP_DLOPEN",
+	"PGB_OPT_BINDS", "PGB_OPT_WRAP_DLOPEN", "PGB_OPT_HOST_DLOPEN",
 	"PGB_STATE", "PGB_LIBICONV_PREFIX", "PGB_T058_SHARED_WRAPPERS",
 	"PGB_LOG", "PGB_DEBUG", "PGB_TS", "PGB_TS_COLUMNS", "PGB_TS_HEARTBEAT",
 }
@@ -140,6 +142,7 @@ func (c *Config) Export() {
 	set("PGB_OPT_BASELINE", c.ArchBaseline)
 	set("PGB_OPT_BINDS", strings.Join(c.ExtraBinds, " "))
 	set("PGB_OPT_WRAP_DLOPEN", strings.Join(c.WrapDlopen, " "))
+	set("PGB_OPT_HOST_DLOPEN", bit(c.HostDlopen))
 	set("PGB_STATE", c.State)
 	set("PGB_LIBICONV_PREFIX", c.LibiconvPrefix)
 	if spec := logx.SubsysSpec(); spec != "" {

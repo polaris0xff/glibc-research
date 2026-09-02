@@ -75,9 +75,11 @@
 #include "pgb-elfload.h"
 
 #include <elf.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdarg.h>
 #include <stdint.h>
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -114,6 +116,37 @@ const char *pgb_elf_dlerror(void)
     return pgb_el_errbuf;
 }
 
+/* ⭐ A TRACE THAT SURVIVES THE PROCESS DYING, because the failures this loader
+ * has to explain are constructors that segfault, and a message buffered behind
+ * one of those is a message nobody reads. Unbuffered write(2) to stderr, gated
+ * on PGB_ELFLOAD_DEBUG so it costs one getenv in a normal run.
+ *
+ * ⛔ Ignored for a set-uid process, with every other environment switch. */
+static int el_dbg_on(void)
+{
+    static int v = -1;
+    if (v < 0)
+        v = (getauxval(AT_SECURE) == 0) && getenv("PGB_ELFLOAD_DEBUG") != NULL;
+    return v;
+}
+
+static void el_dbg(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
+
+static void el_dbg(const char *fmt, ...)
+{
+    char b[512];
+    va_list ap;
+    int n;
+
+    if (!el_dbg_on())
+        return;
+    __builtin_va_start(ap, fmt);
+    n = vsnprintf(b, sizeof b, fmt, ap);
+    __builtin_va_end(ap);
+    if (n > 0)
+        (void)!write(2, b, (size_t)n < sizeof b ? (size_t)n : sizeof b - 1);
+}
+
 /* ------------------------------------------------------------ loaded object */
 
 #define EL_MAX_OBJS   64
@@ -147,10 +180,13 @@ struct el_obj {
     int          symbolic;      /* DT_SYMBOLIC or DF_SYMBOLIC */
     int          textrel;
 
-    /* PT_TLS, if any. modid is this loader's own module numbering. */
+    /* PT_TLS, if any. modid is this loader's own module numbering.
+     * tls_tpoff is non-zero once the block has been placed in glibc's static
+     * TLS surplus -- see el_static_tls(). */
     const unsigned char *tls_image;
     size_t tls_filesz, tls_memsz, tls_align;
     size_t tls_modid;
+    long   tls_tpoff;
 
     unsigned char *relro;  size_t relrosz;
 
@@ -193,6 +229,44 @@ int pgb_elf_available(void)
     return &pgb_provider_syms[0] != NULL && pgb_provider_syms[0].name != NULL;
 }
 
+/* ⭐ CLASS A OF experiments/73-, DEFINED HERE BECAUSE ld.so DEFINES IT.
+ *
+ * These are not in libc.a and never will be: the host's dynamic loader
+ * exports them, so a loader compiled in has to own them itself or every
+ * object using general-dynamic TLS fails to resolve. Measured: of 492
+ * undefined-symbol failures in the first full sweep of 904 host objects,
+ * 398 were __tls_get_addr alone -- one name, 81% of the failures.
+ *
+ * ⚠ Checked BEFORE the generated table, because the generated table is built
+ * from archives that do not contain these and a stale entry must not win. */
+struct el_tls_index;
+void *__tls_get_addr(struct el_tls_index *ti);
+
+static const struct pgb_provider_sym el_own_syms[] = {
+    { "__tls_get_addr", (void *)(uintptr_t)&__tls_get_addr },
+    { NULL, NULL }
+};
+
+/* ⭐ THREAD-LOCAL symbols this image's own glibc defines, reached by ADDRESS
+ * rather than by name. A TLS symbol cannot go in the generated provider table
+ * -- 30 of libc.a's exports are TLS and the linker refuses a non-TLS
+ * reference to any of them, which is a link error, not a policy. But their
+ * run-time address IS available, and the offset from the thread pointer is
+ * the same in every thread, so a host object importing errno binds correctly
+ * everywhere. 10 of the 42 initial-exec failures in the first sweep were
+ * exactly this one name. */
+static void *el_addr_errno(void)   { return &errno; }
+static void *el_addr_h_errno(void) { return &h_errno; }
+
+static void *el_tls_provider(const char *name)
+{
+    if (strcmp(name, "errno") == 0)
+        return el_addr_errno();
+    if (strcmp(name, "h_errno") == 0)
+        return el_addr_h_errno();
+    return NULL;
+}
+
 /* The executable's own static glibc, by name. The generated table is sorted,
  * so this is a binary search: the table runs to several thousand entries and
  * a load touches it once per undefined symbol.
@@ -203,6 +277,11 @@ int pgb_elf_available(void)
 static void *el_provider(const char *name)
 {
     size_t lo = 0, hi;
+    const struct pgb_provider_sym *own;
+
+    for (own = el_own_syms; own->name; own++)
+        if (strcmp(own->name, name) == 0)
+            return own->addr;
 
     if (&pgb_provider_syms[0] == NULL)
         return NULL;
@@ -486,7 +565,84 @@ static size_t el_tls_next_modid = 1;
 
 struct el_tls_index { unsigned long ti_module, ti_offset; };
 
-void *__tls_get_addr(struct el_tls_index *ti);
+/* The thread pointer. On x86-64 (variant II) %fs:0 holds its own address and
+ * static TLS blocks live at NEGATIVE offsets from it. */
+static void *el_tp(void)
+{
+    void *p;
+    __asm__ volatile ("mov %%fs:0, %0" : "=r"(p));
+    return p;
+}
+
+/* ⭐ glibc's OWN static-TLS bookkeeping, and the reason initial-exec is
+ * reachable at all. A static glibc lays out TLS in __libc_setup_tls() as
+ * `memsz + _dl_tls_static_surplus`, so the surplus is already ALLOCATED in
+ * every thread's block -- it is only unclaimed. Claiming a slice of it is
+ * what ld.so does for a dlopen'd module with initial-exec TLS, and these are
+ * the four variables it does it through. All four are plain GLOBAL OBJECTs in
+ * libc.a, 8 bytes each, verified with readelf rather than assumed.
+ *
+ * ⚠ Weak, because a build that never links them must still compile: then the
+ * relocation is refused by name instead of writing a wrong offset. */
+extern size_t _dl_tls_static_used  __attribute__((weak));
+extern size_t _dl_tls_static_size  __attribute__((weak));
+extern size_t _dl_tls_static_align __attribute__((weak));
+
+/* Place o's TLS block in the surplus, once. Returns 0 and sets o->tls_tpoff.
+ *
+ * ⚠ THE HONEST LIMIT, AND IT IS ABOUT THREADS, NOT ABOUT SPACE. glibc gives
+ * every thread a block of _dl_tls_static_size, so the slice EXISTS in threads
+ * created later and is zero there. It is seeded with the module's init image
+ * only in the thread that loaded it. So a module whose PT_TLS p_filesz is 0 --
+ * 14 of the 24 measured in the first sweep -- is correct on every thread,
+ * because zero is what its image says. A module with a non-zero image is
+ * correct on the loading thread and zero-initialised on threads created after
+ * it, which is stated here and asserted in experiments/76- rather than
+ * discovered by a user.
+ */
+static int el_static_tls(struct el_obj *o)
+{
+    size_t align, used, newused;
+    unsigned char *blk;
+
+    if (o->tls_tpoff)
+        return 0;
+    if (&_dl_tls_static_used == NULL || &_dl_tls_static_size == NULL) {
+        el_err("pgb-elfload: %s: glibc's static-TLS bookkeeping is not linked "
+               "in, so initial-exec TLS cannot be placed", o->soname);
+        return -1;
+    }
+    if (!o->tls_memsz) {
+        el_err("pgb-elfload: %s: initial-exec TLS but no PT_TLS segment",
+               o->soname);
+        return -1;
+    }
+    align = o->tls_align ? o->tls_align : 1;
+    if ((uintptr_t)el_tp() % align) {
+        el_err("pgb-elfload: %s: PT_TLS wants %zu-byte alignment and the "
+               "thread pointer does not have it", o->soname, align);
+        return -1;
+    }
+    used    = _dl_tls_static_used;
+    newused = (used + o->tls_memsz + align - 1) & ~(align - 1);
+    if (newused > _dl_tls_static_size) {
+        el_err("pgb-elfload: %s: static TLS surplus exhausted -- needs %zu "
+               "bytes, %zu of %zu used", o->soname, o->tls_memsz, used,
+               (size_t)_dl_tls_static_size);
+        return -1;
+    }
+    _dl_tls_static_used = newused;
+    if (&_dl_tls_static_align != NULL && align > _dl_tls_static_align)
+        _dl_tls_static_align = align;
+
+    o->tls_tpoff = -(long)newused;
+    blk = (unsigned char *)el_tp() + o->tls_tpoff;
+    if (o->tls_filesz)
+        memcpy(blk, o->tls_image, o->tls_filesz);
+    if (o->tls_memsz > o->tls_filesz)
+        memset(blk + o->tls_filesz, 0, o->tls_memsz - o->tls_filesz);
+    return 0;
+}
 
 void *__tls_get_addr(struct el_tls_index *ti)
 {
@@ -502,6 +658,13 @@ void *__tls_get_addr(struct el_tls_index *ti)
         if (el_objs[i]->tls_modid == ti->ti_module) { o = el_objs[i]; break; }
     if (!o)
         return NULL;
+
+    /* ⛔ A module placed in static TLS must answer general-dynamic out of the
+     * SAME block. Handing back a separate heap block would give one module two
+     * copies of its own thread storage, which is a silent wrong answer of
+     * exactly the kind this loader exists to avoid. */
+    if (o->tls_tpoff)
+        return (char *)el_tp() + o->tls_tpoff + ti->ti_offset;
 
     b = calloc(1, sizeof *b);
     if (!b)
@@ -627,16 +790,61 @@ static int el_reloc_one(struct el_obj *o, const Elf64_Rela *r)
         }
         return 0;
 
-    /* ⛔ INITIAL-EXEC. The offset is from the thread pointer, into the STATIC
-     * TLS block, which glibc lays out before main() and which cannot be grown
-     * afterwards. Refused BY NAME rather than bound to a plausible-looking
-     * wrong offset -- solo's mechanism 4, and the difference between a loud
-     * failure and a silent corruption of another module's thread storage. */
-    case R_X86_64_TPOFF64:
-        el_err("pgb-elfload: %s: initial-exec TLS (R_X86_64_TPOFF64) for %s "
-               "needs static TLS surplus this image cannot grow",
-               o->soname, name ? name : "?");
-        return -1;
+    /* ⭐ INITIAL-EXEC. The value is an offset from the thread pointer into the
+     * STATIC TLS block. Three cases, in the order they are tried, and the
+     * measurement that made the order matter is in the comment on each:
+     *
+     *   1. the symbol is one THIS IMAGE's own glibc defines as thread-local
+     *      -- errno and h_errno. Their offset is computed from their real
+     *      address, so it is right in every thread, for free.
+     *   2. the symbol is defined by another LOADED object's PT_TLS. 18 of the
+     *      42 initial-exec failures in the first sweep had no PT_TLS of their
+     *      own at all, which is what this case is.
+     *   3. the relocation is against this object's own PT_TLS.
+     *
+     * ⛔ Still refused BY NAME when none applies, never bound to a
+     * plausible-looking wrong offset -- solo's mechanism 4, and the difference
+     * between a loud failure and silently corrupting another module's thread
+     * storage. */
+    case R_X86_64_TPOFF64: {
+        struct el_obj *owner = o;
+        uint64_t symoff = 0;
+        int i;
+
+        if (name && *name) {
+            void *a = el_tls_provider(name);
+            if (a) {
+                *(int64_t *)where = (int64_t)((char *)a - (char *)el_tp()) +
+                                    r->r_addend;
+                return 0;
+            }
+        }
+        if (name && *name) {
+            const Elf64_Sym *s = el_lookup_in(o, name, ver);
+            if (s && ELF64_ST_TYPE(s->st_info) == STT_TLS) {
+                symoff = s->st_value;
+            } else {
+                owner = NULL;
+                for (i = 0; i < el_nobjs; i++) {
+                    s = el_lookup_in(el_objs[i], name, ver);
+                    if (s && ELF64_ST_TYPE(s->st_info) == STT_TLS) {
+                        owner = el_objs[i];
+                        symoff = s->st_value;
+                        break;
+                    }
+                }
+                if (!owner) {
+                    el_err("pgb-elfload: %s: initial-exec TLS symbol %s is "
+                           "defined nowhere in the loaded set", o->soname, name);
+                    return -1;
+                }
+            }
+        }
+        if (el_static_tls(owner) != 0)
+            return -1;
+        *(int64_t *)where = owner->tls_tpoff + (int64_t)symoff + r->r_addend;
+        return 0;
+    }
 
     case R_X86_64_TLSDESC:
         el_err("pgb-elfload: %s: TLSDESC relocation for %s is not implemented",
@@ -1093,13 +1301,23 @@ static struct el_obj *el_load(const char *path, const struct el_obj *req)
     }
     el_read_dynamic(o, dyn);
     free(ph);
+    el_dbg("pgb-elfload: mapped %s at %p (%zu bytes)\n", o->soname,
+           (void *)o->base, o->span);
 
     /* Registered BEFORE relocating so that a dependency cycle terminates and
      * so that a symbol defined here is visible to its own dependencies. */
     el_objs[el_nobjs++] = o;
 
     if (el_load_needed(o) != 0 || el_relocate(o) != 0) {
-        el_nobjs--;
+        /* ⚠ NOT el_nobjs--. el_load_needed() appends dependencies AFTER this
+         * object, so decrementing would drop the last dependency and leave the
+         * failed object registered -- a later lookup would then resolve into a
+         * half-relocated image. Remove o by identity instead. */
+        int k, w = 0;
+        for (k = 0; k < el_nobjs; k++)
+            if (el_objs[k] != o)
+                el_objs[w++] = el_objs[k];
+        el_nobjs = w;
         return NULL;
     }
 
@@ -1125,11 +1343,17 @@ static void el_init(struct el_obj *o)
      * constructor that calls into a dependency requires. */
     for (i = 0; i < (size_t)o->nneeded; i++)
         el_init(o->needed[i]);
+    el_dbg("pgb-elfload: init %s (DT_INIT %s, %zu in DT_INIT_ARRAY)\n",
+           o->soname, o->init ? "yes" : "no", o->init_arrayn);
     if (o->init)
         o->init();
     for (i = 0; i < o->init_arrayn; i++)
-        if (o->init_array[i])
+        if (o->init_array[i]) {
+            el_dbg("pgb-elfload:   init_array[%zu] %p\n", i,
+                   (void *)o->init_array[i]);
             o->init_array[i]();
+        }
+    el_dbg("pgb-elfload: init %s done\n", o->soname);
 }
 
 /* -------------------------------------------------------------- public face */
@@ -1154,6 +1378,24 @@ void *pgb_elf_dlopen(const char *path, int flags)
     if (!el_search(found, sizeof found, path, NULL)) {
         el_err("pgb-elfload: cannot find %s", path);
         return NULL;
+    }
+    /* ⛔ A PATH TO A SONAME THIS IMAGE ALREADY SERVES IS REFUSED, not mapped.
+     * The DT_NEEDED walk short-circuits these; a direct dlopen of the same
+     * file has to as well, or the caller gets a SECOND libc by naming a path
+     * instead of a soname. Measured: glibc's own stub libraries -- libdl.so.2,
+     * libpthread.so.0, libutil.so.1, libanl.so.1, libBrokenLocale.so.1 --
+     * bind to GLIBC_PRIVATE symbols in a libc.so.6 that is not in this
+     * process, and every one of them crashed in its initialiser before this
+     * check existed. */
+    {
+        const char *b = strrchr(found, '/');
+        b = b ? b + 1 : found;
+        if (el_soname_served(b)) {
+            el_err("pgb-elfload: %s is already served by this image's own "
+                   "static glibc; loading it would put a second libc in the "
+                   "process", b);
+            return NULL;
+        }
     }
     {
         const char *b = strrchr(found, '/');

@@ -75,6 +75,7 @@
  */
 
 #include "pgb-dlopen.h"
+#include "pgb-elfload.h"
 
 #include <string.h>
 
@@ -143,6 +144,48 @@ static const struct pgb_dl_lib *pgb_find(const char *path)
     return NULL;
 }
 
+/* ⭐ HANDLES FROM TWO SOURCES HAVE TO BE TOLD APART, and there is no bit to
+ * spare in either. A table handle points into pgb_dlopen_libs; a loader handle
+ * points at the loader's own object record. dlsym must send each to the right
+ * place, so the loader's handles are recorded here as they are issued. Small
+ * and linear: a program that dlopens more than a few dozen HOST objects is not
+ * a case this mechanism is claiming. */
+#define PGB_ELF_HANDLES 64
+static void *pgb_elf_handles[PGB_ELF_HANDLES];
+static int   pgb_elf_nhandles;
+
+static void pgb_elf_remember(void *h)
+{
+    int i;
+    for (i = 0; i < pgb_elf_nhandles; i++)
+        if (pgb_elf_handles[i] == h)
+            return;
+    if (pgb_elf_nhandles < PGB_ELF_HANDLES)
+        pgb_elf_handles[pgb_elf_nhandles++] = h;
+}
+
+static int pgb_is_elf_handle(void *h)
+{
+    int i;
+    for (i = 0; i < pgb_elf_nhandles; i++)
+        if (pgb_elf_handles[i] == h)
+            return 1;
+    return 0;
+}
+
+/* Hand a path to the compiled-in loader and adopt its error into dlerror(). */
+static void *pgb_elf_open(const char *path, int flags)
+{
+    void *h = pgb_elf_dlopen(path, flags);
+    if (h == NULL) {
+        const char *e = pgb_elf_dlerror();
+        pgb_dl_err = e ? e : "pgb: the compiled-in loader refused the object";
+        return NULL;
+    }
+    pgb_elf_remember(h);
+    return h;
+}
+
 void *__wrap_dlopen(const char *path, int flags)
 {
     const struct pgb_dl_lib *l;
@@ -153,9 +196,17 @@ void *__wrap_dlopen(const char *path, int flags)
 
     pgb_dl_err = NULL;
 
+    /* ⭐ THE ORDER IS COMPILED-IN TABLE FIRST, LOADER SECOND, and it matters.
+     * A program's own plugin is already in the link, so answering it from the
+     * table maps nothing at all. Reaching for the loader first would map a
+     * copy of code the executable already contains and give the process two of
+     * every symbol in it. The loader is for objects that are NOT in the link,
+     * which is exactly what a HOST plugin is. */
     if (&pgb_dlopen_libs[0] == NULL) {
+        if (pgb_elf_available() && path != NULL)
+            return pgb_elf_open(path, flags);
         pgb_dl_err = "pgb: no plugin table was compiled in "
-                     "(build with --wrap-dlopen)";
+                     "(build with --wrap-dlopen or --host-dlopen)";
         return NULL;
     }
 
@@ -170,6 +221,10 @@ void *__wrap_dlopen(const char *path, int flags)
     } else {
         l = pgb_find(path);
         if (l == NULL) {
+            /* Not one of this build's own plugins. With --host-dlopen the
+             * compiled-in loader gets it; without, the message is unchanged. */
+            if (pgb_elf_available())
+                return pgb_elf_open(path, flags);
             pgb_dl_err = "pgb: no such plugin in the compiled-in table";
             return NULL;
         }
@@ -210,6 +265,15 @@ void *__wrap_dlsym(void *handle, const char *name)
         return NULL;
     }
 
+    if (pgb_is_elf_handle(handle)) {
+        void *a = pgb_elf_dlsym(handle, name);
+        if (a == NULL) {
+            const char *e = pgb_elf_dlerror();
+            pgb_dl_err = e ? e : "pgb: symbol not found in the loaded object";
+        }
+        return a;
+    }
+
     l = (const struct pgb_dl_lib *)handle;
     if (l->syms == NULL) {
         pgb_dl_err = "pgb: plugin has no symbol table";
@@ -226,10 +290,12 @@ void *__wrap_dlsym(void *handle, const char *name)
 
 int __wrap_dlclose(void *handle)
 {
+    pgb_dl_err = NULL;
+    if (pgb_is_elf_handle(handle))
+        return pgb_elf_dlclose(handle);
     /* Nothing was mapped, so nothing is unmapped. Returning 0 is not a lie:
      * dlclose's contract is that the caller may no longer use the handle,
      * and it may not. */
     (void)handle;
-    pgb_dl_err = NULL;
     return 0;
 }

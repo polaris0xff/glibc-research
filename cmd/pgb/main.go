@@ -78,6 +78,11 @@ OPTIONS (build)
                              build produced; its exported symbols become the
                              plugin's dlsym table. For programs that load
                              their OWN plugins
+  --host-dlopen              load a HOST shared object with pgb's own ELF
+                             loader, resolving it against the static glibc
+                             already in the binary. The host's ld.so is never
+                             consulted and no second libc enters the process.
+                             For programs that load somebody ELSE's plugins
   --engine chroot|docker|podman|host
 
 DIAGNOSTICS
@@ -192,6 +197,8 @@ func (p *parser) option(a string) (bool, error) {
 		if v, err = p.value(a); err == nil {
 			p.c.WrapDlopen = append(p.c.WrapDlopen, v)
 		}
+	case "--host-dlopen":
+		p.c.HostDlopen = true
 	case "--engine":
 		if v, err = p.value(a); err == nil {
 			p.engine = v

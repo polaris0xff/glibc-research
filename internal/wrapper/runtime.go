@@ -110,6 +110,11 @@ func (b *Builder) Build() (string, error) {
 			return "", err
 		}
 	}
+	if b.C.HostDlopen {
+		if err := b.buildProviderTable(rd, src); err != nil {
+			return "", err
+		}
+	}
 	return rd, nil
 }
 

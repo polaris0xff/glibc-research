@@ -127,6 +127,28 @@ LINK FLAGS
 `, strings.Join(c.WrapDlopen, " "))
 	}
 
+	if c.HostDlopen {
+		w.WriteString(`  -Wl,--wrap=dlopen              load a HOST shared object with pgb's OWN ELF
+  -Wl,--wrap=dlsym               loader and resolve it against the static glibc
+  -Wl,--wrap=dlclose             already in this executable. The host's ld.so
+  -Wl,--wrap=dlerror             is never consulted and its libc.so.6 is never
+                                 mapped: a DT_NEEDED naming a library this
+                                 image already contains is ANSWERED, not opened
+  <pgb-elfload.o>                the loader itself
+  <pgb-provider-table.o>         GENERATED for this build: every symbol the
+                                 pinned static glibc can define, WEAKLY
+                                 referenced so listing a name costs a string
+                                 and a pointer and pulls no archive member
+  -Wl,@pgb-provider-u.rsp        the dial. -u forces those members into the
+                                 link so the table has addresses to hand out.
+                                 Measured on the spike: 946,752 bytes and
+                                 1,251 live entries without it, 2,621,872 and
+                                 4,891 with it
+  -Wl,--start-group ...          the -u names span libresolv.a, libanl.a and
+                                 the rest; a single-pass link needs the group
+`)
+	}
+
 	w.WriteString(`
 WHAT EACH ONE IS FOR, WITH THE MEASUREMENT
   NSS      __nss_configure_lookup() pins every database to services glibc

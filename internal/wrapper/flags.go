@@ -76,5 +76,19 @@ func LinkFlags(c *cfg.Config, rd string, cxx bool) []string {
 			out = append(out, dlopenObjects(rd)...)
 		}
 	}
+	// --host-dlopen reuses the same --wrap redirection, so it is added only
+	// when --wrap-dlopen did not already ask for it. pgb-dlopen.c consults its
+	// own compiled-in plugin table first and falls through to the ELF loader,
+	// which is the order that keeps a program's own plugins from being mapped
+	// when they are already in the link.
+	if c.HostDlopen {
+		if flags := hostDlopenLinkFlags(rd); flags != nil {
+			if len(c.WrapDlopen) == 0 {
+				out = append(out, "-Wl,--wrap=dlopen,--wrap=dlsym,--wrap=dlclose,--wrap=dlerror",
+					filepath.Join(rd, "pgb-dlopen.o"))
+			}
+			out = append(out, flags...)
+		}
+	}
 	return out
 }
