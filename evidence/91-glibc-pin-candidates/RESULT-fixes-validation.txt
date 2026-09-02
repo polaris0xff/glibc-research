@@ -1,0 +1,45 @@
+91 - glibc pin candidates
+date        : 2026-09-02T15:37:11Z
+incumbent   : debian:12 sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929
+
+ARM 1 -- digests
+  debian:12 sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929
+  ubuntu:24.04 sha256:1e0a86e57d247923571b75e0aaf48a1449cf8c543d51fb3e07a4a7d7bfa79316
+
+ARM 2 -- kernel floor (image, glibc, ABI-tag, file(1))
+  debian:12 2.36 3.2.0 3.2.0
+  ubuntu:24.04 ? unread unread
+
+ARM 3 -- NSS modules opened with the override on
+  debian:12 none
+  ubuntu:24.04 none
+
+ARM 4 -- class residue (env, glibc, B, C, S)
+  pgb-env-debian12 2.36 20 0 49
+  pgb-env-debian-trixie 2.41 5 0 50
+
+ARM 5 -- POCs
+  10-gawk ok
+
+-- WHAT THIS FILE IS -------------------------------------------------
+⚠ NOT a full run. This is the one-POC run used to validate the three
+fixes made to experiments/91- on 2026-09-02e, kept because it is the
+measurement behind them:
+
+  ARM 1  ubuntu:24.04 resolved and debian:trixie did NOT -- Docker Hub
+         429'd a DIFFERENT tag than it 429'd an hour earlier, which is
+         why a candidate whose environment exists now falls back to the
+         digest that environment records.
+  ARM 2  TWO rows. Before the fix this arm produced ONE: `docker run -i`
+         attached the container to the loop's own stdin, which was
+         `< candidates.txt`, so docker drained the list and the loop
+         ended after the incumbent.
+  ARM 4  class B 20 -> 5 and class C 0 at BOTH pins, which is what
+         PROGRESS.md publishes from 73-'s own table. The old counter
+         counted indented LINES and reported 12 -> 7 with class C = 1 --
+         one being the line "empty on every environment."
+  ARM 5  one POC, and the point of it is the gcc column: 10-gawk built
+         at 14.2.0, proving PGB_ENGINE + PGB_ENV_IMAGE + PGB_ENV_DIGEST
+         actually select the candidate environment.
+
+The full ten-POC run's RESULT.txt lands separately.
