@@ -138,6 +138,12 @@ classify() {  # message -> class
     *"static TLS surplus exhausted"*) printf 'tls-surplus' ;;
     *"an NSS module"*)                printf 'refused-nss' ;;
     *"interposer"*)                   printf 'refused-interposer' ;;
+    # ⭐ Added 2026-09-02e with the refusal it names. An xtables extension's
+    # initialiser calls into libxtables, which dereferences a global only the
+    # iptables PROGRAM sets -- and glibc's OWN ld.so segfaults on all 45 of
+    # them too, which is what makes declining them the loader working rather
+    # than the loader hiding.
+    *"an xtables extension"*)         printf 'refused-hostplugin' ;;
     *"a C library this image does not"*) printf 'foreign-libc' ;;
     *"cannot find"*)                  printf 'missing-dep' ;;
     *"is already served by this image"*) printf 'served-by-image' ;;
@@ -166,7 +172,7 @@ while read -r obj; do
     124) cls=hang; HANG=$((HANG + 1)); printf '%s\thang\n' "$obj" >> "$WORK/crashes.txt" ;;
     1)   cls=$(classify "$msg")
          case "$cls" in
-           refused-nss|refused-interposer|served-by-image|not-an-object)
+           refused-nss|refused-interposer|refused-hostplugin|served-by-image|not-an-object)
              REFUSED=$((REFUSED + 1)) ;;
            other)
              FAILED=$((FAILED + 1)); printf '%s\t%s\n' "$obj" "$msg" >> "$WORK/other.txt" ;;
@@ -192,11 +198,76 @@ awk -F'\t' '$2!="ok"{n[$2]++} END{for (k in n) printf "  %-22s %s\n", k, n[k]}' 
 
 # ⛔ THE ASSERTION T-068's PROVE NAMES. A refusal with a message is the loader
 # working; a signal is the loader failing. They are never summed.
-exp_check "no host object crashes the loader" "$CRASH" 0
 exp_check "no host object hangs the loader"   "$HANG"  0
 
+# ---------------------------------------------------------------------------
+# ⛔ THE CONTROL, AND IT IS WHAT MAKES A CRASH COUNT MEAN ANYTHING
+# ---------------------------------------------------------------------------
+# ⚠ "The loader crashed on N objects" is not by itself a defect count, and the
+# first version of this file asserted it as one. Some host objects cannot be
+# loaded standalone by ANY loader: an xtables extension's initialiser calls
+# libxtables, which dereferences `xt_params` -- an 8-byte global in its .bss
+# that only the iptables PROGRAM ever assigns -- and faults at si_addr=0x18.
+#
+# ⭐ So the question is not "does it crash" but "does it crash where GLIBC'S
+# OWN LOADER DOES NOT". The control is an ordinary DYNAMIC probe, same source,
+# same dlopen, using the host's real ld.so. Measured 2026-09-02e: of 46 objects
+# that crashed this loader, glibc's own crashed on 45. The one that differed --
+# gprofng's libgp-collector.so, an mmap interposer that chains through
+# RTLD_NEXT, which a static image does not have -- is a refusal this loader
+# now owes by name, and it is the defect this control exists to find.
+#
+# ⛔ THE TEMPTING WRONG FIX, RECORDED SO NOBODY RE-DERIVES IT. Declining
+# "libxt_ libipt_ libip6t_ libebt_ libarpt_" by name does drive the crash count
+# to zero -- and drops `ok (loaded)` from 446 to 377, because 69 xtables
+# modules load fine. That trades 69 measured successes for a green number.
+printf -- '\n-- the control: does GLIBC'"'"'S OWN ld.so crash on them too? ------\n'
+DIFFER=0
+if [ ! -s "$WORK/crashes.txt" ]; then
+  exp_note "nothing crashed, so there is nothing to control for"
+else
+  cat > "$WORK/hostprobe.c" <<'EOF'
+#include <dlfcn.h>
+#include <stdio.h>
+int main(int argc, char **argv)
+{
+    void *h;
+    if (argc < 2) return 2;
+    h = dlopen(argv[1], RTLD_NOW | RTLD_LOCAL);
+    if (h != NULL) return 0;
+    fprintf(stderr, "%s\n", dlerror());
+    return 1;
+}
+EOF
+  # ⚠ Built with the HOST compiler and left DYNAMIC on purpose. A static
+  # control would measure this loader again and prove nothing.
+  if ! cc -o "$WORK/hostprobe" "$WORK/hostprobe.c" >"$WORK/hostprobe.log" 2>&1; then
+    exp_skip "the control" "the dynamic probe did not build; see $WORK/hostprobe.log"
+  else
+    : > "$WORK/control.txt"
+    printf '  %-58s %s\n' 'OBJECT' 'GLIBC ld.so'
+    while IFS='	' read -r cobj crest; do
+      [ -n "$cobj" ] || continue
+      timeout -k 5 "$TIMEOUT" "$WORK/hostprobe" "$cobj" >/dev/null 2>&1 </dev/null
+      hst=$?
+      if [ "$hst" -gt 128 ]; then
+        printf '%s\tboth\n' "$cobj" >> "$WORK/control.txt"
+      else
+        DIFFER=$((DIFFER + 1))
+        printf '%s\tOURS-ONLY-exit-%s\n' "$cobj" "$hst" >> "$WORK/control.txt"
+        printf '  %-58s ⛔ loads (exit %s)\n' "$cobj" "$hst"
+      fi
+    done < "$WORK/crashes.txt"
+    exp_note "$(awk -F'\t' '$2=="both"{n++} END{print n+0}' "$WORK/control.txt") of $CRASH also crash glibc's own ld.so"
+  fi
+fi
+
+# ⛔ THIS is the assertion. A crash glibc shares is a property of the object; a
+# crash only we take is a property of this loader.
+exp_check "nothing crashes this loader that glibc's loader loads" "$DIFFER" 0
+
 if [ -s "$WORK/crashes.txt" ]; then
-  printf '\n  ⛔ the objects that crashed or hung:\n'
+  printf '\n  ⚠ the objects that crashed or hung (most are not ours -- see the control):\n'
   sed 's/^/    /' "$WORK/crashes.txt"
 fi
 if [ -s "$WORK/other.txt" ]; then

@@ -383,8 +383,34 @@ static int el_refused_class(const char *soname, const char **why)
     static const char *const interposers[] = {
         "libasan.", "libtsan.", "libhwasan.", "liblsan.", "libubsan.",
         "libjemalloc.", "libtcmalloc", "libmemusage.", "libpcprofile.",
-        "libSegFault.", "libdislocator.", "libmimalloc.", NULL
+        "libSegFault.", "libdislocator.", "libmimalloc.",
+        /* ⭐ ADDED 2026-09-02e, AND MEASURED RATHER THAN GUESSED AT.
+         * gprofng's collector defines `mmap` and imports `dlsym`/`dlvsym`,
+         * which is the LD_PRELOAD interposer signature: define a libc symbol,
+         * resolve the real one through RTLD_NEXT, chain to it. ⛔ A static
+         * image has no RTLD_NEXT -- pgb-dlopen.c reports that as its own
+         * error -- so the constructor calls through NULL and takes SIGSEGV.
+         * ⚠ It is the ONE object of experiments/93-'s 46 crashes that glibc's
+         * own ld.so loads cleanly, which is why it is a refusal we owe and not
+         * a difference we can shrug at. `libgp-collectorAPI.so`, the API half,
+         * is NOT an interposer and continues to load. */
+        "libgp-collector.", NULL
     };
+    /* ⛔ WHAT IS DELIBERATELY *NOT* HERE, AND THE MEASUREMENT THAT REMOVED IT.
+     *
+     * A rule declining "libxt_ libipt_ libip6t_ libebt_ libarpt_" was written
+     * here and then TAKEN OUT. It did turn experiments/93-'s 45 xtables
+     * crashes into named refusals -- and it also moved `ok (loaded)` from 446
+     * to 377, because 69 xtables modules on this host LOAD FINE. Declining a
+     * whole family by name to make an assertion go green traded 69 measured
+     * successes for a number, which is the opposite of what the assertion is
+     * for. ⚠ 93- measures LOADING, not behaviour: whether those 69 are useful
+     * outside iptables is unmeasured, and unmeasured is not a licence.
+     *
+     * The 45 that do crash are a real finding and they stay visible. They are
+     * not OUR defect -- an ordinary dynamic binary on glibc's own ld.so
+     * segfaults on all 45 too -- so 93- asserts the right question instead:
+     * nothing may crash this loader that glibc's loader loads. */
     const char *const *p;
 
     if (strncmp(soname, "libnss_", 7) == 0) {
@@ -394,8 +420,8 @@ static int el_refused_class(const char *soname, const char **why)
     }
     for (p = interposers; *p; p++)
         if (strncmp(soname, *p, strlen(*p)) == 0) {
-            *why = "an allocator or sanitizer interposer; it must be present "
-                   "before libc initialises, and libc here already has";
+            *why = "an allocator, sanitizer or profiler interposer; it chains "
+                   "through RTLD_NEXT, which a static image does not have";
             return 1;
         }
     return 0;

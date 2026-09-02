@@ -813,7 +813,7 @@
 /usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-xbm.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-xpm.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/gio/modules/libdconfsettings.so	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
-/usr/lib/x86_64-linux-gnu/gprofng/libgp-collector.so	crash	
+/usr/lib/x86_64-linux-gnu/gprofng/libgp-collector.so	refused-interposer	pgb-elfload: libgp-collector.so is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/gprofng/libgp-collectorAPI.so	ok	
 /usr/lib/x86_64-linux-gnu/gprofng/libgp-heap.so	ok	
 /usr/lib/x86_64-linux-gnu/gprofng/libgp-iotrace.so	ok	
@@ -942,7 +942,7 @@
 /usr/lib/x86_64-linux-gnu/libapt-private.so.0.0.0	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libarchive.so.13.7.2	undefined	pgb-elfload: libacl.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libargon2.so.1	ok	
-/usr/lib/x86_64-linux-gnu/libasan.so.8.0.0	refused-interposer	pgb-elfload: libasan.so.8.0.0 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libasan.so.8.0.0	refused-interposer	pgb-elfload: libasan.so.8.0.0 is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libasound.so.2.0.0	undefined	pgb-elfload: libasound.so.2: undefined symbol: __isoc23_vfscanf@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libassuan.so.0.8.6	undefined	pgb-elfload: libgpg-error.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libatk-1.0.so.0.25209.1	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
@@ -1088,7 +1088,7 @@
 /usr/lib/x86_64-linux-gnu/libhistory.so.8.2	undefined	pgb-elfload: libhistory.so.8: undefined symbol: __isoc23_strtol@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libhogweed.so.6.8	undefined	pgb-elfload: libgmp.so.10: undefined symbol: __isoc23_strtol@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libhunspell-1.7.so.0.0.1	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/libhwasan.so.0.0.0	refused-interposer	pgb-elfload: libhwasan.so.0.0.0 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libhwasan.so.0.0.0	refused-interposer	pgb-elfload: libhwasan.so.0.0.0 is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libhyphen.so.0.3.0	ok	
 /usr/lib/x86_64-linux-gnu/libicudata.so.74.2	ok	
 /usr/lib/x86_64-linux-gnu/libicui18n.so.74.2	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
@@ -1105,7 +1105,7 @@
 /usr/lib/x86_64-linux-gnu/libitm.so.1.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libjansson.so.4.14.0	undefined	pgb-elfload: libjansson.so.4: undefined symbol: __isoc23_strtoll@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libjbig.so.0	ok	
-/usr/lib/x86_64-linux-gnu/libjemalloc.so.2	refused-interposer	pgb-elfload: libjemalloc.so.2 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libjemalloc.so.2	refused-interposer	pgb-elfload: libjemalloc.so.2 is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libjpeg.so.8.2.2	ok	
 /usr/lib/x86_64-linux-gnu/libjq.so.1.0.4	undefined	pgb-elfload: libjq.so.1: undefined symbol: __isoc23_strtol@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libjson-c.so.5.3.0	undefined	pgb-elfload: libjson-c.so.5: undefined symbol: __isoc23_strtoull@GLIBC_2.38
@@ -1121,7 +1121,7 @@
 /usr/lib/x86_64-linux-gnu/liblcms2.so.2.0.14	ok	
 /usr/lib/x86_64-linux-gnu/libldap.so.2.0.200	undefined	pgb-elfload: liblber.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/liblldb-18.so.1	undefined	pgb-elfload: libexpat.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
-/usr/lib/x86_64-linux-gnu/liblsan.so.0.0.0	refused-interposer	pgb-elfload: liblsan.so.0.0.0 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/liblsan.so.0.0.0	refused-interposer	pgb-elfload: liblsan.so.0.0.0 is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libltdl.so.7.3.2	undefined	pgb-elfload: libltdl.so.7: undefined symbol: strlcpy@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/liblz4.so.1.9.4	ok	
 /usr/lib/x86_64-linux-gnu/liblzf.so.1.5	ok	
@@ -1131,7 +1131,7 @@
 /usr/lib/x86_64-linux-gnu/libm.so.6	served-by-image	pgb-elfload: libm.so.6 is already served by this image's own static glibc; loading it would put a second libc in the process
 /usr/lib/x86_64-linux-gnu/libmagic.so.1.0.0	undefined	pgb-elfload: libmagic.so.1: undefined symbol: __isoc23_strtoul@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libmd.so.0.1.0	ok	
-/usr/lib/x86_64-linux-gnu/libmemusage.so	refused-interposer	pgb-elfload: libmemusage.so is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libmemusage.so	refused-interposer	pgb-elfload: libmemusage.so is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libmenu.so.6.4	ok	
 /usr/lib/x86_64-linux-gnu/libmenuw.so.6.4	ok	
 /usr/lib/x86_64-linux-gnu/libmhash.so.2.0.1	undefined	pgb-elfload: libmhash.so.2: undefined symbol: __isoc23_strtol@GLIBC_2.38
@@ -1182,7 +1182,7 @@
 /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so.0.5200.1	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libpangoft2-1.0.so.0.5200.1	undefined	pgb-elfload: libglib-2.0.so.0: undefined symbol: __isoc23_strtoll_l@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libpciaccess.so.0.11.1	undefined	pgb-elfload: libpciaccess.so.0: undefined symbol: __isoc23_strtoul@GLIBC_2.38
-/usr/lib/x86_64-linux-gnu/libpcprofile.so	refused-interposer	pgb-elfload: libpcprofile.so is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libpcprofile.so	refused-interposer	pgb-elfload: libpcprofile.so is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libpcre2-16.so.0.11.2	ok	
 /usr/lib/x86_64-linux-gnu/libpcre2-32.so.0.11.2	ok	
 /usr/lib/x86_64-linux-gnu/libpcre2-8.so.0.11.2	ok	
@@ -1248,8 +1248,8 @@
 /usr/lib/x86_64-linux-gnu/libtiff.so.6.0.1	undefined	pgb-elfload: libstdc++.so.6: undefined symbol: iconv_open@GLIBC_2.2.5
 /usr/lib/x86_64-linux-gnu/libtinfo.so.6.4	ok	
 /usr/lib/x86_64-linux-gnu/libtirpc.so.3.0.0	undefined	pgb-elfload: libkrb5support.so.0: undefined symbol: strlcpy@GLIBC_2.38
-/usr/lib/x86_64-linux-gnu/libtsan.so.2.0.0	refused-interposer	pgb-elfload: libtsan.so.2.0.0 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
-/usr/lib/x86_64-linux-gnu/libubsan.so.1.0.0	refused-interposer	pgb-elfload: libubsan.so.1.0.0 is an allocator or sanitizer interposer; it must be present before libc initialises, and libc here already has
+/usr/lib/x86_64-linux-gnu/libtsan.so.2.0.0	refused-interposer	pgb-elfload: libtsan.so.2.0.0 is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
+/usr/lib/x86_64-linux-gnu/libubsan.so.1.0.0	refused-interposer	pgb-elfload: libubsan.so.1.0.0 is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libudev.so.1.7.8	undefined	pgb-elfload: libcap.so.2: undefined symbol: __isoc23_strtoul@GLIBC_2.38
 /usr/lib/x86_64-linux-gnu/libunistring.so.5.0.0	undefined	pgb-elfload: libunistring.so.5: undefined symbol: iconv@GLIBC_2.2.5
 /usr/lib/x86_64-linux-gnu/libunwind-coredump.so.0.0.0	undefined	pgb-elfload: libunwind-coredump.so.0: undefined symbol: _Ux86_64_dwarf_find_unwind_table
