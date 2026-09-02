@@ -88,7 +88,7 @@ local bed. `podman` is still unexercised.
 **Source** `docs/AGENTS.md` §13 · **Category** ci · **Priority** P2 · **Effort** M · **Status** open
 
 **Problem.** Every number in this repository is x86_64, one machine, one day.
-`--arch arm64` exists in `oci-pull.sh` and `fetch-rootfs.sh` and re-resolves by
+`--arch arm64` exists in `pgb rootfs pull` and `pgb rootfs fetch` and re-resolves by
 tag, trading the digest pin away.
 
 **Premise.** ⚠ Expect IFUNC and CPU-baseline questions x86_64 did not raise.

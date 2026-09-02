@@ -278,7 +278,7 @@ forever after `execve`'s extra `SIGTRAP`, which made `/bin/true` — a binary
 that unmistakably loads `libc.so.6` — report opening nothing at all.
 
 ⚠ **One environment difference between the beds is real and is now its own
-entry (T-015):** `oci-pull.sh` unpacks an image's filesystem and drops its
+entry (T-015):** the OCI pull unpacks an image's filesystem and drops its
 config, so `LANG=C.UTF-8` from the `archlinux` image applies under docker and
 not under chroot. It shows up only in the host **data** column, which is
 never asserted.
@@ -302,7 +302,7 @@ seconds**.
 wrapped in `timeout ${PGB_VERIFY_TIMEOUT:-120}`, so the *next* instrument
 defect costs one row and a visible `exit124` rather than a runner.
 
-## T-015 — `oci-pull.sh` unpacks the filesystem and drops the image config
+## T-015 — the OCI pull unpacks the filesystem and drops the image config
 
 **Source** found while cross-checking the two `pgb verify` arms (T-014),
 session of 2026-09-01.
@@ -320,7 +320,7 @@ the chroot bed does not, and the same binary therefore takes a different
 ```
 docker run --rm --entrypoint /usr/bin/env archlinux@sha256:818793c8… | grep LANG
   -> LANG=C.UTF-8
-grep -c LANG scripts/common/rootfs-run.sh
+the chroot bed sets no LANG at all
   -> 0
 ```
 
@@ -329,7 +329,7 @@ the **host data** column, which `../docs/AGENTS.md` §3 reports and never
 asserts, and the two arms agree on all eleven rows for both asserted columns.
 What was wrong was the *claim* that the beds are the same environment.
 
-**Approach.** `oci-pull.sh` already parses the manifest; the config blob it
+**Approach.** `internal/ociimg` already parses the manifest; the config blob it
 points at carries `Env`, `Cmd`, `Entrypoint` and `WorkingDir`. Record them
 into `.oci-provenance`, and have `rootfs-run.sh` apply `Env` unless the caller
 overrides it.

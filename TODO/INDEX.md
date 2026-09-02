@@ -25,7 +25,7 @@ pretending to be one.
 | T-012 | P1 | XL | open | toolchain | `pgb build <url-or-package>` |
 | T-013 | P2 | S | open | toolchain | Measure developer friction |
 | T-014 | P1 | M | done | toolchain | `pgb verify` ignores `--engine` |
-| T-015 | P2 | S | open | toolchain | `oci-pull.sh` drops the image config |
+| T-015 | P2 | S | open | toolchain | the OCI pull drops the image config |
 | T-016 | P1 | S | done | toolchain | Pinned env cannot run CMake or meson |
 | T-017 | P1 | S | done | toolchain | `env create` builds one engine; `pick_engine` may choose another |
 | T-018 | P1 | S | done | toolchain | A `pgb` binary has no `PT_GNU_EH_FRAME` |
