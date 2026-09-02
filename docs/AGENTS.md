@@ -20,13 +20,69 @@ the full map.
 | 6 | [`design/toolchain.md`](design/toolchain.md) | ⭐ what `pgb` is (a toolchain, not a format) and where it is going |
 
 ⚠ **Then, before you write an experiment or read somebody else's code**, the
-methodology binding on that work: [`methodology/experiments.md`](methodology/experiments.md),
+methodology binding on that work: [`methodology/sessions.md`](methodology/sessions.md),
+[`methodology/experiments.md`](methodology/experiments.md),
 [`methodology/references.md`](methodology/references.md),
 [`methodology/vendoring.md`](methodology/vendoring.md). They are vendored, and
 `methodology/PROVENANCE.md` says at which commit.
 
 ⭐ **`sh TODO/check.sh` is the gate.** Run it before every commit; it fails if
 the record disagrees with itself.
+
+---
+
+## 0b. The shape of a session
+
+⭐ **Everything in this block is answered here so you do not have to infer it.**
+[`methodology/sessions.md`](methodology/sessions.md) is the full specification;
+this is what it means in this repository.
+
+| question | answer |
+|---|---|
+| **What do I do?** | [`../TODO/PROGRESS.md`](../TODO/PROGRESS.md) "Work order", then [`../TODO/RESUME.md`](../TODO/RESUME.md) for what the last session had in flight |
+| **In what order?** | the work order, top down. P0 before P1 before P2; [`../TODO/INDEX.md`](../TODO/INDEX.md) carries the argument for the ordering and it is meant to be re-derived, not re-argued. ⛔ Do not skip down the list for something easier |
+| **How many?** | as many as fit. ⛔ One task is not a session |
+| **How long?** | until the operator interrupts, or every task in the work order is complete **with evidence**. ⛔ Not "until a task is done" |
+| **What if I am blocked?** | finish everything that does not depend on the blocker, write the blocker into `PROGRESS.md` "Open questions" with what you tried, and keep going. ⛔ Do not stop and wait |
+| **What if it cannot be done?** | that is a result. Record which rung stopped it, verbatim, the way the POCs do. A recorded failure is worth more than a skipped row |
+| **How do I end?** | [`methodology/sessions.md`](methodology/sessions.md) "Ending": rewrite `PROGRESS.md`, refresh `RESUME.md`, write `SUMMARY.md`, both gates green, CI green, push, then print the summary table |
+
+⛔ **Write [`../TODO/RESUME.md`](../TODO/RESUME.md) at the START**, not the end.
+It is a dead man's switch: everything else in the protocol is written at the
+moment an interrupted session never reaches. Refresh it whenever what is in
+flight changes.
+
+⛔ **Do not idle.** Do not end a turn to wait for a build, and do not reach for
+a scheduler or wake-up tool to do the waiting for you — that is the same thing
+wearing a disguise. Long builds run in the background while you work on
+something else; block on the job's own output, not on a timer.
+
+### The discipline, in full
+
+- **Every claim carries its measurement.** A number with no command that
+  produced it does not go in a document.
+- **An absence is not a zero.** A probe that found nothing may have looked in
+  the wrong place — say which.
+- **Exit codes: 0 ok, 1 it ran and failed, 2 it could not run.** `pgb`, the
+  experiments and the POCs all obey this.
+- ⛔ **A skip is not a pass and not a failure.** A check that quietly runs
+  nothing and reports success is the worst answer this codebase can give.
+- ⛔ **Verify before you trust.** Defects in this tree have been found by
+  something disagreeing — a gate, a control, CI — and essentially never by
+  reading. Run the thing.
+- **Read code with codegraph first and grep second.**
+  [`codegraph.md`](codegraph.md) says what it covers and what it cannot see
+  (it indexes no shell).
+- ⛔ **The experiments and POCs stay shell.** They are the independent
+  acceptance harness; rewriting them in the language of the thing they test
+  destroys that.
+- ⛔ **`HISTORY/` is never edited** — it is the oracle every gate is measured
+  against. **`methodology/` is vendored** and never edited.
+- **Comments say what the block does.** No changelogs, no corrections-to-
+  corrections. Historical lore goes to [`history/`](history/) or `HISTORY/`.
+- **Commit as work lands and push.** ⛔ Never one commit at the end.
+- ⛔ **Never edit a shell script while it is running** — `sh` re-reads from a
+  byte offset. Copy the tree aside or wait.
 
 ---
 
