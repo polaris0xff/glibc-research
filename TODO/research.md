@@ -583,7 +583,7 @@ not.
 hosts and uses their libs because that's the way it is allowed to use stuff
 like nvidia drivers, it only dlopens when it needs to and host has what it
 needs, so restudy all of anylinux reference materials"*.
-**Category** research · **Priority** P0 · **Effort** L · **Status** open
+**Category** research · **Priority** P0 · **Effort** L · **Status** done
 
 ⛔ **WORK UNTIL IT IS MET OR THE PREMISE IS SIGNIFICANTLY ADVANCED.**
 
@@ -634,3 +634,58 @@ something the bundle cannot carry, and never silently.**
 it could have carried; the policy table in `docs/research/`; and
 `experiments/85-`/`89-` re-run so the eleven rows distinguish "carried" from
 "deferred by policy" instead of counting both as contamination.
+
+## ✅ Done — [`../docs/design/host-fallback.md`](../docs/design/host-fallback.md), and the mechanism
+
+⭐ **The policy is written up and implemented.** `internal/bundle/hostpolicy.go`
+emits it into the bundle's `.env`; 29 offline selftest cases assert it
+(`pgb selftest`, subject `bundle-hostpolicy`).
+
+⭐ **The search order is ADOPTED, not invented** —
+`Anylinux-sharun/src/main.rs:230-340`, highest priority first:
+
+    1  SHARUN_EXTRA_LIBRARY_PATH        the caller, this run
+    2  the mesa path, if PGB_HOST_MESA  the opt-in
+    3  ⭐ THE BUNDLE'S OWN lib/          the default answer for everything
+    4  LD_LIBRARY_PATH                  the caller's environment
+    5  /etc/libnvidiacurrent            the host's NVIDIA install
+    6  the ordinary host dirs + /etc/ld.so.cache
+    7  /run/opengl-driver/lib, /run/current-system/sw/lib   NixOS
+    8  ⭐ SHARUN_FALLBACK_LIBRARY_PATH   LAST, and documented as last
+
+⚠ Row 7 is not decoration: `pg83/solo`'s issue #2 was a NixOS `VkResult -9`
+fixed by scanning `/run/opengl-driver`. A search order missing it fails on
+NixOS **only**, which is the worst kind of missing row.
+
+**Four classes, and the list is closed** — anything else in a bundle's trace is
+still a bundling defect and still fails:
+
+| class | default | opt-in |
+|---|---|---|
+| **nvidia** | ⭐ **HOST ALWAYS**, and not an opt-in | — it cannot be bundled: it is the counterpart of a kernel module the user installed, and its driver links a 10+ year old glibc so any bundled glibc satisfies it |
+| mesa / GL / VA | bundled | `PGB_HOST_MESA=1`. Upstream tried mixing bundled and host drivers and **withdrew it** |
+| vulkan ICDs and layers | bundled | `PGB_HOST_VULKAN=1`. Separate from mesa because the LAYERS are the user's — mangohud, lsfg-vk |
+| glibc | bundled | `PGB_HOST_GLIBC=1`. The only opt-in that REORDERS rather than appends |
+
+⛔ **Every opt-in is reported, never silent**, including the default, because an
+opt-in that quietly changed which libc a process runs is this project's whole
+subject.
+
+⭐ **What changes about the acceptance test.** `docs/AGENTS.md` §3 criterion 2
+stands unchanged for `pgb build` — a static ELF loading a host object has
+failed, and `experiments/76-` asserts zero on all eleven. For a **bundle** it
+becomes *no host shared object OUTSIDE the four classes*, and `HostClass()` is
+the classifier, asserted in both directions: `libGLX_nvidia.so.0` is correct,
+`libcurl.so.4` is a defect, and a classifier answering "nvidia" for everything
+would make every bundle pass.
+
+⭐ **One thing that fell out and is worth carrying.** Upstream's own FAQ names
+`pg83/solo` — the reference T-064 built from — and rejects it. Their first
+objection, *"not able to dlopen any library from the host"*, is now **false of
+this project's static output**: `experiments/76-` does it on 11 of 11. Their
+other three are about DRIVER VERSIONS, not about `dlopen`, and they stand. That
+is why a bundle exists **beside** the static ELF rather than instead of it.
+
+⚠ **NO GPU WAS INVOLVED.** Every GL row here is `swrast` (`TODO` T-059), so the
+driver classes are implemented and REPORTED, not measured on hardware. The
+order and the reporting are asserted; the driver behaviour is T-059's.

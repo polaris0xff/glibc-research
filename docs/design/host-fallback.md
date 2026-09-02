@@ -16,8 +16,11 @@ things, and it is right to. `TODO` T-065.
   does not have, and the honest thing is to say whose measurement it is.
 - ⚠ **The search order below is implemented and asserted; the per-class
   opt-ins are implemented and only partly asserted** — the classes needing a
-  driver cannot be exercised on a machine with none. `experiments/77-` says
-  which rows are which.
+  driver cannot be exercised on a machine with none. The assertions are 29
+  offline cases in `internal/bundle/hostpolicy_selftest.go`, run by
+  `pgb selftest` under the subject `bundle-hostpolicy`; they assert what the
+  policy EMITS, which is decidable without hardware. Whether a real driver
+  then loads is `TODO` T-059.
 
 ## Provenance
 
@@ -184,7 +187,8 @@ is the worst kind of missing row.
 ## What `pgb` does with this
 
 ⭐ **Implemented in `internal/bundle/hostpolicy.go`**, emitted into the
-bundle's `.env`, and asserted by `experiments/77-`.
+bundle's `.env`, and asserted by `internal/bundle/hostpolicy_selftest.go` —
+29 cases, offline, run by `pgb selftest`.
 
 | class | default | opt-in | variable |
 |---|---|---|---|
@@ -214,6 +218,9 @@ than against zero. A bundle that loads the host's `libcurl` is still a defect
 and still fails; one that loads `libGLX_nvidia.so.0` has done the right thing.
 
 ⚠ **On this machine that distinction cannot be exercised**, because there is no
-GPU and every GL row is `swrast` — so `experiments/77-` asserts the ORDER and
-the reporting, and records the driver classes as unexercised rather than
-passing them.
+GPU and every GL row is `swrast` — so the selftest asserts the ORDER, the
+per-class opt-ins and the classifier, all of which are decidable offline, and
+the driver behaviour is recorded as unexercised rather than passed. ⛔ The
+classifier is asserted in BOTH directions: one that answered "nvidia" for
+everything would make every bundle pass, so `libcurl.so.4`, `libssl.so.3` and
+`libQt6Core.so.6` are asserted to classify as nothing.

@@ -1296,13 +1296,61 @@ for kdenlive. ⭐ **The bar is the field**: `experiments/86-`'s hand-built
 Anylinux arm for the CLI, and `kdenlive-AppImage-Enhanced` for the big one.
 `docs/AGENTS.md` §14 forbids "better" without the measurement.
 
+## ⚠ Significantly advanced, and STILL OPEN — `experiments/78-`
+
+⭐ **2.86× the field → 1.22×, on `jq`.** ⛔ Not parity, so this entry stays
+open with the remaining lever named.
+
+`evidence/78-bundle-cli-bench/RESULT.txt`. ⭐ **The subject is a CLI and that is
+what made it possible**: a `jq` bundle builds in about a minute, so this was
+four measured iterations in the time one kdenlive build takes.
+
+    ARM          BYTES     COLD_MS  WARM_MS  WORKLOAD_MS  OUTPUT
+    none      12261750         126        9           13  6
+    safe       4890913          60       10           13  6
+    aggressive 4890913          68       11           14  6
+
+    field (Anylinux-AppImages, experiments/86-)   4,006,916 B
+    ours, was                                    11,471,610 B   2.86×
+    ours, now                                     4,890,913 B   1.22×
+
+⛔ **A correctness column, because a smaller bundle that answers differently is
+not a smaller bundle.** All three arms run the same job and their output is
+compared byte for byte; that is the experiment's only assertion, because a
+wall-clock figure from one machine on one day is not a threshold anything
+should fail on.
+
+**Two levers, both structural rather than a list of names.**
+
+| | |
+|---|---|
+| ⭐ **the reachability sweep, which NOTHING consumed** | `sweep.go` computes the DT_NEEDED closure of every program plus every plugin directory, and had two callers: the `pgb bundle sweep` subcommand, which only prints, and its own selftest. The build path never called it, so every debloat rule was a rule about NAMES and the one structural answer in the tree was shown to a human and thrown away. ⭐ `codegraph callers Sweep` is the one command that shows it — `RULES.md`'s own example of what codegraph is for. **On `jq`: 277 objects, 12.0 MiB.** Safe to delete on because the sweep counts anything it cannot classify as REACHABLE, and `b.integrity()` re-checks every DT_NEEDED afterwards |
+| ⭐ **`share/i18n` is 17 MiB of a 22 MiB `jq` bundle** | glibc's locale **SOURCE** data — the text `localedef` compiles FROM, not what a program reads. `cns11643_stroke` alone is 4.31 MiB in a bundle whose entire `lib/` is 4.8 MiB. The rule is **conditional**: a bundle shipping `localedef`, `locale` or `iconvconfig` keeps them. **On `jq`: 15.0 MiB** |
+
+Debloat went from **12.7% off to 86.9% off** on the same closure.
+
+⛔ **What is left, and it is why this stays open.**
+
+1. **kdenlive is not re-measured yet.** The Prove asks for both; `experiments/90-`
+   is the harness and takes ~30 minutes.
+2. ⚠ **The remaining 1.22× is a PACKAGE-SIZE gap, not a bundler one**, and
+   `Anylinux-AppImages/FAQ.md` names it: their libraries come from packages
+   optimised for size, ours from nixpkgs, and their own example is a
+   `libicudata.so` that is *"less than 1 MiB"* in one and *"30 MiB"* in the
+   other. ⭐ The next lever is therefore **where the closure comes from**
+   (`pkgforge-dev/archlinux-pkgs-debloated` is the named corpus), not another
+   debloat rule.
+3. `--debloat aggressive` now buys **nothing** over `safe` on `jq` —
+   4,890,913 B both. The sweep made the aggressive name-rules redundant for a
+   CLI; whether that holds for a GL application is unmeasured.
+
 ---
 
 ## T-067 — ⛔ P0: does zig buy anything the C runtime pieces cannot?
 
 **Source** ⭐ **operator, 2026-09-02b**: *"Look into using zig if existing c is
 limited/slow, thought that shouldn't be the case"*.
-**Category** toolchain · **Priority** P0 · **Effort** M · **Status** open
+**Category** toolchain · **Priority** P0 · **Effort** M · **Status** done
 
 ⛔ **WORK UNTIL IT IS MET OR THE PREMISE IS SIGNIFICANTLY ADVANCED**, and note
 the operator's own expectation: *"that shouldn't be the case"*. ⭐ **A measured
@@ -1337,3 +1385,63 @@ would adding a zig toolchain cost the build environment and the artefact.
 claim, ending in a ruling: adopt zig for a named component, or record that C is
 adequate and why — so this is not re-asked. ⛔ A migration with no measured
 limitation behind it is refused by this entry, not enabled by it.
+
+## ✅ Done — [`../docs/design/runtime-language.md`](../docs/design/runtime-language.md)
+
+⭐ **Ruling: C is adequate. Do not migrate.** The operator's expectation was
+right; the work was measuring it, and finding what would change the answer.
+
+⭐ **The subject was the best one available**: `pgb-elfload.c`, the compiled-in
+ELF loader T-064 built this session — 1,578 lines of raw pointer arithmetic,
+`mmap`, relocation and TLS, over half of all the C in `tool/runtime/`.
+
+**1. Is any of it measurably slow? No, and mostly there is nothing to be slow.**
+Six of nine files are one-shot constructors or `--wrap` shims. The whole
+runtime's cost against plain `gcc -static` is at the noise floor —
+`evidence/40-overhead`, where two runs put per-exec 42 µs then 28 µs above and
+peak RSS 56 KiB above then **28 KiB below**, a sign change. The loader is the
+only piece doing real work and it is **4.8× faster** than the host `ld.so`
+reached from the same static binary (147,543 ns against 711,066).
+
+**2. Is any of it hard to write correctly in C?** ⭐ **The instruments say no,
+and the defect log says something stronger.**
+
+| instrument | scope | result |
+|---|---|---|
+| `gcc -O2 -Wall -Wextra -fanalyzer` | all 9 files, 3,041 lines | **5 warnings, 0 errors** |
+| ⭐ **UBSan**, running the loader over **904 real host shared objects** | `pgb-elfload.c` | ⭐ **0 runtime errors** |
+| ASan | the same | ⛔ **could not run** — SEGV in its own `SetTLSFakeStack` before any of our code. Recorded as could-not-run, never as a pass |
+
+⚠ **All five gcc warnings are one false positive**: `-Waddress` does not model
+**weak** linkage, so it reports that `&pgb_provider_syms[0] == NULL` is always
+false when a weak symbol's address is exactly what can be NULL — the mechanism
+the whole provider table rests on. C's own analysis is wrong about this
+runtime's most load-bearing construct, in the noisy direction.
+
+⭐ **And the finding that actually decides it.** Five real defects were found
+building the loader, every one by something disagreeing. **Not one is a
+C-language defect** and a memory-safe language would have prevented none:
+`libm.a` being a GNU ld script (the filesystem), `__tls_get_addr` being in no
+archive (the ELF ABI), `DT_RELR` unhandled (a missing feature), `make` not
+depending on the go:embed'd C (a Makefile bug), and a benchmark that forked per
+sample (an instrument bug).
+
+**3. What would zig cost?** ⛔ **The constraint this entry named is the one that
+decides it.**
+
+| | measured |
+|---|---|
+| zig in the pinned `debian:12` | ⛔ **not packaged** — `apt-cache policy zig` returns nothing |
+| so it must be fetched | zig 0.15.2 x86_64-linux, **53,733,924 B**, from `ziglang.org/download/index.json` |
+| against | `pgb` itself at 11,765,820 B, which would be smaller than its own dependency |
+
+⚠ And it would be a **second** toolchain, not a replacement: the application is
+still compiled by the target's `cc` through `pgb`'s wrappers. Two toolchains
+feeding one link is a new class of problem for a benefit nothing above named.
+
+⛔ **"Do not migrate" is not "never re-ask".** Four named conditions reopen it,
+in `runtime-language.md`: a defect that IS a C-language defect; a runtime piece
+measurably slow with its number; zig arriving in the pinned image; or a
+component that cannot be written correctly in C — the loader was the candidate
+for that last one and came out at 1,093 code lines against `pg83/solo`'s 2,332
+for the same job in C++.

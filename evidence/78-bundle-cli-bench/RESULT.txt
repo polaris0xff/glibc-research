@@ -1,10 +1,10 @@
 experiment 78 - the bundler iterated on a CLI
-date (UTC)   : 2026-09-02T11:38:55Z
+date (UTC)   : 2026-09-02T11:44:08Z
 host kernel  : Linux 6.18.44-fc-v22
 rounds       : 20 (best of), cold cache droppable: yes
 workload     : jq '[.items[].n] | add' over 83 bytes of UTF-8 JSON
 
 ARM                 BYTES      COLD_MS      WARM_MS  WORKLOAD_MS OUTPUT
-none             12261750          162           11           13 6
-safe              9030288          104           10           13 6
-aggressive        9030310           95           10           13 6
+none             12261750          126            9           13 6
+safe              4890913           60           10           13 6
+aggressive        4890913           68           11           14 6
