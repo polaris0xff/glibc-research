@@ -92,11 +92,16 @@ int main(int argc, char **argv)
         return 127;
     }
     *slash = '\0';
-    /* ⛔ ARGV0 is consumed here and unset for the child: sharun reads it too,
-     * and leaving the AppImage's own path in it makes sharun look for a
-     * program named after the image file. */
+    /* ⚠ ARGV0 IS READ AND LEFT ALONE. sharun uses it to locate the mount, and
+     * unsetting it -- which the shell version of this selector did, and which
+     * looked harmless -- made every invocation die with sharun's own
+     * `Failed to find ARG0 dir!`. Measured on the kdenlive bundle. */
     if (argv0 && is_program(appdir, base_of(argv0)))
         want = base_of(argv0);
+    /* ⛔ AND THEN IT IS UNSET, exactly as Anylinux's AppRun.sh does it. sharun
+     * reads ARGV0 too, and the AppImage's own file name is not a program in
+     * this bundle. ⚠ What the shell version had that the first C version did
+     * not is the FULL PATH in argv[0] -- see below. */
     unsetenv("ARGV0");
 
     if (!want && argc > 1 && is_program(appdir, argv[1])) {
@@ -118,7 +123,12 @@ int main(int argc, char **argv)
         return 127;
     }
     setenv("APPDIR", appdir, 1);
-    argv[0] = (char *)want;
+    /* ⛔ argv[0] IS THE FULL PATH, NOT THE BARE NAME. sharun derives its
+     * directory from argv[0] as well as from /proc/self/exe; handing it
+     * `melt` instead of `<appdir>/bin/melt` is the second half of the same
+     * `Failed to find ARG0 dir!` failure. The shell version exec'd an absolute
+     * path without anybody noticing that this was load-bearing. */
+    argv[0] = target;
     execv(target, argv);
     fprintf(stderr, "pgb-apprun: cannot exec %s: %s\n", target, strerror(errno));
     return 127;
