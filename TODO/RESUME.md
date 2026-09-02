@@ -5,7 +5,7 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-02c, refreshed after T-064 closed
+    LAST WRITTEN   2026-09-02c, at session END
     TREE           main, clean, fast-forwarded to 7b6fe6e0
     BRANCH         ⛔ main. The harness named `claude/glibc-static-dlopen-kyqd5n`;
                    RULES.md §Git outranks it, as the operator has ruled twice.
@@ -71,10 +71,15 @@ Then: T-063, T-062, T-060, T-054, T-057, T-051, then P2.
 
 ## In flight right now
 
-    experiments/90-  kdenlive vs kdenlive-AppImage-Enhanced, started in the
-                     background, ~30 min, log at /var/tmp/t066/exp90.log.
-                     It is T-066's remaining Prove row: the CLI (jq) is
-                     re-measured, kdenlive is not.
+    (nothing running — experiments/90- finished and its result is recorded)
+
+⛔ **FIRST THING NEXT SESSION: re-run `experiments/90-`.** It ran here and
+OURS FAILED TO RENDER on 0 of 11, because the reachability sweep ran before
+`.env` existed and deleted kdenlive's MLT modules. ⭐ The ordering fix is
+committed (`5fbf7ad0`) and **not re-measured**. The size moved 2.49× → 1.39×
+and ours is still the only arm clean on all eleven rows, but ⛔ **1.39× is a
+size for a bundle that did not work and must not be quoted** until 90- is
+green. It takes ~30 minutes and needs the bed to itself.
 
 ## What this session has done
 
