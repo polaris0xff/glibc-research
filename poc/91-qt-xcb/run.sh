@@ -180,10 +180,24 @@ if [ ! -x "$INST/bin/qmake" ]; then
   if [ ! -f "$BLD/build.ninja" ]; then
     rm -rf "$BLD"; mkdir -p "$BLD"
     POC_PGB_FLAGS="--bind $PREFIX" \
-    poc_in_env "cd $BLD && PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig \
+    # ⛔ QT FINDS XCB THROUGH CMake, NOT THROUGH LDFLAGS, and the first attempt
+    # gave it only PKG_CONFIG_PATH and -L. What it printed was
+    #
+    #   ERROR: Feature "xcb": Forcing to "ON" breaks its condition:
+    #       ... AND TARGET XCB::XCB AND TEST_xcb_syslibs AND ...
+    #       TARGET XCB::XCB not found
+    #
+    # -- a feature error about a library that is built and installed. Qt's
+    # configure passes everything after `--` to cmake, so CMAKE_PREFIX_PATH is
+    # how the static prefix becomes visible to `find_package`. ⚠ And
+    # `share/pkgconfig` belongs on PKG_CONFIG_PATH for the same reason it does
+    # inside `pgb nix`: xcb-proto and xorgproto put their .pc files there.
+    poc_in_env "cd $BLD && PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig:$PREFIX/share/pkgconfig \
+       PKG_CONFIG='pkg-config --static' \
        CFLAGS=-I$PREFIX/include CXXFLAGS=-I$PREFIX/include LDFLAGS=-L$PREFIX/lib \
        OPENSSL_ROOT_DIR=$PREFIX \
-       $SRC/configure -prefix $INST $QT_CONFIGURE_LINE" >>"$LOG" 2>&1 \
+       $SRC/configure -prefix $INST $QT_CONFIGURE_LINE \
+       -- -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_FIND_ROOT_PATH=$PREFIX" >>"$LOG" 2>&1 \
       || { poc_check "qtbase configures with xcb" failed ok
            rung_failed "qtbase configure -xcb" "./configure refused" "$LOG"; poc_finish; }
   fi

@@ -972,16 +972,24 @@ nix_try_build() {   # srcdir flags log hooks [install]
   # for a package that had just been built and installed one directory over.
   # That one missing path took out the whole X stack: libxcb, and then every
   # xcb-util-* that depends on it, and then qtbase's -xcb.
-  _envset="CPPFLAGS=\"-I$NIX_PREFIX/include \${CPPFLAGS:-}\" LDFLAGS=\"-L$NIX_PREFIX/lib \${LDFLAGS:-}\" PKG_CONFIG_PATH=\"$NIX_PREFIX/lib/pkgconfig:$NIX_PREFIX/share/pkgconfig\" PATH=\"$NIX_PREFIX/bin:\$PATH\""
+  _envset="CPPFLAGS=\"-I$NIX_PREFIX/include \${CPPFLAGS:-}\" LDFLAGS=\"-L$NIX_PREFIX/lib -L$NIX_PREFIX/lib64 \${LDFLAGS:-}\" PKG_CONFIG_PATH=\"$NIX_PREFIX/lib/pkgconfig:$NIX_PREFIX/share/pkgconfig:$NIX_PREFIX/lib64/pkgconfig\" PATH=\"$NIX_PREFIX/bin:\$PATH\""
   _instcmd=""
   [ -n "$_in" ] && _instcmd="&& make install"
 
   case " $_hk " in
     *" cmake "*)
-      _cmd="cd \"\$(pgb_build_root CMakeLists.txt)\" && cmake -S . -B _pgbbuild -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$NIX_PREFIX -DCMAKE_PREFIX_PATH=$NIX_PREFIX $_fl && cmake --build _pgbbuild -j $_j"
+      _cmd="cd \"\$(pgb_build_root CMakeLists.txt)\" && cmake -S . -B _pgbbuild -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$NIX_PREFIX -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_PREFIX_PATH=$NIX_PREFIX $_fl && cmake --build _pgbbuild -j $_j"
       [ -n "$_in" ] && _cmd="$_cmd && cmake --install _pgbbuild" ;;
     *" meson "*)
-      _cmd="cd \"\$(pgb_build_root meson.build)\" && meson setup _pgbbuild --default-library=static --prefer-static --prefix=$NIX_PREFIX $_fl && ninja -C _pgbbuild"
+      # ⛔ `--libdir=lib` IS NOT COSMETIC. meson defaults libdir to `lib64` on
+      # x86_64 Linux, so every meson package installed into $NIX_PREFIX/lib64
+      # while every autotools package installed into $NIX_PREFIX/lib -- and
+      # PKG_CONFIG_PATH and -L named only `lib`. Measured on libxkbcommon:
+      # `dep ok libxkbcommon` was printed, `.built/libxkbcommon` was written,
+      # `xkbcommon.pc` was sitting in lib64/pkgconfig, and qtbase's configure
+      # said `XKB_FOUND = "FALSE"`. A dependency that builds, installs, and is
+      # invisible is the worst of the three outcomes.
+      _cmd="cd \"\$(pgb_build_root meson.build)\" && meson setup _pgbbuild --default-library=static --prefer-static --prefix=$NIX_PREFIX --libdir=lib $_fl && ninja -C _pgbbuild"
       [ -n "$_in" ] && _cmd="$_cmd && ninja -C _pgbbuild install" ;;
     *)
       # ⛔ NOT EVERY PACKAGE HAS A ./configure, AND THE FALL-THROUGH USED TO
@@ -1030,7 +1038,7 @@ nix_try_build() {   # srcdir flags log hooks [install]
             elif [ -x ./configure ] && grep -q oconfigure ./configure 2>/dev/null; then
               ./configure PREFIX=$NIX_PREFIX $_fl && make -j $_j $_instcmd;
             elif [ -x ./configure ]; then ./configure --prefix=$NIX_PREFIX --disable-shared --enable-static $_fl && make -j $_j $_instcmd;
-            elif [ -x ./config ] && [ -f ./Configure ]; then ./config no-shared no-tests --prefix=$NIX_PREFIX --openssldir=$NIX_PREFIX/ssl && make -j $_j build_sw ${_in:+&& make install_sw};
+            elif [ -x ./config ] && [ -f ./Configure ]; then ./config no-shared no-tests --prefix=$NIX_PREFIX --openssldir=$NIX_PREFIX/ssl --libdir=lib && make -j $_j build_sw ${_in:+&& make install_sw};
             else $_mk$_mki; fi" ;;
   esac
 

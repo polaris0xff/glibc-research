@@ -1,0 +1,21 @@
+90 - our kdenlive bundle against pkgforge-dev/kdenlive-AppImage-Enhanced
+
+competitor pinned at 26.08.0-1@2026-09-01_1788277742
+
+  ARTEFACT                                    BYTES
+  P  ours (one command, nixpkgs)          370887898
+  E  kdenlive-AppImage-Enhanced           191900604
+     ratio P/E                                1.93x
+
+render (melt, a real MP4):
+  P -1 ms, 0 bytes of MP4
+  E 1959 ms, 4162 bytes of MP4
+
+startup (melt -version):
+  P 1995 ms cold, -489 ms warm
+  E 1043 ms cold, -298 ms warm
+
+on the eleven: ours 0/11 rendered, 7/11 with zero host objects;
+               the competitor 11/11 rendered, 4/11 clean.
+
+conditions: 2026-09-02T00:13:42Z, Linux 6.18.44-fc-v22

@@ -989,6 +989,28 @@ fi
 # project it serves, and anything not in it is REPORTED rather than silently
 # left broken.
 # ---------------------------------------------------------------------------
+# ⛔ DETECTION IS CHEAP; CARRYING IS NOT. The first version copied EVERY baked
+# directory that existed -- 525 of them for kdenlive -- and the artefact went
+# from 354 MB to 539 MB for two variables' worth of benefit. Almost all of
+# those directories are `lib/` trees whose shared objects are already
+# flattened into the bundle's own `lib/`, so the copy was pure duplication.
+# ⭐ So: everything is FOUND and COUNTED, and only a directory the override
+# table can actually redirect is CARRIED. The rest are reported as a number,
+# which is what makes the gap visible without paying for it.
+baked_override() {  # store-name subpath -> the .env lines, or nothing
+  case "$2" in
+    lib/mlt-*)       printf 'MLT_REPOSITORY=${SHARUN_DIR}/store/%s/%s\n' "$1" "$2" ;;
+    share/mlt-*)     printf 'MLT_DATA=${SHARUN_DIR}/store/%s/%s\n' "$1" "$2"
+                     printf 'MLT_PROFILES_PATH=${SHARUN_DIR}/store/%s/%s/profiles\n' "$1" "$2"
+                     printf 'MLT_PRESETS_PATH=${SHARUN_DIR}/store/%s/%s/presets\n' "$1" "$2" ;;
+    lib/frei0r-*)    printf 'FREI0R_PATH=${SHARUN_DIR}/store/%s/%s\n' "$1" "$2" ;;
+    lib/ladspa*)     printf 'LADSPA_PATH=${SHARUN_DIR}/store/%s/%s\n' "$1" "$2" ;;
+    lib/gstreamer-*) printf 'GST_PLUGIN_SYSTEM_PATH_1_0=${SHARUN_DIR}/store/%s/%s\n' "$1" "$2" ;;
+    lib/babl-*)      printf 'BABL_PATH=${SHARUN_DIR}/store/%s/%s\n' "$1" "$2" ;;
+    lib/gegl-*)      printf 'GEGL_PATH=${SHARUN_DIR}/store/%s/%s\n' "$1" "$2" ;;
+  esac
+}
+
 say "scanning the packed binaries for compiled-in store paths"
 BAKED=$(
   { ls "$APPDIR"/shared/bin/* 2>/dev/null
@@ -997,43 +1019,31 @@ BAKED=$(
       LC_ALL=C grep -aoE '/nix/store/[a-z0-9]{32}-[A-Za-z0-9._+-]+/[A-Za-z0-9._+/-]*' "$_f" 2>/dev/null
     done | sort -u
 )
-NBAKED=0; NBAKED_DIR=0
+NBAKED=0; NBAKED_DIR=0; NBAKED_CARRIED=0; BAKED_VARS=""
 for _bp in $BAKED; do
   NBAKED=$((NBAKED + 1))
   _bb=$(printf '%s' "$_bp" | sed -E 's|^/nix/store/([^/]+).*|\1|')
   _bs=$(printf '%s' "$_bp" | sed -E 's|^/nix/store/[^/]+/||')
   [ -d "$ROOT/$_bb/$_bs" ] || continue
+  NBAKED_DIR=$((NBAKED_DIR + 1))
   _bn=$(printf '%s' "$_bb" | cut -c34-)
-  [ -d "$APPDIR/store/$_bn" ] || {
+  _lines=$(baked_override "$_bn" "$_bs")
+  [ -n "$_lines" ] || continue
+  if [ ! -d "$APPDIR/store/$_bn" ]; then
     mkdir -p "$APPDIR/store"
     cp -aL "$ROOT/$_bb" "$APPDIR/store/$_bn" 2>/dev/null || continue
-  }
-  NBAKED_DIR=$((NBAKED_DIR + 1))
-  printf '%s\t%s\n' "$_bn" "$_bs" >> "$WORK/baked-dirs.tsv"
+  fi
+  printf '%s\n' "$_lines" >> "$APPDIR/.env"
+  BAKED_VARS="$BAKED_VARS $(printf '%s' "$_lines" | cut -d= -f1 | tr '\n' ' ')"
+  NBAKED_CARRIED=$((NBAKED_CARRIED + 1))
+  printf '%s\t%s\n' "$_bn" "$_bs" >> "$BAKEDTSV"
 done
-say "baked paths $NBAKED found, $NBAKED_DIR of them naming a real directory"
-
-# The override table. ⚠ Each row is a project's own documented variable; a
-# directory that matches no row is named in the warning below so the gap is
-# visible rather than mysterious.
-if [ -s "$WORK/baked-dirs.tsv" ]; then
-  _known=""
-  while IFS="$(printf '\t')" read -r _n _sub; do
-    case "$_sub" in
-      lib/mlt-*)      printf 'MLT_REPOSITORY=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known MLT_REPOSITORY" ;;
-      share/mlt-*)    printf 'MLT_DATA=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"
-                      printf 'MLT_PROFILES_PATH=${SHARUN_DIR}/store/%s/%s/profiles\n' "$_n" "$_sub" >> "$APPDIR/.env"
-                      printf 'MLT_PRESETS_PATH=${SHARUN_DIR}/store/%s/%s/presets\n' "$_n" "$_sub" >> "$APPDIR/.env"
-                      _known="$_known MLT_DATA" ;;
-      lib/frei0r-*)   printf 'FREI0R_PATH=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known FREI0R_PATH" ;;
-      lib/ladspa*)    printf 'LADSPA_PATH=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known LADSPA_PATH" ;;
-      lib/gstreamer-*) printf 'GST_PLUGIN_SYSTEM_PATH_1_0=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known GST_PLUGIN_SYSTEM_PATH_1_0" ;;
-      lib/babl-*)     printf 'BABL_PATH=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known BABL_PATH" ;;
-      lib/gegl-*)     printf 'GEGL_PATH=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known GEGL_PATH" ;;
-    esac
-  done < "$WORK/baked-dirs.tsv"
-  [ -n "$_known" ] && say "overrides  $(printf '%s' "$_known" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
-fi
+say "baked paths $NBAKED strings, $NBAKED_DIR naming a real directory, $NBAKED_CARRIED carried"
+[ -n "$BAKED_VARS" ] && say "overrides   $(printf '%s' "$BAKED_VARS" | tr ' ' '\n' | grep -v '^$' | sort -u | tr '\n' ' ')"
+# ⚠ The ones NOT carried are named in the count above rather than in a list:
+# for kdenlive that is 500-odd `lib/` trees whose objects are already in the
+# bundle's flattened lib/. A program that needs one of them will fail the way
+# melt did, with its own message, and the fix is a row in baked_override().
 
 # ---------------------------------------------------------------------------
 # 6. pack: uruntime + dwarfs, the Anylinux way

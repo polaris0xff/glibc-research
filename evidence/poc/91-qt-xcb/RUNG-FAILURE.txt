@@ -3,17 +3,16 @@ POC 91-qt-xcb -- THE RUNG THAT STOPPED IT
 
 rung      : qtbase configure -xcb
 summary   : ./configure refused
-date (UTC): 2026-09-02T00:00:13Z
+date (UTC): 2026-09-02T00:15:54Z
 configure : -static -release -force-bundled-libs -xcb -xkbcommon -bundled-xcb-xinput -no-opengl -no-dbus -no-glib -no-icu -openssl-linked -sql-sqlite -qt-sqlite -no-cups -no-fontconfig -no-libudev -no-feature-testlib -qpa xcb -default-qpa xcb -nomake examples -nomake tests
 
 -- the error, verbatim, with the file it came from --------------
 
-87:  Header "libxml/parser.h" has symbol "xmlCtxtSetErrorHandler" with dependency libxml-2.0: YES 
-154:CMake Error at cmake/QtBuildInformation.cmake:559 (message):
-174:CMake Error at cmake/QtBuildInformation.cmake:559 (message):
-211:CMake Error at cmake/QtBuildInformation.cmake:245 (message):
-222:See also "/var/tmp/pgb-poc/91-qt-xcb/build/CMakeFiles/CMakeError.log".
-223:CMake Error at /var/tmp/pgb-poc/91-qt-xcb/qtbase/cmake/QtProcessConfigureArgs.cmake:1500 (message):
+104:CMake Error at cmake/QtBuildInformation.cmake:559 (message):
+124:CMake Error at cmake/QtBuildInformation.cmake:559 (message):
+161:CMake Error at cmake/QtBuildInformation.cmake:245 (message):
+172:See also "/var/tmp/pgb-poc/91-qt-xcb/build/CMakeFiles/CMakeError.log".
+173:CMake Error at /var/tmp/pgb-poc/91-qt-xcb/qtbase/cmake/QtProcessConfigureArgs.cmake:1500 (message):
 
 -- the last 40 lines of the log --------------------------------
 
@@ -31,7 +30,7 @@ ERROR: Feature "xcb": Forcing to "ON" breaks its condition:
     QT_FEATURE_thread AND TARGET XCB::XCB AND TEST_xcb_syslibs AND QT_FEATURE_xkbcommon_x11
 Condition values dump:
     QT_FEATURE_thread = "ON"
-    TARGET XCB::XCB not found
+    TARGET XCB::XCB found
     TEST_xcb_syslibs = ""
     QT_FEATURE_xkbcommon_x11 not evaluated
 

@@ -4,17 +4,7 @@ dep skip    at-spi2-core-2.60.6-dev (in NIX_DEP_SKIP)
 dep skip    gtk+3-3.24.52-dev (in NIX_DEP_SKIP)
 dep skip    mariadb-connector-c-3.3.5-dev (in NIX_DEP_SKIP)
 dep skip    libpq-18.4-dev (in NIX_DEP_SKIP)
-dep build   libxml2  (depth 1)
-dep build   find-xml-catalogs-hook  (depth 2)
-pgb: the plan has no source
-pgb: dep FAILED  find-xml-catalogs-hook -- its source could not be fetched
-patches     1 applied (-p1)
-repointed --exec-prefix=/02qcpld1y6xhs5gz9bchpxaw0xdhmsp5dv88lh25r2ss44kh8dxz -> --exec-prefix=/var/tmp/pgb-poc/91-qt-xcb/prefix
-pgb: dropped shared-library flag: --enable-shared
-build system: autoreconf pkg-config 
-round 1: configure --exec-prefix=/var/tmp/pgb-poc/91-qt-xcb/prefix --disable-static --without-icu --without-python --without-http --without-zlib --without-docs  
-round 1: built
-dep ok      libxml2 -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep have    libxml2
 dep skip    libxslt-1.1.45-dev (in NIX_DEP_SKIP)
 dep have    openssl
 dep skip    sqlite-3.53.3-dev (in NIX_DEP_SKIP)
@@ -58,48 +48,7 @@ dep have    libxext
 dep have    libxi
 dep have    libxrender
 dep have    libxcb
-dep build   libxkbcommon  (depth 1)
-dep have    xkeyboard-config
-dep have    libxcb
-dep have    libxml2
-dep skip    wayland-1.26.0-dev (in NIX_DEP_SKIP)
-dep skip    wayland-protocols-1.49 (in NIX_DEP_SKIP)
-patches     0 applied (-p1)
-build system: meson ninja pkg-config 
-round 1: configure  
-
-pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
-  Header "string.h" has symbol "strndup" : YES 
-  Header "stdio.h" has symbol "asprintf" : YES 
-  Header "stdio.h" has symbol "open_memstream" : YES 
-  Header "stdlib.h" has symbol "secure_getenv" : YES 
-  Header "stdlib.h" has symbol "realpath" : YES 
-  Header "limits.h" has symbol "PATH_MAX" : YES 
-  Checking for function "gnu_get_libc_version" : YES 
-  Header "locale.h" has symbol "newlocale" : YES 
-  Checking if "newlocale fails on invalid locales" runs: YES
-  Checking if "-Wl,--version-script" links: YES 
-  Program scripts/map-to-def found: YES (/root/.local/state/pgb/nix-deps/1052447777/libxkbcommon/build/j59gh2hrsflxda2csxfbdkzfm3dj8400-source/scripts/map-to-def)
-  Program bison found: YES 3.8.2 3.8.2 (/usr/bin/bison)
-  Run-time dependency xcb found: YES 1.17.0
-  Run-time dependency xcb-xkb found: YES 1.17.0
-  Run-time dependency libxml-2.0 found: YES 2.15.3
-  Header "libxml/parser.h" has symbol "xmlCtxtSetErrorHandler" with dependency libxml-2.0: YES 
-  Header "libxml/parser.h" has symbol "xmlCtxtParseDtd" with dependency libxml-2.0: YES 
-  Run-time dependency icu-uc found: NO (tried pkgconfig and cmake)
-  Header "getopt.h" has symbol "getopt_long" : YES 
-  Run-time dependency bash-completion found: NO (tried pkgconfig and cmake)
-  Has header "linux/input.h" : YES 
-  Run-time dependency wayland-client found: NO (tried pkgconfig and cmake)
-  Run-time dependency wayland-protocols found: NO (tried pkgconfig and cmake)
-  Found CMake: /usr/bin/cmake (3.25.1)
-  Build-time dependency wayland-scanner found: NO (tried pkgconfig and cmake)
-  
-  meson.build:757:12: ERROR: Problem encountered: The Wayland xkbcli programs require wayland-client and wayland-protocols which were not found.
-  You can disable the Wayland xkbcli programs with -Denable-wayland=false.
-  
-  A full log can be found at /root/.local/state/pgb/nix-deps/1052447777/libxkbcommon/build/j59gh2hrsflxda2csxfbdkzfm3dj8400-source/_pgbbuild/meson-logs/meson-log.txt
-pgb: dep FAILED  libxkbcommon -- the parent will have to do without it
+dep have    libxkbcommon
 dep have    libxcb-util
 dep have    libxcb-image
 dep have    libxcb-keysyms
@@ -128,6 +77,7 @@ built into  /var/tmp/pgb-poc/91-qt-xcb/prefix
   ok    libxext
   ok    libxfixes
   ok    libxi
+  ok    libxkbcommon
   ok    libxml2
   ok    libxrender
   ok    openssl
@@ -135,7 +85,7 @@ built into  /var/tmp/pgb-poc/91-qt-xcb/prefix
   ok    xkeyboard-config
   ok    xorgproto
   ok    xtrans
-'/usr/bin/cmake' '-DQT_INTERNAL_CALLED_FROM_CONFIGURE:BOOL=TRUE' '-DFEATURE_testlib=OFF' '-DCMAKE_INSTALL_PREFIX=/var/tmp/pgb-poc/91-qt-xcb/inst' '-DQT_QPA_PLATFORMS=xcb' '-DQT_QPA_DEFAULT_PLATFORM=xcb' '-DBUILD_SHARED_LIBS=OFF' '-DQT_BUILD_EXAMPLES=FALSE' '-DQT_BUILD_TESTS=FALSE' '-DCMAKE_BUILD_TYPE=Release' '-DFEATURE_force_bundled_libs=ON' '-DFEATURE_xcb=ON' '-DFEATURE_xkbcommon=ON' '-DINPUT_bundled_xcb_xinput=yes' '-DINPUT_opengl=no' '-DFEATURE_dbus=OFF' '-DFEATURE_glib=OFF' '-DFEATURE_icu=OFF' '-DINPUT_openssl=linked' '-DFEATURE_sql_sqlite=ON' '-DFEATURE_system_sqlite=OFF' '-DFEATURE_cups=OFF' '-DFEATURE_fontconfig=OFF' '-DFEATURE_libudev=OFF' '-G' 'Ninja' '/var/tmp/pgb-poc/91-qt-xcb/qtbase'
+'/usr/bin/cmake' '-DCMAKE_PREFIX_PATH=/var/tmp/pgb-poc/91-qt-xcb/prefix' '-DCMAKE_FIND_ROOT_PATH=/var/tmp/pgb-poc/91-qt-xcb/prefix' '-DQT_INTERNAL_CALLED_FROM_CONFIGURE:BOOL=TRUE' '-DFEATURE_testlib=OFF' '-DCMAKE_INSTALL_PREFIX=/var/tmp/pgb-poc/91-qt-xcb/inst' '-DQT_QPA_PLATFORMS=xcb' '-DQT_QPA_DEFAULT_PLATFORM=xcb' '-DBUILD_SHARED_LIBS=OFF' '-DQT_BUILD_EXAMPLES=FALSE' '-DQT_BUILD_TESTS=FALSE' '-DCMAKE_BUILD_TYPE=Release' '-DFEATURE_force_bundled_libs=ON' '-DFEATURE_xcb=ON' '-DFEATURE_xkbcommon=ON' '-DINPUT_bundled_xcb_xinput=yes' '-DINPUT_opengl=no' '-DFEATURE_dbus=OFF' '-DFEATURE_glib=OFF' '-DFEATURE_icu=OFF' '-DINPUT_openssl=linked' '-DFEATURE_sql_sqlite=ON' '-DFEATURE_system_sqlite=OFF' '-DFEATURE_cups=OFF' '-DFEATURE_fontconfig=OFF' '-DFEATURE_libudev=OFF' '-G' 'Ninja' '/var/tmp/pgb-poc/91-qt-xcb/qtbase'
 -- The CXX compiler identification is GNU 12.2.0
 -- The C compiler identification is GNU 12.2.0
 -- Detecting CXX compiler ABI info
@@ -159,7 +109,7 @@ CMake Error at cmake/QtBuildInformation.cmake:559 (message):
   Condition values dump:
 
       QT_FEATURE_thread = "ON"
-      TARGET XCB::XCB not found
+      TARGET XCB::XCB found
       TEST_xcb_syslibs = ""
       QT_FEATURE_xkbcommon_x11 not evaluated
 
@@ -198,7 +148,7 @@ ERROR: Feature "xcb": Forcing to "ON" breaks its condition:
     QT_FEATURE_thread AND TARGET XCB::XCB AND TEST_xcb_syslibs AND QT_FEATURE_xkbcommon_x11
 Condition values dump:
     QT_FEATURE_thread = "ON"
-    TARGET XCB::XCB not found
+    TARGET XCB::XCB found
     TEST_xcb_syslibs = ""
     QT_FEATURE_xkbcommon_x11 not evaluated
 
