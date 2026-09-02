@@ -5,102 +5,102 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-02d, refreshed at session END
-    TREE           main, clean
+    LAST WRITTEN   2026-09-02e, at session START
+    TREE           main, clean, at 72effbe5
     BRANCH         ⛔ main. The harness named
-                   `claude/glibc-kdenlive-validation-2x7c3c`; RULES.md §Git
-                   outranks it, as the operator has ruled twice. That branch
-                   was already on the remote at main's commit when this
-                   session started and is left alone — the git proxy refuses
-                   deletes.
-    CI             green on every commit of this session.
+                   `claude/glibc-research-work-order-o8vn6f`; RULES.md §Git
+                   outranks it and the OPERATOR SAID THE SAME in the work
+                   order ("use the default main branch"). The local copy is
+                   deleted; the remote copy was already there at main's commit
+                   and is left alone — the git proxy refuses deletes.
+    CI             not yet run this session.
 
 ---
 
-# ⛔ TWO THINGS A FRESH SESSION CANNOT INFER AND BOTH COST TIME
+# ⛔ WHAT A FRESH SESSION CANNOT INFER, RE-CONFIRMED THIS SESSION
 
-⚠ **The clone comes up SHALLOW.** `git rev-parse --is-shallow-repository`
-returned `true` again this session, and `origin/main` came back as a **forced
-update** from a stale commit. ⛔ Do not "recover" the orphan commits and do not
-force-push. `git fetch --unshallow`, then `merge --ff-only`.
+⚠ **The clone came up SHALLOW again.** `git fetch --unshallow` then
+`merge --ff-only` — 174 commits after unshallowing.
 
-⚠ **The container is fresh: nothing is bootstrapped**, and it costs ~25
-minutes. `./pgb bootstrap --detach` does all of it in parallel;
-`./pgb bootstrap --check` says when it is ready.
+⚠ **The container is fresh: nothing was bootstrapped.** ⭐ But it is FASTER
+than the ~25 min the record claims on this machine: `./pgb bootstrap --detach`
+had nix, the chroot build env and all 11 rootfs on disk in **~2 minutes**.
+Verified by `du`, not by a marker.
 
     make                            builds ./pgb, ~15 s
-    ./pgb selftest                  200 pass, 1 could not run (no zstd), exit 2
-    make check                      selftests + both record gates, exits 0
-    disk                            ~15 GiB free at session end
+    ./pgb bootstrap --detach        nix + env + bed, parallel
+    sh scripts/common/install-codegraph.sh   v1.6.0, 93 files, 1,799 nodes
+
+## ⛔ THE ONE THING THAT WAS LOST WITH THE CONTAINER
+
+⛔ **`pgb-env-debian-trixie` DID NOT SURVIVE**, and the record said it
+"exists". It was never reproducible from the tree: **the trixie digest was
+never committed anywhere**, only re-resolved at run time by `experiments/91-`
+arm 1 from a rolling registry lookup.
+
+Re-resolved this session, with 91-'s own control passing (the method
+reproduces the pinned `debian:12` digest `sha256:2f65600e…`):
+
+    debian:trixie   sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
+
+⚠ **This is not provably the same image the last session measured arms 2–4
+against**, because that digest was not recorded. Arm 5 must therefore be read
+against a re-measured arm 2/3/4 on THIS digest, or the digest committed and
+both re-run.
 
 ## In flight right now
 
-    (nothing running)
+    pgb env create   pgb-env-debian-trixie, background, log in the session
+                     scratchpad. This is the long pole for T-070 arm 5.
+    pgb bootstrap    the docker environment is still building; the chroot
+                     engine works now (`pgb --engine chroot ...`).
 
-⭐ **The loose end from earlier in this session is CLOSED.** The naive-vs-fast
-sweep equivalence, on the real kdenlive AppDir — 1,633 libraries, 1.49 GiB,
-2,586 roots:
+⭐ **The loose end the work order named is ALREADY CLOSED** — commit 72effbe5,
+which landed after the work order was written. The naive-vs-fast sweep
+equivalence on the real kdenlive AppDir: 838 s vs 7.07 s, both exit 0, both 47
+lines, `diff` exit 0. Re-verified this session against the committed files
+`evidence/90-kdenlive-vs-enhanced/sweep-equivalence-{naive,fast}.txt`.
+⛔ `/var/tmp/pgb-appimage-kden` and `/var/tmp/pgb-naive-sweep` are both GONE
+with the container, and nothing is owed from them.
 
-    naive   838 s     exit 0, 47 lines
-    fast      7.07 s  exit 0, 47 lines
-    diff    IDENTICAL
+## ⛔ WHAT IS LEFT, IN ORDER
 
-Both outputs are kept:
-`evidence/90-kdenlive-vs-enhanced/sweep-equivalence-naive.txt` and
-`evidence/90-kdenlive-vs-enhanced/sweep-equivalence-fast.txt`.
-⚠ The naive arm carried concurrent load, so "about 100×" is the honest claim
-and 118× is the arithmetic.
-
-## ⛔ WHAT IS LEFT, IN ORDER — and every one of these is READY TO RUN
-
-    1  T-070 arm 5   the ten POCs at glibc 2.41. The environment EXISTS:
-                     /var/lib/pgb-rootfs/pgb-env-debian-trixie, full package
-                     list, gcc 14.2.0. `PGB_ENV_NAME=pgb-env-debian-trixie
-                     sh poc/<name>/run.sh`. Uses the bed. ⛔ THIS IS THE ONE
-                     ROW between "indicated" and "measured" for the pin move;
-                     the other three costs are all ZERO.
-    2  T-071 Prove   `sh experiments/85-opengl.sh`. The data-coherence arm is
-                     written; the Prove was already carried out by hand on
-                     kdenlive's AppDir, so this is confirmation on 85-'s own
-                     subject. Uses the bed.
-    3  T-068         `sh experiments/93-host-object-residue.sh`. Written, its
-                     probe verified, NOT RUN. No bed; ~900 forks.
-    4  T-066         mine pkgforge-dev/archlinux-pkgs-debloated (NOT in
-                     references/), then the allowlist route. See PROGRESS.
+    1  T-070 arm 5   the ten POCs at glibc 2.41. ⛔ THE ENVIRONMENT HAD TO BE
+                     REBUILT (see above). `PGB_PIN_POCS` + `PGB_PIN_POC_ENV`
+                     turn arm 5 of experiments/91- on. Uses the bed.
+    2  T-071 Prove   `sh experiments/85-opengl.sh`, data-coherence arm written
+                     and unrun. Uses the bed.
+    3  T-068         `sh experiments/93-host-object-residue.sh`. ⚠ It DOES
+                     need the chroot build env — it builds its probe with
+                     `pgb --engine chroot build --host-dlopen`. The ~900-fork
+                     sweep itself is host-side.
+    4  T-066         mine pkgforge-dev/archlinux-pkgs-debloated, then the
+                     allowlist route.
     5  T-072         route D, designed and costed, not implemented.
 
-## ⛔ Machine notes a fresh session cannot infer
+## ⛔ Machine notes
 
-- **Go 1.24.7 at `/usr/local/go/bin/go`.** `make` builds `./pgb`; `make check`
-  runs the selftests and both record gates.
-- ⛔ **`make` depends on `tool/runtime/*.c`.** It did not once, and that
-  shipped a stale loader through a whole 11-environment run.
-- ⛔ **DISK IS THE BINDING CONSTRAINT**, and the lesson is LEFTOVERS not
-  allowance: delete the previous build tree before the next big one.
-  `/var/tmp/pgb-appimage-kden` is **7 GB** and is now free to delete: the
-  equivalence diff it was being kept for is done.
-- **Absent on a fresh container:** nix, zstd, musl-gcc, podman, codegraph, gh.
-  `docker` IS present. `sh scripts/common/install-codegraph.sh`.
-- ⚠ **`musl-gcc` is the one remaining blocker on `experiments/90-`'s arm O.**
-  The rust `x86_64-unknown-linux-musl` target was the first and is installed.
-- ⚠ **Docker Hub rate-limits anonymous pulls here.** ⭐ `pgb rootfs pull` does
-  the anonymous-token dance and succeeds where `docker pull` 429s.
-- ⚠ **An experiment writes its own `RESULT.txt`.** Redirect stdout to a
-  separate log, never onto `RESULT.txt`.
-- ⛔ **`evidence/*/build/` is `.gitignore`d**, so `debloat`, sweep and
-  `icd json` totals are overwritten by the next run. Copy what you need out.
+- 4 cores, uid 0, **30 GiB free at session start**. Go 1.24.7.
+- ⛔ **`make` depends on `tool/runtime/*.c`.**
+- ⛔ **DISK IS BINDING.** Delete the previous build tree before the next.
+- **Absent on a fresh container:** nix→installed by bootstrap, zstd, musl-gcc,
+  podman, gh. `docker`, `strace`, `gcc`, `make`, `curl`, `tar`, `xz` present.
+- ⚠ **Docker Hub rate-limits anonymous pulls.** `pgb rootfs pull` succeeds
+  where `docker pull` 429s. ⭐ `docker buildx imagetools inspect` (metadata
+  only, no pull) answered fine this session for both `debian:12` and
+  `debian:trixie`.
+- ⚠ **An experiment writes its own `RESULT.txt`.** Redirect stdout elsewhere.
+- ⛔ **`evidence/*/build/` is `.gitignore`d.** Copy out what you need.
 - ⛔ **Never edit a shell script while it is running.**
 - ⚠ **`pgrep -f "90-kdenlive"` MATCHES YOUR OWN WAITING LOOP.** Use
   `ps -eo pid,args | grep -v grep`.
-- ⚠ Use a heredoc for commit messages, never `git commit -m` with backticks.
-- 4 cores, ~15 GiB RAM, uid 0.
 
-## ⛔ THE RULE THIS SESSION LEARNED THE EXPENSIVE WAY
+## ⛔ THE RULE THE LAST SESSION LEARNED THE EXPENSIVE WAY
 
 `experiments/90-`'s render and startup arms are **wall-clock on the build
-host**, so "it does not touch the bed" is **not** sufficient. Running `go
-build`, `pgb selftest` and the gates during them moved the **competitor's
-fixed artefact** from 2,033 ms to 13,680 ms. ⭐ Before starting anything, ask
-which shared resource the experiment needs: counts and exit statuses need the
-**bed** idle; **milliseconds need the whole machine** idle.
+host**, so "it does not touch the bed" is **not** sufficient. ⭐ Before
+starting anything, ask which shared resource it needs: counts and exit
+statuses need the **bed** idle; **milliseconds need the whole machine** idle.
 `RULES.md` §"the shared resource is sometimes the clock".
+⛔ **A same-day `safe` vs `aggressive` kdenlive timing comparison is still
+owed.**
