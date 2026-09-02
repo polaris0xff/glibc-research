@@ -69,8 +69,44 @@ func bundleCommand(c *cfg.Config, args []string) error {
 			return nil
 		}
 		return bundleSweep(rest)
+	case "manifests":
+		if len(rest) != 1 {
+			return fail.Cannot("pgb bundle manifests needs one APPDIR")
+		}
+		return bundleManifests(rest[0])
 	}
-	return fail.Cannot("unknown: pgb bundle %s (appimage, sweep, fold-env, onelf-recipe)", sub)
+	return fail.Cannot("unknown: pgb bundle %s (appimage, sweep, manifests, fold-env, onelf-recipe)", sub)
+}
+
+// bundleManifests asserts the bundle's DATA is coherent: every vendor and ICD
+// manifest names a library that is in the bundle, by a name the loader can
+// resolve there.
+//
+// ⛔ IT EXITS NON-ZERO, WHICH IS WHY IT EXISTS SEPARATELY FROM THE BUILD. The
+// build reports the same finding and carries on, because a closure can
+// legitimately carry a manifest for a vendor it did not bundle. An EXPERIMENT
+// needs the other thing: a verdict it can fail on, with a negative control
+// that a deliberately un-rewritten manifest is caught. `TODO` T-071's Prove.
+func bundleManifests(appDir string) error {
+	n, outside, absent := bundle.CheckManifests(appDir)
+	fmt.Printf("manifests read: %d\n", n)
+	for _, s := range outside {
+		fmt.Printf("OUTSIDE  %s\n", s)
+	}
+	for _, s := range absent {
+		fmt.Printf("ABSENT   %s\n", s)
+	}
+	if n == 0 {
+		// ⚠ Not a pass. A bundle with no manifests at all has not been
+		// checked, and saying "ok" here is the quiet no-op docs/AGENTS.md §0b
+		// calls the worst answer this codebase can give.
+		return fail.Cannot("no manifest was found under %s, so nothing was checked", appDir)
+	}
+	if len(outside) > 0 || len(absent) > 0 {
+		return fail.Exit(1)
+	}
+	fmt.Printf("VERDICT: every manifest names a library present in the bundle.\n")
+	return nil
 }
 
 // bundleSweep reports which shared objects in a bundle nothing can reach.

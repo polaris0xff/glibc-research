@@ -1057,7 +1057,7 @@ one any more.
 ### ⭐ WHERE IT STANDS — ALL SIX GATES MET
 
 **The tool is Go.** One static binary; the shell and Python are retired under
-`HISTORY/` and are the oracle. 187 carried selftests pass and 1 cannot run here
+`HISTORY/` and are the oracle. 200 carried selftests pass and 1 cannot run here
 (no `zstd` binary), `sh TODO/check.sh` and `sh scripts/common/check-docs.sh`
 are green, and CI is green at 16 of 16 jobs.
 
@@ -1256,12 +1256,22 @@ after each iteration/improvements."*
 | subject | ours | the field | |
 |---|---|---|---|
 | `jq` (`experiments/86-`) | **11,471,610 B**, 7 store paths | **4,006,916 B**, 68 libraries | ⛔ **2.86×** |
-| kdenlive (`experiments/90-`) | **477,191,058 B** | 191,900,604 B | ⛔ **2.49×** |
-| kdenlive render | 3,559 ms | 1,323 ms | ⛔ **2.69×** |
-| kdenlive cold start | 181 ms | 52 ms | ⛔ **3.48×** |
+| kdenlive (`experiments/90-`) | **471,033,944 B** | 191,900,604 B | ⛔ **2.45×** |
+| kdenlive render | 4,947 ms | 2,033 ms | ⛔ **2.43×** |
+| kdenlive cold start | 300 ms | 61 ms | ⛔ **4.92×** |
 
-⭐ The one column ours wins is host-object cleanliness — 11/11 against 4/11 —
-and T-065 is about whether that is even the right assertion for a bundle.
+⛔ **THE kdenlive ROWS ARE RUN 5's (2026-09-02d, `safe`) AND THEY SUPERSEDE
+WHAT WAS HERE.** The previous figures — 477,191,058 B, 3,559 ms, 181 ms — came
+from before the five-run sequence in which runs 1 through 4 were each invalid
+for a different reason, and no run before 5 both rendered and completed.
+⭐ Run 5 is the first that did: `ours rendered on every environment = 11 of 11`.
+⚠ Timings move with the machine, so the render and start rows are a same-day
+comparison against the competitor and not a claim about last week's numbers.
+
+⭐ The one column ours wins is host-object cleanliness — **11/11 against 4/11**,
+and on `rockylinux-8` the competitor loads **10** host shared objects to our
+zero — and T-065 is about whether that is even the right assertion for a
+bundle.
 
 **Why a CLI is the subject, and the operator named it.** kdenlive is a
 20-minute build and a 477 MB artefact: an iteration loop nobody can run. `bash`
@@ -1276,6 +1286,28 @@ then re-measure the big subjects once.
    codegraph: `Sweep` has exactly two callers, `bundleSweep` and its own
    selftest. `--debloat` is pattern rules only. 489 MB of kdenlive's `lib/` is
    unreachable. **This is the single largest unused lever.**
+   ⭐ **PULLED 2026-09-02c** — `DropUnreachable` consumes it — and then
+   **gated to `aggressive`** on the same day, after three classes of
+   runtime-loaded library turned out to be invisible to it.
+   ⛔ **AND IT WAS QUADRATIC, which is a second finding inside the first.** The
+   soname scan did one `bytes.Contains` per needle per object, so it re-read
+   every byte of the bundle once for every library in it. On kdenlive that is
+   ~1,000 objects against ~1,000 names over a 2 GiB tree.
+
+   ⭐ **Measured while it ran, rather than argued from the shape of the loop:**
+   `/proc/<pid>/io` showed `rchar` advancing **14 MiB per 5 s — 2.8 MiB/s** —
+   at 101% CPU, sleeping on nothing. The bundler reads each object once and
+   then scans that buffer a thousand times, so the *bundle* advances at
+   2.8 MiB/s while the *scanner* runs at gigabytes per second. On this AppDir
+   that is **~12 minutes for the sweep alone**, against ~8 minutes for the
+   whole of the rest of the build — fetch, debloat, wrapper lifting and all.
+
+   ⭐ Replaced with a single-pass scan that is **exactly** equivalent by
+   construction — the splitting alphabet is derived from the needles
+   themselves, so a needle occurrence cannot straddle a split, and only runs
+   containing `.so` are kept because `IsSharedObject` requires it — with the
+   original kept as `sonamesMentionedNaive`, the control its selftest compares
+   against on fixtures built for the four ways the two could differ.
 2. `store/` is 405 MB of the kdenlive bundle and duplicates what is already in
    `lib/`.
 3. `share/` is 368 MB, most of it one icon theme shipping every size.
@@ -1656,6 +1688,12 @@ cross-check.
 | every thread pays it | the reserve is in the executable's `PT_TLS`, so it is allocated per thread whether or not anything dlopens. ⛔ Sized by a flag, defaulting to not reserved |
 | alignment | the array needs an explicit `aligned()` at least as large as any module `p_align` it serves — 64 observed here |
 | threads | unchanged from today: the init image is seeded in the loading thread, and threads created later see zero |
+
+⛔ **D IS DESIGNED AND MEASURED, NOT IMPLEMENTED.** `pgb-elfload.c` is
+unchanged: what exists is the probe above and the reading of it. ⚠ Landing D
+means a new `__thread` reserve, a flag to size it, and `experiments/76-` re-run
+across eleven environments — and this entry stays P1, so it waits behind the
+P0s rather than being half-done in front of them.
 
 **Prove.** The surplus measured before and after, and the two objects that
 fail today either loading or refused with the number they needed.

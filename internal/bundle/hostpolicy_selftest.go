@@ -29,6 +29,10 @@ func HostPolicySelftest() *selftest.Report {
 	// And one that carries nothing, which is the case that must not claim to
 	// serve GL or Vulkan out of directories it does not have.
 	empty := func(string) bool { return false }
+	// The vendor directory's contents, for __EGL_VENDOR_LIBRARY_FILENAMES.
+	// ⚠ A non-JSON file is included on purpose: it must NOT reach the list.
+	vendors := func(string) []string { return []string{"50_mesa.json", "10_nvidia.json", "README"} }
+	noVendors := func(string) []string { return nil }
 
 	get := func(lines []string, key string) string {
 		for _, l := range lines {
@@ -40,7 +44,7 @@ func HostPolicySelftest() *selftest.Report {
 	}
 
 	// ---- the default policy: bundled first, host last ----------------------
-	def := HostPolicy{}.EnvLines(full)
+	def := HostPolicy{}.EnvLines(full, vendors)
 
 	fb := get(def, "SHARUN_FALLBACK_LIBRARY_PATH")
 	r.CheckBool("default: a host fallback exists at all", fb != "", true)
@@ -70,8 +74,29 @@ func HostPolicySelftest() *selftest.Report {
 	r.CheckBool("default: the host ICD dirs are still reachable",
 		strings.Contains(get(def, "VK_DRIVER_FILES"), "/usr/share/vulkan/icd.d"), true)
 
+	// ⛔ __EGL_VENDOR_LIBRARY_FILENAMES OVERRIDES __EGL_VENDOR_LIBRARY_DIRS
+	// ENTIRELY — libglvnd's LoadVendors() returns as soon as it finds the
+	// first one set — so a bundle that sets only DIRS is silently overridden
+	// by any host that exports FILENAMES, and loads the HOST's vendors.
+	fn := get(def, "__EGL_VENDOR_LIBRARY_FILENAMES")
+	r.CheckBool("default: FILENAMES is set, so a host value cannot win",
+		fn != "", true)
+	r.CheckBool("default: it names the bundle's own vendor files",
+		strings.Contains(fn, "${SHARUN_DIR}/share/glvnd/egl_vendor.d/50_mesa.json"), true)
+	r.CheckBool("default: and every vendor file, not just the first",
+		strings.Contains(fn, "10_nvidia.json"), true)
+	// ⛔ NEGATIVE: it takes FILES, so a non-JSON file in the same directory
+	// must not reach the list.
+	r.CheckBool("default: a non-JSON file in the same directory is not listed",
+		strings.Contains(fn, "README"), false)
+
 	// ⛔ NEGATIVE: with nothing bundled, nothing may claim to serve it.
-	bare := HostPolicy{}.EnvLines(empty)
+	bare := HostPolicy{}.EnvLines(empty, noVendors)
+	// ⛔ AND EMPTY IS NOT SAFE HERE — `getenv` returns a non-NULL empty
+	// string, libglvnd takes the branch, and no vendor is loaded at all. A
+	// bundle with no vendor directory must leave the variable UNSET.
+	r.Check("empty bundle: FILENAMES is unset, not set-and-empty",
+		get(bare, "__EGL_VENDOR_LIBRARY_FILENAMES"), "")
 	r.Check("empty bundle: no LIBGL_DRIVERS_PATH is claimed",
 		get(bare, "LIBGL_DRIVERS_PATH"), "")
 	r.CheckBool("empty bundle: VK_DRIVER_FILES names no ${SHARUN_DIR}",
@@ -80,18 +105,24 @@ func HostPolicySelftest() *selftest.Report {
 		get(bare, "SHARUN_FALLBACK_LIBRARY_PATH") != "", true)
 
 	// ---- the opt-ins each move exactly one class ---------------------------
-	mesa := HostPolicy{Mesa: true}.EnvLines(full)
+	mesa := HostPolicy{Mesa: true}.EnvLines(full, vendors)
 	r.Check("PGB_HOST_MESA: the bundle stops claiming LIBGL_DRIVERS_PATH",
 		get(mesa, "LIBGL_DRIVERS_PATH"), "")
 	r.CheckBool("PGB_HOST_MESA: it is recorded in the environment",
 		get(mesa, "PGB_HOST_MESA") == "1", true)
+	// ⛔ AND IT MUST RELEASE THE VENDOR LIST TOO. The opt-in says "use the
+	// host's mesa"; pinning FILENAMES at the bundle's own vendor JSONs would
+	// override the host's configuration and hand it back the bundle's mesa,
+	// which is the opt-in doing the opposite of what it says.
+	r.Check("PGB_HOST_MESA: the bundle stops pinning the EGL vendor list",
+		get(mesa, "__EGL_VENDOR_LIBRARY_FILENAMES"), "")
 	// ⛔ and it must NOT have moved Vulkan or glibc.
 	r.CheckBool("PGB_HOST_MESA: vulkan is untouched",
 		strings.HasPrefix(get(mesa, "VK_DRIVER_FILES"), "${SHARUN_DIR}/"), true)
 	r.Check("PGB_HOST_MESA: glibc is untouched",
 		get(mesa, "SHARUN_EXTRA_LIBRARY_PATH"), "")
 
-	vk := HostPolicy{Vulkan: true}.EnvLines(full)
+	vk := HostPolicy{Vulkan: true}.EnvLines(full, vendors)
 	r.CheckBool("PGB_HOST_VULKAN: host layers are admitted",
 		get(vk, "VK_LAYER_PATH") != "", true)
 	r.Check("PGB_HOST_VULKAN: sharun's own gate is set",
@@ -102,7 +133,7 @@ func HostPolicySelftest() *selftest.Report {
 	// ⛔ THE EXPENSIVE ONE. It is the only opt-in that REORDERS rather than
 	// appends: the host's directories arrive at SHARUN_EXTRA_LIBRARY_PATH,
 	// which sharun documents as highest priority.
-	gl := HostPolicy{Glibc: true}.EnvLines(full)
+	gl := HostPolicy{Glibc: true}.EnvLines(full, vendors)
 	r.CheckBool("PGB_HOST_GLIBC: host dirs reach the highest-priority slot",
 		strings.Contains(get(gl, "SHARUN_EXTRA_LIBRARY_PATH"), "/usr/lib"), true)
 	r.Check("PGB_HOST_GLIBC: mesa is untouched",

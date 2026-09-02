@@ -512,17 +512,132 @@ func librariesNamedInManifests(dir string) []string {
 	return uniq(out)
 }
 
+// dotSo is the substring every shared-object name contains, by IsSharedObject's
+// own definition. It is what makes the run filter below exact rather than a
+// heuristic.
+var dotSo = []byte(".so")
+
 // sonamesMentionedInObjects finds, for every ELF in the bundle, the shared
 // object names it spells out literally -- the fingerprint of a dlopen by name.
 //
 // ⚠ Substring search over the whole file rather than a .rodata walk: a soname
 // can also arrive through a string table, a build-id note, or a constant
 // assembled at compile time into an unexpected section, and reading the wrong
-// section is how the previous three misses happened. Cost is one pass per
-// object over bytes already on disk.
+// section is how the previous three misses happened.
+//
+// ⛔ AND IT WAS QUADRATIC, WHICH IS NOT A STYLE POINT — IT IS MOST OF WHY
+// `--debloat aggressive` COSTS WHAT IT COSTS. The obvious shape is a
+// `bytes.Contains` per needle per object, which re-reads every byte of the
+// bundle once for every library in it: on kdenlive that is roughly a thousand
+// objects against a thousand names over a 2 GiB tree.
+//
+// ⭐ THE FAST PATH IS EXACTLY EQUIVALENT, BY CONSTRUCTION RATHER THAN BY
+// CARE. Every needle is a shared-object name, so:
+//
+//   - build the ALPHABET as the set of bytes that occur in some needle. A
+//     needle occurring in the data consists only of those bytes, so it lies
+//     entirely inside one maximal run of them. Extracting the runs therefore
+//     cannot lose an occurrence, and the alphabet is derived from the needles
+//     rather than written down, so it cannot drift from them;
+//   - keep only runs containing `.so`. `IsSharedObject` requires the name to
+//     end in `.so` or `.so.N`, so every needle contains that substring, so
+//     every run containing a needle contains it too;
+//   - a run's needles are computed ONCE and cached, because a bundle spells
+//     the same soname out in hundreds of objects.
+//
+// The result is one pass over the bytes plus a needle scan over the few
+// distinct soname-shaped strings the bundle actually contains.
+// `sonamesMentionedNaive` below is the original, kept as the CONTROL its
+// selftest compares against — this is a change to the function that decides
+// what gets DELETED, and "it looks equivalent" is not the standard.
 func sonamesMentionedInObjects(root string, objects []string, index map[string]string) []string {
 	// Only names the bundle actually has can be roots, so the needle set is
 	// the index rather than every plausible soname.
+	var needles []string
+	var alphabet [256]bool
+	minLen := 0
+	for n := range index {
+		if !IsSharedObject(n) {
+			continue
+		}
+		needles = append(needles, n)
+		for i := 0; i < len(n); i++ {
+			alphabet[n[i]] = true
+		}
+		if minLen == 0 || len(n) < minLen {
+			minLen = len(n)
+		}
+	}
+	if len(needles) == 0 {
+		return nil
+	}
+
+	runHits := map[string][]string{} // a distinct run -> the needles inside it
+	found := map[string]bool{}
+	for _, o := range objects {
+		data, err := os.ReadFile(o)
+		if err != nil {
+			continue
+		}
+		self := filepath.Base(o)
+		runs := map[string]bool{}
+		start := -1
+		for i := 0; i <= len(data); i++ {
+			if i < len(data) && alphabet[data[i]] {
+				if start < 0 {
+					start = i
+				}
+				continue
+			}
+			if start >= 0 {
+				if r := data[start:i]; len(r) >= minLen && bytes.Contains(r, dotSo) {
+					runs[string(r)] = true
+				}
+				start = -1
+			}
+		}
+		for r := range runs {
+			hits, done := runHits[r]
+			if !done {
+				for _, n := range needles {
+					if len(n) <= len(r) && strings.Contains(r, n) {
+						hits = append(hits, n)
+					}
+				}
+				if hits == nil {
+					hits = []string{}
+				}
+				runHits[r] = hits
+			}
+			for _, n := range hits {
+				if n != self {
+					found[n] = true
+				}
+			}
+		}
+	}
+	var out []string
+	for n := range found {
+		if p, ok := index[n]; ok {
+			out = append(out, p)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// sonamesMentionedNaive is the ORIGINAL implementation of the function above:
+// one `bytes.Contains` per needle per object. It is kept, and it is not dead
+// code — it is the control `SonameScanSelftest` compares the fast path
+// against.
+//
+// ⛔ WHY A CONTROL AND NOT A READING. This function decides which libraries a
+// bundle KEEPS. A speedup that silently stopped finding one name would delete
+// a library the application dlopens by name, on somebody else's machine, with
+// every DT_NEEDED still resolving and every gate in this tree green — which is
+// exactly how the libSDL3 miss reached a run. The two implementations are
+// compared on a fixture instead.
+func sonamesMentionedNaive(root string, objects []string, index map[string]string) []string {
 	needles := make([][]byte, 0, len(index))
 	names := make([]string, 0, len(index))
 	for n := range index {

@@ -504,3 +504,18 @@ mechanisms — seed the new thread's slices on the way in.
 **Prove.** The sweep re-run with a row per class, the crash count at zero
 because each is a named refusal rather than a signal, and `libLLVM` either
 loading or its 605th constructor explained.
+
+⭐ **THE HARNESS NOW EXISTS: `experiments/93-host-object-residue.sh`**, written
+2026-09-02d. ⛔ **And writing it exposed something about the numbers above:**
+the 904-object sweep this entry is built on was **ad-hoc and never committed**,
+so `818 of 904`, `ok=818 fail=76 crash=10` and the 86 are quoted in four
+places with no command that reproduces them — which `docs/AGENTS.md` §0b
+forbids in a document, and which made T-068's own Prove impossible to carry
+out. 93- is one `timeout`ed fork per object, so a crash leaves the rest
+measurable, and it classifies **from the loader's own `el_err()` strings**
+rather than from an exit status, with anything it cannot classify printed
+rather than absorbed.
+
+⚠ **93- has not been RUN yet** — it was written while the test bed was
+occupied by `experiments/90-`. Until it runs, the counts in this entry remain
+the previous session's, uncorroborated.

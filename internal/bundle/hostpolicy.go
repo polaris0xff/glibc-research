@@ -146,8 +146,11 @@ func (p HostPolicy) Report() {
 // bundle's own paths so the ordering in docs/design/host-fallback.md holds.
 //
 // `have` reports whether the bundle carries a given relative path, so a class
-// the bundle does not have never claims to serve it.
-func (p HostPolicy) EnvLines(have func(rel string) bool) []string {
+// the bundle does not have never claims to serve it. `list` returns the file
+// names directly inside a relative directory, sorted, which libglvnd's
+// __EGL_VENDOR_LIBRARY_FILENAMES needs because it takes FILES and not a
+// directory.
+func (p HostPolicy) EnvLines(have func(rel string) bool, list func(rel string) []string) []string {
 	var out []string
 	add := func(f string, a ...any) { out = append(out, fmt.Sprintf(f, a...)) }
 
@@ -177,6 +180,41 @@ func (p HostPolicy) EnvLines(have func(rel string) bool) []string {
 		}
 		if have("share/glvnd/egl_vendor.d") {
 			add("__EGL_VENDOR_LIBRARY_DIRS=${SHARUN_DIR}/share/glvnd/egl_vendor.d")
+			// ⛔ AND FILENAMES, BECAUSE IT DOES NOT ADD TO DIRS — IT REPLACES
+			// IT. Read out of libglvnd's own `src/EGL/libeglvendor.c`
+			// (v1.7.0, `LoadVendors`) rather than assumed:
+			//
+			//     env = getenv("__EGL_VENDOR_LIBRARY_FILENAMES");
+			//     if (env != NULL) { ...load each token as a FILE...; return; }
+			//
+			// ⚠ The `return` is the whole point: if that variable is set at
+			// all, `__EGL_VENDOR_LIBRARY_DIRS` is never read. So a host that
+			// exports it — and some GL wrappers do — makes a bundle that sets
+			// only DIRS load the HOST's vendor JSONs and `dlopen` the host's
+			// libEGL_mesa, which is precisely the two-libc state this project
+			// exists to prevent, arrived at by a variable nobody set.
+			//
+			// ⛔ AND SETTING IT EMPTY WOULD BE WORSE, NOT SAFER: `getenv`
+			// returns a non-NULL empty string, so the branch is taken, no
+			// vendor is loaded, and the bundle has no EGL at all.
+			//
+			// ⭐ So it is set to the bundle's own vendor files, which is what
+			// scanning DIRS would have found anyway. A name that later goes
+			// missing costs that one vendor and nothing else: the same file
+			// makes `LoadVendorFromConfigFile` return NULL on an unreadable
+			// path and carry on.
+			if files := list("share/glvnd/egl_vendor.d"); len(files) > 0 {
+				var paths []string
+				for _, f := range files {
+					if !strings.HasSuffix(f, ".json") {
+						continue
+					}
+					paths = append(paths, "${SHARUN_DIR}/share/glvnd/egl_vendor.d/"+f)
+				}
+				if len(paths) > 0 {
+					add("__EGL_VENDOR_LIBRARY_FILENAMES=%s", strings.Join(paths, ":"))
+				}
+			}
 		}
 	} else {
 		// ⚠ Unset rather than pointed elsewhere. Naming a host directory here

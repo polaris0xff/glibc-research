@@ -612,9 +612,32 @@ func (b *Builder) integrity() {
 // closure can legitimately carry a manifest for a vendor it did not bundle.
 // What must not happen is that it goes unsaid.
 func (b *Builder) manifestIntegrity() {
+	n, outside, absent := CheckManifests(b.AppDir)
+	if n == 0 {
+		return
+	}
+	if len(outside) == 0 && len(absent) == 0 {
+		logx.Say("manifests   %d name only libraries present in the bundle", n)
+		return
+	}
+	for _, s := range outside {
+		logx.Warnf("a manifest still names a path OUTSIDE the bundle: %s", s)
+	}
+	for _, s := range absent {
+		logx.Warnf("a manifest names a library the bundle does not have: %s", s)
+	}
+}
+
+// CheckManifests is manifestIntegrity's measurement, separated from its
+// reporting so `pgb bundle manifests` asserts on the SAME code a build runs
+// rather than on a second implementation of the same rule.
+//
+// It returns how many manifests it read, the ones naming a path outside the
+// bundle, and the ones naming a library the bundle does not carry.
+func CheckManifests(appDir string) (n int, outside, absent []string) {
 	provided := map[string]bool{}
 	for _, d := range []string{"lib", "lib32"} {
-		entries, err := os.ReadDir(filepath.Join(b.AppDir, d))
+		entries, err := os.ReadDir(filepath.Join(appDir, d))
 		if err != nil {
 			continue
 		}
@@ -622,17 +645,15 @@ func (b *Builder) manifestIntegrity() {
 			provided[e.Name()] = true
 		}
 	}
-	var outside, absent []string
-	n := 0
 	for _, g := range manifestGlobs {
-		files, _ := filepath.Glob(filepath.Join(b.AppDir, g))
+		files, _ := filepath.Glob(filepath.Join(appDir, g))
 		for _, f := range files {
 			data, err := os.ReadFile(f)
 			if err != nil {
 				continue
 			}
 			n++
-			rel, _ := filepath.Rel(b.AppDir, f)
+			rel, _ := filepath.Rel(appDir, f)
 			// The same two forms librariesNamedInManifests reads: a JSON
 			// "library_path", and — for an OpenCL .icd, which is not JSON —
 			// one library per line.
@@ -659,21 +680,9 @@ func (b *Builder) manifestIntegrity() {
 			}
 		}
 	}
-	if n == 0 {
-		return
-	}
-	if len(outside) == 0 && len(absent) == 0 {
-		logx.Say("manifests   %d name only libraries present in the bundle", n)
-		return
-	}
 	sortStrings(outside)
 	sortStrings(absent)
-	for _, s := range outside {
-		logx.Warnf("a manifest still names a path OUTSIDE the bundle: %s", s)
-	}
-	for _, s := range absent {
-		logx.Warnf("a manifest names a library the bundle does not have: %s", s)
-	}
+	return n, outside, absent
 }
 
 func sortStrings(s []string) {

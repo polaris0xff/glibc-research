@@ -115,6 +115,62 @@ exp_note "A $(wc -c < "$A_IMG") bytes    B $(wc -c < "$B_IMG") bytes"
 exp_note "the difference is the GL stack: $(( ($(wc -c < "$A_IMG") - $(wc -c < "$B_IMG")) / 1024 / 1024 )) MiB"
 
 # ---------------------------------------------------------------------------
+# ⛔ DATA COHERENCE -- T-071's Prove, and the arm that would have caught all
+# four of its failures.
+# ---------------------------------------------------------------------------
+printf -- '\n-- the bundle'"'"'s DATA, not its DT_NEEDED graph -----------------\n'
+# ⛔ WHY THIS IS A SEPARATE ARM AND NOT PART OF THE RUN BELOW. Every other
+# check in this tree follows CODE: DT_NEEDED edges, traced opens, symbol
+# tables. EGL is not reached that way -- libglvnd reads a JSON file and
+# dlopens the string inside it -- so a bundle whose vendor JSON still names
+# `/nix/store/…` has every DT_NEEDED resolving, every file present, every
+# check green, and no EGL on the target. That is failure 3 of T-071's four,
+# and it shipped.
+#
+# ⭐ The verdict comes from `pgb bundle manifests`, which is the SAME code the
+# build runs -- internal/bundle.CheckManifests -- so this asserts on the
+# mechanism rather than on a shell re-implementation of it.
+A_APPDIR="$A_CACHE/eglinfo/AppDir"
+if [ ! -d "$A_APPDIR" ]; then
+  exp_skip "manifest coherence" "arm A's AppDir is not on disk at $A_APPDIR"
+else
+  "$BUNDLER" bundle manifests "$A_APPDIR" >"$B/manifests-A.log" 2>&1
+  _mst=$?
+  exp_check "arm A: every manifest names a library present in the bundle" \
+    "$([ "$_mst" -eq 0 ] && echo yes || echo no)" yes
+  sed 's/^/        /' "$B/manifests-A.log"
+
+  # ⛔ THE NEGATIVE CONTROL, AND WITHOUT IT THE ARM ABOVE IS WORTHLESS. A
+  # check that passes on a bundle where nothing is wrong has not shown it can
+  # see anything. One vendor JSON is put back the way nixpkgs ships it -- an
+  # absolute store path -- and the check must FAIL. Restored afterwards, and
+  # the restore is verified, because a control that damages the subject and
+  # leaves it damaged has broken every arm after it.
+  _vj=$(ls "$A_APPDIR"/share/glvnd/egl_vendor.d/*.json 2>/dev/null | head -1)
+  if [ -z "$_vj" ]; then
+    exp_skip "manifest coherence: the negative control" \
+      "arm A carries no EGL vendor JSON to un-rewrite"
+  else
+    cp "$_vj" "$B/vendor.json.orig"
+    sed 's|"library_path"[[:space:]]*:[[:space:]]*"\([^"/]*\)"|"library_path": "/nix/store/00000000000000000000000000000000-mesa/lib/\1"|' \
+      "$B/vendor.json.orig" > "$_vj"
+    if cmp -s "$B/vendor.json.orig" "$_vj"; then
+      exp_skip "manifest coherence: the negative control" \
+        "the JSON could not be un-rewritten, so the control proves nothing"
+    else
+      "$BUNDLER" bundle manifests "$A_APPDIR" >"$B/manifests-A-broken.log" 2>&1
+      _bst=$?
+      exp_check "an un-rewritten manifest is CAUGHT (the control)" \
+        "$([ "$_bst" -ne 0 ] && echo caught || echo missed)" caught
+      grep -m1 '^OUTSIDE' "$B/manifests-A-broken.log" | sed 's/^/        /'
+    fi
+    cp "$B/vendor.json.orig" "$_vj"
+    exp_check "the control restored the manifest it damaged" \
+      "$(cmp -s "$B/vendor.json.orig" "$_vj" && echo yes || echo no)" yes
+  fi
+fi
+
+# ---------------------------------------------------------------------------
 # The trace classifier, taken verbatim from experiments/62- for the same two
 # reasons its comment gives: strace splits a call across `vfork( <unfinished`
 # and `<... vfork resumed>) = N`, so matching on the call name alone drops

@@ -29,18 +29,24 @@ minutes. `./pgb bootstrap --detach` does all of it in parallel;
 `./pgb bootstrap --check` says when it is ready.
 
     make                            builds ./pgb, ~15 s
-    ./pgb selftest                  187 pass, 1 could not run (no zstd), exit 2
+    ./pgb selftest                  200 pass, 1 could not run (no zstd), exit 2
     make check                      selftests + both record gates, exits 0
     disk                            30 GiB free at session start
 
 ## In flight right now
 
-    (nothing running)
+    experiments/90- RUN 6, `aggressive`   log /var/tmp/exp90-run6-aggressive.log
+                                      ⛔ DO NOT KILL IT. Run 4 died that way.
+                                      ⚠ The SWEEP alone takes ~12 min of it.
 
     the trixie build environment      READY, glibc 2.41, full package list, at
                                       /var/lib/pgb-rootfs/pgb-env-debian-trixie
-    T-070 NSS probes                  BUILT against 2.41, not yet run:
-                                      /var/tmp/t070/debian-trixie/nss-{fix,plain}
+    a snapshot of the NAIVE-sweep pgb /var/tmp/pgb-naive-sweep, kept so the
+                                      sweep speedup has a before/after and an
+                                      equivalence check on a REAL bundle
+    written but NOT RUN               experiments/91- (glibc pin candidates),
+                                      experiments/93- (host-object residue),
+                                      experiments/85-'s new data-coherence arm
 
 ## ⭐ KDENLIVE IS VALIDATED — RUN 5, `safe`, exit 0, pass=8 fail=0 skip=1
 
@@ -63,7 +69,7 @@ competitor's 1 on each glibc row and **10 on rockylinux-8**.
 gated on `aggressive` (`internal/bundle/appimage.go`). Run 6 must set
 `PGB_APPIMAGE_DEBLOAT=aggressive`.
 
-⛔ **AND THE ARTEFACT CACHE IS KEYED ON THE BUNDLER'S MTIME, NOT ON THE BUILD
+⭐ **THE ARTEFACT CACHE NOW KEYS ON THE BUILD OPTIONS TOO** — it was keyed on
 OPTIONS** — so a re-run at `aggressive` would silently re-measure the `safe`
 artefact. That is the run-2 defect in a new costume. Fix it in
 `experiments/90-` before run 6.
@@ -129,10 +135,13 @@ rule reuses a non-empty artefact that is older than `./pgb`.
     T-070  P0  ⭐ VETO CLEARED and class B measured at both pins (above).
                ⛔ NOT YET: the NSS floor at 2.41 (probes built, bed was busy)
                and the ten POCs at 2.41. cfg.go is UNTOUCHED.
-    T-071  P0  EGL from a nixpkgs closure. ⭐ The half-fix is CLOSED: the
-               rewrite now iterates the sweep's own manifestGlobs, and
-               manifestIntegrity() is the first check in this tree that reads
-               DATA rather than DT_NEEDED. Items 3, 4 and 5 remain.
+    T-071  P0  ⭐ items 1, 2 and 5 DONE. The rewrite iterates the sweep's own
+               manifestGlobs; manifestIntegrity() is the first check here that
+               reads DATA rather than DT_NEEDED and it PASSED on the real
+               kdenlive bundle (`manifests 8 name only libraries present`);
+               __EGL_VENDOR_LIBRARY_FILENAMES is set, because libglvnd's own
+               source shows it REPLACES _DIRS. Items 3 and 4 remain, and
+               experiments/85-'s new arm is written but NOT RUN.
     T-068  P1  the loader residue, 86 of 904; crashes 30 -> 10 and the 10 are
                ONE family, large C++ libraries. libLLVM dies in the 605th
                static constructor.

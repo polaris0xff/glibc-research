@@ -6,7 +6,7 @@ and the entries.
     STATE     2026-09-02c
     COUNTS    45 entries, 20 open, 25 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
-              CI: GREEN; selftests 187 pass, 1 could not run (no zstd)
+              CI: GREEN; selftests 200 pass, 1 could not run (no zstd)
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
     NEW       ⭐ GATE 5 IS COMPLETE — ten of ten POCs and twenty-three
               experiments, every row measured. T-061's last gap is closed.

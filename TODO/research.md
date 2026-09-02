@@ -790,16 +790,26 @@ and every rewrite is a place the format can change under us.
 
 **What this entry owns.**
 
-1. ⭐ **A control for the rewrites.** Today `icdLibraryPath` is one regexp over
-   two globs and nothing asserts the result LOADS. A bundle whose JSON still
-   names a store path passes every gate in the tree. The control is: after
-   bundling, no manifest may name a path outside the bundle, and every library
-   a manifest names must exist in it.
-2. ⛔ **The layer manifests are unhandled.** `implicit_layer.d` and
-   `explicit_layer.d` carry `library_path` too and were not in the rewrite
-   globs — they are in the SWEEP's globs now, which means the sweep keeps a
-   library whose manifest still points at `/nix/store`. ⚠ Half-fixed is worse
-   than neither: the library survives and the path is still wrong.
+1. ⭐ **A control for the rewrites.** ✅ **DONE 2026-09-02d.**
+   `internal/bundle.CheckManifests` is the measurement — no manifest may name a
+   path outside the bundle, and every library a manifest names must exist in
+   it. It runs in the build as `manifestIntegrity()` (a report, like
+   `integrity()`, because a closure may legitimately carry a manifest for a
+   vendor it did not bundle) and is exposed as **`pgb bundle manifests
+   APPDIR`**, which exits non-zero, so `experiments/85-` can assert on it.
+   ⛔ **With the negative control the Prove asks for**: one vendor JSON is put
+   back the way nixpkgs ships it and the check must FAIL, then the damage is
+   restored and the restore itself is asserted.
+   ⭐ **This is the first check in this tree that reads DATA rather than
+   DT_NEEDED**, which is the whole shape of T-071's four failures.
+2. ⛔ **The layer manifests are unhandled.** ✅ **DONE 2026-09-02d.** The
+   rewrite now iterates the SWEEP's own `manifestGlobs` instead of a second
+   hand-written list, so the two rules cannot disagree about which files
+   matter, and it handles the OpenCL `.icd` form — one library per line, not
+   JSON — which neither side read before. The selftest generates its fixture
+   **from `manifestGlobs`**, so a glob added to the list gets an assertion
+   automatically; a second hand-maintained list would be this same defect one
+   level up.
 3. **Size.** The GL stack is **95 MiB of a 163 MB bundle** (`experiments/85-`),
    because nixpkgs' mesa is 273 MB unstripped and the Anylinux flow ships a
    debloated one. Folds into T-066's "where the closure comes from".
@@ -807,9 +817,33 @@ and every rewrite is a place the format can change under us.
    bundled. ⚠ Untested against nixpkgs' libglvnd, which is the dispatcher that
    would have to find a host vendor while its own vendors are bundled. The
    `PGB_HOST_MESA` opt-in is likewise implemented and unexercised.
-5. ⛔ **`__EGL_VENDOR_LIBRARY_DIRS` vs `__EGL_VENDOR_LIBRARY_FILENAMES`.** The
-   bundle sets the first; the second overrides it and is what a host
-   configuration may already have set. Nothing clears or honours it.
+5. ⛔ **`__EGL_VENDOR_LIBRARY_DIRS` vs `__EGL_VENDOR_LIBRARY_FILENAMES`.**
+   ✅ **DONE 2026-09-02d, and the semantics were READ rather than assumed** —
+   libglvnd v1.7.0 `src/EGL/libeglvendor.c`, `LoadVendors()`:
+
+   ```c
+   env = getenv("__EGL_VENDOR_LIBRARY_FILENAMES");
+   if (env != NULL) { ...load each token as a FILE...; return; }
+   ```
+
+   ⛔ **The `return` is the finding.** FILENAMES does not add to DIRS, it
+   REPLACES it: if it is set at all, `__EGL_VENDOR_LIBRARY_DIRS` is never
+   read. So a host that exports it makes a bundle setting only DIRS load the
+   **host's** vendor JSONs and `dlopen` the host's `libEGL_mesa` — the
+   two-libc state this project exists to prevent, arrived at through a
+   variable nobody in the bundle set.
+
+   ⚠ **And "just set it empty" would have been worse, not safer**, which is
+   exactly why this was worth reading instead of guessing: `getenv` returns a
+   non-NULL empty string, the branch is taken, no vendor is loaded, and the
+   bundle has no EGL at all.
+
+   The bundle now sets it to its own vendor files — what scanning DIRS would
+   have found anyway — and **releases it under `PGB_HOST_MESA`**, where
+   pinning it would make the opt-in do the opposite of what it says. Four
+   selftest assertions including two negatives: a non-JSON file in the same
+   directory must not reach the list, and a bundle with no vendor directory
+   must leave the variable unset rather than set-and-empty.
 
 **⚠ What this entry CANNOT settle here, and it must not be closed by silence.**
 Every GL row in this tree is `swrast` — this machine has no GPU and none of the
@@ -822,3 +856,10 @@ manifest in the bundle, the library it names resolves INSIDE the bundle, and no
 manifest names a path outside it — asserted, on a bundle built by `pgb bundle
 appimage`, with a negative control that a deliberately un-rewritten manifest
 fails it.
+
+⭐ **The arm is WRITTEN (2026-09-02d)** — `experiments/85-`, four assertions
+including the negative control and a check that the control restored what it
+damaged. ⛔ **It has not been RUN yet**, because arm A is a `mesa-demos` bundle
+and the build bed was occupied by `experiments/90-`; until it runs this entry
+has a mechanism and not a measurement, which is the distinction
+`docs/AGENTS.md` §0b exists for.

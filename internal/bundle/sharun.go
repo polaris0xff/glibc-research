@@ -199,7 +199,20 @@ func (b *Builder) writeEnv() error {
 	// per-class opt-ins: docs/design/host-fallback.md, TODO T-065. Before this
 	// the bundle set only its own paths and could never reach the host's
 	// NVIDIA driver, which is the one thing it must never bundle.
-	lines = append(lines, b.Host.EnvLines(have)...)
+	list := func(rel string) []string {
+		entries, err := os.ReadDir(filepath.Join(b.AppDir, rel))
+		if err != nil {
+			return nil
+		}
+		var out []string
+		for _, e := range entries {
+			if !e.IsDir() {
+				out = append(out, e.Name())
+			}
+		}
+		return out
+	}
+	lines = append(lines, b.Host.EnvLines(have, list)...)
 
 	lines = append(lines, b.liftWrapperEnv()...)
 	lines = append(lines, b.carryBakedPaths()...)
