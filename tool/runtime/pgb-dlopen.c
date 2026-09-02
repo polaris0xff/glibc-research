@@ -154,6 +154,17 @@ static const struct pgb_dl_lib *pgb_find(const char *path)
 static void *pgb_elf_handles[PGB_ELF_HANDLES];
 static int   pgb_elf_nhandles;
 
+/* ⛔ IS THE LOADER IN THIS LINK AT ALL. `--wrap-dlopen` links this file without
+ * pgb-elfload.o -- a program loading its OWN plugins needs no loader, and
+ * linking one would drag in the provider table with it. The loader's entry
+ * points are therefore WEAK (pgb-elfload.h), so their addresses are 0 here and
+ * the address must be tested BEFORE the call: calling through a weak-undefined
+ * function is a jump to NULL, not a "no". */
+static int pgb_elf_linked(void)
+{
+    return &pgb_elf_available != 0 && pgb_elf_available();
+}
+
 static void pgb_elf_remember(void *h)
 {
     int i;
@@ -203,7 +214,7 @@ void *__wrap_dlopen(const char *path, int flags)
      * every symbol in it. The loader is for objects that are NOT in the link,
      * which is exactly what a HOST plugin is. */
     if (&pgb_dlopen_libs[0] == NULL) {
-        if (pgb_elf_available() && path != NULL)
+        if (pgb_elf_linked() && path != NULL)
             return pgb_elf_open(path, flags);
         pgb_dl_err = "pgb: no plugin table was compiled in "
                      "(build with --wrap-dlopen or --host-dlopen)";
@@ -223,7 +234,7 @@ void *__wrap_dlopen(const char *path, int flags)
         if (l == NULL) {
             /* Not one of this build's own plugins. With --host-dlopen the
              * compiled-in loader gets it; without, the message is unchanged. */
-            if (pgb_elf_available())
+            if (pgb_elf_linked())
                 return pgb_elf_open(path, flags);
             pgb_dl_err = "pgb: no such plugin in the compiled-in table";
             return NULL;

@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/polaris0xff/glibc-research/internal/fail"
@@ -84,6 +85,14 @@ type Config struct {
 	WrapDlopen    []string
 	HostDlopen    bool
 
+	// TLSReserve is --tls-reserve: bytes of the executable's OWN thread-local
+	// storage set aside for initial-exec TLS in objects --host-dlopen loads.
+	// ⛔ Zero by default because EVERY THREAD pays for it whether or not
+	// anything is dlopen'd. glibc's own surplus -- ~3,168 bytes of headroom,
+	// measured -- is a constant that cannot be enlarged, so this is the only
+	// place a module wanting more than that can be put. T-072 route D.
+	TLSReserve int
+
 	// SharedWrappers reproduces the pre-T-058 single wrapper directory. Only
 	// experiments/87- sets it; nothing in pgb does.
 	SharedWrappers bool
@@ -114,6 +123,7 @@ func Load(self string) *Config {
 		ExtraBinds:    strings.Fields(os.Getenv("PGB_OPT_BINDS")),
 		WrapDlopen:    strings.Fields(os.Getenv("PGB_OPT_WRAP_DLOPEN")),
 		HostDlopen:    logx.EnvBool("PGB_OPT_HOST_DLOPEN", false),
+		TLSReserve:    envInt("PGB_OPT_TLS_RESERVE", 0),
 
 		SharedWrappers: os.Getenv("PGB_T058_SHARED_WRAPPERS") != "",
 	}
@@ -139,6 +149,7 @@ var OptVars = []string{
 	"PGB_OPT_VERBOSE", "PGB_OPT_EMBED_LOCALE", "PGB_OPT_EMBED_CACERT",
 	"PGB_OPT_EMBED_TERMINFO", "PGB_OPT_USE_ICONV", "PGB_OPT_BASELINE",
 	"PGB_OPT_BINDS", "PGB_OPT_WRAP_DLOPEN", "PGB_OPT_HOST_DLOPEN",
+	"PGB_OPT_TLS_RESERVE",
 	"PGB_STATE", "PGB_LIBICONV_PREFIX", "PGB_T058_SHARED_WRAPPERS",
 	"PGB_LOG", "PGB_DEBUG", "PGB_TS", "PGB_TS_COLUMNS", "PGB_TS_HEARTBEAT",
 }
@@ -156,6 +167,7 @@ func (c *Config) Export() {
 	set("PGB_OPT_BINDS", strings.Join(c.ExtraBinds, " "))
 	set("PGB_OPT_WRAP_DLOPEN", strings.Join(c.WrapDlopen, " "))
 	set("PGB_OPT_HOST_DLOPEN", bit(c.HostDlopen))
+	set("PGB_OPT_TLS_RESERVE", strconv.Itoa(c.TLSReserve))
 	set("PGB_STATE", c.State)
 	set("PGB_LIBICONV_PREFIX", c.LibiconvPrefix)
 	if spec := logx.SubsysSpec(); spec != "" {
@@ -346,6 +358,21 @@ func envOr(name, def string) string {
 		return v
 	}
 	return def
+}
+
+// envInt reads a non-negative integer setting. ⚠ An unparsable or negative
+// value falls back to the default rather than failing: Load has no way to
+// report, and the flag path is where a bad value is rejected out loud.
+func envInt(name string, def int) int {
+	v, ok := os.LookupEnv(name)
+	if !ok || v == "" {
+		return def
+	}
+	n, err := strconv.Atoi(v)
+	if err != nil || n < 0 {
+		return def
+	}
+	return n
 }
 
 func fieldsOr(name string, def []string) []string {

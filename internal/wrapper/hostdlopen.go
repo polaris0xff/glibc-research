@@ -132,8 +132,16 @@ func (b *Builder) buildProviderTable(rd, src string) error {
 		"-O2", "-fno-builtin", "-w"); err != nil {
 		return err
 	}
-	if err := b.compileIfStale(src, "pgb-elfload.c",
-		filepath.Join(rd, "pgb-elfload.o"), "-O2"); err != nil {
+	// ⛔ THE RESERVE SIZE IS IN THE OBJECT'S NAME, and it has to be.
+	// compileIfStale compares mtimes and nothing else -- it does not know what
+	// flags produced the object -- and Dir() is keyed on the compiler's
+	// identity plus the asset digest, not on the build options. So two builds
+	// differing only in --tls-reserve would share one pgb-elfload.o and the
+	// second would silently get the first's reserve. That is the artefact-cache
+	// defect this tree has already paid for once; a distinct path per size
+	// makes the mtime rule correct instead of working around it.
+	if err := b.compileIfStale(src, "pgb-elfload.c", elfloadObj(rd, b.C.TLSReserve),
+		"-O2", fmt.Sprintf("-DPGB_TLS_RESERVE=%d", b.C.TLSReserve)); err != nil {
 		return err
 	}
 	// pgb-dlopen.o carries the --wrap entry points and falls through to the
@@ -149,12 +157,22 @@ func (b *Builder) buildProviderTable(rd, src string) error {
 // libresolv.a, libanl.a and the rest, and a single-pass linker resolves each
 // archive where it appears. Without --start-group the first full table failed
 // the link on 40-odd sunrpc and resolver names.
-func hostDlopenLinkFlags(rd string) []string {
+// elfloadObj is where the loader object for one reserve size lives. The size is
+// part of the name so the mtime-based staleness check cannot serve an object
+// built for a different reserve.
+func elfloadObj(rd string, reserve int) string {
+	if reserve == 0 {
+		return filepath.Join(rd, "pgb-elfload.o")
+	}
+	return filepath.Join(rd, fmt.Sprintf("pgb-elfload-tls%d.o", reserve))
+}
+
+func hostDlopenLinkFlags(rd string, reserve int) []string {
 	if _, err := os.Stat(filepath.Join(rd, "pgb-provider-table.o")); err != nil {
 		return nil
 	}
 	return []string{
-		filepath.Join(rd, "pgb-elfload.o"),
+		elfloadObj(rd, reserve),
 		filepath.Join(rd, "pgb-provider-table.o"),
 		"-Wl,@" + filepath.Join(rd, "pgb-provider-u.rsp"),
 		"-Wl,--start-group",

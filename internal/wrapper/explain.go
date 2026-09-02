@@ -147,6 +147,19 @@ LINK FLAGS
   -Wl,--start-group ...          the -u names span libresolv.a, libanl.a and
                                  the rest; a single-pass link needs the group
 `)
+		// ⭐ Printed whether or not a reserve was asked for, because zero is
+		// the interesting value: it is what makes a large module's refusal
+		// "the surplus is a constant" rather than a defect.
+		fmt.Fprintf(w, `  -DPGB_TLS_RESERVE=%d%s
+                                 bytes of THIS binary's own thread-local
+                                 storage set aside for initial-exec TLS in
+                                 loaded objects. glibc's surplus is a constant
+                                 -- measured 3,168 bytes of headroom, and
+                                 padding the executable moves size and used
+                                 together, so it cannot be enlarged. 2 of 904
+                                 host objects want more; one wants 56,248.
+                                 ⚠ EVERY thread pays for it: default 0
+`, c.TLSReserve, map[bool]string{true: "", false: "  (--tls-reserve)"}[c.TLSReserve > 0])
 	}
 
 	w.WriteString(`

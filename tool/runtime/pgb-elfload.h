@@ -41,22 +41,50 @@ extern const struct pgb_provider_sym pgb_provider_syms[] __attribute__((weak));
  * is what keeps a second libc from entering the process. NULL-terminated. */
 extern const char *const pgb_provider_sonames[] __attribute__((weak));
 
+/* ⛔ WEAK, AND WITHOUT IT `--wrap-dlopen` ALONE DOES NOT LINK.
+ *
+ * pgb-dlopen.c is linked by BOTH opt-ins: `--wrap-dlopen`, for a program's own
+ * plugins, and `--host-dlopen`, which adds the loader. pgb_elf_available()
+ * below exists precisely so the first can be built WITHOUT the second -- but
+ * a strong undefined reference fails the link before that check ever runs.
+ *
+ * ⚠ IT LOOKED LIKE IT WORKED for as long as the two were built in that order.
+ * The runtime objects are cached in a directory keyed on the COMPILER, so a
+ * previous --host-dlopen build left pgb-elfload.o there and a later
+ * --wrap-dlopen build linked it by name. Change compiler -- which is what
+ * moving the pin does -- and the same POC fails with five undefined
+ * references. Caught by poc/70-sqlite-extensions and poc/80-mlt against
+ * pgb-env-debian-trixie, on the first build in a fresh runtime directory.
+ *
+ * ⚠ PGB_ELFLOAD_IMPL keeps the DEFINITIONS strong: a weak definition would
+ * let anything else in the link silently replace the loader.
+ */
+#ifdef PGB_ELFLOAD_IMPL
+#define PGB_ELF_WEAK
+#else
+#define PGB_ELF_WEAK __attribute__((weak))
+#endif
+
 /* The loader. pgb-dlopen.c calls these after its own compiled-in plugin table
  * misses; nothing else should. Returns NULL / sets the error string. */
-void       *pgb_elf_dlopen(const char *path, int flags);
-void       *pgb_elf_dlsym(void *handle, const char *name);
-int         pgb_elf_dlclose(void *handle);
-const char *pgb_elf_dlerror(void);
+void       *pgb_elf_dlopen(const char *path, int flags) PGB_ELF_WEAK;
+void       *pgb_elf_dlsym(void *handle, const char *name) PGB_ELF_WEAK;
+int         pgb_elf_dlclose(void *handle) PGB_ELF_WEAK;
+const char *pgb_elf_dlerror(void) PGB_ELF_WEAK;
 
 /* ⭐ solo's mechanism 5: make "what did this binary satisfy internally"
  * observable from INSIDE, beside the syscall trace pgb verify takes from
  * outside. Two independent instruments on the same question. Writes an
  * ldd-format listing to fd, including names served WITHOUT a mapping. */
-void pgb_elf_trace_loaded(int fd);
+void pgb_elf_trace_loaded(int fd) PGB_ELF_WEAK;
 
 /* Non-zero once a provider table is compiled in and non-empty. pgb-dlopen.c
  * uses it to decide whether falling through is even possible, so that a build
- * without the loader keeps its existing honest error instead of a new one. */
-int pgb_elf_available(void);
+ * without the loader keeps its existing honest error instead of a new one.
+ *
+ * ⛔ Call it through pgb_elf_linked() in pgb-dlopen.c, never directly: when
+ * the loader is not linked this symbol's address is 0, and calling through it
+ * is a jump to NULL rather than a "no". */
+int pgb_elf_available(void) PGB_ELF_WEAK;
 
 #endif /* PGB_ELFLOAD_H */

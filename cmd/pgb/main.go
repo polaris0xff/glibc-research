@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/polaris0xff/glibc-research/internal/cfg"
@@ -83,6 +84,13 @@ OPTIONS (build)
                              already in the binary. The host's ld.so is never
                              consulted and no second libc enters the process.
                              For programs that load somebody ELSE's plugins
+  --tls-reserve BYTES        set aside BYTES of the binary's OWN thread-local
+                             storage for initial-exec TLS in objects
+                             --host-dlopen loads. glibc's own surplus is a
+                             constant (~3,168 bytes of headroom, measured) and
+                             cannot be enlarged, so this is the only place a
+                             larger module fits. Default 0: EVERY thread pays
+                             for it, dlopen or not
   --engine chroot|docker|podman|host
 
 DIAGNOSTICS
@@ -199,6 +207,18 @@ func (p *parser) option(a string) (bool, error) {
 		}
 	case "--host-dlopen":
 		p.c.HostDlopen = true
+	case "--tls-reserve":
+		// ⛔ Rejected out loud here, unlike the environment path, because a
+		// caller who typed a size meant it and a silent fallback to zero would
+		// look exactly like a reserve that did not help.
+		if v, err = p.value(a); err == nil {
+			n, cerr := strconv.Atoi(v)
+			if cerr != nil || n < 0 {
+				err = fail.Cannot("--tls-reserve wants a non-negative byte count, got %q", v)
+			} else {
+				p.c.TLSReserve = n
+			}
+		}
 	case "--engine":
 		if v, err = p.value(a); err == nil {
 			p.engine = v

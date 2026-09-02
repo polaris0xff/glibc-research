@@ -82,7 +82,7 @@ func LinkFlags(c *cfg.Config, rd string, cxx bool) []string {
 	// which is the order that keeps a program's own plugins from being mapped
 	// when they are already in the link.
 	if c.HostDlopen {
-		if flags := hostDlopenLinkFlags(rd); flags != nil {
+		if flags := hostDlopenLinkFlags(rd, c.TLSReserve); flags != nil {
 			if len(c.WrapDlopen) == 0 {
 				out = append(out, "-Wl,--wrap=dlopen,--wrap=dlsym,--wrap=dlclose,--wrap=dlerror",
 					filepath.Join(rd, "pgb-dlopen.o"))

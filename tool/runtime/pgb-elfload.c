@@ -72,6 +72,7 @@
 
 #define _GNU_SOURCE
 
+#define PGB_ELFLOAD_IMPL 1
 #include "pgb-elfload.h"
 
 #include <elf.h>
@@ -718,6 +719,94 @@ extern size_t _dl_tls_static_used  __attribute__((weak));
 extern size_t _dl_tls_static_size  __attribute__((weak));
 extern size_t _dl_tls_static_align __attribute__((weak));
 
+/* ⭐ T-072 ROUTE D -- OUR OWN RESERVE, and it exists because the surplus above
+ * is a CONSTANT. Measured on this build host with a static probe read twice,
+ * the only difference being a padding array in the probe's own PT_TLS:
+ *
+ *     no pad      size=3264   used=96      headroom=3168
+ *     64 KiB pad  size=68864  used=65648   headroom=3216   pad at tp-65616
+ *
+ * ⛔ So padding the executable raises _dl_tls_static_size AND _used together:
+ * the headroom moves by 48 bytes, which is alignment rounding. Route B --
+ * "make the surplus bigger by padding" -- is refuted by that pair of numbers.
+ *
+ * ⭐ But the pad IS allocated, in every thread, at a stable offset from the
+ * thread pointer; it is merely accounted as `used` rather than as surplus. So
+ * a loader that hands out slices of its OWN __thread array gets exactly what
+ * it reserved. Two of 904 host objects want more than the surplus and one
+ * wants 56,248 bytes, which a 64 KiB reserve serves and 3,168 never can.
+ *
+ * ⚠ EVERY THREAD PAYS FOR IT whether or not anything is ever dlopen'd, which
+ * is why the default is ZERO and the size is a build option
+ * (`pgb build --host-dlopen --tls-reserve=N`). Not reserved unless asked for.
+ *
+ * ⭐ And it removes a dependency rather than adding one: placing a module here
+ * needs none of the three glibc internals above. They stay only for
+ * el_tls_bookkeeping_sane()'s cross-check and for the fallback path.
+ */
+#ifndef PGB_TLS_RESERVE
+#define PGB_TLS_RESERVE 0
+#endif
+/* The reserve's own alignment bounds the module p_align it can promise. 64 is
+ * the largest observed across the 904-object sweep; a module wanting more is
+ * declined here and falls back to the surplus rather than being handed storage
+ * that does not meet its stated alignment. */
+#ifndef PGB_TLS_RESERVE_ALIGN
+#define PGB_TLS_RESERVE_ALIGN 64
+#endif
+
+#if PGB_TLS_RESERVE > 0
+static __thread unsigned char el_tls_reserve[PGB_TLS_RESERVE]
+    __attribute__((aligned(PGB_TLS_RESERVE_ALIGN)));
+/* ⚠ NOT __thread. Which slice a module owns is a decision about the PROCESS:
+ * the offset from the thread pointer is the same in every thread, because
+ * el_tls_reserve is one __thread object in the executable's own PT_TLS and the
+ * ABI gives it the same tp-relative address in every thread. Making this
+ * per-thread would hand the same module a different offset per thread, which
+ * is the silent wrong answer this loader exists to avoid.
+ *
+ * ⚠ Unlocked, exactly as the _dl_tls_static_used path beside it is: this
+ * loader has no mutex anywhere and concurrent dlopen is not claimed. */
+static size_t el_tls_reserve_used;
+#endif
+
+/* Place o in our own reserve. 0 = placed, 1 = no reserve or it does not fit,
+ * so the caller falls back to glibc's surplus. */
+static int el_tls_from_reserve(struct el_obj *o)
+{
+#if PGB_TLS_RESERVE > 0
+    size_t align = o->tls_align ? o->tls_align : 1;
+    size_t off;
+    unsigned char *p;
+
+    if (align > PGB_TLS_RESERVE_ALIGN)
+        return 1;
+    off = (el_tls_reserve_used + align - 1) & ~(align - 1);
+    /* ⛔ Compared as a sum that cannot wrap: off and tls_memsz are both
+     * bounded by the object's own headers, and PGB_TLS_RESERVE is a literal. */
+    if (off > (size_t)PGB_TLS_RESERVE || o->tls_memsz > (size_t)PGB_TLS_RESERVE - off)
+        return 1;
+    p = el_tls_reserve + off;
+    o->tls_tpoff = (long)((char *)p - (char *)el_tp());
+    /* The reserve is below the thread pointer like every other static TLS
+     * block; a non-negative offset would mean the layout is not what this
+     * loader believes and the module must not be placed. */
+    if (o->tls_tpoff >= 0) {
+        o->tls_tpoff = 0;
+        return 1;
+    }
+    el_tls_reserve_used = off + o->tls_memsz;
+    if (o->tls_filesz)
+        memcpy(p, o->tls_image, o->tls_filesz);
+    if (o->tls_memsz > o->tls_filesz)
+        memset(p + o->tls_filesz, 0, o->tls_memsz - o->tls_filesz);
+    return 0;
+#else
+    (void)o;
+    return 1;
+#endif
+}
+
 /* Place o's TLS block in the surplus, once. Returns 0 and sets o->tls_tpoff.
  *
  * ⚠ THE HONEST LIMIT, AND IT IS ABOUT THREADS, NOT ABOUT SPACE. glibc gives
@@ -780,6 +869,16 @@ static int el_static_tls(struct el_obj *o)
 
     if (o->tls_tpoff)
         return 0;
+    if (!o->tls_memsz) {
+        el_err("pgb-elfload: %s: initial-exec TLS but no PT_TLS segment",
+               o->soname);
+        return -1;
+    }
+    /* ⭐ OUR OWN RESERVE FIRST, because it needs none of glibc's internals and
+     * is the only place large modules fit. Zero-sized unless the build asked
+     * for one, in which case this returns 1 and nothing below changes. */
+    if (el_tls_from_reserve(o) == 0)
+        return 0;
     if (&_dl_tls_static_used == NULL || &_dl_tls_static_size == NULL) {
         el_err("pgb-elfload: %s: glibc's static-TLS bookkeeping is not linked "
                "in, so initial-exec TLS cannot be placed", o->soname);
@@ -794,11 +893,6 @@ static int el_static_tls(struct el_obj *o)
                (long)((char *)&errno - (char *)el_tp()));
         return -1;
     }
-    if (!o->tls_memsz) {
-        el_err("pgb-elfload: %s: initial-exec TLS but no PT_TLS segment",
-               o->soname);
-        return -1;
-    }
     align = o->tls_align ? o->tls_align : 1;
     if ((uintptr_t)el_tp() % align) {
         el_err("pgb-elfload: %s: PT_TLS wants %zu-byte alignment and the "
@@ -808,9 +902,13 @@ static int el_static_tls(struct el_obj *o)
     used    = _dl_tls_static_used;
     newused = (used + o->tls_memsz + align - 1) & ~(align - 1);
     if (newused > _dl_tls_static_size) {
+        /* ⭐ The message names the fix, because there is one now: the surplus
+         * is a constant and cannot be enlarged, but a reserve of our own can
+         * be asked for at build time. */
         el_err("pgb-elfload: %s: static TLS surplus exhausted -- needs %zu "
-               "bytes, %zu of %zu used", o->soname, o->tls_memsz, used,
-               (size_t)_dl_tls_static_size);
+               "bytes, %zu of %zu used (reserve is %zu; build with "
+               "--tls-reserve N for more)", o->soname, o->tls_memsz, used,
+               (size_t)_dl_tls_static_size, (size_t)PGB_TLS_RESERVE);
         return -1;
     }
     _dl_tls_static_used = newused;

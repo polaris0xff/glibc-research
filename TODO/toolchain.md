@@ -1801,18 +1801,72 @@ measurement had an unquoted shell variable, read a trace file that did not
 exist, and printed `none` for every arm. `experiments/21-` supplies the arm that
 can fail, on the same target and the same method, and it fires.
 
-**⛔ What is NOT yet measured, and the ruling waits on it.**
+### ⛔ ARM 5, 2026-09-02e — and the first thing it found was OUR bug, not glibc's
 
-| | |
-|---|---|
-| the ten POCs at 2.41 | `pgb-env-debian-trixie` exists and carries the full package list; ⚠ a newer glibc deprecates as well as adds, and **gcc goes 12.2.0 → 14.2.0** with it, which is the larger of the two changes and the one likelier to reject old source |
+⚠ **The recipe this entry carried did not measure the candidate at all.**
+`PGB_ENV_NAME=pgb-env-debian-trixie sh poc/<name>/run.sh` builds against the
+**incumbent** on a machine running dockerd, and nothing in a POC's output says
+which glibc it used. Caught by reading `.comment` out of the binary the POC had
+just produced: `GCC: (Debian 12.2.0-14+deb12u1)` where the candidate carries
+14.2.0. Commit 333cb92f; arm 5 now asserts the `.comment` of every POC binary
+against the environment's own recorded gcc, so the arm cannot pass for the
+wrong environment again.
 
-⛔ **So the pin has NOT moved and `cfg.go` is untouched.** Three of the four
-measurable costs have come back at zero — the kernel floor did not move, class
-C is empty on every row at both pins, and the NSS floor holds — so the move is
-**indicated**. ⚠ "Indicated" is not "measured": the POC row is what stands
-between them, and it is the row where a toolchain two major gcc versions newer
-is most likely to say no.
+⭐ **Then, with the environment actually selected, gcc 14.2.0 / glibc 2.41
+rejected no source at all** on the first six:
+
+    POC                    OUTCOME   GCC IN .comment
+    10-gawk                ok        14.2.0
+    20-nano                ok        14.2.0
+    30-curl                ok        14.2.0     (OpenSSL + zlib)
+    40-jq                  ok        14.2.0     (oniguruma)
+    50-python              ok        14.2.0     (CPython 3.12.7, 49 modules)
+    60-leveldb             ok        14.2.0     (C++, CMake)
+    70-sqlite-extensions   ⛔ exit 1  unread     -- see below
+    80-mlt                 ⛔ exit 1  unread     -- the same cause
+
+⛔ **AND THE TWO FAILURES ARE `pgb`'s, NOT the pin's.** Both died at the LINK
+with five undefined references — `pgb_elf_dlopen`, `pgb_elf_dlsym`,
+`pgb_elf_dlclose`, `pgb_elf_dlerror`, `pgb_elf_available`:
+
+    ld: .../pgb-dlopen.o: in function `pgb_elf_open':
+        pgb-dlopen.c: undefined reference to `pgb_elf_dlopen'
+
+`--wrap-dlopen` links `pgb-dlopen.o`, which falls through to the ELF loader;
+`pgb-elfload.o` is compiled and linked **only** under `--host-dlopen`.
+`pgb_elf_available()` exists so the first can be built without the second — its
+own comment says *"so that a build without the loader keeps its existing honest
+error"* — but a **strong** undefined reference fails the link before that check
+can run.
+
+⭐ **It looked like it worked for as long as the two were built in that order.**
+The runtime objects are cached in a directory keyed on the COMPILER's identity,
+so an earlier `--host-dlopen` build left `pgb-elfload.o` there and every later
+`--wrap-dlopen` build linked it by name. **Change compiler — which is exactly
+what moving the pin does — and the directory is new and empty.** Verified by
+looking: the trixie runtime directory holds `pgb-dlopen.o` and no
+`pgb-elfload.o` at all.
+
+⚠ **This is the second time today a cached artefact made a build succeed for a
+reason nobody intended**, and it is the same shape as PROGRESS.md finding 1.
+⛔ **It also nearly produced the wrong ruling**: read at face value, arm 5 said
+"the pin move breaks 2 of 10 POCs", which would have blocked a move whose four
+measured costs are all zero.
+
+**Fixed** by making the loader's five entry points weak (`pgb-elfload.h`) and
+testing the address before the call (`pgb_elf_linked()` in `pgb-dlopen.c`).
+Proved in a FRESH runtime directory, which is the condition that failed:
+
+    --wrap-dlopen alone, empty runtime dir   app links, plug_answer=42, exit 0
+    pgb-elfload.o in that directory          absent -- it linked WITHOUT it
+    --host-dlopen, rebuilt after the fix     still loads, still refuses at 0
+
+⛔ **So the pin has NOT moved and `cfg.go` is untouched.** ⭐ **Six of the ten
+POCs now BUILD AND RUN at 2.41**, verified per binary rather than per exit
+status, and the four measurable costs are still zero. ⚠ The remaining four —
+`70-sqlite-extensions`, `80-mlt`, `90-qt`, `91-qt-xcb` — are **not measured at
+2.41**: two were blocked by the link bug above and are to be re-run now that it
+is fixed. ⛔ **Six is not ten and the ruling waits for ten.**
 
 ---
 
@@ -1896,11 +1950,55 @@ is the opposite of true.
 today, 3,176 recorded previously. Where a number is quoted, that is the one to
 quote.
 
-⛔ **D IS DESIGNED AND MEASURED, NOT IMPLEMENTED.** `pgb-elfload.c` is
-unchanged: what exists is the probe above and the reading of it. ⚠ Landing D
-means a new `__thread` reserve, a flag to size it, and `experiments/76-` re-run
-across eleven environments — and this entry stays P1, so it waits behind the
-P0s rather than being half-done in front of them.
+### ⭐ IMPLEMENTED 2026-09-02e — `--tls-reserve N`, and the control fails the right way
 
-**Prove.** The surplus measured before and after, and the two objects that
-fail today either loading or refused with the number they needed.
+`tool/runtime/pgb-elfload.c` now allocates initial-exec TLS out of its own
+`__thread` array first and falls back to glibc's surplus. The size is
+`pgb build --host-dlopen --tls-reserve N`, **default 0** — every thread pays
+for the reserve whether or not anything is ever `dlopen`'d.
+
+**The subject** is a shared object whose initial-exec `PT_TLS` is
+`memsz 0xdbb8 = 56,248` bytes — the size the one real host object in the T-068
+sweep wanted — and a probe that `dlopen`s it and calls into it:
+
+    ARM  BUILT WITH                       RESULT
+    A    --host-dlopen                    ⛔ REFUSED, exit 1:
+                                          "static TLS surplus exhausted --
+                                           needs 56248 bytes, 240 of 3456 used
+                                           (reserve is 0)"
+    B    --host-dlopen --tls-reserve 65536  ⭐ loaded, bigtls_touch(7)=1
+    C    --host-dlopen --tls-reserve 1024   ⛔ REFUSED, and did NOT overflow:
+                                          "needs 56248 bytes, 1280 of 4480 used
+                                           (reserve is 1024)"
+    C2   the same 1024 reserve, a 512-byte module  ⭐ loaded, =3
+
+⭐ **A is the control and it is the whole argument**: same source, same loader,
+same object, and the only difference is the flag. ⚠ **C is the second
+control** — a reserve that exists but does not fit must refuse rather than
+write past the array, and C2 in the same binary shows the reserve is genuinely
+being used rather than bypassed.
+
+⭐ **And the guard was verified against a known-bad change rather than trusted.**
+With the fit check deleted from `el_tls_from_reserve()`, arm C stops refusing
+and instead places the module past the end of the reserve: `dlsym` misses and
+the process takes **SIGSEGV (exit 139)**. That is what the two lines of bounds
+check are worth.
+
+⚠ **`_dl_tls_static_size` reads 3,456 for this probe against 3,264 for the
+one in the section above**, which is the same point restated: it is the
+program's own `PT_TLS` PLUS the surplus, so it moves with the binary. The
+headroom is 3,216 bytes here and 3,168 there.
+
+⛔ **The threads limitation is UNCHANGED and is not fixed by this.** The
+reserve is seeded with the module's init image in the loading thread only;
+threads created afterwards see zero, exactly as with the surplus. Route D
+changes where the storage comes from, not when it is initialised.
+
+⛔ **NOT YET RE-RUN ACROSS THE ELEVEN.** `experiments/76-` is what would say
+whether `--tls-reserve` costs anything on the matrix, and it has not been run
+with it. The measurements above are the build host only.
+
+**Prove.** ⭐ Arms A/B/C/C2 above, plus the known-bad change. ⚠ Outstanding:
+`experiments/76-` on eleven environments with a non-zero reserve, and the two
+objects from the T-068 sweep that fail today measured by name rather than by a
+synthetic subject of the same size.
