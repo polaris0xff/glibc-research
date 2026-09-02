@@ -35,7 +35,6 @@ import (
 	"time"
 
 	"github.com/polaris0xff/glibc-research/internal/fail"
-	"github.com/polaris0xff/glibc-research/internal/logx"
 )
 
 // Client fetches from a channel and a substituter.
@@ -610,5 +609,3 @@ func SortedStrings(in []string) []string {
 	sort.Strings(out)
 	return out
 }
-
-var _ = logx.Say

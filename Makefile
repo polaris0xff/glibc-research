@@ -24,8 +24,16 @@ release:
 	@printf '%-14s %s bytes\n' "$(BIN)" "$$(wc -c < $(BIN))"
 	@file $(BIN)
 
+# The exit-code contract is 0 ok, 1 a case ran and failed, 2 a case could not
+# run on this machine. Only 1 stops the gates; 2 is reported and they still run,
+# because a machine without zstd must still be able to check the record.
 check: $(BIN)
-	./$(BIN) selftest
+	@./$(BIN) selftest; rc=$$?; \
+	  case $$rc in \
+	    0) ;; \
+	    2) echo "make check: some selftests could not run here; recorded, not asserted" ;; \
+	    *) exit $$rc ;; \
+	  esac
 	sh TODO/check.sh
 	sh scripts/common/check-docs.sh
 

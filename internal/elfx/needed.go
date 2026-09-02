@@ -18,7 +18,6 @@ package elfx
 
 import (
 	"debug/elf"
-	"encoding/binary"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -151,5 +150,3 @@ func dynstrExtent(f *elf.File) (off, size uint64, err error) {
 	}
 	return 0, 0, fmt.Errorf("DT_STRTAB 0x%x is in no PT_LOAD segment", addr)
 }
-
-var _ = binary.LittleEndian

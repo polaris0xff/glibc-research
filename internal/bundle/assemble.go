@@ -24,8 +24,6 @@ import (
 	"github.com/polaris0xff/glibc-research/internal/elfx"
 	"github.com/polaris0xff/glibc-research/internal/fail"
 	"github.com/polaris0xff/glibc-research/internal/logx"
-	"github.com/polaris0xff/glibc-research/internal/nixx"
-	"github.com/polaris0xff/glibc-research/internal/proc"
 )
 
 // libSubtrees are library trees that are directories and break when
@@ -575,6 +573,3 @@ func sortStrings(s []string) {
 		}
 	}
 }
-
-var _ = nixx.HashOf
-var _ = proc.Look

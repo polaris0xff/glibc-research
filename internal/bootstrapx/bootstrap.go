@@ -30,8 +30,6 @@ import (
 	"github.com/polaris0xff/glibc-research/internal/selftest"
 )
 
-var log = logx.New("bootstrap")
-
 // Options controls one bootstrap run.
 type Options struct {
 	Nix, Bed, Env, Docker bool

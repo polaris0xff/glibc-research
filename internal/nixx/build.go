@@ -19,7 +19,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"strconv"
 	"strings"
 
@@ -825,5 +824,3 @@ func crc32String(s string) uint32 {
 	}
 	return ^crc
 }
-
-var _ = runtime.NumCPU

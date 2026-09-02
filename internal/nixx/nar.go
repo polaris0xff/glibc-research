@@ -11,7 +11,6 @@ package nixx
 
 import (
 	"bufio"
-	"bytes"
 	"crypto/ed25519"
 	"crypto/sha256"
 	"encoding/base64"
@@ -496,14 +495,3 @@ func DefaultKeys() map[string]ed25519.PublicKey {
 	}
 	return map[string]ed25519.PublicKey{name: key}
 }
-
-// storePathHashOf extracts the hash part of a /nix/store path.
-func storePathHashOf(p string) string {
-	base := filepath.Base(p)
-	if i := strings.IndexByte(base, '-'); i > 0 {
-		return base[:i]
-	}
-	return base
-}
-
-var _ = bytes.Equal
