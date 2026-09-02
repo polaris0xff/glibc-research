@@ -1,0 +1,23 @@
+===============================================================
+POC 70-sqlite-extensions -- a program with an OPEN plugin ABI and no way to link a plugin in
+===============================================================
+upstream      : https://www.sqlite.org/2024/sqlite-autoconf-3470000.tar.gz
+version       : SQLite 3.47.0 + 15 extensions from sqlite/sqlite ext/misc @ version-3.47.0
+sha256        : 83eb21a6f6a649f506df8bd3aab85a08f7556ceed5dbd8dea743ea003fc3a957
+normal build  : cc shell.c sqlite3.c -ldl -lm; each extension: cc -shared -fPIC ext.c
+stresses      : dlopen by user-supplied path, dlsym by derived name, 15 plugins in one link, per-plugin symbol namespaces
+date (UTC)    : 2026-09-02T15:47:14Z
+evidence      : /home/user/glibc-research/evidence/91-glibc-pin-candidates/build/evidence-pgb-env-debian-trixie/poc/70-sqlite-extensions
+---------------------------------------------------------------
+-- fetching ---------------------------------------------------
+  ok    extension sources fetched and verified       = 16
+
+-- building ---------------------------------------------------
+  ok    extensions built (object and shared object)  = 15
+  FAIL  link the wrapped arm                         = failed, expected ok
+        see /home/user/glibc-research/evidence/91-glibc-pin-candidates/build/evidence-pgb-env-debian-trixie/poc/70-sqlite-extensions/build.log
+  FAIL  wrapped binary exists                        = no, expected yes
+
+---------------------------------------------------------------
+pass=2 fail=2 skip=0
+VERDICT: 70-sqlite-extensions did NOT meet expectation.

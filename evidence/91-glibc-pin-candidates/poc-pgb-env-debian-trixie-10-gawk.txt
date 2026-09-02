@@ -1,0 +1,62 @@
+===============================================================
+POC 10-gawk -- a locale- and iconv-sensitive program whose extension API needs dlopen
+===============================================================
+upstream      : https://ftp.gnu.org/gnu/gawk/gawk-5.3.1.tar.gz
+version       : 5.3.1
+sha256        : fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e
+normal build  : ./configure && make
+stresses      : locale (LC_CTYPE, LC_NUMERIC), iconv, dlopen extension API
+date (UTC)    : 2026-09-02T15:40:54Z
+evidence      : /home/user/glibc-research/evidence/91-glibc-pin-candidates/build/evidence-pgb-env-debian-trixie/poc/10-gawk
+---------------------------------------------------------------
+  ok    built                                        = yes
+
+  the binary:
+    size                   4008288 bytes
+    file                   ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, BuildID
+    PT_INTERP              absent
+    DT_NEEDED              0
+    pgb runtime linked     yes
+
+  functional test across the pinned matrix:
+    ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
+    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.22: functional test                 = ok
+    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.20: functional test                 = ok
+    alpine-3.10          musl   ok         none                         none
+  ok    alpine-3.10: functional test                 = ok
+    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
+  ok    voidlinux-musl: functional test              = ok
+    debian-11            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    debian-11: functional test                   = ok
+    debian-12            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    debian-12: functional test                   = ok
+    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf 
+  ok    ubuntu-20.04: functional test                = ok
+    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf 
+  ok    rockylinux-8: functional test                = ok
+    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf 
+  ok    opensuse-leap-15.6: functional test          = ok
+    fedora-42            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    fedora-42: functional test                   = ok
+    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf 
+  ok    archlinux-latest: functional test            = ok
+
+  OBSERVATION -- gawk -l filefuncs: a static binary asked to dlopen a real extension (measured, not asserted):
+    ENVIRONMENT          LIBC   OUTCOME    HOST OBJECTS PULLED IN
+    alpine-3.22          musl   refused    /pgb-ext/filefuncs.so 
+    alpine-3.20          musl   refused    /pgb-ext/filefuncs.so 
+    alpine-3.10          musl   refused    /pgb-ext/filefuncs.so 
+    voidlinux-musl       musl   refused    /pgb-ext/filefuncs.so 
+    debian-11            glibc  refused    /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
+    debian-12            glibc  refused    /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
+    ubuntu-20.04         glibc  refused    /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
+    rockylinux-8         glibc  refused    /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
+    opensuse-leap-15.6   glibc  refused    /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
+    fedora-42            glibc  LOADED     /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
+    archlinux-latest     glibc  refused    /pgb-ext/filefuncs.so /usr/lib/ld-linux-x86-64.so.2 /usr/lib/libc.so.6 
+
+---------------------------------------------------------------
+pass=12 fail=0 skip=0
+VERDICT: 10-gawk builds and works across the matrix.

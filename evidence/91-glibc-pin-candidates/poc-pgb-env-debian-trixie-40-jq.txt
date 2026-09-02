@@ -1,0 +1,63 @@
+===============================================================
+POC 40-jq -- Unicode correctness, where the failure is silent rather than fatal
+===============================================================
+upstream      : https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-1.7.1.tar.gz
+version       : 1.7.1
+sha256        : 478c9ca129fd2e3443fe27314b455e211e0d8c60bc8ff7df703873deeee580c2
+normal build  : ./configure --with-oniguruma && make
+stresses      : Unicode round-trip, surrogate pairs, optional static dependency detection
+date (UTC)    : 2026-09-02T15:44:18Z
+evidence      : /home/user/glibc-research/evidence/91-glibc-pin-candidates/build/evidence-pgb-env-debian-trixie/poc/40-jq
+---------------------------------------------------------------
+        dependency: oniguruma 6.9.9, built static in the same environment
+  ok    built                                        = yes
+
+  the binary:
+    size                   4209120 bytes
+    file                   ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, BuildID
+    PT_INTERP              absent
+    DT_NEEDED              0
+    pgb runtime linked     yes
+
+  functional test across the pinned matrix:
+    ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
+    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.22: functional test                 = ok
+    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.20: functional test                 = ok
+    alpine-3.10          musl   ok         none                         none
+  ok    alpine-3.10: functional test                 = ok
+    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
+  ok    voidlinux-musl: functional test              = ok
+    debian-11            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    debian-11: functional test                   = ok
+    debian-12            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    debian-12: functional test                   = ok
+    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf 
+  ok    ubuntu-20.04: functional test                = ok
+    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf 
+  ok    rockylinux-8: functional test                = ok
+    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf 
+  ok    opensuse-leap-15.6: functional test          = ok
+    fedora-42            glibc  ok         none                         /etc/nsswitch.conf 
+  ok    fedora-42: functional test                   = ok
+    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf 
+  ok    archlinux-latest: functional test            = ok
+
+  OBSERVATION -- the locale jq sees, and whether it still counts codepoints (measured, not asserted):
+    ENVIRONMENT          LIBC   OUTCOME    HOST OBJECTS PULLED IN
+    alpine-3.22          musl   LANG=unset codepoint-length-of-cafe=4 none
+    alpine-3.20          musl   LANG=unset codepoint-length-of-cafe=4 none
+    alpine-3.10          musl   LANG=unset codepoint-length-of-cafe=4 none
+    voidlinux-musl       musl   LANG=unset codepoint-length-of-cafe=4 none
+    debian-11            glibc  LANG=unset codepoint-length-of-cafe=4 none
+    debian-12            glibc  LANG=unset codepoint-length-of-cafe=4 none
+    ubuntu-20.04         glibc  LANG=unset codepoint-length-of-cafe=4 none
+    rockylinux-8         glibc  LANG=unset codepoint-length-of-cafe=4 none
+    opensuse-leap-15.6   glibc  LANG=unset codepoint-length-of-cafe=4 none
+    fedora-42            glibc  LANG=unset codepoint-length-of-cafe=4 none
+    archlinux-latest     glibc  LANG=unset codepoint-length-of-cafe=4 none
+
+---------------------------------------------------------------
+pass=12 fail=0 skip=0
+VERDICT: 40-jq builds and works across the matrix.

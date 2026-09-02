@@ -492,17 +492,32 @@ else
     # wrong environment still runs, still passes its own 11-row matrix, and
     # says nothing about which glibc it used. `.comment` is what the compiler
     # wrote into the binary, so it is the one field the POC cannot fake.
+    #
+    # ⛔ THREE OUTCOMES, NOT TWO, AND THE THIRD IS WHY. A POC is not required
+    # to leave its binary in its evidence directory: 90-qt and 91-qt-xcb leave
+    # none at all, and the first version of this check called that a MISMATCH
+    # and failed two POCs that had just passed 20 and 27 assertions across
+    # eleven environments. `docs/AGENTS.md` §0b: an absence is not a zero, and
+    # a skip is neither a pass nor a failure. Recursive, because some POCs put
+    # what they built in a subdirectory.
     seen=""
-    for b in "$POC_EV/poc/$p"/*; do
-      [ -f "$b" ] && [ -x "$b" ] || continue
+    for b in $(find "$POC_EV/poc/$p" -type f -perm -u+x 2>/dev/null); do
       v=$(readelf -p .comment "$b" 2>/dev/null | sed -n 's/.*GCC: (.*) *\([0-9][0-9.]*\).*/\1/p' | head -1)
       [ -n "$v" ] && { seen="$v"; break; }
     done
-    printf '  %-14s %-8s %s\n' "$p" "$st" "${seen:-unread}"
-    printf '%s %s\n' "$p" "${seen:-unread}" >> "$WORK/pocgcc.txt"
-    # The POC's own verdict, kept out of the gitignored build tree so the
-    # candidate run leaves a record.
-    cp -f "$POC_EV/poc/$p/RESULT.txt" "$EXP_OUT/poc-$POC_ENV-$p.txt" 2>/dev/null || true
+    case "${seen:-}" in
+      "")        gcc_state=unmeasured ;;
+      "$POC_GCC") gcc_state="$seen" ;;
+      *)         gcc_state="⛔ $seen" ;;
+    esac
+    printf '  %-20s %-8s %s\n' "$p" "$st" "$gcc_state"
+    printf '%s %s\n' "$p" "${seen:-unmeasured}" >> "$WORK/pocgcc.txt"
+    # ⚠ THE POC'S VERDICT IS ITS STDOUT. poc_finish() PRINTS pass/fail and
+    # exits; it writes no RESULT.txt -- poc/common.sh says so in as many words,
+    # "RESULT.txt IS A CONVENTION, NOT AN AUTOMATION ... saved by hand". The
+    # first version of this copied a RESULT.txt that never exists, silently,
+    # and left the candidate run with no committed record at all.
+    cp -f "$WORK/poc-$p.log" "$EXP_OUT/poc-$POC_ENV-$p.txt" 2>/dev/null || true
   done
 
   # ⛔ NOT `grep -c ... || echo 0`. grep -c PRINTS the count and then EXITS 1
@@ -511,10 +526,22 @@ else
   # moment every POC passed.
   exp_check "every POC asked for built against $POC_ENV" \
     "$(awk '$2=="failed"{n++} END{print n+0}' "$WORK/pocs.txt" 2>/dev/null)" 0
-  # ⛔ ASSERTED, not noted. A POC whose binary carries another gcc was built
-  # somewhere else, and its 11-of-11 table describes the wrong environment.
-  exp_check "every POC binary carries the candidate's gcc ($POC_GCC)" \
-    "$(awk -v w="$POC_GCC" '$2!=w{n++} END{print n+0}' "$WORK/pocgcc.txt")" 0
+  # ⛔ ASSERTED ON THE MISMATCH, not on the absence. A POC whose binary carries
+  # another gcc was built somewhere else and its 11-of-11 table describes the
+  # wrong environment -- that is a failure. A POC that leaves no binary to read
+  # is UNMEASURED, and calling that a failure fails POCs that passed.
+  _mis=$(awk -v w="$POC_GCC" '$2!="unmeasured" && $2!=w {n++} END{print n+0}' "$WORK/pocgcc.txt")
+  _ver=$(awk -v w="$POC_GCC" '$2==w {n++} END{print n+0}' "$WORK/pocgcc.txt")
+  _unm=$(awk '$2=="unmeasured" {n++} END{print n+0}' "$WORK/pocgcc.txt")
+  exp_check "no POC binary carries a gcc other than the candidate's ($POC_GCC)" "$_mis" 0
+  # ⭐ AND THE VERIFIED COUNT IS PRINTED, because "0 mismatches" is also what a
+  # run that read nothing at all would report. The two numbers together are the
+  # measurement; either alone can be satisfied by an instrument that is blind.
+  exp_note "gcc verified on $_ver POC binaries, $_unm left none to read, $_mis mismatched"
+  if [ "$_unm" -gt 0 ]; then
+    exp_note "⚠ unmeasured (no executable in the POC's evidence directory): \
+$(awk '$2=="unmeasured"{printf "%s ", $1}' "$WORK/pocgcc.txt")"
+  fi
   fi
 fi
 printf '\n'
@@ -534,8 +561,19 @@ printf '\n'
   sed 's/^/  /' "$WORK/nss.txt" 2>/dev/null || printf '  (not run)\n'
   printf '\nARM 4 -- class residue (env, glibc, B, C, S)\n'
   sed 's/^/  /' "$WORK/classes.txt" 2>/dev/null || printf '  (not run)\n'
-  printf '\nARM 5 -- POCs\n'
-  sed 's/^/  /' "$WORK/pocs.txt" 2>/dev/null || printf '  (not run)\n'
+  # ⛔ THE GCC COLUMN GOES IN THE RECORD, and leaving it out was the third
+  # defect in this arm. The committed file carried "10-gawk ok" and nothing
+  # about WHICH environment produced it -- which is exactly the claim the arm
+  # exists to support, and exactly what was wrong before the arm asserted it.
+  printf '\nARM 5 -- POCs (name, outcome, gcc read from the binary .comment)\n'
+  if [ -s "$WORK/pocs.txt" ]; then
+    awk 'NR==FNR{g[$1]=$2; next} {printf "  %-22s %-8s %s\n", $1, $2, (g[$1]?g[$1]:"unmeasured")}' \
+      "$WORK/pocgcc.txt" "$WORK/pocs.txt" 2>/dev/null
+    printf '  environment : %s %s\n' "${POC_ENV:-?}" "${POC_IMG:-?}"
+    printf '  its gcc     : %s\n' "${POC_GCC:-?}"
+  else
+    printf '  (not run)\n'
+  fi
 } > "$RESULT"
 exp_note "written: $RESULT"
 

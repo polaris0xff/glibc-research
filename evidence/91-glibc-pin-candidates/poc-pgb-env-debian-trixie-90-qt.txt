@@ -1,0 +1,91 @@
+===============================================================
+POC 90-qt -- Qt 6 widgets, static glibc, on eleven environments -- T-054 rung 1
+===============================================================
+upstream      : nixpkgs qt6.qtbase -> qtbase-everywhere-src-6.11.1.tar.xz
+version       : Qt 6.11.1 (qtbase)
+sha256        : d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac
+normal build  : ./configure -prefix ... && cmake --build . && cmake --install .
+stresses      : a very large C++ build system, static plugin import, QPA, raster paint, CLDR data
+date (UTC)    : 2026-09-02T15:52:06Z
+evidence      : /home/user/glibc-research/evidence/91-glibc-pin-candidates/build/evidence-pgb-env-debian-trixie/poc/90-qt
+---------------------------------------------------------------
+-- rung 1: the source, planned by nixpkgs ----------------------
+  ok    qtbase source present                        = ok
+        d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac  2h62s8fj35hf19kkxj6c9r2idrgzwdky-qtbase-everywhere-src-6.11.1.tar.xz
+        nixpkgs named 11 patches; NONE applied -- see the header for why
+  ok    stock tarball, unpatched                     = ok
+
+-- rung 2: qtbase 6.11.1, -static, through pgb -----------------
+  building qtbase (this is the long pole: hours, not minutes)
+  ok    qtbase configures through pgb                = ok
+  ok    qtbase builds through pgb                    = ok
+        libQt6Core.a 23357296 bytes
+        libQt6Gui.a 19764422 bytes
+        libQt6Widgets.a 22318108 bytes
+  ok    qtbase produced NO shared object anywhere    = 0
+  ok    the offscreen QPA plugin is a static archive = ok
+        plugins/platforms/libqoffscreen.a 187266 bytes
+        static plugin archives built: 5 (libqjpeg.a libqico.a libqgif.a libqoffscreen.a libqminimal.a )
+
+-- rung 3: a Qt Widgets program, linked static -----------------
+  ok    the Qt program links static                  = ok
+
+  the binary:
+    size                   29023208 bytes
+    file                   ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, BuildID
+    PT_INTERP              absent
+    DT_NEEDED              0
+    pgb runtime linked     yes
+  ok    no PT_INTERP                                 = 0
+  ok    no DT_NEEDED                                 = 0
+
+  functional test across the pinned matrix:
+    ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
+    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.22: functional test                 = ok
+    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.20: functional test                 = ok
+    alpine-3.10          musl   ok         none                         none
+  ok    alpine-3.10: functional test                 = ok
+    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
+  ok    voidlinux-musl: functional test              = ok
+    debian-11            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
+  ok    debian-11: functional test                   = ok
+    debian-12            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
+  ok    debian-12: functional test                   = ok
+    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
+  ok    ubuntu-20.04: functional test                = ok
+    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
+  ok    rockylinux-8: functional test                = ok
+    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
+  ok    opensuse-leap-15.6: functional test          = ok
+    fedora-42            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
+  ok    fedora-42: functional test                   = ok
+    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
+  ok    archlinux-latest: functional test            = ok
+
+  OBSERVATION -- asking for a QPA plugin that is NOT compiled in (measured, not asserted):
+    ENVIRONMENT          LIBC   OUTCOME    HOST OBJECTS PULLED IN
+    alpine-3.22          musl   xcb-requested:exit134 none
+    alpine-3.20          musl   xcb-requested:exit134 none
+    alpine-3.10          musl   xcb-requested:exit134 none
+    voidlinux-musl       musl   xcb-requested:exit134 none
+    debian-11            glibc  xcb-requested:exit134 none
+    debian-12            glibc  xcb-requested:exit134 none
+    ubuntu-20.04         glibc  xcb-requested:exit134 none
+    rockylinux-8         glibc  xcb-requested:exit134 none
+    opensuse-leap-15.6   glibc  xcb-requested:exit134 none
+    fedora-42            glibc  xcb-requested:exit134 none
+    archlinux-latest     glibc  xcb-requested:exit134 none
+
+  the depth reached:
+    Qt 6 QtCore/Gui/Widgets  ⭐ static, this POC
+    QPA offscreen plugin     ⭐ compiled in, no dlopen
+    Qt with a real display   ⛔ NOT ATTEMPTED -- needs xcb, T-054 rung 2
+    KDE Frameworks 6         ⛔ NOT ATTEMPTED -- T-054 rung 3
+    kdenlive                 ⛔ NOT ATTEMPTED -- T-054 rung 4
+    MLT + ffmpeg (engine)    ⭐ done in poc/80-mlt, 11 of 11
+
+---------------------------------------------------------------
+pass=20 fail=0 skip=0
+VERDICT: 90-qt builds and works across the matrix.
