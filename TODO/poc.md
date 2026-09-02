@@ -412,3 +412,71 @@ worth making and it is not the same claim as beating it at all.
 
 **Blocked on** T-054 answering first, and on T-052, because a video editor is
 exactly the case where the OpenGL question decides whether the bundle runs.
+
+## ⭐ THE COMPARISON EXISTS — `experiments/90-kdenlive-vs-enhanced.sh`
+
+⛔ **AND THE BAR IS NOT MET. Ours is bigger, starts slower and renders
+slower**, on all three of the columns the operator named. That is the result,
+stated first, because `docs/AGENTS.md` §14 forbids "strictly better" without a
+measurement and equally forbids hiding one.
+
+Subject: **kdenlive 26.08.0** on both sides — nixpkgs has that exact release
+and the competitor's tag is `26.08.0-1`, which is luck rather than design.
+
+| column | P — ours, one command | E — `kdenlive-AppImage-Enhanced` | |
+|---|---|---|---|
+| **size** | **397,903,295 B** | **191,900,604 B** | ⛔ **2.07×** |
+| **render** (melt → a real MP4) | **3,625 ms** | 2,001 ms | ⛔ **1.81×** |
+| **start** cold | 3,344 ms | 1,325 ms | ⛔ 2.52× |
+| **start** warm | 139 ms | 34 ms | ⛔ 4.1× |
+| runs on the eleven | **11 of 11** | **11 of 11** | equal |
+| the MP4 | 4,149 B, 48 frames, libx264 | 4,162 B | equal |
+
+⭐ **What IS established, and it is the half T-054 could not reach**: a
+kdenlive that renders, produced by **one command from a package name**, on
+eleven distributions including four musl ones. The engine, the Qt stack, KF6,
+MLT and ffmpeg all arrive from the nixpkgs closure with no nix installed.
+
+### ⛔ Two defects this comparison found in our own bundle
+
+- **`melt` started, answered `-version`, and could not render.** MLT bakes its
+  module directory into libmlt at build time and nixpkgs does not wrap it, so
+  the bundle printed `mlt_repository_init: no plugins found in
+  "/nix/store/…-mlt-7.40.0/lib/mlt-7"`. ⭐ A bundle can pass every check the
+  bundler already makes and still not render; §5d now scans the packed
+  binaries for compiled-in store paths (**735 strings, 532 naming a real
+  directory**) and redirects the ones a documented variable can reach.
+- **The store shard copied whole packages when a variable named one
+  directory.** `QT_PLUGIN_PATH=…/qtdeclarative-6.11.1/lib/qt-6/plugins` pulled
+  in all **190 MB** of qtdeclarative, whose shared objects were already
+  flattened into `lib/`. The shard was **947 MB of a 1.2 GB `lib/`**. Copying
+  only the named subdirectory took the artefact from **539 MB to 398 MB**.
+
+### ⛔ And one in the measurement, which is the interesting one
+
+**A multi-program bundle needs a selector, a selector is a shell script, and a
+script is run by the HOST's `/bin/sh` — which loads the host's libc.** Ours
+opened 1–4 host shared objects on every glibc row and none on the four musl
+ones. ⭐ **The competitor pays exactly the same price** — its `AppRun.sh` is a
+shell script too, and on Rocky 8 it opened **10** where ours opened 3. So the
+column is asserted as a comparison rather than an absolute, and
+`tool/nix-appimage.sh` now takes the shell **only when there is more than one
+program**, leaving 85-, 86- and 89-'s zero-host-object rows untouched.
+
+### ⭐ The route to the bar, in the order the numbers say
+
+1. **`--debloat aggressive`** is untried on this artefact and removes ~90 MiB
+   of Vulkan ICDs for GPUs this architecture has; `experiments/89-` measured
+   it as 0.78× on a GL bundle.
+2. **`share/` is 368 MB**, most of it `breeze-icons` (108 MB) — an icon theme
+   ships every size and colour of every icon, and a debloat rule for unused
+   icon sizes is the biggest single lever left.
+3. **The `store/` shard is still 405 MB.** The wrapper env names 226 paths;
+   copying only the named subdirectory helped, and de-duplicating what is
+   already in `lib/` would help again.
+4. **Start and render** are dominated by mounting a 398 MB dwarfs image
+   against a 192 MB one: the size column IS the time column here, so 1–3 move
+   both.
+
+⛔ **The entry stays open.** It closes when the three columns are measured
+again after 1–3, whichever way they come out.
