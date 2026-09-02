@@ -803,16 +803,23 @@ anywhere.
 ## T-056 — Port the python helpers to Rust
 
 **Source** operator, 2026-09-01c, explicitly filed as *"far future"*.
-**Category** toolchain · **Priority** P2 · **Effort** L · **Status** open
+**Category** toolchain · **Priority** P2 · **Effort** L · **Status** done
 
-`internal/nixx/plan.go`, `internal/nixx/drv.go`, `internal/elfx/needed.go` and
-`internal/nixx/nar.go` are python, and python is not present on every host
-this project claims. ⚠ `experiments/70-` already settled that a **carried-in**
-static binary runs on 12 of 12, so the language decision is not blocked on
-whether a runtime is present — it is a question of when the churn is worth it.
-⭐ The operator also named `nixie-dev/nixie` as the shape a minimal relocatable
-nix might take. ⛔ Not started, and it must not start before T-050 and T-052
-have settled what these tools actually need to do.
+⭐ **Superseded by T-061**, which took them to Go instead of Rust.
+
+The entry asked for the four Python helpers — the planner, the derivation
+reader, the DT_NEEDED reader and the NAR reader — to stop being Python,
+because Python is not present on every host this project claims. T-061 did
+that in Go: they are `internal/nixx/plan.go`, `internal/nixx/drv.go`,
+`internal/elfx/needed.go` and `internal/nixx/nar.go`, inside the one static
+binary, and the Python is retired under `HISTORY/`.
+
+⚠ **Rust was the language this entry named and it is not the language that
+was used.** `docs/design/toolchain.md` "Language and structure" carries the
+comparison and the reason: Rust wins on rigour, Go wins on the combination
+this port needed. ⭐ `nixie-dev/nixie`, which the operator named as the shape
+a minimal relocatable nix might take, is still unexamined — that belongs to
+T-060, not here.
 
 ## T-058 — two `pgb build`s at once share one wrapper directory
 
@@ -1058,7 +1065,7 @@ pass, `sh TODO/check.sh` and `sh scripts/common/check-docs.sh` are green.
 | 2 nix-nar | ⭐ met — byte-identical NARs, identical nix-base32 hashes, identical signature decisions, on fixtures and a real cache.nixos.org object |
 | 3 parity | ⭐ met — doctor, env info, attr, info, closure, hydra drv and a whole nix-free plan, all identical |
 | 4 wrappers | ⭐ met in its strongest form — the same source through both toolchains is BYTE-IDENTICAL |
-| 5 the matrix | ⚠ **partial**: nine POCs and eighteen experiments pass; `poc/91-qt-xcb` and experiments 62, 86, 89, 90 had not finished when the session was checkpointed |
+| 5 the matrix | ⚠ **partial**: 9 of 10 POCs and 21 of 23 experiments pass. `poc/91-qt-xcb` ran out of disk mid-Qt-build; `experiments/86-` and `experiments/90-` were never started, for the same reason |
 | 6 the artefact | ⭐ met — statically linked, no `PT_INTERP`, no `DT_NEEDED` |
 
 Requirement 2's second half is met too: pgb built by pgb inside the pinned

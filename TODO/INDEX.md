@@ -3,13 +3,13 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 34  OPEN 16  DONE 18
+    TOTAL 34  OPEN 15  DONE 19
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 1 | 1 | 0 |
 | P1 | a documented capability does not work, or a flag does nothing | 25 | 8 | 17 |
-| P2 | worth doing; nothing is wrong without it | 8 | 7 | 1 |
+| P2 | worth doing; nothing is wrong without it | 8 | 6 | 2 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
 Effort: S under a day · M a few days · L a week · XL almost always two entries
@@ -45,7 +45,7 @@ pretending to be one.
 | T-053 | P2 | S | done | research | patchelf and patsh: use them, or say why not |
 | T-054 | P1 | L | open | poc | kdenlive, static: exhaust it |
 | T-055 | P1 | L | open | poc | If static will not reach it, a kdenlive bundle that BEATS the field |
-| T-056 | P2 | L | open | toolchain | Port the python helpers to Rust |
+| T-056 | P2 | L | done | toolchain | Port the python helpers to Rust — superseded by T-061 |
 | T-057 | P1 | L | ⚠started | research | The bundler: a maintained nix-appimage descendant on the Anylinux mechanisms |
 | T-058 | P1 | S | done | toolchain | Two `pgb build`s at once share one wrapper directory |
 | T-059 | P1 | M | open | research | GL on real hardware, and the NVIDIA case |

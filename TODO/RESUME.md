@@ -24,7 +24,7 @@ bundler. `CGO_ENABLED=0`. The shell and Python are retired under
     sh TODO/check.sh               green
     sh scripts/common/check-docs.sh  green
     gates 1, 2, 3, 4, 6            met, with output
-    gate 5                         9 POCs and 19 experiments pass; 3 rows left
+    gate 5                         9 of 10 POCs, 21 of 23 experiments; 3 rows left
 
 Evidence, per row, as each landed: `evidence/92-go-port/RESULT.txt`.
 The decision, the architecture and the gates:

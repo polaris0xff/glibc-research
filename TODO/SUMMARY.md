@@ -11,12 +11,12 @@ thing was not measured this says so rather than giving a number.
 |---|---|---|
 | **Elapsed** | 2026-09-02T04:0xZ | 2026-09-02T05:5xZ — **≈2h**, ended by an operator checkpoint rather than by the work finishing |
 | **Commits** | `184b1c56` | `894bfaec` — **19 commits**, every one on `main` |
-| **Work** | T-061 open, nothing written | ⭐ **the whole toolchain ported to Go**, 5 defects found in code that had been trusted, gates 1/2/3/4/6 met, gate 5 at 9 POCs + 19 experiments |
+| **Work** | T-061 open, nothing written | ⭐ **the whole toolchain ported to Go**, 5 defects found in code that had been trusted, gates 1/2/3/4/6 met, gate 5 at 9 of 10 POCs and 21 of 23 experiments |
 | **Changes** | — | **166 files**, 30,540 insertions(+), 1,353 deletions(-) |
 | **Size** | — | **17,690 lines** of Go replacing **8,343** of shell and Python, which are retired under `HISTORY/` rather than deleted |
 | **Checks** | both gates green | green. ⭐ **124 carried selftests**, up from 72 |
 | **Cost** | — | ⚠ **not metered.** What can be pointed at: the real 399,356,002-byte `packages.json` fetched once, a 648,570-byte `cache.nixos.org` NAR, mesa and Qt closures for the bundler experiments. ⛔ **The session's disk allowance ran out**, which is what stopped `poc/91-qt-xcb`. No paid service used |
-| **Health** | 34 entries, 16 open | **34 entries, 16 open.** T-061 is substantially landed and stays open for its remainder. Tree clean, `main` pushed |
+| **Health** | 34 entries, 16 open | **34 entries, 15 open.** ⭐ **T-056 closed** — superseded by T-061, which took the Python helpers to Go rather than Rust. T-061 stays open for its remainder. Tree clean, `main` pushed |
 
 ## What actually happened
 
