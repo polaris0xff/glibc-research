@@ -1043,7 +1043,23 @@ static int el_reloc_one(struct el_obj *o, const Elf64_Rela *r)
     case R_X86_64_JUMP_SLOT:
         val = el_resolve(o, name, ver, &found);
         if (!found) {
-            if (weak) { *(uint64_t *)where = 0; return 0; }
+            /* ⛔ A WEAK UNDEFINED SYMBOL BECOMES ZERO, AND THAT IS CORRECT --
+             * it is what ld.so does and what the ABI says. ⚠ But if the
+             * object then CALLS it, the process jumps to address 0 and dies
+             * with rip=0 and si_addr=0, naming nothing. That is the whole
+             * diagnosis a crash gives you, and it took a signal handler
+             * printing RIP to learn even that much.
+             *
+             * So the binding is recorded here rather than reconstructed
+             * afterwards. It is behind PGB_ELFLOAD_DEBUG, so a normal load
+             * pays a getenv that was already being paid. */
+            if (weak) {
+                *(uint64_t *)where = 0;
+                el_dbg("pgb-elfload: %s: weak %s%s%s is undefined -> bound to "
+                       "0; CALLING it will fault at rip=0\n", o->soname,
+                       name ? name : "?", ver ? "@" : "", ver ? ver : "");
+                return 0;
+            }
             el_err("pgb-elfload: %s: undefined symbol: %s%s%s",
                    o->soname, name ? name : "?", ver ? "@" : "", ver ? ver : "");
             return -1;

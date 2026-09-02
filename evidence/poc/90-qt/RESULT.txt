@@ -14,3 +14,11 @@ build gcc     : gcc (Debian 14.2.0-19) 14.2.0
 build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
 ---------------------------------------------------------------
 -- rung 1: the source, planned by nixpkgs ----------------------
+  ok    qtbase source present                        = ok
+        d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac  2h62s8fj35hf19kkxj6c9r2idrgzwdky-qtbase-everywhere-src-6.11.1.tar.xz
+        nixpkgs named 11 patches; NONE applied -- see the header for why
+  ok    stock tarball, unpatched                     = ok
+
+-- rung 2: qtbase 6.11.1, -static, through pgb -----------------
+  building qtbase (this is the long pole: hours, not minutes)
+  ok    qtbase configures through pgb                = ok
