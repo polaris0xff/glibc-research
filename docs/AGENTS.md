@@ -495,6 +495,8 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 | [`comparison.md`](comparison.md) | the head-to-head: several ways to ship the same program across the same 11 environments, and what actually separates them |
 | [`research/prior-art.md`](research/prior-art.md) | the reference sweep, verdicts, provenance |
 | [`research/solo.md`](research/solo.md) | ⭐ **the `pg83/solo` sweep, and the route it opened.** A `.so` loader compiled *into* a static binary — §7 route D — with the measurement that says the symbols are there, the four mechanisms worth taking at file and line, and what must not be ported |
+| [`design/host-fallback.md`](design/host-fallback.md) | ⭐ **what a bundle may take from the HOST, and why "zero host objects" is the wrong test for one.** The four permitted classes, the search order adopted from `Anylinux-sharun`, and the per-class opt-ins. T-065 |
+| [`design/runtime-language.md`](design/runtime-language.md) | ⭐ **is C enough for `tool/runtime/`?** The ruling, with the numbers: 0 UBSan findings over 904 host objects, and five real defects none of which a language change would have prevented. T-067 |
 | [`design/tiers.md`](design/tiers.md) | ⛔ **design only, nothing built.** The tiered-output plan for the host-plugin class, and what "universal" can honestly mean |
 | [`history/corrections.md`](history/corrections.md) | ⚠ claims measured wrong, instrument defects, evaluated approaches. **Read on demand, not to orient.** ⭐ This is where superseded findings live — keep them out of the pages above |
 | [`research/nix.md`](research/nix.md) | ⭐ **THE NIX SWEEP AND THE FRONT END.** Ten references, `pgb nix`, and the three findings: nixpkgs' `pkgsStatic` is **musl**; a package can be resolved, planned AND fetched with **no nix** (with the availability rate that limits it); and a nixpkgs binary is location-locked, which is why every bundler ships a store. Opens with what it did NOT establish |
@@ -539,12 +541,12 @@ classes and the entry that owns each; it is not a second work order.
 |---|---|---|
 | **`pgb build <url-or-package>`** — the toolchain the project is for | T-012 | the design and the static-first/bundle-last rule are in [`design/toolchain.md`](design/toolchain.md) |
 | ⭐ **host `dlopen`** — §7 item 1 | ✅ **T-064 CLOSED**, T-068 carries the residue | `pgb build --host-dlopen`. `experiments/76-`: 11 of 11 carried, zero host objects, a real host `.so` on 7 of 7 glibc rows, control 0 of 11. 1,093 code lines against solo's 2,332 |
-| ⛔ **the bundle is bigger and slower than the field** | ⛔ **T-066 (P0)** | 2.86× on `jq`, 2.49× and ~3× slower on kdenlive. ⭐ Iterate on a **CLI**, not kdenlive. The reachability sweep exists and ⛔ nothing consumes it — the largest unused lever. T-055 folds into this |
-| ⛔ **what a bundle may take from the HOST** | ⛔ **T-065 (P0)** | anylinux defers to the host **deliberately** for drivers, bundled-first with a documented lowest-priority fallback. "Zero host objects" is right for a static ELF and wrong for a bundle |
+| ⚠ **the bundle is bigger than the field** | ⛔ **T-066 (P0), advanced not met** | ⭐ **2.86× → 1.22× on `jq`** (`experiments/78-`): the reachability sweep now feeds debloat (277 objects, 12.0 MiB) and `share/i18n`, glibc's locale SOURCES, was 17 MiB of a 22 MiB bundle. ⛔ The rest is a **package-size** gap, not a bundler one |
+| ⭐ **what a bundle may take from the HOST** | ✅ **T-065 CLOSED** | four classes, the search order adopted from `Anylinux-sharun`, 29 offline assertions. [`design/host-fallback.md`](design/host-fallback.md) |
 | **a host with no compiler** | T-051, T-060 | `pgb nix` already works with no nix installed; the C toolchain is the last crutch |
 | **aarch64** | T-041 | `pgb rootfs pull --arch arm64` re-resolves by tag, trading the digest pin away. ⚠ Nothing has been run — expect IFUNC and CPU-baseline questions x86_64 did not raise |
 | **a real GPU** | T-059, and T-065 decides what it may use | every GL row is `swrast`; NVIDIA is untouched |
-| **is C enough for `tool/runtime/`?** | ⛔ **T-067 (P0)** | a question, not a migration — a measured "C is adequate" closes it |
+| **is C enough for `tool/runtime/`?** | ✅ **T-067 CLOSED** | yes, measured. [`design/runtime-language.md`](design/runtime-language.md) |
 
 ## 14. Rules, and things not to redo
 

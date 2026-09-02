@@ -71,25 +71,39 @@ Then: T-063, T-062, T-060, T-054, T-057, T-051, then P2.
 
 ## In flight right now
 
-    (nothing running)
+    experiments/90-  kdenlive vs kdenlive-AppImage-Enhanced, started in the
+                     background, ~30 min, log at /var/tmp/t066/exp90.log.
+                     It is T-066's remaining Prove row: the CLI (jq) is
+                     re-measured, kdenlive is not.
 
-## What this session has done so far
+## What this session has done
 
-⭐ **T-064 is CLOSED and it was the first P0.** `tool/runtime/pgb-elfload.c` is
-an ELF loader compiled into the binary; `pgb build --host-dlopen` turns it on;
-`experiments/76-` measures it on all eleven, exit 0, four of four assertions:
+⭐ **THREE OF THE FOUR P0s ARE CLOSED; T-066 is advanced and stays open.**
 
-    carried: nine assertions pass, every environment     = 11 of 11
-    carried: loaded no host shared object, every one     = 11 of 11
-    native:  loads a real host object on every glibc row  = 7 of 7
-    native:  refuses CLEANLY on every musl row, no signal = 4 of 4
-    control: ran                                          = 0 of 11
+    T-064  ✅ static glibc's dlopen, REALLY solved. Our own ELF loader,
+              tool/runtime/pgb-elfload.c, `pgb build --host-dlopen`.
+              experiments/76-, exit 0, four of four:
+                carried: nine assertions, every environment  = 11 of 11
+                carried: loaded no host shared object         = 11 of 11
+                native:  a REAL host .so on every glibc row   =  7 of 7
+                native:  refuses CLEANLY on musl, no signal   =  4 of 4
+                control: ran                                  =  0 of 11
+              ⭐ On the four musl rows that is a GLIBC .so dlopen'd on a
+              machine with no glibc. 1,093 code lines against solo's 2,332.
+    T-065  ✅ what a bundle may take from the HOST: docs/design/host-fallback.md
+              plus internal/bundle/hostpolicy.go, 29 offline assertions.
+              Four classes, search order adopted from Anylinux-sharun.
+    T-066  ⚠ ADVANCED, NOT MET. 2.86x the field -> 1.22x on jq. Two levers:
+              the reachability sweep NOTHING consumed (277 objects, 12.0 MiB)
+              and share/i18n, glibc's locale SOURCES, 17 MiB of a 22 MiB
+              bundle. Debloat 12.7% -> 86.9% off.
+    T-067  ✅ C is adequate: docs/design/runtime-language.md. 0 UBSan findings
+              over 904 host objects; zig is not in the pinned debian:12 and
+              would be a 53,733,924 B fetch.
+    T-068  NEW, P1: the 86 of 904 host objects --host-dlopen does not load,
+              each classified rather than summarised.
 
-⭐ On the four musl rows that is a GLIBC `.so` dlopen'd on a machine with no
-glibc. 1,093 code lines against solo's 2,332 for the loader alone. T-068 is
-new and carries the residue (86 of 904 host objects) so it is not rounded off.
-
-⛔ **Five defects found, each by something disagreeing, never by reading:**
+⛔ **Seven defects found, each by something disagreeing, never by reading:**
 
     libm.a is a GNU ld SCRIPT, not an archive -- read as `ar` it is zero
       symbols in silence. Second time this trap has fired here.
@@ -101,24 +115,26 @@ new and carries the residue (86 of 904 host objects) so it is not rounded off.
       through one.
     make did not depend on the go:embed'd C, so editing the loader printed
       "Nothing to be done" and the next build used the PREVIOUS loader. It
-      cost a full eleven-environment run.
+      cost a full eleven-environment run. FIXED in the Makefile.
     my own benchmark forked per sample and reported the loader 10x slower
       than ld.so; that was copy-on-write faults on a 4.4 MB static image.
+    the reachability sweep had NO consumer -- `codegraph callers Sweep`.
+    the docs gate caught host-fallback.md citing an experiment I never wrote.
 
 ## ⛔ WHAT IS LEFT, IN ORDER
 
-    T-065   ⛔ NEXT. anylinux dlopens the HOST on purpose and this tree
-            asserts that is always failure. Right for a static ELF, WRONG
-            for a bundle. Restudy Anylinux-sharun, Anylinux-AppImages,
-            VHSgunzo__sharun, runimage, nixGL and the trackers; write the
-            policy up; implement the search order -- bundled-first with a
-            documented lowest-priority host fallback and per-class opt-ins
-            for mesa, Vulkan ICDs, NVIDIA and a newer host glibc.
-    T-066   ⛔ the bundler is bloated and slow. ⭐ Iterate on a CLI (bash or
-            7z), NOT kdenlive. The reachability sweep exists and NOTHING
-            consumes it -- the largest unused lever in the tree.
-    T-067   ⛔ is C enough for tool/runtime/? ⭐ A measured "C is adequate,
-            here is why" CLOSES it. ⚠ pgb-elfload.c is 1,093 new lines of C
-            written this session and is the natural subject.
-    T-068   the --host-dlopen residue, classified in docs/limitations.md §1
+    T-066   ⛔ STILL OPEN, and the remaining gap is NOT a bundler one:
+            Anylinux's libraries come from packages optimised for size and
+            ours from nixpkgs (their example: a libicudata.so under 1 MiB
+            vs 30 MiB). ⭐ The next lever is WHERE THE CLOSURE COMES FROM --
+            pkgforge-dev/archlinux-pkgs-debloated is the named corpus --
+            not another debloat rule. Also: kdenlive is not re-measured yet
+            (experiments/90- was running when this was written), and
+            --debloat aggressive now buys NOTHING over safe on jq.
+    T-068   the --host-dlopen residue; docs/limitations.md §1 classifies it.
+            30 of the 86 are objects no static image should load (NSS,
+            sanitizer and allocator interposers) and refusing them by class
+            is most of the entry. libLLVM is the one that is really about
+            the loader: it maps and relocates cleanly and dies in the 605th
+            of its C++ static constructors.
     then    T-063, T-062, T-060, T-054, T-057, T-051, then P2
