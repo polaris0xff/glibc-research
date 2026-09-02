@@ -361,6 +361,15 @@ experiment; none has been shown to be unreachable.
    solo's other 5,948 translate glibc onto musl, and a glibc host needs none
    of it. T-064, **closed**. The residue — 86 of 904 host objects on the build
    host — is **T-068**, and `limitations.md` §1 has it classified.
+   ⚠ **That 904 is an ad-hoc sweep nobody committed**, which is why
+   `experiments/93-` exists; ⛔ it has still not been run, so the residue is
+   quoted from a number with no command behind it.
+   ⭐ **Two of the 86 are now addressable**: the objects wanting more static
+   TLS than glibc's surplus are served by `pgb build --host-dlopen
+   --tls-reserve N`, which allocates out of the binary's own `__thread` array
+   because the surplus is a constant that padding cannot enlarge. Measured on
+   the build host only — 56,248 bytes refused at 0 and loaded at 65536 —
+   ⛔ **not re-measured across the eleven**. `TODO` T-072.
 
    ⚠ **The old routes, kept because the argument is what chose D:**
 
