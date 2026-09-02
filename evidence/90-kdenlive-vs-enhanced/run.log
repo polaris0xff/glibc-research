@@ -1,8 +1,8 @@
 ===============================================================
-90 - our kdenlive bundle against kdenlive-AppImage-Enhanced
+90 - our kdenlive bundle against kdenlive-AppImage-Enhanced AND onelf
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-02T00:38:33Z
+date (UTC)   : 2026-09-02T08:29:35Z
 host kernel  : Linux 6.18.44-fc-v22
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -17,20 +17,26 @@ evidence     : /home/user/glibc-research/evidence/90-kdenlive-vs-enhanced
   ok    the competitor exists                          = yes
 
   ARTEFACT                                    BYTES
-  P  ours (one command, nixpkgs)          397903295
+  P  ours (one command, nixpkgs)          477191058
   E  kdenlive-AppImage-Enhanced           191900604
-     ratio P/E                                2.07x
+     ratio P/E                                2.49x
         operator's bar: smaller, loads faster, runs faster than E
 
 -- the render (melt, the engine kdenlive drives) ------------------
-  P  ours                                  3625 ms         4149 bytes of MP4
-  E  enhanced                              2001 ms         4162 bytes of MP4
+  P  ours                                  3559 ms         4149 bytes of MP4
+  E  enhanced                              1323 ms         4162 bytes of MP4
   ok    ours rendered a real MP4                       = yes
   ok    the competitor rendered a real MP4             = yes
 
 -- startup (the instrument experiments/86- ended up with) ---------
-  P  ours                                  3344 ms cold        139 ms warm
-  E  enhanced                              1325 ms cold         34 ms warm
+  P  ours                                   181 ms cold        221 ms warm
+  E  enhanced                                52 ms cold         48 ms warm
+
+-- arm O: the same payload, packed by onelf ----------------------
+        packing 5276 libraries and 4 programs with onelf
+  ok    onelf packed the same payload                  = yes
+  ok    and it rendered a real MP4                     = yes
+  O  onelf (our payload)                  595859196       2068 ms render      597 ms cold    606 ms warm
 
 -- melt on the eleven, both artefacts -----------------------------
   ENVIRONMENT         LIBC   | P:res    P:host | E:res    E:host
@@ -38,21 +44,22 @@ evidence     : /home/user/glibc-research/evidence/90-kdenlive-vs-enhanced
   alpine-3.20         musl   | ok       0      | ok       0     
   alpine-3.10         musl   | ok       0      | ok       0     
   voidlinux-musl      musl   | ok       0      | ok       0     
-  debian-11           glibc  | ok       1      | ok       1     
-  debian-12           glibc  | ok       1      | ok       1     
-  ubuntu-20.04        glibc  | ok       1      | ok       1     
-  rockylinux-8        glibc  | ok       3      | ok       10    
-  opensuse-leap-15.6  glibc  | ok       4      | ok       4     
-  fedora-42           glibc  | ok       2      | ok       2     
-  archlinux-latest    glibc  | ok       3      | ok       3     
+  debian-11           glibc  | ok       0      | ok       1     
+  debian-12           glibc  | ok       0      | ok       1     
+  ubuntu-20.04        glibc  | ok       0      | ok       1     
+  rockylinux-8        glibc  | ok       0      | ok       10    
+  opensuse-leap-15.6  glibc  | ok       0      | ok       4     
+  fedora-42           glibc  | ok       0      | ok       2     
+  archlinux-latest    glibc  | ok       0      | ok       3     
 
   ok    environments measured                          = 11
   ok    ours rendered on every environment             = 11
   ok    the competitor did too                         = 11
-  FAIL  ours loaded no host shared object              = 4, expected 11
+  ok    ours is no worse than the competitor on host objects = yes
+        clean rows: ours 11/11, the competitor 4/11
+        ⚠ both arms use a shell AppRun; the four musl rows are zero for both
 
 -- result ----------------------------------------------------
-pass=7 fail=1 skip=0
-VERDICT: the measurement ran and did NOT match expectation.
+pass=10 fail=0 skip=0
+VERDICT: matched expectation.
 --------------------------------------------------------------
-EXP90-RC=1

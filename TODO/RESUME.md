@@ -88,9 +88,16 @@ identical to the recorded row. The rewrites are neutral on the wrapper path.
 
 ## In flight right now
 
-    experiments/86-              RUNNING, both arms built, on the eleven now
-                                 evidence/86-bundler-vs-anylinux/RESULT.txt
-                                 status file: /var/tmp/exp86-status
+    (nothing running)
 
     bootstrap                    ⭐ COMPLETE: nix, chroot env, docker env,
                                  11 of 11 rootfs, dockerd up
+
+⭐ **GATE 5 IS COMPLETE.** All three missing rows landed this session:
+`poc/91-qt-xcb` (27 assertions, 11/11), `experiments/86-` (7 cases) and
+`experiments/90-` (10 cases, **0 skipped** — the onelf arm ran for the first
+time). Evidence in `evidence/92-go-port/RESULT.txt`.
+
+⚠ **This machine had to be extended for arm O** and a fresh container will not
+have it: `rustup target add x86_64-unknown-linux-musl` and
+`apt-get install musl-tools`. Without both, the onelf arm skips.

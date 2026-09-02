@@ -1140,8 +1140,27 @@ Both were taken and neither is in an entry yet:
   failures that were all one defect in OUR harness: onelf dispatches on
   argv[0]'s basename and silently falls back to the package default, so a
   symlink named `melt-onelf` ran kdenlive, which needs a display. Fixed in
-  `experiments/90-kdenlive-vs-enhanced.sh`; ⛔ **the three-arm run has not been
-  re-run since**, so the recorded onelf row is still the wrong one.
+  `experiments/90-kdenlive-vs-enhanced.sh`.
+
+  ⭐ **RE-RUN 2026-09-02b, and the row is real for the first time.** It took a
+  second defect out of the same arm first: the staging step copied
+  `shared/bin/*`, a glob never matches a leading dot, and a nixpkgs wrapper
+  leaves the payload ELF beside itself as `.NAME-wrapped` — so the recipe,
+  written from a readdir, named an entrypoint the packed directory did not
+  contain. `../docs/history/corrections.md` C16. The machine also needed
+  `musl-gcc` and the `x86_64-unknown-linux-musl` rust target, both installed.
+
+  | | P — ours | E — Enhanced | O — onelf, OUR payload |
+  |---|---|---|---|
+  | size | 477,191,058 B | **191,900,604 B** | 595,859,196 B |
+  | render | 3,559 ms | **1,323 ms** | 2,068 ms |
+  | start cold | 181 ms | **52 ms** | 597 ms |
+  | on the eleven | **11/11 clean** | 4/11 clean | — |
+
+  ⛔ **The bar is still NOT met against E.** ⭐ **But arm O isolates the
+  PACKER** — same payload, same 5,276 libraries, same zstd level — and there
+  ours is smaller and starts 3.3x faster. onelf renders faster once running,
+  which is a runtime difference on a payload both share.
 
 ### Prove
 

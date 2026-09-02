@@ -1,27 +1,24 @@
-===============================================================
-90 - our kdenlive bundle against kdenlive-AppImage-Enhanced AND onelf
-===============================================================
--- conditions ------------------------------------------------
-date (UTC)   : 2026-09-02T07:33:36Z
-host kernel  : Linux 6.18.44-fc-v22
-host arch    : x86_64
-host distro  : Ubuntu 24.04.4 LTS
-host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
-cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
-ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
-evidence     : /home/user/glibc-research/evidence/90-kdenlive-vs-enhanced
---------------------------------------------------------------
+90 - our kdenlive bundle against pkgforge-dev/kdenlive-AppImage-Enhanced
 
--- the two artefacts ---------------------------------------------
-        fetching the competitor, pinned at 26.08.0-1@2026-09-01_1788277742
-        building ours: ./pgb bundle appimage kdenlive --with-program melt
-  ok    ours exists                                    = yes
-  ok    the competitor exists                          = yes
+competitor pinned at 26.08.0-1@2026-09-01_1788277742
 
   ARTEFACT                                    BYTES
   P  ours (one command, nixpkgs)          477191058
   E  kdenlive-AppImage-Enhanced           191900604
      ratio P/E                                2.49x
-        operator's bar: smaller, loads faster, runs faster than E
+  O  onelf (our payload, their packer)      595859196
 
--- the render (melt, the engine kdenlive drives) ------------------
+render (melt, a real MP4):
+  P 3559 ms, 4149 bytes of MP4
+  E 1323 ms, 4162 bytes of MP4
+  O 2068 ms, 4149 bytes of MP4
+
+startup (melt -version):
+  P 181 ms cold, 221 ms warm
+  E 52 ms cold, 48 ms warm
+  O 597 ms cold, 606 ms warm
+
+on the eleven: ours 11/11 rendered, 11/11 with zero host objects;
+               the competitor 11/11 rendered, 4/11 clean.
+
+conditions: 2026-09-02T08:50:14Z, Linux 6.18.44-fc-v22

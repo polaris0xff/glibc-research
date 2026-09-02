@@ -249,7 +249,11 @@ else
     # ⭐ The payload ELFs and the flattened library tree, exactly as our own
     # bundle carries them. ⚠ `cp -al` where possible: two copies of 1.2 GB of
     # libraries is disk this machine does not have.
-    cp -al "$OURDIR"/shared/bin/* "$D/bin/" 2>/dev/null || cp -a "$OURDIR"/shared/bin/* "$D/bin/"
+    # ⛔ `bin/.` AND NOT `bin/*`. A nixpkgs wrapper leaves the real ELF beside
+    # it as `.NAME-wrapped`, a shell glob never matches a leading dot, and the
+    # recipe -- written from a readdir, which does see them -- then names an
+    # entrypoint the packed directory does not contain.
+    cp -al "$OURDIR"/shared/bin/. "$D/bin/" 2>/dev/null || cp -a "$OURDIR"/shared/bin/. "$D/bin/"
     cp -al "$OURDIR"/lib/. "$D/lib/" 2>/dev/null || cp -a "$OURDIR"/lib/. "$D/lib/"
     [ -d "$OURDIR/share" ] && { cp -al "$OURDIR/share" "$D/share" 2>/dev/null || cp -a "$OURDIR/share" "$D/share"; }
     [ -d "$OURDIR/store" ] && { cp -al "$OURDIR/store" "$D/store" 2>/dev/null || cp -a "$OURDIR/store" "$D/store"; }

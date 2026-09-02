@@ -511,6 +511,53 @@ pgb[compile] /usr/bin/cc -march=x86-64 -fno-plt -march=x86-64 -c ...
 ⚠ **`-shared` mode is not rewritten**, because it is passed through untouched
 by design so that `./configure`'s shared-library probes keep working.
 
+## C16 — "onelf cannot pack our payload"
+
+**Claimed** by `experiments/90-kdenlive-vs-enhanced.sh` for two sessions
+running, in the second-worst form a claim can take: an arm that SKIPPED, with
+the reason recorded against the competitor.
+
+**Measured.** The arm skipped for two independent reasons, and neither of them
+was onelf.
+
+⚠ **The first was the machine.** onelf's runtime stub needs `musl-gcc` and the
+`x86_64-unknown-linux-musl` rust target. Neither was installed, and the build
+died at `error[E0463]: can't find crate for 'std'`. That is an honest skip and
+the arm said so — but it hid the second reason behind it.
+
+⛔ **The second was ours, and it is a one-character class of bug.** With the
+toolchain installed, onelf built and then refused:
+
+    error: entrypoint path 'bin/.kdenlive-wrapped' not found in directory
+
+A nixpkgs wrapper leaves the real ELF beside itself as `.NAME-wrapped`.
+`pgb bundle onelf-recipe` writes the recipe from a **readdir**, which returns
+dotfiles, so it correctly named `bin/.kdenlive-wrapped`. The experiment staged
+the directory with
+
+    cp -al "$OURDIR"/shared/bin/* "$D/bin/"
+
+and ⛔ **a shell glob never matches a leading dot**, so the two `-wrapped` ELFs
+were silently dropped. The recipe named an entrypoint the packed directory did
+not contain. The line immediately below it already used the correct `lib/.`
+form, which is what makes this an oversight rather than a judgement.
+
+**Now:** `shared/bin/.` , and the arm produces an artefact. The three-arm row
+exists for the first time, and it is the only comparison in this tree that
+isolates the PACKER — same payload, same 5,276 libraries, same zstd level:
+
+| | P — ours | O — onelf, our payload |
+|---|---|---|
+| size | **477,191,058 B** | 595,859,196 B |
+| startup, cold | **181 ms** | 597 ms |
+| render | 3,559 ms | **2,068 ms** |
+
+⭐ **The lesson is the one C-series entry that keeps recurring: a skipped arm
+is not a result about the thing that was skipped.** This is the SECOND defect
+in this same arm blamed on onelf — the first was our symlink dispatching on
+argv[0] (`TODO/toolchain.md` T-055). Both times the instrument was wrong and
+the competitor carried the verdict.
+
 ---
 
 ## Approaches evaluated and refused

@@ -233,8 +233,40 @@ GATE 5 - the experiment suite, against the Go pgb
     are also not the same build of jq -- nixpkgs' against Arch's -- which
     the experiment says itself.
 
-  ⛔ NO ROW YET: 90-kdenlive-vs-enhanced. It builds a kdenlive-sized closure
-    and has not been started. Nothing here is extrapolated from it.
+  90-kdenlive-vs-enhanced     0  matched expectation (10 cases, 0 skipped;
+                                 see below -- the onelf arm RAN this time)
+
+  ⭐ GATE 5 IS COMPLETE: ten of ten POCs and twenty-three experiments, every
+    row measured. Nothing in this gate is extrapolated.
+
+  ⭐ 90-kdenlive-vs-enhanced, session of 2026-09-02b, THREE arms:
+
+      ARTEFACT                                 BYTES     render    cold  warm
+      P  ours (one command, nixpkgs)       477,191,058   3,559 ms  181   221
+      E  kdenlive-AppImage-Enhanced        191,900,604   1,323 ms   52    48
+      O  onelf (OUR payload, THEIR packer) 595,859,196   2,068 ms  597   606
+
+      on the eleven: ours 11/11 rendered and 11/11 with ZERO host objects;
+                     the competitor 11/11 rendered and 4/11 clean.
+
+    ⛔ T-055's BAR IS STILL NOT MET. E is 2.49x smaller, renders 2.7x faster
+    and starts 3.5x faster. Recorded first, because AGENTS.md §14 forbids
+    hiding a measurement as firmly as it forbids "strictly better" without
+    one.
+
+    ⭐ WHAT IS NEW IS ARM O, and it is the one comparison that isolates the
+    PACKER: same payload, same nixpkgs binaries, same 5,276 libraries, same
+    zstd level 19. On that footing our packer beats onelf on both axes it
+    controls -- 477 MB against 596 MB, and 181 ms cold against 597 ms --
+    while onelf renders faster once running. ⚠ The size and startup columns
+    are the packer; the render column is the payload both share, so the
+    2,068/3,559 ms difference is a runtime effect and not a packing one.
+
+    ⚠ AND OUR OWN NUMBER MOVED. T-055 records 397,903,295 B for arm P; today
+    it is 477,191,058 B on the same `safe` debloat level. Nothing in the
+    bundler changed between them, so the closure did -- this is a fresh
+    nixpkgs resolution, and the two numbers are not the same measurement.
+    Neither is corrected into the other.
 
   ⚠ Three of these failed on their first run against the Go pgb and each
     failure was a real defect, not a harness difference:
