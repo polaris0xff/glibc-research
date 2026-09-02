@@ -74,6 +74,46 @@ losing the session.
 ⚠ **The session of 2026-09-01 wrote it at the END**, which is the wrong time,
 and the file says so. Had that session died it would have handed over nothing.
 
+## ⛔ Reading existing code: codegraph first, grep second
+
+⭐ **Before you change code you did not just write, ask codegraph what touches
+it.** grep finds lines containing a string; codegraph answers *what calls this*,
+*what does this call*, and *what breaks if I change it*, from an index built out
+of the parse tree. Those are different questions and this project has already
+paid for the difference.
+
+```sh
+sh scripts/common/install-codegraph.sh   # the container is fresh every session
+codegraph callers  <symbol>              # ⭐ the one that pays
+codegraph callees  <symbol>
+codegraph impact   <symbol>              # blast radius before a signature change
+codegraph explore  "<question>"          # source plus the paths between symbols
+codegraph sync                           # after you edit; under a second here
+```
+
+⚠ **`codegraph` indexes Go, C and Python. It does not index shell**, and this
+project is part shell. Measured, not assumed: `codegraph query poc_matrix`
+returns nothing, and `poc_matrix` is a function in `poc/common.sh`.
+
+| reading | instrument |
+|---|---|
+| `internal/`, `cmd/`, `tool/runtime/*.c`, `HISTORY/`'s Python | ⭐ codegraph first |
+| `experiments/*.sh`, `poc/*/run.sh`, `scripts/common/*.sh`, `TODO/check.sh` | grep — codegraph cannot see them |
+| prose in `docs/` and `TODO/` | grep |
+
+⛔ **An empty codegraph result is not evidence that something is unused** — it
+may have a shell caller, or live in a path the index excludes. Say which
+instrument found nothing. `../docs/AGENTS.md` §14: an absence is not a zero.
+
+⭐ **What this catches, from this project's own record.** The Go port's fourth
+defect was a feature written and never wired: `internal/logx/stamp.go` had the
+columns, the parser and the heartbeat, and nothing called `NewStamper`, so
+`pgb --ts` printed no timestamps. `codegraph callers NewStamper` is one command
+and one second. It took a session to find by reading.
+
+`check.sh` asserts the index is current. Full detail, the configuration and what
+is excluded: [`../docs/codegraph.md`](../docs/codegraph.md).
+
 ## The record is part of the change
 
 ⛔ **`PROGRESS.md`, `INDEX.md` and the entry are edited in the same commit as

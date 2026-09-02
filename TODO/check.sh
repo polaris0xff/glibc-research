@@ -15,14 +15,22 @@
 #   4. status in the index matches status in the entry
 #   5. PROGRESS.md's COUNTS line agrees
 #   6. every markdown link in TODO/ resolves
+#   7. the codegraph index is current, when codegraph is installed
+#
+# ⛔ THE FAILURE COUNT LIVES IN A FILE, NOT A VARIABLE. Checks 3 and 6 feed a
+# `while` loop from a pipe, which POSIX sh runs in a subshell, so a variable
+# incremented inside one is discarded when it exits. Both printed FAIL lines and
+# the gate still exited 0 under them.
 #
 # Exit: 0 agrees, 1 disagrees.
 set -u
 D=$(cd "$(dirname "$0")" && pwd)
-fail=0
+FAILS=$(mktemp) || exit 2
+trap 'rm -f "$FAILS"' EXIT INT TERM
 say() { printf '  %-6s %s\n' "$1" "$2"; }
-bad() { say FAIL "$1"; fail=$((fail+1)); }
+bad() { say FAIL "$1"; printf '%s\n' "$1" >> "$FAILS"; }
 ok()  { say ok   "$1"; }
+note() { say '--'  "$1"; }
 
 rows=$(awk -F'|' '/^\| T-[0-9]+ \|/ {gsub(/ /,"",$2); print $2}' "$D/INDEX.md")
 n_rows=$(printf '%s\n' "$rows" | grep -c .)
@@ -62,7 +70,7 @@ ok "every row has an entry, statuses compared"
 for f in "$D"/*.md; do
   case "$f" in */INDEX.md|*/PROGRESS.md|*/RULES.md) continue ;; esac
   grep -oE '^## (T-[0-9]+) — ' "$f" | awk '{print $2}' | while read -r eid; do
-    grep -q "^| $eid |" "$D/INDEX.md" || echo "  FAIL   $eid has an entry but no row"
+    grep -q "^| $eid |" "$D/INDEX.md" || bad "$eid has an entry but no row"
   done
 done
 
@@ -77,11 +85,27 @@ esac
 for f in "$D"/*.md; do
   grep -oE '\]\(([^)]+)\)' "$f" 2>/dev/null | sed 's/](\(.*\))/\1/' | while read -r l; do
     case "$l" in http*|\#*) continue ;; esac
-    [ -e "$D/${l%%#*}" ] || echo "  FAIL   $(basename "$f") -> $l does not resolve"
+    [ -e "$D/${l%%#*}" ] || bad "$(basename "$f") -> $l does not resolve"
   done
 done
 ok "links checked"
 
+# 7. the codegraph index, which is what an agent reads existing code with.
+# ⚠ A missing codegraph is NOT a failure: the tool is a machine convenience and
+# the index is gitignored, so a gate that failed on its absence would teach
+# people to skip the gate. A STALE index is a failure -- it answers questions
+# wrongly, and `codegraph sync` costs under a second.
+if command -v codegraph >/dev/null 2>&1 && [ -d "$D/../.codegraph" ]; then
+  if codegraph status "$D/.." 2>/dev/null | grep -q 'Index is up to date'; then
+    ok "codegraph index is current"
+  else
+    bad "the codegraph index is stale; run: codegraph sync"
+  fi
+else
+  note "codegraph absent or not indexed; run: sh scripts/common/install-codegraph.sh"
+fi
+
+fail=$(grep -c . "$FAILS")
 printf '\n'
 if [ "$fail" -gt 0 ]; then printf 'VERDICT: the record disagrees with itself (%s).\n' "$fail"; exit 1; fi
 printf 'VERDICT: the record agrees with itself.\n'

@@ -186,6 +186,8 @@ scripts/common/
   rootfs-images.txt       the 11 environments, pinned by digest
   mine-repo.sh            reference-sweep fetcher, vendored    (--selftest)
   check-docs.sh           the documentation gate
+  install-codegraph.sh    ⭐ the code-reading index, pinned and sha256-checked
+codegraph.json            what that index excludes and deprioritises
 experiments/lib.sh        conditions block, assertions, pid-attributed tracing
 experiments/NN-*.sh       numbered; exit 0 matched, 1 did not, 2 could not run
 docs/REQUIREMENTS.md      the operator's acceptance bar, and how far short
@@ -412,6 +414,7 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 | this file | current state; read to orient |
 | [`REQUIREMENTS.md`](REQUIREMENTS.md) | ⛔ **the operator's binding acceptance bar, and how far short of it the project is.** Read before choosing work |
 | [`design/toolchain.md`](design/toolchain.md) | ⭐ **what `pgb` is and where it is going**: the `pgb build <spec>` shape, static-first/bundle-last, the bar a `pgb` bundle would have to clear, and the language decision |
+| [`codegraph.md`](codegraph.md) | ⭐ **how to read this tree's code**: install the index, what it covers, what it cannot see, and the one command that catches a feature nobody wired up |
 | [`limitations.md`](limitations.md) | the open problems, each with a reproduction and a route |
 | [`comparison.md`](comparison.md) | the head-to-head: several ways to ship the same program across the same 11 environments, and what actually separates them |
 | [`research/prior-art.md`](research/prior-art.md) | the reference sweep, verdicts, provenance |

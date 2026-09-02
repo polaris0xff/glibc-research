@@ -53,3 +53,7 @@ evidence/*/AppDir*/
 #   CGO_ENABLED=0 go build -trimpath -o pgb ./cmd/pgb
 /pgb
 /pgb-go
+
+# codegraph keeps its index here. It is a build product: `codegraph init`
+# rebuilds it from the tree in under a minute.
+/.codegraph/
