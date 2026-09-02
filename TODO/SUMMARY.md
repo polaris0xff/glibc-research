@@ -11,7 +11,7 @@ thing was not measured this says so rather than giving a number.
 |---|---|---|
 | **Elapsed** | 2026-09-02T04:0xZ | 2026-09-02T05:5xZ — **≈2h**, ended by an operator checkpoint rather than by the work finishing |
 | **Commits** | `184b1c56` | `fe62869d` — **24 commits**, every one on `main` |
-| **Work** | T-061 open, nothing written | ⭐ **the whole toolchain ported to Go**, 7 defects found in code that had been trusted, gates 1/2/3/4/6 met, gate 5 at 9 of 10 POCs and 21 of 23 experiments |
+| **Work** | T-061 open, nothing written | ⭐ **the whole toolchain ported to Go**, 8 defects found in code that had been trusted, gates 1/2/3/4/6 met, gate 5 at 9 of 10 POCs and 21 of 23 experiments |
 | **Changes** | — | **169 files**, 30,681 insertions(+), 1,429 deletions(-) |
 | **Size** | — | **17,690 lines** of Go replacing **8,343** of shell and Python, which are retired under `HISTORY/` rather than deleted |
 | **Checks** | both gates green, ⛔ **CI red and unnoticed** | both gates green, ⭐ **124 carried selftests** (up from 72), and ⭐ **CI repaired** — it had been failing since the first port commit |
@@ -30,7 +30,7 @@ The shell and Python were moved with `git mv` into `HISTORY/<commit>/<original
 path>`, per the operator's ruling, and every gate was measured against them
 rather than against a claim.
 
-## The seven defects, all found by something disagreeing
+## The eight defects, all found by something disagreeing
 
 ⛔ **None of these was found by reading the code.**
 
@@ -58,6 +58,10 @@ rather than against a claim.
 7. **A skip counted as a failure**, found by the repaired CI within minutes:
    the runner is not root, `rootfs-run` needs root, and `Report.Write`
    returned 1 for it. It returns 0 / 1 / 2 now, like everything else here.
+8. **The libiconv build needed `msgfmt`**, which the pinned image does not
+   carry. It had been worked around on this machine by installing gettext,
+   which is the wrong direction for a project whose argument is not needing
+   things on the host. `--disable-nls` removes the dependency instead.
 
 ## zstd, because the environment has none
 

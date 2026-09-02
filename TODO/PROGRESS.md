@@ -65,7 +65,7 @@ byte-identical to the host build. Gate 5 is nine POCs and eighteen
 experiments; the rows are in the evidence file and the rest are named under
 "In progress".
 
-### 2. The seven defects the port found, in code that had been trusted
+### 2. The eight defects the port found, in code that had been trusted
 
 Each was found by a measurement disagreeing, not by reading:
 
@@ -95,6 +95,9 @@ Each was found by a measurement disagreeing, not by reading:
 7. ⛔ **A skip counted as a failure**, found by the repaired CI within
    minutes. The runner is not root, `rootfs-run` needs root, and the report
    returned 1 for it. It returns 0 / 1 / 2 now, like everything else here.
+8. ⛔ **The libiconv build needed `msgfmt`.** The pinned image has no
+   gettext; this machine had been given it by hand, which hid the problem.
+   `--disable-nls` removes the dependency rather than adding one.
 
 ### 3. zstd, decoded in Go
 
