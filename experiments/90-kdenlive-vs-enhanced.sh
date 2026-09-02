@@ -110,12 +110,28 @@ printf -- '\n-- the render (melt, the engine kdenlive drives) ------------------
 # cannot differ by what they read; the work is entirely inside their own
 # ffmpeg and MLT.
 MELT_ARGS="color:blue out=48 -consumer avformat:%OUT% vcodec=libx264 preset=ultrafast an=1"
+# ⛔ THE PROGRAM NAME GOES IN argv[0] FOR ONE RUNTIME AND argv[1] FOR THE
+# OTHER, AND GETTING IT WRONG DOES NOT LOOK LIKE A DISPATCH BUG.
+# `onelf` resolves its entrypoint from argv[0]'s basename and falls back to the
+# package's DEFAULT entrypoint when no name matches -- so invoking the bundle
+# through a symlink called `melt-onelf` ran **kdenlive**, which needs a display,
+# and died in `QMessageLogger::fatal` inside `QApplicationPrivate::init`.
+# ⚠ What that printed was `Aborted` and nothing else, three runs in a row, and
+# the arm was recorded as "onelf cannot run our payload". It ran it fine: the
+# same bundle answers `melt -version` in 0.4 s through a symlink named `melt`.
+# The backtrace is in the entry; the lesson is that a fallback that is silent
+# turns a naming mistake into a capability claim about somebody else's tool.
+# ⭐ So the selector is derived from the BASENAME the artefact is invoked under,
+# which is the one thing both runtimes agree on, and arm O is always invoked
+# through a directory whose file is named exactly after the entrypoint.
+sel_of() {  # invocation path -> the argv[1] selector, empty for argv[0] dispatch
+  case "$(basename "$1")" in melt) printf '' ;; *) printf 'melt' ;; esac
+}
 render() {  # artefact tag -> ms, or -1
   _a="$1"; _t="$2"
   rm -f "$WORK/$_t.mp4"
   _s=$(date +%s%N)
-  # shellcheck disable=SC2086
-  case "$_a" in *melt-onelf) _sel="" ;; *) _sel="melt" ;; esac
+  _sel=$(sel_of "$_a")
   # shellcheck disable=SC2086
   timeout -k 10 "$RUN_TIMEOUT" "$_a" $_sel $(printf '%s' "$MELT_ARGS" | sed "s|%OUT%|$WORK/$_t.mp4|") \
     >"$B/render.$_t.log" 2>&1 || { printf '%s' -1; return; }
@@ -141,10 +157,11 @@ printf -- '\n-- startup (the instrument experiments/86- ended up with) ---------
 # would time an error path. melt starts the same runtime.
 start_ms() {  # artefact n -> total ms for n invocations
   _a="$1"; _n="$2"; _i=0
+  _sm=$(sel_of "$_a")
   _s=$(date +%s%N)
   while [ "$_i" -lt "$_n" ]; do
-    case "$_a" in *melt-onelf*) "$_a" -version ;; *) "$_a" melt -version ;; esac >/dev/null 2>&1 \
-      || { printf '%s' -1; return; }
+    # shellcheck disable=SC2086
+    "$_a" $_sm -version >/dev/null 2>&1 || { printf '%s' -1; return; }
     _i=$((_i + 1))
   done
   _e=$(date +%s%N)
@@ -155,13 +172,23 @@ start_ms() {  # artefact n -> total ms for n invocations
 # experiment. ⭐ A cold mount is obtained WITHOUT killing anything, by giving
 # the cold run its own copy: uruntime keys its mount on the image, so a file
 # nothing has run before is cold by construction.
-cold_of() {  # artefact -> ms with a genuinely cold mount
-  _c="$WORK/cold-$(basename "$1")"
-  # ⚠ `cp -L`: arm O is invoked through a SYMLINK named after its entrypoint,
-  # and copying the link would copy a dangling name.
-  rm -f "$_c"; cp -L "$1" "$_c"; chmod +x "$_c"
-  _r=$(start_ms "$_c" 1)
-  rm -f "$_c"
+# ⛔ AND THE COPY KEEPS THE NAME. A cold copy called `cold-melt` is dispatched
+# by onelf as "no entrypoint of that name" -- the same silent fallback as
+# above -- so the cold column would have timed kdenlive failing to find a
+# display. The copy goes into a fresh DIRECTORY and keeps its basename.
+# ⚠ `cp -L`: arm O is invoked through a symlink named after its entrypoint, and
+# copying the link would copy a dangling name.
+# ⚠ AND onelf IS NOT COLD JUST BECAUSE THE FILE IS NEW. uruntime keys its mount
+# on the image, so a fresh file is cold by construction; onelf keys its
+# extraction on a content hash, so the same bytes under a new name reuse the
+# same warm cache. `XDG_CACHE_HOME` is therefore pointed at an empty directory
+# too, which is cold for all three and unfair to none.
+cold_of() {  # artefact -> ms with a genuinely cold runtime
+  _d="$WORK/cold-run"; rm -rf "$_d"; mkdir -p "$_d/cache"
+  _c="$_d/$(basename "$1")"
+  cp -L "$1" "$_c"; chmod +x "$_c"
+  _r=$(XDG_CACHE_HOME="$_d/cache" start_ms "$_c" 1)
+  rm -rf "$_d"
   printf '%s' "$_r"
 }
 # ⛔ THE WARM FIGURE IS MEASURED, NOT SUBTRACTED. `86-`'s arithmetic --
@@ -171,8 +198,8 @@ cold_of() {  # artefact -> ms with a genuinely cold mount
 # for the competitor, a number that cannot be a duration and was printed
 # anyway. Warm is now: one run to warm the mount, then N runs timed, divided.
 warm_of() {  # artefact -> ms per run once the mount is warm
-  case "$1" in *melt-onelf*) "$1" -version ;; *) "$1" melt -version ;; esac >/dev/null 2>&1 \
-    || { printf '%s' -1; return; }
+  # shellcheck disable=SC2086
+  "$1" $(sel_of "$1") -version >/dev/null 2>&1 || { printf '%s' -1; return; }
   _t=$(start_ms "$1" "$WARM_RUNS")
   [ "$_t" = -1 ] && { printf '%s' -1; return; }
   printf '%s' $(( _t / WARM_RUNS ))
@@ -247,12 +274,15 @@ else
     # ⛔ onelf DISPATCHES ON argv[0], NOT ON argv[1]. `pack --entrypoint
     # name=path` is "selected via argv[0]" in its own schema, so
     # `./pkg melt -version` runs KDENLIVE with `melt` as an argument -- which
-    # is why this arm's first run reported `Aborted` and no MP4. A symlink
+    # is why this arm's first runs reported `Aborted` and no MP4. A symlink
     # named after the entrypoint is how onelf is meant to be invoked, and it
     # is also how sharun works, so the two runtimes agree on the mechanism.
-    ln -sf "$ONELF" "$WORK/melt-onelf"
-    O_R=$(render "$WORK/melt-onelf" onelf); O_MP4=$( [ -f "$WORK/onelf.mp4" ] && wc -c < "$WORK/onelf.mp4" || echo 0)
-    O_COLD=$(cold_of "$WORK/melt-onelf"); O_WARM=$(warm_of "$WORK/melt-onelf")
+    # ⚠ AND THE SYMLINK'S NAME IS THE ENTRYPOINT AND NOTHING ELSE. `melt-onelf`
+    # is not `melt`; it matched no entrypoint and silently ran the default.
+    # It therefore lives in its own directory: see sel_of above.
+    O_DIR="$WORK/onelf-argv0"; mkdir -p "$O_DIR"; ln -sf "$ONELF" "$O_DIR/melt"
+    O_R=$(render "$O_DIR/melt" onelf); O_MP4=$( [ -f "$WORK/onelf.mp4" ] && wc -c < "$WORK/onelf.mp4" || echo 0)
+    O_COLD=$(cold_of "$O_DIR/melt"); O_WARM=$(warm_of "$O_DIR/melt")
     exp_check "onelf packed the same payload" "$([ "$O_SZ" -gt 1000 ] && echo yes || echo no)" yes
     exp_check "and it rendered a real MP4"    "$([ "${O_MP4:-0}" -gt 1000 ] && echo yes || echo no)" yes
     printf '  %-34s %14s   %8s ms render   %6s ms cold  %5s ms warm\n' \

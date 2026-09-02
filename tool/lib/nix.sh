@@ -1036,7 +1036,14 @@ nix_try_build() {   # srcdir flags log hooks [install]
               # ⛔ b2 RETURNS NON-ZERO WHEN ANY TARGET FAILED, AND A LIBRARY SET
               # ALWAYS HAS ONE. Measured on boost 1.89.0: it copied 18,512
               # targets, put every libboost_*.a in the prefix -- and exited
-              # non-zero, so pgb wrote no `.built` marker and the NEXT run
+              # ⛔ AND THE MARKER IS NAMED WITHOUT BACKTICKS, because this
+              # comment lives INSIDE a double-quoted assignment: a backtick
+              # pair here is command substitution run by the COMPOSING shell,
+              # not a quotation. Writing the marker name in backticks made
+              # dash print pgb: 1: .built: not found at the exact moment
+              # boost's round 1 started -- a message about a comment, read for
+              # an hour as a message about the build.
+              # non-zero, so pgb wrote no .built marker and the NEXT run
               # spent twenty-five minutes building it again. The success test
               # is therefore what landed, not what b2 thought of the run.
               ./bootstrap.sh --prefix=$NIX_PREFIX --without-libraries=python &&
@@ -1062,6 +1069,11 @@ nix_try_build() {   # srcdir flags log hooks [install]
   # what it chose so a wrong choice is visible rather than mysterious.
   # ⚠ Defined INSIDE the build shell because an autoreconf hook can create
   # `configure` after this function is composed.
+  # ⛔ AND IT GOES ON ITS OWN LINE. It was interpolated as the right-hand side
+  # of `&&` -- `cd X && export Y && pgb_build_root() { ... }` -- and a function
+  # definition cannot be the right operand of `&&`. What dash reported was
+  # `pgb: 1: .built: not found`, which names neither the function nor the
+  # operator and sent the reader looking for a missing file.
   _root_fn='pgb_build_root() {
   for _w in "$@"; do
     [ -f "./$_w" ] && { printf %s .; return 0; }
@@ -1087,8 +1099,11 @@ nix_try_build() {   # srcdir flags log hooks [install]
   # favour of a stale docker one. What it printed was
   # "pip packages MISSING from the environment: meson==1.9.1" about an
   # environment that has it. Same defect class as T-017, one layer in.
+  [ -n "${PGB_NIX_DEBUG_CMD:-}" ] && printf "=== CMD ===\n%s\n=== ENV ===\n%s\n=== END ===\n" "$_cmd" "$_envset" >&2
   sh "$PGB_SELF/pgb" ${ENGINE:+--engine "$ENGINE"} build --bind "$_t:$_t" --bind "$NIX_PREFIX:$NIX_PREFIX" -- sh -c "
-    cd '$_t' && export $_envset && $_root_fn
+$_root_fn
+cd '$_t' || exit 1
+export $_envset
     $_pre $_cmd
   " > "$_lg" 2>&1
 }
