@@ -73,8 +73,13 @@ func BuildLibiconv(prefix, version string, force bool) error {
 		argv []string
 		env  []string
 	}{
+		// --disable-nls drops the forty translation catalogues. pgb links
+		// libiconv.a for its conversion tables and never shows its messages,
+		// and building them needs msgfmt from gettext — a host dependency
+		// that buys nothing and that the pinned build image does not carry.
 		{"configure", []string{"./configure", "--prefix=" + prefix,
-			"--enable-static", "--disable-shared", "--enable-extra-encodings"},
+			"--enable-static", "--disable-shared", "--enable-extra-encodings",
+			"--disable-nls"},
 			[]string{"CFLAGS=-O2 -fPIC"}},
 		{"make", []string{"make", "-j" + strconv.Itoa(runtime.NumCPU())}, nil},
 		{"make install", []string{"make", "install"}, nil},
