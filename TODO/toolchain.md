@@ -1345,6 +1345,44 @@ then re-measure the big subjects once.
 4. Start and render both track artefact size — the dwarfs image is mounted at
    launch — so 1–3 move all three columns at once.
 
+### ⭐ THE COMPETITOR'S WHOLE PIPELINE IS 89 LINES, AND IT ANSWERS THE ENTRY
+
+Read 2026-09-02d out of `references/pkgforge-dev__kdenlive-AppImage-Enhanced/tree/`
+— `get-dependencies.sh` (37 lines) and `make-appimage.sh` (52). ⛔ **The gap is
+not a debloat rule we have not written. It is the direction the two pipelines
+run in.**
+
+| | ours | theirs |
+|---|---|---|
+| starting set | nixpkgs' **complete closure** — every path every derivation declared, **2.53 GiB** | `pacman -Syu` of a **hand-picked list of 12 packages** |
+| then | **subtract**: delete what can be *proved* unreachable | **add**: `quick-sharun` walks the DT_NEEDED closure of ~20 named paths |
+| the heavy packages | whatever nixpkgs built | ⭐ `get-debloated-pkgs --add-common` — size-optimised **rebuilds**, which is `pkgforge-dev/archlinux-pkgs-debloated`, the corpus this entry already names |
+| what must not come | nothing; the sweep has to *discover* it | ⭐ `pacman -Rsndd --noconfirm qt6-webengine` — an explicit **removal**, one line |
+| subsystems | inferred — our soname-string rule scans every ELF for `libSDL3.so.0` at 2.8 MiB/s | ⭐ **declared**: `DEPLOY_OPENGL=1 DEPLOY_SDL=1 DEPLOY_PIPEWIRE=1` |
+
+⛔ **SUBTRACTIVE CANNOT WIN AGAINST ADDITIVE HERE, AND IT IS STRUCTURAL RATHER
+THAN A MATTER OF EFFORT.** The sweep is deliberately conservative — sweep.go's
+own rule is *"anything a rule cannot classify counts as REACHABLE"* — so
+everything it cannot **prove** unnecessary stays. An allowlist keeps only what
+was **named**. Starting from a superset and deleting provable dead weight can
+approach the allowlist's result only if the proof is complete, and it is not:
+three classes of runtime-loaded library were invisible to it in a single
+afternoon.
+
+⭐ **And the arithmetic already said so.** `aggressive` deletes 250 MiB of
+AppDir for 42.4 MiB of artefact — about **6 to 1**, because dwarfs was already
+compressing what got deleted. Closing 426 MB → 192 MB by deletion alone would
+need roughly **1.4 GiB** more of provably-dead AppDir. There is not that much
+left to prove.
+
+⚠ **What this does NOT say.** It is a reading of somebody else's build script,
+not a measurement of ours-rebuilt-additively; the measurement backing it is the
+6:1 ratio and the 2.22× gap, both from run 6. ⭐ **The route it indicates** —
+`pgb bundle appimage` taking an allowlist of paths rather than a closure, and
+sourcing heavy packages from a debloated corpus — is the next thing to build
+and it is not yet built. `pkgforge-dev/archlinux-pkgs-debloated` is **not
+mined** into `references/`; that is the first step.
+
 **Approach.** Restudy the family first, then iterate against the CLI:
 `pkgforge__nix-appimage`, `ralismark__nix-appimage`, `of-the-stars__nix-appimage`,
 `logos-co__nix-bundle-appimage`, `VHSgunzo__sharun`, `VHSgunzo__runimage`,
