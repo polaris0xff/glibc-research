@@ -1,0 +1,128 @@
+92 - the Go port of the toolchain: T-061's six workload gates
+
+⛔ THIS FILE IS WRITTEN AS EACH GATE LANDS, NOT AT THE END. A gate with no
+   output below has not been run, and nothing here is extrapolated from
+   another row.
+
+Machine: 4 cores, ~15 GiB RAM, Linux 6.18.44-fc-v22, Ubuntu 24.04 host.
+Go: go1.24.7 linux/amd64 at /usr/local/go/bin/go.
+
+
+GATE 6 - the artefact
+---------------------------------------------------------------------------
+  CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -o pgb ./cmd/pgb
+
+  file:            ELF 64-bit LSB executable, x86-64, statically linked
+  PT_INTERP:       absent
+  DT_NEEDED:       0
+  size:            (recorded with the final artefact below)
+
+  Carried inside it, so nothing has to be cloned beside it:
+    pgb-apprun.c pgb-cacert.c pgb-dlopen.c pgb-dlopen.h pgb-iconv.c
+    pgb-locale.c pgb-nssfix.c pgb-terminfo.c pgb-trace.c
+    scripts/common/rootfs-images.txt
+
+
+GATE 4 - the wrappers, and the strongest form of the check
+---------------------------------------------------------------------------
+⭐ Not "the flags look the same": the same source built through the Go pgb and
+   through the shell pgb, under the chroot engine, produces a BYTE-IDENTICAL
+   binary.
+
+  subject:  ci/probe.c
+  command:  pgb --engine chroot build -- sh -c 'cc -O2 -o probe probe.c'
+
+  go-out/probe  2,177,320 bytes  sha256 251cec644a142ac68915793b2a3dbd161e5659aa605921dc66762109ec6a5f16
+  sh-out/probe  2,177,320 bytes  sha256 251cec644a142ac68915793b2a3dbd161e5659aa605921dc66762109ec6a5f16
+
+  .comment of both: GCC: (Debian 12.2.0-14+deb12u1) 12.2.0
+  -- the pinned environment's compiler, not this host's 13.3.0.
+
+  The wrappers are the pgb binary under another name, chosen by argv[0], and
+  they read one JSON manifest written when the wrapper directory was created.
+  No shell is started per compiler invocation.
+
+
+GATE 2 - nix-nar: hashes, extraction and SIGNATURE DECISIONS
+---------------------------------------------------------------------------
+Fixtures (offline), both implementations:
+
+  pgb selftest nix-nar                     30 cases, all pass
+  python3 scripts/common/nix-nar.py selftest   all checks pass
+
+  nix-base32 against nix-hash's own output:
+    sha256('')      0mdqa9w1p6cmli6976v4wi0sw9r4p5prkj7lzfd1877wk11c9c73
+    sha256('hello') 094qif9n4cq4fdg459qzbhg1c6wywawwaaivx0k0x8xhbyx4vwic
+  ed25519 against RFC 8032 vectors 1 and 2, accept and both refusals.
+  narinfo fixtures verify against the pinned cache.nixos.org key, and FAIL
+  when NarSize is changed.
+
+Differential on a tree with a directory, a subdirectory, an executable, a
+5,000-byte binary file and a symlink:
+
+  python3 nix-nar.py dump  -> sha256 9ec6619d92e74a99300acae011829ae85db7c0e4e58414faae48112e0453b97e
+  pgb nix nar dump         -> sha256 9ec6619d92e74a99300acae011829ae85db7c0e4e58414faae48112e0453b97e
+  BYTE-IDENTICAL ARCHIVES.
+
+  hash, both:              sha256:0zmrac22w4a8mvx19175wk0bfpg8ka113q6a18q9jjp7jafn3ily
+  python extracts go's NAR, go extracts python's NAR, and `diff -r` of the
+  two extracted trees reports no difference.
+
+⭐ A REAL cache.nixos.org OBJECT, not only fixtures:
+
+  https://cache.nixos.org/nar/1fvi35gv5c5gy2rlml3n9i9wgcp2jc3mmiznaai61xdw49rj76yi.nar.zst
+  648,570 bytes, Compression: zstd, for bash-5.3p15.
+
+  signature   go:     verified by cache.nixos.org-1
+              python: ok cache.nixos.org-1
+  NarHash     go:     sha256:1fvi35gv5c5gy2rlml3n9i9wgcp2jc3mmiznaai61xdw49rj76yi
+              python: sha256:1fvi35gv5c5gy2rlml3n9i9wgcp2jc3mmiznaai61xdw49rj76yi
+              narinfo claims the same value.
+
+⚠ ONE DIFFERENCE, STATED RATHER THAN HIDDEN. The python decoder reached zstd
+  and xz through ctypes into libzstd.so.1 and through python's own lzma. A
+  CGO_ENABLED=0 Go binary can do neither, so it pipes through the `zstd` and
+  `xz` COMMANDS and says exactly which decoder is missing when one is. Both
+  routes depend on something outside the language; they depend on different
+  things. `pgb selftest nix-nar` reports the availability of each and
+  round-trips gzip, zstd and xz rather than assuming them.
+
+
+GATE 5 - the matrix (partial: the probe, chroot arm)
+---------------------------------------------------------------------------
+  pgb --engine chroot verify <the byte-identical probe above>
+
+    ENVIRONMENT          LIBC   RESULT   HOST .so LOADED  HOST DATA READ
+    alpine-3.22          musl   ok       none             /etc/nsswitch.conf
+    alpine-3.20          musl   ok       none             /etc/nsswitch.conf
+    alpine-3.10          musl   ok       none             none
+    voidlinux-musl       musl   ok       none             /etc/nsswitch.conf
+    debian-11            glibc  ok       none             /etc/nsswitch.conf
+    debian-12            glibc  ok       none             /etc/nsswitch.conf
+    ubuntu-20.04         glibc  ok       none             /etc/nsswitch.conf
+    rockylinux-8         glibc  ok       none             /etc/nsswitch.conf
+    opensuse-leap-15.6   glibc  ok       none             /etc/nsswitch.conf
+    fedora-42            glibc  ok       none             /etc/nsswitch.conf
+    archlinux-latest     glibc  ok       none             /etc/nsswitch.conf
+
+    VERDICT: ran on every fetched environment and loaded no host shared object.
+
+  ⚠ This is ONE subject. The nine POCs and the experiment suite are the rest
+    of this gate and are recorded below as they run.
+
+
+THE CARRIED-IN SELFTESTS
+---------------------------------------------------------------------------
+  pgb selftest    72 cases, all pass
+
+  oci-pull    6 cases   the whiteout merge, with a positive control
+  rootfs-run  3 cases   isolation, with a planted file the host does not have
+  elf         8 cases   ELF and `ar` read directly, against real fixtures
+  nix-nar    30 cases   see gate 2
+  nix-drv    12 cases   the ATerm reader, its escapes and its refusals
+  nix-index  13 cases   the streaming walk at four reader sizes, against a
+                        whole-document decode as the control
+
+
+GATE 1 - nix-index on the real ~400 MB packages.json:  NOT YET RUN
+GATE 3 - doctor / env info / nix plan / verify parity: NOT YET RUN

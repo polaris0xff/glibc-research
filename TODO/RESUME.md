@@ -33,13 +33,30 @@ Asked interactively before any code was written. All four are binding.
 
 ## Where the work stands
 
-    PHASE 0  bootstrap running detached since 03:09Z, logs in
-             /var/tmp/pgb-bootstrap/{nix,env,bed,env-docker}.log.
-             ⛔ THE MACHINE IS FRESH: 0 of 11 rootfs, no build env, no nix.
-             Check with: sh scripts/common/bootstrap.sh --check
+    MACHINE  READY. 11 of 11 rootfs, chroot env, docker env, nix, zstd.
+             ⛔ bootstrap.sh's `env` step built the DOCKER environment, not
+             the chroot one — it calls `pgb env create` with no engine after
+             starting dockerd, so pick_engine returns docker. The chroot env
+             was built by hand with `sh pgb --engine chroot env create`.
+             `pgb bootstrap` in Go must not repeat it.
 
-    NEXT     the Go skeleton, then the Python helpers (they carry selftests,
-             so they are the cheapest parity to prove), then the shell.
+    DONE     the Go pgb: driver, wrappers (argv[0] multi-call), env, build,
+             verify, rootfs (native unshare+chroot, no shell), OCI pull,
+             ELF/ar reader, and the nix NAR/drv/index readers.
+             72 carried selftests, all pass.
+             ⭐ GATE 4 MET: same source through the Go pgb and the shell pgb
+             is BYTE-IDENTICAL (sha256 251cec64…).
+             ⭐ GATE 2 MET: byte-identical NARs, identical hashes, identical
+             signature decisions, on fixtures AND on a real cache.nixos.org
+             object. evidence/92-go-port/RESULT.txt has both.
+
+    NEXT     nix-fetch + nix plan/build (tool/lib/nix.sh, 1259 lines), then
+             the bundler (tool/nix-appimage.sh, 1139), then bootstrap, then
+             repoint experiments/ and poc/ at the Go entry points and run
+             gates 1, 3 and 5.
+
+    ⚠ THE SHELL IS STILL LIVE and still the oracle. Nothing has moved to
+      HISTORY/ yet; that happens per file as its gate passes.
 
 ## ⛔ Machine notes a fresh session cannot infer
 

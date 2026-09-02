@@ -13,6 +13,7 @@ import (
 	"github.com/polaris0xff/glibc-research/internal/envx"
 	"github.com/polaris0xff/glibc-research/internal/fail"
 	"github.com/polaris0xff/glibc-research/internal/logx"
+	"github.com/polaris0xff/glibc-research/internal/nixx"
 	"github.com/polaris0xff/glibc-research/internal/ociimg"
 	"github.com/polaris0xff/glibc-research/internal/rootfs"
 	"github.com/polaris0xff/glibc-research/internal/selftest"
@@ -50,6 +51,8 @@ func runCommand(c *cfg.Config, cmd string, args []string) error {
 			return fail.Cannot("pgb verify NEEDS a binary")
 		}
 		return verifyx.Verify(c, args[0], args[1:])
+	case "nix":
+		return nixCommand(c, args)
 	case "rootfs":
 		return rootfsCommand(c, args)
 	case "elf":
@@ -223,6 +226,15 @@ func selftestCommand(c *cfg.Config, args []string) error {
 	}
 	if want("elf") {
 		all.Merge(elfSelftest())
+	}
+	if want("nix-nar") {
+		all.Merge(nixx.Selftest(nixFixtureDir(c)))
+	}
+	if want("nix-drv") {
+		all.Merge(nixx.DrvSelftest())
+	}
+	if want("nix-index") {
+		all.Merge(nixx.IndexSelftest())
 	}
 	if all.Print() != 0 {
 		return fail.Exit(1)

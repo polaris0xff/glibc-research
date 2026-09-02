@@ -42,9 +42,9 @@ func Selftest() *selftest.Report {
 	addDir(tw, "usr/lib/")
 	addFile(tw, "usr/lib/.wh.libnss_stale.so.2", nil) // delete one file
 	addDir(tw, "etc/")
-	addFile(tw, "etc/.wh..wh..opq", nil)      // clear a whole directory
-	addFile(tw, "etc/resolv.conf", []byte{})  // ... then re-add into it
-	addFile(tw, "new", []byte("hello\n"))     // and add a new file
+	addFile(tw, "etc/.wh..wh..opq", nil)     // clear a whole directory
+	addFile(tw, "etc/resolv.conf", []byte{}) // ... then re-add into it
+	addFile(tw, "new", []byte("hello\n"))    // and add a new file
 	_ = tw.Close()
 
 	blob := filepath.Join(dir, "layer.tar")
