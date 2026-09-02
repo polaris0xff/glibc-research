@@ -481,9 +481,14 @@ them, one fork each, through `tool/runtime/pgb-elfload.c`.
 in a summary.** 818 of 904 load; these are the rest, ranked by how many objects
 demand each, which is `pg83/solo`'s `dev/abi_demand.py` shape.
 
+⭐ **The first row is already done and the count has moved**: crashes 30 → 10,
+because 24 of them were objects no static image should load and are now named
+refusals rather than signals.
+
 | n | what | route |
 |---|---|---|
-| 30 | **crash after loading**, and almost all of them are objects no static image should load: `libnss_*` (⛔ `docs/AGENTS.md` §14 says keeping NSS out IS the fix), `libtsan`/`libhwasan`/`libjemalloc`/`libmemusage`/`libpcprofile` — allocator and sanitizer interposers designed to arrive by `LD_PRELOAD` before libc initialises | refuse them by class, the way a served soname is already refused. That converts a crash into a named error and is most of this entry |
+| ✅ **24 of the 30 crashes** — `libnss_*` and the allocator/sanitizer interposers | ⭐ **DONE.** `el_refused_class()` refuses both families by name: `docs/AGENTS.md` §14 already says keeping NSS out IS the fix, and an interposer must be present *before* libc initialises, which in this image it already has. **Crashes 30 → 10, and 24 are now named refusals.** Re-swept, 904 objects: `ok=818 fail=76 crash=10` |
+| ⛔ **10 crashes left, and they are 5 distinct libraries** — `libLLVM-17`, `libLLVM.so.20.1`, `libclang-18`, `liblldb-18`, `libgprofng` (each counted twice, `/lib` and `/usr/lib` being the same file) | ⭐ **This is the real residue and it is one family: large C++ libraries with hundreds of static constructors.** `libLLVM-17` maps and relocates cleanly and dies in the **605th** of 604+ `DT_INIT_ARRAY` entries. Nothing else in 904 objects behaves like this |
 | 20 | **undefined symbol** | the demand-ranked worklist. Read them out of `evidence/` and decide per name whether it is class B (host glibc newer than the pin), class S (in `libc.so.6`, never in `libc.a` — `libtirpc.a` is already in the pinned environment and defines the sunrpc half), or genuinely another library's |
 | 4 | **`R_X86_64_TLSDESC`** | needs a resolver trampoline. solo implements it; `lib/elf_loader.cpp` at `79451211` is the read |
 | 2 | **static TLS surplus exhausted** — one object wants 56,248 bytes against a 3,456-byte surplus | glibc sizes the surplus from `glibc.rtld.optional_static_tls`. Whether a static binary can raise its own before `__libc_setup_tls` runs is the question, and it is not yet answered |

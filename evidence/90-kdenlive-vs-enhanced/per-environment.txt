@@ -2,3 +2,4 @@ alpine-3.22         musl   P=exit21 host=0 | E=ok host=0
 alpine-3.20         musl   P=exit21 host=0 | E=ok host=0
 alpine-3.10         musl   P=exit21 host=0 | E=ok host=0
 voidlinux-musl      musl   P=exit21 host=0 | E=ok host=0
+debian-11           glibc  P=exit21 host=0 | E=ok host=1
