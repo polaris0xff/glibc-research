@@ -949,6 +949,83 @@ already showed that a nixpkgs binary handed **the loader fetched beside it**
 runs in a rootfs with no `/nix`. That is a relocatable nix without a single
 line of C, and it is the fallback rung if the static build stops.
 
+
+## ⭐ RUNG 1 MEASURED: `pgb nix deps`, and eleven defects it found
+
+⛔ **`pgb nix deps` is new and it is what rung 1 needed.** nixpkgs' `nix` is
+**seven component derivations over ONE source tree**, so no single plan
+describes the build — but the union of those plans is exactly the library
+closure a static nix needs. `pgb nix deps --plan X` builds a plan's
+dependencies into the shared static prefix and stops.
+
+**First pass: 24 built, 32 failed.** The failures were specific enough to fix
+rather than to report, and fixing them is the "universal builder" work goal 1
+names:
+
+| what stopped | why | fixed by |
+|---|---|---|
+| boost | `bootstrap.sh` + `b2` is a build system pgb did not know; it said *"No targets specified and no makefile found"* | a b2 branch |
+| zstd, libblake3, icu4c | the build file is in `build/cmake/`, `c/`, `icu4c/source/` | `pgb_build_root()` finds the shallowest one and says which it chose |
+| lowdown | `oconfigure` takes `PREFIX=` and prints its key list when handed `--prefix` | an oconfigure branch |
+| libseccomp | `configure: error: please install gperf` | `gperf` in the environment |
+| **all six nix components** | `Meson version is 1.0.1 but project requires >= 1.1` | `meson==1.9.1` pip-installed into the environment, **with the pip set in the environment stamp** |
+| doctest | its CMake config looks for MPI | test-only dependencies skipped by default |
+
+### ⛔ And five defects in pgb itself, each of which produced a plausible result
+
+1. **`pgb nix` ran every inner `pgb build` through `pick_engine`**, so
+   `--engine chroot` was used for nothing and a freshly rebuilt chroot
+   environment was ignored for a stale docker one. T-017 one layer in.
+2. **The environment stamp's `packages=[\(.*\)]$` is greedy**, so adding a
+   second bracketed field made it capture `a b] pip=[c` — and pgb refused a
+   just-created environment for missing a package that was in it.
+3. **The Dockerfile put the pip step above the trust anchor**, so pip died
+   with *"certificate verify failed"* five retries deep: a message about pypi
+   that is really about the order of two lines.
+4. ⛔ **The `cpp` wrapper appended LINK flags and the runtime OBJECT to the
+   preprocessor.** `cpp foo.c` has no `-c`/`-E`/`-S`, so the wrapper chose
+   `mode=link`. On libX11 that produced `pgb-nssfix.o:4:457: warning: null
+   character(s) ignored` and `configure: error: .../cpp defines unix with or
+   without -undef`. `cpp` is a query tool and is passed through untouched now.
+5. ⛔ **`PKG_CONFIG_PATH` had `lib/pkgconfig` and not `share/pkgconfig`**,
+   where every architecture-independent package puts its `.pc`. libxcb's
+   configure said *"Package 'xcb-proto', required by 'virtual:world', not
+   found"* about a package built one directory over.
+
+### ⛔ Three more, and the last one is the worst kind
+
+6. **`pgb nix deps` keyed its per-dependency directories on the NAME alone**,
+   so two runs with different `$NIX_PREFIX` shared
+   `$PGB_STATE/nix-deps/openssl`; one run's tree was rebuilt under the other's
+   feet and the loser failed compiling a demo. T-058 arriving in `pgb nix`.
+7. **nixpkgs writes its output paths as placeholders** — `--libdir=$(out)/lib`
+   and `--libdir=/02qcpld…52chars/lib` — and passed through, **libxml2
+   installed itself into `/02qcpld1y6xhs5gz9bchpxaw0xdhmsp5dv88lh25r2ss44kh8dxz/lib`**.
+   `.built/libxml2` was written, the prefix had nothing in it, and libxkbcommon
+   then failed for want of a library that had just "built".
+8. ⛔ **meson and openssl install into `lib64` while everything else looks in
+   `lib`.** `dep ok libxkbcommon` was printed, `.built/libxkbcommon` was
+   written, `xkbcommon.pc` was sitting in `lib64/pkgconfig`, and qtbase's
+   configure said `XKB_FOUND = "FALSE"`. openssl's `libcrypto.a` was there too,
+   in **both** prefixes. ⭐ **A dependency that builds, installs and is
+   invisible is the worst of the three outcomes**, and pgb produced it twice.
+
+### ⭐ And one adaptation rule worth having
+
+meson prints the option that turns a feature off, in the error:
+*"You can disable the Wayland xkbcli programs with `-Denable-wayland=false`."*
+`nix_diagnose` takes that literally — only the disable form, only when the flag
+is not already set. Measured on libxkbcommon: two rounds, two of meson's own
+suggestions, built on the third.
+
+⚠ **And the plan carries three flag lists while only `configureFlags` was ever
+read**, so every cmake and meson package got none of the options nixpkgs chose
+for it — including nix's own `-Dgc=enabled`, `-Dcpuid=enabled` and
+`-Dseccomp-sandboxing=enabled`.
+
+**Where rung 1 stands:** the closure is being rebuilt with all of the above in
+place. ⛔ **Rungs 2 and 3 are not reached and this entry stays open.**
+
 **Prove.** `evidence/89-static-nix/RESULT.txt`: the rung reached, with the
 error and the file it came from for the rung that stopped — plus, for any rung
 reached, `nix-instantiate` naming a derivation inside a rootfs that has no nix.

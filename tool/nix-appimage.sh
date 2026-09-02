@@ -939,16 +939,29 @@ fi
 NWENV=0
 if [ -s "$WRAPENV" ]; then
   mkdir -p "$APPDIR/store"
-  # Copy every store path the wrapper's environment refers to.
-  for _sp in $(grep -oE '/nix/store/[a-z0-9]{32}-[^:; ]*' "$WRAPENV" 2>/dev/null \
-               | sed -E 's|(/nix/store/[a-z0-9]{32}-[^/]*).*|\1|' | sort -u); do
-    _b=$(basename "$_sp")
+  # ⛔ COPY THE SUBDIRECTORY THE VARIABLE NAMES, NOT THE WHOLE PACKAGE.
+  # `QT_PLUGIN_PATH=/nix/store/...-qtdeclarative-6.11.1/lib/qt-6/plugins` names
+  # one directory; the first version copied the entire 190 MB store path for
+  # it, and every one of qtdeclarative's shared objects was ALREADY flattened
+  # into the bundle's own lib/. Measured on kdenlive: the store shard came to
+  # 947 MB of a 1.2 GB lib/ -- most of it a second copy of the same files.
+  # ⚠ A value naming the package ROOT still copies the package; that is the
+  # variable's own request, not an over-copy.
+  for _ref in $(grep -oE '/nix/store/[a-z0-9]{32}-[^:; ]*' "$WRAPENV" 2>/dev/null | sort -u); do
+    _b=$(printf '%s' "$_ref" | sed -E 's|^/nix/store/([^/]*).*|\1|')
+    _sub=$(printf '%s' "$_ref" | sed -E 's|^/nix/store/[^/]*/?||')
     _n=$(printf '%s' "$_b" | cut -c34-)
     if [ ! -d "$ROOT/$_b" ]; then
-      sh "$FETCH" fetch "$_sp" --out "$ROOT" >/dev/null 2>&1 \
+      sh "$FETCH" fetch "/nix/store/$_b" --out "$ROOT" >/dev/null 2>&1 \
         || { warn "wrapper env names $_b, which is not in the closure and could not be fetched"; continue; }
     fi
-    [ -d "$APPDIR/store/$_n" ] || cp -aL "$ROOT/$_b" "$APPDIR/store/$_n" 2>/dev/null || true
+    if [ -n "$_sub" ] && [ -e "$ROOT/$_b/$_sub" ]; then
+      [ -e "$APPDIR/store/$_n/$_sub" ] && continue
+      mkdir -p "$APPDIR/store/$_n/$(dirname "$_sub")"
+      cp -aL "$ROOT/$_b/$_sub" "$APPDIR/store/$_n/$_sub" 2>/dev/null || true
+    else
+      [ -d "$APPDIR/store/$_n" ] || cp -aL "$ROOT/$_b" "$APPDIR/store/$_n" 2>/dev/null || true
+    fi
   done
   # ⭐ prefix/suffix/set become sharun .env lines with the SAME semantics.
   # sharun expands ${SHARUN_DIR} and ${VAR}, so a prefix is `V=new${SEP}${V}`.
@@ -1029,9 +1042,10 @@ for _bp in $BAKED; do
   _bn=$(printf '%s' "$_bb" | cut -c34-)
   _lines=$(baked_override "$_bn" "$_bs")
   [ -n "$_lines" ] || continue
-  if [ ! -d "$APPDIR/store/$_bn" ]; then
-    mkdir -p "$APPDIR/store"
-    cp -aL "$ROOT/$_bb" "$APPDIR/store/$_bn" 2>/dev/null || continue
+  # Only the directory the baked path names, for the same reason.
+  if [ ! -e "$APPDIR/store/$_bn/$_bs" ]; then
+    mkdir -p "$APPDIR/store/$_bn/$(dirname "$_bs")"
+    cp -aL "$ROOT/$_bb/$_bs" "$APPDIR/store/$_bn/$_bs" 2>/dev/null || continue
   fi
   printf '%s\n' "$_lines" >> "$APPDIR/.env"
   BAKED_VARS="$BAKED_VARS $(printf '%s' "$_lines" | cut -d= -f1 | tr '\n' ' ')"

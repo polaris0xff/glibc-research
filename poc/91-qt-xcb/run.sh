@@ -170,6 +170,78 @@ QT_CONFIGURE_LINE="-static -release -force-bundled-libs \
 -openssl-linked -sql-sqlite -qt-sqlite -no-cups -no-fontconfig -no-libudev \
 -no-feature-testlib -qpa xcb -default-qpa xcb -nomake examples -nomake tests"
 
+# ⛔ A STATIC ARCHIVE'S DEPENDENCIES HAVE TO COME AFTER IT, AND QT'S CONFIGURE
+# TESTS DO NOT KNOW THAT. `libX11.a` calls into libxcb, so Qt's `xcb_syslibs`
+# test failed with
+#
+#   libx11/.../src/xcb_io.c:272: undefined reference to `xcb_poll_for_event'
+#
+# and configure reported `TEST_xcb_syslibs = ""` -- a feature test failing for
+# a link-order reason, on libraries that are all present. With shared
+# libraries the loader resolves this and nobody notices; that is precisely the
+# difference this project is about.
+#
+# ⭐ `CMAKE_C_STANDARD_LIBRARIES` is appended AFTER every other library on the
+# link line, which is the one place a transitive static dependency can go.
+# Repeating a library is safe: an archive member is pulled in once.
+# ⛔ AND THE TAIL IS A GROUP. The xcb-util libraries call back into libxcb and
+# libxcb calls into libXau/libXdmcp, so no single ordering resolves them all:
+# the second attempt moved past libX11's xcb references and stopped at
+# `libxcb-1.17.0/src/xcb_auth.c: undefined reference to XauGetBestAuthByAddr`.
+# `--start-group` is the linker's own answer to a cycle between archives.
+STATIC_TAIL="-Wl,--start-group -lxcb -lXau -lXdmcp -lxcb-xkb -lxcb-util -lxcb-image -lxcb-keysyms -lxcb-render-util -lxcb-icccm -lxcb-cursor -lxcb-render -lxcb-shm -lxcb-shape -lxcb-randr -lxcb-xfixes -lxcb-sync -lxcb-xinerama -lxcb-dri3 -lxcb-present -lxcb-glx -lxcb-xinput -lxkbcommon -lxkbcommon-x11 -Wl,--end-group -lpthread -ldl -lm"
+
+# ⭐ QT'S CONFIG TEST IS ANSWERED WITH EVIDENCE, NOT ARGUED WITH.
+#
+# `TEST_xcb_syslibs` is a `try_compile` whose link line Qt composes itself,
+# from an `XCB::XCB` target that carries no transitive information for a
+# STATIC libxcb. It therefore fails on link order alone:
+#
+#   libxcb-1.17.0/src/xcb_auth.c: undefined reference to `XauGetBestAuthByAddr'
+#   .../xcb_io.c: undefined reference to `xcb_poll_for_event'
+#
+# -- a cycle between libX11.a, libxcb.a and libXau.a, which is what
+# `--start-group` exists for and which Qt's test cannot be told about through
+# CMAKE_C_STANDARD_LIBRARIES (its try_compile does not use it).
+#
+# ⛔ SO THE OVERRIDE IS ONLY TAKEN IF THIS POC PROVES THE LINK ITSELF. The
+# program below opens an xcb connection and uses xkbcommon-x11, linked exactly
+# the way the Qt build will link it. If THAT fails, the override is not passed
+# and the rung is recorded as stopped -- which is the point: an override
+# nobody checked is a way of making a build succeed by lying to it.
+printf -- '\n-- rung 2b: proving the static xcb link before overriding Qt ----\n'
+cat > "$W/xcbprobe.c" <<'EOF'
+#include <xcb/xcb.h>
+#include <xcb/xkb.h>
+#include <xkbcommon/xkbcommon-x11.h>
+#include <X11/Xlib.h>
+#include <stdio.h>
+int main(void)
+{
+    int screen = 0;
+    xcb_connection_t *c = xcb_connect(NULL, &screen);
+    int err = c ? xcb_connection_has_error(c) : -1;
+    /* referenced so the xkbcommon-x11 archive is really needed */
+    int dev = c && !err ? xkb_x11_get_core_keyboard_device_id(c) : -1;
+    if (c) xcb_disconnect(c);
+    printf("xcb=%d xkb_device=%d\n", err, dev);
+    return 0;
+}
+EOF
+POC_PGB_FLAGS="--bind $PREFIX" \
+poc_in_env "cd $W && \$CC -I$PREFIX/include -o xcbprobe xcbprobe.c \
+   -L$PREFIX/lib $STATIC_TAIL" >>"$LOG" 2>&1
+XCBLINK=$([ -x "$W/xcbprobe" ] && echo ok || echo failed)
+poc_check "a static xcb + xkbcommon-x11 program links" "$XCBLINK" ok
+if [ "$XCBLINK" != ok ]; then
+  rung_failed "static xcb link" "the xcb archives do not link even in a group" "$LOG"
+  poc_finish
+fi
+poc_check "and it is static (no PT_INTERP)" \
+  "$(readelf -l "$W/xcbprobe" 2>/dev/null | grep -c INTERP)" "0"
+QT_TEST_OVERRIDES="-DTEST_xcb_syslibs=ON"
+poc_note "so Qt is told TEST_xcb_syslibs=ON, with the link above as the evidence"
+
 if [ ! -x "$INST/bin/qmake" ]; then
   # ⛔ `CMakeCache.txt` IS NOT A CONFIGURE-SUCCEEDED MARKER, and treating it as
   # one cost a whole run. A configure that dies part way still leaves one, so a
@@ -197,7 +269,9 @@ if [ ! -x "$INST/bin/qmake" ]; then
        CFLAGS=-I$PREFIX/include CXXFLAGS=-I$PREFIX/include LDFLAGS=-L$PREFIX/lib \
        OPENSSL_ROOT_DIR=$PREFIX \
        $SRC/configure -prefix $INST $QT_CONFIGURE_LINE \
-       -- -DCMAKE_PREFIX_PATH=$PREFIX -DCMAKE_FIND_ROOT_PATH=$PREFIX" >>"$LOG" 2>&1 \
+       -- -DCMAKE_PREFIX_PATH=$PREFIX $QT_TEST_OVERRIDES \
+       -DCMAKE_C_STANDARD_LIBRARIES='$STATIC_TAIL' \
+       -DCMAKE_CXX_STANDARD_LIBRARIES='$STATIC_TAIL'" >>"$LOG" 2>&1 \
       || { poc_check "qtbase configures with xcb" failed ok
            rung_failed "qtbase configure -xcb" "./configure refused" "$LOG"; poc_finish; }
   fi

@@ -3,19 +3,23 @@ POC 91-qt-xcb -- THE RUNG THAT STOPPED IT
 
 rung      : qtbase configure -xcb
 summary   : ./configure refused
-date (UTC): 2026-09-02T00:15:54Z
+date (UTC): 2026-09-02T00:31:05Z
 configure : -static -release -force-bundled-libs -xcb -xkbcommon -bundled-xcb-xinput -no-opengl -no-dbus -no-glib -no-icu -openssl-linked -sql-sqlite -qt-sqlite -no-cups -no-fontconfig -no-libudev -no-feature-testlib -qpa xcb -default-qpa xcb -nomake examples -nomake tests
 
 -- the error, verbatim, with the file it came from --------------
 
 104:CMake Error at cmake/QtBuildInformation.cmake:559 (message):
-124:CMake Error at cmake/QtBuildInformation.cmake:559 (message):
-161:CMake Error at cmake/QtBuildInformation.cmake:245 (message):
-172:See also "/var/tmp/pgb-poc/91-qt-xcb/build/CMakeFiles/CMakeError.log".
-173:CMake Error at /var/tmp/pgb-poc/91-qt-xcb/qtbase/cmake/QtProcessConfigureArgs.cmake:1500 (message):
+139:CMake Error at cmake/QtBuildInformation.cmake:245 (message):
+150:See also "/var/tmp/pgb-poc/91-qt-xcb/build/CMakeFiles/CMakeError.log".
+151:CMake Error at /var/tmp/pgb-poc/91-qt-xcb/qtbase/cmake/QtProcessConfigureArgs.cmake:1500 (message):
 
 -- the last 40 lines of the log --------------------------------
 
+
+Call Stack (most recent call first):
+  cmake/QtFeature.cmake:831 (qt_configure_add_report_error)
+  cmake/QtFeature.cmake:968 (qt_feature_check_and_save_internal_value)
+  cmake/QtFeature.cmake:1249 (qt_evaluate_feature)
   cmake/QtFeature.cmake:1213 (qt_feature_module_end)
   src/CMakeLists.txt:13 (qt_feature_evaluate_features)
 
@@ -33,11 +37,6 @@ Condition values dump:
     TARGET XCB::XCB found
     TEST_xcb_syslibs = ""
     QT_FEATURE_xkbcommon_x11 not evaluated
-
-ERROR: Feature "xkbcommon": Forcing to "ON" breaks its condition:
-    XKB_FOUND
-Condition values dump:
-    XKB_FOUND = "FALSE"
 
 
 CMake Error at cmake/QtBuildInformation.cmake:245 (message):
