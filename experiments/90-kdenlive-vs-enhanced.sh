@@ -32,7 +32,7 @@
 set -u
 . "$(dirname "$0")/lib.sh"
 
-exp_begin "90 - our kdenlive bundle against kdenlive-AppImage-Enhanced"
+exp_begin "90 - our kdenlive bundle against kdenlive-AppImage-Enhanced AND onelf"
 
 RR="$REPO_DIR/scripts/common/rootfs-run.sh"
 BUNDLER="$REPO_DIR/tool/nix-appimage.sh"
@@ -177,6 +177,74 @@ printf '  %-34s %10s ms cold   %8s ms warm\n' "P  ours"     "$P_COLD" "$P_WARM"
 printf '  %-34s %10s ms cold   %8s ms warm\n' "E  enhanced" "$E_COLD" "$E_WARM"
 
 # ---------------------------------------------------------------------------
+# arm O -- ⭐ onelf, the third packer
+# ---------------------------------------------------------------------------
+# ⛔ THE OPERATOR NAMED IT, 2026-09-02: *"QaidVoid/onelf is an 'alternative' to
+# AnyLinux AppImages, the 'competitor' that is currently winning all the tests
+# and comparisons ... i want to see if anylinux still wins everyone."*
+#
+# ⭐ SAME PAYLOAD, DIFFERENT PACKER, WHICH IS THE ONLY WAY THIS ARM IS FAIR.
+# Arm E ships Arch's kdenlive; arm P ships nixpkgs'. Giving onelf a THIRD build
+# would measure three distributions rather than three packers. So arm O is
+# built from **our own AppDir** -- the same nixpkgs binaries, the same 5,000
+# libraries -- packed by onelf instead of by uruntime+dwarfs+sharun. The
+# difference between P and O is therefore the packing and the runtime, and
+# nothing else.
+#
+# ⚠ onelf is vendored at `references/QaidVoid__onelf` commit
+# 74b4c9a40aa2bab1e78b7f2898583678780b6d85 and built from that source; its
+# runtime stub needs a musl gcc and the x86_64-unknown-linux-musl rust target,
+# and the arm is SKIPPED rather than faked when either is missing.
+printf -- '\n-- arm O: the same payload, packed by onelf ----------------------\n'
+ONELF_SRC="$REPO_DIR/references/QaidVoid__onelf/tree"
+ONELF_BIN="$ONELF_SRC/target/release/onelf"
+ONELF="$WORK/kdenlive-onelf.bin"
+OURDIR="$CACHE/kdenlive/AppDir"
+if [ ! -x "$ONELF_BIN" ]; then
+  command -v cargo >/dev/null 2>&1 && \
+    ( cd "$ONELF_SRC" && ONELF_MUSL_CC=musl-gcc cargo build --release ) \
+      >>"$B/onelf-build.log" 2>&1 || true
+fi
+O_SZ=0; O_R=-1; O_COLD=-1; O_WARM=-1; O_MP4=0
+if [ ! -x "$ONELF_BIN" ]; then
+  exp_skip "arm O (onelf)" "onelf did not build; see $B/onelf-build.log"
+elif [ ! -d "$OURDIR" ]; then
+  exp_skip "arm O (onelf)" "our AppDir is not on disk to repack"
+else
+  if [ ! -s "$ONELF" ]; then
+    D="$WORK/onelfdir"; rm -rf "$D"; mkdir -p "$D/bin" "$D/lib"
+    # ⭐ The payload ELFs and the flattened library tree, exactly as our own
+    # bundle carries them. ⚠ `cp -al` where possible: two copies of 1.2 GB of
+    # libraries is disk this machine does not have.
+    cp -al "$OURDIR"/shared/bin/* "$D/bin/" 2>/dev/null || cp -a "$OURDIR"/shared/bin/* "$D/bin/"
+    cp -al "$OURDIR"/lib/. "$D/lib/" 2>/dev/null || cp -a "$OURDIR"/lib/. "$D/lib/"
+    [ -d "$OURDIR/share" ] && { cp -al "$OURDIR/share" "$D/share" 2>/dev/null || cp -a "$OURDIR/share" "$D/share"; }
+    [ -d "$OURDIR/store" ] && { cp -al "$OURDIR/store" "$D/store" 2>/dev/null || cp -a "$OURDIR/store" "$D/store"; }
+    _ep=""
+    for _p in "$OURDIR"/shared/bin/*; do
+      _n=$(basename "$_p"); [ "$_n" = kdenlive ] && continue
+      _ep="$_ep --entrypoint $_n=bin/$_n"
+    done
+    exp_note "packing $(ls "$D/lib" | wc -l) libraries and $(ls "$D/bin" | wc -l) programs with onelf"
+    # shellcheck disable=SC2086
+    "$ONELF_BIN" pack "$D" -o "$ONELF" --command bin/kdenlive --name kdenlive $_ep \
+      >>"$B/onelf-pack.log" 2>&1 || exp_note "onelf pack failed; see $B/onelf-pack.log"
+  fi
+  if [ -s "$ONELF" ]; then
+    chmod +x "$ONELF"
+    O_SZ=$(wc -c < "$ONELF")
+    O_R=$(render "$ONELF" onelf); O_MP4=$( [ -f "$WORK/onelf.mp4" ] && wc -c < "$WORK/onelf.mp4" || echo 0)
+    O_COLD=$(cold_of "$ONELF"); O_WARM=$(warm_of "$ONELF")
+    exp_check "onelf packed the same payload" "$([ "$O_SZ" -gt 1000 ] && echo yes || echo no)" yes
+    exp_check "and it rendered a real MP4"    "$([ "${O_MP4:-0}" -gt 1000 ] && echo yes || echo no)" yes
+    printf '  %-34s %14s   %8s ms render   %6s ms cold  %5s ms warm\n' \
+      "O  onelf (our payload)" "$O_SZ" "$O_R" "$O_COLD" "$O_WARM"
+  else
+    exp_skip "arm O (onelf)" "no artefact was produced"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
 # the eleven
 # ---------------------------------------------------------------------------
 printf -- '\n-- melt on the eleven, both artefacts -----------------------------\n'
@@ -285,12 +353,15 @@ exp_note "⚠ both arms use a shell AppRun; the four musl rows are zero for both
   printf '  %-34s %14s\n' 'E  kdenlive-AppImage-Enhanced' "$E_SZ"
   printf '  %-34s %14s\n' '   ratio P/E' \
     "$(awk -v p="$P_SZ" -v e="$E_SZ" 'BEGIN{printf "%.2fx", p/e}')"
+  printf '  %-34s %14s\n' 'O  onelf (our payload, their packer)' "${O_SZ:-skipped}"
   printf '\nrender (melt, a real MP4):\n'
   printf '  P %s ms, %s bytes of MP4\n' "$P_R" "$P_MP4"
   printf '  E %s ms, %s bytes of MP4\n' "$E_R" "$E_MP4"
+  printf '  O %s ms, %s bytes of MP4\n' "${O_R:-skipped}" "${O_MP4:-0}"
   printf '\nstartup (melt -version):\n'
   printf '  P %s ms cold, %s ms warm\n' "$P_COLD" "$P_WARM"
   printf '  E %s ms cold, %s ms warm\n' "$E_COLD" "$E_WARM"
+  printf '  O %s ms cold, %s ms warm\n' "${O_COLD:-skipped}" "${O_WARM:-skipped}"
   printf '\non the eleven: ours %s/%s rendered, %s/%s with zero host objects;\n' \
     "$P_RUNS" "$ENVS" "$P_CLEAN" "$ENVS"
   printf '               the competitor %s/%s rendered, %s/%s clean.\n' \
