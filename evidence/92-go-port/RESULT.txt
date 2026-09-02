@@ -213,3 +213,64 @@ had more than one claimant; `--log trace` names each.
 ⚠ Both answers are BUILDABLE — the two derivations produce the same output —
 so nothing built from either plan was wrong. What was wrong is that one
 attribute had two plans and nothing said so.
+
+
+REQUIREMENT 2 - pgb builds itself with pgb, and needs no repository beside it
+---------------------------------------------------------------------------
+"produce a single statically linked executable pgb we can distribute and devs
+don't need to clone the repo and run setup etc ... and pgb must then build
+itself with pgb."
+
+  pgb --engine chroot build --bind /usr/local/go --bind DIR:/out -- \
+    sh -c 'CGO_ENABLED=0 go build -trimpath -buildvcs=false -o /out/pgb ./cmd/pgb'
+
+⭐ BYTE-IDENTICAL to the host build of the same tree:
+
+  built on the host      11,655,641 bytes  sha256 8fcf86da3ec3b02b011bc6865cf72dacb96fd6b969ce6764007c952a7dedcd26
+  built by pgb, inside   11,655,641 bytes  sha256 8fcf86da3ec3b02b011bc6865cf72dacb96fd6b969ce6764007c952a7dedcd26
+
+  file:      ELF 64-bit LSB executable, x86-64, statically linked
+  PT_INTERP: absent          DT_NEEDED: 0
+  and it runs: `pgb selftest zstd` inside gives 22 cases, all pass.
+
+⚠ WITHOUT -buildvcs=false the two differ by 16 bytes, and the reason is
+stated rather than worked around: the host build is in a git worktree and Go
+stamps the revision into it; the pinned environment has no git, so Go omits
+the stamp. Nothing else differs.
+
+A COPY WITH NO REPOSITORY BESIDE IT, in an otherwise empty directory:
+
+  ./pgb --engine host build -- sh -c '$CC -O2 -o t t.c'
+  t: ELF 64-bit LSB executable, x86-64, statically linked
+  ./pgb selftest zstd   -> 22 cases, all pass
+  ./pgb doctor          -> reports the host, finds the compiler, static
+                           linking and __nss_configure_lookup in libc.a
+
+The C runtime sources and the rootfs manifest are inside the binary, so
+there is nothing to clone and nothing to install beside it.
+
+
+ZSTD - decoded in Go, differential against the reference encoder
+---------------------------------------------------------------------------
+⛔ WHY IT IS A GATE AT ALL. The pinned build environment carries no zstd
+binary. The retired Python reached libzstd.so.1 through ctypes; CGO_ENABLED=0
+has no equivalent, so `pgb nix build` inside the environment stopped at
+"zstd-compressed and no zstd decoder on PATH" -- experiment 88 arm 5.
+
+internal/zstd decodes RFC 8878 with nothing outside the standard library.
+
+  corpus:  120 frames from 12 inputs -- /usr/bin/gcc, libc.so.6, pgb itself,
+           /usr/share/dict/words, GPL-3, a build log, 3 MB of urandom, and
+           six synthetic shapes -- at levels 1,2,3,5,8,12,16,19, plus
+           --ultra -22 --long=27 and -3 --no-check.
+  result:  120 of 120 byte-identical to the input, read whole AND one byte
+           at a time.
+  damage:  572 truncations, every one refused. 400 flipped bytes: none
+           decoded to different content without an error.
+
+  Carried offline as `pgb selftest zstd`: 8 frames and the generators for
+  their plaintexts, 22 cases.
+
+⚠ xz is still decoded by the xz command. cache.nixos.org serves .nar.xz for
+older paths; the build environment has xz and a target rootfs does not, so an
+xz NAR fetched from inside a target would still stop. Stated, not hidden.

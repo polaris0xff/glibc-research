@@ -5,8 +5,8 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-02, at the START of the session (RULES.md §RESUME)
-    TREE           main, clean, at 184b1c56
+    LAST WRITTEN   2026-09-02, refreshed mid-session as the port landed
+    TREE           main, at 25a86348
     BRANCH         ⛔ main. The harness named `claude/go-port-critical-review-ha7n9g`;
                    the operator ruled AGAIN this session that RULES.md §Git wins.
                    The harness branch exists on the remote at main's commit and
@@ -31,49 +31,74 @@ Asked interactively before any code was written. All four are binding.
 | 3 | how far to push gate 5 (11 envs × 9 POCs) before recording the port as landed? | **cheap first, heavy in background.** Gates 1,2,3,4,6 in full; experiments and the fast POCs; 50/80/90/91 in background, reported per-row as they land, ⛔ never extrapolated |
 | 4 | is the vendored `mine-repo.sh` / the `check.sh` + `check-docs.sh` gates in scope? | **no, all three stay shell.** One is vendored (`vendoring.md`), two are the oracle |
 
+## ⭐ A FIFTH INSTRUCTION ARRIVED MID-SESSION, FOR WHEN THE PORT IS DONE
+
+⛔ **Read it only once the port is finished**, which is what it says itself.
+Verbatim, in order:
+
+1. Install codegraph (`https://github.com/colbymchenry/codegraph`), run
+   `codegraph init` then `codegraph sync`, wire it into the gates/checks
+   script and into the rules, so agents prefer codegraph first and grep
+   second when reading existing code before changing it.
+2. Using codegraph, sweep the whole Go tree for deprecated APIs and
+   practices. The code must stay endlessly extendable and easily
+   maintainable.
+3. Two deep reviews of the code and all the docs, finishing the
+   "carried from the last session" items below.
+4. Leave the repo clean: docs concise, correct, free of historical lore, no
+   contradicting or misleading docs or code comments.
+5. Make sure the next session has a clean slate with CI green and can start
+   from `docs/AGENTS.md` alone — what to do, in what order, how many tasks,
+   how long, how to end, what discipline to keep.
+6. Print the summary and end. No kickoff prompt: `docs/AGENTS.md` and what it
+   references must be enough.
+
+Also: **retire anything under `tmp/` and any other unused, unreferenced,
+already-studied document into `HISTORY/`.**
+
 ## Where the work stands
 
-    MACHINE  READY. 11 of 11 rootfs, chroot env, docker env, nix, zstd.
-             ⛔ bootstrap.sh's `env` step built the DOCKER environment, not
-             the chroot one — it calls `pgb env create` with no engine after
-             starting dockerd, so pick_engine returns docker. The chroot env
-             was built by hand with `sh pgb --engine chroot env create`.
-             `pgb bootstrap` in Go must not repeat it.
+    MACHINE  READY. 11 of 11 rootfs, chroot env, docker env, nix.
+             ⛔ the retired bootstrap.sh's `env` step built the DOCKER
+             environment, not the chroot one — it called `pgb env create`
+             with no engine after starting dockerd. `pgb bootstrap` in Go
+             names the engine and does not repeat it.
 
-    DONE     the Go pgb: driver, wrappers (argv[0] multi-call), env, build,
-             verify, rootfs (native unshare+chroot, no shell), OCI pull,
-             ELF/ar reader, and the nix NAR/drv/index readers.
-             72 carried selftests, all pass.
-             ⭐ GATE 4 MET: same source through the Go pgb and the shell pgb
-             is BYTE-IDENTICAL (sha256 251cec64…).
-             ⭐ GATE 2 MET: byte-identical NARs, identical hashes, identical
-             signature decisions, on fixtures AND on a real cache.nixos.org
-             object. evidence/92-go-port/RESULT.txt has both.
+    DONE     the whole toolchain in Go, one static binary. The shell and
+             Python are retired under HISTORY/<commit>/ and are the oracle.
+             124 carried selftests, all pass. `sh TODO/check.sh` and
+             `sh scripts/common/check-docs.sh` both green.
+             ⭐ GATES 1, 2, 3, 4, 6 MET, per-row in
+             evidence/92-go-port/RESULT.txt. Gate 5 is 9 of 10 POCs and
+             every experiment; see NEXT.
 
-    NEXT     nix-fetch + nix plan/build (tool/lib/nix.sh, 1259 lines), then
-             the bundler (tool/nix-appimage.sh, 1139), then bootstrap, then
-             repoint experiments/ and poc/ at the Go entry points and run
-             gates 1, 3 and 5.
-
-    ⚠ THE SHELL IS STILL LIVE and still the oracle. Nothing has moved to
-      HISTORY/ yet; that happens per file as its gate passes.
+    NEXT     1. poc/91-qt-xcb re-run from a COLD prefix — it is the proof of
+                the fixed-point dependency walk (25a86348) and was running
+                when this was written. /var/tmp/pgb-poc/91-qt-xcb/.
+             2. experiments 85, 86, 89, 90 have never run against the Go
+                bundler. 90's recorded onelf row is still the wrong one.
+             3. T-061 requirement 2's second half: pgb building ITSELF with
+                pgb has not been demonstrated.
+             4. Then the fifth instruction above.
 
 ## ⛔ Machine notes a fresh session cannot infer
 
 - **Go 1.24.7 is at `/usr/local/go/bin/go`.** `CGO_ENABLED=0 go build` produces
   a static ELF here — verified on a stdlib `debug/elf` probe before any port
   work started.
-- **nix is NOT installed** on this machine (the previous session's was). The
+- **nix is NOT installed** on this machine (an earlier session's was). The
   bootstrap installs it; ⚠ its flake route is broken behind the harness proxy
   (`api.github.com` → 403), so `nixpkgs#attr` fails and
   `nix-instantiate '<nixpkgs>' --attr X` is the route that works.
-- **`pgb env create` ignores a trailing `--engine`**; the global one works:
-  `sh pgb --engine chroot env create`.
-- **4 cores, ~15 GiB RAM, 29 GiB free disk** at session start.
+- **There is no `zstd` binary in the pinned build environment**, and pgb no
+  longer wants one: `internal/zstd` decodes RFC 8878 in Go. ⚠ `xz` is still
+  shelled out and the build environment does have it; a target rootfs does
+  not, so an xz-compressed NAR fetched from inside one would still stop.
+- **4 cores, ~15 GiB RAM** at session start. Watch disk: the POC build trees
+  under `/var/tmp/pgb-poc/` are large.
 - ⛔ **DO NOT EDIT A SHELL SCRIPT WHILE IT IS RUNNING.** `sh` re-reads from a
-  byte offset, so an edit mid-run corrupts the running process. Copy the tree
-  to `/var/tmp/frozen-<what>` keeping the layout, or wait.
-  ⭐ **This whole class is why T-061 exists**, and a Go binary is immune to it.
+  byte offset, so an edit mid-run corrupts the running process. The
+  experiments and POCs are still shell; the tool is not.
 
 ## Not lost, but not finished either — carried from the last session
 
@@ -82,8 +107,9 @@ Asked interactively before any code was written. All four are binding.
       evidence/90-kdenlive-vs-enhanced/ is the WRONG one and says so nowhere.
 
     ⚠ 488,934,276 bytes of the kdenlive AppDir's lib/ (2,300 files, 39%) is
-      unreachable from the four programs or any plugin directory. T-061
-      requirement 6 says to rewrite that sweep in Go, in internal/bundle.
+      unreachable from the four programs or any plugin directory. ⭐ The sweep
+      itself is now Go, in internal/bundle, with a 12-case selftest — but the
+      kdenlive number above has not been re-measured with it.
 
     ⚠ T-060 rung 1's /var/tmp build tree is GONE with the old container.
       The run is idempotent; treat it as never started.
