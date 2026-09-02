@@ -1432,8 +1432,78 @@ not a measurement of ours-rebuilt-additively; the measurement backing it is the
 6:1 ratio and the 2.22× gap, both from run 6. ⭐ **The route it indicates** —
 `pgb bundle appimage` taking an allowlist of paths rather than a closure, and
 sourcing heavy packages from a debloated corpus — is the next thing to build
-and it is not yet built. `pkgforge-dev/archlinux-pkgs-debloated` is **not
-mined** into `references/`; that is the first step.
+and it is not yet built.
+
+### ⭐ MINED 2026-09-02e — and an allowlist is NOT enough, which the corpus says in its own recipes
+
+`references/pkgforge-dev__archlinux-pkgs-debloated`, commit
+`f29738934d003731a37bb1ca191030927fd3fa1b`, route proxy, 24 recipes.
+⛔ **Reading them changes this entry's named lever, because a "debloated
+package" is not a package with files deleted. It is a package REBUILT with
+different build options**, and what that removes is a `DT_NEEDED` **edge**:
+
+| recipe | what it actually does | the edge it removes |
+|---|---|---|
+| `qt6-base-mini.sh` | inserts `-DFEATURE_icu=OFF`, `-DCMAKE_BUILD_TYPE=MinSizeRel`, `-O2`→`-Os` | ⭐ `libQt6Core.so` → `libicuuc/libicudata`, ~30 MiB |
+| `mesa-mini.sh` | deletes `llvm-libs` from `depends`, `-D amd-use-llvm=false -D draw-use-llvm=false` | ⭐ `libgallium.so` → `libLLVM.so`, **150+ MiB** |
+| `ffmpeg-mini.sh` | deletes `--enable-libsvtav1`, `--enable-vapoursynth`→`--enable-small` | `libavcodec` → `libx265.so`, ~20 MiB |
+| `icu-mini.sh` | rebuilds `libicudata.so` | 30 MiB → **<3 MiB** |
+| `opus-mini.sh` | Arch's own options | 5 MiB → **<500 KiB** |
+| `libxml2-mini`, `gdk-pixbuf2-mini`, `librsvg-mini`, `glycin-mini` | drop icu / drop glycin | ~20 MiB of glycin |
+
+And the set kdenlive gets is not a guess — `get-debloated-pkgs.sh:210`,
+reached by `get-dependencies.sh`'s one call to `--add-common`:
+
+    icu-mini  opus-mini  libxml2-mini  qt6-base-mini  gtk3-mini  gtk4-mini
+    glycin-mini   + mesa-mini (ADD_MESA)  + vulkan-intel-mini  (+ intel-media-driver-mini)
+
+⛔ **SO AN ALLOWLIST CANNOT REACH THIS, AND THAT IS THE CORRECTION.** The lever
+this entry named is *"take an allowlist of paths rather than a closure"*. That
+is necessary and it is still worth building — but it is **bounded**, and the
+bound is not effort. An allowlist chooses which *paths* to carry; it cannot
+remove a dependency a library **declares**. A perfect allowlist naming only
+kdenlive's true dependencies still carries `libicudata.so`, because the
+`libQt6Core.so` in the closure has a `DT_NEEDED` on it and deleting it breaks
+the binary — which is exactly the assertion `b.integrity()` already makes
+("every DT_NEEDED in the bundle resolves inside it"). Only a **rebuild**
+removes the edge.
+
+### ⛔ AND WHY THEIR SWAP IS CHEAP AND OURS IS NOT — the packaging models differ
+
+⭐ **This is the structural reason, and it is about content addressing rather
+than about bundlers.** Arch swaps `qt6-base` for `qt6-base-mini` and **nothing
+downstream rebuilds**: the soname `libQt6Core.so.6` is unchanged, so kdenlive's
+existing binary keeps resolving against it. One rebuild of one package, done
+once in their CI and published.
+
+Ours cannot do that. `internal/bundle/appimage.go:154` fetches the closure by
+**exact store path** — `b.Nix.Fetch("/nix/store/"+b.Base, WithClosure: true)`
+— and a nixpkgs store path is the hash of the derivation's inputs. Changing
+qtbase's build options changes qtbase's hash, which changes the hash of
+everything that depends on it. ⛔ **So a `qt6-base-mini` equivalent invalidates
+the binary cache for kdenlive's entire KDE/Qt subtree, and every one of those
+paths would have to be built from source** — the thing `pgb nix` exists to
+avoid, and the reason `experiments/88-` is a *fetch* story.
+
+⚠ **`pgb nix build` CAN already express the option change** — `nixArgs.Configure`
+→ `Builder.ConfigureExtra` → `internal/nixx/tree.go:99` — so the mechanism is
+present. What is absent is a costing of the rebuild it forces.
+
+⭐ **Three routes, and the entry now carries the argument rather than one name:**
+
+| | route | what it costs, and what would settle it |
+|---|---|---|
+| **A** | the **allowlist**, as already named | still worth building; bounded by the edges above. ⛔ Measure the bound: sum the sizes of the closure paths that are reachable ONLY through an edge a `-mini` rebuild would delete. That number is the ceiling an allowlist cannot pass, and it is cheap — it needs the AppDir and `pgb bundle sweep`, no rebuild |
+| **B** | build our own `-mini` derivations through `pgb nix build --configure` | ⚠ forces a from-source build of every dependent path. Cost unknown; the first measurement is how many store paths kdenlive's closure has downstream of `qtbase` and `mesa` |
+| **C** | splice a smaller library into the fetched closure post hoc | ⛔ breaks the closure's own guarantee — the NarHash no longer matches what was signed — and `b.integrity()` would have to be re-satisfied by hand. Cheapest to try, weakest to defend |
+
+⛔ **Nothing here is measured yet on our own bundle**, and it must not be
+written up as though it were. ⚠ **The AppDir this would be measured against —
+`/var/tmp/pgb-appimage-kden`, 7 GB — did not survive the container**, so route
+A's ceiling is a rebuild away and is the first thing to run when a bundle
+exists again. ⭐ The claim carried here is only what the corpus's own recipes
+say, at file and line, plus the store-path property read out of
+`appimage.go:154`.
 
 **Approach.** Restudy the family first, then iterate against the CLI:
 `pkgforge__nix-appimage`, `ralismark__nix-appimage`, `of-the-stars__nix-appimage`,

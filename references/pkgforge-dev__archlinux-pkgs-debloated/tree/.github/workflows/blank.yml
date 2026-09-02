@@ -1,0 +1,127 @@
+name: build & release packages
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  schedule:
+    - cron: "0 3 1/7 * *"
+  workflow_dispatch:
+    inputs:
+      ONE_PACKAGE:
+        description: 'Set to the name of only one package to be built, package name only without -nano or -mini'
+        required: false
+        default: ''
+      FORCE_BUILD:
+        description: 'Set to 1 to force building even if version does not match with upstream'
+        required: false
+        default: '0'
+jobs:
+  build:
+    name: "Build: ${{ matrix.script }} (${{ matrix.arch }})"
+    permissions:
+      actions: read
+      security-events: write
+      contents: write
+    runs-on: ${{ matrix.runs-on }}
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        script:
+          - llvm-mini
+          - llvm-nano
+          - libxml2-mini
+          - qt6-base-mini
+          - gtk3-mini
+          - gtk4-mini
+          - gdk-pixbuf2-mini
+          - librsvg-mini
+          - ffmpeg-mini
+          - ffmpeg-nano
+          - sdl2_image-mini
+          - x265-mini
+          - opus-mini
+          - mesa-mini
+          - mesa-nano
+          - mesa-zink-mini
+          - mangohud-mini
+          - icu-mini
+          - kiconthemes-mini
+          - libdecor-mini
+          - intel-media-driver-mini
+          - glycin-mini
+          - gtk2-mini
+          - webkit2gtk-4.1-mini
+        arch: [x86_64, aarch64]
+        include:
+          - arch: x86_64
+            platform: linux/amd64
+            runs-on: ubuntu-24.04
+          - arch: aarch64
+            platform: linux/arm64
+            runs-on: ubuntu-24.04-arm
+        exclude:
+          - arch: aarch64
+            script: intel-media-driver-mini
+    container:
+      image: ghcr.io/pkgforge-dev/archlinux:latest
+      options: --cap-add=SYS_ADMIN --security-opt seccomp=unconfined
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_COMPILERCHECK: content
+      CCACHE_SLOPPINESS: time_macros,file_macro,include_file_mtime,include_file_ctime
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: set up ccache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-ccache-${{ matrix.script }}-${{ matrix.arch }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-${{ matrix.script }}-${{ matrix.arch }}-
+
+      - name: prepare container
+        run: /bin/sh ./bin/prepare-build
+
+      - name: build package
+        env:
+          FORCE_BUILD: ${{ github.event.inputs.FORCE_BUILD }}
+          ONE_PACKAGE:  ${{ github.event.inputs.ONE_PACKAGE }}
+        run: /bin/sh ./bin/build-package ${{ matrix.script }}.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ format('{0}-{1}', matrix.script, matrix.arch) }}
+          path: "dist"
+
+  release:
+    name: "release"
+    if: ${{ github.ref_name == 'main' }}
+    needs: [build]
+    permissions:
+      actions: read
+      security-events: write
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: "*"
+          merge-multiple: true
+
+      - name: release
+        uses: softprops/action-gh-release@v3.0.0
+        with:
+          name: "Continuous build"
+          tag_name: continuous
+          prerelease: false
+          make_latest: true
+          target_commitish: ${{ github.sha }}
+          files: |
+            *.pkg.tar.zst
+            *.pkg.tar.xz

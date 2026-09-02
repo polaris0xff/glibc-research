@@ -1,0 +1,12 @@
+[
+ {
+  "name": "continuous",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/zipball/refs/tags/continuous",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/tarball/refs/tags/continuous",
+  "commit": {
+   "sha": "404e59c8cc7e8c4adeb2e04cfd22df7470873d1c",
+   "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/commits/404e59c8cc7e8c4adeb2e04cfd22df7470873d1c"
+  },
+  "node_id": "REF_kwDONxezrrRyZWZzL3RhZ3MvY29udGludW91cw"
+ }
+]

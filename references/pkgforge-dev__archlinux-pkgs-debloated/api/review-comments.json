@@ -1,0 +1,624 @@
+[
+ {
+  "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2293620714",
+  "pull_request_review_id": 3144350788,
+  "id": 2293620714,
+  "node_id": "PRRC_kwDONxezrs6Itd_q",
+  "diff_hunk": "@@ -4,25 +4,25 @@\n \n ---\n \n-This repo makes modified versiones of some Archlinux packages, these are intended for AppImages to reduce final size:\n+This repo makes modified versiones of Archlinux packages, these are intended for AppImages to reduce final size, like:\n \n-* `mesa-mini` and `vulkan-{radeon,intel,etc}-mini` **Mesa that does not link to `libLLVM.so`**, making any hardware accelerated app tiny as result.\n+* `mesa-mini` and `vulkan-{radeon,intel,etc}-mini` remove linking to `libLLVM.so`, making any hardware accelerated app tiny as result.\n \n-* `mesa-nano` and `vulkan-{radeon,intel,etc}-nano` similar to `mesa-mini`, built with -Os which makes it ~30% smaller, note -Os can have a performance and even stability issue so do not use this package in apps like emulators where this is critical.\n+* `mesa-nano` and `vulkan-{radeon,intel,etc}-nano` similar to `mesa-mini`, built with -Os which makes it ~30% smaller. Note -Os can have a performance and even stability issue so do not use this package in apps like emulators where this is critical.\n \n-* `llvm-libs-mini` and `llmv-libs-nano`, smaller versions of `libLLVM.so` which is a 130+ MiB library that Archlinux compiles with support for a lot of architectures (`arm`, `aarch64`, `risv`, etc), the mini version should be a drop in replacment that is unlikely to cause any issue, while the nano version only ships the host target (`x86_64` or `aarch64`) + `AMDGPU`.\n+* `llvm-libs-mini` smaller version of `libLLVM.so` which is a 150+ MiB library, this version is reduced down to 99 MiB. \n \n-* iculess versions of `libxml2` and `qt6-base`, normally these packages depend on a 30 MiB libicudata lib that is rarely needed, using them gets rid of said library.\n+* `llvm-libs-nano` similar to mine but with the llvm targets limited (`x86_64` or `aarch64`) + `AMDGPU`, this reduces the size of the library to less than 70 MiB. Note this will cause issues if application dependso on more llvm targets",
+  "path": "README.md",
+  "commit_id": "7ced94017fa86f1144313a7089f41235955f8583",
+  "original_commit_id": "fc5487245f9d46a5c06f05148c93fa37e8012c38",
+  "user": {
+   "login": "fiftydinar",
+   "id": 65243233,
+   "node_id": "MDQ6VXNlcjY1MjQzMjMz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/65243233?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/fiftydinar",
+   "html_url": "https://github.com/fiftydinar",
+   "followers_url": "https://api.github.com/users/fiftydinar/followers",
+   "following_url": "https://api.github.com/users/fiftydinar/following{/other_user}",
+   "gists_url": "https://api.github.com/users/fiftydinar/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/fiftydinar/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/fiftydinar/subscriptions",
+   "organizations_url": "https://api.github.com/users/fiftydinar/orgs",
+   "repos_url": "https://api.github.com/users/fiftydinar/repos",
+   "events_url": "https://api.github.com/users/fiftydinar/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/fiftydinar/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "```suggestion\r\n* `llvm-libs-nano`, similar to `mini`, but with the llvm targets limited (`x86_64` or `aarch64`) + `AMDGPU`, this reduces the size of the library to less than 70 MiB. Note this will cause issues if application depends on more llvm targets\r\n```",
+  "created_at": "2025-08-22T12:39:12Z",
+  "updated_at": "2025-08-22T12:39:12Z",
+  "html_url": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/27#discussion_r2293620714",
+  "pull_request_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/27",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2293620714"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/27#discussion_r2293620714"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/27"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2293620714/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 15,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 17,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2293621382",
+  "pull_request_review_id": 3144351630,
+  "id": 2293621382,
+  "node_id": "PRRC_kwDONxezrs6IteKG",
+  "diff_hunk": "@@ -4,25 +4,25 @@\n \n ---\n \n-This repo makes modified versiones of some Archlinux packages, these are intended for AppImages to reduce final size:\n+This repo makes modified versiones of Archlinux packages, these are intended for AppImages to reduce final size, like:\n \n-* `mesa-mini` and `vulkan-{radeon,intel,etc}-mini` **Mesa that does not link to `libLLVM.so`**, making any hardware accelerated app tiny as result.\n+* `mesa-mini` and `vulkan-{radeon,intel,etc}-mini` remove linking to `libLLVM.so`, making any hardware accelerated app tiny as result.\n \n-* `mesa-nano` and `vulkan-{radeon,intel,etc}-nano` similar to `mesa-mini`, built with -Os which makes it ~30% smaller, note -Os can have a performance and even stability issue so do not use this package in apps like emulators where this is critical.\n+* `mesa-nano` and `vulkan-{radeon,intel,etc}-nano` similar to `mesa-mini`, built with -Os which makes it ~30% smaller. Note -Os can have a performance and even stability issue so do not use this package in apps like emulators where this is critical.\n \n-* `llvm-libs-mini` and `llmv-libs-nano`, smaller versions of `libLLVM.so` which is a 130+ MiB library that Archlinux compiles with support for a lot of architectures (`arm`, `aarch64`, `risv`, etc), the mini version should be a drop in replacment that is unlikely to cause any issue, while the nano version only ships the host target (`x86_64` or `aarch64`) + `AMDGPU`.\n+* `llvm-libs-mini` smaller version of `libLLVM.so` which is a 150+ MiB library, this version is reduced down to 99 MiB. \n \n-* iculess versions of `libxml2` and `qt6-base`, normally these packages depend on a 30 MiB libicudata lib that is rarely needed, using them gets rid of said library.\n+* `llvm-libs-nano` similar to mine but with the llvm targets limited (`x86_64` or `aarch64`) + `AMDGPU`, this reduces the size of the library to less than 70 MiB. Note this will cause issues if application dependso on more llvm targets\n \n-* `ffmpeg-mini` which mainly removes linking to libx265.so, which is a 20 MiB library that is rarely needed, using it gets rid of said library.\n+* `qt6-base-mini` and `libxml2-mini`, remove 30 MiB libicudata lib dependency.",
+  "path": "README.md",
+  "commit_id": "7ced94017fa86f1144313a7089f41235955f8583",
+  "original_commit_id": "fc5487245f9d46a5c06f05148c93fa37e8012c38",
+  "user": {
+   "login": "fiftydinar",
+   "id": 65243233,
+   "node_id": "MDQ6VXNlcjY1MjQzMjMz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/65243233?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/fiftydinar",
+   "html_url": "https://github.com/fiftydinar",
+   "followers_url": "https://api.github.com/users/fiftydinar/followers",
+   "following_url": "https://api.github.com/users/fiftydinar/following{/other_user}",
+   "gists_url": "https://api.github.com/users/fiftydinar/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/fiftydinar/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/fiftydinar/subscriptions",
+   "organizations_url": "https://api.github.com/users/fiftydinar/orgs",
+   "repos_url": "https://api.github.com/users/fiftydinar/repos",
+   "events_url": "https://api.github.com/users/fiftydinar/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/fiftydinar/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "```suggestion\r\n* `qt6-base-mini` and `libxml2-mini`, removes 30 MiB libicudata lib dependency.\r\n```",
+  "created_at": "2025-08-22T12:39:31Z",
+  "updated_at": "2025-08-22T12:39:31Z",
+  "html_url": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/27#discussion_r2293621382",
+  "pull_request_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/27",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2293621382"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/27#discussion_r2293621382"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/27"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2293621382/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 17,
+  "original_line": 17,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 20,
+  "position": 20,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2293648233",
+  "pull_request_review_id": 3144386282,
+  "id": 2293648233,
+  "node_id": "PRRC_kwDONxezrs6Itktp",
+  "diff_hunk": "@@ -4,25 +4,25 @@\n \n ---\n \n-This repo makes modified versiones of some Archlinux packages, these are intended for AppImages to reduce final size:\n+This repo makes modified versiones of Archlinux packages, these are intended for AppImages to reduce final size, like:\n \n-* `mesa-mini` and `vulkan-{radeon,intel,etc}-mini` **Mesa that does not link to `libLLVM.so`**, making any hardware accelerated app tiny as result.\n+* `mesa-mini` and `vulkan-{radeon,intel,etc}-mini` remove linking to `libLLVM.so`, making any hardware accelerated app tiny as result.\n \n-* `mesa-nano` and `vulkan-{radeon,intel,etc}-nano` similar to `mesa-mini`, built with -Os which makes it ~30% smaller, note -Os can have a performance and even stability issue so do not use this package in apps like emulators where this is critical.\n+* `mesa-nano` and `vulkan-{radeon,intel,etc}-nano` similar to `mesa-mini`, built with -Os which makes it ~30% smaller. Note -Os can have a performance and even stability issue so do not use this package in apps like emulators where this is critical.\n \n-* `llvm-libs-mini` and `llmv-libs-nano`, smaller versions of `libLLVM.so` which is a 130+ MiB library that Archlinux compiles with support for a lot of architectures (`arm`, `aarch64`, `risv`, etc), the mini version should be a drop in replacment that is unlikely to cause any issue, while the nano version only ships the host target (`x86_64` or `aarch64`) + `AMDGPU`.\n+* `llvm-libs-mini` smaller version of `libLLVM.so` which is a 150+ MiB library, this version is reduced down to 99 MiB. \n \n-* iculess versions of `libxml2` and `qt6-base`, normally these packages depend on a 30 MiB libicudata lib that is rarely needed, using them gets rid of said library.\n+* `llvm-libs-nano` similar to mine but with the llvm targets limited (`x86_64` or `aarch64`) + `AMDGPU`, this reduces the size of the library to less than 70 MiB. Note this will cause issues if application dependso on more llvm targets\n \n-* `ffmpeg-mini` which mainly removes linking to libx265.so, which is a 20 MiB library that is rarely needed, using it gets rid of said library.\n+* `qt6-base-mini` and `libxml2-mini`, remove 30 MiB libicudata lib dependency.",
+  "path": "README.md",
+  "commit_id": "7ced94017fa86f1144313a7089f41235955f8583",
+  "original_commit_id": "fc5487245f9d46a5c06f05148c93fa37e8012c38",
+  "user": {
+   "login": "Samueru-sama",
+   "id": 36420837,
+   "node_id": "MDQ6VXNlcjM2NDIwODM3",
+   "avatar_url": "https://avatars.githubusercontent.com/u/36420837?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Samueru-sama",
+   "html_url": "https://github.com/Samueru-sama",
+   "followers_url": "https://api.github.com/users/Samueru-sama/followers",
+   "following_url": "https://api.github.com/users/Samueru-sama/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Samueru-sama/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Samueru-sama/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Samueru-sama/subscriptions",
+   "organizations_url": "https://api.github.com/users/Samueru-sama/orgs",
+   "repos_url": "https://api.github.com/users/Samueru-sama/repos",
+   "events_url": "https://api.github.com/users/Samueru-sama/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Samueru-sama/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Do you say they remove X or they removes X? xd",
+  "created_at": "2025-08-22T12:50:06Z",
+  "updated_at": "2025-08-22T12:50:06Z",
+  "html_url": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/27#discussion_r2293648233",
+  "pull_request_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/27",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2293648233"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/27#discussion_r2293648233"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/27"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2293648233/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 17,
+  "original_line": 17,
+  "side": "RIGHT",
+  "in_reply_to_id": 2293621382,
+  "author_association": "MEMBER",
+  "original_position": 20,
+  "position": 20,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2332024306",
+  "pull_request_review_id": 3199227150,
+  "id": 2332024306,
+  "node_id": "PRRC_kwDONxezrs6K_93y",
+  "diff_hunk": "@@ -41,5 +44,5 @@ ls -la\n rm -fv ./*-docs-*.pkg.tar.* ./*-debug-*.pkg.tar.* ./*-demos-*.pkg.tar.*\n mv ./gtk4-*.pkg.tar.\"$EXT\" ../gtk4-mini-\"$ARCH\".pkg.tar.\"$EXT\"\n cd ..\n-rm -rf ./gtk\n+rm -rf \"$tmpbuild\"",
+  "path": "gtk4-mini.sh",
+  "commit_id": "8c8bd0bc469e71c12aba09436ffeb0953d9d303f",
+  "original_commit_id": "8c8bd0bc469e71c12aba09436ffeb0953d9d303f",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "The cleanup removes '$tmpbuild' but the original code removed './gtk', not './gtk4'. This should be consistent with the directory name used in the git clone command.",
+  "created_at": "2025-09-09T05:05:45Z",
+  "updated_at": "2025-09-09T05:05:46Z",
+  "html_url": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/29#discussion_r2332024306",
+  "pull_request_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/29",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2332024306"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/29#discussion_r2332024306"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/29"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2332024306/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 47,
+  "original_line": 47,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 22,
+  "position": 22,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2332024317",
+  "pull_request_review_id": 3199227150,
+  "id": 2332024317,
+  "node_id": "PRRC_kwDONxezrs6K_939",
+  "diff_hunk": "@@ -39,5 +42,5 @@ ls -la\n rm -fv ./*-docs-*.pkg.tar.* ./*-debug-*.pkg.tar.* ./*-demos-*.pkg.tar.*\n mv ./gtk3-*.pkg.tar.\"$EXT\" ../gtk3-mini-\"$ARCH\".pkg.tar.\"$EXT\"\n cd ..\n-rm -rf ./gtk\n+rm -rf \"$tmpbuild\"",
+  "path": "gtk3-mini.sh",
+  "commit_id": "8c8bd0bc469e71c12aba09436ffeb0953d9d303f",
+  "original_commit_id": "8c8bd0bc469e71c12aba09436ffeb0953d9d303f",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "The cleanup removes '$tmpbuild' but the original code removed './gtk', not './gtk3'. This should be consistent with the directory name used in the git clone command.",
+  "created_at": "2025-09-09T05:05:46Z",
+  "updated_at": "2025-09-09T05:05:46Z",
+  "html_url": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/29#discussion_r2332024317",
+  "pull_request_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/29",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2332024317"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/29#discussion_r2332024317"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/29"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2332024317/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 45,
+  "original_line": 45,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 22,
+  "position": 22,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2366546351",
+  "pull_request_review_id": 3250344068,
+  "id": 2366546351,
+  "node_id": "PRRC_kwDONxezrs6NDqGv",
+  "diff_hunk": "@@ -42,6 +42,22 @@ sed -i \\\n sed -i -e 's|LD_LIBRARY_PATH|#LD_LIBRARY_PATH|' ./PKGBUILD\n \n cat ./PKGBUILD\n+\n+# Do not build if version does not match with upstream\n+CURRENT_VERSION=$(awk -F'=' '/pkgver=/{print $2; exit}' ./PKGBUILD)\n+UPSTREAM_VERSION=$(pacman -Ss '^llvm-libs$' | awk '{print $2; exit}' | cut -d- -f1 | sed 's/^[0-9]\\+://')\n+echo \"----------------------------------------------------------------\"\n+echo \"PKGBUILD version: $CURRENT_VERSION\"\n+echo \"UPSTREAM version: $UPSTREAM_VERSION\"\n+if [ \"$CURRENT_VERSION\" != \"$UPSTREAM_VERSION\" ]; then",
+  "path": "llvm-mini.sh",
+  "commit_id": "426a4cfe95ceee0d11c34aebb5a58a845a8fad1d",
+  "original_commit_id": "f35f2090212107a6fa48056c1d11c516b889a1e9",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "The FORCE_BUILD check is missing in this condition. All other scripts include `[ \"$FORCE_BUILD\" != 1 ] &&` before the version comparison to allow bypassing the version check when needed.\n```suggestion\nif [ \"$FORCE_BUILD\" != 1 ] && [ \"$CURRENT_VERSION\" != \"$UPSTREAM_VERSION\" ]; then\n```",
+  "created_at": "2025-09-22T02:05:55Z",
+  "updated_at": "2025-09-22T02:05:56Z",
+  "html_url": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/30#discussion_r2366546351",
+  "pull_request_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/30",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2366546351"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/30#discussion_r2366546351"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/30"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2366546351/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 52,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 11,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2366546360",
+  "pull_request_review_id": 3250344068,
+  "id": 2366546360,
+  "node_id": "PRRC_kwDONxezrs6NDqG4",
+  "diff_hunk": "@@ -37,6 +37,22 @@ sed -i \\\n \t./PKGBUILD\n \n cat ./PKGBUILD\n+\n+# Do not build if version does not match with upstream\n+CURRENT_VERSION=$(awk -F'=' '/pkgver=/{print $2; exit}' ./PKGBUILD)\n+UPSTREAM_VERSION=$(pacman -Ss '^opus$' | awk '{print $2; exit}' | cut -d- -f1)",
+  "path": "opus-mini.sh",
+  "commit_id": "426a4cfe95ceee0d11c34aebb5a58a845a8fad1d",
+  "original_commit_id": "f35f2090212107a6fa48056c1d11c516b889a1e9",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "This version extraction is inconsistent with other scripts. Most other scripts handle epoch versions using `sed 's/^[0-9]\\+://'` to remove the epoch prefix (e.g., '1:' from '1:1.4-1'), but this script doesn't handle epochs.\n```suggestion\nUPSTREAM_VERSION=$(pacman -Ss '^opus$' | awk '{print $2; exit}' | cut -d- -f1 | sed 's/^[0-9]\\+://')\n```",
+  "created_at": "2025-09-22T02:05:56Z",
+  "updated_at": "2025-09-22T02:05:56Z",
+  "html_url": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/30#discussion_r2366546360",
+  "pull_request_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/30",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2366546360"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/30#discussion_r2366546360"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/30"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2366546360/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 43,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 7,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2463191778",
+  "pull_request_review_id": 3380416380,
+  "id": 2463191778,
+  "node_id": "PRRC_kwDONxezrs6S0VLi",
+  "diff_hunk": "@@ -47,27 +50,17 @@ sed -i \\\n cat ./PKGBUILD\n \n # Do not build if version does not match with upstream\n-CURRENT_VERSION=$(awk -F'=' '/pkgver=/{print $2; exit}' ./PKGBUILD)\n-UPSTREAM_VERSION=$(pacman -Ss '^qt6-base$' | awk '{print $2; exit}' | cut -d- -f1 | sed 's/^[0-9]\\+://')\n-echo \"----------------------------------------------------------------\"\n-echo \"PKGBUILD version: $CURRENT_VERSION\"\n-echo \"UPSTREAM version: $UPSTREAM_VERSION\"\n-if [ \"$FORCE_BUILD\" != 1 ] && [ \"$CURRENT_VERSION\" != \"$UPSTREAM_VERSION\" ]; then\n-\t>&2 echo \"ABORTING BUILD BECAUSE OF VERSION MISMATCH WITH UPSTREAM!\"\n-\t>&2 echo \"----------------------------------------------------------------\"\n-\t:> ~/OPERATION_ABORTED\n+if ! check-upstream-version; then\n \texit 0\n+else\n+\tmakepkg -fs --noconfirm --skippgpcheck\n fi",
+  "path": "qt6-base-mini.sh",
+  "commit_id": "6ed06370ae663568873467528b754b75fe02eba3",
+  "original_commit_id": "6ed06370ae663568873467528b754b75fe02eba3",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "[nitpick] The if-else logic is inverted: when the check succeeds, the code should build; when it fails, it should exit. The current structure uses negation which makes the logic harder to follow. Consider restructuring to `if check-upstream-version; then makepkg ...; else exit 0; fi` for better readability.",
+  "created_at": "2025-10-26T04:36:55Z",
+  "updated_at": "2025-10-26T04:36:55Z",
+  "html_url": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/38#discussion_r2463191778",
+  "pull_request_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/38",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2463191778"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/38#discussion_r2463191778"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/38"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2463191778/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": 53,
+  "start_side": "RIGHT",
+  "line": null,
+  "original_line": 57,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 46,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2463191779",
+  "pull_request_review_id": 3380416380,
+  "id": 2463191779,
+  "node_id": "PRRC_kwDONxezrs6S0VLj",
+  "diff_hunk": "@@ -1,22 +1,25 @@\n #!/bin/sh\n \n-set -ex\n+set -e",
+  "path": "qt6-base-mini.sh",
+  "commit_id": "a7be26efff41694695f7a573e8f1938626ca2e4d",
+  "original_commit_id": "6ed06370ae663568873467528b754b75fe02eba3",
+  "user": {
+   "login": "Copilot",
+   "id": 175728472,
+   "node_id": "BOT_kgDOCnlnWA",
+   "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Copilot",
+   "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+   "followers_url": "https://api.github.com/users/Copilot/followers",
+   "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+   "organizations_url": "https://api.github.com/users/Copilot/orgs",
+   "repos_url": "https://api.github.com/users/Copilot/repos",
+   "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Copilot/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "[nitpick] Removed the `-x` flag from `set -ex`. While this reduces verbosity, it also makes debugging harder when scripts fail in CI. The `-x` flag is valuable for troubleshooting build issues. Consider keeping it or documenting why it was removed.\n```suggestion\nset -ex\n```",
+  "created_at": "2025-10-26T04:36:55Z",
+  "updated_at": "2025-10-26T04:36:55Z",
+  "html_url": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/38#discussion_r2463191779",
+  "pull_request_url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/38",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2463191779"
+   },
+   "html": {
+    "href": "https://github.com/pkgforge-dev/archlinux-pkgs-debloated/pull/38#discussion_r2463191779"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/38"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/pkgforge-dev/archlinux-pkgs-debloated/pulls/comments/2463191779/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 3,
+  "original_line": 3,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 4,
+  "position": 4,
+  "subject_type": "line"
+ }
+]

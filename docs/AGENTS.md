@@ -263,7 +263,8 @@ evidence/                 committed RESULT.txt per experiment and POC
 HISTORY/<commit>/         ⛔ the shell and Python the Go port replaced. Kept
                           because it is the ORACLE every byte-identical
                           comparison was made against. Nothing here runs
-references/               13 upstream trees + trackers, tracked, PROVENANCE.md
+references/               34 upstream trees + trackers, tracked, PROVENANCE.md
+                          (`ls references/ | wc -l`, and each has one)
 .github/workflows/portability.yml
 docs/                     see §11
 tmp/START.md              the original brief
@@ -513,8 +514,10 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 
 ## 12. Provenance
 
-- `references/` — 13 upstream trees at captured commits, each with
-  `PROVENANCE.md` naming commit, route, and what could not be fetched
+- `references/` — **34** upstream trees at captured commits, each with
+  `PROVENANCE.md` naming commit, route, and what could not be fetched. ⚠ The
+  count is `ls references/ | wc -l`, which equals `ls references/*/PROVENANCE.md
+  | wc -l`; three documents carried **13** long after it stopped being true
   (discussions are GraphQL-only and were **not** fetched for any repository).
   Re-fetch: `sh scripts/common/mine-repo.sh OWNER/REPO --out references`.
 - **One deliberate deletion:**

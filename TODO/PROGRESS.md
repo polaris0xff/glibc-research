@@ -194,11 +194,14 @@ measured.
     T-071   ⚠ P0. Items 1, 2, 5 done. ⛔ experiments/85-'s new data-coherence
             arm is WRITTEN AND NOT RUN -- that is this entry's Prove.
             Item 3 folds into T-066; item 4's other half is T-059's.
-    T-066   ⚠ P0. ⭐ The next lever is NAMED and is not another debloat rule:
-            mine pkgforge-dev/archlinux-pkgs-debloated (NOT in references/),
-            then make `pgb bundle appimage` take an ALLOWLIST rather than a
-            closure. Deletion is worth ~1/8 on the artefact (7.5:1); it
-            cannot close 2.22x.
+    T-066   ⚠ P0. ⭐ The corpus IS NOW MINED (34 trees), and reading it moved
+            the lever: a "debloated package" is a REBUILD with different build
+            options, so what it removes is a DT_NEEDED EDGE. ⛔ An allowlist
+            cannot reach that -- it chooses paths, not what a library
+            declares. Build the allowlist anyway, but measure its ceiling
+            first (route A in the entry): the closure paths reachable ONLY
+            through an edge a `-mini` rebuild would delete. Needs an AppDir,
+            and the 7 GB one did not survive the container.
 
     ---- then, unchanged in relative order ----
 

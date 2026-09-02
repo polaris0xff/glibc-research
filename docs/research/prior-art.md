@@ -28,10 +28,10 @@ the recommendation will not come back for it.**
 
 ## The corpus
 
-⭐ **Tracked, in this tree, under `references/`.** Thirteen repositories, each
-with metadata, issues and pull requests in both states, comments, review
-comments, releases, tags, and the tree at a captured commit. Re-fetch any of
-them with:
+⭐ **Tracked, in this tree, under `references/`.** **34** repositories
+(`ls references/ | wc -l`), each with metadata, issues and pull requests in
+both states, comments, review comments, releases, tags, and the tree at a
+captured commit. Re-fetch any of them with:
 
 ```sh
 sh scripts/common/mine-repo.sh OWNER/REPO --out references
