@@ -1813,17 +1813,26 @@ against the environment's own recorded gcc, so the arm cannot pass for the
 wrong environment again.
 
 ⭐ **Then, with the environment actually selected, gcc 14.2.0 / glibc 2.41
-rejected no source at all** on the first six:
+rejected no source at all — 8 of 10, run 1:**
 
-    POC                    OUTCOME   GCC IN .comment
-    10-gawk                ok        14.2.0
-    20-nano                ok        14.2.0
-    30-curl                ok        14.2.0     (OpenSSL + zlib)
-    40-jq                  ok        14.2.0     (oniguruma)
-    50-python              ok        14.2.0     (CPython 3.12.7, 49 modules)
-    60-leveldb             ok        14.2.0     (C++, CMake)
-    70-sqlite-extensions   ⛔ exit 1  unread     -- see below
-    80-mlt                 ⛔ exit 1  unread     -- the same cause
+    POC                    OUTCOME              GCC IN .comment
+    10-gawk                ok   pass=12 fail=0  14.2.0
+    20-nano                ok   pass=12 fail=0  14.2.0
+    30-curl                ok   pass=12 fail=0  14.2.0   (OpenSSL + zlib)
+    40-jq                  ok   pass=12 fail=0  14.2.0   (oniguruma)
+    50-python              ok   pass=12 fail=0  14.2.0   (CPython, 49 modules)
+    60-leveldb             ok   pass=12 fail=0  14.2.0   (C++, CMake)
+    90-qt                  ok   pass=20 fail=0  unmeasured  (static Qt 6.11.1)
+    91-qt-xcb              ok   pass=27 fail=0  unmeasured  (a real X window)
+    70-sqlite-extensions   ⛔ exit 1             -- see below
+    80-mlt                 ⛔ exit 1             -- the same cause
+
+⚠ **`unmeasured` is not a weaker pass, and it is not a failure.** Both Qt POCs
+leave no executable in their evidence directory — checked recursively, zero —
+so there is no `.comment` to read. Their 20 and 27 assertions across eleven
+environments are the measurement; the compiler column simply has no source for
+them. ⛔ The first version of this check called that a mismatch and failed two
+POCs that had passed everything.
 
 ⛔ **AND THE TWO FAILURES ARE `pgb`'s, NOT the pin's.** Both died at the LINK
 with five undefined references — `pgb_elf_dlopen`, `pgb_elf_dlsym`,
@@ -1878,12 +1887,18 @@ weak or strong:
 ⚠ `pgb_dlopen_libs` and the two provider-table symbols were already weak; they
 are the pattern this fix follows rather than a new one.
 
-⛔ **So the pin has NOT moved and `cfg.go` is untouched.** ⭐ **Six of the ten
-POCs now BUILD AND RUN at 2.41**, verified per binary rather than per exit
-status, and the four measurable costs are still zero. ⚠ The remaining four —
-`70-sqlite-extensions`, `80-mlt`, `90-qt`, `91-qt-xcb` — are **not measured at
-2.41**: two were blocked by the link bug above and are to be re-run now that it
-is fixed. ⛔ **Six is not ten and the ruling waits for ten.**
+⛔ **So the pin has NOT moved and `cfg.go` is untouched.** ⭐ **Eight of the ten
+POCs BUILD AND RUN at 2.41**, and the two that did not were stopped by this
+repository's own link bug rather than by the pin. The four measurable costs are
+still zero: the kernel floor did not move, class C is empty on every row at
+both pins, the NSS floor holds, and now eight real projects — up to a static
+Qt 6 with a mapped X window — build and pass their full matrices under a
+toolchain two major gcc versions newer.
+
+⚠ **The ruling waits for the last two**, which are re-running against the fix.
+⛔ **Eight is not ten**, and the two outstanding are precisely the two that
+exercise `--wrap-dlopen`, which is where today's defect lived — so they are the
+rows least safe to extrapolate.
 
 ---
 
