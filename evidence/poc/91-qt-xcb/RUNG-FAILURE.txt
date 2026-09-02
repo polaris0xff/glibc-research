@@ -1,59 +1,70 @@
 POC 91-qt-xcb -- THE RUNG THAT STOPPED IT
 =========================================
 
-rung      : qtbase configure -xcb
-summary   : ./configure refused
-date (UTC): 2026-09-02T00:31:05Z
+rung      : probe build
+summary   : cmake failed for the application
+date (UTC): 2026-09-02T00:59:29Z
 configure : -static -release -force-bundled-libs -xcb -xkbcommon -bundled-xcb-xinput -no-opengl -no-dbus -no-glib -no-icu -openssl-linked -sql-sqlite -qt-sqlite -no-cups -no-fontconfig -no-libudev -no-feature-testlib -qpa xcb -default-qpa xcb -nomake examples -nomake tests
 
 -- the error, verbatim, with the file it came from --------------
 
-104:CMake Error at cmake/QtBuildInformation.cmake:559 (message):
-139:CMake Error at cmake/QtBuildInformation.cmake:245 (message):
-150:See also "/var/tmp/pgb-poc/91-qt-xcb/build/CMakeFiles/CMakeError.log".
-151:CMake Error at /var/tmp/pgb-poc/91-qt-xcb/qtbase/cmake/QtProcessConfigureArgs.cmake:1500 (message):
+2540:-- Installing: /var/tmp/pgb-poc/91-qt-xcb/inst/include/QtCore/QCborError
+2565:-- Installing: /var/tmp/pgb-poc/91-qt-xcb/inst/include/QtCore/QJsonParseError
+2587:-- Installing: /var/tmp/pgb-poc/91-qt-xcb/inst/include/QtCore/QCborParserError
+2763:-- Installing: /var/tmp/pgb-poc/91-qt-xcb/inst/include/QtCore/QPropertyBindingError
+3692:-- Installing: /var/tmp/pgb-poc/91-qt-xcb/inst/include/QtSql/QSqlError
+3813:-- Installing: /var/tmp/pgb-poc/91-qt-xcb/inst/include/QtNetwork/QSslError
+4760:-- Installing: /var/tmp/pgb-poc/91-qt-xcb/inst/include/QtWidgets/QErrorMessage
+6338:/root/.local/state/pgb/nix-deps/1052447777/libxcb/build/libxcb-1.17.0/src/xcb_auth.c:165: undefined reference to `XauGetBestAuthByAddr'
+6340:/root/.local/state/pgb/nix-deps/1052447777/libxcb/build/libxcb-1.17.0/src/xcb_auth.c:386: undefined reference to `XauDisposeAuth'
+6342:/root/.local/state/pgb/nix-deps/1052447777/libxcb/build/libxcb-1.17.0/src/xcb_auth.c:258: undefined reference to `XdmcpWrap'
+6344:/root/.local/state/pgb/nix-deps/1052447777/libxcb/build/libxcb-1.17.0/src/xcb_auth.c:378: undefined reference to `XauDisposeAuth'
+6345:collect2: error: ld returned 1 exit status
+6346:gmake[2]: *** [CMakeFiles/qtxcbprobe.dir/build.make:179: qtxcbprobe] Error 1
+6347:gmake[1]: *** [CMakeFiles/Makefile2:84: CMakeFiles/qtxcbprobe.dir/all] Error 2
+6348:gmake: *** [Makefile:91: all] Error 2
 
 -- the last 40 lines of the log --------------------------------
 
-
-Call Stack (most recent call first):
-  cmake/QtFeature.cmake:831 (qt_configure_add_report_error)
-  cmake/QtFeature.cmake:968 (qt_feature_check_and_save_internal_value)
-  cmake/QtFeature.cmake:1249 (qt_evaluate_feature)
-  cmake/QtFeature.cmake:1213 (qt_feature_module_end)
-  src/CMakeLists.txt:13 (qt_feature_evaluate_features)
-
-
-
--- Configuration summary has been written to /var/tmp/pgb-poc/91-qt-xcb/build/config.summary
-
-Note: Using static linking will disable the use of dynamically loaded plugins. Make sure to import all needed static plugins, or compile needed modules into the library.
-Note: Disabling X11 Accessibility Bridge: D-Bus or AT-SPI is missing.
-
-ERROR: Feature "xcb": Forcing to "ON" breaks its condition:
-    QT_FEATURE_thread AND TARGET XCB::XCB AND TEST_xcb_syslibs AND QT_FEATURE_xkbcommon_x11
-Condition values dump:
-    QT_FEATURE_thread = "ON"
-    TARGET XCB::XCB found
-    TEST_xcb_syslibs = ""
-    QT_FEATURE_xkbcommon_x11 not evaluated
-
-
-CMake Error at cmake/QtBuildInformation.cmake:245 (message):
-  Check the configuration messages for an error that has occurred.
-Call Stack (most recent call first):
-  cmake/QtBuildInformation.cmake:64 (qt_configure_print_summary)
-  cmake/QtBuildRepoHelpers.cmake:397 (qt_print_feature_summary)
-  cmake/QtBaseHelpers.cmake:295 (qt_build_repo_end)
-  CMakeLists.txt:36 (qt_internal_qtbase_build_repo)
-
-
--- Configuring incomplete, errors occurred!
-See also "/var/tmp/pgb-poc/91-qt-xcb/build/CMakeFiles/CMakeOutput.log".
-See also "/var/tmp/pgb-poc/91-qt-xcb/build/CMakeFiles/CMakeError.log".
-CMake Error at /var/tmp/pgb-poc/91-qt-xcb/qtbase/cmake/QtProcessConfigureArgs.cmake:1500 (message):
-  CMake exited with code 1.
-
-
+-- Looking for gethostbyname
+-- Looking for gethostbyname - found
+-- Looking for connect
+-- Looking for connect - found
+-- Looking for remove
+-- Looking for remove - found
+-- Looking for shmat
+-- Looking for shmat - found
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /var/tmp/pgb-poc/91-qt-xcb/app/build
+[ 25%] Automatic MOC and UIC for target qtxcbprobe
+[ 25%] Built target qtxcbprobe_autogen
+[ 50%] Building CXX object CMakeFiles/qtxcbprobe.dir/qtxcbprobe_autogen/mocs_compilation.cpp.o
+[ 75%] Building CXX object CMakeFiles/qtxcbprobe.dir/main.cpp.o
+[100%] Linking CXX executable qtxcbprobe
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/inst/lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0x9e1): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/inst/lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1c8): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/inst/lib/libQt6Widgets.a(qfiledialog.cpp.o): in function `qt_tildeExpansion(QString const&)':
+qfiledialog.cpp:(.text._Z17qt_tildeExpansionRK7QString+0x1a6): warning: Using 'getpwnam_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/inst/lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xcc): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/inst/lib/libQt6Network.a(qhostinfo.cpp.o): in function `QHostInfoAgent::lookup(QString const&)':
+qhostinfo.cpp:(.text._ZN14QHostInfoAgent6lookupERK7QString+0x1a1): warning: Using 'getaddrinfo' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libcrypto.a(libcrypto-lib-bio_sock.o): in function `BIO_gethostbyname':
+bio_sock.c:(.text+0x52): warning: Using 'gethostbyname' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a(xcb_auth.o): in function `get_authptr':
+/root/.local/state/pgb/nix-deps/1052447777/libxcb/build/libxcb-1.17.0/src/xcb_auth.c:165: undefined reference to `XauGetBestAuthByAddr'
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a(xcb_auth.o): in function `_xcb_get_auth_info':
+/root/.local/state/pgb/nix-deps/1052447777/libxcb/build/libxcb-1.17.0/src/xcb_auth.c:386: undefined reference to `XauDisposeAuth'
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a(xcb_auth.o): in function `compute_auth':
+/root/.local/state/pgb/nix-deps/1052447777/libxcb/build/libxcb-1.17.0/src/xcb_auth.c:258: undefined reference to `XdmcpWrap'
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a(xcb_auth.o): in function `_xcb_get_auth_info':
+/root/.local/state/pgb/nix-deps/1052447777/libxcb/build/libxcb-1.17.0/src/xcb_auth.c:378: undefined reference to `XauDisposeAuth'
+collect2: error: ld returned 1 exit status
+gmake[2]: *** [CMakeFiles/qtxcbprobe.dir/build.make:179: qtxcbprobe] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:84: CMakeFiles/qtxcbprobe.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2
 
 full log: /home/user/glibc-research/evidence/poc/91-qt-xcb/build.log

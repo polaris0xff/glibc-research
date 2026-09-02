@@ -25,30 +25,20 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
 ## In flight
 
-    T-058 CLOSED   experiments/87-, 8 assertions, control reproduces the old
-                   behaviour 5 of 5. pgb build is concurrency-safe.
-    T-050 CLOSED   experiments/88-, 25 assertions. hydra's job API is the
-                   name->derivation index: 19 of 20 against Deriver's 9 of 20,
-                   drvpaths byte-identical to nix-instantiate's, and jq
-                   planned+fetched+BUILT at uid 12000 with no nix and no /nix.
-    T-053 CLOSED   patsh is aimed at a case nixpkgs no longer produces; the
-                   wrapper environment is read out of the binary wrapper.
-    T-057 items 1,3,4 landed. experiments/89-, 10 assertions: --debloat
-                   none/safe/aggressive at 170.6/147.2/132.9 MB with all three
-                   identical on 11 of 11. 86- re-run on mpv (297 store paths):
-                   2.71x the size of a hand-built Anylinux AppImage, 11/11
-                   either way, warm start within each other's spread.
-    ⭐ T-060 IN FLIGHT -- THE FLAGSHIP. `pgb nix deps` builds nix's
-                   dependency closure static. First pass 24 built / 32 failed;
-                   the fixes are in (build-root discovery, b2, oconfigure,
-                   gperf, meson 1.9.1 in the env, test-dep skipping) and the
-                   second pass is RUNNING:
-                     sh /var/tmp/pgb-t060/rung1.sh  ->  rung1b.log
-                   Next: rung 2, link nix itself; rung 3, run it in a rootfs
-                   with no nix.
-    poc/91-qt-xcb  WRITTEN, NOT RUN. T-054 rung 2: static Qt with the real xcb
-                   plugin against Xvfb over TCP, plus OpenSSL LINKED and
-                   QtSql. Needs the X stack built static first.
+    CLOSED   T-058 (experiments/87-)  T-050 (experiments/88-)  T-053
+    LANDED   T-057 items 1, 3, 4: experiments/89- (debloat, three arms, all
+             identical on 11 of 11) and 86- re-run on mpv (2.71x, 11/11)
+    MEASURED T-055: experiments/90-, kdenlive 26.08.0 both sides.
+             ⛔ THE BAR IS NOT MET: 2.07x the size, 1.81x the render,
+             2.5x cold / 4.1x warm start. 11 of 11 either way. The route to
+             the bar is written in the entry, in the order the numbers say.
+    RUNNING  poc/91-qt-xcb -- qtbase CONFIGURES with xcb (the static xcb link
+             is proved first, then TEST_xcb_syslibs is overridden with that
+             as the evidence). The build is in flight; watch
+             /var/tmp/pgb-t054/poc91l.log
+    RUNNING  T-060 rung 1, the nix closure: sh /var/tmp/pgb-t060/rung1.sh
+             -> rung1b.log. 30 libraries built. Eleven pgb defects found and
+             fixed on the way; the entry lists every one.
 
 ## ⛔ Machine notes a fresh session cannot infer
 
@@ -58,5 +48,12 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
   that works. ⛔ **That is exactly the crutch this session is removing.**
 - **`pgb env create` ignores a trailing `--engine`**; the global one works:
   `sh pgb --engine chroot env create`.
-- **4 cores, ~15 GiB RAM, ~25 GiB free disk.** Watch the disk: a qtbase tree
-  is several GiB and nothing under `/var/tmp` survives the machine.
+- **4 cores, ~15 GiB RAM.** ⛔ **DISK IS THE BINDING CONSTRAINT**: it reached
+  **1.3 GiB free** with a Qt build and a kdenlive bundle in flight. A kdenlive
+  AppDir is 1.5 GiB and its closure another 3; delete `AppDir` and `store`
+  under `$PGB_APPIMAGE_CACHE` as soon as an artefact is measured.
+- ⛔ **DO NOT EDIT A SHELL SCRIPT WHILE IT IS RUNNING.** `sh` re-reads from a
+  byte offset, so an edit mid-run corrupts the running process: it cost a
+  20-minute kdenlive pack with `Syntax error: end of file unexpected`. Copy
+  the tree to `/var/tmp/frozen` (keeping the repo's directory layout, because
+  every tool resolves its siblings from its own path) or wait.

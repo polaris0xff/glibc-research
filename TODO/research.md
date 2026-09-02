@@ -476,6 +476,53 @@ parameterised by `$PGB_VS_APP` and its evidence directory was not, so running
 it against mpv **overwrote the jq run's `per-environment.txt`**. Evidence files
 are per subject now.
 
+
+## ⭐ AND THREE MORE MECHANISMS THE kdenlive CASE REQUIRED
+
+⛔ **A wrapper is not the only way a program learns where its plugins are.**
+MLT bakes its module directory into `libmlt` at build time and nixpkgs does not
+wrap it, because in nixpkgs the store is there. In a bundle it is not, and
+`melt` **started, answered `-version`, and could not render**:
+
+    mlt_repository_init: no plugins found in
+      "/nix/store/2zh…-mlt-7.40.0/lib/mlt-7"
+
+⭐ So the bundler now **scans every packed program and library for embedded
+`/nix/store/<hash>-<name>/…` strings** — 735 of them for kdenlive, 532 naming a
+real directory — and carries the ones a documented variable can redirect
+(`MLT_REPOSITORY`, `MLT_DATA`, `FREI0R_PATH`, `LADSPA_PATH`,
+`GST_PLUGIN_SYSTEM_PATH_1_0`, `BABL_PATH`, `GEGL_PATH`). ⚠ **Detection is
+cheap; carrying is not**: the first version copied every baked directory that
+existed and the artefact went from 354 MB to **539 MB** for two variables'
+worth of benefit, because those directories are `lib/` trees already flattened
+into the bundle's own `lib/`. What is not carried is counted, so the gap is
+visible without being paid for.
+
+⛔ **The store shard copied whole packages when a variable named one
+directory.** `QT_PLUGIN_PATH=…/qtdeclarative-6.11.1/lib/qt-6/plugins` pulled in
+all **190 MB** of qtdeclarative. The shard was **947 MB of a 1.2 GB `lib/`** —
+most of it a second copy of the same files. Copying only the named
+subdirectory: **539 MB → 398 MB**.
+
+⭐ **`--with-program NAME` carries a helper from anywhere in the CLOSURE**, not
+just the entry package's own `bin/`. kdenlive renders by running `melt`, which
+is mlt's binary; a bundle that cannot render is not comparable to one that can.
+
+⛔ **AND A MULTI-PROGRAM BUNDLE COSTS THE HOST'S `/bin/sh`.** Carrying several
+programs needs a selector, a selector is a shell script, and a script is run by
+the **host's** interpreter, which loads the host's libc. Measured in
+`experiments/90-`: 1–4 host shared objects on every glibc row, none on the four
+musl ones. ⭐ `pkgforge-dev/kdenlive-AppImage-Enhanced` pays the same price —
+its `AppRun.sh` is a shell script too, and it opened **10** on Rocky 8 where
+ours opened 3. ⚠ The shebang cannot point into the bundle: the mount path is
+not known until run time. So the shell is taken **only when there is more than
+one program**, and a single-program bundle keeps `AppRun` as a hardlink of
+sharun — which is why 85-, 86- and 89-'s zero-host-object rows are unaffected.
+
+⛔ **And `mkdwarfs` failures now print `mkdwarfs`'s own error.**
+`die "mkdwarfs failed"` with the output on `/dev/null` is four words for twenty
+minutes of work; measured when the disk filled during a kdenlive pack.
+
 **What is left of this entry** — it stays **open** for one thing only: the
 32-bit path has no 32-bit application behind it.
 
