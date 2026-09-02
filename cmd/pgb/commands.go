@@ -252,45 +252,59 @@ func elfCommand(c *cfg.Config, args []string) error {
 	return fail.Cannot("unknown: pgb elf %s (needed, print, info, shorten)", sub)
 }
 
+// A suite is one carried selftest. Adding one is a line in selftestSuites and
+// nothing else in the tree knows the set.
+type suite struct {
+	name string
+	run  func() *selftest.Report
+}
+
+func selftestSuites(c *cfg.Config) []suite {
+	return []suite{
+		{"oci-pull", ociimg.Selftest},
+		{"rootfs-run", rootfs.Selftest},
+		{"elf", elfSelftest},
+		{"zstd", zstd.Selftest},
+		{"nix-nar", func() *selftest.Report { return nixx.Selftest(nixFixtureDir(c)) }},
+		{"nix-drv", nixx.DrvSelftest},
+		{"nix-index", nixx.IndexSelftest},
+		{"bootstrap", func() *selftest.Report { return bootstrapx.Selftest(c) }},
+		{"bundle-sweep", bundle.Selftest},
+		{"bundle-appimage", func() *selftest.Report { return bundle.AppImageSelftest(c) }},
+	}
+}
+
 func selftestCommand(c *cfg.Config, args []string) error {
+	all := selftestSuites(c)
+	names := make([]string, len(all))
+	known := make(map[string]bool, len(all))
+	for i, s := range all {
+		names[i], known[s.name] = s.name, true
+	}
+
 	only := map[string]bool{}
 	for _, a := range args {
+		if a == "--list" {
+			for _, n := range names {
+				logx.Say("%s", n)
+			}
+			return nil
+		}
+		// A name that matches nothing would select nothing and then report
+		// "all pass", which is the most misleading answer this command has.
+		if !known[a] {
+			return fail.Cannot("no such selftest: %s (have: %s)", a, strings.Join(names, ", "))
+		}
 		only[a] = true
 	}
-	want := func(name string) bool { return len(only) == 0 || only[name] }
 
-	all := selftest.New("pgb")
-	if want("oci-pull") {
-		all.Merge(ociimg.Selftest())
+	report := selftest.New("pgb")
+	for _, s := range all {
+		if len(only) == 0 || only[s.name] {
+			report.Merge(s.run())
+		}
 	}
-	if want("rootfs-run") {
-		all.Merge(rootfs.Selftest())
-	}
-	if want("elf") {
-		all.Merge(elfSelftest())
-	}
-	if want("zstd") {
-		all.Merge(zstd.Selftest())
-	}
-	if want("nix-nar") {
-		all.Merge(nixx.Selftest(nixFixtureDir(c)))
-	}
-	if want("nix-drv") {
-		all.Merge(nixx.DrvSelftest())
-	}
-	if want("nix-index") {
-		all.Merge(nixx.IndexSelftest())
-	}
-	if want("bootstrap") {
-		all.Merge(bootstrapx.Selftest(c))
-	}
-	if want("bundle-sweep") {
-		all.Merge(bundle.Selftest())
-	}
-	if want("bundle-appimage") {
-		all.Merge(bundle.AppImageSelftest(c))
-	}
-	if all.Print() != 0 {
+	if report.Print() != 0 {
 		return fail.Exit(1)
 	}
 	return nil

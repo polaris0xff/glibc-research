@@ -19,7 +19,7 @@ import (
 
 func nixCommand(c *cfg.Config, args []string) error {
 	if len(args) == 0 {
-		return fail.Cannot("pgb nix needs a subcommand (nar, index, hydra, drv, plan)")
+		return fail.Cannot("pgb nix needs a subcommand (plan, deps, build, fetch, cache, nar, drv, index, hydra, plan-doc)")
 	}
 	sub, rest := args[0], args[1:]
 	switch sub {

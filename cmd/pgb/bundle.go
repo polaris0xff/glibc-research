@@ -17,7 +17,7 @@ import (
 
 func bundleCommand(c *cfg.Config, args []string) error {
 	if len(args) == 0 {
-		return fail.Cannot("pgb bundle needs a subcommand (appimage, sweep, fold-env)")
+		return fail.Cannot("pgb bundle needs a subcommand (appimage, sweep, fold-env, onelf-recipe)")
 	}
 	sub, rest := args[0], args[1:]
 	switch sub {
