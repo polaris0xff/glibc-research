@@ -1,36 +1,3 @@
-alpine-3.22: builtin-modules=85 extension-suffixes=3 lib-dynload-on-path=1 | 
-alpine-3.20: builtin-modules=85 extension-suffixes=3 lib-dynload-on-path=1 | 
-alpine-3.10: builtin-modules=85 extension-suffixes=3 lib-dynload-on-path=1 | 
-voidlinux-musl: builtin-modules=85 extension-suffixes=3 lib-dynload-on-path=1 | 
-debian-11: builtin-modules=85 extension-suffixes=3 lib-dynload-on-path=1 | /usr/lib/x86_64-linux-gnu/gconv/gconv-modules.cache 
-debian-12: builtin-modules=85 extension-suffixes=3 lib-dynload-on-path=1 | /usr/lib/x86_64-linux-gnu/gconv/gconv-modules.cache 
-ubuntu-20.04: builtin-modules=85 extension-suffixes=3 lib-dynload-on-path=1 | /usr/lib/x86_64-linux-gnu/gconv/gconv-modules.cache 
-rockylinux-8: builtin-modules=85 extension-suffixes= lib-dynload-on-path=1 | 
-opensuse-leap-15.6: builtin-modules=85 extension-suffixes=3 lib-dynload-on-path=1 | 
-fedora-42: builtin-modules=85 extension-suffixes=3 lib-dynload-on-path=1 | 
-archlinux-latest: builtin-modules=85 extension-suffixes=3 lib-dynload-on-path=1 | 
-alpine-3.22: builtin-modules=87 extension-suffixes=3 lib-dynload-on-path=1 | 
-alpine-3.20: builtin-modules=87 extension-suffixes=3 lib-dynload-on-path=1 | 
-alpine-3.10: builtin-modules=87 extension-suffixes=3 lib-dynload-on-path=1 | 
-voidlinux-musl: builtin-modules=87 extension-suffixes=3 lib-dynload-on-path=1 | 
-debian-11: builtin-modules=87 extension-suffixes=3 lib-dynload-on-path=1 | 
-debian-12: builtin-modules=87 extension-suffixes=3 lib-dynload-on-path=1 | 
-ubuntu-20.04: builtin-modules=87 extension-suffixes=3 lib-dynload-on-path=1 | 
-rockylinux-8: builtin-modules=87 extension-suffixes= lib-dynload-on-path=1 | 
-opensuse-leap-15.6: builtin-modules=87 extension-suffixes=3 lib-dynload-on-path=1 | 
-fedora-42: builtin-modules=87 extension-suffixes=3 lib-dynload-on-path=1 | 
-archlinux-latest: builtin-modules=87 extension-suffixes=3 lib-dynload-on-path=1 | 
-alpine-3.22: builtin=87 localhost=resolves dynload-on-path=1 | 
-alpine-3.20: builtin=87 localhost=resolves dynload-on-path=1 | 
-alpine-3.10: builtin=87 localhost=resolves dynload-on-path=1 | 
-voidlinux-musl: builtin=87 localhost=resolves dynload-on-path=1 | 
-debian-11: builtin=87 localhost=NO dynload-on-path=1 | 
-debian-12: builtin=87 localhost=NO dynload-on-path=1 | 
-ubuntu-20.04: builtin=87 localhost=NO dynload-on-path=1 | 
-rockylinux-8: builtin=87 localhost=resolves dynload-on-path=1 | 
-opensuse-leap-15.6: builtin=87 localhost=resolves dynload-on-path=1 | 
-fedora-42: builtin=87 localhost=resolves dynload-on-path=1 | 
-archlinux-latest: builtin=87 localhost=resolves dynload-on-path=1 | 
 alpine-3.22: builtin=87 localhost=resolves dynload-on-path=1 | 
 alpine-3.20: builtin=87 localhost=resolves dynload-on-path=1 | 
 alpine-3.10: builtin=87 localhost=resolves dynload-on-path=1 | 

@@ -15,6 +15,7 @@
 package rootfs
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -217,10 +218,10 @@ func Inner(args []string) error {
 		return fail.Cannot("cd %s inside the root filesystem: %v", workdir, err)
 	}
 
-	// The command is exec'd directly. Routing through the target's /bin/sh
-	// would turn every distroless or single-binary filesystem into exit 127,
-	// which reads as "the binary failed" when it means "the runner could not
-	// start it".
+	// The command is exec'd directly rather than through the target's /bin/sh,
+	// because a root filesystem under test may not have one — a distroless
+	// image does not, and neither does a fixture built to hold exactly one
+	// binary.
 	path := argv[0]
 	if !strings.ContainsRune(path, os.PathSeparator) {
 		if p, err := exec.LookPath(path); err == nil {
@@ -228,7 +229,18 @@ func Inner(args []string) error {
 		}
 	}
 	if err := syscall.Exec(path, argv, os.Environ()); err != nil {
-		return fail.Cannot("cannot run %s inside %s: %v", argv[0], root, err)
+		// The status follows the convention `chroot` and `env` use, because a
+		// caller reads it: 127 is "not found", which is also what the kernel
+		// reports for a binary whose INTERPRETER is missing, and 126 is
+		// "found and not executable". Collapsing both into the runner's own
+		// "could not run" would hide the difference between a missing loader
+		// and a broken runner.
+		fmt.Fprintf(os.Stderr, "pgb: cannot run %s inside %s: %v\n", argv[0], root, err)
+		if errors.Is(err, syscall.EACCES) || errors.Is(err, syscall.EPERM) ||
+			errors.Is(err, syscall.ENOEXEC) {
+			os.Exit(126)
+		}
+		os.Exit(127)
 	}
 	return nil
 }

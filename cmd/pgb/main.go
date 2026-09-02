@@ -119,11 +119,12 @@ func run() int {
 }
 
 // structuredCommands take subcommand words rather than a user's argv, so
-// global options stay recognised among their positionals. For build, verify
-// and shell the remaining argv belongs to the caller's own program and is
-// passed through untouched.
+// global options stay recognised among their positionals. For build, verify,
+// shell and rootfs the remaining argv belongs to the subcommand or to the
+// caller's own program and is passed through untouched — `pgb rootfs run`
+// has a --bind of its own, and a global one would eat it.
 var structuredCommands = map[string]bool{
-	"env": true, "nix": true, "bundle": true, "rootfs": true, "elf": true,
+	"env": true, "nix": true, "bundle": true, "elf": true,
 	"selftest": true, "doctor": true, "explain": true, "cc-dir": true,
 	"bootstrap": true, "help": true, "debug": true, "build-root": true,
 }

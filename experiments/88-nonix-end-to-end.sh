@@ -248,7 +248,7 @@ printf 'nix-on-path=%s\n' "$(command -v nix >/dev/null 2>&1 && echo yes || echo 
 printf 'nix-dir=%s\n' "$([ -d /nix ] && echo present || echo absent)"
 printf 'cc=%s\n' "$(command -v cc >/dev/null 2>&1 && echo yes || echo no)"
 mkdir -p "$PGB_STATE" || exit 3
-sh /repo/pgb --engine host nix build jq --out /nonixhome/jqbuild
+/repo/pgb --engine host nix build jq --out /nonixhome/jqbuild
 INNER
   cp "$WORK/inner.sh" "$HOMEDIR/inner.sh"; chmod +x "$HOMEDIR/inner.sh"
   chown -R 12000:12000 "$HOMEDIR" 2>/dev/null || true
