@@ -170,6 +170,20 @@ for img in $CANDIDATES; do
     # ⛔ The reason, not just the absence. A rate limit and a missing tag are
     # both "no digest" and only one of them is about the candidate.
     printf '  %-16s %s\n' "$img" "unresolved: $(head -1 "$e" 2>/dev/null)"
+    # ⭐ AND A RATE LIMIT MUST NOT SILENTLY DROP A CANDIDATE. Docker Hub's
+    # anonymous limit refuses a different tag on each run -- `debian:trixie`
+    # resolved and `ubuntu:24.04` 429'd one run, and the reverse the next -- so
+    # which candidates a run measures becomes a coin toss, and a candidate that
+    # vanished looks the same as one nobody asked for. An environment already
+    # built for this candidate recorded the digest it was built FROM, which is
+    # a better answer than none: it is the digest this machine actually holds.
+    # ⚠ Labelled `on-disk`, never presented as a fresh resolution.
+    _d=$(sed -n 's/^digest: *//p' "$ROOTFS_DIR/pgb-env-$(tagof "$img")/.pgb-env" 2>/dev/null)
+    if [ -n "${_d:-}" ]; then
+      exp_note "⚠ $img: taking the digest from the environment on disk, NOT re-resolved: $_d"
+      printf '  %-16s %s (on-disk)\n' "$img" "$_d"
+      printf '%s %s\n' "$img" "$_d" >> "$WORK/candidates.txt"
+    fi
   fi
 done
 
@@ -196,6 +210,13 @@ printf 'int main(void){return 0;}\n' > "$WORK/floor.c"
 floor_probe() {  # image outdir -> writes glibc.txt readelf.txt file.txt
   _img="$1"; _o="$2"
   mkdir -p "$_o"
+  # ⛔ `</dev/null` IS NOT OPTIONAL, and leaving it off cost this arm its second
+  # row. `docker run -i` attaches the container's stdin to THIS process's fd 0,
+  # and the caller below is `while read ... done < candidates.txt` -- so docker
+  # drained the candidate list and the loop ended after one iteration, having
+  # measured the incumbent and nothing else. It does not look like a failure:
+  # arm 2 printed one tidy row and its assertion (the incumbent's floor was
+  # read) passed. Same defect experiments/93- carries the same guard against.
   docker run --rm -i -v "$_o:/out" -v "$WORK/floor.c:/floor.c:ro" "$_img" \
     /bin/sh -c '
       export DEBIAN_FRONTEND=noninteractive
@@ -208,7 +229,7 @@ floor_probe() {  # image outdir -> writes glibc.txt readelf.txt file.txt
       file    /out/static    2>/dev/null  > /out/file.txt
       gcc -dumpmachine                    > /out/triple.txt 2>/dev/null
       gcc --version 2>&1 | head -1        > /out/gcc.txt
-    ' >"$_o/docker.log" 2>&1
+    ' >"$_o/docker.log" 2>&1 </dev/null
 }
 
 # ⭐ Two readings of the same fact. `readelf -n` prints the note glibc encoded;
@@ -362,16 +383,41 @@ for img in $CANDIDATES; do
     printf '  %-22s %-8s %-8s %-8s %-8s\n' "$en" - 'not run' 'not run' 'not run'
     continue
   fi
-  # 73- writes its own RESULT.txt under evidence/73-.../; it is moved aside per
-  # environment so two runs cannot overwrite one another.
-  PGB_ENV_NAME="$en" sh "$REPO_DIR/experiments/73-host-dso-abi-demand.sh" \
+  # ⛔ 73- WRITES ITS OWN RESULT.txt, and evidence/73-host-dso-abi-demand/ is
+  # COMMITTED and describes the PINNED environment. Running it for a candidate
+  # replaced that file with the candidate's -- so the tree then carried a
+  # committed result headed `pinned build glibc : 2.41` under the incumbent's
+  # name, and nothing in it said a candidate produced it. PGB_EVIDENCE_DIR
+  # sends each candidate's run to its own tree instead.
+  PGB_EVIDENCE_DIR="$WORK/evidence-73-$en" PGB_ENV_NAME="$en" \
+    sh "$REPO_DIR/experiments/73-host-dso-abi-demand.sh" \
     >"$WORK/73-$en.log" 2>&1
-  cp -f "$OUT_DIR/73-host-dso-abi-demand/RESULT.txt" "$WORK/73-$en.RESULT.txt" 2>/dev/null
+  cp -f "$WORK/evidence-73-$en/73-host-dso-abi-demand/RESULT.txt" \
+        "$WORK/73-$en.RESULT.txt" 2>/dev/null
   g=$(sed -n 's/^pinned glibc *: *\([0-9.]*\).*/\1/p' "$WORK/73-$en.log" | head -1)
   [ -n "$g" ] || g=$(sed -n 's/.*pinned glibc: \([0-9.]*\).*/\1/p' "$WORK/73-$en.log" | head -1)
-  cb=$(awk '/CLASS B/{f=1;next} /CLASS [CSE]/{f=0} f&&/^ /{n++} END{print n+0}' "$WORK/73-$en.RESULT.txt" 2>/dev/null)
-  cc=$(awk '/CLASS C/{f=1;next} /CLASS [SE]/{f=0} f&&/^ /{n++} END{print n+0}' "$WORK/73-$en.RESULT.txt" 2>/dev/null)
-  cs=$(awk '/CLASS S/{f=1;next} /CLASS E/{f=0} f&&/^ /{n++} END{print n+0}' "$WORK/73-$en.RESULT.txt" 2>/dev/null)
+  # ⛔ COUNT SYMBOLS, NOT LINES. This counted every indented line in the
+  # section, so it counted the column header, the "... N distinct symbols"
+  # footer, and -- worst -- the sentence "empty on every environment.", which
+  # made an EMPTY class C report as **1**. That is a cost this pin does not
+  # have, printed in the one column the ruling turns on. A symbol row is
+  # `  SYMBOL  GLIBC_x.yz  OBJS  ENVS`: four fields whose second is a version.
+  # ⚠ AND THE SECTION IS TRUNCATED AT TEN ROWS, so counting rows undercounts
+  # any class with more: 73- prints the top ten and then `... N distinct
+  # symbols`. That footer is the exact figure, so it wins where it appears and
+  # the row count is the fallback for a class that never reached ten.
+  class_count() {  # result-file class-letter -> distinct symbols
+    awk -v want="CLASS $2 " '
+      index($0, want) == 3 { f = 1; n = 0; total = -1; next }
+      /^  CLASS /          { f = 0 }
+      f && $1 == "..." && $3 == "distinct" { total = $2 }
+      f && $2 ~ /^GLIBC_/  { n++ }
+      END { print (total >= 0 ? total : n + 0) }
+    ' "$1" 2>/dev/null
+  }
+  cb=$(class_count "$WORK/73-$en.RESULT.txt" B)
+  cc=$(class_count "$WORK/73-$en.RESULT.txt" C)
+  cs=$(class_count "$WORK/73-$en.RESULT.txt" S)
   printf '  %-22s %-8s %-8s %-8s %-8s\n' "$en" "${g:-?}" "${cb:-?}" "${cc:-?}" "${cs:-?}"
   printf '%s %s %s %s %s\n' "$en" "${g:-?}" "${cb:-?}" "${cc:-?}" "${cs:-?}" >> "$WORK/classes.txt"
 done
@@ -393,22 +439,83 @@ if [ -z "$POCS" ] || [ -z "$POC_ENV" ]; then
   exp_note "not run: PGB_PIN_POCS and PGB_PIN_POC_ENV are what turn this arm on."
   exp_note "⛔ that is 'could not run', not 'passed' -- the ruling says so."
 else
-  printf '  %-14s %s\n' POC OUTCOME
+  # ⛔ PGB_ENV_NAME ALONE DOES NOT SELECT A GLIBC, and believing it did made
+  # this arm measure the incumbent while reporting the candidate. Three
+  # separate things have to agree:
+  #
+  #   PGB_ENGINE      the chroot engine is the only one that READS a name; on a
+  #                   machine running dockerd, detection picks docker, which
+  #                   builds from the image pgb-env:<version> and ignores it
+  #   PGB_ENV_IMAGE   the stamp check compares IMAGES. With only the name set,
+  #   PGB_ENV_DIGEST  the wanted image is still the default, so the guard sees
+  #                   a match and the build proceeds against the wrong glibc
+  #
+  # Both are read from the environment's own `.pgb-env`, so this cannot drift
+  # from what `pgb env create` actually built.
+  POC_ENV_ROOT="$ROOTFS_DIR/$POC_ENV"
+  if [ ! -f "$POC_ENV_ROOT/.pgb-env" ]; then
+    exp_skip "arm 5" "no $POC_ENV_ROOT/.pgb-env -- create the environment first"
+  else
+  POC_IMG=$(sed -n 's/^image: *//p'  "$POC_ENV_ROOT/.pgb-env")
+  POC_DIG=$(sed -n 's/^digest: *//p' "$POC_ENV_ROOT/.pgb-env")
+  # The gcc the candidate carries, as the version alone: `gcc (Debian
+  # 14.2.0-19) 14.2.0` -> `14.2.0`. It is what every produced binary must say.
+  POC_GCC=$(sed -n 's/^gcc: *//p' "$POC_ENV_ROOT/.pgb-env" | awk '{print $NF}')
+  exp_note "$POC_ENV: $POC_IMG $POC_DIG"
+  exp_note "$POC_ENV: gcc $POC_GCC -- every binary below must carry it"
+
+  # ⛔ THE CANDIDATE'S POC EVIDENCE GOES SOMEWHERE ELSE. evidence/poc/<name>/
+  # is committed and describes the PINNED environment; a candidate run writing
+  # there would silently replace the incumbent's record with the candidate's,
+  # and nothing in either file says which pin produced it.
+  POC_EV="$WORK/evidence-$POC_ENV"
+  mkdir -p "$POC_EV"
+
+  printf '  %-14s %-8s %s\n' POC OUTCOME 'GCC IN .comment'
+  : > "$WORK/pocgcc.txt"
   for p in $POCS; do
-    if [ ! -x "$REPO_DIR/poc/$p/run.sh" ] && [ ! -f "$REPO_DIR/poc/$p/run.sh" ]; then
+    if [ ! -f "$REPO_DIR/poc/$p/run.sh" ]; then
       printf '  %-14s %s\n' "$p" "absent"
       continue
     fi
-    if PGB_ENV_NAME="$POC_ENV" sh "$REPO_DIR/poc/$p/run.sh" >"$WORK/poc-$p.log" 2>&1; then
-      printf '  %-14s %s\n' "$p" "ok"
+    if PGB_ENGINE=chroot PGB_ENV_NAME="$POC_ENV" \
+       PGB_ENV_IMAGE="$POC_IMG" PGB_ENV_DIGEST="$POC_DIG" \
+       PGB_EVIDENCE_DIR="$POC_EV" \
+       sh "$REPO_DIR/poc/$p/run.sh" >"$WORK/poc-$p.log" 2>&1; then
+      st=ok
       printf '%s ok\n' "$p" >> "$WORK/pocs.txt"
     else
-      printf '  %-14s %s\n' "$p" "exit $? -- see $WORK/poc-$p.log"
+      st="exit $?"
       printf '%s failed\n' "$p" >> "$WORK/pocs.txt"
     fi
+    # ⭐ THE CHECK THAT CAN DISAGREE WITH THE WHOLE ARM. A POC that built in the
+    # wrong environment still runs, still passes its own 11-row matrix, and
+    # says nothing about which glibc it used. `.comment` is what the compiler
+    # wrote into the binary, so it is the one field the POC cannot fake.
+    seen=""
+    for b in "$POC_EV/poc/$p"/*; do
+      [ -f "$b" ] && [ -x "$b" ] || continue
+      v=$(readelf -p .comment "$b" 2>/dev/null | sed -n 's/.*GCC: (.*) *\([0-9][0-9.]*\).*/\1/p' | head -1)
+      [ -n "$v" ] && { seen="$v"; break; }
+    done
+    printf '  %-14s %-8s %s\n' "$p" "$st" "${seen:-unread}"
+    printf '%s %s\n' "$p" "${seen:-unread}" >> "$WORK/pocgcc.txt"
+    # The POC's own verdict, kept out of the gitignored build tree so the
+    # candidate run leaves a record.
+    cp -f "$POC_EV/poc/$p/RESULT.txt" "$EXP_OUT/poc-$POC_ENV-$p.txt" 2>/dev/null || true
   done
+
+  # ⛔ NOT `grep -c ... || echo 0`. grep -c PRINTS the count and then EXITS 1
+  # when the count is zero, so the fallback fires as well and the value becomes
+  # two lines, "0\n0" -- which never equals "0" and fails the arm at exactly the
+  # moment every POC passed.
   exp_check "every POC asked for built against $POC_ENV" \
-    "$(grep -c ' failed$' "$WORK/pocs.txt" 2>/dev/null || echo 0)" 0
+    "$(awk '$2=="failed"{n++} END{print n+0}' "$WORK/pocs.txt" 2>/dev/null)" 0
+  # ⛔ ASSERTED, not noted. A POC whose binary carries another gcc was built
+  # somewhere else, and its 11-of-11 table describes the wrong environment.
+  exp_check "every POC binary carries the candidate's gcc ($POC_GCC)" \
+    "$(awk -v w="$POC_GCC" '$2!=w{n++} END{print n+0}' "$WORK/pocgcc.txt")" 0
+  fi
 fi
 printf '\n'
 

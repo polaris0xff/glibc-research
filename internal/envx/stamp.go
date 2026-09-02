@@ -43,8 +43,10 @@ func Want(c *cfg.Config) Stamp {
 	}
 }
 
-// String renders the stamp. Packages are sorted, so reordering the setting is
-// not a difference.
+// String renders the stamp in the order the fields already hold. It does not
+// sort: Want and ParseStamp do that on the way in, which is what makes
+// reordering PGB_ENV_PACKAGES not a difference. A Stamp built by hand renders
+// whatever order it was given.
 func (s Stamp) String() string {
 	return fmt.Sprintf("%s iconv=%s packages=[%s] pip=[%s]",
 		s.Image, boolBit(s.Iconv), strings.Join(s.Packages, " "), strings.Join(s.Pip, " "))
@@ -141,6 +143,13 @@ func Have(c *cfg.Config, e cfg.Engine) Stamp {
 	return Stamp{}
 }
 
+// ServesNamedEnv reports whether an engine reads PGB_ENV_NAME. The chroot
+// engine builds in RootfsDir/EnvName, so the name selects the environment; the
+// container engines build from the image pgb-env:<version> and never look at
+// it. Split out from RequireCurrent so the rule can be asserted without a
+// daemon, a rootfs or a network.
+func ServesNamedEnv(e cfg.Engine) bool { return e == cfg.EngineChroot }
+
 // RequireCurrent refuses a build against an environment that is not what the
 // current settings describe, and names the difference.
 //
@@ -155,6 +164,18 @@ func Have(c *cfg.Config, e cfg.Engine) Stamp {
 func RequireCurrent(c *cfg.Config, e cfg.Engine) error {
 	if e == cfg.EngineHost {
 		return nil
+	}
+	// A named environment is a chroot directory, and the container engines
+	// never read the name -- they build from the image pgb-env:<version>. So a
+	// caller that named one and got a container engine has its choice dropped,
+	// and the build runs in the DEFAULT environment while reporting nothing.
+	if !ServesNamedEnv(e) && c.EnvName != cfg.DefaultEnvName {
+		fmt.Fprintf(os.Stderr, "pgb: engine %s cannot serve the named environment %s.\n", e, c.EnvName)
+		fmt.Fprintf(os.Stderr, "     PGB_ENV_NAME names a directory under %s, which only the\n", c.RootfsDir)
+		fmt.Fprintf(os.Stderr, "     chroot engine reads; %s builds from the image pgb-env:%s.\n", e, cfg.Version)
+		fmt.Fprintln(os.Stderr, "     The build would SUCCEED, in the environment this pin names by")
+		fmt.Fprintln(os.Stderr, "     default -- which no output of it would ever show.")
+		return fail.Cannot("name it for an engine that reads it: pgb --engine chroot build ...")
 	}
 	want := Want(c)
 	have := Have(c, e)

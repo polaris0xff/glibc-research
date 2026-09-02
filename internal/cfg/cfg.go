@@ -117,6 +117,19 @@ func Load(self string) *Config {
 
 		SharedWrappers: os.Getenv("PGB_T058_SHARED_WRAPPERS") != "",
 	}
+	// PGB_ENGINE is the environment's form of --engine, and it exists because
+	// the shell harnesses cannot always pass a flag: poc/common.sh builds
+	// through one entry point whose only flag slot is claimed by the POC
+	// itself. Without it, naming a candidate environment on a machine running
+	// dockerd silently built against the default one. An unusable value is
+	// ignored here rather than fatal, because Load has no way to report; the
+	// flag path validates and the detected engine is a safe fallback.
+	//
+	// ⛔ NOT in OptVars: exporting it across an engine boundary would make the
+	// re-entered pgb try to enter a second container.
+	if e := os.Getenv("PGB_ENGINE"); e != "" {
+		_ = c.SetEngine(e)
+	}
 	return c
 }
 
