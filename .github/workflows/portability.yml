@@ -62,6 +62,47 @@ env:
 
 jobs:
   # ---------------------------------------------------------------------------
+  # 0. `pgb` is a Go binary and is not committed, so it is built once here and
+  #    handed to every job that needs it as an artefact.
+  #
+  # ⭐ THAT IS ALSO THE PRODUCT'S OWN CLAIM, TESTED. One statically linked
+  # file is built on the runner and then used inside a Debian 12 container by
+  # the `build` job, with nothing installed for it there.
+  # ---------------------------------------------------------------------------
+  toolchain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build one static pgb
+        run: |
+          set -eux
+          make release
+          file pgb
+          # ⛔ The distribution claim is that it needs nothing beside it. A
+          # dynamic pgb would still pass every other job and quietly break on
+          # a host whose libc is older.
+          # ⚠ Written as `if` rather than `cmd && exit 1`: under `set -e` a
+          # failing grep makes the whole && list non-zero and fails the step,
+          # so the passing case would be the one that goes red.
+          if readelf -l pgb | grep -q INTERP; then
+            echo "pgb has a PT_INTERP" >&2; exit 1
+          fi
+          if readelf -d pgb 2>/dev/null | grep -q NEEDED; then
+            echo "pgb has DT_NEEDED" >&2; exit 1
+          fi
+          ./pgb --version
+      - name: The carried selftests, offline
+        run: ./pgb selftest
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pgb
+          path: pgb
+          retention-days: 7
+
+  # ---------------------------------------------------------------------------
   # 1. The matrix itself, derived from the one file that carries the pins.
   #    ⛔ Hand-copying the eleven rows into this YAML is what let CI and the
   #    local bed drift apart in runs 1-10. Derive, never duplicate.
@@ -95,11 +136,18 @@ jobs:
   #    different binaries and prove nothing about portability.
   # ---------------------------------------------------------------------------
   build:
+    needs: toolchain
     runs-on: ubuntu-latest
     container:
       image: debian@sha256:2f65600e1252c5649d2213e1d1ea4d74253d26514dc6530102a875e429245929
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: pgb }
+      - name: The binary built on the runner runs here unchanged
+        run: |
+          chmod +x pgb
+          ./pgb --version
 
       - name: Install the toolchain
         run: |
@@ -223,10 +271,13 @@ jobs:
   # TODO T-014, docs/history/corrections.md C9.
   # ---------------------------------------------------------------------------
   verify-docker:
-    needs: build
+    needs: [toolchain, build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: pgb }
+      - run: chmod +x pgb
       - uses: actions/download-artifact@v4
         with: { name: probes, path: out }
       - name: pgb verify --engine docker
@@ -256,25 +307,36 @@ jobs:
   # to run here: it will say what it could not do.
   # ---------------------------------------------------------------------------
   probe-host:
+    needs: toolchain
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: pgb }
+      - run: chmod +x pgb
       - name: Install prerequisites
         run: sudo apt-get update -qq && sudo apt-get install -y -qq strace
       - name: The record has to agree with itself
         run: sh TODO/check.sh
+      - name: The documentation has to agree with the tree
+        run: sh scripts/common/check-docs.sh
       - name: Every shell script has to parse
+        # ⚠ The tool is a Go binary now; what is left in shell is the
+        # acceptance harness, and it is the harness this asserts.
         run: |
           set -eu
-          for f in pgb $(find scripts experiments poc tool ci TODO -name '*.sh' 2>/dev/null); do
+          n=0
+          for f in $(find scripts experiments poc tool ci TODO -name '*.sh' 2>/dev/null); do
             sh -n "$f" || { echo "sh -n failed: $f" >&2; exit 1; }
+            n=$((n + 1))
           done
-          echo "all shell scripts parse"
+          [ "$n" -gt 20 ] || { echo "only $n scripts found; the glob is wrong" >&2; exit 1; }
+          echo "$n shell scripts parse"
       - name: Selftests, which need nothing privileged
         run: |
           set -eux
-          "./pgb" rootfs pull --selftest
           sh scripts/common/mine-repo.sh --selftest
+          "./pgb" rootfs pull --selftest
           "./pgb" rootfs run --selftest || \
             echo "rootfs-run selftest could not run here (needs CAP_SYS_ADMIN); recorded, not asserted"
       - name: Host probe (expected to report an incomplete bed here)
