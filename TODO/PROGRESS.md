@@ -3,13 +3,14 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log
 and the entries.
 
-    STATE     2026-09-02c
+    STATE     2026-09-02d
     COUNTS    45 entries, 20 open, 25 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN; selftests 200 pass, 1 could not run (no zstd)
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
-    NEW       ⭐ GATE 5 IS COMPLETE — ten of ten POCs and twenty-three
-              experiments, every row measured. T-061's last gap is closed.
+    NEW       ⭐ KDENLIVE RENDERS ON 11 OF 11, at `safe` AND at `aggressive`.
+              Five runs in, the comparison the operator asked for exists.
+              ⛔ And its bar is NOT met: 2.22x the size.
 
 ## ⛔ READ THIS FIRST: the toolchain is Go now, and the shell is the oracle
 
@@ -21,8 +22,7 @@ oracle every gate is measured against.
 
 **Read [`toolchain.md`](toolchain.md) §T-061 for what was required, then
 [`../docs/design/toolchain.md`](../docs/design/toolchain.md) "Language and
-structure" for the decision, the architecture and the six gates.** The
-measurements are in `evidence/92-go-port/RESULT.txt`, per row, as they landed.
+structure" for the decision, the architecture and the six gates.**
 
 ⛔ **The experiments and the POCs stay shell** and are the acceptance harness.
 An entry below that proposes editing shell under `tool/` or `scripts/` is
@@ -42,157 +42,160 @@ Quoted, because the framing is load-bearing:
 
 | goal | entries | where it stands |
 |---|---|---|
-| 1. the builder | T-050 ✅, T-051, T-060, T-012 | ⭐ **T-050 CLOSED**: `experiments/88-` plans, fetches **and builds** a nixpkgs package with no nix and no root, 25 assertions. ⚠ It still needs a C toolchain on the host, which is T-051; **T-060** is the static-glibc nix that removes the last crutch and is **rung 1 of 3**, 31 of nix's dependencies built |
-| 2. the bundler | T-057 ⚠started, T-052 ✅, T-053 ✅ | ⭐ **items 1, 3 and 4 landed**: debloating with a three-arm control (`experiments/89-`), wrapper environments lifted into `.env`, and the lib32 path. ⛔ **item 2, a 32-bit application, is still untried** |
-| 3. kdenlive | T-054, T-055 | ⭐ **rung 2 climbed**: `poc/91-qt-xcb` — a static Qt 6 opening a **real xcb window**, 26 assertions, 11/11, zero host objects. ⛔ **T-055's bar is NOT met**: ours 395,294,317 B against 191,900,604 B |
+| 1. the builder | T-050 ✅, T-051, T-060, T-012 | unchanged this session |
+| 2. the bundler | T-057 ⚠, T-052 ✅, T-053 ✅, T-066, T-071 | ⭐ the sweep is proved on a plugin-heavy subject; ⛔ **the size gap is structural**, see below |
+| 3. kdenlive | T-054, T-055 | ⭐ **the comparison exists and is honest**: 11/11 render, 11/11 zero host objects against 4/11. ⛔ **The bar is NOT met**: 2.22× the size |
 
-## What this session did (2026-09-02c)
+## What this session did (2026-09-02d)
 
-⭐ **THREE OF THE FOUR P0s ARE CLOSED. T-066 is significantly advanced and
-stays open**, because 1.22× the field is not parity.
+### 1. ⭐ kdenlive, validated — and the bar, still not met
 
-### 1. ⭐ T-064 — static glibc's `dlopen`, REALLY solved
+⛔ **Runs 1–4 each failed for a different reason and run 4's cause was the
+previous agent's own kill.** Run 5 (`safe`) and run 6 (`aggressive`) both
+completed:
 
-`tool/runtime/pgb-elfload.c` is an ELF loader compiled INTO the binary;
-`pgb build --host-dlopen` turns it on. It maps the object, walks `DT_NEEDED`,
-relocates (`DT_RELA` **and** `DT_RELR`), honours symbol versioning, places
-initial-exec TLS in glibc's own reserved surplus, runs the initialisers, and
-binds every undefined symbol to the static glibc already in the executable. A
-`DT_NEEDED` naming a library the image already contains is **answered, not
-opened**.
+| | ours | kdenlive-AppImage-Enhanced |
+|---|---|---|
+| rendered a real MP4 | **11 of 11** | 11 of 11 |
+| zero host shared objects | ⭐ **11 of 11** | 4 of 11; **10 on rockylinux-8** |
+| size, `safe` | 471,033,944 B | 191,900,604 B — **2.45×** |
+| size, `aggressive` | 426,528,098 B | — **2.22×** |
 
-`experiments/76-`, exit 0, four of four:
+⛔ **THE THREE SWEEP FIXES ARE PROVED.** At `aggressive`, `DropUnreachable`
+deleted **1,712 objects, 227.4 MiB**, and `melt` still rendered **4,149
+bytes** — byte-for-byte what `safe` produced. MLT's modules and
+`libSDL3.so.0` survived a sweep that removed 1,712 objects around them, which
+is exactly what runs 1 and 3 died on.
 
-    TARGET               LIBC   CARRIED  NATIVE  CONTROL  HOST .so LOADED
-    alpine-3.22          musl   ok       exit1   exit1    none
-    alpine-3.20          musl   ok       exit1   exit1    none
-    alpine-3.10          musl   ok       exit1   exit1    none
-    voidlinux-musl       musl   ok       exit1   exit1    none
-    debian-11            glibc  ok       ok      SIG6     none
-    debian-12            glibc  ok       ok      SIG11    none
-    ubuntu-20.04         glibc  ok       ok      SIG6     none
-    rockylinux-8         glibc  ok       ok      SIG6     none
-    opensuse-leap-15.6   glibc  ok       ok      SIG8     none
-    fedora-42            glibc  ok       ok      SIG8     none
-    archlinux-latest     glibc  ok       ok      SIG11    none
+⚠ **Run 6's render and startup MILLISECONDS are contaminated**, by this session
+running builds and selftests during a wall-clock arm. The control that exposed
+it: the *competitor's fixed artefact* moved 2,033 → 13,680 ms. `RULES.md` gains
+the rule. ⛔ **A same-day `safe` vs `aggressive` timing comparison has NOT been
+done.**
 
-      carried: nine assertions, every environment  = 11 of 11
-      carried: loaded no host shared object        = 11 of 11
-      native:  a REAL host .so on every glibc row  =  7 of 7
-      native:  refuses CLEANLY on musl, no signal  =  4 of 4
-      control: ran                                 =  0 of 11
+### 2. ⚠ T-070 — three of four costs measured at zero, and the pin has not moved
 
-⭐ **On the four musl rows that is a GLIBC shared object being `dlopen`'d on a
-machine that ships no glibc**, from one ordinary static ELF —
-`PT_INTERP=0 DT_NEEDED=0` — with nothing beside it. ⭐ **1,093 code lines
-against `pg83/solo`'s 2,332** for the loader alone; solo's other 5,948
-translate glibc onto musl and a glibc host needs none of them.
+`experiments/91-glibc-pin-candidates.sh`, new. The cheap veto runs first so
+nothing expensive is spent on a candidate that fails it.
 
-⛔ **The musl refusal is the mechanism working, not a gap**: every object there
-carries `DT_NEEDED libc.musl-x86_64.so.1`, and musl's libc IS its loader.
+    image           glibc  gcc      .note.ABI-tag  file(1)
+    debian:12       2.36   12.2.0   3.2.0          for GNU/Linux 3.2.0
+    debian:trixie   2.41   14.2.0   3.2.0          for GNU/Linux 3.2.0
 
-### 2. ⭐ T-065 — what a bundle may take from the HOST
+    ENVIRONMENT            B@2.36   B@2.41   SERVED
+    opensuse-leap-15.6     13       0        993  -> 1005
+    fedora-42              15       0        961  -> 976
+    archlinux-latest       20       5        1198 -> 1213
+    debian-12              0        0        851  -> 849   ⚠ the one cost
+    class B distinct   20 -> 5      class C  empty at BOTH pins, all 11 rows
 
-[`../docs/design/host-fallback.md`](../docs/design/host-fallback.md) is the
-write-up; `internal/bundle/hostpolicy.go` the mechanism; 29 offline selftest
-cases the assertion. ⛔ **"Zero host objects" is right for a static ELF and
-wrong for a bundle**, and the difference had never been written down. Four
-classes, search order adopted from `Anylinux-sharun` rather than invented, and
-**NVIDIA is host-always and not an opt-in** — its driver links a 10+ year old
-glibc and it cannot be bundled at all.
+⭐ The `__isoc23_*` family at `GLIBC_2.38` is gone; the five left are at
+`GLIBC_2.42`/`2.43` on the one rolling distribution. The NSS floor holds at
+2.41, with `experiments/21-`'s below-floor arm firing as the control.
 
-### 3. ⚠ T-066 — 2.86× the field to 1.22×, on `jq`
+⛔ **`cfg.go` is UNTOUCHED. The ten POCs at 2.41 are the row that stands
+between "indicated" and "measured"**, and gcc goes 12.2.0 → 14.2.0 with the
+pin, which is the larger of the two changes.
 
-`experiments/78-` is the harness and the subject is a CLI, which is what made
-four measured iterations fit where one kdenlive build goes. Two levers, both
-structural:
+### 3. ⭐ T-066 — the gap is the direction the pipeline runs in
 
-    the reachability sweep NOTHING consumed   277 objects, 12.0 MiB
-    share/i18n, glibc's locale SOURCES        15.0 MiB of a 22 MiB bundle
+Read out of the competitor's own 89 lines: they `pacman -Syu` twelve
+hand-picked packages, swap in **debloated rebuilds** of the heavy ones, remove
+one explicitly, and `quick-sharun` walks the closure of ~20 **named** paths.
+We start from nixpkgs' complete 2.53 GiB closure and subtract.
 
-Debloat went from 12.7% off to 86.9% off; the bundle from 11,471,610 B to
-4,890,913 B against the field's 4,006,916.
+⛔ **Subtractive cannot win against additive**, because `sweep.go`'s own rule
+is *"anything a rule cannot classify counts as REACHABLE"*.
 
-### 4. ⭐ T-067 — C is adequate, and the defect log is the argument
+⭐ **And the arithmetic agrees independently:** `aggressive` deletes 250 MiB of
+AppDir for **42.4 MiB of artefact** — about **6 to 1**, because dwarfs was
+already compressing what got deleted. Closing 426 MB → 192 MB by deletion alone
+would need ~1.4 GiB more of provably-dead AppDir.
 
-[`../docs/design/runtime-language.md`](../docs/design/runtime-language.md).
-0 UBSan findings running the loader over **904 real host shared objects**; the
-5 gcc warnings are one false positive (`-Waddress` does not model weak
-linkage). zig is **not packaged** in the pinned `debian:12` and would be a
-53,733,924 B fetch and a *second* toolchain. ⭐ And the seven defects below are
-the real argument: **not one is a C-language defect.**
+⛔ **And the sweep was quadratic**: the bundle advanced at **2.8 MiB/s**,
+~12 minutes on kdenlive against ~8 for the whole of the rest of the build.
+Replaced with a single-pass scan, exactly equivalent by construction, with the
+original kept as the control its selftest compares against.
 
-### 5. ⛔ Seven defects, every one found by something disagreeing
+### 4. ⚠ T-071 — items 1, 2 and 5 done
 
-1. **`libm.a` is a GNU ld script, not an archive.** Read as `ar` it yields zero
-   symbols in silence; the provider table had 4,891 names instead of 7,216.
-   ⚠ Second time this trap has fired in this tree.
-2. **`__tls_get_addr` is in no archive** — `ld.so` exports it. 398 of 492
-   undefined-symbol failures were that one name.
-3. ⛔ **`DT_RELR` was ignored.** Fedora and Arch pack relative relocations into
-   a bitmap, so the loader "succeeded" and left pointers unrelocated — a
-   **silent wrong answer**, caught only because a constructor was called
-   through one: `init_array[0] 0x670`.
-4. ⛔ **`make` did not depend on the `go:embed`'d C**, so editing the loader
-   printed "Nothing to be done" and the next build used the PREVIOUS loader.
-   It cost a full eleven-environment run. Fixed in the `Makefile`.
-5. ⛔ **My own benchmark forked per sample** and reported the loader 10×
-   slower than `ld.so`; that was copy-on-write faults on a 4.4 MB static image.
-6. ⛔ **The reachability sweep had no consumer** — `codegraph callers Sweep`.
-7. ⛔ **The sweep then ran before `.env` existed** and deleted kdenlive's MLT
-   modules. ⭐ `jq` did not catch this and COULD NOT: a CLI with no plugin
-   directories has nothing at risk. The fast subject is for iterating; the
-   plugin-heavy one is the control.
+⭐ The rewrite now iterates the **sweep's own** `manifestGlobs`, so the two
+rules cannot disagree about which files matter. `manifestIntegrity()` is the
+**first check in this tree that reads DATA rather than DT_NEEDED**, and it
+passed on the real kdenlive bundle: `manifests 8 name only libraries present`.
+`pgb bundle manifests` exposes it with a non-zero exit so an experiment can
+fail on it.
 
-### 6. T-068 opened, so the residue is carried rather than rounded off
+⛔ **`__EGL_VENDOR_LIBRARY_FILENAMES` REPLACES `_DIRS` rather than adding to
+it** — read out of libglvnd's `LoadVendors()`. A host that exports it made a
+bundle setting only `_DIRS` load the **host's** vendors. ⚠ And setting it empty
+would have been worse: `getenv` returns a non-NULL empty string, so the branch
+is taken and the bundle gets **no EGL at all**.
 
-86 of 904 host objects do not load. 30 crash and almost all are objects no
-static image should load — NSS modules, sanitizer and allocator interposers.
-`../docs/limitations.md` §1 classifies every one.
+### 5. ⚠ T-072 — route B refuted, route D opened
+
+    no pad     : size=3264  used=96    headroom=3168
+    64 KiB pad : size=68864 used=65648 headroom=3216   pad at tp-65616
+
+Padding the binary's own `PT_TLS` raises size **and** used together: +48 bytes,
+alignment noise. ⭐ But the pad is allocated in every thread at a stable
+offset, so a loader handing out slices of **its own** `__thread` array gets
+what it reserved. ⛔ Not implemented.
+
+### 6. ⚠ T-068 — the harness exists; the numbers it was built on do not
+
+`experiments/93-host-object-residue.sh`, new. ⛔ Writing it exposed that the
+904-object sweep quoted in four places was **ad-hoc and never committed** — a
+number with no command that reproduces it, and the reason T-068's own Prove
+could not be carried out. ⚠ **93- has not been run.**
+
+### 7. ⛔ Ten findings, and not one came from reading code
+
+1. **The artefact cache ignored the build options**, so the `aggressive` run
+   would have re-measured the `safe` bytes to the digit. Run 2's defect in a
+   new costume.
+2. **The soname scan was quadratic** — found by watching `/proc/<pid>/io`.
+3. **`__EGL_VENDOR_LIBRARY_FILENAMES` replaces `_DIRS`**, and empty is worse
+   than unset.
+4. **The pinned digest is the per-platform manifest digest, not the index
+   digest** — caught by a control requiring the method to reproduce a digest
+   this tree already pins.
+5. **A registry 429 was being reported as "unresolved"** — indistinguishable
+   from a tag that does not exist.
+6. **An unquoted shell variable made a measurement print `none` for every
+   arm** — caught because `experiments/21-` supplies an arm that must fail.
+7. **Run 6's clock was contaminated by this session** — caught because the
+   competitor's fixed artefact moved 6.7×.
+8. **`_dl_tls_static_size` was being quoted as the surplus** in four places.
+9. **T-068's 904-object sweep was never committed.**
+10. **A `while read` loop whose child reads stdin truncates itself** —
+    demonstrated at 1 of 5, not asserted.
 
 ## ⭐ Work order
 
-⛔ **REORDERED 2026-09-02c on the operator's instruction**: *"focus on solving
-glibc's remaining quirks, ensure future version won't break our tooling or
-binary built by your tooling"*, plus a dedicated EGL/nix entry.
-
-⭐ **The reordering has an argument, not just a preference.** Three of the four
-2026-09-02b P0s are closed. What remains splits into two kinds of work, and one
-of them **degrades on its own**:
-
-| | |
-|---|---|
-| ⛔ **time-sensitive** | the glibc **class B ceiling widens with every glibc release the pin does not follow**. Nothing else here gets worse by being left alone. That is why it goes first |
-| everything else | as expensive next year as this year |
+⛔ **Unchanged in shape from 2026-09-02c.** What moved is how much of each is
+measured.
 
     ---- glibc's remaining quirks, and future-proofing ----
 
-    T-070   ⛔ THE PIN. It is a FLOOR set to 2.36 when the floor is 2.34, and
-            because the output is STATIC there is no upward pressure at all --
-            the usual "build old for compatibility" reason does not apply
-            here and docs/design/glibc-versions.md is why. Meanwhile class B
-            is 20 symbols, 14 of them __isoc23_* at exactly GLIBC_2.38, and
-            it grows. ⛔ Measure the cost FIRST: the kernel floor a newer
-            glibc declares is the thing a move can take away.
-    T-068   the --host-dlopen residue, now 86 of 904 with the crashes down
-            from 30 to 10. ⭐ The 10 are ONE family -- large C++ libraries
-            with hundreds of static constructors -- and libLLVM is the
-            specimen: it maps and relocates cleanly and dies in the 605th.
-    T-072   the static TLS surplus: 3,176 bytes of headroom, and one real
-            library wants 56,248. A glibc quirk with a named tunable and
-            three untried routes.
+    T-070   ⚠ P0. Three of four costs are ZERO. ⛔ ONE ROW LEFT: the ten POCs
+            against pgb-env-debian-trixie (already built, glibc 2.41, full
+            package list). Then the ruling, then cfg.go.
+    T-068   P1. experiments/93- is written and NOT RUN. Run it first; it needs
+            no bed, only ~900 forks.
+    T-072   P1. Route D designed and costed, not implemented. It also closes
+            T-068's "static TLS surplus exhausted" row.
 
     ---- the bundle, and the one class that is all DATA ----
 
-    T-071   ⛔ EGL from a nixpkgs closure. FOUR distinct failures so far and
-            every one of them was in DATA rather than code -- a missing
-            package, a flattened directory, an absolute store path inside a
-            third-party JSON, and a vendor library the reachability sweep
-            could not see. ⚠ The fourth was caught before it shipped on
-            2026-09-02c; the first three each cost a run.
-    T-066   ⚠ the bundler, still open. 2.86x -> 1.22x on jq. ⛔ kdenlive is
-            the outstanding row. The remaining gap is WHERE THE CLOSURE
-            COMES FROM, not another debloat rule.
+    T-071   ⚠ P0. Items 1, 2, 5 done. ⛔ experiments/85-'s new data-coherence
+            arm is WRITTEN AND NOT RUN -- that is this entry's Prove.
+            Item 3 folds into T-066; item 4's other half is T-059's.
+    T-066   ⚠ P0. ⭐ The next lever is NAMED and is not another debloat rule:
+            mine pkgforge-dev/archlinux-pkgs-debloated (NOT in references/),
+            then make `pgb bundle appimage` take an ALLOWLIST rather than a
+            closure. Deletion is worth ~1/6 on the artefact; it cannot close
+            2.22x.
 
     ---- then, unchanged in relative order ----
 
@@ -221,12 +224,17 @@ one clear fix inside T-063 arm S:
 
 ⭐ **None blocking.**
 
-1. ⚠ **One branch exists on the remote and this session did not create it.**
-   The harness named `claude/glibc-pgb-recovery-6dleai`; `RULES.md` §Git
-   outranks it and every commit is on `main`. The branch was already on the
-   remote at `main`'s commit when this session started and the git proxy
-   refuses remote deletes, so it is left for a human to remove in the web UI.
-2. ⚠ **A GPU** — **T-059**, not a question. Every GL row is `swrast`.
-3. ⭐ **The porting report is gone, as the operator asked.** Its content is
-   in `docs/design/toolchain.md` "Language and structure" and T-061 deleted
-   the file.
+1. ⚠ **A branch exists on the remote that this session did not create.** The
+   harness named `claude/glibc-kdenlive-validation-2x7c3c`; `RULES.md` §Git
+   outranks it and every commit is on `main`. It was already on the remote at
+   `main`'s commit when this session started, and the git proxy refuses remote
+   deletes, so it is left for a human to remove in the web UI.
+2. ⚠ **A GPU** — **T-059**, not a question. Every GL row is `swrast`, and
+   T-071 item 4's second half cannot be settled without one.
+3. ⚠ **Docker Hub rate-limits anonymous pulls in this environment**, which cost
+   `ubuntu:24.04` its row in `experiments/91-`. ⭐ `pgb rootfs pull` does the
+   anonymous-token dance and succeeds where `docker pull` 429s; that is the
+   route to use.
+4. ⚠ **`musl-gcc` is absent**, which is the one remaining blocker on
+   `experiments/90-`'s arm O. The rust `x86_64-unknown-linux-musl` target was
+   the first and is now installed.

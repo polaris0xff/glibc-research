@@ -1,70 +1,73 @@
-# SUMMARY.md — the session of 2026-09-02c
+# SUMMARY.md — the session of 2026-09-02d
 
 ⛔ **Overwritten every session.** The history is the git log.
 
-The four P0s the operator set on 2026-09-02b. ⭐ **Three closed, one advanced
-and deliberately left open.**
+⭐ **The headline: kdenlive is validated, five runs after it was first asked
+for, and the three sweep fixes that had never been exercised now have their
+measurement.** Everything else in this session came out of getting there.
 
 ## Before and after
 
 | | at start | at end |
 |---|---|---|
-| **host `dlopen`** | ⛔ the project's one measured, unfixed failure. `limitations.md` §1 | ⭐ **SOLVED.** Our own ELF loader, `pgb build --host-dlopen`, **11 of 11**, zero host shared objects |
-| **a glibc `.so` on a musl machine** | impossible | ⭐ **dlopen'd on Alpine ×3 and Void musl**, from one static ELF |
-| **loader size vs `pg83/solo`** | solo: 2,332 code lines + 5,948 of glibc→musl shim | ⭐ **ours: 1,093 code lines, no shim** |
-| **what a bundle may take from the host** | ⛔ never written down; "zero host objects" applied to bundles too | ⭐ **four classes, search order adopted, 29 offline assertions** |
-| **the reachability sweep** | ⛔ existed; **nothing consumed it** | ⭐ consumed by debloat: 277 objects, 12.0 MiB on `jq` |
-| **`jq` bundle vs the field** | 11,471,610 B — **2.86×** | ⭐ 4,890,913 B — **1.22×** |
-| **debloat on the same closure** | 12.7% off | ⭐ **86.9% off** |
-| **is C enough for `tool/runtime/`?** | an open P0 question | ⭐ **answered: yes**, 0 UBSan findings over 904 host objects |
-| **Entries** | 40 / 19 open / 21 done | 42 / 17 open / 25 done |
-| **`make` after editing the runtime C** | ⛔ "Nothing to be done" — shipped a stale loader | rebuilds |
+| **kdenlive rendering** | ⛔ `ours rendered on 0 of 11`, four runs, four different causes | ⭐ **11 of 11, twice** — at `safe` and at `aggressive` |
+| **the three sweep fixes** | committed, **never exercised end to end** | ⭐ **proved**: 1,712 objects and 227.4 MiB deleted, and `melt` still rendered 4,149 bytes |
+| **the kdenlive size figure** | 1.39×, quoted from a bundle that **did not render** | ⭐ **2.45× at `safe`, 2.22× at `aggressive`**, both from runs that rendered |
+| **the artefact cache** | keyed on the bundler's mtime only | ⭐ keyed on the **build options** too — it caught its own case on the next run |
+| **the soname scan** | ⛔ quadratic: the bundle advanced at **2.8 MiB/s**, ~12 min on kdenlive | ⭐ single pass, **exactly** equivalent by construction, with the original kept as its control |
+| **the glibc pin** | ⛔ 2.36, a floor set two releases above its own floor, ceiling widening yearly | ⭐ **three of four costs measured at zero**; the move is *indicated*, `cfg.go` untouched |
+| **class B** | 20 distinct symbols, 14 at `GLIBC_2.38` | ⭐ **5 at glibc 2.41**, all on the one rolling distribution |
+| **class C (what a move COSTS)** | unknown | ⭐ **empty on all 11 rows at both pins** |
+| **the manifest rewrite** | ⛔ half-fixed: the sweep knew 5 globs, the rewrite 3 | ⭐ one list, and a **build-time check that reads DATA**, passing on the real bundle |
+| **`__EGL_VENDOR_LIBRARY_FILENAMES`** | ⛔ never set; a host value silently wins | ⭐ set from the bundle's own vendors, released under `PGB_HOST_MESA` |
+| **T-068's 904-object sweep** | ⛔ ad-hoc, never committed, quoted in four places | ⭐ `experiments/93-`, written and its probe verified; **not yet run** |
+| **selftests** | 138 pass | **200 pass**, 1 could not run (no zstd) |
+| **Entries** | 45 / 20 open / 25 done | 45 / 20 open / 25 done |
 
-## The four P0s
+## What was actually settled
 
 | | | |
 |---|---|---|
-| **T-064** | ✅ **closed** | `experiments/76-`, exit 0, four of four. Carried arm 11/11 with zero host objects; a **real host `.so`** on 7 of 7 glibc rows; a clean refusal on 4 of 4 musl rows; the control 0 of 11 |
-| **T-065** | ✅ **closed** | `docs/design/host-fallback.md` + `internal/bundle/hostpolicy.go`. NVIDIA is host-always and not an opt-in |
-| **T-066** | ⚠ **advanced, OPEN** | 2.86× → 1.22× on `jq`. ⛔ kdenlive ran and **failed to render** — my regression, fixed but **not re-measured** |
-| **T-067** | ✅ **closed** | `docs/design/runtime-language.md`. C is adequate, with four named conditions that reopen it |
+| **T-055 / goal 3** | ⭐ **the comparison exists and is honest** | ours renders on 11 of 11 with **zero host shared objects**; the competitor renders on 11 of 11 with **4 of 11 clean**. ⛔ **The operator's bar — smaller, loads faster, runs faster — is NOT met**: 2.22× the size, and the timing columns of the run that would have settled them are contaminated |
+| **T-070** | ⚠ **advanced, open** | kernel floor unchanged (3.2.0 → 3.2.0 at glibc 2.41, two instruments); class B 20 → 5; class C empty at both pins; NSS floor holds with its below-floor control firing. ⛔ The ten POCs at 2.41 are the one row left |
+| **T-071** | ⚠ **advanced, open** | items 1, 2 and 5 done. Items 3 and 4 remain, and 4's untestable half is T-059's |
+| **T-066** | ⚠ **advanced, open** | ⭐ **the gap is the direction the pipeline runs in** — theirs is additive from an allowlist, ours subtractive from a closure — and deletion is worth ~1/6 on the packed artefact |
+| **T-072** | ⚠ **advanced, open** | route B **refuted** by measurement, route D opened and costed, neither implemented |
+| **T-068** | ⚠ **advanced, open** | the harness exists; the sweep it was built on turned out to be unreproducible |
 
-## ⛔ Eight defects, every one found by something disagreeing
+## ⛔ Findings, and not one came from reading code
 
-1. **`libm.a` is a GNU ld script, not an archive** — zero symbols in silence.
-   Second sighting here; a third arrived in the supplied paper.
-2. **`__tls_get_addr` is in no archive** — 398 of 492 failures, one name.
-3. ⛔ **`DT_RELR` ignored** — a **silent wrong answer**: the loader reported
-   success and left pointers unrelocated. `init_array[0] 0x670`.
-4. ⛔ **`make` did not depend on the `go:embed`'d C** — cost a full
-   eleven-environment run measuring a fix that was never in the binary.
-5. ⛔ **My benchmark forked per sample** — reported the loader 10× slower than
-   `ld.so`; it was copy-on-write faults on a 4.4 MB static image.
-6. ⛔ **The reachability sweep had no consumer** — `codegraph callers Sweep`.
-7. ⛔ **The sweep then ran before `.env` existed** and deleted kdenlive's MLT
-   modules. `jq` could not have caught it: a CLI has no plugin directories.
-8. ⚠ **I pushed once with `TODO/check.sh` red** (stale index), having read the
-   gate output after committing rather than before.
+1. ⛔ **The artefact cache ignored the build options.** It rebuilt when the
+   *bundler* changed and not when the *invocation* did, and nothing in the
+   cache path mentions one — so the `aggressive` run would have re-measured the
+   `safe` bytes, silently, to the digit. That is run 2's defect in a new
+   costume. Found by asking what the next run would actually do.
+2. ⛔ **The soname scan was quadratic.** Found by watching `/proc/<pid>/io`
+   while it ran: `rchar` advancing 14 MiB per 5 s at 101% CPU.
+3. ⛔ **`__EGL_VENDOR_LIBRARY_FILENAMES` replaces `_DIRS` rather than adding to
+   it**, and setting it *empty* would leave the bundle with no EGL at all.
+   Found by reading libglvnd's own `LoadVendors()` instead of guessing.
+4. ⛔ **The pinned digest is the per-platform manifest digest, not the OCI index
+   digest**, and `docker pull` records the latter. Found by a control that
+   required the method to reproduce a digest this tree already pins.
+5. ⛔ **A registry 429 was being reported as "unresolved"** — indistinguishable
+   in the table from a tag that does not exist.
+6. ⛔ **My own NSS measurement printed `none` for every arm from an empty
+   pipeline**, because of an unquoted shell variable. Caught because
+   `experiments/21-` supplies an arm that must fail, and it fires.
+7. ⛔ **I contaminated run 6's clock** by running builds and selftests during a
+   wall-clock arm. Caught because the *competitor's fixed artefact* moved 6.7×.
+8. ⛔ **`_dl_tls_static_size` was being quoted as the static TLS surplus** in
+   four places. It includes the program's own `PT_TLS`, so it moves with the
+   binary — implying, backwards, that a bigger binary has more room.
+9. ⛔ **T-068's 904-object sweep was never committed**, so the entry's own
+   Prove could not be carried out.
+10. ⛔ **A `while read` loop whose child reads stdin truncates itself** —
+    demonstrated at 1 of 5 rather than asserted.
 
-## The supplied working paper
+## ⛔ What the next session must not read as settled
 
-⭐ **Useful, not slop.** Vendored at
-`references/operator__one-libc-in-the-process/`, swept in
-`docs/research/one-libc.md`, entry **T-069**. It supplied the source-level
-cause of `experiments/72-` (glibc's dummy link map), killed the `-rdynamic`
-export route twice at T1, and prompted a check on our provider table that could
-have been a silent second libc — measured, and safe.
-
-⭐ **Its own §10 limitation — *"no bridge of our own"* — is what
-`experiments/76-` closed, at T1, on eleven environments, the same day.**
-
-## ⛔ What the next session must do first
-
-1. ⛔ **Re-measure `experiments/90-`.** The ordering fix is committed and
-   unverified. Until it runs, **1.39× is a size for a bundle that did not
-   render** and must not be quoted.
-2. **T-066's remaining lever is not another debloat rule** — it is *where the
-   closure comes from*. `Anylinux-AppImages/FAQ.md` names it: their packages
-   are optimised for size, ours are nixpkgs.
-3. **T-068**: `libLLVM` maps and relocates cleanly and dies in the **605th** of
-   its C++ static constructors. It is the only ordinary library that does.
+- **The operator's bar for kdenlive is not met**, and the run that would give
+  a same-day `safe` vs `aggressive` timing comparison has not been done.
+- **The pin has not moved.** `cfg.go` is untouched and the POC row is open.
+- **`experiments/91-`, `93-` and `85-`'s new arm are written and NOT RUN.**

@@ -3,22 +3,22 @@
 competitor pinned at 26.08.0-1@2026-09-01_1788277742
 
   ARTEFACT                                    BYTES
-  P  ours (one command, nixpkgs)          471033944
+  P  ours (one command, nixpkgs)          426528098
   E  kdenlive-AppImage-Enhanced           191900604
-     ratio P/E                                2.45x
+     ratio P/E                                2.22x
   O  onelf (our payload, their packer)              0
 
 render (melt, a real MP4):
-  P 4947 ms, 4149 bytes of MP4
-  E 2033 ms, 4162 bytes of MP4
+  P 24074 ms, 4149 bytes of MP4
+  E 13680 ms, 4162 bytes of MP4
   O -1 ms, 0 bytes of MP4
 
 startup (melt -version):
-  P 300 ms cold, 239 ms warm
-  E 61 ms cold, 82 ms warm
+  P 5941 ms cold, 337 ms warm
+  E 1183 ms cold, 129 ms warm
   O -1 ms cold, -1 ms warm
 
 on the eleven: ours 11/11 rendered, 11/11 with zero host objects;
                the competitor 11/11 rendered, 4/11 clean.
 
-conditions: 2026-09-02T13:55:55Z, Linux 6.18.44-fc-v22
+conditions: 2026-09-02T14:44:01Z, Linux 6.18.44-fc-v22

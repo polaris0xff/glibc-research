@@ -867,7 +867,27 @@ fails it.
 
 ⭐ **The arm is WRITTEN (2026-09-02d)** — `experiments/85-`, four assertions
 including the negative control and a check that the control restored what it
-damaged. ⛔ **It has not been RUN yet**, because arm A is a `mesa-demos` bundle
-and the build bed was occupied by `experiments/90-`; until it runs this entry
-has a mechanism and not a measurement, which is the distinction
-`docs/AGENTS.md` §0b exists for.
+damaged. ⚠ **`experiments/85-` itself has not been run**, because arm A is a
+`mesa-demos` bundle and the bed was occupied by `experiments/90-`.
+
+⭐ **But the Prove was carried out by hand on a REAL bundle — kdenlive's, the
+one `experiments/90-` had just built — and it is stronger than a fixture:**
+
+```
+$ pgb bundle manifests .../kdenlive/AppDir
+manifests read: 8
+VERDICT: every manifest names a library present in the bundle.        exit 0
+
+# the negative control: 50_mesa.json put back the way nixpkgs ships it
+$ pgb bundle manifests .../kdenlive/AppDir
+OUTSIDE  share/glvnd/egl_vendor.d/50_mesa.json
+         -> /nix/store/000…-mesa/lib/libEGL_mesa.so.0                 exit 1
+
+# restored, and the restore verified
+$ pgb bundle manifests .../kdenlive/AppDir                            exit 0
+```
+
+⛔ **That un-rewritten path is failure 3 of the four above, reproduced
+deliberately and caught.** It is the first time this class has been detectable
+at all: the same bundle passes `integrity()` — every `DT_NEEDED` resolves —
+in both states.

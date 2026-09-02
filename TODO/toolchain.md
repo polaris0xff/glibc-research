@@ -1339,6 +1339,20 @@ then re-measure the big subjects once.
    containing `.so` are kept because `IsSharedObject` requires it — with the
    original kept as `sonamesMentionedNaive`, the control its selftest compares
    against on fixtures built for the four ways the two could differ.
+
+   ⭐ **MEASURED ON THE REAL kdenlive AppDir — 1,633 library files, 1.49 GiB,
+   2,586 roots, 33 plugin directories:**
+
+   ```
+   pgb bundle sweep AppDir --env AppDir/.env --list
+     naive   > 600 s   (killed at a ten-minute limit; ~12 min observed
+                        in run 6's build log)
+     fast      7.07 s
+   ```
+
+   ⛔ **At least 85×, and the honest figure is nearer 100×.** ⚠ The naive arm is
+   a lower bound rather than a time: it was cut off, so what is recorded is
+   "longer than ten minutes", not a number.
 2. `store/` is 405 MB of the kdenlive bundle and duplicates what is already in
    `lib/`.
 3. `share/` is 368 MB, most of it one icon theme shipping every size.
@@ -1374,6 +1388,14 @@ AppDir for 42.4 MiB of artefact — about **6 to 1**, because dwarfs was already
 compressing what got deleted. Closing 426 MB → 192 MB by deletion alone would
 need roughly **1.4 GiB** more of provably-dead AppDir. There is not that much
 left to prove.
+
+⭐ **And the corpus names exactly the packages that dominate OUR bundle.**
+`Anylinux-AppImages/HOW-TO-MAKE-THESE.md`: *"Installs a debloated MESA, Vulkan,
+Qt, GTK, libicudata, and more"*, with `--prefer-nano`, `ffmpeg-mini` and
+`intel-media-driver-mini`. ⚠ Compare what `experiments/85-` measured on our
+side — the GL stack alone is **95 MiB of a 163 MB bundle** — and what run 6's
+debloat log lists: mesa's Vulkan drivers, `libteflon`, the locale catalogues.
+**The overlap is not partial; it is the same list.**
 
 ⚠ **What this does NOT say.** It is a reading of somebody else's build script,
 not a measurement of ours-rebuilt-additively; the measurement backing it is the
