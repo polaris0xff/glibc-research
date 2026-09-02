@@ -42,6 +42,15 @@ GATE 4 - the wrappers, and the strongest form of the check
   they read one JSON manifest written when the wrapper directory was created.
   No shell is started per compiler invocation.
 
+  ⭐ RE-MEASURED 2026-09-02b, after the modernisation pass touched
+  internal/wrapper (runtime.go and dlopen.go). Same command, same subject:
+
+    probe  2,177,320 bytes  sha256 251cec644a142ac68915793b2a3dbd161e5659aa605921dc66762109ec6a5f16
+
+  Byte-identical to the row above, so the rewrites are proven neutral on the
+  path that has no carried selftest. ⚠ That gap is why this had to be re-run
+  by hand rather than checked in seconds, and it is T-062.
+
 
 GATE 2 - nix-nar: hashes, extraction and SIGNATURE DECISIONS
 ---------------------------------------------------------------------------

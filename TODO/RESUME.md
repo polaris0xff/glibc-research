@@ -63,10 +63,11 @@ The work order is `PROGRESS.md`; this is only the short form.
 5. Then the backlog: T-055, T-060 rungs 2–3, T-054 rungs 3–4, T-057 item 2,
    T-051, then P2 by category.
 
-⚠ **Gate 4's byte-identity is still owed a re-measurement.** The modernize pass
-touched `internal/wrapper`, which no carried selftest covers (that is T-062).
-Rebuild `ci/probe.c` through both toolchains and compare sha256 against
-`251cec64…` before trusting the wrapper path.
+⭐ **Gate 4 was re-measured and holds byte-for-byte.** The modernize pass
+touched `internal/wrapper`, which no carried selftest covers (that is T-062),
+so `ci/probe.c` was rebuilt through the chroot engine: 2,177,320 bytes,
+sha256 `251cec644a142ac68915793b2a3dbd161e5659aa605921dc66762109ec6a5f16`,
+identical to the recorded row. The rewrites are neutral on the wrapper path.
 
 ## ⛔ Machine notes a fresh session cannot infer
 
