@@ -55,20 +55,36 @@ var (
 	// say it as `could not find shared library for Python`. The flag still has
 	// to come off, but the reason is structural rather than an absent input.
 	configureWantsShared = regexp.MustCompile(`configure: error: could not find shared library for ([A-Za-z0-9_+-]+)`)
+	// The feature is named at the END rather than the input: postgres writes
+	// `could not find function 'gss_store_cred_into' required for GSSAPI`.
+	configureRequiredFor = regexp.MustCompile(`configure: error:[^\n]*? required for ([A-Za-z0-9_+-]+)`)
+	// Last resort, and only after every rule above has declined: in a fatal
+	// line ending "not found", the FIRST word is usually the feature rather
+	// than the token immediately before it — postgres writes `Tcl shell not
+	// found` for --with-tcl. It is safe as a last rule because flagForName
+	// answers "" unless the build actually carries the flag.
+	configureFirstWord = regexp.MustCompile(`configure: error: ((?:lib)?[A-Za-z0-9_+-]+)[^\n]*?not found`)
 )
 
 // flagForName returns the drop directive for the option that asked for a
 // dependency named in an error, trying the conventional spellings with and
 // without a lib prefix. It answers "" when the build carries none of them,
 // which keeps this targeted rather than a search over the flag list.
-func flagForName(name string, has func(string) bool) string {
-	for _, cand := range []string{
+//
+// ⚠ An option can carry a value — postgres asks for uuid as `--with-uuid=e2fs`
+// — so a candidate matches either exactly or as the part before an `=`, and
+// what is dropped is the flag as the build actually spells it.
+func flagForName(name string, flags []string) string {
+	cands := []string{
 		"--with-" + name, "--enable-" + name,
 		"--with-" + strings.TrimPrefix(name, "lib"),
 		"--enable-" + strings.TrimPrefix(name, "lib"),
-	} {
-		if has(cand) {
-			return "drop:" + cand
+	}
+	for _, cand := range cands {
+		for _, f := range flags {
+			if f == cand || strings.HasPrefix(f, cand+"=") {
+				return "drop:" + f
+			}
 		}
 	}
 	return ""
@@ -141,20 +157,26 @@ func diagnose(logFile string, flags []string) string {
 			if len(fields) == 0 {
 				continue
 			}
-			if d := flagForName(fields[0], has); d != "" {
+			if d := flagForName(fields[0], flags); d != "" {
 				return d
 			}
 		}
 	}
 
 	if m := configureRequiresLib.FindStringSubmatch(text); m != nil {
-		if d := flagForName(m[1], has); d != "" {
+		if d := flagForName(m[1], flags); d != "" {
 			return d
 		}
 	}
 
 	if m := configureWantsShared.FindStringSubmatch(text); m != nil {
-		if d := flagForName(strings.ToLower(m[1]), has); d != "" {
+		if d := flagForName(strings.ToLower(m[1]), flags); d != "" {
+			return d
+		}
+	}
+
+	if m := configureRequiredFor.FindStringSubmatch(text); m != nil {
+		if d := flagForName(strings.ToLower(m[1]), flags); d != "" {
 			return d
 		}
 	}
@@ -175,6 +197,13 @@ func diagnose(logFile string, flags []string) string {
 	}
 	if m := plainSuggestion.FindStringSubmatch(text); m != nil && !has(m[1]) {
 		return "add:" + m[1]
+	}
+
+	// Last resort: the first word of a fatal "not found" line.
+	if m := configureFirstWord.FindStringSubmatch(text); m != nil {
+		if d := flagForName(strings.ToLower(m[1]), flags); d != "" {
+			return d
+		}
 	}
 
 	// nixpkgs pins the autoconf cache variable cf_cv_type_of_bool for its own

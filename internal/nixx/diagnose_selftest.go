@@ -84,6 +84,28 @@ func DiagnoseSelftest() *selftest.Report {
 			[]string{"--with-openssl", "--with-python"}),
 		"drop:--with-python")
 
+	// The feature is named at the END and the missing thing is a FUNCTION, so
+	// none of the input-shaped rules above can see it.
+	r.Check("'required for GSSAPI' folds to --with-gssapi",
+		say("reqfor", "configure: error: could not find function 'gss_store_cred_into' "+
+			"required for GSSAPI\n", []string{"--with-openssl", "--with-gssapi"}),
+		"drop:--with-gssapi")
+
+	// ⚠ An option can carry a VALUE. postgres asks for uuid as
+	// `--with-uuid=e2fs`, so an exact-match candidate misses it, and what comes
+	// off has to be the flag as the build spells it rather than the candidate.
+	r.Check("a valued flag is matched on its name and dropped whole",
+		say("valued", "configure: error: library 'uuid' is required for E2FS UUID\n",
+			[]string{"--with-openssl", "--with-uuid=e2fs"}),
+		"drop:--with-uuid=e2fs")
+
+	// The last resort: the feature is the FIRST word, not the token before
+	// "not found" -- which for `Tcl shell not found` would be "shell".
+	r.Check("'Tcl shell not found' folds to --with-tcl",
+		say("firstword", "configure: error: Tcl shell not found\n",
+			[]string{"--with-openssl", "--with-tcl"}),
+		"drop:--with-tcl")
+
 	// ⛔ AND THE SILENCES, which are the half a pattern change breaks quietly.
 	r.Check("a flag the message names but the build does not carry is not dropped",
 		say("absent", "configure: error: llvm-config not found, but required when "+
