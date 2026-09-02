@@ -124,8 +124,48 @@ THE CARRIED-IN SELFTESTS
                         whole-document decode as the control
 
 
-GATE 1 - nix-index on the real ~400 MB packages.json:  NOT YET RUN
-GATE 3 - doctor / env info / nix plan / verify parity: NOT YET RUN
+GATE 1 - nix-index on the real ~400 MB packages.json
+---------------------------------------------------------------------------
+Input: the real index for the channel this machine pins,
+  https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1063758.e8be7818e19a/packages.json.br
+decoded to 399,356,002 bytes of JSON. Both implementations read the SAME file.
+
+  python3 scripts/common/nix-index.py index   149,812 attributes
+      wall 5.10 s   peak RSS 88,756 KiB
+  pgb nix index                               149,812 attributes
+      wall 3.50 s   peak RSS 12,284 KiB
+
+  py.tsv  13,785,151 bytes  sha256 9ebf81081a51f081796e42699b54779853e362dab013c20af436cc94f4fce1b3
+  go.tsv  13,785,151 bytes  sha256 9ebf81081a51f081796e42699b54779853e362dab013c20af436cc94f4fce1b3
+  IDENTICAL.
+
+  1.46x the wall time and 7.2x the peak RSS, measured with os.wait4 around
+  each process. ⚠ One run each, one machine: the RSS ratio is the solid
+  number here, the wall time is within a range this instrument does not
+  resolve finely.
+
+
+GATE 3 - parity of the commands, against the shell tool
+---------------------------------------------------------------------------
+Same cache directory, same channel index, output compared verbatim:
+
+  pgb nix cache attr jq       IDENTICAL to `nix-fetch.sh attr jq`
+  pgb nix cache attr sed      IDENTICAL  (the freebsd.sed tie-break)
+  pgb nix cache attr bash     IDENTICAL  (bash -> bash-interactive-5.3p15)
+  pgb nix cache info PATH     IDENTICAL  (verified narinfo fields)
+  pgb nix cache closure PATH  IDENTICAL  (5 paths, bash-5.3p15)
+  pgb nix cache drv jq        IDENTICAL  (the hydra route)
+
+⭐ AND THE WHOLE NIX-FREE PLAN ROUTE, END TO END:
+
+  sh pgb nix plan jq --out F   resolved through hydra, 9 derivations fetched
+  pgb nix plan jq --out F      and verified over HTTPS, ATerm parsed, plan
+                               written
+  diff: IDENTICAL, 1,380 bytes.
+
+  That one comparison covers the hydra job lookup, the attribute index, the
+  narinfo signature checks, the NAR extraction of nine derivations, the ATerm
+  reader and the planner together.
 
 
 GATE 3 (part) - `nix plan`, differential against the python planner

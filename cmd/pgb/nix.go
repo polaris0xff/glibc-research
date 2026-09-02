@@ -5,6 +5,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -52,9 +53,24 @@ func nixCommand(c *cfg.Config, args []string) error {
 		}
 		return drvCommand(rest)
 	case "plan":
+		return nixPlanCommand(c, rest)
+	case "plan-doc":
+		// The planner on its own: a `nix derivation show --recursive` document
+		// on stdin, one plan on stdout.
 		return planCommand(rest)
+	case "deps":
+		return nixDepsCommand(c, rest)
+	case "build":
+		return nixBuildCommand(c, rest)
+	case "fetch":
+		return nixFetchCommand(c, rest)
+	case "cache":
+		return nixCacheCommand(c, rest)
+	case "", "help", "-h", "--help":
+		fmt.Print(nixUsage)
+		return nil
 	}
-	return fail.Cannot("unknown: pgb nix %s (nar, index, hydra, drv, plan)", sub)
+	return fail.Cannot("unknown: pgb nix %s (plan, deps, build, fetch, cache, nar, drv, index, hydra, plan-doc)", sub)
 }
 
 func narCommand(c *cfg.Config, args []string) error {

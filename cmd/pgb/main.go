@@ -125,7 +125,7 @@ func run() int {
 var structuredCommands = map[string]bool{
 	"env": true, "nix": true, "bundle": true, "rootfs": true, "elf": true,
 	"selftest": true, "doctor": true, "explain": true, "cc-dir": true,
-	"bootstrap": true, "help": true, "debug": true,
+	"bootstrap": true, "help": true, "debug": true, "build-root": true,
 }
 
 // parser threads the argv walk so option handlers can consume a value.
@@ -269,7 +269,13 @@ func dispatch(argv []string) error {
 			return nil
 		}
 		if !known {
-			return fail.Cannot("unknown option: %s", a)
+			// Once a command is named, an option pgb does not know is the
+			// subcommand's to parse or to refuse. Before that there is nobody
+			// to hand it to.
+			if cmd == "" {
+				return fail.Cannot("unknown option: %s", a)
+			}
+			rest = append(rest, a)
 		}
 	}
 

@@ -61,6 +61,8 @@ func runCommand(c *cfg.Config, cmd string, args []string) error {
 		return selftestCommand(c, args)
 	case "debug":
 		return debugCommand(c, args)
+	case "build-root":
+		return buildRootCommand(args)
 	case buildx.InnerBuild:
 		return buildx.Inner(c, args)
 	case buildx.InnerShell:
