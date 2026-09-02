@@ -1093,6 +1093,25 @@ say "baked paths $NBAKED strings, $NBAKED_DIR naming a real directory, $NBAKED_C
 # melt did, with its own message, and the fix is a row in baked_override().
 
 # ---------------------------------------------------------------------------
+# 5e. ⭐ FOLD THE ENVIRONMENT, because the lifting step repeats itself
+#
+# ⛔ A record is appended per program, and kdenlive, melt, ffmpeg and
+# kdenlive_render each carry the SAME QT_PLUGIN_PATH and XDG_DATA_DIRS
+# prefixes. The bundle therefore asked Qt to scan **sixty plugin directories,
+# most of them four times over**, on every start -- 20,012 bytes of `.env`
+# where 5,461 says the same thing. Found while translating `.env` into an
+# `onelf.toml` for `experiments/90-`'s third arm, which cannot repeat a key at
+# all and so made the repetition impossible to miss.
+# ⚠ Order is preserved: the first occurrence of a path keeps its position, so
+# what resolves first still resolves first.
+# ---------------------------------------------------------------------------
+if [ -s "$APPDIR/.env" ]; then
+  _before=$(wc -c < "$APPDIR/.env")
+  python3 "$SELF/onelf-recipe.py" --fold-env "$APPDIR/.env" 2>/dev/null || true
+  say "env         $_before -> $(wc -c < "$APPDIR/.env") bytes after folding"
+fi
+
+# ---------------------------------------------------------------------------
 # 6. pack: uruntime + dwarfs, the Anylinux way
 # ---------------------------------------------------------------------------
 need "$URUNTIME_URL" "$CACHE/tools/uruntime" || die "could not fetch uruntime"
