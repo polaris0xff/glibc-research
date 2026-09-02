@@ -301,6 +301,28 @@ static void *el_provider(const char *name)
     return NULL;
 }
 
+/* ⛔ A FOREIGN C LIBRARY OR LOADER IS REFUSED, NEVER MAPPED.
+ *
+ * On a musl target every shared object carries DT_NEEDED
+ * libc.musl-x86_64.so.1, and musl's libc IS its dynamic loader -- mapping it
+ * into a process whose libc is glibc and running its initialiser crashes,
+ * which is what the first run of experiments/76- measured on Alpine 3.22 and
+ * 3.20 (SIG11 on both). ⭐ The refusal is not a limitation being papered
+ * over: a second libc in the process is the outcome docs/limitations.md §1
+ * calls WORSE than failing, so the honest answer on those rows is a named
+ * error, and that is what this produces.
+ *
+ * Anything shaped like a libc or a loader that the provider table does not
+ * already serve falls here, so a libc this list has never heard of is refused
+ * rather than mapped on the strength of not being recognised. */
+static int el_foreign_libc(const char *soname)
+{
+    return strncmp(soname, "libc.", 5) == 0 ||
+           strncmp(soname, "ld-", 3) == 0 ||
+           strncmp(soname, "ld.so", 5) == 0 ||
+           strncmp(soname, "libpthread.", 11) == 0;
+}
+
 /* ⭐ solo's mechanism 3, and the mechanism that keeps a foreign libc OUT.
  * Before touching the disk, a DT_NEEDED is checked against the sonames this
  * executable already satisfies. A plugin needing libc.so.6 gets the glibc in
@@ -1216,6 +1238,12 @@ static int el_load_needed(struct el_obj *o)
         if ((dep = el_already(nm)) != NULL) {
             o->needed[keep++] = dep;
             continue;
+        }
+        if (el_foreign_libc(nm)) {
+            el_err("pgb-elfload: %s needs %s, a C library this image does not "
+                   "provide; mapping it would put a second libc in the process",
+                   o->soname, nm);
+            return -1;
         }
         if (!el_search(found, sizeof found, nm, o)) {
             el_err("pgb-elfload: %s: cannot find %s", o->soname, nm);

@@ -132,8 +132,15 @@ func (b *Builder) buildProviderTable(rd, src string) error {
 		"-O2", "-fno-builtin", "-w"); err != nil {
 		return err
 	}
-	return b.compileIfStale(src, "pgb-elfload.c",
-		filepath.Join(rd, "pgb-elfload.o"), "-O2")
+	if err := b.compileIfStale(src, "pgb-elfload.c",
+		filepath.Join(rd, "pgb-elfload.o"), "-O2"); err != nil {
+		return err
+	}
+	// pgb-dlopen.o carries the --wrap entry points and falls through to the
+	// loader. --wrap-dlopen compiles it too, but --host-dlopen can be asked
+	// for on its own and the link names the object either way.
+	return b.compileIfStale(src, "pgb-dlopen.c",
+		filepath.Join(rd, "pgb-dlopen.o"), "-O2")
 }
 
 // hostDlopenLinkFlags are the link-line pieces --host-dlopen adds.

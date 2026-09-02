@@ -15,7 +15,16 @@ export CGO_ENABLED = 0
 
 all: $(BIN)
 
-$(BIN): $(shell find . -name '*.go' -not -path './HISTORY/*' 2>/dev/null) go.mod
+# ⛔ THE EMBEDDED SOURCES ARE DEPENDENCIES, and leaving them out was a real
+# defect: assets.go go:embed's tool/runtime/*.c and the pinned target list into
+# the binary, so editing the ELF loader and running `make` printed "Nothing to
+# be done" and the next build compiled the PREVIOUS loader. It cost a full
+# eleven-environment run of experiments/76- that measured a fix which was never
+# in the binary. Anything go:embed reaches belongs on this line.
+EMBEDDED := $(wildcard tool/runtime/*.c) $(wildcard tool/runtime/*.h) \
+            scripts/common/rootfs-images.txt
+
+$(BIN): $(shell find . -name '*.go' -not -path './HISTORY/*' 2>/dev/null) go.mod $(EMBEDDED)
 	$(GO) build $(GOFLAGS) -o $(BIN) ./cmd/pgb
 
 release:
