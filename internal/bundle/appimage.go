@@ -177,7 +177,17 @@ func (b *Builder) Build() error {
 	// ⛔ AFTER writeEnv, because the sweep reads `.env` to find the plugin
 	// directories nothing links against -- and BEFORE integrity, so the
 	// control runs on what is actually shipped. See DropUnreachable.
-	if b.O.Debloat != "none" {
+	//
+	// ⛔ AND AT `aggressive` ONLY, WHICH IS A DOWNGRADE MADE ON EVIDENCE.
+	// It ran at `safe` for one afternoon and three separate classes of
+	// runtime-loaded library turned out to be invisible to it: MLT's modules,
+	// libglvnd's vendor libraries, and a libSDL3.so.0 dlopen'd by name from
+	// inside an MLT module with no data file naming it anywhere. Each was
+	// fixed, and finding three in one day is the measurement -- the sweep's
+	// model is a good approximation of reachability and it is not a proof, so
+	// `safe` must not mean it. What `safe` means is rules that cannot be wrong
+	// about a name; `aggressive` means this.
+	if b.O.Debloat == "aggressive" {
 		b.DropUnreachable()
 	}
 	b.integrity()

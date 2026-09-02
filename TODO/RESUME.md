@@ -71,15 +71,35 @@ Then: T-063, T-062, T-060, T-054, T-057, T-051, then P2.
 
 ## In flight right now
 
-    (nothing running — experiments/90- finished and its result is recorded)
+    experiments/90- kdenlive, log /var/tmp/exp90-final.log, started with all
+    three sweep fixes in. ⛔ IT WILL NOT HAVE FINISHED. Check the log, then
+    re-run: `sh experiments/90-kdenlive-vs-enhanced.sh` (~25 min, needs the
+    bed to itself; it now rebuilds when ./pgb is newer than the artefact).
 
-⛔ **FIRST THING NEXT SESSION: re-run `experiments/90-`.** It ran here and
-OURS FAILED TO RENDER on 0 of 11, because the reachability sweep ran before
-`.env` existed and deleted kdenlive's MLT modules. ⭐ The ordering fix is
-committed (`5fbf7ad0`) and **not re-measured**. The size moved 2.49× → 1.39×
-and ours is still the only arm clean on all eleven rows, but ⛔ **1.39× is a
-size for a bundle that did not work and must not be quoted** until 90- is
-green. It takes ~30 minutes and needs the bed to itself.
+⛔ **THE SWEEP MISSED THREE CLASSES OF RUNTIME-LOADED LIBRARY IN ONE DAY** and
+that is the headline of the 2026-09-02c reviews:
+
+    MLT modules      loaded from a dir named in .env -- the sweep ran BEFORE
+                     writeEnv wrote it. Fixed by ordering.
+    libEGL_mesa.so.0 named in a vendor JSON, living in lib/ itself, which the
+                     plugin-dir rule excludes (p == root). Fixed: manifest
+                     roots, 3 selftest cases incl. the negative arm.
+    libSDL3.so.0     ⛔ dlopen'd BY NAME from inside an MLT module, with NO
+                     data file naming it anywhere. `melt` said "Failed loading
+                     SDL3 library." Fixed: any soname spelled out inside any
+                     ELF is a root.
+
+⛔ **AND SWEEP DELETION MOVED FROM `safe` TO `aggressive`**, on that evidence.
+Three misses in a day means the model is a good approximation of reachability
+and not a proof, so `safe` must not mean it.
+
+⚠ **CORRECT THE NUMBER I PUBLISHED.** The 4,890,913 B / 1.22x for jq was
+produced by the UNSAFE sweep. Honest, re-measured:
+
+    was                    11,471,610 B  2.86x
+    safe (name rules)       7,331,882 B  1.83x
+    aggressive (+ sweep)    6,389,461 B  1.59x
+    field                   4,006,916 B  1.00x
 
 ## What this session has done
 

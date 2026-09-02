@@ -4,7 +4,7 @@
 and the entries.
 
     STATE     2026-09-02c
-    COUNTS    42 entries, 17 open, 25 done
+    COUNTS    45 entries, 20 open, 25 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN; selftests 138 pass, 1 could not run (no zstd)
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
@@ -152,42 +152,59 @@ static image should load — NSS modules, sanitizer and allocator interposers.
 
 ## ⭐ Work order
 
-⛔ **FOUR NEW P0s, set by the operator on 2026-09-02b, and each carries the
-same instruction: work until it is met or the premise is significantly
-advanced.** They outrank everything below them.
+⛔ **REORDERED 2026-09-02c on the operator's instruction**: *"focus on solving
+glibc's remaining quirks, ensure future version won't break our tooling or
+binary built by your tooling"*, plus a dedicated EGL/nix entry.
 
-    T-064   ⛔ static glibc's dlopen, REALLY solved — our own ELF loader,
-            resolving against our own static glibc. experiments/73- already
-            measured that 90.8–97.8% of host imports are definable by it and
-            the unexplained residue is ZERO. Restudy references/pg83__solo
-            (elf_loader.cpp is 2,707 lines and most of that is musl
-            translation a glibc host does not need) and beat it
-    T-065   ⛔ anylinux dlopens the HOST on purpose, and this project asserts
-            that is always failure. It is right for a static ELF and WRONG for
-            a bundle: sharun searches bundled-first with a documented
-            lowest-priority host fallback and per-class opt-ins for mesa,
-            Vulkan ICDs, NVIDIA and even a newer host glibc. Restudy the whole
-            family, write the policy up, adopt it
-    T-066   ⛔ the bundler is bloated and slow — 2.86x on jq, 2.49x and ~3x
-            slower on kdenlive. ⭐ Iterate on a CLI (bash or 7z), NOT on
-            kdenlive: minutes not 20, and it benchmarks cleanly. The
-            reachability sweep exists and NOTHING consumes it, which is the
-            largest unused lever in the tree
-    T-067   ⛔ does zig buy anything tool/runtime/'s C cannot? ⭐ A measured
-            "C is adequate, here is why" CLOSES this entry — it is a question,
-            not a migration
+⭐ **The reordering has an argument, not just a preference.** Three of the four
+2026-09-02b P0s are closed. What remains splits into two kinds of work, and one
+of them **degrades on its own**:
 
-    ---- and then ----
+| | |
+|---|---|
+| ⛔ **time-sensitive** | the glibc **class B ceiling widens with every glibc release the pin does not follow**. Nothing else here gets worse by being left alone. That is why it goes first |
+| everything else | as expensive next year as this year |
 
-    T-063   the miniflux proof: arm S has a static postgres running on Alpine;
-            src/interfaces does not build, so initdb/pg_ctl/psql do not exist
-    T-062   eight packages carry no selftest, internal/wrapper first
-    T-055   the bundle size cut — folded into T-066's iteration
+    ---- glibc's remaining quirks, and future-proofing ----
+
+    T-070   ⛔ THE PIN. It is a FLOOR set to 2.36 when the floor is 2.34, and
+            because the output is STATIC there is no upward pressure at all --
+            the usual "build old for compatibility" reason does not apply
+            here and docs/design/glibc-versions.md is why. Meanwhile class B
+            is 20 symbols, 14 of them __isoc23_* at exactly GLIBC_2.38, and
+            it grows. ⛔ Measure the cost FIRST: the kernel floor a newer
+            glibc declares is the thing a move can take away.
+    T-068   the --host-dlopen residue, now 86 of 904 with the crashes down
+            from 30 to 10. ⭐ The 10 are ONE family -- large C++ libraries
+            with hundreds of static constructors -- and libLLVM is the
+            specimen: it maps and relocates cleanly and dies in the 605th.
+    T-072   the static TLS surplus: 3,176 bytes of headroom, and one real
+            library wants 56,248. A glibc quirk with a named tunable and
+            three untried routes.
+
+    ---- the bundle, and the one class that is all DATA ----
+
+    T-071   ⛔ EGL from a nixpkgs closure. FOUR distinct failures so far and
+            every one of them was in DATA rather than code -- a missing
+            package, a flattened directory, an absolute store path inside a
+            third-party JSON, and a vendor library the reachability sweep
+            could not see. ⚠ The fourth was caught before it shipped on
+            2026-09-02c; the first three each cost a run.
+    T-066   ⚠ the bundler, still open. 2.86x -> 1.22x on jq. ⛔ kdenlive is
+            the outstanding row. The remaining gap is WHERE THE CLOSURE
+            COMES FROM, not another debloat rule.
+
+    ---- then, unchanged in relative order ----
+
+    T-063   the miniflux proof: arm S has a static postgres running on
+            Alpine; src/interfaces does not build
+    T-062   eight packages carry no selftest
     T-060   rungs 2 and 3, the static nix
     T-054   rungs 3 (KF6) and 4 (kdenlive static)
     T-057   item 2: a 32-bit application through the lib32 path
     T-051   the no-compiler host
-    then P2 by category
+    T-012   pgb build <url-or-package>
+    then    P2 by category
 
 ⭐ **Two pieces of real work are NAMED and are not entries**, because each is
 one clear fix inside T-063 arm S:

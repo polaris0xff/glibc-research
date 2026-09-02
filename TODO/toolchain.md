@@ -1462,3 +1462,81 @@ measurably slow with its number; zig arriving in the pinned image; or a
 component that cannot be written correctly in C — the loader was the candidate
 for that last one and came out at 1,093 code lines against `pg83/solo`'s 2,332
 for the same job in C++.
+
+## T-070 — ⛔ the glibc pin is a FLOOR set to 2.36, and the ceiling moves every year
+
+**Source** ⭐ **operator, 2026-09-02c**: *"focus on solving glibc's remaining
+quirks, ensure future version won't break our tooling or binary built by your
+tooling"*, and the question *"why do we compile on an older distro, isn't glibc
+backwards compatible?"*
+**Category** toolchain · **Priority** P0 · **Effort** M · **Status** open
+
+⭐ **The question is answered in
+[`../docs/design/glibc-versions.md`](../docs/design/glibc-versions.md) and the
+answer produced this entry.** glibc's backward compatibility is real and is
+irrelevant to our output, because the output is static:
+`PT_INTERP=0 DT_NEEDED=0`, no versioned imports, no host glibc consulted. ⛔ So
+there is **no** "build old to run on old hosts" pressure here at all.
+
+**The pin exists for a FLOOR.** glibc 2.34 made `files` and `dns` NSS builtin;
+below it `__nss_configure_lookup` only MOVES the dlopen. `experiments/21-`
+measures it: a 2.31 build **with** nssfix still opens `libnss_dns.so.2` and
+`libnss_files.so.2`; a 2.36 build opens none.
+
+⛔ **And a CEILING points the other way, and unlike anything else in this
+project it gets worse with time.** `--host-dlopen` needs a HOST object's
+imports satisfiable by OUR glibc, and `experiments/73-`'s class B is where that
+fails: 20 symbols, **14 of them `__isoc23_*` at exactly `GLIBC_2.38`**, plus
+`strlcpy`/`strlcat` at 2.38. Every glibc release the pin does not follow widens
+it.
+
+⭐ **The pin is 2.36. The floor is 2.34. Nothing forces it to sit near the
+floor** — that is the finding. A pin at ≥ 2.38 closes the majority of class B
+by construction.
+
+**⛔ Approach: measure the cost BEFORE moving it, because a static binary's
+only host requirement is the kernel and that is the thing a newer glibc can
+take away.**
+
+| | must be measured |
+|---|---|
+| 1 | the **kernel floor** a newer glibc's static binaries declare. Today `file` says `for GNU/Linux 3.2.0`. ⛔ If a newer pin raises it, that trades a real portability property for a symbol-coverage one and the trade has to be stated, not discovered |
+| 2 | `experiments/21-` re-run against the new pin — the NSS floor must still hold |
+| 3 | all ten POCs still build. A newer glibc deprecates as well as adds |
+| 4 | `experiments/73-` re-run: class B is what the move buys, and **class C — empty today — is what it could cost** |
+| 5 | the `debian:13` (glibc 2.41) manifest digest, pinned as `debian:12` is |
+
+**Prove.** A row per candidate pin — glibc version, kernel floor, class B
+residue, class C residue, POCs building, `21-` verdict — and a ruling: move the
+pin, or record why the floor-adjacent pin is right after all. ⛔ Not "it built".
+
+---
+
+## T-072 — the static TLS surplus is 3,456 bytes and one real library wants 56,248
+
+**Source** the residue of `experiments/76-` and T-068.
+**Category** toolchain · **Priority** P1 · **Effort** M · **Status** open
+
+⛔ **A glibc quirk with a named tunable, which is why it is its own entry.**
+`pgb-elfload.c` places initial-exec TLS in the surplus glibc already reserves,
+and the reserve is small: measured on the build host,
+`_dl_tls_static_size = 3264`, `_dl_tls_static_used = 88`, so **3,176 bytes** of
+headroom. Two of 904 host objects want more than that; one wants 56,248.
+
+**The question.** glibc sizes the surplus in `_dl_tls_static_surplus_init()`
+from the `glibc.rtld.optional_static_tls` tunable. ⚠ In a **static** binary
+`__libc_setup_tls` runs before `main`, so the tunable would have to be in the
+environment (`GLIBC_TUNABLES`) at exec time — which a library cannot arrange
+for itself, and which `docs/design/host-fallback.md`'s AT_SECURE discipline
+says must be ignored for a set-uid process anyway.
+
+**Routes, none tried.**
+
+| | |
+|---|---|
+| A | re-exec once with `GLIBC_TUNABLES=glibc.rtld.optional_static_tls=N` when a module needs more than the surplus. ⛔ Costs a re-exec and changes `/proc/self/exe` semantics; `pg83/solo` PR #5's ruling on intercepting routes-to-a-value is the read |
+| B | link the binary so its OWN `PT_TLS` is padded, making `memsz` larger and the block bigger. ⭐ Cheapest if it works: a dummy `__thread` array in the runtime, sized by a flag |
+| C | refuse, as now, and record the class. ⚠ 2 of 904 is the measured cost of doing nothing |
+
+**Prove.** The surplus measured before and after, and the two objects that
+fail today either loading or refused with the number they needed.

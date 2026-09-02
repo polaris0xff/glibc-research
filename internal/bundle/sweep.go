@@ -23,6 +23,7 @@
 package bundle
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -254,6 +255,34 @@ func Sweep(o SweepOptions) (*SweepResult, error) {
 			roots = append(roots, p)
 		}
 	}
+
+	// ⛔ A SONAME SPELLED OUT INSIDE AN ELF IS A ROOT, because that is what a
+	// dlopen(3) call by name looks like from the outside.
+	//
+	// ⚠ THIS IS THE THIRD CLASS OF RUNTIME-LOADED LIBRARY THIS SWEEP MISSED,
+	// all three found on 2026-09-02c and each by a different symptom:
+	//
+	//   MLT's modules        loaded out of a directory named in .env
+	//                        -> the .env rule, once it ran AFTER writeEnv
+	//   libEGL_mesa.so.0     named in a vendor JSON, living in lib/ itself
+	//                        -> the manifest rule above
+	//   ⛔ libSDL3.so.0      dlopen'd BY NAME from inside an MLT module, with
+	//                        no data file naming it anywhere
+	//                        -> this rule. `melt` reported "Failed loading
+	//                        SDL3 library." on all eleven environments
+	//
+	// The third has no manifest and no directory to key on. What it does have
+	// is the string: a `dlopen("libSDL3.so.0")` puts that soname in the
+	// caller's .rodata, so scanning every ELF in the bundle for names the
+	// index already knows finds it without knowing anything about SDL or MLT.
+	//
+	// ⭐ Deliberately over-broad. A soname mentioned in a log message or a
+	// version banner also counts, and keeping a library nothing loads costs
+	// space where deleting one something loads costs the application. The
+	// sweep's own contract says which way to err.
+	for _, r := range sonamesMentionedInObjects(o.Dir, allObjects, index) {
+		roots = append(roots, r)
+	}
 	roots = uniq(roots)
 
 	// Everything in a plugin directory is a root of its own closure.
@@ -481,4 +510,50 @@ func librariesNamedInManifests(dir string) []string {
 		}
 	}
 	return uniq(out)
+}
+
+// sonamesMentionedInObjects finds, for every ELF in the bundle, the shared
+// object names it spells out literally -- the fingerprint of a dlopen by name.
+//
+// ⚠ Substring search over the whole file rather than a .rodata walk: a soname
+// can also arrive through a string table, a build-id note, or a constant
+// assembled at compile time into an unexpected section, and reading the wrong
+// section is how the previous three misses happened. Cost is one pass per
+// object over bytes already on disk.
+func sonamesMentionedInObjects(root string, objects []string, index map[string]string) []string {
+	// Only names the bundle actually has can be roots, so the needle set is
+	// the index rather than every plausible soname.
+	needles := make([][]byte, 0, len(index))
+	names := make([]string, 0, len(index))
+	for n := range index {
+		if !IsSharedObject(n) {
+			continue
+		}
+		needles = append(needles, []byte(n))
+		names = append(names, n)
+	}
+	found := map[string]bool{}
+	for _, o := range objects {
+		data, err := os.ReadFile(o)
+		if err != nil {
+			continue
+		}
+		self := filepath.Base(o)
+		for i, nd := range needles {
+			if names[i] == self || found[names[i]] {
+				continue
+			}
+			if bytes.Contains(data, nd) {
+				found[names[i]] = true
+			}
+		}
+	}
+	var out []string
+	for n := range found {
+		if p, ok := index[n]; ok {
+			out = append(out, p)
+		}
+	}
+	sort.Strings(out)
+	return out
 }

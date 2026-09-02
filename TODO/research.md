@@ -747,3 +747,78 @@ this is a caution about how F2 is read, not a contradiction of its evidence.
 names every gap (no upstream, no author, no licence, no independent
 reproduction), and swept in
 [`../docs/research/one-libc.md`](../docs/research/one-libc.md).
+
+## T-071 — ⛔ EGL out of a nixpkgs closure: the vendor libraries are the fragile part
+
+**Source** ⭐ **operator, 2026-09-02c**: *"add a dedicated task to solving the
+egl issue with nix"*.
+**Category** research · **Priority** P0 · **Effort** L · **Status** open
+
+⛔ **This exists because EGL out of nixpkgs has failed three times, each for a
+DIFFERENT reason, and two of the three were invisible to every check the tree
+had.** `experiments/85-` gets `EGL vendor string: Mesa Project` on 11 of 11
+today, so the entry is not "make EGL work" — it is that the way it works is
+held together by three separate rewrites of third-party data, none of which has
+a control.
+
+**The three failures so far, in order.** `TODO/research.md` T-052 records the
+first two; the third was found reviewing the sweep on 2026-09-02c.
+
+| | what broke | why it was hard to see |
+|---|---|---|
+| 1 | `eglInitialize failed`, no vendor at all — **mesa was not in the closure** when libglvnd was present and no driver was | libglvnd loads fine on its own; the failure is one layer down |
+| 2 | `lib/dri` and `lib/gbm` were **flattened**, and they are found through a variable naming a DIRECTORY | a flattened copy has every file, so nothing is missing |
+| 3 | ⛔ **the ICD/vendor JSONs name an ABSOLUTE `/nix/store` path** — `"library_path": "/nix/store/4cvv9…-mesa-26.2.1/lib/libEGL_mesa.so.0"` — so libglvnd found the vendor file, opened a path that did not exist, and failed **with `libEGL_mesa.so.0` sitting in `lib/` beside it** | the library IS in the bundle. Every integrity check passes |
+
+⭐ **And a fourth was caught before it shipped, on 2026-09-02c.** The
+reachability sweep now deletes what nothing can reach, and **a vendor library
+is unreachable by construction**: it lives in `lib/` itself, which the
+plugin-directory rule deliberately excludes (`p == root`), and nothing carries
+`DT_NEEDED libEGL_mesa.so.0` because libglvnd `dlopen`s it by name out of the
+JSON. `internal/bundle/sweep.go` now takes manifest-named libraries as roots,
+with three selftest cases including the negative arm. ⛔ **That is the fourth
+distinct way this stack has broken, and the pattern is the same every time: EGL
+is reached through DATA, and every check this tree owns follows CODE.**
+
+**⛔ The problem, stated so it is not re-derived.** A nixpkgs closure is
+**location-locked** (`docs/research/nix.md`), and the GL stack is the worst
+case for that: libglvnd finds vendors through
+`share/glvnd/egl_vendor.d/*.json`, the Vulkan loader through
+`share/vulkan/icd.d/*.json`, and both files carry absolute store paths written
+at build time. Bundling therefore means **rewriting third-party data files**,
+and every rewrite is a place the format can change under us.
+
+**What this entry owns.**
+
+1. ⭐ **A control for the rewrites.** Today `icdLibraryPath` is one regexp over
+   two globs and nothing asserts the result LOADS. A bundle whose JSON still
+   names a store path passes every gate in the tree. The control is: after
+   bundling, no manifest may name a path outside the bundle, and every library
+   a manifest names must exist in it.
+2. ⛔ **The layer manifests are unhandled.** `implicit_layer.d` and
+   `explicit_layer.d` carry `library_path` too and were not in the rewrite
+   globs — they are in the SWEEP's globs now, which means the sweep keeps a
+   library whose manifest still points at `/nix/store`. ⚠ Half-fixed is worse
+   than neither: the library survives and the path is still wrong.
+3. **Size.** The GL stack is **95 MiB of a 163 MB bundle** (`experiments/85-`),
+   because nixpkgs' mesa is 273 MB unstripped and the Anylinux flow ships a
+   debloated one. Folds into T-066's "where the closure comes from".
+4. **NVIDIA.** `docs/design/host-fallback.md` rules it host-always and never
+   bundled. ⚠ Untested against nixpkgs' libglvnd, which is the dispatcher that
+   would have to find a host vendor while its own vendors are bundled. The
+   `PGB_HOST_MESA` opt-in is likewise implemented and unexercised.
+5. ⛔ **`__EGL_VENDOR_LIBRARY_DIRS` vs `__EGL_VENDOR_LIBRARY_FILENAMES`.** The
+   bundle sets the first; the second overrides it and is what a host
+   configuration may already have set. Nothing clears or honours it.
+
+**⚠ What this entry CANNOT settle here, and it must not be closed by silence.**
+Every GL row in this tree is `swrast` — this machine has no GPU and none of the
+eleven has a display. **T-059** owns hardware. So T-071's assertions are about
+the bundle's DATA being coherent and its libraries being reachable, which is
+decidable without a GPU; anything about a driver actually rendering is T-059's.
+
+**Prove.** `experiments/85-` extended with a data-coherence arm: for every
+manifest in the bundle, the library it names resolves INSIDE the bundle, and no
+manifest names a path outside it — asserted, on a bundle built by `pgb bundle
+appimage`, with a negative control that a deliberately un-rewritten manifest
+fails it.

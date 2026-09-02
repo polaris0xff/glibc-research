@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 42  OPEN 17  DONE 25
+    TOTAL 45  OPEN 20  DONE 25
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
-| P0 | breaks correctness, loses data, or takes the process down | 5 | 1 | 4 |
-| P1 | a documented capability does not work, or a flag does nothing | 29 | 11 | 18 |
+| P0 | breaks correctness, loses data, or takes the process down | 7 | 3 | 4 |
+| P1 | a documented capability does not work, or a flag does nothing | 30 | 12 | 18 |
 | P2 | worth doing; nothing is wrong without it | 8 | 5 | 3 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -59,6 +59,9 @@ pretending to be one.
 | T-067 | P0 | M | done | toolchain | ⭐ C is adequate for `tool/runtime/`, measured: 0 UBSan findings over 904 objects |
 | T-068 | P1 | M | open | runtime | The residue `--host-dlopen` does not load: 86 of 904, each classified |
 | T-069 | P1 | S | done | research | ⭐ The supplied working paper, swept: useful, and it names the gap `experiments/76-` closed |
+| T-070 | P0 | M | open | toolchain | ⛔ The glibc pin is a FLOOR at 2.36 and the class B ceiling widens yearly |
+| T-071 | P0 | L | open | research | ⛔ EGL from a nixpkgs closure: four failures, all in DATA rather than code |
+| T-072 | P1 | M | open | toolchain | The static TLS surplus is 3,456 bytes; one real library wants 56,248 |
 
 ## The argument behind the ordering
 
