@@ -1861,6 +1861,23 @@ Proved in a FRESH runtime directory, which is the condition that failed:
     pgb-elfload.o in that directory          absent -- it linked WITHOUT it
     --host-dlopen, rebuilt after the fix     still loads, still refuses at 0
 
+⭐ **AND THE CLASS WAS SWEPT RATHER THAN THE INSTANCE PATCHED.** The shape is
+*"a runtime source references a symbol another runtime source defines, when a
+DIFFERENT option decides whether that one is compiled"*. Every `tool/runtime/*.c`
+was checked for cross-file `pgb_` references, and there is **exactly one such
+pair in the tree** — `pgb-dlopen.c` → `pgb-elfload.c`, the five names above.
+Confirmed with `nm` rather than grep, which is what says whether a reference is
+weak or strong:
+
+    nm pgb-dlopen.o -> pgb_elf_available  w   (was U)
+                      pgb_elf_dlopen      w
+                      pgb_elf_dlsym       w
+                      pgb_elf_dlclose     w
+                      pgb_elf_dlerror     w
+
+⚠ `pgb_dlopen_libs` and the two provider-table symbols were already weak; they
+are the pattern this fix follows rather than a new one.
+
 ⛔ **So the pin has NOT moved and `cfg.go` is untouched.** ⭐ **Six of the ten
 POCs now BUILD AND RUN at 2.41**, verified per binary rather than per exit
 status, and the four measurable costs are still zero. ⚠ The remaining four —
