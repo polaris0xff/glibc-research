@@ -128,7 +128,6 @@ func (b *Builder) debloat() {
 	b.dropRule("libteflon (an NPU delegate, not a GPU driver)", teflon)
 
 	b.dropLocaleSources()
-	b.dropUnreachable()
 
 	after := dirSize(b.AppDir)
 	if before > 0 {
@@ -180,7 +179,21 @@ func containsString(list []string, want string) bool {
 	return slices.Contains(list, want)
 }
 
-// dropUnreachable removes the shared objects nothing in the bundle can reach.
+// DropUnreachable removes the shared objects nothing in the bundle can reach.
+//
+// ⛔ IT RUNS AFTER writeEnv(), NOT INSIDE debloat(), AND THAT ORDER IS THE
+// WHOLE CORRECTNESS OF IT. The sweep learns which directories hold plugins
+// partly from the bundle's own `.env` -- MLT_REPOSITORY, FREI0R_PATH,
+// GST_PLUGIN_SYSTEM_PATH_1_0 and the rest name directories whose contents
+// nothing links against and which are loaded by name at run time.
+//
+// ⚠ MEASURED, BY BREAKING IT. The first version called this from debloat(),
+// which runs BEFORE writeEnv(), so `.env` did not exist yet, the sweep saw no
+// plugin directories, and it deleted kdenlive's MLT modules as unreachable.
+// experiments/90- caught it in one row: ours rendered 0 bytes of MP4 where the
+// previous run rendered 4,149. ⭐ jq did not catch it and could not -- a CLI
+// with no plugin directories has nothing at risk, which is the limit of
+// iterating on a CLI and the reason the plugin-heavy case stays a control.
 //
 // ⛔ THE SWEEP EXISTED AND NOTHING CONSUMED IT. `internal/bundle/sweep.go`
 // computes exactly this and had two callers: the `pgb bundle sweep`
@@ -203,7 +216,7 @@ func containsString(list []string, want string) bool {
 // can reach an object is not a size/function trade of the kind `--debloat
 // aggressive` exists to gate; the locale rule above is one of those and this
 // is not.
-func (b *Builder) dropUnreachable() {
+func (b *Builder) DropUnreachable() {
 	res, err := Sweep(SweepOptions{
 		Dir:      b.AppDir,
 		EnvFiles: []string{filepath.Join(b.AppDir, ".env")},

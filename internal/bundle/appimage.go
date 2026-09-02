@@ -171,10 +171,16 @@ func (b *Builder) Build() error {
 	if err := b.installSharun(); err != nil {
 		return err
 	}
-	b.integrity()
 	if err := b.writeEnv(); err != nil {
 		return err
 	}
+	// ⛔ AFTER writeEnv, because the sweep reads `.env` to find the plugin
+	// directories nothing links against -- and BEFORE integrity, so the
+	// control runs on what is actually shipped. See DropUnreachable.
+	if b.O.Debloat != "none" {
+		b.DropUnreachable()
+	}
+	b.integrity()
 	return b.pack()
 }
 
