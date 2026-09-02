@@ -190,21 +190,16 @@ func (b *Builder) writeEnv() error {
 	if have("lib/gdk-pixbuf-2.0/2.10.0/loaders.cache") {
 		add("GDK_PIXBUF_MODULE_FILE=${SHARUN_DIR}/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache")
 	}
-	if have("lib/dri") {
-		// For the mesa case a bundle is a complete answer: nixGL does not use
-		// the host's GL either, it points nixpkgs' own mesa at itself.
-		add("LIBGL_DRIVERS_PATH=${SHARUN_DIR}/lib/dri")
-		add("LIBVA_DRIVERS_PATH=${SHARUN_DIR}/lib/dri")
-	}
 	if have("lib/gbm") {
 		add("GBM_BACKENDS_PATH=${SHARUN_DIR}/lib/gbm")
 	}
-	if have("share/glvnd/egl_vendor.d") {
-		add("__EGL_VENDOR_LIBRARY_DIRS=${SHARUN_DIR}/share/glvnd/egl_vendor.d")
-	}
-	if have("share/vulkan/icd.d") {
-		add("VK_DRIVER_FILES=${SHARUN_DIR}/share/vulkan/icd.d")
-	}
+
+	// ⭐ THE DRIVER AND FALLBACK CLASSES ARE THE POLICY'S, NOT THIS FUNCTION'S.
+	// Bundled-first with a documented lowest-priority host fallback and
+	// per-class opt-ins: docs/design/host-fallback.md, TODO T-065. Before this
+	// the bundle set only its own paths and could never reach the host's
+	// NVIDIA driver, which is the one thing it must never bundle.
+	lines = append(lines, b.Host.EnvLines(have)...)
 
 	lines = append(lines, b.liftWrapperEnv()...)
 	lines = append(lines, b.carryBakedPaths()...)

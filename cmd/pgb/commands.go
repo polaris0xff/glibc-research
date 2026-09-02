@@ -271,6 +271,7 @@ func selftestSuites(c *cfg.Config) []suite {
 		{"nix-diagnose", nixx.DiagnoseSelftest},
 		{"bootstrap", func() *selftest.Report { return bootstrapx.Selftest(c) }},
 		{"bundle-sweep", bundle.Selftest},
+		{"bundle-hostpolicy", bundle.HostPolicySelftest},
 		{"bundle-appimage", func() *selftest.Report { return bundle.AppImageSelftest(c) }},
 	}
 }

@@ -80,6 +80,10 @@ type Builder struct {
 	Prog    string
 	Base    string // the entry store path's base name
 	wrapEnv []WrapRecord
+
+	// Host is what this bundle may take from the machine it runs on.
+	// docs/design/host-fallback.md; the zero value is bundled-first.
+	Host HostPolicy
 }
 
 // NewAppImageBuilder applies the defaults.
@@ -90,7 +94,8 @@ func NewAppImageBuilder(c *cfg.Config, o AppImageOptions) *Builder {
 	if o.Cache == "" {
 		o.Cache = envOr("PGB_APPIMAGE_CACHE", "/var/tmp/pgb-appimage")
 	}
-	return &Builder{C: c, Nix: nixx.NewClient(), O: o, Arch: machine()}
+	return &Builder{C: c, Nix: nixx.NewClient(), O: o, Arch: machine(),
+		Host: LoadHostPolicy()}
 }
 
 func envOr(name, def string) string {
