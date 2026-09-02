@@ -574,3 +574,63 @@ now and it is the half that says the detection code runs at all.
 **Prove.** A row per environment for a machine that has a GPU, with the vendor
 and renderer strings, plus the detection path exercised on the eleven that do
 not.
+
+---
+
+## T-065 — ⛔ P0: anylinux dlopens the HOST on purpose. Restudy why, and adopt the policy
+
+**Source** ⭐ **operator, 2026-09-02b**: *"anylinux deliberately dlopens on
+hosts and uses their libs because that's the way it is allowed to use stuff
+like nvidia drivers, it only dlopens when it needs to and host has what it
+needs, so restudy all of anylinux reference materials"*.
+**Category** research · **Priority** P0 · **Effort** L · **Status** open
+
+⛔ **WORK UNTIL IT IS MET OR THE PREMISE IS SIGNIFICANTLY ADVANCED.**
+
+**Problem.** This project treats **any** host `.so` entering a process as the
+failure it exists to prevent, and asserts on it in `poc_matrix` and
+`pgb verify`. ⛔ **That is right for a static ELF and wrong for a bundle**, and
+the difference has never been written down. A bundle that refuses the host's
+GL, Vulkan or NVIDIA userspace cannot run on real hardware at all — which is
+why every GL row in this tree is `swrast`.
+
+**Premise, read out of the vendored source rather than assumed.** anylinux's
+sharun (`references/pkgforge-dev__Anylinux-sharun/tree/src/main.rs`) implements
+a **priority-ordered library search**, not a wall:
+
+    SHARUN_EXTRA_LIBRARY_PATH      highest priority
+    (the bundle's own lib/)
+    SHARUN_FALLBACK_LIBRARY_PATH   "lowest priority" -- main.rs:45
+
+plus explicit opt-ins for the cases where the host **must** win:
+`SHARUN_USE_HOST_GLIBC`, `SHARUN_MESA_PATH`, `SHARUN_ALLOW_SYS_VKICD`,
+`SHARUN_NO_NVIDIA_EGL_PRIME`, `SHARUN_ALLOW_LD_PRELOAD`,
+`SHARUN_ALLOW_QT_PLUGIN_PATH`.
+
+⭐ **And the maintainer states the rule in their own tracker**
+(`references/VHSgunzo__sharun/api/issues.json`): sharun compares the host's
+`libc.so.6 --version` against the bundled one — *"300 microseconds"* — and
+uses the host's loader and libc **only when the host's is newer**, by
+symlinking them into a temp dir and putting it first on `--library-path`.
+⛔ **So the policy is: bundle by default, defer to the host when the host has
+something the bundle cannot carry, and never silently.**
+
+**Approach.**
+1. **Read the family properly**: `pkgforge-dev__Anylinux-sharun`,
+   `pkgforge-dev__Anylinux-AppImages`, `VHSgunzo__sharun`,
+   `VHSgunzo__runimage`, `nix-community__nixGL`, and the trackers. Write the
+   policy up as a table of *what defers to the host, when, and how it is
+   detected* — this is a `docs/research/` page, not a paragraph.
+2. **Separate the two claims in this tree's own instruments.** "Zero host
+   objects" stays the assertion for a **static ELF**; for a **bundle** the
+   assertion becomes "no host object the bundle could have carried", with the
+   driver classes named and allowed.
+3. **Implement the search order** in `internal/bundle`: bundled first, host
+   fallback last, per-class opt-ins, and ⛔ **every deferral reported**, never
+   silent.
+
+**Prove.** A bundle that runs GL against a **real** driver rather than
+`swrast` — the T-059 hardware case — while still loading nothing from the host
+it could have carried; the policy table in `docs/research/`; and
+`experiments/85-`/`89-` re-run so the eleven rows distinguish "carried" from
+"deferred by policy" instead of counting both as contamination.

@@ -1236,3 +1236,104 @@ that exercises neither.
 and the suite fails when an option is disconnected from the flags it controls,
 demonstrated by disconnecting one deliberately, the way `experiments/89-` uses
 a control arm.
+
+---
+
+## T-066 — ⛔ P0: the bundler is bloated and slow. Rebuild it against a CLI benchmark
+
+**Source** ⭐ **operator, 2026-09-02b**: *"pgb bundle isn't good enough, it is
+bloated, slow and a complete failure. Restudy what all nixappimage related
+references and fix/patch/reimplement/iterate+improve everything needed to fix
+our bundles. best place is to bundle a cli first, bundle something like bash or
+maybe 7z which can be benchmarked better, and smaller and less time to compare
+after each iteration/improvements."*
+**Category** toolchain · **Priority** P0 · **Effort** XL · **Status** open
+
+⛔ **WORK UNTIL IT IS MET OR THE PREMISE IS SIGNIFICANTLY ADVANCED.**
+
+**Problem, measured, and it is not close.**
+
+| subject | ours | the field | |
+|---|---|---|---|
+| `jq` (`experiments/86-`) | **11,471,610 B**, 7 store paths | **4,006,916 B**, 68 libraries | ⛔ **2.86×** |
+| kdenlive (`experiments/90-`) | **477,191,058 B** | 191,900,604 B | ⛔ **2.49×** |
+| kdenlive render | 3,559 ms | 1,323 ms | ⛔ **2.69×** |
+| kdenlive cold start | 181 ms | 52 ms | ⛔ **3.48×** |
+
+⭐ The one column ours wins is host-object cleanliness — 11/11 against 4/11 —
+and T-065 is about whether that is even the right assertion for a bundle.
+
+**Why a CLI is the subject, and the operator named it.** kdenlive is a
+20-minute build and a 477 MB artefact: an iteration loop nobody can run. `bash`
+or `7z` is minutes and megabytes, benchmarks cleanly (startup dominated, no
+display, a real workload in `7z b`), and every improvement shows up
+immediately. ⛔ **Do not iterate on kdenlive.** Land the CLI numbers first,
+then re-measure the big subjects once.
+
+**Premise — the levers already measured and not pulled.**
+
+1. ⛔ **The reachability sweep exists and NOTHING consumes it.** Confirmed with
+   codegraph: `Sweep` has exactly two callers, `bundleSweep` and its own
+   selftest. `--debloat` is pattern rules only. 489 MB of kdenlive's `lib/` is
+   unreachable. **This is the single largest unused lever.**
+2. `store/` is 405 MB of the kdenlive bundle and duplicates what is already in
+   `lib/`.
+3. `share/` is 368 MB, most of it one icon theme shipping every size.
+4. Start and render both track artefact size — the dwarfs image is mounted at
+   launch — so 1–3 move all three columns at once.
+
+**Approach.** Restudy the family first, then iterate against the CLI:
+`pkgforge__nix-appimage`, `ralismark__nix-appimage`, `of-the-stars__nix-appimage`,
+`logos-co__nix-bundle-appimage`, `VHSgunzo__sharun`, `VHSgunzo__runimage`,
+`pkgforge-dev__Anylinux-sharun`, `nix-community__patsh`, `leleliu008__elftool`.
+⭐ **Iterate, patch and reimplement — the brief says reuse and improve before
+reinventing.** Each change lands with the CLI numbers before and after.
+
+**Prove.** ⛔ Not "it is smaller". A table with a row per iteration for the CLI
+subject — bytes, cold start, warm start, and the workload's own time — showing
+what each change bought; then the same three columns re-measured for `jq` and
+for kdenlive. ⭐ **The bar is the field**: `experiments/86-`'s hand-built
+Anylinux arm for the CLI, and `kdenlive-AppImage-Enhanced` for the big one.
+`docs/AGENTS.md` §14 forbids "better" without the measurement.
+
+---
+
+## T-067 — ⛔ P0: does zig buy anything the C runtime pieces cannot?
+
+**Source** ⭐ **operator, 2026-09-02b**: *"Look into using zig if existing c is
+limited/slow, thought that shouldn't be the case"*.
+**Category** toolchain · **Priority** P0 · **Effort** M · **Status** open
+
+⛔ **WORK UNTIL IT IS MET OR THE PREMISE IS SIGNIFICANTLY ADVANCED**, and note
+the operator's own expectation: *"that shouldn't be the case"*. ⭐ **A measured
+"C is fine, here is the evidence" closes this entry.** It is a question, not a
+migration.
+
+**Problem.** `tool/runtime/` is C — `pgb-nssfix.c`, `pgb-cacert.c`,
+`pgb-terminfo.c`, `pgb-trace.c` and the iconv wrappers — compiled into every
+artefact. If C is limiting or slow anywhere, that cost is paid by every binary
+pgb produces.
+
+**Premise.** ⭐ There is prior art **in this tree's own corpus**:
+`references/allyourcodebase__pipewire/src/wrap/dlfcn.zig` exports
+`__wrap_dlopen`, `__wrap_dlsym` and `__wrap_dlclose` against a compiled-in
+table — the same mechanism as `--wrap-dlopen`, written in zig. So the question
+is not hypothetical and there is a working comparison to read.
+
+⚠ **And there is a real constraint the answer must respect**: `pgb` is one
+static Go binary built `CGO_ENABLED=0` that **carries its C sources and
+compiles them with the target's toolchain**. Anything zig replaces must still
+be compilable inside the pinned build environment with no new host dependency —
+⛔ or it fails the same way the libiconv/`msgfmt` defect did, by needing a tool
+the environment does not have.
+
+**Approach.** Name a specific place C is actually limiting before proposing a
+language: measure the runtime pieces, read the zig prior art, and answer three
+questions with evidence — is any runtime piece measurably slow; is any of it
+hard to write correctly in C (T-064's loader is the honest candidate); and what
+would adding a zig toolchain cost the build environment and the artefact.
+
+**Prove.** A written comparison in `docs/design/`, with a number behind each
+claim, ending in a ruling: adopt zig for a named component, or record that C is
+adequate and why — so this is not re-asked. ⛔ A migration with no measured
+limitation behind it is refused by this entry, not enabled by it.

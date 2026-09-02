@@ -3,11 +3,11 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 36  OPEN 15  DONE 21
+    TOTAL 40  OPEN 19  DONE 21
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
-| P0 | breaks correctness, loses data, or takes the process down | 1 | 0 | 1 |
+| P0 | breaks correctness, loses data, or takes the process down | 5 | 4 | 1 |
 | P1 | a documented capability does not work, or a flag does nothing | 27 | 10 | 17 |
 | P2 | worth doing; nothing is wrong without it | 8 | 5 | 3 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
@@ -53,39 +53,46 @@ pretending to be one.
 | T-061 | P0 | XL | done | toolchain | Port the whole toolchain to Go, and ship one static `pgb` |
 | T-062 | P1 | M | open | toolchain | Eight packages carry no selftest, `internal/wrapper` among them |
 | T-063 | P1 | L | open | poc | miniflux + an embedded PostgreSQL, against onelf's ~70 MB |
+| T-064 | P0 | XL | open | runtime | ⛔ Make static glibc's `dlopen` really solved, with our own loader |
+| T-065 | P0 | L | open | research | ⛔ anylinux dlopens the HOST on purpose — restudy why, and adopt the policy |
+| T-066 | P0 | XL | open | toolchain | ⛔ The bundler is bloated and slow — rebuild it against a CLI benchmark |
+| T-067 | P0 | M | open | toolchain | ⛔ Does zig buy anything the C runtime pieces cannot? |
 
 ## The argument behind the ordering
 
 ⭐ **Recorded so it can be re-derived rather than re-argued.** The order itself
 is in [`PROGRESS.md`](PROGRESS.md) "Work order"; this is why it is that order.
 
-0. ⭐ **T-061 is landed and no longer outranks anything.** The toolchain is one
-   static Go binary, the shell and Python it replaced are the oracle under
-   `../HISTORY/`, and ⭐ **all six workload gates are met** — gate 5 completed
-   in the session of 2026-09-02b with ten of ten POCs and twenty-three
-   experiments. The entry stays open only for what the operator adds to it.
-1. **T-063 first, because it is closest to done and it is the operator's
-   newest instruction.** Arm S already has a static PostgreSQL 18.6 running on
-   Alpine; what is missing is `src/interfaces`, so `initdb`/`pg_ctl`/`psql` do
-   not exist yet and nothing yet claims the miniflux stack runs. ⚠ An entry
-   that is one build away from an answer is worth more than one that is ten.
-2. **T-062 next, and it is the cheapest insurance in the tree.** Eight
-   packages carry no selftest and `internal/wrapper` is one of them — it
-   composes every flag `pgb build` injects, and its only acceptance is gate 4,
-   which needs a bed, a network and half an hour. ⛔ **A change to the product
-   cannot currently be checked while it is being made.**
-3. **T-055 before the remaining rungs.** `experiments/90-` measured the gap and
-   it is size-dominated: the artefact is 2.49x the competitor and start and
-   render both track size. The reachability sweep exists and ⛔ **nothing
-   consumes it**, which is the single largest lever and is already written.
+0. ⛔ **FOUR P0s, set by the operator on 2026-09-02b, outrank everything.**
+   Each carries the same instruction — *work until it is met or the premise is
+   significantly advanced* — so none of them is a spike to be timeboxed.
+   - **T-064** is first because it is the project's thesis. `limitations.md` §1
+     is the one measured, unfixed failure and the reason `REQUIREMENTS.md`
+     part 1 is not met. ⭐ The evidence is already in hand: `experiments/73-`
+     says 90.8–97.8% of host imports are definable by our own static glibc and
+     the unexplained residue is **zero**, and `experiments/72-` says the host
+     loader can never be the answer because a static binary's dynamic symbol
+     table is empty. The loader has to be ours.
+   - **T-065** is second because it changes what the other entries are allowed
+     to assert. This tree treats every host `.so` as contamination; anylinux
+     defers to the host **deliberately** for drivers. Until that policy is
+     written down, T-066's bundle and T-059's GPU work are measured against
+     the wrong bar.
+   - **T-066** is third and is the operator's harshest verdict — *"bloated,
+     slow and a complete failure"*. ⭐ It is ordered after T-065 because the
+     size lever and the host-deferral policy interact: what may be dropped
+     depends on what may be deferred.
+   - **T-067** is last of the four because it is a **question**, and a measured
+     "C is adequate" closes it. ⛔ It must not become a migration without a
+     named, measured limitation behind it.
+1. **T-063 next**, because it is closest to done: arm S already has a static
+   PostgreSQL running on Alpine and what is missing is `src/interfaces`.
+2. **T-062 after it** — eight packages carry no selftest and `internal/wrapper`
+   is one of them. It composes every flag `pgb build` injects and its only
+   acceptance is gate 4, which needs a bed and half an hour, so ⛔ a change to
+   the product cannot currently be checked while it is being made.
+3. **T-055 folds into T-066.** Same lever, same measurement; do not run them as
+   two efforts.
 4. **T-060, T-054, T-057 and T-051 by goal.** Each is a rung on one of the
-   operator's three goals and each has evidence per rung; take the goal that
-   is furthest from its bar.
+   operator's three goals; take the goal furthest from its bar.
 5. **P2 by category last.** Nothing is wrong without them.
-
-⚠ **Two pieces of real work are named in `PROGRESS.md` and are deliberately
-NOT entries**, because each is one clear fix inside T-063 arm S: the static
-**link-order** problem (`AC_SEARCH_LIBS` probes `-lreadline` alone;
-`poc/91-qt-xcb` answered the same class with `-Wl,--start-group`) and **a C
-link that pulled in a C++ archive** (`libicuuc.a` needs `operator delete`;
-`LinkFlags` already takes a `cxx bool`). File them if they outgrow that.

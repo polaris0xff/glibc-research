@@ -337,3 +337,59 @@ routes HTTPS through a proxy that exports its own `CURL_CA_BUNDLE` and
 existing observation records why — `docs/history/corrections.md`. If the new
 step 8 fails on hosts that DO have a store, suspect the proxy's certificate
 before suspecting the mechanism, and say which it was.
+
+---
+
+## T-064 — ⛔ P0: make static glibc's `dlopen` REALLY solved, with our own loader
+
+**Source** ⭐ **operator, 2026-09-02b**: *"static glibc really 'solved', restudy
+solo reference, implement a better faster version of cross libc dlopen"*.
+**Category** runtime · **Priority** P0 · **Effort** XL · **Status** open
+
+⛔ **WORK UNTIL IT IS MET OR THE PREMISE IS SIGNIFICANTLY ADVANCED.** This is
+not a spike. `docs/limitations.md` §1 is the project's one measured, unfixed
+failure and the reason `REQUIREMENTS.md` part 1 is not met.
+
+**Problem.** A static glibc binary cannot `dlopen` a host shared object. Where
+it succeeds — Debian 12 and Arch, measured in `poc/10-gawk` — the success is
+the *worse* outcome: the host loader and a second libc enter the process.
+
+**Premise, and it is already measured rather than hoped for.**
+
+- `experiments/73-` parsed **5,807 real host shared objects** across the seven
+  glibc environments: **90.8%–97.8%** of every `GLIBC_`/`GCC_`-versioned import
+  is already definable by the pinned static glibc, and the unexplained residue
+  is **zero**. The symbols are there.
+- `experiments/72-` measured why the host loader can never be the answer: a
+  static executable's **dynamic symbol table is empty**, so a host-loaded
+  plugin has nothing to bind back to. ⛔ A perfect loader would still have
+  nowhere to look — which is exactly why the loader has to be **ours**.
+- `references/pg83__solo` is a working ELF loader: `lib/elf_loader.cpp` is
+  **2,707 lines** and `lib/dlfcn.cpp` **370**. ⭐ It pays most of that
+  translating a guest's glibc imports onto **musl**. A static **glibc** host
+  has no translation to do, so the port is a subtraction, not a rewrite.
+
+**Approach.** Map the object ourselves, walk `DT_NEEDED`, relocate, and bind
+its imports to a table of the executable's own symbols — the same generated
+table `--wrap-dlopen` already builds, pointed at libc instead of at the
+application's plugins. Nothing of the host's is mapped, so no second libc
+enters and the output stays one ordinary ELF.
+
+⚠ **The honest unknowns, named so they are not discovered late:** TLS is the
+one place where "we are glibc, so it is simpler" is not obviously true;
+`IFUNC`/`STT_GNU_IFUNC` resolvers run at relocation time; and symbol
+*versioning* must be honoured, not ignored, or the wrong definition binds
+silently.
+
+**Relationship to the older entries.** T-033 is route D and is this entry's
+predecessor — it stays open only as the research note. T-031 (port
+cross-libc-dlopen's full rewrite) is the *other* direction, letting host
+objects in, and ⛔ **is not this**: `experiments/50-` already measured that
+route producing no effect.
+
+**Prove.** ⛔ Not "it links". A POC that `dlopen`s a **real host shared
+object** — start with the gawk extension `poc/10-gawk` already fails on — on
+**11 of 11**, with `pgb verify` reporting **zero host shared objects loaded**
+on every row, against a control that uses the host loader and fails. Plus a
+measurement against solo's own loader: ours must be smaller in lines and
+faster to first symbol, or the "better faster" in the instruction is unmet.
