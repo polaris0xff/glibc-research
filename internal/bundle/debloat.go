@@ -127,6 +127,9 @@ func (b *Builder) debloat() {
 	teflon, _ := filepath.Glob(filepath.Join(b.AppDir, "lib", "libteflon.so*"))
 	b.dropRule("libteflon (an NPU delegate, not a GPU driver)", teflon)
 
+	b.dropLocaleSources()
+	b.dropUnreachable()
+
 	after := dirSize(b.AppDir)
 	if before > 0 {
 		logx.Say("  debloat   %s -> %s (%.1f%% off)",
@@ -175,4 +178,91 @@ func dirSize(path string) int64 {
 
 func containsString(list []string, want string) bool {
 	return slices.Contains(list, want)
+}
+
+// dropUnreachable removes the shared objects nothing in the bundle can reach.
+//
+// ⛔ THE SWEEP EXISTED AND NOTHING CONSUMED IT. `internal/bundle/sweep.go`
+// computes exactly this and had two callers: the `pgb bundle sweep`
+// subcommand, which only prints, and its own selftest. The bundler's build
+// path never called it, so every rule above is a rule about NAMES -- a list of
+// Vulkan drivers, a list of documentation directories -- and the one
+// structural answer in the tree was reporting to a human and being thrown
+// away. `TODO` T-066 calls this the largest unused lever and it was right:
+// codegraph callers Sweep is the one command that shows it.
+//
+// ⭐ WHY THIS IS SAFE TO DELETE ON, and it is the sweep's own design rather
+// than optimism: reachability is the DT_NEEDED closure of every program in the
+// bundle PLUS every object in any directory something could load a plugin out
+// of, and ANYTHING A RULE CANNOT CLASSIFY COUNTS AS REACHABLE. It errs toward
+// keeping. `b.integrity()` then re-checks that every DT_NEEDED of every ELF
+// left still resolves inside the bundle, so a mistake here is a build failure
+// rather than a bundle that dies on someone's machine.
+//
+// ⚠ It runs at `safe` as well as `aggressive`. A structural proof that nothing
+// can reach an object is not a size/function trade of the kind `--debloat
+// aggressive` exists to gate; the locale rule above is one of those and this
+// is not.
+func (b *Builder) dropUnreachable() {
+	res, err := Sweep(SweepOptions{
+		Dir:      b.AppDir,
+		EnvFiles: []string{filepath.Join(b.AppDir, ".env")},
+	})
+	if err != nil {
+		// ⚠ Reported, not fatal, and NOTHING is deleted. A sweep that could
+		// not run is not a sweep that found nothing -- docs/AGENTS.md §0b.
+		logx.Say("  debloat   reachability sweep could not run: %v", err)
+		return
+	}
+	if len(res.Unresolved) > 0 {
+		// ⛔ The bundle is already inconsistent, so its DT_NEEDED graph is not
+		// a sound basis for deleting anything. Say so and keep everything.
+		logx.Say("  debloat   %d unresolved DT_NEEDED name(s); sweep NOT used to delete",
+			len(res.Unresolved))
+		return
+	}
+	// ⚠ SweepResult.Unreachable is RELATIVE to the bundle root; dropRule takes
+	// paths. Passing the relative ones deletes nothing and reports success,
+	// which is the quiet no-op docs/AGENTS.md §0b calls the worst answer this
+	// codebase can give.
+	abs := make([]string, 0, len(res.Unreachable))
+	for _, rel := range res.Unreachable {
+		abs = append(abs, filepath.Join(b.AppDir, rel))
+	}
+	b.dropRule("unreachable by DT_NEEDED from any program or plugin dir", abs)
+}
+
+// dropLocaleSources removes share/i18n, which is glibc's locale SOURCE data.
+//
+// ⭐ THE NUMBER THAT FOUND THIS: on a `jq` bundle, share/ was 17 MiB of a
+// 22 MiB AppDir and share/i18n was all of it -- cns11643_stroke alone is
+// 4.31 MiB, iso14651_t1_common 3.23 MiB. `jq`. The bundle's entire lib/ was
+// 4.8 MiB.
+//
+// ⛔ IT IS NOT RUNTIME DATA. share/i18n/locales and share/i18n/charmaps are
+// the INPUT to `localedef`: text a locale is compiled FROM. What a running
+// program reads is the COMPILED form -- a locale-archive, or lib/locale --
+// and that is a different tree which this rule does not touch. glibc ships
+// the sources so a system can build locales it was not given.
+//
+// ⚠ SO THE RULE IS CONDITIONAL, not a blanket delete. If the bundle ships a
+// program that compiles locales, the sources are its input and it keeps them.
+// A bundle carrying `localedef` and no i18n data would be a bundle whose
+// localedef cannot do anything, which is the silent-wrong-answer shape this
+// project keeps finding.
+func (b *Builder) dropLocaleSources() {
+	for _, prog := range []string{"localedef", "locale", "iconvconfig"} {
+		for _, dir := range []string{"bin", filepath.Join("shared", "bin")} {
+			if _, err := os.Stat(filepath.Join(b.AppDir, dir, prog)); err == nil {
+				logx.Say("  debloat   share/i18n kept: the bundle ships %s", prog)
+				return
+			}
+		}
+	}
+	i18n := filepath.Join(b.AppDir, "share", "i18n")
+	if _, err := os.Stat(i18n); err != nil {
+		return
+	}
+	b.dropRule("share/i18n (locale SOURCES; nothing here compiles locales)",
+		[]string{i18n})
 }
