@@ -37,23 +37,29 @@ tracker reads.
 tracker, which is evidence of intent and never of behaviour.
 
 **Approach.** `nix bundle` the same subject `experiments/60-` uses, run it on
-all 11 with the `62-` instrument. ⚠ Needs nix on the build host, which this
-environment does not have.
+all 11 with the `62-` instrument. ⚠ Needs nix on the build host — `pgb
+bootstrap` installs it, so this is no longer the blocker it was.
 
 **Prove.** `evidence/64-nix-appimage/RESULT.txt` with the coverage and
 host-object columns filled, comparable to `60-` and `62-`.
 
 ## T-022 — Spike a nixpkgs front end for the planner
 
-⭐ **RULED ON BY THE OPERATOR, 2026-09-01b: IN SCOPE.** The open question this
-entry existed to settle — *"does depending on nix defeat the point?"* — is
-answered. `../docs/design/nix-front-end.md` records the ruling verbatim, the
-two reference recipe shapes at their pinned commit, the "use nix without
-installing nix" reading list, and what the next session owes before writing
-anything. ⛔ **The mining is the FIRST task of the next session** and this
-entry should be re-scoped from it, not from the text below.
+**Source** follow-on from T-020 · **Category** research · **Priority** P2 · **Effort** M · **Status** ✅ done
 
-**Source** follow-on from T-020 · **Category** research · **Priority** P2 · **Effort** M · **Status** open
+⭐ **CLOSED: the spike shipped.** The question it existed to settle — *"does
+depending on nix defeat the point?"* — was ruled in scope by the operator
+(2026-09-01b) and the front end is now `internal/nixx`: `pgb nix plan`, `deps`,
+`fetch` and `build`, designed in `../docs/design/nix-front-end.md` and proven
+end to end by `experiments/88-`, which plans, fetches **and builds** a nixpkgs
+package with no nix and no root, 25 assertions.
+
+⚠ **One nuance of the Prove line is NOT met and moves to T-012**, which owns the
+planner: `pgb nix deps` prints the transitive input list and marks each entry
+with its build **outcome** (ok / skipped / failed), not with the disposition
+the line asked for (link-statically / build-static / bundle). The
+static-first/bundle-last rule those three words come from is in
+`../docs/design/toolchain.md`.
 
 **Problem.** T-012's planner needs a dependency graph. Building one from distro
 metadata is strictly harder than reading one that already exists.

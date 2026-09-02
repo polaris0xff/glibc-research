@@ -3,13 +3,13 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 36  OPEN 16  DONE 20
+    TOTAL 36  OPEN 15  DONE 21
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 1 | 0 | 1 |
 | P1 | a documented capability does not work, or a flag does nothing | 27 | 10 | 17 |
-| P2 | worth doing; nothing is wrong without it | 8 | 6 | 2 |
+| P2 | worth doing; nothing is wrong without it | 8 | 5 | 3 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
 Effort: S under a day · M a few days · L a week · XL almost always two entries
@@ -32,7 +32,7 @@ pretending to be one.
 | T-019 | P1 | S | done | toolchain | The docker engine drops every build option |
 | T-020 | P1 | M | done | research | Sweep the nix-appimage family |
 | T-021 | P2 | M | open | research | Build one nix-appimage and run it on the matrix |
-| T-022 | P2 | M | open | research | Spike a nixpkgs front end for the planner |
+| T-022 | P2 | M | done | research | Spike a nixpkgs front end for the planner |
 | T-030 | P1 | M | done | runtime | `--wrap-dlopen` against a compiled-in table |
 | T-031 | P2 | L | open | runtime | Port cross-libc-dlopen's full rewrite, not one function |
 | T-032 | P1 | S | done | runtime | `--embed-terminfo` and a CA-bundle answer |
