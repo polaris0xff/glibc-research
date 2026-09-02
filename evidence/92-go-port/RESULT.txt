@@ -366,3 +366,34 @@ internal/zstd decodes RFC 8878 with nothing outside the standard library.
 ⚠ xz is still decoded by the xz command. cache.nixos.org serves .nar.xz for
 older paths; the build environment has xz and a target rootfs does not, so an
 xz NAR fetched from inside a target would still stop. Stated, not hidden.
+
+
+CI - green again, after three rounds of repair
+---------------------------------------------------------------------------
+⛔ CI HAD BEEN RED FOR EVERY COMMIT OF THE PORT AND NOTHING SAID SO. `pgb` is
+a built binary now and is not committed, so `build`, `verify-docker` and
+`probe-host` each did `actions/checkout` and then ran `./pgb` against
+nothing; `probe-host` also ran `sh -n` over it.
+
+A `toolchain` job builds one static pgb with setup-go and hands it to the
+others as an artefact. ⭐ That is the distribution claim under test: the
+binary built on the runner is then used, unchanged and with nothing installed
+for it, inside the pinned Debian 12 container.
+
+Repairing it found two more defects that no local run would have:
+
+  round 2   `Report.Write` counted a SKIP as a failure. The runner is not
+            root, `rootfs-run` needs root, and `pgb selftest` therefore
+            exited 1. It returns 0 / 1 / 2 now, like the rest of the project.
+  round 3   the libiconv build needed `msgfmt`. The pinned image has no
+            gettext; this machine had been given it by hand, which hid the
+            problem. `--disable-nls` removes the dependency instead of adding
+            one, verified inside the image by digest with msgfmt absent.
+
+  run 93, a50542da: 16 of 16 jobs green.
+    toolchain      static pgb, no PT_INTERP, no DT_NEEDED, 124 selftests
+    matrix         11 targets derived from rootfs-images.txt
+    build          libiconv, both probe arms, and they differ as they must
+    run-matrix     all 11 environments, portable arm and plain control
+    verify-docker  pgb verify --engine docker, AND the control still fails it
+    probe-host     both record gates, every shell script parses, selftests

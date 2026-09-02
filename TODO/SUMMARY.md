@@ -14,7 +14,7 @@ thing was not measured this says so rather than giving a number.
 | **Work** | T-061 open, nothing written | ⭐ **the whole toolchain ported to Go**, 8 defects found in code that had been trusted, gates 1/2/3/4/6 met, gate 5 at 9 of 10 POCs and 21 of 23 experiments |
 | **Changes** | — | **169 files**, 30,681 insertions(+), 1,429 deletions(-) |
 | **Size** | — | **17,690 lines** of Go replacing **8,343** of shell and Python, which are retired under `HISTORY/` rather than deleted |
-| **Checks** | both gates green, ⛔ **CI red and unnoticed** | both gates green, ⭐ **124 carried selftests** (up from 72), and ⭐ **CI repaired** — it had been failing since the first port commit |
+| **Checks** | both gates green, ⛔ **CI red and unnoticed** | both gates green, ⭐ **124 carried selftests** (up from 72), and ⭐ **CI GREEN** — 16 of 16 jobs on `a50542da`, all eleven matrix targets. It had been failing since the first port commit |
 | **Cost** | — | ⚠ **not metered.** What can be pointed at: the real 399,356,002-byte `packages.json` fetched once, a 648,570-byte `cache.nixos.org` NAR, mesa and Qt closures for the bundler experiments. ⛔ **The session's disk allowance ran out**, which is what stopped `poc/91-qt-xcb`. No paid service used |
 | **Health** | 34 entries, 16 open | **34 entries, 15 open.** ⭐ **T-056 closed** — superseded by T-061, which took the Python helpers to Go rather than Rust. T-061 stays open for its remainder. Tree clean, `main` pushed |
 
