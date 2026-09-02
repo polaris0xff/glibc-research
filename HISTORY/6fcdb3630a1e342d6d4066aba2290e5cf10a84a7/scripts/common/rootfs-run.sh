@@ -36,11 +36,11 @@
 # libraries.
 #
 # Usage:
-#   sh scripts/common/rootfs-run.sh ROOTFS -- /bin/sh -c 'echo hi'
-#   sh scripts/common/rootfs-run.sh ROOTFS --copy ./prog:/prog -- /prog
-#   sh scripts/common/rootfs-run.sh ROOTFS --bind /src:/src -- make
-#   sh scripts/common/rootfs-run.sh ROOTFS --no-net -- /prog
-#   sh scripts/common/rootfs-run.sh --selftest        prove the isolation, offline
+#   "./pgb" rootfs run ROOTFS -- /bin/sh -c 'echo hi'
+#   "./pgb" rootfs run ROOTFS --copy ./prog:/prog -- /prog
+#   "./pgb" rootfs run ROOTFS --bind /src:/src -- make
+#   "./pgb" rootfs run ROOTFS --no-net -- /prog
+#   "./pgb" rootfs run --selftest        prove the isolation, offline
 #
 # Exit codes: the command's own, or 2 if the runner could not start it.
 # ⛔ Read the exit code unpiped: it is the command's, and that is the point.

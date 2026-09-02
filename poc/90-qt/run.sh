@@ -118,7 +118,7 @@ NIXOUT="$WORK/qt6-src"
 TARBALL=$(ls "$NIXOUT"/*qtbase-everywhere-src-*.tar.xz 2>/dev/null | head -1)
 if [ -z "$TARBALL" ]; then
   mkdir -p "$NIXOUT"
-  sh "$PGB" nix fetch qt6.qtbase --out "$NIXOUT" >>"$LOG" 2>&1 || true
+  "$PGB" nix fetch qt6.qtbase --out "$NIXOUT" >>"$LOG" 2>&1 || true
   TARBALL=$(ls "$NIXOUT"/*qtbase-everywhere-src-*.tar.xz 2>/dev/null | head -1)
 fi
 # ⚠ The fallback is upstream, through the RV proxy, pinned to the same digest

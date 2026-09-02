@@ -40,11 +40,11 @@
 # `--no-docker` leaves the daemon alone entirely.
 #
 # Usage:
-#   sh scripts/common/bootstrap.sh              # everything, in parallel, wait
-#   sh scripts/common/bootstrap.sh --detach     # start and return; --check later
-#   sh scripts/common/bootstrap.sh --check      # what is present; exit 1 if not ready
-#   sh scripts/common/bootstrap.sh --selftest   # the logic, offline, no side effects
-#   sh scripts/common/bootstrap.sh --no-nix --no-bed --no-env --no-docker
+#   "./pgb" bootstrap              # everything, in parallel, wait
+#   "./pgb" bootstrap --detach     # start and return; --check later
+#   "./pgb" bootstrap --check      # what is present; exit 1 if not ready
+#   "./pgb" bootstrap --selftest   # the logic, offline, no side effects
+#   "./pgb" bootstrap --no-nix --no-bed --no-env --no-docker
 #
 # Exit: 0 ready, 1 something failed, 2 could not run.
 
@@ -153,8 +153,8 @@ report() {
     warn '⛔ dockerd is RUNNING and the docker environment is MISSING.'
     warn '   pick_engine prefers docker, so every pgb build will refuse.'
     warn '   Fix it with either:'
-    warn '     sh pgb env create --engine docker'
-    warn '     sh pgb build --engine chroot ...   (per invocation)'
+    warn '     ./pgb env create --engine docker'
+    warn '     ./pgb build --engine chroot ...   (per invocation)'
     return 1
   fi
   return 0
@@ -204,7 +204,7 @@ fi
 if [ "$CHECK" = 1 ]; then
   say "pgb bootstrap: what this machine has"
   if report; then say "  VERDICT: ready to build and verify."; exit 0
-  else say "  VERDICT: NOT ready. Run: sh scripts/common/bootstrap.sh"; exit 1; fi
+  else say "  VERDICT: NOT ready. Run: "./pgb" bootstrap"; exit 1; fi
 fi
 
 # ---------------------------------------------------------------------------
@@ -300,7 +300,7 @@ fi
 
 if [ "$DO_ENV" = 1 ]; then
   if have_env; then say "  chroot environment already present, skipping"
-  else start env sh "$REPO/pgb" env create; fi
+  else start env "$REPO/pgb" env create; fi
 fi
 
 if [ "$DO_BED" = 1 ]; then
@@ -312,7 +312,7 @@ fi
 # the daemon is what makes pick_engine choose docker. See the header.
 if [ "$DO_DOCKER" = 1 ] && have_dockerd; then
   if have_docker_env; then say "  docker environment already present, skipping"
-  else start env-docker sh "$REPO/pgb" env create --engine docker; fi
+  else start env-docker "$REPO/pgb" env create --engine docker; fi
 fi
 
 if [ -z "$PIDS" ]; then
@@ -324,7 +324,7 @@ fi
 if [ "$MODE" = detach ]; then
   say ""
   say "started in the background. Read docs/AGENTS.md and TODO/PROGRESS.md,"
-  say "then: sh scripts/common/bootstrap.sh --check"
+  say "then: "./pgb" bootstrap --check"
   exit 0
 fi
 

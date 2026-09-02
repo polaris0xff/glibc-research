@@ -186,7 +186,7 @@ EOF
 
 # Built through pgb, so this is the ACTUAL portable binary asking the question,
 # not a differently-linked stand-in.
-if ! sh "$REPO_DIR/pgb" --bind "$B" build -- /bin/sh -c \
+if ! "$REPO_DIR/pgb" --bind "$B" build -- /bin/sh -c \
       "\$CC -O2 -o '$B/plugin-probe' '$B/probe.c'" >"$B/build.log" 2>&1; then
   exp_note "build failed"; tail -5 "$B/build.log"; exit 2
 fi
@@ -199,7 +199,7 @@ while read -r ref name libc digest; do
   [ -n "$r" ] || { exp_skip "$name" "not fetched"; continue; }
   printf '  == %s (%s)\n' "$name" "$libc"
   cp "$B/plugin-probe" "$r/pgb-plugin-probe"
-  sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" -- /pgb-plugin-probe 2>&1 \
+  "$REPO_DIR/pgb" rootfs run "$r" -- /pgb-plugin-probe 2>&1 \
     | sed 's/^/  /' | tee -a "$EXP_OUT/dlerror.txt"
   rm -f "$r/pgb-plugin-probe"
   printf '\n'

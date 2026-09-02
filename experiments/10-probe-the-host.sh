@@ -64,13 +64,13 @@ else
   exp_check "unshare --mount works" no yes
 fi
 
-if sh "$REPO_DIR/scripts/common/rootfs-run.sh" --selftest >/dev/null 2>&1; then
+if "$REPO_DIR/pgb" rootfs run --selftest >/dev/null 2>&1; then
   exp_check "rootfs-run isolation selftest" pass pass
 else
   exp_check "rootfs-run isolation selftest" fail pass
 fi
 
-if sh "$REPO_DIR/scripts/common/oci-pull.sh" --selftest >/dev/null 2>&1; then
+if "$REPO_DIR/pgb" rootfs pull --selftest >/dev/null 2>&1; then
   exp_check "oci-pull whiteout selftest" pass pass
 else
   exp_check "oci-pull whiteout selftest" fail pass
@@ -110,7 +110,7 @@ while read -r ref name libc digest; do
 done < "$REPO_DIR/scripts/common/rootfs-images.txt"
 
 exp_check "target root filesystems missing" "$missing" 0
-exp_note "run: sh scripts/common/fetch-rootfs.sh"
+exp_note "run: "./pgb" rootfs fetch"
 
 {
   exp_conditions

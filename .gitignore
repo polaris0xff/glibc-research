@@ -49,6 +49,7 @@ evidence/poc/*/link.log
 evidence/*/*.AppImage
 evidence/*/AppDir*/
 
-# The Go build products. `go build -o pgb ./cmd/pgb` produces the tool itself.
+# The tool itself is a build product now:
+#   CGO_ENABLED=0 go build -trimpath -o pgb ./cmd/pgb
+/pgb
 /pgb-go
-/pgb.bin

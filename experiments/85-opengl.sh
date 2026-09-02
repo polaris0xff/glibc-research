@@ -44,7 +44,7 @@ set -u
 
 exp_begin "85 - the bundled OpenGL stack, on all eleven"
 
-RR="$REPO_DIR/scripts/common/rootfs-run.sh"
+RR="$REPO_DIR/pgb"
 BUNDLER="$REPO_DIR/tool/nix-appimage.sh"
 CACHE="${PGB_APPIMAGE_CACHE:-/var/tmp/pgb-appimage}"
 RUN_TIMEOUT="${PGB_GL_TIMEOUT:-90}"
@@ -96,12 +96,12 @@ B_IMG="$B_CACHE/eglinfo/eglinfo-nogl-x86_64.AppImage"
 
 if [ ! -s "$A_IMG" ]; then
   exp_note "building arm A (bundled mesa) -- several minutes, ~400 MB of closure"
-  PGB_APPIMAGE_CACHE="$A_CACHE" sh "$BUNDLER" mesa-demos \
+  PGB_APPIMAGE_CACHE="$A_CACHE" "$BUNDLER" mesa-demos \
     --out "$A_IMG" --name eglinfo >"$B/build-A.log" 2>&1 || true
 fi
 if [ ! -s "$B_IMG" ]; then
   exp_note "building arm B (--no-gl control)"
-  PGB_APPIMAGE_CACHE="$B_CACHE" sh "$BUNDLER" mesa-demos --no-gl \
+  PGB_APPIMAGE_CACHE="$B_CACHE" "$BUNDLER" mesa-demos --no-gl \
     --out "$B_IMG" --name eglinfo >"$B/build-B.log" 2>&1 || true
 fi
 [ -s "$A_IMG" ] || { exp_note "arm A did not build; see $B/build-A.log"; exit 2; }
@@ -160,7 +160,7 @@ HOME=/tmp; export HOME
 TMPDIR=/tmp; export TMPDIR
 exec /gl-arm
 SH
-  timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$_r" -- /bin/sh /gl-run.sh \
+  timeout -k 10 "$RUN_TIMEOUT" "$RR" rootfs run "$_r" -- /bin/sh /gl-run.sh \
     </dev/null >"$B/out.$_tag" 2>&1
   _st=$?
   reap_rootfs "$_r"
@@ -216,7 +216,7 @@ while read -r ref name libc digest; do
   # to be self-contained.
   timeout -k 10 "$RUN_TIMEOUT" strace -f \
     -e trace=openat,open,execve,clone,clone3,vfork,fork -o "$B/tr.$name.A" \
-    sh "$RR" "$root" -- /bin/sh /gl-run.sh </dev/null >/dev/null 2>&1
+    "$RR" rootfs run "$root" -- /bin/sh /gl-run.sh </dev/null >/dev/null 2>&1
   reap_rootfs "$root"
   apl=$(classify_trace "$B/tr.$name.A" /gl-arm payload)
   anh=$(printf '%s\n' "$apl" | grep '^host ' | count)

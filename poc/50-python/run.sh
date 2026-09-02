@@ -245,7 +245,7 @@ if [ ! -x "$BIN" ] || [ "${POC_REBUILD:-0}" = 1 ]; then
          "$STDLIB/lib/python3.12/tkinter" "$STDLIB/lib/python3.12/turtledemo" \
          "$STDLIB/lib/python3.12/__pycache__"
   find "$STDLIB" -name '__pycache__' -type d -exec rm -rf {} + 2>/dev/null
-  poc_note "stdlib tree: $(du -sh "$STDLIB" | cut -f1), $(find "$STDLIB" -name '*.py' | wc -l) .py files"
+  poc_note "stdlib tree: $(du -"$STDLIB" | cut -f1), $(find "$STDLIB" -name '*.py' | wc -l) .py files"
   poc_note "lib-dynload .so files remaining: $(find "$STDLIB" -name '*.so' | wc -l)"
 fi
 

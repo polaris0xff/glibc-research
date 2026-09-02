@@ -191,13 +191,13 @@ entry does not close it by silence.
 patchelf & patsh here?"*
 **Category** research · **Priority** P2 · **Effort** S · **Status** done
 
-**Where it stands.** `tool/elf-needed.py` does ONE edit — rewrite an absolute
+**Where it stands.** `internal/elfx/needed.go` does ONE edit — rewrite an absolute
 `DT_NEEDED` to its basename, in place, at the same `.dynstr` offset — because
 that is the single edit `tool/nix-appimage.sh` needed and patchelf is not on
 this machine. That is a reason for the sixty lines, not an argument against
 patchelf.
 
-⭐ **And the ground has moved since: `scripts/common/nix-fetch.sh` can now
+⭐ **And the ground has moved since: `internal/nixx/fetch.go` can now
 fetch patchelf's own closure from cache.nixos.org**, so "not installed" is no
 longer a blocker for either tool.
 
@@ -218,11 +218,11 @@ the measurement that says why it is not needed.
 
 ## ⭐ CLOSED — the hole is filled, and patsh is not what fills it
 
-**patchelf**: `tool/elf-needed.py` keeps its sixty lines and the reason is now
+**patchelf**: `internal/elfx/needed.go` keeps its sixty lines and the reason is now
 measured rather than asserted. It does ONE edit — rewrite an absolute
 `DT_NEEDED` to its basename **at the same `.dynstr` offset** — and refuses to
 move anything, which is exactly the case patchelf is famous for getting wrong.
-`scripts/common/nix-fetch.sh` can fetch patchelf's closure, so availability is
+`internal/nixx/fetch.go` can fetch patchelf's closure, so availability is
 no longer the argument; the argument is that the bundler's only ELF edit is the
 one edit that needs no section growth. ⚠ **Revisit per edit, not per tool**: an
 RPATH or interpreter rewrite is patchelf's job and `elf-needed.py` must not

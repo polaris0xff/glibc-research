@@ -206,7 +206,7 @@ printf '\n'
 # ===========================================================================
 printf -- '-- provider: what the pinned static glibc can define ----------\n'
 
-[ -d "$ENV_ROOT" ] || { exp_skip "pinned build environment" "$ENV_ROOT absent; run: sh pgb env create"; exp_finish; }
+[ -d "$ENV_ROOT" ] || { exp_skip "pinned build environment" "$ENV_ROOT absent; run: ./pgb env create"; exp_finish; }
 
 LIBDIR=""
 for d in "$ENV_ROOT/usr/lib/x86_64-linux-gnu" "$ENV_ROOT/usr/lib64" "$ENV_ROOT/usr/lib"; do

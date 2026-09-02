@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/polaris0xff/glibc-research/internal/bootstrapx"
 	"github.com/polaris0xff/glibc-research/internal/buildx"
 	"github.com/polaris0xff/glibc-research/internal/cfg"
 	"github.com/polaris0xff/glibc-research/internal/envx"
@@ -63,6 +64,8 @@ func runCommand(c *cfg.Config, cmd string, args []string) error {
 		return debugCommand(c, args)
 	case "build-root":
 		return buildRootCommand(args)
+	case "bootstrap":
+		return bootstrapCommand(c, args)
 	case buildx.InnerBuild:
 		return buildx.Inner(c, args)
 	case buildx.InnerShell:
@@ -205,11 +208,27 @@ func elfCommand(c *cfg.Config, args []string) error {
 	}
 	switch sub {
 	case "needed":
-		return elfNeeded(rest[0])
+		for _, p := range rest {
+			if err := elfNeeded(p); err != nil {
+				return err
+			}
+		}
+		return nil
+	case "print":
+		// FILE<tab>NEEDED, one per line, so a caller can attribute an
+		// unresolved entry to the file that wants it.
+		for _, p := range rest {
+			if err := elfPrint(p); err != nil {
+				return err
+			}
+		}
+		return nil
 	case "info":
 		return elfInfo(rest[0])
+	case "shorten":
+		return elfShorten(rest)
 	}
-	return fail.Cannot("unknown: pgb elf %s (needed, info)", sub)
+	return fail.Cannot("unknown: pgb elf %s (needed, print, info, shorten)", sub)
 }
 
 func selftestCommand(c *cfg.Config, args []string) error {
@@ -238,6 +257,9 @@ func selftestCommand(c *cfg.Config, args []string) error {
 	if want("nix-index") {
 		all.Merge(nixx.IndexSelftest())
 	}
+	if want("bootstrap") {
+		all.Merge(bootstrapx.Selftest(c))
+	}
 	if all.Print() != 0 {
 		return fail.Exit(1)
 	}
@@ -258,4 +280,35 @@ func debugCommand(c *cfg.Config, args []string) error {
 		logx.Say("  %s", s)
 	}
 	return nil
+}
+
+// bootstrapCommand prepares a fresh machine.
+func bootstrapCommand(c *cfg.Config, args []string) error {
+	o := bootstrapx.DefaultOptions()
+	for _, a := range args {
+		switch a {
+		case "--check":
+			o.Check = true
+		case "--detach":
+			o.Detach = true
+		case "--wait":
+			o.Detach = false
+		case "--no-nix":
+			o.Nix = false
+		case "--no-bed":
+			o.Bed = false
+		case "--no-env":
+			o.Env = false
+		case "--no-docker":
+			o.Docker = false
+		case "--selftest":
+			if bootstrapx.Selftest(c).Print() != 0 {
+				return fail.Exit(1)
+			}
+			return nil
+		default:
+			return fail.Cannot("pgb bootstrap: unknown argument: %s", a)
+		}
+	}
+	return bootstrapx.Run(c, o)
 }

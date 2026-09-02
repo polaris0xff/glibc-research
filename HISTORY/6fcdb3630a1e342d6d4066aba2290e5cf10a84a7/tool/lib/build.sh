@@ -82,7 +82,7 @@ cmd_build() {
       done
       # ⭐ The source tree is bind-mounted at the SAME path inside, so every
       # absolute path a build system bakes into a Makefile still resolves.
-      exec sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" \
+      exec "$PGB_SELF/pgb" rootfs run "$r" \
            --bind "$wrk:$wrk" --bind "$PGB_SELF:$PGB_SELF" \
            --bind "$PGB_STATE:$PGB_STATE" $bindargs --workdir "$wrk" \
            -- /bin/sh -c 'PGB_INNER=1 "$0" __inner-build "$@"' "$PGB_SELF/pgb" "$@"
@@ -136,7 +136,7 @@ cmd_shell() {
       [ -d "$r" ] || die "no build environment. run: pgb env create" 2
       export_options
       wrk=$(pwd)
-      exec sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" \
+      exec "$PGB_SELF/pgb" rootfs run "$r" \
            --bind "$wrk:$wrk" --bind "$PGB_SELF:$PGB_SELF" \
            --bind "$PGB_STATE:$PGB_STATE" --workdir "$wrk" \
            -- /bin/sh -c 'PGB_INNER=1 "$0" __inner-shell' "$PGB_SELF/pgb"

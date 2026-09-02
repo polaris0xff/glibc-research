@@ -81,20 +81,20 @@ build_in() {   # rootfs-name  out-prefix
   _env="$ROOTFS_DIR/exp21-$_rn"
   if [ ! -f "$_env/.exp21-ready" ]; then
     rm -rf "$_env"; cp -a "$_src" "$_env" || return 1
-    sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$_env" -- /bin/sh -c \
+    "$REPO_DIR/pgb" rootfs run "$_env" -- /bin/sh -c \
       'export DEBIAN_FRONTEND=noninteractive; apt-get update -qq && \
        apt-get install -y -qq --no-install-recommends gcc libc6-dev' \
       >"$B/$_rn-apt.log" 2>&1 || { exp_skip "build in $_rn" "package install failed"; return 1; }
     : > "$_env/.exp21-ready"
   fi
   cp "$B/probe.c" "$_env/probe.c"
-  sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$_env" -- /bin/sh -c \
+  "$REPO_DIR/pgb" rootfs run "$_env" -- /bin/sh -c \
     'cd / && gcc -static -O2 -o /probe-plain probe.c 2>/dev/null && \
      gcc -static -O2 -DNSSFIX -o /probe-nssfix probe.c 2>/dev/null' \
     >>"$B/$_rn-build.log" 2>&1 || { exp_skip "build in $_rn" "compile failed"; return 1; }
   cp "$_env/probe-plain"  "$B/$_op-plain"  || return 1
   cp "$_env/probe-nssfix" "$B/$_op-nssfix" || return 1
-  _v=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$_env" -- /bin/sh -c 'ldd --version' 2>/dev/null | head -1)
+  _v=$("$REPO_DIR/pgb" rootfs run "$_env" -- /bin/sh -c 'ldd --version' 2>/dev/null | head -1)
   exp_note "built in $_rn: $_v"
   return 0
 }
@@ -125,7 +125,7 @@ printf '    %-28s %-8s %s\n' 'BUILD glibc / arm' 'EXIT' 'HOST NSS MODULES OPENED
 # goes to stderr, which is where the operator sees it and $( ) does not.
 modules_for() {  # binary label -> echoes the comma list, table row on stderr
   cp "$1" "$TARGET/exp21-probe"
-  sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$TARGET" -- /exp21-probe >/dev/null 2>&1
+  "$REPO_DIR/pgb" rootfs run "$TARGET" -- /exp21-probe >/dev/null 2>&1
   _st=$?
   _m=$(exp_trace_opens "$TARGET" /exp21-probe "$B/tr-$2.txt" \
        | grep -oE 'libnss_[a-z0-9_]*\.so[^"]*' | sort -u | tr '\n' ',' | sed 's/,$//')

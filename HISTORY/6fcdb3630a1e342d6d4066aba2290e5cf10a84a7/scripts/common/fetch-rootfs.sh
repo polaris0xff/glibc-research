@@ -6,10 +6,10 @@
 # describe the same filesystem.
 #
 # Usage:
-#   sh scripts/common/fetch-rootfs.sh                 all rows
-#   sh scripts/common/fetch-rootfs.sh alpine-3.22 debian-12
-#   sh scripts/common/fetch-rootfs.sh --list          what is pinned, and what is on disk
-#   sh scripts/common/fetch-rootfs.sh --arch arm64    re-resolve by TAG, not digest
+#   "./pgb" rootfs fetch                 all rows
+#   "./pgb" rootfs fetch alpine-3.22 debian-12
+#   "./pgb" rootfs fetch --list          what is pinned, and what is on disk
+#   "./pgb" rootfs fetch --arch arm64    re-resolve by TAG, not digest
 #
 # Exit codes: 0 every requested row is on disk, 1 one or more failed, 2 could
 # not run.

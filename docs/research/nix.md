@@ -25,7 +25,7 @@ section below, and **assume more remain**.
 |---|---|
 | two minutes | "The three findings", below |
 | ten minutes | that, then "Known-weak claims" |
-| the implementation to do | "The mechanisms", then `tool/lib/nix.sh` |
+| the implementation to do | "The mechanisms", then `internal/nixx/build.go` |
 | a reason to distrust this | `experiments/80-` and `83-`, then the selftests |
 
 ---
@@ -176,7 +176,7 @@ complete binary-cache protocol and it reads as a specification:
 | nix-base32, **not RFC 4648**, bits consumed from the END | `main.go:427-450` |
 | the NAR grammar | `narextract/narextract.go`, 265 lines |
 
-⭐ **Reimplemented rather than carried**, in `scripts/common/nix-nar.py`, because
+⭐ **Reimplemented rather than carried**, in `internal/nixx/nar.go`, because
 this project's tool is POSIX sh and C and a Go binary is a bigger dependency
 than 400 lines. 28-check selftest, RFC 8032 vectors, and two real narinfo
 bodies committed as fixtures under `scripts/common/fixtures/nix/`.
@@ -299,11 +299,11 @@ is nix-user-chroot in a container, and needing a container is the condition
 
 | | |
 |---|---|
-| `scripts/common/nix-fetch.sh` | resolve, closure, fetch — with `--selftest` |
-| `scripts/common/nix-nar.py` | NAR, nix-base32, ed25519, narinfo verification — 28 checks including RFC 8032 vectors and two committed real narinfos |
-| `tool/nix-drv.py` | the ATerm derivation reader — 12 checks including both nix escapes and two refusals |
-| `tool/nix-plan.py` | derivation → build plan, shared by both routes |
-| `tool/elf-needed.py` | the one ELF edit the bundler needs, with a toolchain-built fixture |
+| `internal/nixx/fetch.go` | resolve, closure, fetch — with `--selftest` |
+| `internal/nixx/nar.go` | NAR, nix-base32, ed25519, narinfo verification — 28 checks including RFC 8032 vectors and two committed real narinfos |
+| `internal/nixx/drv.go` | the ATerm derivation reader — 12 checks including both nix escapes and two refusals |
+| `internal/nixx/plan.go` | derivation → build plan, shared by both routes |
+| `internal/elfx/needed.go` | the one ELF edit the bundler needs, with a toolchain-built fixture |
 | `tool/nix-appimage.sh` | the bundler, with `--selftest` for the wrapper-following logic |
 | `experiments/80-` | nixpkgs with no nix, oracle-checked against a real nix |
 | `experiments/83-` | the `.drv` route, its availability rate, and the reader against the evaluator |

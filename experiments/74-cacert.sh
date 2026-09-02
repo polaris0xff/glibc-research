@@ -113,11 +113,11 @@ EOF
 
 printf -- '-- building --------------------------------------------------\n'
 PGB="$REPO_DIR/pgb"
-if ! sh "$PGB" --bind "$WORK" build -- /bin/sh -c \
+if ! "$PGB" --bind "$WORK" build -- /bin/sh -c \
       "\$CC -O2 -o $WORK/probe-plain $WORK/probe.c" >"$WORK/plain.log" 2>&1; then
   exp_skip "build the control arm" "see $WORK/plain.log"; exp_finish
 fi
-if ! sh "$PGB" --bind "$WORK" --embed-cacert build -- /bin/sh -c \
+if ! "$PGB" --bind "$WORK" --embed-cacert build -- /bin/sh -c \
       "\$CC -O2 -o $WORK/probe-cacert $WORK/probe.c" >"$WORK/cacert.log" 2>&1; then
   exp_skip "build the --embed-cacert arm" "see $WORK/cacert.log"; exp_finish
 fi
@@ -155,7 +155,7 @@ field() { printf '%s' "$1" | tr '|' '\n' | sed -n "s/^$2=//p"; }
 # outside it is dangling, so `-s` is false and the oracle said the opposite
 # of the truth -- while the shim, running inside, was right.
 host_has_store() {  # rootfs -> yes|no
-  _out=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$1" -- /bin/sh -c '
+  _out=$("$REPO_DIR/pgb" rootfs run "$1" -- /bin/sh -c '
     for p in /etc/ssl/certs/ca-certificates.crt /etc/pki/tls/certs/ca-bundle.crt \
              /etc/ssl/ca-bundle.pem /etc/ssl/cert.pem /etc/pki/tls/cacert.pem \
              /etc/ssl/certs/ca-bundle.crt /usr/share/ssl/certs/ca-bundle.crt \
@@ -178,13 +178,13 @@ while read -r image name libc rest; do
   # ⛔ The harness's own CA variables must not decide the answer. `env -i`
   # would also drop PATH, so the two are unset explicitly and the rest of the
   # environment is left as the bed provides it.
-  out_c=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" --copy "$WORK/probe-plain:/probe" \
+  out_c=$("$REPO_DIR/pgb" rootfs run "$r" --copy "$WORK/probe-plain:/probe" \
             -- /bin/sh -c 'unset SSL_CERT_FILE SSL_CERT_DIR CURL_CA_BUNDLE; /probe' 2>/dev/null | tail -1)
-  out_e=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" --copy "$WORK/probe-cacert:/probe" \
+  out_e=$("$REPO_DIR/pgb" rootfs run "$r" --copy "$WORK/probe-cacert:/probe" \
             -- /bin/sh -c 'unset SSL_CERT_FILE SSL_CERT_DIR CURL_CA_BUNDLE; /probe' 2>/dev/null | tail -1)
   # ⛔ The override check: a value the caller set, which is deliberately a
   # path that does not exist. The shim must leave it alone.
-  out_o=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" --copy "$WORK/probe-cacert:/probe" \
+  out_o=$("$REPO_DIR/pgb" rootfs run "$r" --copy "$WORK/probe-cacert:/probe" \
             -- /bin/sh -c 'SSL_CERT_FILE=/nonexistent/operator/choice /probe' 2>/dev/null | tail -1)
 
   c_dflt=$(field "$out_c" certs_default); c_dflt=${c_dflt:--1}

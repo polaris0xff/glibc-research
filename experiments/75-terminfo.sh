@@ -90,11 +90,11 @@ EOF
 
 printf -- '-- building --------------------------------------------------\n'
 PGB="$REPO_DIR/pgb"
-if ! sh "$PGB" --bind "$WORK" build -- /bin/sh -c \
+if ! "$PGB" --bind "$WORK" build -- /bin/sh -c \
       "\$CC -O2 -o $WORK/probe-plain $WORK/probe.c" >"$WORK/plain.log" 2>&1; then
   exp_skip "build the control arm" "see $WORK/plain.log"; exp_finish
 fi
-if ! sh "$PGB" --bind "$WORK" --embed-terminfo build -- /bin/sh -c \
+if ! "$PGB" --bind "$WORK" --embed-terminfo build -- /bin/sh -c \
       "\$CC -O2 -o $WORK/probe-ti $WORK/probe.c" >"$WORK/ti.log" 2>&1; then
   exp_skip "build the --embed-terminfo arm" "see $WORK/ti.log"; exp_finish
 fi
@@ -119,12 +119,12 @@ while read -r image name libc rest; do
   r=$(exp_rootfs "$name") || true
   [ -n "$r" ] || { exp_skip "$name" "rootfs absent"; continue; }
 
-  oc=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" --copy "$WORK/probe-plain:/probe" \
+  oc=$("$REPO_DIR/pgb" rootfs run "$r" --copy "$WORK/probe-plain:/probe" \
         -- /bin/sh -c 'unset TERMINFO TERMINFO_DIRS; TERM=xterm-256color /probe' 2>/dev/null | tail -1)
-  oe=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" --copy "$WORK/probe-ti:/probe" \
+  oe=$("$REPO_DIR/pgb" rootfs run "$r" --copy "$WORK/probe-ti:/probe" \
         -- /bin/sh -c 'unset TERMINFO TERMINFO_DIRS; TERM=xterm-256color /probe' 2>/dev/null | tail -1)
   # ⛔ The caller's own TERMINFO must survive, even pointing nowhere useful.
-  oo=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" --copy "$WORK/probe-ti:/probe" \
+  oo=$("$REPO_DIR/pgb" rootfs run "$r" --copy "$WORK/probe-ti:/probe" \
         -- /bin/sh -c 'TERMINFO=/operator/choice TERM=xterm-256color /probe' 2>/dev/null | tail -1)
 
   c=$(field "$oc" reachable); c=${c:-0}

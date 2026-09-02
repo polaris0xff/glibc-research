@@ -369,7 +369,7 @@ building a dependency into a private prefix, check what paths it recorded.
 
 ## 6. The kernel is not abstracted, and the test bed shares one
 
-`scripts/common/rootfs-run.sh` is `unshare --mount` plus `chroot`. The target
+`internal/rootfs/run.go` is `unshare --mount` plus `chroot`. The target
 distribution's userland is the only one visible, which is what makes the
 results meaningful — but **the kernel is the host's**, Linux 6.18.44 for every
 number here.

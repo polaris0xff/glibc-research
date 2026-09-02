@@ -248,16 +248,16 @@ env_create() {
         say "environment already at $r (delete it to rebuild)"; return 0
       fi
       say "creating $PGB_ENV_NAME from $PGB_ENV_IMAGE ($PGB_ENV_DIGEST)"
-      sh "$PGB_SELF/scripts/common/oci-pull.sh" "$PGB_ENV_IMAGE" \
+      "$PGB_SELF/pgb" rootfs pull "$PGB_ENV_IMAGE" \
          --digest "$PGB_ENV_DIGEST" --out "$r" || die "image pull failed"
       say "installing: $PGB_ENV_PACKAGES"
-      sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /bin/sh -c \
+      "$PGB_SELF/pgb" rootfs run "$r" -- /bin/sh -c \
         "export DEBIAN_FRONTEND=noninteractive; apt-get update -qq && \
          apt-get install -y -qq --no-install-recommends $PGB_ENV_PACKAGES" \
         >"$r.install.log" 2>&1 || { tail -20 "$r.install.log" >&2; die "package install failed"; }
       if [ -n "${PGB_ENV_PIP:-}" ]; then
         say "installing (pip): $PGB_ENV_PIP"
-        sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /bin/sh -c \
+        "$PGB_SELF/pgb" rootfs run "$r" -- /bin/sh -c \
           "python3 -m pip install --break-system-packages --no-cache-dir -q $PGB_ENV_PIP" \
           >>"$r.install.log" 2>&1 || { tail -20 "$r.install.log" >&2; die "pip install failed"; }
       fi
@@ -271,7 +271,7 @@ env_create() {
         # to $r/tmp is invisible to the very command that needs it.
         mkdir -p "$r/opt"
         cp "$PGB_SELF/scripts/build-libiconv.sh" "$r/opt/pgb-build-libiconv.sh"
-        sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /bin/sh -c \
+        "$PGB_SELF/pgb" rootfs run "$r" -- /bin/sh -c \
           "export DEBIAN_FRONTEND=noninteractive; apt-get install -y -qq --no-install-recommends curl ca-certificates >/dev/null 2>&1; \
            PGB_LIBICONV_PREFIX=$PGB_LIBICONV_PREFIX sh /opt/pgb-build-libiconv.sh" \
           >>"$r.install.log" 2>&1 || { tail -20 "$r.install.log" >&2; die "libiconv build failed"; }
@@ -282,8 +282,8 @@ env_create() {
         printf 'packages: %s\n' "$PGB_ENV_PACKAGES"
         printf 'pip: %s\n' "${PGB_ENV_PIP:-}"
         printf 'created: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-        printf 'gcc: %s\n' "$(sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /usr/bin/gcc --version 2>/dev/null | head -1)"
-        printf 'glibc: %s\n' "$(sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$r" -- /bin/sh -c 'ldd --version' 2>/dev/null | head -1)"
+        printf 'gcc: %s\n' "$("$PGB_SELF/pgb" rootfs run "$r" -- /usr/bin/gcc --version 2>/dev/null | head -1)"
+        printf 'glibc: %s\n' "$("$PGB_SELF/pgb" rootfs run "$r" -- /bin/sh -c 'ldd --version' 2>/dev/null | head -1)"
       } > "$r/.pgb-env"
       # ⭐ The machine-readable half, written LAST so a half-built environment
       # has no stamp and is refused rather than trusted.

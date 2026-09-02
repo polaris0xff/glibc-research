@@ -87,7 +87,7 @@ BS=$(time_build static ${CC:-cc} -O2 -static -o "$B/subject-static" "$B/subject.
 BP=""
 if [ -x "$REPO_DIR/pgb" ]; then
   _t0=$(date +%s%N)
-  if sh "$REPO_DIR/pgb" --bind "$B" build -- /bin/sh -c \
+  if "$REPO_DIR/pgb" --bind "$B" build -- /bin/sh -c \
        "\$CC -O2 -o '$B/subject-pgb' '$B/subject.c'" >>"$B/build.log" 2>&1; then
     _t1=$(date +%s%N); BP=$(( (_t1 - _t0) / 1000000 ))
   else

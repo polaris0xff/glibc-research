@@ -43,7 +43,7 @@ set -u
 
 exp_begin "86 - our bundler against a hand-built Anylinux AppImage"
 
-RR="$REPO_DIR/scripts/common/rootfs-run.sh"
+RR="$REPO_DIR/pgb"
 BUNDLER="$REPO_DIR/tool/nix-appimage.sh"
 ARCH_ROOT="$ROOTFS_DIR/archlinux-latest"
 QS="$REPO_DIR/references/pkgforge-dev__Anylinux-AppImages/tree/useful-tools/quick-sharun.sh"
@@ -104,7 +104,7 @@ printf -- '-- arm P: our bundler, one command --------------------------------\n
 P_IMG="${PGB_APPIMAGE_CACHE:-/var/tmp/pgb-appimage}/$APP/$APP-pgb-x86_64.AppImage"
 if [ ! -s "$P_IMG" ]; then
   exp_note "sh tool/nix-appimage.sh $APP     <- the whole of arm P"
-  sh "$BUNDLER" "$APP" --out "$P_IMG" >"$B/build-P.log" 2>&1 || true
+  "$BUNDLER" "$APP" --out "$P_IMG" >"$B/build-P.log" 2>&1 || true
 fi
 exp_check "arm P built from the package name alone" \
   "$([ -s "$P_IMG" ] && echo yes || echo no)" yes
@@ -156,7 +156,7 @@ if [ ! -s "$A_IMG" ]; then
   AD="$B/AppDir-any"
   rm -rf "$AD"; mkdir -p "$AD/lib"
   cp "$B/sharun" "$AD/sharun"; chmod +x "$AD/sharun"
-  sh "$RR" "$ARCH_ROOT" --bind "$B:$B" --workdir "$B" -- /bin/sh -c "
+  "$RR" rootfs run "$ARCH_ROOT" --bind "$B:$B" --workdir "$B" -- /bin/sh -c "
     set -e
     pacman -Sy --noconfirm --needed base-devel binutils patchelf file $APP >/dev/null 2>&1
     cc -shared -fPIC -O2 $B/anylinux.c -o $AD/lib/anylinux.so
@@ -303,7 +303,7 @@ now_ns() { date +%s%N; }
 # it is identical for both arms either way.
 time_arm() {  # rootfs n -> milliseconds for one enter running the payload n times
   _t0=$(now_ns)
-  timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$1" -- /bin/sh /vs-time.sh "$2" \
+  timeout -k 10 "$RUN_TIMEOUT" "$RR" rootfs run "$1" -- /bin/sh /vs-time.sh "$2" \
     </dev/null >/dev/null 2>&1
   _st=$?
   _t1=$(now_ns)
@@ -331,7 +331,7 @@ while read -r ref name libc digest; do
 
     # Correctness first, and its own reap, so the timing below starts from a
     # rootfs with nothing of this artefact mounted.
-    timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$root" -- /bin/sh /vs-test.sh \
+    timeout -k 10 "$RUN_TIMEOUT" "$RR" rootfs run "$root" -- /bin/sh /vs-test.sh \
       </dev/null >"$B/out.$name.$arm" 2>&1
     st=$?; reap_rootfs "$root"
 
@@ -351,7 +351,7 @@ while read -r ref name libc digest; do
 
     timeout -k 10 "$RUN_TIMEOUT" strace -f \
       -e trace=openat,open,execve,clone,clone3,vfork,fork -o "$B/tr.$name.$arm" \
-      sh "$RR" "$root" -- /bin/sh /vs-test.sh </dev/null >/dev/null 2>&1
+      "$RR" rootfs run "$root" -- /bin/sh /vs-test.sh </dev/null >/dev/null 2>&1
     reap_rootfs "$root"
     pl=$(classify_trace "$B/tr.$name.$arm" /vs-arm payload)
     nh=$(printf '%s\n' "$pl" | grep '^host ' | count)

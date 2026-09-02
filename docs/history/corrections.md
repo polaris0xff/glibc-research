@@ -43,7 +43,7 @@ part of the POC. `docs/limitations.md` §5.
 
 **Disproved by** noticing the same row reported `host-ca-bundle=none`. This
 development environment routes HTTPS through a proxy and exports
-`CURL_CA_BUNDLE`; `scripts/common/rootfs-run.sh` replicates that anchor into
+`CURL_CA_BUNDLE`; `HISTORY/6fcdb3630a1e342d6d4066aba2290e5cf10a84a7/scripts/common/rootfs-run.sh` replicates that anchor into
 the target so builds can fetch, and curl prefers it over its compiled-in path.
 The probe was measuring the harness.
 
@@ -249,7 +249,7 @@ for i in $(seq 1 30); do docker info >/dev/null 2>&1 && break; sleep 1; done
 | | defect | how it presented |
 |---|---|---|
 | ⛔ **P0** | `cmd_build`'s docker branch ended `/bin/sh -c "$PGB_SELF/pgb __inner-build $*"`. `$*` joins argv with spaces and the inner `sh -c` re-splits it, so any single argument containing spaces is torn into words | `pgb build -- sh -c '$CC -O2 -o out/x x.c'` printed `sh: 0: Illegal option -O`, wrote **no output file**, and **exited 0**. A build that produced nothing reported success. The chroot branch never had this: it passes `"$@"` |
-| ⛔ **P1** | the docker and podman engines carried no TLS trust anchor, where `scripts/common/rootfs-run.sh` replicates one into the chroot and explains why | the first `pgb --engine docker env create` died at `RUN sh /opt/pgb/build-libiconv.sh` with **exit 60** — curl's "unable to get local issuer certificate". `apt-get` had just succeeded in the same image because Debian's sources are `http`, so it reads as "libiconv is broken" |
+| ⛔ **P1** | the docker and podman engines carried no TLS trust anchor, where `HISTORY/6fcdb3630a1e342d6d4066aba2290e5cf10a84a7/scripts/common/rootfs-run.sh` replicates one into the chroot and explains why | the first `pgb --engine docker env create` died at `RUN sh /opt/pgb/build-libiconv.sh` with **exit 60** — curl's "unable to get local issuer certificate". `apt-get` had just succeeded in the same image because Debian's sources are `http`, so it reads as "libiconv is broken" |
 | ⛔ **P1** | `--bind` passed its argument to `-v` unresolved | `docker run -v relbind:/mnt` does not mount `./relbind`. It creates an **empty named volume** called `relbind`, mounts that, and exits 0. Reproduced on docker 29.3.1 |
 
 **Now:** argv is passed as argv, the anchor named by the caller's own
@@ -454,7 +454,7 @@ entry was opened on, and 72- is why it moved.
 
 ## C15 — "pgb's compile flags are additions, so where they sit on the command line does not matter"
 
-**Claimed** implicitly by `tool/lib/wrappers.sh` since the wrappers were
+**Claimed** implicitly by `HISTORY/6fcdb3630a1e342d6d4066aba2290e5cf10a84a7/tool/lib/wrappers.sh` since the wrappers were
 written, and stated in `pgb explain` as a flat list of flags with no ordering.
 
 **Disproved by** `poc/90-qt`, on the first attempt to configure Qt 6.11.1. The

@@ -126,7 +126,7 @@ if [ -f "$ICONV_PREFIX/lib/libiconv.a" ]; then
   fi
 fi
 if [ "$HAVE_ICONV" = 0 ]; then
-  exp_skip "arm B (static libiconv)" "no libiconv.a at $ICONV_PREFIX -- run scripts/build-libiconv.sh"
+  exp_skip "arm B (static libiconv)" "no libiconv.a at $ICONV_PREFIX -- run pgb env create"
 fi
 
 exp_note "arm A size: $(wc -c < "$B/gconv-plain") bytes"
@@ -142,11 +142,11 @@ while read -r ref name libc digest; do
   [ -n "$r" ] || { exp_skip "$name" "not fetched"; continue; }
 
   cp "$B/gconv-plain" "$r/pgb-gconv-plain"
-  ra=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" -- /pgb-gconv-plain 2>/dev/null | tr -d '\n')
+  ra=$("$REPO_DIR/pgb" rootfs run "$r" -- /pgb-gconv-plain 2>/dev/null | tr -d '\n')
   rb="(skipped)"
   if [ "$HAVE_ICONV" = 1 ]; then
     cp "$B/gconv-shim" "$r/pgb-gconv-shim"
-    rb=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" -- /pgb-gconv-shim 2>/dev/null | tr -d '\n')
+    rb=$("$REPO_DIR/pgb" rootfs run "$r" -- /pgb-gconv-shim 2>/dev/null | tr -d '\n')
   fi
   printf '    %-20s %-6s %-26s %s\n' "$name" "$libc" "${ra:-<no output>}" "${rb:-<no output>}"
 
@@ -208,13 +208,13 @@ while read -r ref name libc digest; do
   r=$(exp_rootfs "$name")
   [ -n "$r" ] || continue
   cp "$B/locale-plain" "$r/pgb-locale-plain"
-  la=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" -- /pgb-locale-plain 2>/dev/null | tr -d '\n')
+  la=$("$REPO_DIR/pgb" rootfs run "$r" -- /pgb-locale-plain 2>/dev/null | tr -d '\n')
   lb="(no host C.utf8 to bundle)"
   if [ -n "$HOST_LOCALE_SRC" ]; then
     mkdir -p "$r/opt/pgb-locale"
     cp -a "$HOST_LOCALE_SRC" "$r/opt/pgb-locale/C.utf8" 2>/dev/null
     cp "$B/locale-locpath" "$r/pgb-locale-locpath"
-    lb=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$r" -- /pgb-locale-locpath 2>/dev/null | tr -d '\n')
+    lb=$("$REPO_DIR/pgb" rootfs run "$r" -- /pgb-locale-locpath 2>/dev/null | tr -d '\n')
   fi
   printf '    %-20s %-6s %-34s %s\n' "$name" "$libc" "${la:-<none>}" "${lb:-<none>}"
   case "$lb" in *"codeset=UTF-8"*) exp_check "$name: bundled locale yields UTF-8" yes yes ;;

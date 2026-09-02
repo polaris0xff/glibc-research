@@ -186,7 +186,7 @@ cmd_doctor() {
     done < "$PGB_SELF/scripts/common/rootfs-images.txt"
   fi
   printf '    %s present under %s\n' "$n" "$PGB_ROOTFS_DIR"
-  [ "$n" = 0 ] && say "    run: sh scripts/common/fetch-rootfs.sh"
+  [ "$n" = 0 ] && say "    run: "./pgb" rootfs fetch"
   return $rc
 }
 

@@ -40,9 +40,9 @@
 set -u
 . "$(dirname "$0")/lib.sh"
 
-FETCH="$REPO_DIR/scripts/common/nix-fetch.sh"
-DRVPY="$REPO_DIR/tool/nix-drv.py"
-PLANPY="$REPO_DIR/tool/nix-plan.py"
+FETCH="$REPO_DIR/pgb"
+DRVPY="$REPO_DIR/pgb"
+PLANPY="$REPO_DIR/pgb"
 WORK="${TMPDIR:-/var/tmp}/exp83-$$"
 mkdir -p "$WORK"
 trap 'rm -rf "$WORK"' EXIT INT TERM
@@ -59,10 +59,10 @@ done
 
 # -- arm 1: the format reader, offline ---------------------------------------
 printf -- '-- arm 1: the ATerm reader ------------------------------------\n'
-if python3 "$DRVPY" selftest > "$WORK/drv.selftest" 2>&1; then
-  exp_check "tool/nix-drv.py selftest" pass pass
+if "$DRVPY" nix drv selftest > "$WORK/drv.selftest" 2>&1; then
+  exp_check "pgb nix drv selftest" pass pass
 else
-  exp_check "tool/nix-drv.py selftest" FAIL pass
+  exp_check "pgb nix drv selftest" FAIL pass
   sed 's/^/        /' "$WORK/drv.selftest" >&2
 fi
 exp_note "$(grep -c '^  ok' "$WORK/drv.selftest" 2>/dev/null || echo 0) checks, including both nix escapes and two refusals"
@@ -93,7 +93,7 @@ sample_rate() {  # label  <paths on stdin>
     "$((_sr_ok * 100 / _sr_n))"
 }
 
-IDX=$(sh "$FETCH" resolve '.' --limit 1 >/dev/null 2>&1; \
+IDX=$("$FETCH" nix cache resolve '.' --limit 1 >/dev/null 2>&1; \
       printf '%s' "${NIX_FETCH_CACHE:-/var/tmp/pgb-nix-cache}/store-paths.nixpkgs-unstable.txt")
 if [ -s "$IDX" ]; then
   TOTAL=$(wc -l < "$IDX" | tr -d ' ')
@@ -227,12 +227,12 @@ if [ -n "$OUTP_DRV" ] && [ "$(have_drv "$OUTP_DRV")" != 200 ]; then
 fi
 
 if [ -n "$OUTP" ]; then
-  if PGB_STATE="$WORK/state" sh "$REPO_DIR/pgb" nix plan "$OUTP" --out "$WORK/nonix.json" \
+  if PGB_STATE="$WORK/state" "$REPO_DIR/pgb" nix plan "$OUTP" --out "$WORK/nonix.json" \
        >"$WORK/nonix.log" 2>&1 && [ -s "$WORK/nonix.json" ] &&
      grep -q 'no nix was used' "$WORK/nonix.log"; then
     exp_check "that exact store path plans with no nix" built built
     if PGB_STATE="$WORK/state2" PGB_NIX_FORCE_EVAL=1 \
-         sh "$REPO_DIR/pgb" nix plan "$SUBJ" --out "$WORK/withnix.json" \
+         "$REPO_DIR/pgb" nix plan "$SUBJ" --out "$WORK/withnix.json" \
          >"$WORK/withnix.log" 2>&1 && [ -s "$WORK/withnix.json" ]; then
       python3 - "$WORK/nonix.json" "$WORK/withnix.json" > "$WORK/cmp.txt" 2>&1 <<'PY'
 import json, sys
@@ -275,7 +275,7 @@ fi
 
 printf '\n-- arm 3b: does a NAME resolve to what an ATTRIBUTE does? ------\n'
 # ⭐ A FINDING, NOT A FAILURE, and `bash` is the case that shows it plainly.
-BYNAME=$(sh "$FETCH" resolve "/nix/store/[a-z0-9]{32}-$SUBJ-[0-9][^/]*$" --limit 40 2>/dev/null \
+BYNAME=$("$FETCH" nix cache resolve "/nix/store/[a-z0-9]{32}-$SUBJ-[0-9][^/]*$" --limit 40 2>/dev/null \
          | grep -vE -- '-(dev|doc|man|debug|info|devdoc|dist)$' | head -1)
 exp_note "by name     : ${BYNAME:-<none>}"
 exp_note "by attribute: ${OUTP:-<no nix>}"
@@ -300,7 +300,7 @@ printf '\n-- arm 4: the same, with nix removed from PATH -----------------\n'
 # that is a PATH with nothing nix-shaped on it and PGB_NIX_FORCE_EVAL unset.
 if env -i HOME="$HOME" PATH=/usr/bin:/bin TMPDIR="${TMPDIR:-/var/tmp}" \
      PGB_STATE="$WORK/state3" \
-     sh "$REPO_DIR/pgb" nix plan "$SUBJ" --out "$WORK/clean.json" \
+     "$REPO_DIR/pgb" nix plan "$SUBJ" --out "$WORK/clean.json" \
      >"$WORK/clean.log" 2>&1 && [ -s "$WORK/clean.json" ]; then
   exp_check "a plan with nix off PATH entirely" built built
   exp_note "pname: $(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["pname"])' "$WORK/clean.json" 2>/dev/null)"

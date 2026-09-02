@@ -34,7 +34,7 @@ set -u
 
 exp_begin "90 - our kdenlive bundle against kdenlive-AppImage-Enhanced AND onelf"
 
-RR="$REPO_DIR/scripts/common/rootfs-run.sh"
+RR="$REPO_DIR/pgb"
 BUNDLER="$REPO_DIR/tool/nix-appimage.sh"
 WORK="${PGB_KDEN_WORK:-/var/tmp/t055}"
 CACHE="${PGB_KDEN_CACHE:-/var/tmp/pgb-appimage-kden}"
@@ -83,7 +83,7 @@ if [ ! -s "$ENH" ]; then
 fi
 if [ ! -s "$OURS" ]; then
   exp_note "building ours: sh tool/nix-appimage.sh kdenlive --with-program melt"
-  PGB_APPIMAGE_CACHE="$CACHE" sh "$BUNDLER" kdenlive \
+  PGB_APPIMAGE_CACHE="$CACHE" "$BUNDLER" kdenlive \
     --with-program melt --with-program ffmpeg >"$B/build-ours.log" 2>&1 || true
 fi
 [ -s "$OURS" ] || { exp_note "ours did not build; see $B/build-ours.log"; exit 2; }
@@ -334,7 +334,7 @@ run_arm() {  # rootfs artefact tag -> exit status
   _r="$1"; _a="$2"; _t="$3"
   rm -f "$_r/kd-arm"; cp "$_a" "$_r/kd-arm"; chmod +x "$_r/kd-arm"
   write_test "$_r"
-  timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$_r" -- /bin/sh /kd-test.sh \
+  timeout -k 10 "$RUN_TIMEOUT" "$RR" rootfs run "$_r" -- /bin/sh /kd-test.sh \
     </dev/null >"$B/out.$_t" 2>&1
   _st=$?
   printf '%s' "$_st"
@@ -351,14 +351,14 @@ while read -r ref name libc digest; do
   pst=$(run_arm "$root" "$OURS" "$name.P")
   timeout -k 10 "$RUN_TIMEOUT" strace -f \
     -e trace=openat,open,execve,clone,clone3,vfork,fork -o "$B/tr.$name.P" \
-    sh "$RR" "$root" -- /bin/sh /kd-test.sh </dev/null >/dev/null 2>&1
+    "$RR" rootfs run "$root" -- /bin/sh /kd-test.sh </dev/null >/dev/null 2>&1
   reap_rootfs "$root"
   pnh=$(classify_trace "$B/tr.$name.P" /kd-arm tree | grep '^host ' | count)
 
   est=$(run_arm "$root" "$ENH" "$name.E")
   timeout -k 10 "$RUN_TIMEOUT" strace -f \
     -e trace=openat,open,execve,clone,clone3,vfork,fork -o "$B/tr.$name.E" \
-    sh "$RR" "$root" -- /bin/sh /kd-test.sh </dev/null >/dev/null 2>&1
+    "$RR" rootfs run "$root" -- /bin/sh /kd-test.sh </dev/null >/dev/null 2>&1
   reap_rootfs "$root"
   enh_=$(classify_trace "$B/tr.$name.E" /kd-arm tree | grep '^host ' | count)
 

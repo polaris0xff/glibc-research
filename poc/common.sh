@@ -92,7 +92,7 @@ poc_fetch() { # url outfile [sha256]
 # not a per-call argument: a POC that used a flag for the final link and not
 # for the dependencies it links in would be measuring two different toolchains
 # and calling the result one.
-poc_in_env() { sh "$PGB" --bind "$WORK" ${POC_PGB_FLAGS:-} build -- /bin/sh -c "$1"; }
+poc_in_env() { "$PGB" --bind "$WORK" ${POC_PGB_FLAGS:-} build -- /bin/sh -c "$1"; }
 
 # ---------------------------------------------------------------------------
 # The matrix run. This is what the POC is FOR.
@@ -139,7 +139,7 @@ poc_matrix() { # binary-path  [extra files to copy: src:dst ...]
 
     # The POC's own test script, written into the target and run there.
     poc_functional_test > "$_r/pgb-poc-test.sh"
-    sh "$REPO_ROOT/scripts/common/rootfs-run.sh" "$_r" -- /bin/sh /pgb-poc-test.sh \
+    "$REPO_ROOT/pgb" rootfs run "$_r" -- /bin/sh /pgb-poc-test.sh \
        >"$POC_OUT/$name.log" 2>&1
     _st=$?
     case $_st in
@@ -244,7 +244,7 @@ poc_observe() {  # binary-path label [extra files: src:dst ...]
     cp "$_bin" "$_r/$_base" 2>/dev/null || continue
     poc_stage_extras "$_r" "$@"
     poc_observation_probe > "$_r/pgb-poc-probe.sh"
-    _out=$(sh "$REPO_ROOT/scripts/common/rootfs-run.sh" "$_r" -- /bin/sh /pgb-poc-probe.sh 2>&1 | tail -1)
+    _out=$("$REPO_ROOT/pgb" rootfs run "$_r" -- /bin/sh /pgb-poc-probe.sh 2>&1 | tail -1)
     _libs=$(poc_trace "$_r" "/$_base" pgb-poc-probe.sh)
     printf '    %-20s %-6s %-10s %s\n' "$name" "$libc" "${_out:-<none>}" "${_libs:-none}"
     printf '%s\n' "$name: $_out | $_libs" >> "$POC_OUT/observation.txt"
@@ -267,7 +267,7 @@ poc_trace() { # rootfs in-root-binary script-name
   command -v strace >/dev/null 2>&1 || { printf ''; return; }
   _t=$(mktemp) || { printf ''; return; }
   strace -f -e trace=openat,open,execve -o "$_t" \
-    sh "$REPO_ROOT/scripts/common/rootfs-run.sh" "$1" -- /bin/sh "/${3:-pgb-poc-test.sh}" \
+    "$REPO_ROOT/pgb" rootfs run "$1" -- /bin/sh "/${3:-pgb-poc-test.sh}" \
     >/dev/null 2>&1
   awk -v want="$2" '
     { pid = $1 }
@@ -283,7 +283,7 @@ poc_trace_data() { # rootfs in-root-binary script-name
   command -v strace >/dev/null 2>&1 || { printf ''; return; }
   _t=$(mktemp) || { printf ''; return; }
   strace -f -e trace=openat,open,execve -o "$_t" \
-    sh "$REPO_ROOT/scripts/common/rootfs-run.sh" "$1" -- /bin/sh "/${3:-pgb-poc-test.sh}" \
+    "$REPO_ROOT/pgb" rootfs run "$1" -- /bin/sh "/${3:-pgb-poc-test.sh}" \
     >/dev/null 2>&1
   awk -v want="$2" '
     { pid = $1 }

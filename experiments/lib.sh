@@ -99,7 +99,7 @@ exp_rootfs_libc() { # name -> musl | glibc | unknown
 # ⛔ Unpiped: the status has to be the command's own.
 exp_run_status() { # rootfs copyspec cmd...
   _r="$1"; _c="$2"; shift 2
-  sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$_r" --copy "$_c" -- "$@" >/dev/null 2>&1
+  "$REPO_DIR/pgb" rootfs run "$_r" --copy "$_c" -- "$@" >/dev/null 2>&1
   printf '%s' "$?"
 }
 
@@ -108,7 +108,7 @@ exp_run_status() { # rootfs copyspec cmd...
 #
 # ⛔ THE DEFECT THIS EXISTS TO CATCH, and it produced a wrong reading here
 # before it was written: `strace -f` over the whole runner also captures the
-# runner's own helpers. rootfs-run.sh copies the artefact in with `cp -a`, and
+# runner's own helpers. `pgb rootfs run --copy` copies the artefact in, and
 # on this host coreutils `cp` is dynamically linked, so the trace filled up
 # with libacl, libattr, libblkid, libmount, libpcre2, libselinux and libc.so.6
 # opens that had NOTHING to do with the binary under test. Read naively that
@@ -123,7 +123,7 @@ exp_run_status() { # rootfs copyspec cmd...
 exp_trace_opens() {  # rootfs in-root-path tracefile [extra rootfs-run args...]
   _tr_root="$1"; _tr_bin="$2"; _tr_out="$3"; shift 3
   strace -f -e trace=openat,open,execve -o "$_tr_out" \
-    sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$_tr_root" "$@" -- "$_tr_bin" \
+    "$REPO_DIR/pgb" rootfs run "$_tr_root" "$@" -- "$_tr_bin" \
     >/dev/null 2>&1
   awk -v want="$_tr_bin" '
     { pid = $1 }

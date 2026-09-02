@@ -177,10 +177,10 @@ poc_check "extensions built (object and shared object)" "$nobj" "15"
 # unquoted. Every element is a shell-safe token by construction (an extension
 # name and a path this script built).
 # shellcheck disable=SC2086
-sh "$PGB" --bind "$WORK" $wrapspecs build -- /bin/sh -c \
+"$PGB" --bind "$WORK" $wrapspecs build -- /bin/sh -c \
   "\$CC $SQFLAGS -o $SRC/sqlite3-wrapped $SRC/sqlite/shell.c $SRC/sqlite/sqlite3.c -lm" \
   >>"$build_log" 2>&1 || poc_check "link the wrapped arm" failed ok
-sh "$PGB" --bind "$WORK" build -- /bin/sh -c \
+"$PGB" --bind "$WORK" build -- /bin/sh -c \
   "\$CC $SQFLAGS -o $SRC/sqlite3-control $SRC/sqlite/shell.c $SRC/sqlite/sqlite3.c -lm" \
   >>"$build_log" 2>&1 || poc_check "link the control arm" failed ok
 
@@ -328,7 +328,7 @@ if poc_in_env "\$CC $SQFLAGS -fPIC -c -o $SRC/ext/base85.o $SRC/ext/base85.c" >>
     poc_check "raw link of base64.o + base85.o" "collides" "collides"
   fi
   # With namespacing, through pgb: MUST succeed.
-  if sh "$PGB" --bind "$WORK" \
+  if "$PGB" --bind "$WORK" \
        --wrap-dlopen "base64.so=$SRC/ext/base64.o" \
        --wrap-dlopen "base85.so=$SRC/ext/base85.o" \
        build -- /bin/sh -c \

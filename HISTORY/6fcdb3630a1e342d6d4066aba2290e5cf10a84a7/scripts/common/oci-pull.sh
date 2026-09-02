@@ -38,10 +38,10 @@
 # honoured.
 #
 # Usage:
-#   sh scripts/common/oci-pull.sh alpine:3.20 --out /var/rootfs/alpine-3.20
-#   sh scripts/common/oci-pull.sh debian:11 --out DIR --arch arm64
-#   sh scripts/common/oci-pull.sh alpine:3.20 --out DIR --digest sha256:c64c...
-#   sh scripts/common/oci-pull.sh --selftest        prove the whiteout pass, offline
+#   "./pgb" rootfs pull alpine:3.20 --out /var/rootfs/alpine-3.20
+#   "./pgb" rootfs pull debian:11 --out DIR --arch arm64
+#   "./pgb" rootfs pull alpine:3.20 --out DIR --digest sha256:c64c...
+#   "./pgb" rootfs pull --selftest        prove the whiteout pass, offline
 #
 # Exit codes: 0 unpacked, 1 the fetch or unpack failed, 2 could not run.
 #
@@ -298,7 +298,7 @@ done || die "layer unpack failed"
   printf '\nlayers:\n'
   printf '%s\n' "$LAYERS" | sed 's/^/  /'
   printf '\nreproduce exactly:\n'
-  printf '  sh scripts/common/oci-pull.sh %s --arch %s --digest %s --out DIR\n' "$REF" "$ARCH" "$MANIFEST_DIGEST"
+  printf '  "./pgb" rootfs pull %s --arch %s --digest %s --out DIR\n' "$REF" "$ARCH" "$MANIFEST_DIGEST"
 } > "$OUT/.oci-provenance"
 
 say "oci-pull: unpacked to $OUT  (manifest $MANIFEST_DIGEST)"

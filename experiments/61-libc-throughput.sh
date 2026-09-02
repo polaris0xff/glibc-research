@@ -67,8 +67,7 @@ SCALE="${PGB_BENCH_SCALE:-1}"
 MATRIX_SCALE="${PGB_BENCH_MATRIX_SCALE:-1}"
 
 ENV_ROOT="$ROOTFS_DIR/${PGB_ENV_NAME:-pgb-env-debian12}"
-RR="$REPO_DIR/scripts/common/rootfs-run.sh"
-
+RR="$REPO_DIR/pgb"
 B="$EXP_OUT/build"
 rm -rf "$B"; mkdir -p "$B" || exit 2
 
@@ -311,16 +310,16 @@ fi
 # exists to replace with a number.
 B_OK=no
 if [ -d "$ENV_ROOT" ]; then
-  if sh "$RR" "$ENV_ROOT" --bind "$B:$B" --workdir "$B" -- /bin/sh -c \
+  if "$RR" rootfs run "$ENV_ROOT" --bind "$B:$B" --workdir "$B" -- /bin/sh -c \
        "gcc -O2 -static -o $B/b-static $B/bench.c -lm -lpthread" </dev/null >>"$B/build.log" 2>&1 \
-     && ( cd "$B" && sh "$REPO_DIR/pgb" --bind "$B" build -- /bin/sh -c \
+     && ( cd "$B" && "$REPO_DIR/pgb" --bind "$B" build -- /bin/sh -c \
             "\$CC -O2 -o $B/b-pgb $B/bench.c -lm -lpthread" ) >>"$B/build.log" 2>&1; then
     B_OK=yes
   else
     B_WHY="a pinned-env build failed; see build.log"
   fi
 else
-  B_WHY="no build environment: sh pgb env create"
+  B_WHY="no build environment: ./pgb env create"
 fi
 
 exp_check "B: both pinned-env arms built" "$B_OK" yes
@@ -354,7 +353,7 @@ fi
 # glibc. Every environment gets both binaries so the comparison is per-row.
 C_MUSL=no
 if [ -d "$ROOTFS_DIR/alpine-3.22" ]; then
-  if sh "$RR" "$ROOTFS_DIR/alpine-3.22" --bind "$B:$B" --workdir "$B" -- /bin/sh -c \
+  if "$RR" rootfs run "$ROOTFS_DIR/alpine-3.22" --bind "$B:$B" --workdir "$B" -- /bin/sh -c \
        "apk add --no-cache gcc musl-dev >/dev/null 2>&1 && gcc -O2 -static -o $B/c-musl $B/bench.c -lm -lpthread" \
        </dev/null >>"$B/build.log" 2>&1 && [ -x "$B/c-musl" ]; then
     C_MUSL=yes
@@ -376,8 +375,8 @@ if [ "$B_OK" = yes ] && [ "$C_MUSL" = yes ]; then
     ENVS=$((ENVS+1))
     cp "$B/b-pgb" "$root/pgb-bench-p"; cp "$B/c-musl" "$root/pgb-bench-m"
     chmod +x "$root/pgb-bench-p" "$root/pgb-bench-m"
-    sh "$RR" "$root" -- /pgb-bench-p all "$MATRIX_SCALE" </dev/null > "$B/c.$name.P" 2>/dev/null
-    sh "$RR" "$root" -- /pgb-bench-m all "$MATRIX_SCALE" </dev/null > "$B/c.$name.M" 2>/dev/null
+    "$RR" rootfs run "$root" -- /pgb-bench-p all "$MATRIX_SCALE" </dev/null > "$B/c.$name.P" 2>/dev/null
+    "$RR" rootfs run "$root" -- /pgb-bench-m all "$MATRIX_SCALE" </dev/null > "$B/c.$name.M" 2>/dev/null
     pm=$(get malloc4 < "$B/c.$name.P"); mm=$(get malloc4 < "$B/c.$name.M")
     ps=$(get strops  < "$B/c.$name.P"); ms=$(get strops  < "$B/c.$name.M")
     printf '   %-19s %-6s %10s %10s %10s %10s\n' "$name" "$libc" \

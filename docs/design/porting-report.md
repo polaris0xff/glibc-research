@@ -221,8 +221,8 @@ Repository evidence and design:
 - `docs/design/toolchain.md` — current language/structure decision and experiment-70 correction.
 - `TODO/toolchain.md`, T-011 and T-056 — language decision and existing Rust-helper port item.
 - `evidence/70-carried-helper/RESULT.txt` — static Rust GNU and musl helpers passed 12/12.
-- `scripts/common/nix-index.py` — the ~400 MB streaming JSON workload.
-- `scripts/common/nix-nar.py` — NAR, hashing, compression, and Ed25519 verification.
+- `internal/nixx/index.go` — the ~400 MB streaming JSON workload.
+- `internal/nixx/nar.go` — NAR, hashing, compression, and Ed25519 verification.
 
 Official language documentation:
 

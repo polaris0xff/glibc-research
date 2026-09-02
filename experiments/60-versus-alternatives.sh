@@ -84,8 +84,7 @@ ROUNDS="${PGB_VS_ROUNDS:-3}"
 
 ENV_ROOT="$ROOTFS_DIR/${PGB_ENV_NAME:-pgb-env-debian12}"
 MUSL_ROOT="$ROOTFS_DIR/alpine-3.22"
-RR="$REPO_DIR/scripts/common/rootfs-run.sh"
-
+RR="$REPO_DIR/pgb"
 # ⛔ PINNED, FOR THE SAME REASON scripts/common/rootfs-images.txt IS PINNED.
 # "continuous" is a rolling tag: appimagetool publishes every build under it,
 # so an unpinned fetch measures a different packer each week and says nothing
@@ -101,7 +100,7 @@ B="$EXP_OUT/build"
 rm -rf "$B"; mkdir -p "$B" || exit 2
 : > "$EXP_OUT/per-environment.txt"
 
-[ -d "$ENV_ROOT" ] || { exp_note "no build environment: sh pgb env create"; exit 2; }
+[ -d "$ENV_ROOT" ] || { exp_note "no build environment: ./pgb env create"; exit 2; }
 
 # ---------------------------------------------------------------------------
 # The subject. One source, every arm.
@@ -155,7 +154,7 @@ int main(int argc, char **argv)
 EOF
 
 in_env() {  # run a command inside the pinned build environment
-  sh "$RR" "$ENV_ROOT" --bind "$B:$B" --workdir "$B" -- /bin/sh -c "$1" </dev/null
+  "$RR" rootfs run "$ENV_ROOT" --bind "$B:$B" --workdir "$B" -- /bin/sh -c "$1" </dev/null
 }
 
 arm_file() { printf '%s' "$B/arm-$1"; }
@@ -179,7 +178,7 @@ MUSL_VER=; FLATPAK_RUNTIME_BYTES=
 
 in_env "gcc -O2 -o $B/arm-N $B/subject.c" >>"$B/build.log" 2>&1 && BUILT_N=yes
 in_env "gcc -O2 -static -o $B/arm-S $B/subject.c" >>"$B/build.log" 2>&1 && BUILT_S=yes
-( cd "$B" && sh "$REPO_DIR/pgb" --bind "$B" build -- /bin/sh -c \
+( cd "$B" && "$REPO_DIR/pgb" --bind "$B" build -- /bin/sh -c \
     "\$CC -O2 -o $B/arm-P $B/subject.c" ) >>"$B/build.log" 2>&1 && BUILT_P=yes
 
 # ⚠ THE ONE UNPINNED BUILD INPUT IN THIS SCRIPT. The musl arm is compiled by
@@ -189,11 +188,11 @@ in_env "gcc -O2 -static -o $B/arm-S $B/subject.c" >>"$B/build.log" 2>&1 && BUILT
 # the versions it actually got; a rerun that disagrees is a different
 # toolchain, not a different finding about pgb.
 if [ -d "$MUSL_ROOT" ]; then
-  if sh "$RR" "$MUSL_ROOT" --bind "$B:$B" --workdir "$B" -- /bin/sh -c \
+  if "$RR" rootfs run "$MUSL_ROOT" --bind "$B:$B" --workdir "$B" -- /bin/sh -c \
        "apk add --no-cache gcc musl-dev >/dev/null 2>&1 && gcc -O2 -static -o $B/arm-M $B/subject.c" \
        </dev/null >>"$B/build.log" 2>&1 && [ -x "$B/arm-M" ]; then
     BUILT_M=yes
-    MUSL_VER=$(sh "$RR" "$MUSL_ROOT" -- /bin/sh -c 'apk info musl 2>/dev/null | head -1' \
+    MUSL_VER=$("$RR" rootfs run "$MUSL_ROOT" -- /bin/sh -c 'apk info musl 2>/dev/null | head -1' \
                  </dev/null 2>/dev/null | tr -d '\r')
   else
     WHY_M="alpine gcc/musl-dev could not be installed, or the link failed"
@@ -441,7 +440,7 @@ RUN_TIMEOUT="${PGB_VS_TIMEOUT:-25}"
 
 # ⛔ TWO REAPERS WERE WRONG BEFORE THIS ONE.
 #
-#   `pkill -f` matched the runner's OWN command line -- `rootfs-run.sh ... --
+#   `pkill -f` matched the runner's OWN command line -- `pgb rootfs run ... --
 #   /pgb-vs-arm` -- so it killed the experiment along with the leftovers.
 #
 #   `pkill -x pgb-vs-arm` matched the artefact and nothing else, which is not
@@ -476,13 +475,13 @@ trap 'reap_all' EXIT INT TERM
 trace_run() {  # rootfs /artefact tracefile
   timeout -k 10 "$RUN_TIMEOUT" \
     strace -f -e trace=openat,open,execve,clone,clone3,vfork,fork -o "$3" \
-      sh "$RR" "$1" -- "$2" </dev/null >/dev/null 2>&1
+      "$RR" rootfs run "$1" -- "$2" </dev/null >/dev/null 2>&1
   _rc=$?
   reap_rootfs "$1"
   if [ "$_rc" = 124 ] || [ "$_rc" = 137 ]; then
     timeout -k 10 "$RUN_TIMEOUT" \
       strace -e trace=openat,open,execve -o "$3" \
-        sh "$RR" "$1" -- "$2" </dev/null >/dev/null 2>&1
+        "$RR" rootfs run "$1" -- "$2" </dev/null >/dev/null 2>&1
     reap_rootfs "$1"
     printf 'nofork'
   else
@@ -517,7 +516,7 @@ while read -r ref name libc digest; do
       || { printf ' %-10s' 'copy-fail'; continue; }
     chmod +x "$root/pgb-vs-arm"
     # ⛔ UNPIPED. lib.sh: the status has to be the command's own.
-    timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$root" -- /pgb-vs-arm \
+    timeout -k 10 "$RUN_TIMEOUT" "$RR" rootfs run "$root" -- /pgb-vs-arm \
       </dev/null >"$B/out.$name.$a" 2>&1
     st=$?
     reap_rootfs "$root"

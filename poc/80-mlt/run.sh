@@ -216,7 +216,7 @@ poc_note "framework $(printf '%s' "$FW" | wc -w) objects, melt $(printf '%s' "$M
 # program with one C++ translation unit inside a plugin is a shape nothing in
 # this tree had hit before.
 # shellcheck disable=SC2086
-sh "$PGB" --bind "$WORK" $SPECS build -- /bin/sh -c \
+"$PGB" --bind "$WORK" $SPECS build -- /bin/sh -c \
   "\$CXX -o $W/melt-static $MELTO $FW -L$W/inst/lib \
      -Wl,--start-group -lavdevice -lavfilter -lavformat -lavcodec -lswscale -lswresample -lavutil -Wl,--end-group \
      -lm -lpthread -lz" >>"$LOG" 2>&1

@@ -164,7 +164,7 @@ if [ -f "$HOST_LIBC" ] && [ -f "$HOST_LD" ]; then
 
   run_syn() { # binary -> echoes the markers left behind, or "none"
     rm -f "$SYN"/EVIL-*
-    sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$SYN" --no-net -- "/bin/$1" >/dev/null 2>&1
+    "$REPO_DIR/pgb" rootfs run "$SYN" --no-net -- "/bin/$1" >/dev/null 2>&1
     m=$(cd "$SYN" && ls 2>/dev/null | grep '^EVIL-' | sort | tr '\n' ',' | sed 's/,$//')
     printf '%s' "${m:-none}"
   }
@@ -180,7 +180,7 @@ if [ -f "$HOST_LIBC" ] && [ -f "$HOST_LD" ]; then
   # stops the file's modules being used. Stating it the other way round would
   # be wrong, and a reader would design against a property that is not there.
   strace -f -e trace=openat -o "$B/syn-nssfix.trace" \
-    sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$SYN" --no-net -- /bin/probe-nssfix >/dev/null 2>&1
+    "$REPO_DIR/pgb" rootfs run "$SYN" --no-net -- /bin/probe-nssfix >/dev/null 2>&1
   if grep -q 'nsswitch.conf' "$B/syn-nssfix.trace" 2>/dev/null; then
     exp_note "arm B still OPENS /etc/nsswitch.conf; what it does not do is load what the file names"
   fi
@@ -210,7 +210,7 @@ printf '    %-20s %-6s %-9s %-9s %-7s %s\n' ENVIRONMENT LIBC 'A plain' 'B nssfix
 nss_loaded() { # rootfs binary-path in-root-name -> comma list of host NSS modules opened
   _t="$B/trace-$2-$(basename "$1")"
   strace -f -e trace=openat -o "$_t" \
-    sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$1" --copy "$3" -- "/$2" >/dev/null 2>&1
+    "$REPO_DIR/pgb" rootfs run "$1" --copy "$3" -- "/$2" >/dev/null 2>&1
   _m=$(grep -oE '/[^"]*/libnss_[a-z0-9_]*\.so[^"]*' "$_t" 2>/dev/null \
        | sed 's|.*/||' | sort -u | tr '\n' ',' | sed 's/,$//')
   printf '%s' "${_m:-none}"

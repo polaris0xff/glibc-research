@@ -121,7 +121,7 @@ printf '  host-static  .dynsym entries: %s\n' \
 
 # Arm 3: static, plugin linked in, reached through the compiled-in table.
 cc -O2 -c -o "$WORK/plug-static.o" "$WORK/plug.c" || exit 2
-if sh "$REPO_DIR/pgb" --engine host --wrap-dlopen "libplug.so=$WORK/plug-static.o" \
+if "$REPO_DIR/pgb" --engine host --wrap-dlopen "libplug.so=$WORK/plug-static.o" \
      build -- sh -c "\$CC -O2 -o $WORK/host-wrap $WORK/host.c" >"$WORK/wrap.log" 2>&1 \
    && [ -x "$WORK/host-wrap" ]; then
   printf '  host-wrap built\n'

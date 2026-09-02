@@ -14,6 +14,7 @@ import (
 	"github.com/polaris0xff/glibc-research/internal/fail"
 	"github.com/polaris0xff/glibc-research/internal/logx"
 	"github.com/polaris0xff/glibc-research/internal/nixx"
+	"github.com/polaris0xff/glibc-research/internal/selftest"
 )
 
 const nixUsage = `pgb nix -- use nixpkgs as the dependency planner, and build with glibc
@@ -275,6 +276,9 @@ func nixCacheCommand(c *cfg.Config, args []string) error {
 			"(channel, resolve, attr, drv, info, closure, fetch)")
 	}
 	sub, rest := args[0], args[1:]
+	if sub == "selftest" || sub == "--selftest" {
+		return nixCacheSelftest()
+	}
 	a, err := parseNixArgs(rest)
 	if err != nil {
 		return err
@@ -372,6 +376,23 @@ func nixCacheCommand(c *cfg.Config, args []string) error {
 		return nil
 	}
 	return fail.Cannot("unknown: pgb nix cache %s", sub)
+}
+
+// nixCacheSelftest checks the store-path reductions the cache client rests on,
+// offline. The network parts belong in an experiment.
+func nixCacheSelftest() error {
+	r := selftest.New("nix-cache")
+	for _, in := range []string{
+		"/nix/store/abcdefghijklmnopqrstuvwxyz012345-foo-1.0",
+		"abcdefghijklmnopqrstuvwxyz012345-foo-1.0",
+		"abcdefghijklmnopqrstuvwxyz012345",
+	} {
+		r.Check("hash of "+in, nixx.HashOf(in), "abcdefghijklmnopqrstuvwxyz012345")
+	}
+	if r.Print() != 0 {
+		return fail.Exit(1)
+	}
+	return nil
 }
 
 func nixCacheDrv(cl *nixx.Client, want string) error {

@@ -98,7 +98,7 @@ Go, where requirement 6 (no hardcoded layout) applies to it.
 ### 4. The defects, and the one that caused T-061
 
 ⛔ **A comment inside a double-quoted string is a command substitution.**
-`tool/lib/nix.sh` named a file as `` `.built` `` in a comment inside a
+`internal/nixx/build.go` named a file as `` `.built` `` in a comment inside a
 `_cmd="..."` assignment; the composing shell ran it and printed
 `pgb: 1: .built: not found` as boost's round 1 began. An hour went into a boost
 build that was never failing. ⭐ **That defect is the whole argument for

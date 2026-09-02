@@ -26,6 +26,38 @@ func elfNeeded(path string) error {
 	return nil
 }
 
+// elfPrint writes FILE<tab>NEEDED for each entry. A file that is not an ELF is
+// skipped silently: a caller sweeping a directory passes non-objects.
+func elfPrint(path string) error {
+	needed, err := elfx.Needed(path)
+	if err != nil {
+		return nil
+	}
+	for _, n := range needed {
+		logx.Say("%s\t%s", path, n)
+	}
+	return nil
+}
+
+// elfShorten rewrites absolute DT_NEEDED entries to their basenames, in place,
+// and reports what changed.
+func elfShorten(paths []string) error {
+	changed := 0
+	for _, p := range paths {
+		res, err := elfx.Shorten(p)
+		if err != nil {
+			logx.Warnf("%s: %v", p, err)
+			continue
+		}
+		for _, c := range res.Changed {
+			logx.Say("%s: %s", p, c)
+			changed++
+		}
+	}
+	logx.Infof("%d DT_NEEDED entr(y|ies) shortened", changed)
+	return nil
+}
+
 func elfInfo(path string) error {
 	info, err := elfx.Inspect(path)
 	if err != nil {

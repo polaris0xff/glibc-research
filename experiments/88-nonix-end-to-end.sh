@@ -35,7 +35,7 @@ exp_begin "88 - plan, fetch and BUILD a nixpkgs package with no nix and no root"
 
 WORK="${PGB_WORK:-/var/tmp/pgb-exp88}"
 rm -rf "$WORK"; mkdir -p "$WORK" || { echo "cannot create $WORK" >&2; exit 2; }
-NF="$REPO_DIR/scripts/common/nix-fetch.sh"
+NF="$REPO_DIR/pgb"
 PGB="$REPO_DIR/pgb"
 
 # The PATH a host with no nix has. ⛔ Not `PATH` with a grep -v: the point is a
@@ -61,17 +61,17 @@ PKGS="bash coreutils gawk jq curl git tmux nano htop sqlite zlib openssl
 hyd_ok=0; hyd_no=0; drv_ok=0; drv_no=0; n=0
 for p in $PKGS; do
   n=$((n + 1))
-  if nonix sh "$NF" drv "$p" >"$WORK/drv.$p" 2>"$WORK/drv.$p.err"; then
+  if nonix "$NF" nix cache drv "$p" >"$WORK/drv.$p" 2>"$WORK/drv.$p.err"; then
     hyd_ok=$((hyd_ok + 1))
   else
     hyd_no=$((hyd_no + 1)); printf '        hydra   MISS %s\n' "$p"
   fi
   # 83-'s route: a store path from the index, its narinfo's Deriver, and
   # whether THAT .drv is in the cache.
-  sp=$(nonix sh "$NF" resolve "/nix/store/[a-z0-9]{32}-$p-[0-9][^/]*$" --limit 1 2>/dev/null | head -1)
+  sp=$(nonix "$NF" nix cache resolve "/nix/store/[a-z0-9]{32}-$p-[0-9][^/]*$" --limit 1 2>/dev/null | head -1)
   dv=""
-  [ -n "$sp" ] && dv=$(nonix sh "$NF" info "$sp" 2>/dev/null | sed -n 's/^Deriver: //p')
-  if [ -n "$dv" ] && nonix sh "$NF" info "$dv" >/dev/null 2>&1; then
+  [ -n "$sp" ] && dv=$(nonix "$NF" nix cache info "$sp" 2>/dev/null | sed -n 's/^Deriver: //p')
+  if [ -n "$dv" ] && nonix "$NF" nix cache info "$dv" >/dev/null 2>&1; then
     drv_ok=$((drv_ok + 1))
   else
     drv_no=$((drv_no + 1)); printf '        Deriver MISS %s\n' "$p"
@@ -87,9 +87,9 @@ exp_check "packages the hydra route cannot resolve" "$hyd_no" "1"
 # nixpkgs attribute: there is no `grep`, there is `gnugrep`. Asserted both
 # ways so "19 of 20" cannot be read as a 5% failure rate.
 exp_check "the miss has no attribute under that name either" \
-          "$(nonix sh "$NF" attr grep >/dev/null 2>&1 && echo found || echo absent)" "absent"
+          "$(nonix "$NF" nix cache attr grep >/dev/null 2>&1 && echo found || echo absent)" "absent"
 exp_check "and its real attribute resolves" \
-          "$(nonix sh "$NF" drv gnugrep 2>/dev/null | sed -n 's/^Nixname: //p')" "gnugrep-3.12"
+          "$(nonix "$NF" nix cache drv gnugrep 2>/dev/null | sed -n 's/^Nixname: //p')" "gnugrep-3.12"
 exp_note "⚠ THE TWO ROUTES ANSWER DIFFERENT QUESTIONS and the comparison only"
 exp_note "  holds for a package NAME. Deriver answers \"which .drv made this"
 exp_note "  store path\"; hydra answers \"which .drv does this attribute name\"."
@@ -112,7 +112,7 @@ else
     # ⚠ ASK THE ROUTE HERE rather than reading arm 1's file: a file left by a
     # FAILED lookup is empty, and an empty string compared against an empty
     # string is a pass nobody meant to write.
-    nonix sh "$NF" drv "$p" >"$WORK/a2.$p" 2>/dev/null
+    nonix "$NF" nix cache drv "$p" >"$WORK/a2.$p" 2>/dev/null
     hy=$(sed -n 's/^Drv: //p' "$WORK/a2.$p" 2>/dev/null)
     ev=$("$NIXBIN" --store "$WORK/evalstore" '<nixpkgs>' -A "$p" 2>/dev/null \
          | grep '^/nix/store/' | head -1)
@@ -135,7 +135,7 @@ fi
 # ARM 3 -- the two plans, field by field.
 # ---------------------------------------------------------------------------
 printf -- '\n-- arm 3: the no-nix plan against the evaluated plan ----------\n'
-nonix sh "$PGB" nix plan jq --out "$WORK/jq.nonix.plan" >"$WORK/plan.nonix.log" 2>&1
+nonix "$PGB" nix plan jq --out "$WORK/jq.nonix.plan" >"$WORK/plan.nonix.log" 2>&1
 rc_a=$?
 if [ -z "$NIXBIN" ]; then
   exp_skip "arm3: field-by-field comparison" "no nix to produce the other side"
@@ -144,7 +144,7 @@ elif [ "$rc_a" != 0 ]; then
   sed -n '1,15p' "$WORK/plan.nonix.log" | sed 's/^/        /'
 else
   PGB_NIX_FORCE_EVAL=1 PATH="$(dirname "$NIXBIN"):$PATH" \
-    sh "$PGB" nix plan jq --out "$WORK/jq.eval.plan" >"$WORK/plan.eval.log" 2>&1
+    "$PGB" nix plan jq --out "$WORK/jq.eval.plan" >"$WORK/plan.eval.log" 2>&1
   if [ ! -s "$WORK/jq.eval.plan" ]; then
     exp_skip "arm3: field-by-field comparison" "the evaluation route produced no plan"
   else
@@ -172,26 +172,26 @@ fi
 # ARM 4 -- ⛔ THE PLATFORM DEFECT, and the fix, asserted both ways.
 # ---------------------------------------------------------------------------
 printf -- '\n-- arm 4: store-paths.xz is every system the channel built ----\n'
-dar=$(nonix sh "$NF" resolve '/nix/store/[a-z0-9]{32}-nix-2\.35\.2$' --limit 4 2>/dev/null | wc -l)
+dar=$(nonix "$NF" nix cache resolve '/nix/store/[a-z0-9]{32}-nix-2\.35\.2$' --limit 4 2>/dev/null | wc -l)
 exp_note "store paths named nix-2.35.2 in the index: $dar"
 exp_check "a name match really is ambiguous across systems" \
           "$([ "$dar" -gt 1 ] && echo yes || echo no)" "yes"
-sysline=$(nonix sh "$NF" attr jq 2>/dev/null | sed -n 's/^System: //p')
+sysline=$(nonix "$NF" nix cache attr jq 2>/dev/null | sed -n 's/^System: //p')
 exp_check "the attribute index states the system" "$sysline" "x86_64-linux"
-outn=$(nonix sh "$NF" attr jq 2>/dev/null | sed -n 's/^OutputName: //p')
+outn=$(nonix "$NF" nix cache attr jq 2>/dev/null | sed -n 's/^OutputName: //p')
 exp_check "and the default output, which is not 'out'" "$outn" "bin"
-bashname=$(nonix sh "$NF" attr bash 2>/dev/null | sed -n 's/^Name: //p')
+bashname=$(nonix "$NF" nix cache attr bash 2>/dev/null | sed -n 's/^Name: //p')
 exp_check "and the name an attribute really produces" "$bashname" "bash-interactive-5.3p15"
 # ⭐ THE ROUTE IS SYSTEM-EXPLICIT IN BOTH DIRECTIONS, and both halves are
 # asserted. Asking for darwin gets a darwin answer -- hydra really does build
 # jq there -- which is the point: the SYSTEM IS A PARAMETER now, not something
 # a name match decides by accident. And a system nobody builds is refused
 # rather than answered with whatever sorted first.
-dsys=$(nonix sh "$NF" drv jq --system aarch64-darwin 2>/dev/null | sed -n 's/^System: //p')
+dsys=$(nonix "$NF" nix cache drv jq --system aarch64-darwin 2>/dev/null | sed -n 's/^System: //p')
 exp_check "asking for darwin returns a darwin build" "$dsys" "aarch64-darwin"
-lsys=$(nonix sh "$NF" drv jq 2>/dev/null | sed -n 's/^System: //p')
+lsys=$(nonix "$NF" nix cache drv jq 2>/dev/null | sed -n 's/^System: //p')
 exp_check "and the default is the one this project targets" "$lsys" "x86_64-linux"
-if nonix sh "$NF" drv jq --system s390x-none >/dev/null 2>&1; then
+if nonix "$NF" nix cache drv jq --system s390x-none >/dev/null 2>&1; then
   exp_check "a system nobody builds is refused" "answered" "refused"
 else
   exp_check "a system nobody builds is refused" "refused" "refused"
@@ -199,9 +199,9 @@ fi
 # ⚠ AND THE MATCH THAT IS NOT AN EXACT ATTRIBUTE SAYS SO. `sed` reaches
 # `freebsd.sed` through pname -- a real package for the wrong userland.
 exp_check "a pname-only match reports how it matched" \
-          "$(nonix sh "$NF" attr sed 2>/dev/null | sed -n 's/^Matched: //p')" "pname"
+          "$(nonix "$NF" nix cache attr sed 2>/dev/null | sed -n 's/^Matched: //p')" "pname"
 exp_check "and an exact attribute reports that instead" \
-          "$(nonix sh "$NF" attr jq 2>/dev/null | sed -n 's/^Matched: //p')" "attr"
+          "$(nonix "$NF" nix cache attr jq 2>/dev/null | sed -n 's/^Matched: //p')" "attr"
 
 # ---------------------------------------------------------------------------
 # ARM 5 -- ⭐ THE ENTRY: a host with a toolchain, no nix, no /nix, no root.
@@ -209,7 +209,7 @@ exp_check "and an exact attribute reports that instead" \
 printf -- '\n-- arm 5: plan + fetch + BUILD inside a host with neither -----\n'
 ENVROOT="$ROOTFS_DIR/pgb-env-debian12"
 if [ ! -d "$ENVROOT" ]; then
-  exp_skip "arm5: the end-to-end build" "no $ENVROOT (sh pgb --engine chroot env create)"
+  exp_skip "arm5: the end-to-end build" "no $ENVROOT (./pgb --engine chroot env create)"
 else
   HOMEDIR="$WORK/home"
   mkdir -p "$HOMEDIR"
@@ -257,7 +257,7 @@ INNER
   # and no /nix is produced on a machine that has both; everything asserted
   # below is about what the process INSIDE could see and do, and it drops to
   # an unprivileged uid before pgb is reached.
-  timeout 5400 sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$ENVROOT" \
+  timeout 5400 "$REPO_DIR/pgb" rootfs run "$ENVROOT" \
       --bind "$REPO_DIR:/repo" --bind "$HOMEDIR:/nonixhome" \
       -- /bin/sh -c 'exec setpriv --reuid 12000 --regid 12000 --clear-groups /bin/sh /nonixhome/inner.sh' \
       >"$WORK/inner.log" 2>&1

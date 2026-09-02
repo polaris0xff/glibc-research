@@ -164,7 +164,7 @@ TEST
 # was watching". Here nothing was relaxed, but something was ADDED: this
 # development environment routes HTTPS through a proxy and exports
 # CURL_CA_BUNDLE and SSL_CERT_FILE pointing at the proxy's own trust anchor,
-# which scripts/common/rootfs-run.sh replicates into the target so builds can
+# which `pgb rootfs run` replicates into the target so builds can
 # fetch. curl reads CURL_CA_BUNDLE in preference to its compiled-in path.
 #
 # The result was https-verify=verified on Debian 11, Debian 12 and Ubuntu

@@ -48,7 +48,7 @@ undefined reference to `__wrap_iconv_open'
 ... in .text._ZSt24__narrow_multibyte_charsPKcP15__locale_struct
 ```
 
-Fixed in `tool/lib/wrappers.sh` with `-Wl,-u,__wrap_iconv_open` for the **C++
+Fixed in `internal/wrapper/wrappers.go` with `-Wl,-u,__wrap_iconv_open` for the **C++
 drivers only** — the same forcing technique already used for
 `pgb_runtime_anchor`. ⚠ The cost is stated rather than hidden: a C++ program
 now links the iconv shim whether or not it calls `iconv`. The C property
@@ -143,7 +143,7 @@ both define `sqlite3_base_init` **on purpose**. Two plugins colliding on their
 entry point is a thing upstreams deliberately do.
 
 ⭐ **Fixed by giving each plugin the namespace the loader would have given
-it**: `tool/lib/wrappers.sh` renames every symbol a plugin object defines with
+it**: `internal/wrapper/wrappers.go` renames every symbol a plugin object defines with
 `objcopy --redefine-syms` to a per-plugin prefix, and the generated table maps
 the ORIGINAL name to the renamed one. `dlsym` still answers
 `sqlite3_series_init`; nothing else in the link can see it. That is

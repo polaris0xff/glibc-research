@@ -58,7 +58,7 @@ marker_syms() {  # binary -> count of pgb terminfo symbols
 
 build_one() {  # tag outbin src engine extra-opts...
   _tag=$1; _out=$2; _src=$3; _eng=$4; shift 4
-  ( cd "$WORK" && sh "$PGB" --engine "$_eng" "$@" build -- sh -c \
+  ( cd "$WORK" && "$PGB" --engine "$_eng" "$@" build -- sh -c \
       "\$CC -O2 -o $_out $_src" ) >"$WORK/$_tag.log" 2>&1
   echo $? > "$WORK/$_tag.rc"
 }
@@ -82,7 +82,7 @@ build_pair() {  # tag engine
   fi
 }
 
-engine=$(cd "$WORK" && sh "$PGB" doctor 2>/dev/null | awk '/chosen engine:/{print $NF; exit}')
+engine=$(cd "$WORK" && "$PGB" doctor 2>/dev/null | awk '/chosen engine:/{print $NF; exit}')
 exp_note "engine pgb would choose on its own: ${engine:-unknown}"
 
 # ⛔ THE DEFECT LIVES IN THE CHROOT ENGINE, so that is the engine arms 1 and 2
@@ -98,7 +98,7 @@ fi
 
 if [ -z "$ENG" ]; then
   exp_skip "arms 1-2 (the defect and its control)" \
-           "no chroot build environment: run sh pgb --engine chroot env create"
+           "no chroot build environment: run ./pgb --engine chroot env create"
 else
 
 # ---------------------------------------------------------------------------
@@ -119,13 +119,13 @@ exp_check "arm1: terminfo runtime ABSENT from the build that did not" "$np" "0"
 
 # ⭐ The mechanism itself, asserted directly: the two option sets must resolve
 # to two different directories. This is the property arm 1 depends on.
-d_plain=$(cd "$WORK" && sh "$PGB" cc-dir 2>/dev/null | head -1)
-d_term=$(cd "$WORK" && sh "$PGB" --embed-terminfo cc-dir 2>/dev/null | head -1)
+d_plain=$(cd "$WORK" && "$PGB" cc-dir 2>/dev/null | head -1)
+d_term=$(cd "$WORK" && "$PGB" --embed-terminfo cc-dir 2>/dev/null | head -1)
 exp_note "cc-dir plain           : ${d_plain:-none}"
 exp_note "cc-dir --embed-terminfo: ${d_term:-none}"
 exp_check "arm1: the two option sets key to different directories" \
           "$([ -n "$d_plain" ] && [ "$d_plain" != "$d_term" ] && echo yes || echo no)" "yes"
-d_plain2=$(cd "$WORK" && sh "$PGB" cc-dir 2>/dev/null | head -1)
+d_plain2=$(cd "$WORK" && "$PGB" cc-dir 2>/dev/null | head -1)
 exp_check "arm1: the same option set is stable across invocations" \
           "$([ "$d_plain" = "$d_plain2" ] && echo yes || echo no)" "yes"
 

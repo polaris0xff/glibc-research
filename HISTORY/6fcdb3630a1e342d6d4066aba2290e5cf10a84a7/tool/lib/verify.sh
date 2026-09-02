@@ -133,9 +133,9 @@ cmd_verify() {
       any=1
       cp "$bin" "$root/$base" 2>/dev/null || { printf '    %-20s copy failed\n' "$name"; rc=1; continue; }
       if [ $# -gt 0 ]; then
-        sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "/$base" "$@" </dev/null >/dev/null 2>&1
+        "$PGB_SELF/pgb" rootfs run "$root" -- "/$base" "$@" </dev/null >/dev/null 2>&1
       else
-        sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "/$base" </dev/null >/dev/null 2>&1
+        "$PGB_SELF/pgb" rootfs run "$root" -- "/$base" </dev/null >/dev/null 2>&1
       fi
       st=$?
       libs=$(trace_host_objects "$root" "/$base" "$@")
@@ -219,7 +219,7 @@ cmd_verify() {
       *)           rc=1 ;;
     esac
   done 3< "$list"
-  [ "$any" = 1 ] || { say "    nothing to run against. sh scripts/common/fetch-rootfs.sh"; return 2; }
+  [ "$any" = 1 ] || { say "    nothing to run against. "./pgb" rootfs fetch"; return 2; }
   say ""
   if [ "$rc" = 0 ] && [ "${saw_unmeasured:-0}" = 1 ]; then
     say "  VERDICT: ran correctly on every environment."
@@ -249,7 +249,7 @@ trace_host_objects() {
   command -v strace >/dev/null 2>&1 || { printf ''; return; }
   t=$(mktemp) || { printf ''; return; }
   strace -f -e trace=openat,open,execve -o "$t" \
-    sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "$inner" "$@" </dev/null >/dev/null 2>&1
+    "$PGB_SELF/pgb" rootfs run "$root" -- "$inner" "$@" </dev/null >/dev/null 2>&1
   awk -v want="$inner" '
     { pid = $1 }
     $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }
@@ -264,7 +264,7 @@ trace_host_data() { # rootfs in-root-binary [args...]
   command -v strace >/dev/null 2>&1 || { printf ''; return; }
   t=$(mktemp) || { printf ''; return; }
   strace -f -e trace=openat,open,execve -o "$t" \
-    sh "$PGB_SELF/scripts/common/rootfs-run.sh" "$root" -- "$inner" "$@" </dev/null >/dev/null 2>&1
+    "$PGB_SELF/pgb" rootfs run "$root" -- "$inner" "$@" </dev/null >/dev/null 2>&1
   awk -v want="$inner" '
     { pid = $1 }
     $0 ~ ("execve\\(\"" want "\"") { target = pid; seen = 1; next }

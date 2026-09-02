@@ -6,7 +6,7 @@
 # did there.
 #
 # ⚠ THE LOCAL TEST BED DOES NOT WORK HERE, AND THAT IS THE MAIN DESIGN
-# CONSTRAINT. scripts/common/rootfs-run.sh is `unshare --mount` + `chroot`,
+# CONSTRAINT. `pgb rootfs run` is `unshare --mount` + `chroot`,
 # which needs root and CAP_SYS_ADMIN; a GitHub runner gives neither to the job
 # shell. So CI uses containers for the same purpose.
 #
@@ -120,7 +120,7 @@ jobs:
           nm -A "$(cc -print-file-name=libc.a)" 2>/dev/null | grep -w 'T __nss_configure_lookup'
 
       - name: Build GNU libiconv (static)
-        run: sh scripts/build-libiconv.sh
+        run: ./pgb __build-libiconv
 
       - name: Build the probes with pgb
         run: |
@@ -128,7 +128,7 @@ jobs:
           mkdir -p out
           # --engine host: we are ALREADY inside the pinned image, so pgb must
           # not try to create another environment. The image is the control.
-          sh pgb --engine host build -- sh -c '
+          ./pgb --engine host build -- sh -c '
             $CC -O2 -o out/probe-portable ci/probe.c
           '
           # The control arm: same source, plain gcc -static, none of pgb's
@@ -233,7 +233,7 @@ jobs:
         run: |
           set -eux
           chmod +x out/probe-portable
-          sh pgb --engine docker verify ./out/probe-portable
+          ./pgb --engine docker verify ./out/probe-portable
       - name: The control must NOT pass its own verify
         # ⚠ continue-on-error is correct here: a non-zero exit is the EXPECTED
         # result and is what proves `verify` can still fail. A verify that
@@ -243,7 +243,7 @@ jobs:
         run: |
           set -x
           chmod +x out/probe-plain
-          sh pgb --engine docker verify ./out/probe-plain
+          ./pgb --engine docker verify ./out/probe-plain
           echo "plain control verify exit=$?  (non-zero is expected)"
 
   # ---------------------------------------------------------------------------
@@ -273,9 +273,9 @@ jobs:
       - name: Selftests, which need nothing privileged
         run: |
           set -eux
-          sh scripts/common/oci-pull.sh --selftest
+          "./pgb" rootfs pull --selftest
           sh scripts/common/mine-repo.sh --selftest
-          sh scripts/common/rootfs-run.sh --selftest || \
+          "./pgb" rootfs run --selftest || \
             echo "rootfs-run selftest could not run here (needs CAP_SYS_ADMIN); recorded, not asserted"
       - name: Host probe (expected to report an incomplete bed here)
         continue-on-error: true

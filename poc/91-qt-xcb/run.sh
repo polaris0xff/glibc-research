@@ -106,7 +106,7 @@ printf -- '-- rung 1: the X stack, static, planned by nixpkgs -------------\n'
 # what is needed is checkable and naming what is not is a guess that grows.
 QTPLAN="${PGB_QT_PLAN:-$W/qtbase.plan}"
 if [ ! -s "$QTPLAN" ]; then
-  sh "$PGB" nix plan qt6.qtbase --out "$QTPLAN" >>"$LOG" 2>&1 || true
+  "$PGB" nix plan qt6.qtbase --out "$QTPLAN" >>"$LOG" 2>&1 || true
 fi
 poc_check "a plan for qtbase was produced" \
   "$([ -s "$QTPLAN" ] && echo ok || echo failed)" ok
@@ -124,7 +124,7 @@ poc_note "keeping: $QT_KEEP"
 poc_note "skipping $(printf '%s\n' $SKIP | grep -c .) of qtbase's build inputs"
 
 NIX_PREFIX="$PREFIX" NIX_DEP_SKIP="$SKIP" \
-  sh "$PGB" nix deps --plan "$QTPLAN" >>"$LOG" 2>&1 || true
+  "$PGB" nix deps --plan "$QTPLAN" >>"$LOG" 2>&1 || true
 BUILT=$(ls "$PREFIX/.built" 2>/dev/null | tr '\n' ' ')
 poc_note "built into the static prefix: ${BUILT:-<none>}"
 for want in libxcb libxkbcommon openssl; do
@@ -140,7 +140,7 @@ NIXOUT="$WORK/qt6-src"
 TARBALL=$(ls "$NIXOUT"/*qtbase-everywhere-src-*.tar.xz 2>/dev/null | head -1)
 if [ -z "$TARBALL" ]; then
   mkdir -p "$NIXOUT"
-  sh "$PGB" nix fetch qt6.qtbase --out "$NIXOUT" >>"$LOG" 2>&1 || true
+  "$PGB" nix fetch qt6.qtbase --out "$NIXOUT" >>"$LOG" 2>&1 || true
   TARBALL=$(ls "$NIXOUT"/*qtbase-everywhere-src-*.tar.xz 2>/dev/null | head -1)
 fi
 if [ -z "$TARBALL" ]; then

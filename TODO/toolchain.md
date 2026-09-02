@@ -166,7 +166,7 @@ completes unattended.
 
 **Problem.** ⛔ **A documented flag does nothing on this command.** `--engine`
 is parsed globally and honoured by `cmd_build` and `env_create`; `cmd_verify`
-never reads it. It calls `scripts/common/rootfs-run.sh` directly, which is
+never reads it. It calls `internal/rootfs/run.go` directly, which is
 `unshare --mount` + `chroot`, so `pgb verify` needs root and `CAP_SYS_ADMIN`
 and **cannot run on a CI runner at all** — the one place a user most wants the
 tool's own verdict.
@@ -309,7 +309,7 @@ session of 2026-09-01.
 **Category** toolchain · **Priority** P2 · **Effort** S · **Status** open
 
 **Problem.** An OCI image is a filesystem **and** a configuration.
-`scripts/common/oci-pull.sh` unpacks the layers and ignores the config, so the
+`internal/ociimg/pull.go` unpacks the layers and ignores the config, so the
 chroot bed and a `docker run` of the same digest are not the same environment.
 
 **Premise.** ⭐ **Measured**, `../docs/history/corrections.md` C10. The
@@ -433,7 +433,7 @@ toolchain already emits the header.
 **Prove.** `readelf -lW` on a `pgb`-built binary finds `PT_GNU_EH_FRAME`, a
 C++ throw is still caught, and `pgb verify` is unchanged on all eleven.
 
-**Closed with.** `tool/lib/wrappers.sh`, `link_flags()`. Measured after:
+**Closed with.** `internal/wrapper/wrappers.go`, `link_flags()`. Measured after:
 
 | | before | after | delta |
 |---|---|---|---|
@@ -598,7 +598,7 @@ apart by word splitting.
 **Prove.** The same `--wrap-dlopen` build under both engines produces binaries
 with the wrapper present, and the two are byte-identical.
 
-**Closed with.** `tool/lib/build.sh`:
+**Closed with.** `internal/buildx/build.go`:
 
 ```
   chroot   __wrap_dlopen=1  pgb_dlopen_libs=1  namespaced=2  size=2,453,656
@@ -628,10 +628,10 @@ binary cache** with its own signature and NarHash, and its `References` are the
 `.drv` paths of every input. So the derivation graph is reachable over plain
 HTTPS with no nix and no evaluation.
 
-**Landed.** `tool/nix-drv.py` reads nix's ATerm derivation format (12-check
+**Landed.** `internal/nixx/drv.go` reads nix's ATerm derivation format (12-check
 selftest, including the two escapes that matter and two refusal cases) and
-emits the same document `nix derivation show` prints, so `tool/nix-plan.py`
-is shared by both routes. `nix_plan_nonix` in `tool/lib/nix.sh` is tried first
+emits the same document `nix derivation show` prints, so `internal/nixx/plan.go`
+is shared by both routes. `nix_plan_nonix` in `internal/nixx/build.go` is tried first
 and falls back to evaluation.
 
 ⛔ **What is NOT done, and it is the reason this entry stays open:**
@@ -805,8 +805,8 @@ anywhere.
 **Source** operator, 2026-09-01c, explicitly filed as *"far future"*.
 **Category** toolchain · **Priority** P2 · **Effort** L · **Status** open
 
-`tool/nix-plan.py`, `tool/nix-drv.py`, `tool/elf-needed.py` and
-`scripts/common/nix-nar.py` are python, and python is not present on every host
+`internal/nixx/plan.go`, `internal/nixx/drv.go`, `internal/elfx/needed.go` and
+`internal/nixx/nar.go` are python, and python is not present on every host
 this project claims. ⚠ `experiments/70-` already settled that a **carried-in**
 static binary runs on 12 of 12, so the language decision is not blocked on
 whether a runtime is present — it is a question of when the churn is worth it.
@@ -821,7 +821,7 @@ machine, 2026-09-01d.
 **Category** toolchain · **Priority** P1 · **Effort** S · **Status** done
 
 **Problem.** `make_wrappers` wrote one directory, `$PGB_STATE/bin`, and
-`tool/lib/build.sh` bind-mounts `$PGB_STATE` **into** the build environment
+`internal/buildx/build.go` bind-mounts `$PGB_STATE` **into** the build environment
 (`--bind "$PGB_STATE:$PGB_STATE"`, lines 87 and 141). So the compiler a
 running build is executing out of is a directory the next `pgb build` rewrites.
 
@@ -942,7 +942,7 @@ half is optional while boost is not. Any one of those can refuse `-static` the
 way MLT's `add_library(mlt SHARED)` did.
 
 ⭐ **A cheaper second reading of the same goal, which the operator allowed:**
-*"or carries enough of one"*. `scripts/common/nix-fetch.sh` already fetches
+*"or carries enough of one"*. `internal/nixx/fetch.go` already fetches
 nix's own closure from `cache.nixos.org` with no nix and no root — 57 store
 paths, 142 MB, signature and NarHash checked — and `experiments/80-` arm 5
 already showed that a nixpkgs binary handed **the loader fetched beside it**
@@ -1048,7 +1048,7 @@ entry waits.
 
 ### The defect that caused it, in one paragraph
 
-`tool/lib/nix.sh` composed a build command as a double-quoted assignment with a
+`internal/nixx/build.go` composed a build command as a double-quoted assignment with a
 COMMENT inside it, and the comment named a file in backticks: `` `.built` ``.
 Backticks inside double quotes are command substitution, so the composing shell
 ran `.built` and printed `pgb: 1: .built: not found` at the exact moment boost's

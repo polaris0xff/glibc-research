@@ -134,7 +134,7 @@ else
 fi
 
 # the same C through pgb
-if sh "$REPO_DIR/pgb" --engine host build -- \
+if "$REPO_DIR/pgb" --engine host build -- \
      sh -c "\$CC -O2 -o $WORK/a-c-pgb $WORK/helper.c" >"$WORK/c-pgb.log" 2>&1 \
    && [ -f "$WORK/a-c-pgb" ]; then
   arm_add "c-pgb:$WORK/a-c-pgb"
@@ -181,7 +181,7 @@ while read -r ref name libc digest; do
 done < "$REPO_DIR/scripts/common/rootfs-images.txt"
 [ -d "$ROOTFS_DIR/pgb-env-debian12" ] && TARGETS="$TARGETS pgb-env-debian12:glibc"
 
-[ -n "$TARGETS" ] || { printf 'no rootfs fetched: sh scripts/common/fetch-rootfs.sh\n'; exit 2; }
+[ -n "$TARGETS" ] || { printf 'no rootfs fetched: "./pgb" rootfs fetch\n'; exit 2; }
 
 # ---------------------------------------------------------------------------
 # Run every arm on every target.
@@ -211,7 +211,7 @@ for t in $TARGETS; do
     aname=${a%%:*}; apath=${a#*:}
     base=$(basename "$apath")
     cp "$apath" "$root/$base" 2>/dev/null || { row="$row $(printf '%-17s' 'copy-failed')"; continue; }
-    out=$(sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$root" -- "/$base" 2>/dev/null)
+    out=$("$REPO_DIR/pgb" rootfs run "$root" -- "/$base" 2>/dev/null)
     st=$?
     rm -f "$root/$base"
     # ⛔ Exit 0 alone is not a pass. The marker has to be in the output, or a

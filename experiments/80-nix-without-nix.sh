@@ -33,8 +33,8 @@
 set -u
 . "$(dirname "$0")/lib.sh"
 
-FETCH="$(dirname "$0")/../scripts/common/nix-fetch.sh"
-NARPY="$(dirname "$0")/../scripts/common/nix-nar.py"
+FETCH="$(dirname "$0")/../pgb"
+NARPY="$(dirname "$0")/../pgb"
 WORK="${TMPDIR:-/var/tmp}/exp80-$$"
 mkdir -p "$WORK"
 trap 'rm -rf "$WORK"' EXIT INT TERM
@@ -63,11 +63,11 @@ printf '\n'
 # -- arm 1: the index, and the pin hiding in a redirect ----------------------
 printf -- '-- arm 1: resolve a package name with no nix -------------------\n'
 
-REV=$(sh "$FETCH" channel 2>/dev/null | sed -n 's/^revision  //p')
+REV=$("$FETCH" nix cache channel 2>/dev/null | sed -n 's/^revision  //p')
 exp_check "the channel redirect names a revision" "$([ -n "$REV" ] && echo yes || echo no)" yes
 exp_note "channel revision: ${REV:-<none>}"
 
-IDX_N=$(sh "$FETCH" resolve 'bash' --limit 100000 2>/dev/null | wc -l | tr -d ' ')
+IDX_N=$("$FETCH" nix cache resolve 'bash' --limit 100000 2>/dev/null | wc -l | tr -d ' ')
 exp_check "the index answers a name query" "$([ "${IDX_N:-0}" -gt 100 ] && echo yes || echo no)" yes
 exp_note "store paths matching 'bash' in this channel: $IDX_N"
 
@@ -80,20 +80,20 @@ BASH_HASH=9ipfvwnqp1q8ijnmi5sxvlx9r8w34lw3
 printf '\n-- arm 2: verification, and what happens when it should fail ---\n'
 
 FIXDIR="$(dirname "$0")/../scripts/common/fixtures/nix"
-KEY=$(python3 "$NARPY" pubkey)
+KEY=$("$NARPY" nix nar pubkey)
 ok=no
-python3 "$NARPY" verify-narinfo "$KEY" < "$FIXDIR/bash-5.3p15.narinfo" >/dev/null 2>&1 && ok=yes
+"$NARPY" nix nar verify-narinfo "$KEY" < "$FIXDIR/bash-5.3p15.narinfo" >/dev/null 2>&1 && ok=yes
 exp_check "a real narinfo verifies (offline fixture)" "$ok" yes
 
 # ⛔ THE NEGATIVE CONTROL IS THE HALF THAT MEANS ANYTHING. A verifier that
 # always says yes passes the row above.
 sed 's/^NarSize: \([0-9]*\)$/NarSize: 999999999/' "$FIXDIR/bash-5.3p15.narinfo" > "$WORK/tampered.narinfo"
 bad=verified
-python3 "$NARPY" verify-narinfo "$KEY" < "$WORK/tampered.narinfo" >/dev/null 2>&1 || bad=refused
+"$NARPY" nix nar verify-narinfo "$KEY" < "$WORK/tampered.narinfo" >/dev/null 2>&1 || bad=refused
 exp_check "a narinfo with one field changed is refused" "$bad" refused
 
 wrongkey=verified
-python3 "$NARPY" verify-narinfo "cache.nixos.org-1:$(python3 -c '
+"$NARPY" nix nar verify-narinfo "cache.nixos.org-1:$(python3 -c '
 import base64,sys
 k=bytearray(base64.b64decode(sys.argv[1]));k[0]^=1;print(base64.b64encode(bytes(k)).decode())' "${KEY#*:}")" \
   < "$FIXDIR/bash-5.3p15.narinfo" >/dev/null 2>&1 || wrongkey=refused
@@ -102,7 +102,7 @@ exp_check "the same narinfo under a flipped key is refused" "$wrongkey" refused
 # -- arm 3: the closure, against nix's own answer ----------------------------
 printf '\n-- arm 3: the dependency closure -------------------------------\n'
 
-sh "$FETCH" closure "$BASH_HASH" > "$WORK/ours.txt" 2>"$WORK/closure.err"
+"$FETCH" nix cache closure "$BASH_HASH" > "$WORK/ours.txt" 2>"$WORK/closure.err"
 OURS_N=$(wc -l < "$WORK/ours.txt" | tr -d ' ')
 exp_check "a closure comes back over plain HTTPS" "$([ "${OURS_N:-0}" -ge 2 ] && echo yes || echo no)" yes
 exp_note "closure size: $OURS_N paths"
@@ -131,7 +131,7 @@ fi
 printf '\n-- arm 4: the fetch ---------------------------------------------\n'
 
 rm -rf "$WORK/store"
-if sh "$FETCH" fetch "$BASH_HASH" --out "$WORK/store" >"$WORK/fetch.log" 2>&1; then
+if "$FETCH" nix cache fetch "$BASH_HASH" --out "$WORK/store" >"$WORK/fetch.log" 2>&1; then
   exp_check "the closure fetches, hashes checked" ok ok
 else
   exp_check "the closure fetches, hashes checked" failed ok
@@ -212,7 +212,7 @@ if [ -n "$NOSTORE" ]; then
   ctl=$(exp_run_status "$NOSTORE" "/bin/true:/subject-true" /bin/sh -c 'exit 0')
   exp_check "control: the runner itself works there" "$ctl" 0
 else
-  exp_skip "in a rootfs with no /nix, it does not run" "no rootfs available -- run pgb env create or fetch-rootfs.sh"
+  exp_skip "in a rootfs with no /nix, it does not run" "no rootfs available -- run pgb env create or pgb rootfs fetch"
 fi
 
 # ⭐ AND IT RUNS WHEN HANDED ITS OWN LOADER out of the fetched tree, which is
@@ -251,7 +251,7 @@ if [ -n "$NIX" ]; then
 else
   # Even with no nix the index says it: every pkgsStatic path carries the
   # target triple in its NAME.
-  n=$(sh "$FETCH" resolve 'static-x86_64-unknown-linux-musl' --limit 100000 2>/dev/null | wc -l | tr -d ' ')
+  n=$("$FETCH" nix cache resolve 'static-x86_64-unknown-linux-musl' --limit 100000 2>/dev/null | wc -l | tr -d ' ')
   exp_check "the channel index shows static == musl triples" \
     "$([ "${n:-0}" -gt 0 ] && echo yes || echo no)" yes
   exp_note "paths named *-static-x86_64-unknown-linux-musl-*: $n"

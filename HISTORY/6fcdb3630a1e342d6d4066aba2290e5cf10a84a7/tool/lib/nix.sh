@@ -102,14 +102,14 @@ nix_plan_nonix() {   # name-or-storepath outfile -> 0 on success
       # bash-completion, bashdb and bash-5.3p15-doc, and the first line of
       # that is whichever sorted first -- a plan for a package nobody asked
       # for, with no error anywhere.
-      _np_sp=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" resolve                  "/nix/store/[a-z0-9]{32}-$_np_q-[0-9][^/]*$" --limit 5 2>/dev/null | head -1)
-      [ -n "$_np_sp" ] || _np_sp=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" resolve                  "/nix/store/[a-z0-9]{32}-$_np_q$" --limit 5 2>/dev/null | head -1)
+      _np_sp=$("$PGB_SELF/pgb" nix cache resolve                  "/nix/store/[a-z0-9]{32}-$_np_q-[0-9][^/]*$" --limit 5 2>/dev/null | head -1)
+      [ -n "$_np_sp" ] || _np_sp=$("$PGB_SELF/pgb" nix cache resolve                  "/nix/store/[a-z0-9]{32}-$_np_q$" --limit 5 2>/dev/null | head -1)
       ;;
   esac
   [ -n "$_np_sp" ] || { warn "no store path in the channel index matches '$_np_q'"; return 1; }
   say "resolved    $_np_sp  (channel index, no nix)"
 
-  _np_drv=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" info "$_np_sp" 2>/dev/null             | sed -n 's/^Deriver: //p')
+  _np_drv=$("$PGB_SELF/pgb" nix cache info "$_np_sp" 2>/dev/null             | sed -n 's/^Deriver: //p')
   [ -n "$_np_drv" ] || { warn "the narinfo for $_np_sp names no Deriver"; return 1; }
   say "deriver     $_np_drv  (from the signed narinfo)"
 
@@ -128,21 +128,21 @@ nix_plan_from_drv() {   # drvpath query outfile -> 0 on success
   # ENOUGH and depth 2 would be a different tool: the source, the patches and
   # the buildInputs are all DIRECT inputs, and their own inputs are only
   # needed when the dependency walk plans them, which it does one at a time.
-  sh "$PGB_SELF/scripts/common/nix-fetch.sh" fetch "$_pd_drv" --out "$_pd_dir" \
+  "$PGB_SELF/pgb" nix cache fetch "$_pd_drv" --out "$_pd_dir" \
      --no-closure >/dev/null 2>&1 || { warn "could not fetch $_pd_drv"; return 1; }
   _pd_file="$_pd_dir/$(printf '%s' "$_pd_drv" | sed 's|^/nix/store/||')"
-  _pd_inputs=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" info "$_pd_drv" 2>/dev/null \
+  _pd_inputs=$("$PGB_SELF/pgb" nix cache info "$_pd_drv" 2>/dev/null \
                | sed -n 's/^References: //p')
   _pd_n=0
   for _pd_i in $_pd_inputs; do
     case "$_pd_i" in *.drv) ;; *) continue ;; esac
-    sh "$PGB_SELF/scripts/common/nix-fetch.sh" fetch "$_pd_i" --out "$_pd_dir" \
+    "$PGB_SELF/pgb" nix cache fetch "$_pd_i" --out "$_pd_dir" \
        --no-closure >/dev/null 2>&1 && _pd_n=$((_pd_n + 1))
   done
   say "derivations $((_pd_n + 1)) fetched and verified over HTTPS"
 
-  python3 "$PGB_SELF/tool/nix-drv.py" show "$_pd_file" "$_pd_dir"/*.drv 2>/dev/null \
-    | python3 "$PGB_SELF/tool/nix-plan.py" "$_pd_q" "$_pd_file" \
+  "$PGB_SELF/pgb" nix drv show "$_pd_file" "$_pd_dir"/*.drv 2>/dev/null \
+    | "$PGB_SELF/pgb" nix plan-doc "$_pd_q" "$_pd_file" \
     > "$_pd_out.part" 2>/dev/null || { rm -f "$_pd_out.part"; return 1; }
   [ -s "$_pd_out.part" ] || { rm -f "$_pd_out.part"; return 1; }
   mv "$_pd_out.part" "$_pd_out"
@@ -182,7 +182,7 @@ nix_plan_hydra() {   # attr outfile -> 0 on success
     /nix/store/*)     return 1 ;;
   esac
 
-  _ph_info=$(sh "$PGB_SELF/scripts/common/nix-fetch.sh" drv "$_ph_q" \
+  _ph_info=$("$PGB_SELF/pgb" nix cache drv "$_ph_q" \
              --system "${PGB_NIX_SYSTEM:-x86_64-linux}" 2>/dev/null) || return 1
   _ph_drv=$(printf '%s\n' "$_ph_info" | sed -n 's/^Drv: //p')
   [ -n "$_ph_drv" ] || return 1
@@ -235,7 +235,7 @@ nix_plan() {   # attr [outfile]
   # patches are in the same document: their `urls` and `outputHash` are what
   # make a plan usable without nix OR without the binary cache.
   "$_pfx/nix" derivation show "$_drv" --recursive 2>/dev/null \
-    | python3 "$PGB_SELF/tool/nix-plan.py" "$_attr" "$_drv" --nix-prefix "$_pfx" \
+    | "$PGB_SELF/pgb" nix plan-doc "$_attr" "$_drv" --nix-prefix "$_pfx" \
     > "${_out:-/dev/stdout}" || die "could not turn $_drv into a plan" 1
   [ -n "$_out" ] && say "plan: $_out"
   return 0
@@ -260,7 +260,7 @@ nix_fetch_path() {   # storepath urls outputHash destdir -> prints the fetched f
   _target="$_dest/$_base"
   [ -e "$_target" ] && { printf '%s\n' "$_target"; return 0; }
 
-  if sh "$PGB_SELF/scripts/common/nix-fetch.sh" fetch "$_sp" --out "$_dest" \
+  if "$PGB_SELF/pgb" nix cache fetch "$_sp" --out "$_dest" \
        --no-closure >/dev/null 2>"$PGB_STATE/nix-fetch.err"; then
     printf '%s\n' "$_target"
     return 0
@@ -678,7 +678,7 @@ nix_build_dep() {   # drv shortname depth
       # not have -- anything built locally, or garbage-collected.
       _bd_pfx=$(nix_prefix) || { warn "could not plan $2 from $1 without nix, and there is no nix"; return 1; }
       "$_bd_pfx/nix" derivation show "$1" --recursive 2>/dev/null \
-        | python3 "$PGB_SELF/tool/nix-plan.py" "$2" "$1" --nix-prefix "$_bd_pfx" \
+        | "$PGB_SELF/pgb" nix plan-doc "$2" "$1" --nix-prefix "$_bd_pfx" \
         > "$_bd_plan.part" 2>/dev/null || {
           rm -f "$_bd_plan.part"; warn "could not plan $2 from $1"; return 1; }
       mv "$_bd_plan.part" "$_bd_plan"
@@ -1100,7 +1100,7 @@ nix_try_build() {   # srcdir flags log hooks [install]
   # "pip packages MISSING from the environment: meson==1.9.1" about an
   # environment that has it. Same defect class as T-017, one layer in.
   [ -n "${PGB_NIX_DEBUG_CMD:-}" ] && printf "=== CMD ===\n%s\n=== ENV ===\n%s\n=== END ===\n" "$_cmd" "$_envset" >&2
-  sh "$PGB_SELF/pgb" ${ENGINE:+--engine "$ENGINE"} build --bind "$_t:$_t" --bind "$NIX_PREFIX:$NIX_PREFIX" -- sh -c "
+  "$PGB_SELF/pgb" ${ENGINE:+--engine "$ENGINE"} build --bind "$_t:$_t" --bind "$NIX_PREFIX:$NIX_PREFIX" -- sh -c "
 $_root_fn
 cd '$_t' || exit 1
 export $_envset

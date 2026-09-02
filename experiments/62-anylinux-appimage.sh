@@ -62,7 +62,7 @@ exp_begin "62 - pgb against Anylinux-AppImages, the competitive AppImage"
 
 ARCH_ROOT="$ROOTFS_DIR/archlinux-latest"
 ENV_ROOT="$ROOTFS_DIR/${PGB_ENV_NAME:-pgb-env-debian12}"
-RR="$REPO_DIR/scripts/common/rootfs-run.sh"
+RR="$REPO_DIR/pgb"
 QS="$REPO_DIR/references/pkgforge-dev__Anylinux-AppImages/tree/useful-tools/quick-sharun.sh"
 ANYLINUX_C="$REPO_DIR/references/pkgforge-dev__Anylinux-AppImages/tree/useful-tools/lib/anylinux.c"
 
@@ -88,7 +88,7 @@ mkdir -p "$B" || exit 2
 : > "$EXP_OUT/per-environment.txt"
 
 [ -d "$ARCH_ROOT" ] || { exp_note "archlinux-latest not fetched"; exit 2; }
-[ -d "$ENV_ROOT" ]  || { exp_note "no build environment: sh pgb env create"; exit 2; }
+[ -d "$ENV_ROOT" ]  || { exp_note "no build environment: ./pgb env create"; exit 2; }
 [ -f "$QS" ]        || { exp_note "quick-sharun.sh missing from the reference corpus"; exit 2; }
 
 # ⛔ REAP BY WHAT A PROCESS IS CHROOTED INTO, NOT BY ITS NAME, AND THIS ARM IS
@@ -180,7 +180,7 @@ build_appimage() { # name source-file extra-cflags -> $B/<name>.AppImage
   # anylinux.so is pre-built into the AppDir on purpose: quick-sharun skips its
   # own build when the object is already there, which is its documented path
   # and avoids a fetch this environment cannot make.
-  sh "$RR" "$ARCH_ROOT" --bind "$B:$B" --workdir "$B" -- /bin/sh -c "
+  "$RR" rootfs run "$ARCH_ROOT" --bind "$B:$B" --workdir "$B" -- /bin/sh -c "
     set -e
     gcc -O2 -o /usr/bin/pgb-$_n $_src $_cf
     cc -shared -fPIC -O2 $B/anylinux.c -o $_ad/lib/anylinux.so
@@ -194,7 +194,7 @@ build_appimage() { # name source-file extra-cflags -> $B/<name>.AppImage
 }
 
 ANY_SUBJ=no; ANY_BENCH=no
-sh "$RR" "$ARCH_ROOT" -- /bin/sh -c \
+"$RR" rootfs run "$ARCH_ROOT" -- /bin/sh -c \
   'pacman -Sy --noconfirm --needed base-devel wget curl file binutils patchelf >/dev/null 2>&1' \
   </dev/null >>"$B/build.log" 2>&1
 build_appimage subject "$B/subject.c" ""                 && ANY_SUBJ=yes
@@ -279,7 +279,7 @@ while read -r ref name libc digest; do
       P) src="$PGB_SUBJ" ;;
     esac
     rm -f "$root/vs-arm"; cp "$src" "$root/vs-arm"; chmod +x "$root/vs-arm"
-    timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$root" -- /vs-arm </dev/null >"$B/out.$name.$arm" 2>&1
+    timeout -k 10 "$RUN_TIMEOUT" "$RR" rootfs run "$root" -- /vs-arm </dev/null >"$B/out.$name.$arm" 2>&1
     st=$?; reap_rootfs "$root"
     case $st in
       0) res=ok ;; 124) res=timeout ;;
@@ -287,7 +287,7 @@ while read -r ref name libc digest; do
     esac
     timeout -k 10 "$RUN_TIMEOUT" strace -f \
       -e trace=openat,open,execve,clone,clone3,vfork,fork -o "$B/tr.$name.$arm" \
-      sh "$RR" "$root" -- /vs-arm </dev/null >/dev/null 2>&1
+      "$RR" rootfs run "$root" -- /vs-arm </dev/null >/dev/null 2>&1
     reap_rootfs "$root"
     pl=$(classify_trace "$B/tr.$name.$arm" /vs-arm payload)
     nh=$(printf '%s\n' "$pl" | grep '^host ' | count)
@@ -342,7 +342,7 @@ while read -r ref name libc digest; do
       M) src="$MUSL_BENCH" ;;
     esac
     rm -f "$root/vs-arm"; cp "$src" "$root/vs-arm"; chmod +x "$root/vs-arm"
-    timeout -k 10 600 sh "$RR" "$root" -- /vs-arm all "$MATRIX_SCALE" \
+    timeout -k 10 600 "$RR" rootfs run "$root" -- /vs-arm all "$MATRIX_SCALE" \
       </dev/null >"$B/bench.$name.$arm" 2>/dev/null
     reap_rootfs "$root"; rm -f "$root/vs-arm"
   done

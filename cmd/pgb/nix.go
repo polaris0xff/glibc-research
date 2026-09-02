@@ -26,6 +26,12 @@ func nixCommand(c *cfg.Config, args []string) error {
 	case "nar":
 		return narCommand(c, rest)
 	case "index":
+		if len(rest) == 1 && (rest[0] == "selftest" || rest[0] == "--selftest") {
+			if nixx.IndexSelftest().Print() != 0 {
+				return fail.Exit(1)
+			}
+			return nil
+		}
 		if len(rest) < 2 {
 			return fail.Cannot("pgb nix index needs PACKAGES_JSON and OUT_TSV")
 		}
@@ -54,6 +60,14 @@ func nixCommand(c *cfg.Config, args []string) error {
 		return drvCommand(rest)
 	case "plan":
 		return nixPlanCommand(c, rest)
+	case "selftest", "--selftest":
+		r := nixx.Selftest(nixFixtureDir(c))
+		r.Merge(nixx.DrvSelftest())
+		r.Merge(nixx.IndexSelftest())
+		if r.Print() != 0 {
+			return fail.Exit(1)
+		}
+		return nil
 	case "plan-doc":
 		// The planner on its own: a `nix derivation show --recursive` document
 		// on stdin, one plan on stdout.
@@ -79,6 +93,24 @@ func narCommand(c *cfg.Config, args []string) error {
 	}
 	sub, rest := args[0], args[1:]
 	switch sub {
+	case "selftest", "--selftest":
+		if nixx.Selftest(nixFixtureDir(c)).Print() != 0 {
+			return fail.Exit(1)
+		}
+		return nil
+	case "pubkey":
+		logx.Say("%s:%s", nixx.CacheNixosOrgKeyName, nixx.CacheNixosOrgKey)
+		return nil
+	case "unpack":
+		// COMPRESSION WANTED-NARHASH DEST: decompress, hash and extract from
+		// one stream, refusing when the hash does not match.
+		if len(rest) < 3 {
+			return fail.Cannot("pgb nix nar unpack needs COMPRESSION NARHASH DEST")
+		}
+		if err := nixx.Unpack(os.Stdin, rest[0], rest[1], rest[2]); err != nil {
+			return fail.Ran("%v", err)
+		}
+		return nil
 	case "extract":
 		if len(rest) == 0 {
 			return fail.Cannot("pgb nix nar extract needs a destination directory")
@@ -191,6 +223,12 @@ func drvCommand(args []string) error {
 			}
 			files = append(files, args[i])
 		}
+	}
+	if len(files) == 1 && (files[0] == "selftest" || files[0] == "--selftest") {
+		if nixx.DrvSelftest().Print() != 0 {
+			return fail.Exit(1)
+		}
+		return nil
 	}
 	if len(files) == 0 {
 		return fail.Cannot("pgb nix drv needs a .drv file")

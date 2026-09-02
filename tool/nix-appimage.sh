@@ -33,7 +33,7 @@
 # CLOSURE IS NOT A HEURISTIC: it is the exact, complete set of paths the
 # derivation declared, including the dlopen'd ones, because nix would not have
 # built without them. So the closure REPLACES the discovery step, and
-# `scripts/common/nix-fetch.sh` gets it over plain HTTPS with every signature
+# `pgb nix cache` gets it over plain HTTPS with every signature
 # and hash checked and no nix installed.
 #
 # ⚠ WHAT THIS DOES NOT DO, said here rather than in a footnote:
@@ -58,7 +58,7 @@ set -u
 
 SELF=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 REPO=$(dirname "$SELF")
-FETCH="$REPO/scripts/common/nix-fetch.sh"
+FETCH="$REPO/pgb"
 CACHE="${PGB_APPIMAGE_CACHE:-/var/tmp/pgb-appimage}"
 ARCH=$(uname -m)
 
@@ -288,9 +288,9 @@ case "$TARGET" in
     # `nix-instantiate '<nixpkgs>' -A kdenlive` could not resolve at all while
     # hydra answers `kdenlive-26.08.0` without hesitating.
     OUTPATH=""
-    _hy=$(sh "$FETCH" drv "$TARGET" 2>/dev/null) || _hy=""
+    _hy=$("$FETCH" nix cache drv "$TARGET" 2>/dev/null) || _hy=""
     if [ -n "$_hy" ]; then
-      _on=$(sh "$FETCH" attr "$TARGET" 2>/dev/null | sed -n 's/^OutputName: //p')
+      _on=$("$FETCH" nix cache attr "$TARGET" 2>/dev/null | sed -n 's/^OutputName: //p')
       for _cand in "$_on" bin out; do
         [ -n "$_cand" ] || continue
         OUTPATH=$(printf '%s\n' "$_hy" | sed -n "s|^Out\.$_cand: ||p" | head -1)
@@ -364,9 +364,9 @@ mkdir -p "$ROOT" "$CACHE/tools"
 # 2. the closure, verified, with no nix
 # ---------------------------------------------------------------------------
 say "fetching the closure (signature and NarHash checked, no nix involved)"
-sh "$FETCH" fetch "$BASE" --out "$ROOT" >/dev/null 2>&1 || die "could not fetch the closure"
+"$FETCH" nix cache fetch "$BASE" --out "$ROOT" >/dev/null 2>&1 || die "could not fetch the closure"
 NPATHS=$(find "$ROOT" -mindepth 1 -maxdepth 1 | wc -l | tr -d ' ')
-say "closure     $NPATHS store paths, $(du -sh "$ROOT" 2>/dev/null | cut -f1)"
+say "closure     $NPATHS store paths, $(du -"$ROOT" 2>/dev/null | cut -f1)"
 
 # ---------------------------------------------------------------------------
 # 2b. ⛔ THE OpenGL AUGMENTATION, AND IT IS NOT OPTIONAL FOR A GL PROGRAM
@@ -420,7 +420,7 @@ print(list(d.values())[0]["outputs"].get("out", {}).get("path", ""))' 2>/dev/nul
   esac
   [ -n "$_xp" ] || { warn "could not resolve --extra $_x"; continue; }
   say "extra       $_x -> $_xp"
-  sh "$FETCH" fetch "$_xp" --out "$ROOT" >/dev/null 2>&1 \
+  "$FETCH" nix cache fetch "$_xp" --out "$ROOT" >/dev/null 2>&1 \
     || warn "could not fetch the closure of $_x"
 done
 NPATHS=$(find "$ROOT" -mindepth 1 -maxdepth 1 | wc -l | tr -d ' ')
@@ -590,9 +590,9 @@ fi
 # --library-path for it. Measured on galculator: the AppImage mounted, sharun
 # started the binary, and it died with "cannot open shared object file" for a
 # library sitting in the same directory.
-# tool/elf-needed.py carries why the edit is safe and what it refuses.
+# internal/elfx/needed.go carries why the edit is safe and what it refuses.
 say "rewriting absolute DT_NEEDED entries to basenames"
-NREW=$(python3 "$SELF/elf-needed.py" shorten "$APPDIR/shared/bin/$PROG" \
+NREW=$("$REPO/pgb" elf shorten "$APPDIR/shared/bin/$PROG" \
         "$APPDIR"/lib/*.so* 2>/dev/null | wc -l | tr -d ' ')
 say "patched     $NREW absolute DT_NEEDED entries"
 
@@ -894,7 +894,7 @@ MISSING=$(
   { printf '%s\n' "$APPDIR/shared/bin/$PROG"
     find "$APPDIR/lib" -maxdepth 2 -type f -name '*.so*' 2>/dev/null; } \
   | while IFS= read -r _e; do
-      python3 "$SELF/elf-needed.py" print "$_e" 2>/dev/null
+      "$REPO/pgb" elf print "$_e" 2>/dev/null
     done \
   | awk -F'\t' '{print $2}' | sort -u \
   | while IFS= read -r _n; do
@@ -985,7 +985,7 @@ if [ -s "$WRAPENV" ]; then
     _sub=$(printf '%s' "$_ref" | sed -E 's|^/nix/store/[^/]*/?||')
     _n=$(printf '%s' "$_b" | cut -c34-)
     if [ ! -d "$ROOT/$_b" ]; then
-      sh "$FETCH" fetch "/nix/store/$_b" --out "$ROOT" >/dev/null 2>&1 \
+      "$FETCH" nix cache fetch "/nix/store/$_b" --out "$ROOT" >/dev/null 2>&1 \
         || { warn "wrapper env names $_b, which is not in the closure and could not be fetched"; continue; }
     fi
     if [ -n "$_sub" ] && [ -e "$ROOT/$_b/$_sub" ]; then

@@ -52,7 +52,7 @@ set -u
 
 exp_begin "89 - debloating, and the control that says nothing was lost"
 
-RR="$REPO_DIR/scripts/common/rootfs-run.sh"
+RR="$REPO_DIR/pgb"
 BUNDLER="$REPO_DIR/tool/nix-appimage.sh"
 RUN_TIMEOUT="${PGB_GL_TIMEOUT:-120}"
 
@@ -102,18 +102,18 @@ seed_cache() {  # from to
 
 if [ ! -s "$N_IMG" ]; then
   exp_note "building arm N (--debloat none) -- several minutes, ~400 MB of closure"
-  PGB_APPIMAGE_CACHE="$N_CACHE" sh "$BUNDLER" mesa-demos --debloat none \
+  PGB_APPIMAGE_CACHE="$N_CACHE" "$BUNDLER" mesa-demos --debloat none \
     --out "$N_IMG" --name eglinfo >"$B/build-N.log" 2>&1 || true
 fi
 if [ ! -s "$S_IMG" ]; then
   exp_note "building arm S (--debloat safe)"
-  PGB_APPIMAGE_CACHE="$S_CACHE" sh "$BUNDLER" mesa-demos --debloat safe \
+  PGB_APPIMAGE_CACHE="$S_CACHE" "$BUNDLER" mesa-demos --debloat safe \
     --out "$S_IMG" --name eglinfo >"$B/build-S.log" 2>&1 || true
 fi
 if [ ! -s "$A_IMG" ]; then
   exp_note "building arm A (--debloat aggressive)"
   seed_cache "$N_CACHE" "$A_CACHE"
-  PGB_APPIMAGE_CACHE="$A_CACHE" sh "$BUNDLER" mesa-demos --debloat aggressive \
+  PGB_APPIMAGE_CACHE="$A_CACHE" "$BUNDLER" mesa-demos --debloat aggressive \
     --out "$A_IMG" --name eglinfo >"$B/build-A.log" 2>&1 || true
 fi
 [ -s "$N_IMG" ] || { exp_note "arm N did not build; see $B/build-N.log"; exit 2; }
@@ -194,7 +194,7 @@ HOME=/tmp; export HOME
 TMPDIR=/tmp; export TMPDIR
 exec /gl-arm
 SH
-  timeout -k 10 "$RUN_TIMEOUT" sh "$RR" "$_r" -- /bin/sh /gl-run.sh \
+  timeout -k 10 "$RUN_TIMEOUT" "$RR" rootfs run "$_r" -- /bin/sh /gl-run.sh \
     </dev/null >"$B/out.$_tag" 2>&1
   _st=$?
   reap_rootfs "$_r"
@@ -235,7 +235,7 @@ while read -r ref name libc digest; do
   # claim to be self-contained a removed file could have broken.
   timeout -k 10 "$RUN_TIMEOUT" strace -f \
     -e trace=openat,open,execve,clone,clone3,vfork,fork -o "$B/tr.$name.S" \
-    sh "$RR" "$root" -- /bin/sh /gl-run.sh </dev/null >/dev/null 2>&1
+    "$RR" rootfs run "$root" -- /bin/sh /gl-run.sh </dev/null >/dev/null 2>&1
   reap_rootfs "$root"
   spl=$(classify_trace "$B/tr.$name.S" /gl-arm payload)
   snh=$(printf '%s\n' "$spl" | grep '^host ' | count)

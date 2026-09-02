@@ -128,11 +128,11 @@ printf '  plugin.o exports: %s\n' \
   "$(nm --defined-only --extern-only "$WORK/plugin.o" | awk '{print $3}' | tr '\n' ' ')"
 
 PGB="$REPO_DIR/pgb"
-if ! sh "$PGB" --engine host build -- \
+if ! "$PGB" --engine host build -- \
       sh -c "\$CC -O2 -o $WORK/host-plain $WORK/host.c" >"$WORK/plain.log" 2>&1; then
   exp_skip "build the plain arm" "see $WORK/plain.log"
 fi
-if ! sh "$PGB" --engine host --wrap-dlopen "libdemo.so=$WORK/plugin.o" build -- \
+if ! "$PGB" --engine host --wrap-dlopen "libdemo.so=$WORK/plugin.o" build -- \
       sh -c "\$CC -O2 -o $WORK/host-wrap $WORK/host.c" >"$WORK/wrap.log" 2>&1; then
   exp_skip "build the wrapped arm" "see $WORK/wrap.log"
 fi
@@ -166,7 +166,7 @@ while read -r ref name libc digest; do
   code() { # rootfs binary -> cell
     _r="$1"; _b="$2"; _base=$(basename "$_b")
     cp "$_b" "$_r/$_base" 2>/dev/null || { printf 'copy-failed'; return; }
-    sh "$REPO_DIR/scripts/common/rootfs-run.sh" "$_r" -- "/$_base" >/dev/null 2>&1
+    "$REPO_DIR/pgb" rootfs run "$_r" -- "/$_base" >/dev/null 2>&1
     _st=$?
     rm -f "$_r/$_base"
     case $_st in
