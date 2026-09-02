@@ -494,6 +494,7 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
 | [`limitations.md`](limitations.md) | the open problems, each with a reproduction and a route |
 | [`comparison.md`](comparison.md) | the head-to-head: several ways to ship the same program across the same 11 environments, and what actually separates them |
 | [`research/prior-art.md`](research/prior-art.md) | the reference sweep, verdicts, provenance |
+| [`research/one-libc.md`](research/one-libc.md) | ⭐ **a supplied working paper on this exact question, and what it changes.** The source-level cause of `experiments/72-`, the folklore export route killed twice, and ⭐ the limitation it names — *"no bridge of our own"* — which `experiments/76-` closed at T1 on eleven environments |
 | [`research/solo.md`](research/solo.md) | ⭐ **the `pg83/solo` sweep, and the route it opened.** A `.so` loader compiled *into* a static binary — §7 route D — with the measurement that says the symbols are there, the four mechanisms worth taking at file and line, and what must not be ported |
 | [`design/host-fallback.md`](design/host-fallback.md) | ⭐ **what a bundle may take from the HOST, and why "zero host objects" is the wrong test for one.** The four permitted classes, the search order adopted from `Anylinux-sharun`, and the per-class opt-ins. T-065 |
 | [`design/runtime-language.md`](design/runtime-language.md) | ⭐ **is C enough for `tool/runtime/`?** The ruling, with the numbers: 0 UBSan findings over 904 host objects, and five real defects none of which a language change would have prevented. T-067 |
@@ -578,6 +579,18 @@ treat it as a format ask the wrong question — see
   host. ⚠ This does **not** apply to a bundle that carries its own libc and
   loader — there the edge resolves inside the bundle, which is how the anylinux
   stack solves gconv. `design/tiers.md`.
+- ⛔ **Do not try to make a static binary EXPORT its symbols to a loaded
+  object.** The `-rdynamic` / `--export-dynamic` route is dead twice over, and
+  a supplied working paper measured both ends on binutils 2.46.1: the flag
+  produces **no dynamic section at all** on a `-static` link, and even a
+  hand-built `.dynsym` under `-static-pie` is a **dead letter**, because the
+  loader's model of the main program is a placeholder —
+  `elf/dl-support.c`: *"A dummy link map for the executable [...] We don't
+  export any symbols ourselves."* That is the mechanism behind
+  `experiments/72-`'s `DYNSYM 0`. [`research/one-libc.md`](research/one-libc.md).
+- ⚠ **`libc.so`, `libm.a` and friends in `/usr/lib` may be GNU ld SCRIPTS, not
+  ELF or archives.** Three independent sightings now, in three different
+  readers. `history/corrections.md` C18.
 - **Do not use `ldd`/`file` output as a test.** §3.
 - **Do not build below glibc 2.34** — `experiments/21` measures the override
   merely *moving* the dlopen there.

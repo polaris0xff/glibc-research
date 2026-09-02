@@ -187,6 +187,23 @@ into a glibc image is the second-libc outcome this section calls worse than
 failing, so the loader refuses anything shaped like a libc or a loader it does
 not itself provide. Before that check existed the row was SIG11.
 
+⭐ **And the reason the host loader can never be the answer is in glibc's own
+source, not just in our measurement.** `experiments/72-` measured `DYNSYM 0`
+and `undefined symbol: host_api_add`; `elf/dl-support.c` says why:
+
+```c
+/* A dummy link map for the executable, used by dlopen to access the global
+   scope.  We don't export any symbols ourselves, so this can be minimal.  */
+```
+
+⛔ So it is not that a static binary *happens* to export nothing — the loader's
+model of the main program is a placeholder that consults nothing, and **no
+construction of the executable's symbol tables can change that**. A supplied
+working paper measured both halves of the folklore fix and found it dead twice:
+`--export-dynamic` emits no dynamic section on a `-static` link at all, and a
+hand-built `.dynsym` under `-static-pie` is still never consulted.
+[`research/one-libc.md`](research/one-libc.md).
+
 **What it cost, and what it bought.** `experiments/73-` said the symbols were
 there:
 

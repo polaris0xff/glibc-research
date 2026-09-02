@@ -689,3 +689,61 @@ is why a bundle exists **beside** the static ELF rather than instead of it.
 ⚠ **NO GPU WAS INVOLVED.** Every GL row here is `swrast` (`TODO` T-059), so the
 driver classes are implemented and REPORTED, not measured on hardware. The
 order and the reporting are asserted; the driver behaviour is T-059's.
+
+## T-069 — the supplied working paper, swept
+
+**Source** ⭐ **operator, 2026-09-02c**: a 1,148-line working paper,
+*One Libc in the Process*, supplied as an upload with the instruction to
+*"check if this is actually useful and something that would have helped us
+before or can still help us or is just low quality slop"*.
+**Category** research · **Priority** P1 · **Effort** S · **Status** done
+
+**Answer: useful, and not slop.** It states evidence tiers and keeps to them,
+reports its dead ends and one unexplained anomaly, and names its own
+limitations — including the one that matters most.
+
+⭐ **Three things it gave this tree that it did not have**, and the first two
+would have helped earlier:
+
+| | |
+|---|---|
+| the **source-level cause** of `experiments/72-` | `elf/dl-support.c`'s dummy link map: *"We don't export any symbols ourselves."* We had the symptom (`DYNSYM 0`); this is glibc's own statement of the mechanism |
+| the **folklore export route killed twice**, at T1 | `--export-dynamic` emits **no dynamic section at all** on a `-static` link (binutils 2.46.1), and a hand-built `.dynsym` under `-static-pie` is a dead letter anyway. ⛔ A route this project had never closed, and it looks plausible right up to the second measurement. Now in `docs/AGENTS.md` §14 |
+| a **third sighting of the linker-script trap** | its `libc.so: invalid ELF header` is our `libm.a` is a `GROUP(...)` script, in a different reader. Three sightings makes it a platform property, not a recurring mistake |
+
+⭐ **And the thing worth recording most: its own §10 limitation 2 is
+*"No bridge of our own [...] this study did not construct, run, or
+independently re-measure a bridged loader end-to-end."* `experiments/76-` is
+that measurement, at T1, on eleven environments, made the same day.** It is
+also cheaper than the paper's taxonomy predicts, for a reason the paper itself
+supplies (§8.4's direction asymmetry): a static **glibc** carrier needs no ABI
+bridge, so `pgb-elfload.c` is 1,093 code lines against `solo`'s 2,332 plus
+5,948 of glibc→musl shim.
+
+⛔ **One check it prompted, and it could have been a silent second libc.** Its
+F6 observes that a loaded object cannot call the dl API. Ours is the opposite
+case: the generated provider table is built from `libc.a` and carries rows for
+`dlopen`/`dlsym`/`dlclose`/`dlerror`. Had those held *glibc's* `dlopen`, a
+loaded host object calling it — GTK, Qt and mesa all do — would have reached
+the **host** loader. Measured rather than reasoned about:
+
+    provider table 'dlopen' = 0x405780
+    __wrap_dlopen           = 0x405780
+    VERDICT: table points at OUR wrapper -- safe
+
+⚠ Safe **because `--wrap=dlopen` is on the link line and rewrites the table's
+own undefined reference**, not because of anything in the generator. A build
+producing the table without the wrap would reopen it; `internal/wrapper/flags.go`
+adds both together and cannot add one without the other.
+
+⚠ **One generality to distrust.** Its F2 reports that `dlopen` of a
+libc-linked object from a plain static binary *succeeds* — "There is no
+rejection". On the eleven pinned environments it succeeds on **two** and dies
+on nine (`docs/limitations.md` §1). Its own §10 says "single toolchain", so
+this is a caution about how F2 is read, not a contradiction of its evidence.
+
+**Prove.** ⭐ **Done**: vendored at
+`references/operator__one-libc-in-the-process/` with a `PROVENANCE.md` that
+names every gap (no upstream, no author, no licence, no independent
+reproduction), and swept in
+[`../docs/research/one-libc.md`](../docs/research/one-libc.md).

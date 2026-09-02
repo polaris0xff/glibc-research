@@ -1331,8 +1331,25 @@ Debloat went from **12.7% off to 86.9% off** on the same closure.
 
 ⛔ **What is left, and it is why this stays open.**
 
-1. **kdenlive is not re-measured yet.** The Prove asks for both; `experiments/90-`
-   is the harness and takes ~30 minutes.
+1. ⛔ **kdenlive RAN AND FAILED, and the failure was mine.** `experiments/90-`,
+   `pass=6 fail=2`:
+
+       ARTEFACT                          BYTES
+       P  ours (one command, nixpkgs)  267390365
+       E  kdenlive-AppImage-Enhanced   191900604
+          ratio P/E                        1.39x     (was 2.49x)
+
+       render:  ours 0 bytes of MP4        enhanced 4162 bytes
+       on 11:   ours rendered 0 of 11      enhanced 11 of 11
+       clean:   ours 11 of 11              enhanced 4 of 11
+
+   ⭐ The size moved the right way — 477,191,058 → 267,390,365 B, **2.49× →
+   1.39×** — and ours is still the only arm that loads no host object on every
+   row. ⛔ **But it could not render**, because the sweep ran before `.env`
+   existed and deleted the MLT modules. `docs/history/corrections.md` C20; the
+   ordering is fixed in `5fbf7ad0` and **the re-measurement has not been made**.
+   ⚠ Until it is, the 1.39× is a size for a bundle that did not work, and it
+   must not be quoted as a result.
 2. ⚠ **The remaining 1.22× is a PACKAGE-SIZE gap, not a bundler one**, and
    `Anylinux-AppImages/FAQ.md` names it: their libraries come from packages
    optimised for size, ours from nixpkgs, and their own example is a
