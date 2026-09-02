@@ -212,10 +212,21 @@ but without that edge, so the host's `<cwchar>` pulls musl's `wchar.h` before
 the generated header exists. `./build test` gets past it because it builds
 musl first for other reasons.
 
-⚠ **Their CI would not see it.** `.github/workflows/ci.yml` has six jobs —
-`alpine-musl`, `fedora-gcc`, `ubuntu-arm`, `ubuntu-clang`, `ubuntu-qemu`,
-`nixos-lavapipe` — and none builds the standalone archive target on a glibc
-host from a clean tree.
+⚠ **Their CI would not see it**, and ⛔ **the count this document first gave
+was wrong.** `references/pg83__solo/tree/.github/workflows/ci.yml` at the pin
+has **nine** jobs, not six: `fetch-x86_64`, `fetch-aarch64`, `alpine-musl`,
+`fedora-gcc`, `ubuntu-arm`, `ubuntu-clang`, `ubuntu-qemu`, `nixos-lavapipe`,
+`termux-bionic-x86_64`. Three of them — the two fetchers and the Termux row —
+were left out of the original sentence with nothing saying so.
+
+⭐ **The conclusion survives the correction, and re-deriving it is what
+establishes that.** Exactly one job runs the bare default target,
+`alpine-musl` at line 87 (`./build -j12 -Duse_corpus=…` with no target), and
+Alpine is musl. Every glibc row runs a *named* target — `pthread_test`,
+`test`, `corpus`, `vulkan_test`, `secure_test` — which is the path that gets
+past the missing build-graph edge. And no row is a clean tree: all nine
+restore a corpus cache first. So no job builds the standalone archive target
+on a glibc host from a clean tree, which is the failure reproduced above.
 
 ⛔ **This does not impugn the design, and it is not evidence about the
 loader.** It is evidence about one build target, and it is the reason

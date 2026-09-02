@@ -151,7 +151,8 @@ space: `execve` replaces it before the payload runs.
 
 ⛔ **Everything above compares artefacts. `pgb` is a toolchain, so the axis it
 is actually developed along is what a developer has to know and assemble** —
-and no experiment measures that yet. `experiments/63-` is where it should be.
+and no experiment measures that yet. **T-013** carries it, and the experiment
+does not exist: `TODO/toolchain.md` names the number it reserves.
 
 What can be stated now, from building both routes in this repository:
 

@@ -37,8 +37,9 @@ variables. Those are the tool's job.
 
 The comparison that matters is not "which artefact runs in more places" —
 [`../comparison.md`](../comparison.md) shows several tie there. It is **what a
-developer has to know and assemble**, and that is measured in
-`experiments/63-`.
+developer has to know and assemble**, and ⚠ **nothing measures that yet**:
+**T-013** is the open entry that would, and the experiment it reserves a
+number for has not been written.
 
 ⭐ **Credit where it is due**: the `Anylinux-AppImages` stack automates
 dependency *bundling* extremely well. `quick-sharun` finds a program's whole

@@ -3,11 +3,11 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 33  OPEN 15  DONE 18
+    TOTAL 34  OPEN 16  DONE 18
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
-| P0 | breaks correctness, loses data, or takes the process down | 0 | 0 | 0 |
+| P0 | breaks correctness, loses data, or takes the process down | 1 | 1 | 0 |
 | P1 | a documented capability does not work, or a flag does nothing | 25 | 8 | 17 |
 | P2 | worth doing; nothing is wrong without it | 8 | 7 | 1 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
@@ -50,11 +50,17 @@ pretending to be one.
 | T-058 | P1 | S | done | toolchain | Two `pgb build`s at once share one wrapper directory |
 | T-059 | P1 | M | open | research | GL on real hardware, and the NVIDIA case |
 | T-060 | P1 | L | open | toolchain | ⭐ Static-glibc nix: no root, no docker, no nix |
+| T-061 | P0 | XL | open | toolchain | ⛔ Port the whole toolchain to Go, and ship one static `pgb` |
 
 ## The argument behind the ordering
 
 ⭐ **Recorded so it can be re-derived rather than re-argued.**
 
+0. ⛔ **T-061 IS THE ONLY P0 AND IT OUTRANKS EVERY ROW BELOW.** The operator,
+   2026-09-02: the next session ports the tooling to Go and reaches parity, and
+   *"the next session after that will return back to usual tasks."* An entry
+   that changes shell or Python in `tool/` or `scripts/` before that port is
+   work that will be thrown away.
 1. **Harder POCs first (T-001..T-003).** The operator's instruction, and it is
    right for a reason worth writing down: every mechanism in `tool/runtime/`
    exists because something broke. Five passing POCs cannot tell you where the

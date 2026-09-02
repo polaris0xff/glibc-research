@@ -1029,3 +1029,102 @@ place. ⛔ **Rungs 2 and 3 are not reached and this entry stays open.**
 **Prove.** `evidence/89-static-nix/RESULT.txt`: the rung reached, with the
 error and the file it came from for the rung that stopped — plus, for any rung
 reached, `nix-instantiate` naming a derivation inside a rootfs that has no nix.
+
+---
+
+## T-061 — ⛔ PORT THE WHOLE TOOLCHAIN TO GO, and ship one static `pgb`
+
+**Source** ⭐ **operator, session of 2026-09-02**, and the trigger is quoted
+because it is the whole argument: *"when some backticks in some comments inside
+a shell script break everything and lead to hours of wasted time, i think it's
+time we rewrite the tooling properly."*
+**Category** toolchain · **Priority** P0 · **Effort** XL · **Status** open
+
+⛔ **THIS IS THE NEXT SESSION'S ONLY WORK.** The operator: *"create a P0 XL task
+to port everything to go in next session and pass all tests/experiments, reach
+current feature parity … After the next session ports the whole thing to go,
+the next session after that will return back to usual tasks."* Every other open
+entry waits.
+
+### The defect that caused it, in one paragraph
+
+`tool/lib/nix.sh` composed a build command as a double-quoted assignment with a
+COMMENT inside it, and the comment named a file in backticks: `` `.built` ``.
+Backticks inside double quotes are command substitution, so the composing shell
+ran `.built` and printed `pgb: 1: .built: not found` at the exact moment boost's
+round 1 began. ⛔ **The message named neither the file it came from nor the
+construct**, an hour went into diagnosing a boost build that was never failing,
+and the fix was to delete two characters from a comment. ⚠ **No linter in this
+tree would have caught it**, and `sh -n` accepts it, because it is valid shell
+that means something nobody wanted. `docs/history/corrections.md` C16.
+
+### The reading, in this order
+
+1. ⭐ [`../docs/design/porting-report.md`](../docs/design/porting-report.md) —
+   **read it in full before writing any Go.** The commissioned analysis, at
+   commit `2e4c6169`: the ranked language comparison (Go 1, Rust 2, Nim 3, and
+   why Zig is not in the top three), the measured porting surface (22 files,
+   8,982 lines of product shell + Python; 37 more of experiments and POCs), what
+   "single binary" can and cannot mean, the recommended package layout, the
+   nine-step migration sequence, and ⛔ **the six workload gates the port must
+   pass**, which are not "does it compile".
+   ⚠ **Delete this file once the port has landed and its content has moved into
+   `design/toolchain.md`** — the operator asked for that explicitly. It is a
+   session artefact, not a permanent document.
+2. [`design/toolchain.md`](../docs/design/toolchain.md) — the CURRENT language
+   decision (T-011), which this entry overturns. ⭐ Overturning it is the
+   operator's call and it is recorded, not argued: the report is the argument.
+3. `evidence/70-carried-helper/RESULT.txt` — the only compiled-helper evidence
+   this tree has: static Rust, GNU **and** musl, 12 of 12. ⛔ **There is no Go
+   row.** Step 2 of the migration sequence adds one, and it comes BEFORE the
+   rewrite, not after.
+
+### ⛔ What the operator required beyond "port it"
+
+Each is a gate, not a preference. Quoted, then what it means here.
+
+| # | required | what it means in this tree |
+|---|---|---|
+| 1 | *"pass all tests/experiments, reach current feature parity"* | every `experiments/NN-*.sh` and every `poc/NN-*/run.sh` passes against the Go `pgb`. ⭐ **They stay in shell** — the report §"Migration sequence" step 8: they are the independent acceptance harness, and rewriting the oracle with the thing it tests is how a port proves itself against itself |
+| 2 | *"produce a single statically linked executable `pgb` we can distribute and devs don't need to clone the repo and run setup etc"* | `CGO_ENABLED=0`, everything embedded: `tool/runtime/*.c`, the wrapper templates, `rootfs-images.txt`, the nix fixtures. ⭐ **And `pgb` must then build itself with `pgb`** — a static-glibc toolchain whose own tool is not static is an argument against itself |
+| 3 | *"the pgb builder looks like docker build … live logs with `ts` like timestamp, configurable"* | two references are vendored for it: `references/pkgforge__tss/main.rs` (the Rust `ts`) and `references/Azathothas__ToolKit/stamp.ps1`. ⚠ **The PowerShell one carries the part a naive port drops** — a HEARTBEAT when the stream is silent, so a four-minute link does not look like a hang |
+| 4 | *"best in class debugger/verbose loggers"* | levels, per-subsystem selection, and ⛔ **the composed command printed before it runs**. The defect above was invisible for an hour because nothing printed what was about to be executed; `PGB_NIX_DEBUG_CMD` was added by hand mid-session to do exactly that. That must be a first-class facility, not an ad-hoc `printf` |
+| 5 | *"all our crooked hacks must be written into safe, proper, ultra redundant functions"* | every construct whose failure mode is a plausible-looking wrong answer. The tree already lists them: `docs/history/corrections.md` is the inventory |
+| 6 | *"our nix debloater should work today but also in the future if nix changes the tree/structure — do not rely on hardcoded values or rely on them as little as possible"* | ⛔ **the sharpest one, and the one with the most existing debt.** `tool/nix-appimage.sh`'s debloat rules, `store_resolve`, the baked-path table and the wrapper-env lifting all pattern-match nixpkgs' CURRENT layout. Each rule must state what it is looking for structurally (an ELF that nothing needs, a directory no environment variable names) and fall back to doing nothing rather than to guessing |
+
+### ⛔ Do not lose these, they are this session's unrecorded measurements
+
+Both were taken and neither is in an entry yet:
+
+- ⭐ **488,934,276 bytes of the kdenlive AppDir's `lib/` (2,300 files, 39%) is
+  unreachable** from the four programs or any plugin directory — the whole
+  DT_NEEDED closure plus every `.so` under a plugin path. That is the route to
+  T-055's bar (ours 395,294,317 B against the competitor's 191,900,604 B) and
+  it is measured, not estimated. The sweep is a 90-line Python walk; ⚠ **it was
+  not committed** and has to be rewritten. Do it in Go, in `internal/bundle`,
+  as requirement 6 above says.
+- ⭐ **onelf runs our payload.** `experiments/90-`'s arm O reported three
+  failures that were all one defect in OUR harness: onelf dispatches on
+  argv[0]'s basename and silently falls back to the package default, so a
+  symlink named `melt-onelf` ran kdenlive, which needs a display. Fixed in
+  `experiments/90-kdenlive-vs-enhanced.sh`; ⛔ **the three-arm run has not been
+  re-run since**, so the recorded onelf row is still the wrong one.
+
+### Prove
+
+⛔ **Not "it builds".** The report's six workload gates, each with its output:
+
+    1. nix-index    identical output from the real ~400 MB packages.json,
+                    with wall time and peak RSS recorded against the Python
+    2. nix-nar      identical hashes, extraction and SIGNATURE DECISIONS on
+                    the fixtures and on real cache.nixos.org objects
+    3. parity       pgb doctor / env info / nix plan / verify: same output,
+                    same exit codes
+    4. wrappers     compile and link classification parity, no per-invocation
+                    regression that shows up in a real build
+    5. the matrix   all 11 environments, all 9 POCs, every experiment
+    6. the artefact `file`/`readelf` on the produced `pgb`: no PT_INTERP,
+                    no DT_NEEDED, and its size recorded
+
+`evidence/92-go-port/RESULT.txt`, plus a green `sh TODO/check.sh` and
+`sh scripts/common/check-docs.sh`.

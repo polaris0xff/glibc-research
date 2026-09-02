@@ -145,7 +145,8 @@ makes "do not load them at all" obviously the cheaper answer.
 
 ## onelf: refused, and it names the wall itself
 
-`docs/guide/cross-libc.md` (commit `74b4c9a4`) is a clear statement of the same
+`references/QaidVoid__onelf/tree/docs/guide/cross-libc.md` (commit `74b4c9a4`)
+is a clear statement of the same
 problem this project addresses, and of a different answer to it: bundle the
 libc and inject an **`AT_EXECFN` bootstrap** into each bundled executable,
 which reads `AT_EXECFN`, computes the bundled loader's path relative to the

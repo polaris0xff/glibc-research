@@ -522,4 +522,4 @@ by design so that `./configure`'s shared-library probes keep working.
 | bundled loader + AppDir (sharun shape) | needs a directory beside the binary; the brief requires a normal ELF |
 | self-extracting single-file format (onelf shape) | the brief explicitly refuses a new packaging format |
 | `LD_PRELOAD` interposer (anylinux.c shape) | needs a dynamically linked process; the output here has no interpreter |
-| rewriting `PT_INTERP` to a relative path | onelf's `docs/guide/cross-libc.md` records that it breaks when the new path does not fit the original slot |
+| rewriting `PT_INTERP` to a relative path | onelf's own guide — vendored at `references/QaidVoid__onelf/tree/docs/guide/cross-libc.md` — records that it breaks when the new path does not fit the original slot |

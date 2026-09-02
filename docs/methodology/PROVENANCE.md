@@ -17,10 +17,20 @@ record the change here.
 | `authoring.md` | — | how a `TODO/` entry is written |
 | `sessions.md` | `1c7bc4a9a7838276` | ⭐ the spec for the session boundary — `RESUME.md`, the summary table's rows, and the next prompt. `work-todo.md` cited it and it had never been fetched |
 | `history.md` | `76aad32279d81445` | where a superseded explanation goes; cited by `experiments.md` and `vendoring.md` |
+| `gate.md` | `dbf32f2b39cb24b1` | ⭐ **the acceptance gate, all three parts**, and the capability check that says which of them this harness can run. `sessions.md` and `authoring.md` both cite it as required and it had never been fetched |
+| `reviews.md` | `ea6871043faa415f` | ⭐ **part (c) of the gate**: the three lenses, and why three headings over one sweep is not three passes. Cited twice by `history.md` |
 
 ⚠ **Not vendored, but they exist upstream** and are one fetch away:
-`choosing-a-work-model.md`, `gate.md`, `ingest.md`, `initialize.md`,
-`lean-adoption.md`, `reviews.md`, `template-sync.md`, `work-stages.md`.
+`choosing-a-work-model.md`, `ingest.md`, `initialize.md`, `lean-adoption.md`,
+`template-sync.md`, `work-stages.md`.
+
+⛔ **`gate.md` and `reviews.md` were on that list for a whole session while
+`sessions.md` §Ending said "Run the gate. All three parts" and named a file
+this tree did not have.** A required reading that is one fetch away is a
+required reading nobody did. They are vendored now, and
+`scripts/common/check-docs.sh` compares the derived list below against the
+tree on every run so the next omission is a failed check rather than a
+paragraph.
 
 Re-fetch:
 
@@ -45,10 +55,19 @@ for f in $(ls docs/methodology/*.md | grep -v PROVENANCE); do
 done | sort -u
 ```
 
-    ../../scripts/doctor/     ../conventions/shell.md    gate.md
-    ../conventions/code.md    ../security/remote-ops.md  reviews.md
-    ../conventions/prose.md   choosing-a-work-model.md   work-stages.md
+    ../../scripts/doctor/               ../conventions/shell.md
+    ../conventions/code.md              ../security/remote-ops.md
+    ../conventions/forbidden-patterns.md  choosing-a-work-model.md
+    ../conventions/prose.md             work-stages.md
+
+⚠ **`../conventions/forbidden-patterns.md` is new to this list**, and it
+arrived with `gate.md`, which cites it. Vendoring one file adds that file's own
+unresolved links; that is the cost, and it is visible rather than silent.
 
 Those links do not resolve in this tree and that is expected: ⛔ **vendored
 files are not edited**, per `vendoring.md`. Fetch the named file at the pin
 above if you need one.
+
+⭐ **This list is checked, not just published.** `sh scripts/common/check-docs.sh`
+derives it from the tree and fails if it disagrees with the block above — which
+is what turns "vendor one more file" into a one-line diff nobody can forget.
