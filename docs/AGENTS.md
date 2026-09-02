@@ -57,32 +57,30 @@ a scheduler or wake-up tool to do the waiting for you — that is the same thing
 wearing a disguise. Long builds run in the background while you work on
 something else; block on the job's own output, not on a timer.
 
-### The discipline, in full
+### The discipline
 
 - **Every claim carries its measurement.** A number with no command that
   produced it does not go in a document.
 - **An absence is not a zero.** A probe that found nothing may have looked in
   the wrong place — say which.
-- **Exit codes: 0 ok, 1 it ran and failed, 2 it could not run.** `pgb`, the
-  experiments and the POCs all obey this.
-- ⛔ **A skip is not a pass and not a failure.** A check that quietly runs
-  nothing and reports success is the worst answer this codebase can give.
-- ⛔ **Verify before you trust.** Defects in this tree have been found by
+- **Exit codes: 0 ok, 1 it ran and failed, 2 it could not run.** ⛔ A skip is
+  neither a pass nor a failure. A check that quietly runs nothing and reports
+  success is the worst answer this codebase can give.
+- ⛔ **Verify before you trust.** Every defect in this tree was found by
   something disagreeing — a gate, a control, CI — and essentially never by
   reading. Run the thing.
-- **Read code with codegraph first and grep second.**
-  [`codegraph.md`](codegraph.md) says what it covers and what it cannot see
-  (it indexes no shell).
-- ⛔ **The experiments and POCs stay shell.** They are the independent
-  acceptance harness; rewriting them in the language of the thing they test
-  destroys that.
-- ⛔ **`HISTORY/` is never edited** — it is the oracle every gate is measured
-  against. **`methodology/` is vendored** and never edited.
-- **Comments say what the block does.** No changelogs, no corrections-to-
-  corrections. Historical lore goes to [`history/`](history/) or `HISTORY/`.
+- **Read code with codegraph first, grep second** ([`codegraph.md`](codegraph.md);
+  it indexes no shell).
+- ⛔ **The experiments and POCs stay shell** — they are the independent
+  acceptance harness. **`HISTORY/` and `methodology/` are never edited.**
+- **Comments say what the block does.** Historical lore goes to
+  [`history/`](history/), never into code or these pages.
 - **Commit as work lands and push.** ⛔ Never one commit at the end.
 - ⛔ **Never edit a shell script while it is running** — `sh` re-reads from a
-  byte offset. Copy the tree aside or wait.
+  byte offset.
+
+⚠ **§14 carries the rest**: the rules on language and on superseding a finding,
+and the list of things measured once that must not be redone.
 
 ---
 
@@ -403,51 +401,45 @@ one kernel is not "works on Linux".
 
 ## 9. Status
 
+⭐ **Every row is a measurement.** The story behind any of them — what was
+claimed, what disproved it, what the instrument got wrong — is in
+[`history/corrections.md`](history/corrections.md), read on demand. It is not
+repeated here.
+
 | item | status |
 |---|---|
-| test bed, 11 environments, 3 selftests | **COMPLETE** |
-| `experiments/10-probe-the-host.sh` | **COMPLETE** |
-| `experiments/20-static-glibc-nss-dlopen.sh` | **COMPLETE** — 37 assertions |
-| `experiments/21-glibc-version-floor.sh` | **COMPLETE** — confirms the ≥2.34 pin |
-| `experiments/30-gconv-and-locale.sh` | **COMPLETE** — 24 assertions |
-| `experiments/40-overhead.sh` | **COMPLETE** — §10 |
-| `experiments/50-host-plugin-feasibility.sh` | **COMPLETE** — one function of cross-libc-dlopen's rewrite, ported into a static binary. §13 item 4 route B |
-| `experiments/60-versus-alternatives.sh` | **COMPLETE** — 8 arms head to head, `REQUIREMENTS.md` part 2. ⚠ Its AppImage arm used **vanilla** `appimagetool` and its performance columns were startup and size only; both are corrected by 62- and 61-. `history/corrections.md` C7 |
-| `experiments/61-libc-throughput.sh` | **COMPLETE** — the axis 60- got wrong. glibc vs musl at steady state, and whether the gap travels to a musl host |
-| `experiments/62-anylinux-appimage.sh` | **COMPLETE** — `pgb` against `Anylinux-AppImages`, the AppImage that actually competes |
-| `experiments/70-carried-helper.sh` | **COMPLETE** — settles T-011. A static Rust helper *carried into* all 11 targets plus the build environment runs on **12 of 12**, exactly where `sh` does, so "sh is the only thing guaranteed present" does not bind a carried-in binary |
-| `experiments/71-wrap-dlopen.sh` | **COMPLETE** — `--wrap-dlopen` on 11 of 11 with zero host objects, against a control that fails on 11 of 11. Three of its six assertions are negative |
-| `experiments/72-static-host-plugin-abi.sh` | **COMPLETE** — ⛔ a static executable's dynamic symbol table is **empty**, so a shared plugin can never resolve a call back into its host. Prior to 50-'s loader failures: a perfect loader would still have nowhere to look. Three arms, positive control included |
-| `experiments/73-host-dso-abi-demand.sh` | **COMPLETE** — ⭐ what §13 item 4 route D turns on. **5,807 host shared objects**, all eleven environments, parsed byte-wise with no binutils inside the target: **90.8%–97.8%** of every `GLIBC_`/`GCC_`-versioned import is already definable by the pinned static glibc, and the unexplained residue is **zero**. Also settles the version-resolution rule in both directions, and found **three defects in its own instrument** first — a linker script read as an archive, a column order read backwards, and a control that measured the one case glibc guards |
-| `pgb` chroot engine, host engine | **COMPLETE** |
-| `pgb` docker engine | **COMPLETE** — ⭐ its output is **byte-identical** to the chroot engine's for the same source, and both carry `GCC: (Debian 12.2.0-14+deb12u1)` where a host build on this machine carries `Ubuntu 13.3.0`. The two engines are interchangeable, not merely both working. Passes 11 of 11. Three defects found on first run, one a build that produced nothing and exited 0 — `history/corrections.md` C9 |
-| `pgb` podman engine | **UNTESTED** — podman is absent here. The code path is shared with docker except the binary name |
-| `pgb verify --engine` | **COMPLETE for chroot and docker**, and green on a runner in [run 14](https://github.com/polaris0xff/glibc-research/actions/runs/33512788793). Both arms agree on all 11 rows for both asserted columns; criterion 2 under docker is measured by `tool/runtime/pgb-trace.c`, a `ptrace` open-tracer carried into the container. ⚠ `unmeasured`, never `none`, when it cannot attach. podman untested |
-| NSS / iconv / locale mechanisms | **COMPLETE** — 11 of 11 each |
-| POCs 10 gawk, 20 nano, 30 curl, 40 jq, 50 CPython, 60 LevelDB, 70 SQLite, 80 MLT, 90 Qt 6, ⭐ **91 Qt 6 + xcb** | **COMPLETE** — **ten of ten**, all 11 environments each |
-| CI workflow | ⭐ **GREEN**, 16 jobs, latest run 116 on `main` — and it now asserts §3 criterion 2, not just exit status, through `pgb verify --engine docker`. ⚠ It was not unrun before: it ran 10 times and was red 10 times, and the two red rows never executed a binary — GitHub's Node.js cannot start in a musl container. `history/corrections.md` C8. ⭐ Run 13 caught a real defect, the first time this workflow has found one rather than reported one |
-| ⭐ `pgb nix` (plan / fetch / build / **deps**) | **WORKING WITH NO NIX AT ALL** — ⭐ `experiments/88-`: **hydra's job API is the name→derivation index**, 19 of 20 against the narinfo `Deriver:` route's 9 of 20, with the drvpaths **byte-identical** to a local `nix-instantiate`'s; and `packages.json.br` gives the attribute→name→output→**system** mapping over plain HTTPS with no brotli library. jq is **planned, fetched AND BUILT at uid 12000 in a rootfs with no nix and no `/nix`**. ⛔ It also found that `store-paths.xz` is every system the channel built — a name match returned an **aarch64-darwin** Mach-O binary. `docs/research/nix.md` |
-| ⭐ `internal/bundle/appimage.go` | **WORKING, DEBLOATED, AND MEASURED ON A REAL APPLICATION** — uruntime + dwarfs + sharun rather than nix-appimage's squashfs + bwrap, with the nixpkgs **closure** replacing sharun's ldd-and-strace discovery. ⭐ `--debloat none/safe/aggressive` = **170.6 / 147.2 / 132.9 MB** on the same GL subject, **all three identical on 11 of 11** (`experiments/89-`). ⭐ A nixpkgs **wrapper**'s environment is read out of it and re-expressed against the bundle (`internal/bundle/wrapper.go`, T-053). ⭐ Against a hand-built Anylinux AppImage of **mpv** — 297 store paths, ffmpeg, mesa — **2.71×** the size, 11 of 11 either way, warm start within each other's spread. ⛔ NVIDIA still cannot be bundled. `TODO` T-052, T-057, T-059 |
-| `experiments/85-opengl.sh` | **COMPLETE** — ⭐ the bundled GL stack on all eleven: `EGL vendor string: Mesa Project`, `driver: swrast`, **11 of 11, zero host shared objects**, against a `--no-gl` control that produces no vendor anywhere. The GL stack is **95 MiB** of the 163 MB bundle. ⛔ No GPU is present, so every row is software rasterisation and NVIDIA is untouched — `TODO` T-059 |
-| `experiments/86-bundler-vs-anylinux.sh` | **COMPLETE** — ⭐ **our one-command bundle against a hand-built Anylinux AppImage**, same application (`jq 1.8.2`), all eleven. Both **11 of 11 with zero host shared objects**; ⚠ re-measured 2026-09-02b: ours is **11,471,610 B against 4,006,916 — 2.86×** (the earlier 3.05× was a different closure). ⛔ Its first startup instrument measured itself — reaping between runs killed the dwarfs mount, so both arms read ~14,500 ms against a real 17 ms warm. `TODO` T-057 |
-| `experiments/90-kdenlive-vs-enhanced.sh` | **COMPLETE** — ⭐ **three arms**, and the onelf arm ran for the first time in the session of 2026-09-02b. Ours 477,191,058 B / 3,559 ms render / 181 ms cold; `kdenlive-AppImage-Enhanced` 191,900,604 / 1,323 / 52; onelf packing **our** payload 595,859,196 / 2,068 / 597. ⛔ **T-055's bar is NOT met.** ⭐ Ours is **11/11 with zero host objects, the competitor 4/11**, and arm O is the only comparison that isolates the packer. `history/corrections.md` C16 |
-| aarch64 | **UNTESTED** |
-| host `dlopen` | **KNOWN LIMITATION** — §7. ⭐ terminfo and the CA bundle are no longer on this row: both are solved opt-in mechanisms, 11 of 11 each |
+| test bed, 11 environments | ✅ 11 of 11, digest-pinned |
+| all 23 experiments | ✅ every one measured; `evidence/<NN>-*/RESULT.txt` |
+| all 10 POCs | ✅ 11 of 11 environments each, zero host shared objects |
+| NSS / iconv / locale / terminfo / CA-bundle mechanisms | ✅ 11 of 11 each |
+| `pgb` chroot and host engines | ✅ complete |
+| `pgb` docker engine | ✅ complete — output **byte-identical** to the chroot engine for the same source |
+| `pgb` podman engine | ⚠ **untested** — no podman here; the code path is docker's except the binary name |
+| `pgb verify --engine` | ✅ chroot and docker, green on a runner; both arms agree on all 11 rows. ⚠ reports `unmeasured`, never `none`, when it cannot attach |
+| CI workflow | ✅ **green, 16 of 16 jobs**, and it asserts §3 criterion 2 rather than exit status |
+| `pgb nix` (plan / fetch / build / deps) | ✅ works with **no nix installed at all** — `experiments/88-` plans, fetches and builds at uid 12000 in a rootfs with no `/nix` |
+| `internal/bundle` (the AppImage bundler) | ✅ uruntime + dwarfs + sharun over a nixpkgs closure. `--debloat none/safe/aggressive` = 170.6 / 147.2 / 132.9 MB, all three identical on 11 of 11 |
+| bundle vs. the field | ⚠ **behind on size and speed, ahead on cleanliness** — §7 and [`comparison.md`](comparison.md) |
+| host `dlopen` | ⛔ **known limitation** — §7 |
+| aarch64 | ⚠ **untested** |
+| NVIDIA / real GPU | ⚠ **untested** — every GL row is `swrast`; `TODO` T-059 |
 
-**POCs**, all stock tarballs, stock `./configure`, **no source patches**:
+**The ten POCs**, all stock tarballs, stock `./configure`, **no source patches**:
 
-| | project | stresses |
+| | project | what it stresses |
 |---|---|---|
-| 10 | GNU awk 5.3.1 | locale, iconv, `dlopen` extension API |
-| 20 | GNU nano 8.2 + ncurses 6.5 | terminfo data, static dependency chain, multibyte |
-| 30 | curl 8.11.0 + OpenSSL 3.0.15 + zlib 1.3.1 | `getaddrinfo`/NSS, real DNS, real TLS, CA bundle |
-| 40 | jq 1.7.1 + oniguruma 6.9.9 | Unicode round trip, surrogate pairs, optional-dep detection |
-| 50 | CPython 3.12.7 | 49 extension modules linked **in**, `lib-dynload` empty, NSS via `socket`/`pwd` |
-| 60 | LevelDB 1.23 + a C++ subject | ⭐ the first **C++** and first **CMake** POC: static init order, exception unwinding across a static link, RTTI/typeid across TUs, iostreams. Found that no C++ program linked at all — libstdc++ calls `iconv` and `-lstdc++` is scanned after `-lpgbruntime` |
-| 80 | **ffmpeg 7.1 + MLT 7.30.0 — kdenlive's ENGINE** | ⭐ the operator's challenge, taken seriously. A **105 MB static `melt`** with eight `dlopen`'d modules and the whole of ffmpeg compiled in, rendering a real MP4 on 11 of 11. ⛔ Found two failures worth having: MLT hard-codes `add_library(mlt SHARED)`, so `-static` cannot consume it and the answer is a link line rather than a patch; and its `avformat` module cannot be built as a shared object against a static ffmpeg while **the same objects link into a static executable perfectly**. Stops at Qt/KF6, said so |
-| 90 | **Qt 6.11.1 (qtbase), static** | ⭐ **the rung nobody had attempted.** `-static -force-bundled-libs`, offscreen QPA, 11 of 11 with zero host objects. Its plugins come out as **static archives** — `qoffscreen`, `qminimal`, `qjpeg`, `qico`, `qgif` — so `Q_IMPORT_PLUGIN` puts them in the link and `dlopen` is never called. ⛔ Found that pgb's own `-march=x86-64` was overriding every project's per-file ISA selection: `history/corrections.md` C15 |
-| 91 | ⭐ **Qt 6.11.1 + libxcb 1.17 + xkbcommon + OpenSSL 3** | ⭐ **rung 2: a REAL window.** xcb QPA against a real X server, a mapped and exposed `QWindow`, a 320x240 grab of it, OpenSSL **linked** into QtNetwork rather than `dlopen`'d, and a QtSql/SQLite round trip returning `日本`. 27 assertions, 11 of 11, zero host objects. 22 X-stack packages built static from a cold prefix, which is also the second confirmation of the fixed-point dependency walk |
-| 70 | SQLite 3.47.0 + **15** of its own `ext/misc` extensions | ⭐ **an OPEN plugin ABI with no way to link a plugin in.** `.load` calls `dlopen()` on a path the *user* names and derives the entry point from the filename, so there is no `Setup.local` equivalent. Fifteen plugins, **plugin directory created empty**, 11 of 11. Found that all 16 extensions define `sqlite3_api` and any two collided at link time — fixed with per-plugin symbol namespacing |
+| 10 | GNU awk 5.3.1 | locale, iconv, a `dlopen` extension API |
+| 20 | GNU nano 8.2 + ncurses 6.5 | terminfo data, a static dependency chain, multibyte |
+| 30 | curl 8.11.0 + OpenSSL + zlib | `getaddrinfo`/NSS, real DNS, real TLS, CA bundles |
+| 40 | jq 1.7.1 + oniguruma | Unicode round trip, surrogate pairs |
+| 50 | CPython 3.12.7 | 49 extension modules linked **in**, `lib-dynload` empty |
+| 60 | LevelDB 1.23 | the first C++ and first CMake POC: static init, exceptions, RTTI, iostreams |
+| 70 | SQLite 3.47.0 + 15 of its `ext/misc` extensions | an **open plugin ABI** — `dlopen` on a user-named path, entry point derived from the filename |
+| 80 | ffmpeg 7.1 + MLT 7.30.0 (kdenlive's engine) | a 105 MB static `melt`, eight `dlopen`'d modules, a real MP4 render |
+| 90 | Qt 6.11.1 (qtbase), static | offscreen QPA; its plugins come out as **archives**, so `Q_IMPORT_PLUGIN` links them and `dlopen` is never called |
+| 91 | ⭐ Qt 6.11.1 + libxcb + xkbcommon + OpenSSL | ⭐ **a real X window** — xcb QPA, a mapped and exposed `QWindow`, OpenSSL **linked** into QtNetwork, a QtSql round trip returning `日本` |
+
+⚠ `poc/92-miniflux` is **in progress**, not in the count: `TODO` T-063.
 
 ## 10. Overhead
 
@@ -517,114 +509,21 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
   `py_cv_module_nis=n/a` and `--disable-test-modules`; and ncurses'
   `--with-terminfo-dirs`.
 
-## 13. Next steps, in order
+## 13. Next steps
 
-1. **Build the toolchain: `pgb build <url-or-package>`.** ⭐ **This is the
-   project, and everything below is support for it.** Today a developer runs
-   `pgb env create` then `pgb build -- make`, which already means no dependency
-   list, no `.desktop` file and no runtime to choose — but they still have to
-   know how to build the project. The target is that they do not:
-   resolve the spec to a source tree, find the build instructions, plan the
-   dependency graph, link statically as far up the brief's preference order as
-   each dependency will go, and report what landed where.
-   [`design/toolchain.md`](design/toolchain.md) is the design, the
-   static-first/bundle-last rule, and the language decision.
-2. **Get CI green.** ⚠ It is not unrun — it ran ten times and was red every
-   time, and three tracked files said the opposite. The nine green rows and the
-   segfaulting control are a real result; the two red rows are GitHub's Node.js
-   failing to start in a musl container, which is this project's own thesis
-   observed on the CI provider. `history/corrections.md` C8 has the log lines.
-   The workflow now runs every job on the host, enters targets with
-   `docker run --entrypoint`, and **generates** its matrix from
-   `scripts/common/rootfs-images.txt` so CI and the local bed cannot be two
-   different beds again.
-3. **aarch64.** `pgb rootfs pull --arch arm64` and `pgb rootfs fetch --arch
-   arm64` re-resolve by tag, which trades the digest pin away and says so.
-   Nothing has been run. Expect IFUNC and CPU-baseline questions that x86_64
-   did not raise.
-4. **Reach the host-plugin class.** ⭐ **Four** routes now. None has been tried
-   to exhaustion and none has been shown to be closed.
+⛔ **The work order lives in [`../TODO/PROGRESS.md`](../TODO/PROGRESS.md) and
+nowhere else**, with the argument for its order in
+[`../TODO/INDEX.md`](../TODO/INDEX.md). This section names the standing problem
+classes and the entry that owns each; it is not a second work order.
 
-   - ⭐ **Route D — compile an ELF loader IN, and resolve the host object's
-     imports against our own static glibc.** ⭐ **The best-evidenced of the
-     four, and it did not exist before the `pg83/solo` sweep.**
-     [`research/solo.md`](research/solo.md) is the read;
-     `references/pg83__solo/` is the corpus at `79451211`; the mechanism is
-     `lib/elf_loader.cpp` plus `lib/dlfcn.cpp`, MIT.
-     The idea: **do not ask the host loader for anything.** Map the object
-     yourself, walk `DT_NEEDED`, relocate, and bind its imports to a table of
-     the executable's own symbols — the same generated-table mechanism
-     `--wrap-dlopen` already uses, applied to the libc instead of to the
-     application's plugins. Nothing of the host's is mapped, so no second libc
-     enters and the single ordinary ELF survives.
-     ⛔ **solo pays 5,948 lines translating a guest's glibc imports onto musl.
-     A static glibc host has no translation to do**, and
-     `experiments/73-` measures how much of the demand is already met: across
-     **5,807 real host shared objects** in the seven glibc environments,
-     **90.8%–97.8%** of every `GLIBC_`/`GCC_`-versioned import is already
-     definable by the pinned static glibc, with the unexplained residue at
-     **zero** — every remainder falls into a named, measured class.
-     ⚠ **Symbol availability is not a working `dlopen`**, and the honest
-     unknowns are named in `TODO` T-033: the mapper is 2,707 lines and does
-     not get cheaper for being glibc, and TLS is the one place where "we are
-     glibc, so it is simpler" is not obviously true.
-   - ⭐ **Route A — `--wrap` on `dlopen`, against a compiled-in table.** The
-     cheapest by far, and it is already proven prior art:
-     `allyourcodebase/pipewire`'s `src/wrap/dlfcn.zig` exports `__wrap_dlopen`,
-     `__wrap_dlsym` and `__wrap_dlclose` and resolves against a table of
-     libraries baked into the binary. That is the same delivery mechanism
-     `pgb` already uses for `iconv_open`. It serves every program that loads
-     its *own* plugins — POC 50 does this by hand for CPython — and generalises
-     it into a `--wrap-dlopen` mode with a generated table.
-   - ⭐ **Route B — port cross-libc-dlopen's rewrite properly.**
-     `experiments/50-` ported **one function of roughly forty**
-     (`cld_strip_versions`, 7 lines of a 2015-line file) and found no effect.
-     The rewrite at `cross-libc-dlopen.c:1857` is three coordinated steps:
-     ```
-     cld_strip_versions(&e);                      // what 50- tried
-     e.dyn[drop_idx[i]].d_tag = CLD_NEUTRAL_TAG;  // drops the DT_NEEDED edges
-                                                  // that pull a foreign libc in
-     cld_apply_renames(&e, dry_run);              // rebinds the imports left
-     ```
-     ⛔ The failures 50- recorded are what happens when a host object drags the
-     **host libc** in — exactly what step two removes. The untested steps are
-     the ones aimed at the observed failure.
-     ⚠ **Weakened by `experiments/73-`'s second control**, and this is measured
-     rather than argued: rebuilding the object *named in a reference's
-     `DT_VERNEED`* without its versions does not bind — glibc's loader
-     **asserts** (`dl-lookup.c:106: check_match`). So the step 50- did port is
-     actively harmful where it bites, not merely a no-op. Steps two and three
-     are untouched by that and the entry keeps them. Upstream's `docs/limits.md` also
-     says the static-glibc case is one where `dlopen` *works*, that "the real
-     blocker is more likely the preload path", and that all three static cases
-     are **unverified upstream**. `CROSS_LIBC_DLOPEN_DRYRUN` makes the whole
-     rewrite path testable with no GPU and no Alpine.
-     ⚠ A static binary has no `LD_PRELOAD`, so the interposer has to arrive by
-     being linked in — which `--wrap` does. Routes A and B share machinery.
-   - **Route C — carry a loader**, i.e. tier 2 of
-     [`design/tiers.md`](design/tiers.md). Highest cost: it gives up the single
-     ordinary ELF, so it is a **mode** chosen per project rather than a
-     replacement, and `pgb verify` should report which mode a binary is.
-     `experiments/60-` and `62-` measured two existing implementations of this
-     shape, so the design questions are answered — including that a bundle must
-     carry gconv or the `--wrap` onto static libiconv, since bundling a libc
-     alone loses the encoding result tier 1 already has.
-     ⛔ Before building it, read [`design/toolchain.md`](design/toolchain.md)'s
-     bar for a `pgb` bundle. Two good bundlers exist; a third that is merely
-     comparable is not worth shipping, and emitting an anylinux AppImage is a
-     legitimate answer.
-
-5. ✅ **`--embed-terminfo` and `--embed-cacert` are DONE**, `TODO` T-032, and
-   this item is kept only so the next reader does not re-plan them. Both are
-   opt-in, both are proven on 11 of 11 by `poc/20-nano` and `poc/30-curl`, and
-   both **look for the host's data first** — which is a security property for
-   the CA case and is asserted as one against an independent oracle. What is
-   still open in this family is the fifth data dependency: a runtime's own
-   library tree, which is shipped rather than solved (CPython's 98 MiB stdlib).
-6. **Second machine, second kernel.** Every number here is one machine.
-7. **Sweep depth.** `allyourcodebase/pipewire` was fetched and never read;
-   sharun, userland-execve-rust, ppkg and elftool were read at README/file-list
-   depth. See `research/prior-art.md` for what that does and does not support.
+| class | owner | where it stands |
+|---|---|---|
+| **`pgb build <url-or-package>`** — the toolchain the project is for | T-012 | the design and the static-first/bundle-last rule are in [`design/toolchain.md`](design/toolchain.md) |
+| **host `dlopen`** — §7's limitation | T-031, T-033 | ⭐ four routes, none tried to exhaustion and none shown closed. [`research/solo.md`](research/solo.md) is the read for route D, the best-evidenced |
+| **the bundle is bigger and slower than the field** | T-055, T-057 | measured in [`comparison.md`](comparison.md); the reachability sweep exists and ⛔ nothing consumes it, which is the largest unused lever |
+| **a host with no compiler** | T-051, T-060 | `pgb nix` already works with no nix installed; the C toolchain is the last crutch |
+| **aarch64** | T-041 | `pgb rootfs pull --arch arm64` re-resolves by tag, trading the digest pin away. ⚠ Nothing has been run — expect IFUNC and CPU-baseline questions x86_64 did not raise |
+| **a real GPU** | T-059 | every GL row is `swrast`; NVIDIA is untouched |
 
 ## 14. Rules, and things not to redo
 

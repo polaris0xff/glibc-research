@@ -1045,19 +1045,21 @@ reached, `nix-instantiate` naming a derivation inside a rootfs that has no nix.
 because it is the whole argument: *"when some backticks in some comments inside
 a shell script break everything and lead to hours of wasted time, i think it's
 time we rewrite the tooling properly."*
-**Category** toolchain · **Priority** P0 · **Effort** XL · **Status** open
+**Category** toolchain · **Priority** P0 · **Effort** XL · **Status** ✅ done
 
-⛔ **THIS IS THE NEXT SESSION'S ONLY WORK.** The operator: *"create a P0 XL task
-to port everything to go in next session and pass all tests/experiments, reach
-current feature parity … After the next session ports the whole thing to go,
-the next session after that will return back to usual tasks."* Every other open
-entry waits.
+⭐ **CLOSED 2026-09-02b, when gate 5's last three rows landed.** The operator's
+framing when it was opened: *"create a P0 XL task to port everything to go in
+next session and pass all tests/experiments, reach current feature parity …
+After the next session ports the whole thing to go, the next session after that
+will return back to usual tasks."* That has happened; no entry waits on this
+one any more.
 
-### ⭐ WHERE IT STANDS, 2026-09-02
+### ⭐ WHERE IT STANDS — ALL SIX GATES MET
 
-**The port is written and the tool is Go.** One static binary; the shell and
-Python are retired under `HISTORY/` and are the oracle. 124 carried selftests
-pass, `sh TODO/check.sh` and `sh scripts/common/check-docs.sh` are green.
+**The tool is Go.** One static binary; the shell and Python are retired under
+`HISTORY/` and are the oracle. 138 carried selftests pass and 1 cannot run here
+(no `zstd` binary), `sh TODO/check.sh` and `sh scripts/common/check-docs.sh`
+are green, and CI is green at 16 of 16 jobs.
 
 | gate | state |
 |---|---|
@@ -1065,22 +1067,26 @@ pass, `sh TODO/check.sh` and `sh scripts/common/check-docs.sh` are green.
 | 2 nix-nar | ⭐ met — byte-identical NARs, identical nix-base32 hashes, identical signature decisions, on fixtures and a real cache.nixos.org object |
 | 3 parity | ⭐ met — doctor, env info, attr, info, closure, hydra drv and a whole nix-free plan, all identical |
 | 4 wrappers | ⭐ met in its strongest form — the same source through both toolchains is BYTE-IDENTICAL |
-| 5 the matrix | ⚠ **partial**: 9 of 10 POCs and 21 of 23 experiments pass. `poc/91-qt-xcb` ran out of disk mid-Qt-build; `experiments/86-` and `experiments/90-` were never started, for the same reason |
+| 5 the matrix | ⭐ **met** — **ten of ten POCs and twenty-three of twenty-three experiments**, every row measured. The last three landed 2026-09-02b: `poc/91-qt-xcb` (27 assertions, 11/11), `experiments/86-` (7 cases) and `experiments/90-` (10 cases, **0 skipped**) |
 | 6 the artefact | ⭐ met — statically linked, no `PT_INTERP`, no `DT_NEEDED` |
 
 Requirement 2's second half is met too: pgb built by pgb inside the pinned
 environment is byte-identical to the host build.
 
-⚠ **What is left, and it is the entry's remainder, not a new entry**: gate 5's
-unfinished rows, and the operator's post-port instruction — install codegraph
-and wire it into the gates and the rules, sweep the Go tree for deprecated
-practice, two deep reviews of code and docs, and a `docs/AGENTS.md` a session
-with no memory can start from alone.
+⭐ **The remainder is discharged.** Gate 5's unfinished rows are measured, and
+the operator's post-port instruction is done: codegraph is installed and wired
+into the gates and the rules (`e44a6519`), the Go tree was swept with
+staticcheck and gopls' `modernize` (`aa3b7474`, `4376c735`), both deep reviews
+ran and their findings are fixed or filed as **T-062**, the unreferenced-document
+question is answered in `../tmp/README.md`, and `../docs/AGENTS.md` §0b is the
+cold start.
 
-⚠ Requirement 6 is only partly discharged: the reachability sweep exists in
-Go with a 12-case selftest, but nothing consumes it — `--debloat` still has
-its own rules and the sweep is a reporting command. Wiring it in is T-055's
-cut, not this entry's.
+⚠ Requirement 6 is only partly discharged and that is deliberately **not** this
+entry's: the reachability sweep exists in Go with a 12-case selftest, but
+nothing consumes it — `--debloat` still has its own rules and the sweep is a
+reporting command. ⛔ Re-confirmed 2026-09-02b with codegraph: `Sweep` has
+exactly two callers, `bundleSweep` and its own selftest. Wiring it in is
+T-055's cut.
 
 ### The defect that caused it, in one paragraph
 

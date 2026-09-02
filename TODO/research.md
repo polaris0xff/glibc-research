@@ -277,7 +277,7 @@ lavfi test pattern with `VO: [null] 64x48 rgb24`.
 'nixappimage' descendant that uses or rather reimplements many of the anylinux
 tooling, iterating/improving them, and debloating nixappimages, correctly
 packing them, and also solving the opengl problem"*.
-**Category** research · **Priority** P1 · **Effort** L · **Status** ⚠started
+**Category** research · **Priority** P1 · **Effort** L · **Status** open
 
 **Landed already.** `internal/bundle/appimage.go` builds one: uruntime + dwarfs +
 sharun instead of appimage-type2-runtime + mksquashfs + a bwrap AppRun, with

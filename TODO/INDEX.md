@@ -3,11 +3,11 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 36  OPEN 17  DONE 19
+    TOTAL 36  OPEN 16  DONE 20
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
-| P0 | breaks correctness, loses data, or takes the process down | 1 | 1 | 0 |
+| P0 | breaks correctness, loses data, or takes the process down | 1 | 0 | 1 |
 | P1 | a documented capability does not work, or a flag does nothing | 27 | 10 | 17 |
 | P2 | worth doing; nothing is wrong without it | 8 | 6 | 2 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
@@ -46,11 +46,11 @@ pretending to be one.
 | T-054 | P1 | L | open | poc | kdenlive, static: exhaust it |
 | T-055 | P1 | L | open | poc | If static will not reach it, a kdenlive bundle that BEATS the field |
 | T-056 | P2 | L | done | toolchain | Port the python helpers to Rust — superseded by T-061 |
-| T-057 | P1 | L | ⚠started | research | The bundler: a maintained nix-appimage descendant on the Anylinux mechanisms |
+| T-057 | P1 | L | open | research | The bundler: a maintained nix-appimage descendant on the Anylinux mechanisms |
 | T-058 | P1 | S | done | toolchain | Two `pgb build`s at once share one wrapper directory |
 | T-059 | P1 | M | open | research | GL on real hardware, and the NVIDIA case |
 | T-060 | P1 | L | open | toolchain | ⭐ Static-glibc nix: no root, no docker, no nix |
-| T-061 | P0 | XL | open | toolchain | ⛔ Port the whole toolchain to Go, and ship one static `pgb` |
+| T-061 | P0 | XL | done | toolchain | Port the whole toolchain to Go, and ship one static `pgb` |
 | T-062 | P1 | M | open | toolchain | Eight packages carry no selftest, `internal/wrapper` among them |
 | T-063 | P1 | L | open | poc | miniflux + an embedded PostgreSQL, against onelf's ~70 MB |
 

@@ -4,7 +4,7 @@
 and the entries.
 
     STATE     2026-09-02b (recovery session)
-    COUNTS    36 entries, 17 open, 19 done
+    COUNTS    36 entries, 16 open, 20 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN; selftests 138 pass, 1 could not run (no zstd)
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
