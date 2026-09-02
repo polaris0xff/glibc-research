@@ -364,7 +364,7 @@ func startDockerd(o Options) {
 		defer f.Close()
 		_, _ = cmd.Run()
 	}()
-	for w := 0; w < 30; w++ {
+	for w := range 30 {
 		time.Sleep(time.Second)
 		if r, err := proc.Quiet("docker", "info"); err == nil && !r.Failed() {
 			logx.Say("  dockerd up after %ds", w+1)

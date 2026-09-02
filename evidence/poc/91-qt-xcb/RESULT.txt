@@ -13,3 +13,18 @@ evidence      : /home/user/glibc-research/evidence/poc/91-qt-xcb
   ok    a plan for qtbase was produced               = ok
         keeping: libxcb libxcb-util libxcb-image libxcb-keysyms libxcb-render-util libxcb-wm libxcb-cursor libxdmcp libxau libx11 libxext libxrender libxi libxfixes libxkbcommon libxml2 openssl xorgproto xcb-proto
         skipping 46 of qtbase's build inputs
+        built into the static prefix: libpthread-stubs libx11 libxau libxcb libxcb-cursor libxcb-image libxcb-keysyms libxcb-render-util libxcb-util libxcb-wm libxdmcp libxext libxfixes libxi libxkbcommon libxml2 libxrender openssl xcb-proto xkeyboard-config xorgproto xtrans 
+  ok    static libxcb in the prefix                  = ok
+  ok    static libxkbcommon in the prefix            = ok
+  ok    static openssl in the prefix                 = ok
+
+-- rung 2: the qtbase source ------------------------------------
+  ok    qtbase source present                        = ok
+
+-- rung 3: qtbase -static -xcb ---------------------------------
+
+-- rung 2b: proving the static xcb link before overriding Qt ----
+  ok    a static xcb + xkbcommon-x11 program links   = ok
+  ok    and it is static (no PT_INTERP)              = 0
+        so Qt is told TEST_xcb_syslibs=ON, with the link above as the evidence
+  ok    qtbase configures with xcb                   = ok

@@ -335,7 +335,7 @@ func dirsNamedIn(root, envFile string) []string {
 	var out []string
 	for _, m := range envAssign.FindAllStringSubmatch(string(b), -1) {
 		value := strings.Trim(strings.TrimSpace(m[2]), `"'`)
-		for _, part := range strings.Split(value, ":") {
+		for part := range strings.SplitSeq(value, ":") {
 			p := part
 			for _, v := range []string{"${SHARUN_DIR}", "$SHARUN_DIR", "${APPDIR}", "$APPDIR", "${ORIGIN}", "$ORIGIN"} {
 				p = strings.ReplaceAll(p, v, root)

@@ -20,6 +20,7 @@ package bundle
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/polaris0xff/glibc-research/internal/logx"
@@ -173,10 +174,5 @@ func dirSize(path string) int64 {
 }
 
 func containsString(list []string, want string) bool {
-	for _, s := range list {
-		if s == want {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(list, want)
 }

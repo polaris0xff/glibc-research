@@ -40,7 +40,7 @@ func ParsePluginSpec(spec string) (PluginSpec, error) {
 		return PluginSpec{}, fail.Cannot("--wrap-dlopen wants NAME=OBJECT[,OBJECT...], got: %s", spec)
 	}
 	var list []string
-	for _, o := range strings.Split(objs, ",") {
+	for o := range strings.SplitSeq(objs, ",") {
 		if o = strings.TrimSpace(o); o != "" {
 			list = append(list, o)
 		}

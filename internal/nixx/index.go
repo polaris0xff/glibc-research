@@ -191,7 +191,7 @@ func ReadIndex(path string, system string) ([]IndexRow, error) {
 		return nil, fail.Cannot("cannot read %s: %v", path, err)
 	}
 	var out []IndexRow
-	for _, line := range strings.Split(string(b), "\n") {
+	for line := range strings.SplitSeq(string(b), "\n") {
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}

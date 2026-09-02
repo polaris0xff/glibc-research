@@ -101,7 +101,7 @@ func onDiskDigest(dir string) string {
 	if err != nil {
 		return ""
 	}
-	for _, line := range strings.Split(string(b), "\n") {
+	for line := range strings.SplitSeq(string(b), "\n") {
 		if v, ok := strings.CutPrefix(line, "manifest digest:"); ok {
 			return strings.TrimSpace(v)
 		}

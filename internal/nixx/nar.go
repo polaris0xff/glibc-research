@@ -19,6 +19,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 )
@@ -353,7 +354,7 @@ func narDumpNode(path string, w io.Writer) error {
 		}
 		// Sorted by bytes, not by locale: nix asserts this on read, and a
 		// locale-aware sort produces an archive nix itself refuses.
-		sort.Slice(names, func(i, j int) bool { return names[i] < names[j] })
+		slices.Sort(names)
 		for _, name := range names {
 			for _, tok := range []string{"entry", "(", "name", name, "node"} {
 				if err := narWriteStr(w, tok); err != nil {
@@ -409,7 +410,7 @@ type Narinfo map[string]string
 // ParseNarinfo reads the document.
 func ParseNarinfo(text string) Narinfo {
 	info := Narinfo{}
-	for _, line := range strings.Split(text, "\n") {
+	for line := range strings.SplitSeq(text, "\n") {
 		k, v, ok := strings.Cut(line, ": ")
 		if ok {
 			info[k] = v
@@ -428,7 +429,7 @@ func (n Narinfo) Fingerprint() ([]byte, error) {
 		}
 	}
 	var refs []string
-	for _, r := range strings.Fields(n["References"]) {
+	for r := range strings.FieldsSeq(n["References"]) {
 		refs = append(refs, "/nix/store/"+r)
 	}
 	return []byte(fmt.Sprintf("1;%s;%s;%s;%s",
@@ -451,7 +452,7 @@ func (n Narinfo) Verify(keys map[string]ed25519.PublicKey) (bool, string) {
 		names = append(names, k)
 	}
 	sort.Strings(names)
-	for _, one := range strings.Fields(sig) {
+	for one := range strings.FieldsSeq(sig) {
 		name, b64, ok := strings.Cut(one, ":")
 		if !ok {
 			continue

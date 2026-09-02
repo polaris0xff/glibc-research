@@ -86,7 +86,7 @@ func Inspect(path string) (*Info, error) {
 func splitPathList(vals []string) []string {
 	var out []string
 	for _, v := range vals {
-		for _, p := range strings.Split(v, ":") {
+		for p := range strings.SplitSeq(v, ":") {
 			if p != "" {
 				out = append(out, p)
 			}

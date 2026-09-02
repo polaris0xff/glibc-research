@@ -81,7 +81,7 @@ func readEnv(path string) ([]string, map[string]string, error) {
 	}
 	var order []string
 	acc := map[string]string{}
-	for _, raw := range strings.Split(string(b), "\n") {
+	for raw := range strings.SplitSeq(string(b), "\n") {
 		line := strings.TrimSpace(raw)
 		if line == "" || strings.HasPrefix(line, "#") || !strings.Contains(line, "=") {
 			continue

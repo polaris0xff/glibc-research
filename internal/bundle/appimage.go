@@ -216,7 +216,7 @@ func (b *Builder) resolveTarget() (string, error) {
 	}
 	out, code := proc.CaptureAllowFail(filepath.Join(pfx, "nix-instantiate"), "<nixpkgs>", "--attr", b.O.Target)
 	drv := ""
-	for _, line := range strings.Split(out, "\n") {
+	for line := range strings.SplitSeq(out, "\n") {
 		if strings.HasPrefix(line, "/nix/store/") {
 			drv, _, _ = strings.Cut(line, "!")
 			break
@@ -353,7 +353,7 @@ func (b *Builder) hasMesaDriver() bool {
 // symlinks pointing at store paths that are not here, and copying one without
 // resolving it fails in a way the caller then reports as a success.
 func (b *Builder) storeResolve(p string) string {
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		fi, err := os.Lstat(p)
 		if err != nil {
 			return ""
@@ -416,7 +416,7 @@ func (b *Builder) resolveEntry(storeDir, prog string, nameWasAsked bool) (string
 		logx.Warnf("bin/%s does not exist; falling back to bin/%s", prog, filepath.Base(bin))
 	}
 
-	for hop := 0; hop < 5; hop++ {
+	for range 5 {
 		if recs := ReadWrapper(bin); len(recs) > 0 {
 			target := WrapperTarget(recs)
 			for _, r := range recs {

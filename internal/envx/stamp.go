@@ -72,11 +72,10 @@ func ParseStamp(s string) (Stamp, bool) {
 }
 
 func field(s, key string) (string, bool) {
-	i := strings.Index(s, key)
-	if i < 0 {
+	_, rest, ok := strings.Cut(s, key)
+	if !ok {
 		return "", false
 	}
-	rest := s[i+len(key):]
 	if j := strings.IndexAny(rest, " \t"); j >= 0 {
 		rest = rest[:j]
 	}
@@ -89,11 +88,11 @@ func bracketField(s, key string) (string, bool) {
 		return "", false
 	}
 	rest := s[i+len(key)+1:]
-	j := strings.IndexByte(rest, ']')
-	if j < 0 {
+	before, _, ok := strings.Cut(rest, "]")
+	if !ok {
 		return "", false
 	}
-	return rest[:j], true
+	return before, true
 }
 
 // Have reads the stamp an engine's environment actually carries. An empty
@@ -277,7 +276,7 @@ func readDescription(path string) (map[string]string, error) {
 		return nil, err
 	}
 	out := map[string]string{}
-	for _, line := range strings.Split(string(b), "\n") {
+	for line := range strings.SplitSeq(string(b), "\n") {
 		k, v, ok := strings.Cut(line, ": ")
 		if !ok {
 			continue

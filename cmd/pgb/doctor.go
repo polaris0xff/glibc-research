@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 
 	assets "github.com/polaris0xff/glibc-research"
@@ -150,12 +151,7 @@ func hasNSSConfigureLookup() bool {
 	if err != nil {
 		return false
 	}
-	for _, s := range syms {
-		if s == "__nss_configure_lookup" {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(syms, "__nss_configure_lookup")
 }
 
 func infoOK(engine string) bool {
@@ -171,8 +167,8 @@ func capture(argv ...string) string {
 }
 
 func firstLine(s string) string {
-	if i := strings.IndexByte(s, '\n'); i >= 0 {
-		return s[:i]
+	if before, _, ok := strings.Cut(s, "\n"); ok {
+		return before
 	}
 	if s == "" {
 		return "none"
@@ -193,7 +189,7 @@ func prettyName() string {
 	if err != nil {
 		return "unknown"
 	}
-	for _, line := range strings.Split(string(b), "\n") {
+	for line := range strings.SplitSeq(string(b), "\n") {
 		if v, ok := strings.CutPrefix(line, "PRETTY_NAME="); ok {
 			return strings.Trim(v, `"`)
 		}

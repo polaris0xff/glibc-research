@@ -207,7 +207,7 @@ func fetchDecoded(url, dst string) error {
 
 func (c *Client) get(url string) (io.ReadCloser, error) {
 	var lastErr error
-	for attempt := 0; attempt < 3; attempt++ {
+	for attempt := range 3 {
 		if attempt > 0 {
 			time.Sleep(time.Duration(attempt) * 2 * time.Second)
 		}
@@ -309,7 +309,7 @@ func (c *Client) Closure(root string) ([]string, error) {
 				return nil, err
 			}
 			out = append(out, info["StorePath"])
-			for _, r := range strings.Fields(info["References"]) {
+			for r := range strings.FieldsSeq(info["References"]) {
 				rh := HashOf(r)
 				if !seen[rh] {
 					next = append(next, rh)

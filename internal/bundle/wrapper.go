@@ -48,18 +48,14 @@ type WrapRecord struct {
 // count at 1000.
 func findCWrapperCommand(blob []byte) (string, bool) {
 	const marker = "makeCWrapper"
-	i := bytes.Index(blob, []byte(marker))
-	if i < 0 {
+	_, rest, ok := bytes.Cut(blob, []byte(marker))
+	if !ok {
 		return "", false
 	}
-	rest := blob[i+len(marker):]
 	if len(rest) == 0 {
 		return "", false
 	}
-	limit := len(rest)
-	if limit > 1<<16 {
-		limit = 1 << 16
-	}
+	limit := min(len(rest), 1<<16)
 	rest = rest[:limit]
 	// The block ends at the first newline followed by a line with nothing on
 	// it but whitespace.
@@ -142,7 +138,7 @@ func readBinaryWrapper(path string) []WrapRecord {
 func joinContinuations(text string) string {
 	text = strings.ReplaceAll(text, "\\\n", " ")
 	var out []string
-	for _, line := range strings.Split(text, "\n") {
+	for line := range strings.SplitSeq(text, "\n") {
 		s := strings.TrimSpace(line)
 		if strings.HasPrefix(s, "#") {
 			break
@@ -171,7 +167,7 @@ func readShellWrapper(path string) []WrapRecord {
 	}
 	var recs []WrapRecord
 	target := ""
-	for _, line := range strings.Split(string(b), "\n") {
+	for line := range strings.SplitSeq(string(b), "\n") {
 		if m := execRe.FindStringSubmatch(line); m != nil && strings.HasPrefix(m[1], "/nix/store/") {
 			target = m[1]
 			continue

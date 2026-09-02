@@ -241,7 +241,7 @@ func (d *decoder) copyMatch(offset, matchLen int) error {
 		return errCorrupt("match offset reaches before this frame's output")
 	}
 	start := len(d.window) - offset
-	for i := 0; i < matchLen; i++ {
+	for i := range matchLen {
 		d.window = append(d.window, d.window[start+i])
 	}
 	return nil

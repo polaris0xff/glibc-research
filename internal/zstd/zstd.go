@@ -184,7 +184,7 @@ func (r *Reader) readFrameHeader() error {
 			return errCorrupt("truncated frame header")
 		}
 	}
-	for i := 0; i < dictLen; i++ {
+	for i := range dictLen {
 		if r.hdr[i] != 0 {
 			return errCorrupt("frame needs a dictionary, which pgb does not carry")
 		}
@@ -257,7 +257,7 @@ func (r *Reader) readBlock() error {
 		if _, err := io.ReadFull(r.src, b[:]); err != nil {
 			return errCorrupt("truncated RLE block")
 		}
-		for i := 0; i < size; i++ {
+		for range size {
 			r.d.window = append(r.d.window, b[0])
 		}
 	case 2:

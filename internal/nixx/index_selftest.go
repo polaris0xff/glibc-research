@@ -50,7 +50,7 @@ func IndexSelftest() *selftest.Report {
 	// same count as a whole-document decode.
 	var big strings.Builder
 	big.WriteString(`{"packages":{`)
-	for k := 0; k < 500; k++ {
+	for k := range 500 {
 		if k > 0 {
 			big.WriteString(",")
 		}
@@ -145,10 +145,7 @@ func (c *choppyReader) Read(p []byte) (int, error) {
 	if c.i >= len(c.s) {
 		return 0, io.EOF
 	}
-	n := c.n
-	if n > len(p) {
-		n = len(p)
-	}
+	n := min(c.n, len(p))
 	if c.i+n > len(c.s) {
 		n = len(c.s) - c.i
 	}

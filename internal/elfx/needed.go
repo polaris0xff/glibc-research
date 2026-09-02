@@ -91,7 +91,7 @@ func Shorten(path string) (ShortenResult, error) {
 // boundary, so a suffix of a longer entry is never matched.
 func findString(tab []byte, want string) int {
 	start := 0
-	for i := 0; i < len(tab); i++ {
+	for i := range tab {
 		if tab[i] != 0 {
 			continue
 		}

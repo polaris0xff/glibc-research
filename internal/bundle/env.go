@@ -38,7 +38,7 @@ func FoldEnv(path string) (keys int, before, after int64, err error) {
 	}
 	var order []string
 	acc := map[string]string{}
-	for _, raw := range strings.Split(string(b), "\n") {
+	for raw := range strings.SplitSeq(string(b), "\n") {
 		line := strings.TrimSpace(raw)
 		if line == "" || strings.HasPrefix(line, "#") || !strings.Contains(line, "=") {
 			continue
@@ -93,7 +93,7 @@ func dedupePath(v, sep string) string {
 	}
 	seen := map[string]bool{}
 	var out []string
-	for _, part := range strings.Split(v, sep) {
+	for part := range strings.SplitSeq(v, sep) {
 		if seen[part] {
 			continue
 		}

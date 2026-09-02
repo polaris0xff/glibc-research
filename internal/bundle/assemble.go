@@ -196,7 +196,7 @@ func (b *Builder) copyLibraries() error {
 	// Symlinks too: libfoo.so.6 -> libfoo.so.6.0.1 is how a DT_NEEDED
 	// resolves. The pass repeats because a closure has symlinks TO symlinks
 	// and one pass is order-dependent.
-	for round := 0; round < 6; round++ {
+	for range 6 {
 		made := 0
 		_ = filepath.Walk(b.Root, func(p string, fi os.FileInfo, err error) error {
 			if err != nil || fi.IsDir() {

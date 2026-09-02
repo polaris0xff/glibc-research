@@ -16,6 +16,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"io"
+	"maps"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -195,9 +196,7 @@ func fixtures(r *selftest.Report, dir string) {
 		}
 		// The negative case is the half that proves the positive one.
 		tampered := Narinfo{}
-		for k, v := range info {
-			tampered[k] = v
-		}
+		maps.Copy(tampered, info)
 		if n, err := strconv.Atoi(info["NarSize"]); err == nil {
 			tampered["NarSize"] = strconv.Itoa(n + 1)
 		} else {

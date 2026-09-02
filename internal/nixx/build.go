@@ -289,7 +289,7 @@ func (b *Builder) planFromDrv(drvPath, query, out string) (*Plan, error) {
 		return nil, err
 	}
 	fetched := 1
-	for _, ref := range strings.Fields(info["References"]) {
+	for ref := range strings.FieldsSeq(info["References"]) {
 		if !strings.HasSuffix(ref, ".drv") {
 			continue
 		}
@@ -376,7 +376,7 @@ func (b *Builder) planEval(attr, out string) (*Plan, error) {
 	outText, code := proc.CaptureAllowFail(filepath.Join(pfx, "nix-instantiate"),
 		"<nixpkgs>", "--attr", attr)
 	drv := ""
-	for _, line := range strings.Split(outText, "\n") {
+	for line := range strings.SplitSeq(outText, "\n") {
 		if strings.HasPrefix(line, "/nix/store/") {
 			drv, _, _ = strings.Cut(line, "!")
 			break
@@ -814,7 +814,7 @@ func crc32String(s string) uint32 {
 	var crc uint32 = 0xffffffff
 	for i := 0; i < len(s); i++ {
 		crc ^= uint32(s[i])
-		for j := 0; j < 8; j++ {
+		for range 8 {
 			if crc&1 != 0 {
 				crc = (crc >> 1) ^ 0xedb88320
 			} else {

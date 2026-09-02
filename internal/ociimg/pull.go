@@ -22,6 +22,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -59,11 +60,11 @@ type reference struct {
 func parseRef(ref string) reference {
 	registry := "registry-1.docker.io"
 	rest := ref
-	if i := strings.IndexByte(ref, '/'); i >= 0 {
-		head := ref[:i]
+	if before, after, ok := strings.Cut(ref, "/"); ok {
+		head := before
 		if strings.Count(ref, "/") >= 2 ||
 			strings.ContainsAny(head, ".:") || head == "localhost" {
-			registry, rest = head, ref[i+1:]
+			registry, rest = head, after
 		}
 	} else {
 		rest = "library/" + ref
@@ -125,7 +126,7 @@ func newClient(ref reference) *client {
 func (c *client) get(path string) (*http.Response, error) {
 	url := fmt.Sprintf("https://%s/v2/%s", c.ref.Registry, path)
 	var lastErr error
-	for attempt := 0; attempt < 4; attempt++ {
+	for attempt := range 4 {
 		if attempt > 0 {
 			time.Sleep(time.Duration(attempt) * 2 * time.Second)
 		}
@@ -582,9 +583,9 @@ func extractLayer(blob, mediaType, dst string) error {
 	}
 	// Directory modes are applied last so a read-only directory does not block
 	// writing its own contents.
-	for i := len(dirs) - 1; i >= 0; i-- {
-		_ = os.Chmod(dirs[i].path, dirs[i].mode)
-		_ = os.Chtimes(dirs[i].path, dirs[i].mod, dirs[i].mod)
+	for _, dir := range slices.Backward(dirs) {
+		_ = os.Chmod(dir.path, dir.mode)
+		_ = os.Chtimes(dir.path, dir.mod, dir.mod)
 	}
 	return nil
 }

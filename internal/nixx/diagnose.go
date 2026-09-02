@@ -12,6 +12,7 @@ package nixx
 import (
 	"os"
 	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -61,12 +62,7 @@ func diagnose(logFile string, flags []string) string {
 	}
 	text := string(b)
 	has := func(f string) bool {
-		for _, x := range flags {
-			if x == f {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(flags, f)
 	}
 
 	if m := mesonUnknownOption.FindStringSubmatch(text); m != nil {

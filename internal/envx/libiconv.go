@@ -113,7 +113,7 @@ func BuildLibiconv(prefix, version string, force bool) error {
 func download(url, dst string) error {
 	client := &http.Client{Timeout: 30 * time.Minute}
 	var lastErr error
-	for attempt := 0; attempt < 4; attempt++ {
+	for attempt := range 4 {
 		if attempt > 0 {
 			time.Sleep(time.Duration(attempt) * 2 * time.Second)
 		}

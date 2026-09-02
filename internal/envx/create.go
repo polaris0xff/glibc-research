@@ -232,7 +232,7 @@ func Info(c *cfg.Config) error {
 	if fi, err := os.Stat(root); err == nil && fi.IsDir() {
 		logx.Say("  %-22s %s", "state", "created")
 		if b, err := os.ReadFile(filepath.Join(root, ".pgb-env")); err == nil {
-			for _, line := range strings.Split(strings.TrimRight(string(b), "\n"), "\n") {
+			for line := range strings.SplitSeq(strings.TrimRight(string(b), "\n"), "\n") {
 				logx.Say("    %s", line)
 			}
 		}
@@ -257,8 +257,8 @@ func captureInRoot(root string, argv ...string) string {
 }
 
 func firstLineOf(s string) string {
-	if i := strings.IndexByte(s, '\n'); i >= 0 {
-		return s[:i]
+	if before, _, ok := strings.Cut(s, "\n"); ok {
+		return before
 	}
 	return strings.TrimSpace(s)
 }

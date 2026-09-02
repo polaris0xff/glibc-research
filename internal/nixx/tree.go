@@ -18,6 +18,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -322,12 +323,7 @@ func (b *Builder) pgbPath() string {
 }
 
 func hasHook(hooks []string, want string) bool {
-	for _, h := range hooks {
-		if h == want {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(hooks, want)
 }
 
 func quoteAll(in []string) []string {

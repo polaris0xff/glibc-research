@@ -42,7 +42,7 @@ func buildFSE(counts []int16, log int) (*fseTable, error) {
 	mask := size - 1
 	pos := 0
 	for s, c := range counts {
-		for i := int16(0); i < c; i++ {
+		for range c {
 			t.symbol[pos] = uint8(s)
 			pos = (pos + step) & mask
 			for pos > high {
@@ -54,7 +54,7 @@ func buildFSE(counts []int16, log int) (*fseTable, error) {
 		return nil, errCorrupt("FSE table does not close")
 	}
 
-	for u := 0; u < size; u++ {
+	for u := range size {
 		s := t.symbol[u]
 		state := next[s]
 		next[s]++

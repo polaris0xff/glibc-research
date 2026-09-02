@@ -211,7 +211,7 @@ func planCommand(args []string) error {
 func drvCommand(args []string) error {
 	format := "text"
 	var files []string
-	for i := 0; i < len(args); i++ {
+	for i := range args {
 		switch args[i] {
 		case "--json":
 			format = "json"

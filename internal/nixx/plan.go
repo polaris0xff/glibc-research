@@ -16,8 +16,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"maps"
 	"math/big"
 	"path"
+	"slices"
 	"sort"
 	"strings"
 
@@ -213,8 +215,8 @@ func BuildPlan(doc ShowRecursive, attr, drvPath, nixpkgsVersion, nixPrefix strin
 		rec := Source{Store: storePath, URLs: []string{}}
 		base := path.Base(storePath)
 		name := base
-		if i := strings.Index(base, "-"); i >= 0 {
-			name = base[i+1:]
+		if _, after, ok := strings.Cut(base, "-"); ok {
+			name = after
 		}
 		drv := outIndex[base]
 		if drv == "" {
@@ -362,13 +364,9 @@ func ReadPlan(r io.Reader) (*Plan, error) {
 // keeps there.
 func attrsOf(d ShowDrv) map[string]any {
 	out := map[string]any{}
-	for k, v := range d.Env {
-		out[k] = v
-	}
+	maps.Copy(out, d.Env)
 	if len(d.StructuredAttrs) > 0 {
-		for k, v := range d.StructuredAttrs {
-			out[k] = v
-		}
+		maps.Copy(out, d.StructuredAttrs)
 	}
 	return out
 }
@@ -450,19 +448,14 @@ func fullStore(p string) string {
 // storeName strips the hash prefix from a store path's base name.
 func storeName(p string) string {
 	b := path.Base(p)
-	if i := strings.Index(b, "-"); i >= 0 {
-		return b[i+1:]
+	if _, after, ok := strings.Cut(b, "-"); ok {
+		return after
 	}
 	return b
 }
 
 func contains(list []string, want string) bool {
-	for _, s := range list {
-		if s == want {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(list, want)
 }
 
 const nixHashAlphabet = "0123456789abcdfghijklmnpqrsvwxyz"
@@ -509,13 +502,7 @@ func NormaliseHash(h string) string {
 }
 
 func isHexOfLen(s string, lens ...int) bool {
-	ok := false
-	for _, n := range lens {
-		if len(s) == n {
-			ok = true
-			break
-		}
-	}
+	ok := slices.Contains(lens, len(s))
 	if !ok {
 		return false
 	}

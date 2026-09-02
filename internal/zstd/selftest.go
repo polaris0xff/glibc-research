@@ -30,19 +30,19 @@ func subjects() map[string][]byte {
 	m["run"] = []byte(strings.Repeat("Z", 5000))
 
 	var alt []byte
-	for i := 0; i < 200000; i++ {
+	for i := range 200000 {
 		alt = append(alt, byte(i%2))
 	}
 	m["alt"] = alt
 
 	var counter []byte
-	for i := 0; i < 20000; i++ {
+	for i := range 20000 {
 		counter = append(counter, []byte(fmt.Sprintf("%08d,", i))...)
 	}
 	m["counter"] = counter
 
 	var prose []byte
-	for i := 0; i < 700; i++ {
+	for i := range 700 {
 		prose = append(prose, []byte(fmt.Sprintf(
 			"the %d quick brown foxes jump over %d lazy dogs while the band plays on\n", i, i*7))...)
 	}

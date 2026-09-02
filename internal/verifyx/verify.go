@@ -290,7 +290,7 @@ func parseStrace(text, want string) (libs, data []string, ok bool) {
 	seen := false
 	libSet := map[string]bool{}
 	dataSet := map[string]bool{}
-	for _, line := range strings.Split(text, "\n") {
+	for line := range strings.SplitSeq(text, "\n") {
 		pid := ""
 		if m := pidPattern.FindStringSubmatch(line); m != nil {
 			pid = m[1]
@@ -414,7 +414,7 @@ func runContainer(c *cfg.Config, engine string, img cfg.ImageRow, bin string, ar
 func classifyTracerOutput(out string) (libs, data []string) {
 	libSet := map[string]bool{}
 	dataSet := map[string]bool{}
-	for _, line := range strings.Split(out, "\n") {
+	for line := range strings.SplitSeq(out, "\n") {
 		p, ok := strings.CutPrefix(line, "open ")
 		if !ok {
 			continue

@@ -34,7 +34,7 @@ func readHuffTable(src []byte) (*huffTable, int, error) {
 			return nil, 0, errCorrupt("truncated Huffman weights")
 		}
 		weights = make([]uint8, n)
-		for i := 0; i < n; i++ {
+		for i := range n {
 			b := src[1+i/2]
 			if i%2 == 0 {
 				weights[i] = b >> 4
@@ -107,7 +107,7 @@ func readHuffTable(src []byte) (*huffTable, int, error) {
 		}
 		span := 1 << (w - 1)
 		nb := uint8(log + 1 - int(w))
-		for i := 0; i < span; i++ {
+		for i := range span {
 			t.symbol[start[w]+i] = uint8(s)
 			t.nbits[start[w]+i] = nb
 		}
@@ -161,7 +161,7 @@ func (t *huffTable) decodeLiterals(src []byte, streams int, out []byte) error {
 	}
 	sizes := [4]int{s1, s2, s3, s4}
 	off, pos := 0, 0
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		if err := t.decodeStream(body[off:off+sizes[i]], out[pos:pos+bounds[i]]); err != nil {
 			return err
 		}

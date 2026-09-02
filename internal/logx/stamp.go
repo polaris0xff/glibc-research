@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -45,18 +46,12 @@ type StampConfig struct {
 func ParseColumns(spec string) ([]Column, error) {
 	var out []Column
 	seen := map[Column]bool{}
-	for _, raw := range strings.Split(spec, ",") {
+	for raw := range strings.SplitSeq(spec, ",") {
 		s := Column(strings.ToLower(strings.TrimSpace(raw)))
 		if s == "" {
 			continue
 		}
-		ok := false
-		for _, k := range knownColumns {
-			if s == k {
-				ok = true
-				break
-			}
-		}
+		ok := slices.Contains(knownColumns, s)
 		if !ok {
 			names := make([]string, len(knownColumns))
 			for i, k := range knownColumns {

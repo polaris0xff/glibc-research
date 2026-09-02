@@ -126,7 +126,7 @@ func Configure(verbose bool, levelFlag, debugFlag string) error {
 }
 
 func applySubsys(spec string) {
-	for _, raw := range strings.Split(spec, ",") {
+	for raw := range strings.SplitSeq(spec, ",") {
 		s := strings.TrimSpace(raw)
 		switch {
 		case s == "":
@@ -221,7 +221,7 @@ func (lg *Logger) emit(l Level, format string, args ...any) {
 	if color {
 		prefix = colorize(l, prefix)
 	}
-	for _, line := range strings.Split(strings.TrimRight(msg, "\n"), "\n") {
+	for line := range strings.SplitSeq(strings.TrimRight(msg, "\n"), "\n") {
 		fmt.Fprintf(os.Stderr, "%s: %s\n", prefix, line)
 	}
 }

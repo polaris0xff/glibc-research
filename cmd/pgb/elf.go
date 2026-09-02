@@ -6,6 +6,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/polaris0xff/glibc-research/internal/elfx"
@@ -146,13 +147,7 @@ func elfSelftest() *selftest.Report {
 		if err != nil {
 			r.Fail("archive-symbols", err.Error(), "a symbol list")
 		} else {
-			found := false
-			for _, s := range syms {
-				if s == "__nss_configure_lookup" {
-					found = true
-					break
-				}
-			}
+			found := slices.Contains(syms, "__nss_configure_lookup")
 			r.CheckBool("archive-reader-finds-nss-symbol", found, true)
 			r.CheckBool("archive-reader-returns-many", len(syms) > 100, true)
 		}
