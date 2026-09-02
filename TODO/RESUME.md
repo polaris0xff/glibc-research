@@ -50,10 +50,29 @@ both re-run.
 
 ## In flight right now
 
-    pgb env create   pgb-env-debian-trixie, background, log in the session
-                     scratchpad. This is the long pole for T-070 arm 5.
-    pgb bootstrap    the docker environment is still building; the chroot
-                     engine works now (`pgb --engine chroot ...`).
+    experiments/91-  ⛔ RUNNING, arm 5, the ten POCs against
+                     pgb-env-debian-trixie. It OWNS THE BED -- do not start
+                     85-, 93- or any POC beside it. Log:
+                     scratchpad/exp91-full.log; per-POC logs under
+                     evidence/91-glibc-pin-candidates/build/poc-*.log.
+                     Green so far: 10-gawk, 20-nano, both at gcc 14.2.0.
+
+    bootstrap is COMPLETE: nix, chroot env, docker env, 11 of 11 rootfs.
+    pgb-env-debian-trixie is built: glibc 2.41, gcc 14.2.0.
+
+## ⛔ THE INCANTATION FOR A CANDIDATE ENVIRONMENT, AND THE OLD ONE WAS WRONG
+
+⛔ **`PGB_ENV_NAME=... sh poc/<name>/run.sh` -- what the last RESUME and the
+work order both prescribed -- BUILDS AGAINST THE INCUMBENT** on any machine
+running dockerd, and nothing in the POC's output says so. Caught by reading
+`.comment` out of the binary: `GCC: (Debian 12.2.0-14+deb12u1)` where the
+candidate carries 14.2.0. Fixed in commit 333cb92f; `pgb` now refuses it. All
+four of these are needed:
+
+    PGB_ENGINE=chroot                 the only engine that READS a name
+    PGB_ENV_NAME=pgb-env-debian-trixie
+    PGB_ENV_IMAGE=debian:trixie       the stamp guard compares IMAGES, not
+    PGB_ENV_DIGEST=sha256:6788062a…   names, so without these it sees a match
 
 ⭐ **The loose end the work order named is ALREADY CLOSED** — commit 72effbe5,
 which landed after the work order was written. The naive-vs-fast sweep
