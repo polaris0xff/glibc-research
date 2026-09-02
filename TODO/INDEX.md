@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 40  OPEN 19  DONE 21
+    TOTAL 41  OPEN 19  DONE 22
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
-| P0 | breaks correctness, loses data, or takes the process down | 5 | 4 | 1 |
-| P1 | a documented capability does not work, or a flag does nothing | 27 | 10 | 17 |
+| P0 | breaks correctness, loses data, or takes the process down | 5 | 3 | 2 |
+| P1 | a documented capability does not work, or a flag does nothing | 28 | 11 | 17 |
 | P2 | worth doing; nothing is wrong without it | 8 | 5 | 3 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -53,10 +53,11 @@ pretending to be one.
 | T-061 | P0 | XL | done | toolchain | Port the whole toolchain to Go, and ship one static `pgb` |
 | T-062 | P1 | M | open | toolchain | Eight packages carry no selftest, `internal/wrapper` among them |
 | T-063 | P1 | L | open | poc | miniflux + an embedded PostgreSQL, against onelf's ~70 MB |
-| T-064 | P0 | XL | open | runtime | ⛔ Make static glibc's `dlopen` really solved, with our own loader |
+| T-064 | P0 | XL | done | runtime | ⭐ Static glibc's `dlopen`, really solved: our own ELF loader, 11 of 11 |
 | T-065 | P0 | L | open | research | ⛔ anylinux dlopens the HOST on purpose — restudy why, and adopt the policy |
 | T-066 | P0 | XL | open | toolchain | ⛔ The bundler is bloated and slow — rebuild it against a CLI benchmark |
 | T-067 | P0 | M | open | toolchain | ⛔ Does zig buy anything the C runtime pieces cannot? |
+| T-068 | P1 | M | open | runtime | The residue `--host-dlopen` does not load: 86 of 904, each classified |
 
 ## The argument behind the ordering
 

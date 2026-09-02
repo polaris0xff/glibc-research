@@ -344,7 +344,7 @@ before suspecting the mechanism, and say which it was.
 
 **Source** ⭐ **operator, 2026-09-02b**: *"static glibc really 'solved', restudy
 solo reference, implement a better faster version of cross libc dlopen"*.
-**Category** runtime · **Priority** P0 · **Effort** XL · **Status** open
+**Category** runtime · **Priority** P0 · **Effort** XL · **Status** done
 
 ⛔ **WORK UNTIL IT IS MET OR THE PREMISE IS SIGNIFICANTLY ADVANCED.** This is
 not a spike. `docs/limitations.md` §1 is the project's one measured, unfixed
@@ -393,3 +393,109 @@ object** — start with the gawk extension `poc/10-gawk` already fails on — on
 on every row, against a control that uses the host loader and fails. Plus a
 measurement against solo's own loader: ours must be smaller in lines and
 faster to first symbol, or the "better faster" in the instruction is unmet.
+
+## ✅ Done — `sh experiments/76-host-dlopen.sh`, exit 0, four of four
+
+`evidence/76-host-dlopen/RESULT.txt`. The mechanism is
+`tool/runtime/pgb-elfload.c` and `pgb build --host-dlopen`.
+
+```
+TARGET                 LIBC   CARRIED   NATIVE    CONTROL   HOST .so LOADED
+alpine-3.22            musl   ok        exit1     exit1     none
+alpine-3.20            musl   ok        exit1     exit1     none
+alpine-3.10            musl   ok        exit1     exit1     none
+voidlinux-musl         musl   ok        exit1     exit1     none
+debian-11              glibc  ok        ok        SIG6      none
+debian-12              glibc  ok        ok        SIG11     none
+ubuntu-20.04           glibc  ok        ok        SIG6      none
+rockylinux-8           glibc  ok        ok        SIG6      none
+opensuse-leap-15.6     glibc  ok        ok        SIG8      none
+fedora-42              glibc  ok        ok        SIG8      none
+archlinux-latest       glibc  ok        ok        SIG11     none
+
+  carried: nine assertions pass, every environment     = 11 of 11
+  carried: loaded no host shared object, every one     = 11 of 11
+  native:  loads a real host object on every glibc row  = 7 of 7
+  native:  refuses CLEANLY on every musl row, no signal = 4 of 4
+  control: ran                                          = 0 of 11
+```
+
+⭐ **On the four musl rows the carried arm is a GLIBC shared object being
+`dlopen`'d on a machine that ships no glibc**, from one ordinary static ELF —
+`PT_INTERP=0 DT_NEEDED=0` — with nothing beside it.
+
+**Against solo, at `79451211`.** ⭐ Smaller, and by more than the instruction
+hoped for: the expensive half of solo is the part a glibc host does not need.
+
+| | |
+|---|---|
+| ours, `pgb-elfload.c` | **1,093 code lines** (1,555 with comments) |
+| solo, `elf_loader.cpp` + `dlfcn.cpp` | 2,332 code lines |
+| solo, `glibc_shim.cpp` + `musl_tls.c` | 6,296 raw lines — glibc onto **musl**, and ours needs none of it |
+
+**Time to first symbol**, debian-12, one sample each, two objects in one
+process:
+
+| | first | second |
+|---|---|---|
+| ours | **147,543 ns** | 166,220 ns |
+| the same static binary reaching the host `ld.so` | 711,066 ns | 41,430 ns |
+
+⚠ **The per-load figures are at the noise floor** — ours' second exceeds its
+first — and are recorded, never asserted. The first column is not: the control
+must bring in `ld.so` and `libc.so.6` before it can load anything.
+⚠ **solo is not an arm and cannot be** — `docs/research/solo.md` records three
+failed build attempts on this machine, so nothing here has executed it.
+
+**The three honest unknowns the entry named, answered.**
+
+| | |
+|---|---|
+| **TLS** | half right. General dynamic was easy — the loader owns `__tls_get_addr`, which is `experiments/73-`'s class A. Initial exec needed glibc's own surplus: `_dl_tls_static_used`/`_size`/`_align` are plain 8-byte `GLOBAL OBJECT`s in `libc.a`, and `__libc_setup_tls` already allocates `memsz + surplus` in every thread, so the space exists and is only unclaimed. ⚠ A module is seeded with its init image in the loading thread only. |
+| **IFUNC** | `R_X86_64_IRELATIVE` runs the resolver at relocation time, as `ld.so` does. No separate problem appeared. |
+| **symbol versioning** | honoured, not ignored. A wrong version is a loud miss; an unversioned definition satisfies a versioned reference, which is `ld.so`'s documented compatibility rule and where the provider table sits. |
+
+**What is left, measured on 904 host objects on the build host** (818 load):
+20 undefined symbols, 4 `TLSDESC`, 2 objects wanting 56,248 bytes of static TLS
+against a 3,456-byte surplus, and 30 crashes that are almost all objects no
+static image should load — NSS modules, sanitizer and allocator interposers.
+The exception is `libLLVM`, which maps and relocates cleanly and dies in the
+605th of its C++ static constructors. ⚠ These are **T-068**, not this entry.
+
+**Four defects found while building it, every one by something disagreeing.**
+
+| | |
+|---|---|
+| `libm.a` is a **GNU ld script**, not an archive | read as `ar` it yields zero symbols in silence; the table had 4,891 names instead of 7,216 |
+| `__tls_get_addr` is in **no archive** | `ld.so` exports it; 398 of 492 undefined-symbol failures were that one name |
+| **`DT_RELR`** was ignored | Fedora and Arch pack relative relocations into a bitmap; ignoring it is a **silent wrong answer**, not a failure — `init_array[0] 0x670`, an unrelocated vaddr |
+| `make` did not depend on the **go:embed'd** C | editing the loader printed "Nothing to be done" and the next build used the previous loader |
+
+## T-068 — the residue `--host-dlopen` does not load, and it is 86 of 904
+
+**Source** the sweep in T-064: every shared object on the build host, 904 of
+them, one fork each, through `tool/runtime/pgb-elfload.c`.
+**Category** runtime · **Priority** P1 · **Effort** M · **Status** open
+
+⛔ **This exists so T-064's residue is carried as work rather than rounded off
+in a summary.** 818 of 904 load; these are the rest, ranked by how many objects
+demand each, which is `pg83/solo`'s `dev/abi_demand.py` shape.
+
+| n | what | route |
+|---|---|---|
+| 30 | **crash after loading**, and almost all of them are objects no static image should load: `libnss_*` (⛔ `docs/AGENTS.md` §14 says keeping NSS out IS the fix), `libtsan`/`libhwasan`/`libjemalloc`/`libmemusage`/`libpcprofile` — allocator and sanitizer interposers designed to arrive by `LD_PRELOAD` before libc initialises | refuse them by class, the way a served soname is already refused. That converts a crash into a named error and is most of this entry |
+| 20 | **undefined symbol** | the demand-ranked worklist. Read them out of `evidence/` and decide per name whether it is class B (host glibc newer than the pin), class S (in `libc.so.6`, never in `libc.a` — `libtirpc.a` is already in the pinned environment and defines the sunrpc half), or genuinely another library's |
+| 4 | **`R_X86_64_TLSDESC`** | needs a resolver trampoline. solo implements it; `lib/elf_loader.cpp` at `79451211` is the read |
+| 2 | **static TLS surplus exhausted** — one object wants 56,248 bytes against a 3,456-byte surplus | glibc sizes the surplus from `glibc.rtld.optional_static_tls`. Whether a static binary can raise its own before `__libc_setup_tls` runs is the question, and it is not yet answered |
+| 1 | ⭐ **`libLLVM`**, which maps and relocates cleanly and dies in the **605th** of its C++ static constructors | the one that is genuinely about the loader rather than about policy. It is the only crasher that is an ordinary library, and it is where the next real defect probably is |
+
+⚠ **And one that is not a count.** A module placed in glibc's static TLS
+surplus is seeded with its initialisation image in the thread that loaded it;
+threads created afterwards see zeros. Correct for the 14 of 24 measured modules
+whose `PT_TLS` `p_filesz` is 0, wrong for the other 10. ⭐ The route is
+`-Wl,--wrap=pthread_create`, which `pgb` already uses for four other
+mechanisms — seed the new thread's slices on the way in.
+
+**Prove.** The sweep re-run with a row per class, the crash count at zero
+because each is a named refusal rather than a signal, and `libLLVM` either
+loading or its 605th constructor explained.

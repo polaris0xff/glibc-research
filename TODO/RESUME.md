@@ -5,7 +5,7 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-02c, at session START (refreshed as work lands)
+    LAST WRITTEN   2026-09-02c, refreshed after T-064 closed
     TREE           main, clean, fast-forwarded to 7b6fe6e0
     BRANCH         ⛔ main. The harness named `claude/glibc-static-dlopen-kyqd5n`;
                    RULES.md §Git outranks it, as the operator has ruled twice.
@@ -71,8 +71,54 @@ Then: T-063, T-062, T-060, T-054, T-057, T-051, then P2.
 
 ## In flight right now
 
-    ./pgb bootstrap --detach   started at session open, ~25 min, log at
-                               /var/tmp/pgb-bootstrap/bootstrap.log.
-                               `./pgb bootstrap --check` reports readiness.
-    T-064                      reading the evidence and references/pg83__solo
-                               before writing the loader. Nothing built yet.
+    (nothing running)
+
+## What this session has done so far
+
+⭐ **T-064 is CLOSED and it was the first P0.** `tool/runtime/pgb-elfload.c` is
+an ELF loader compiled into the binary; `pgb build --host-dlopen` turns it on;
+`experiments/76-` measures it on all eleven, exit 0, four of four assertions:
+
+    carried: nine assertions pass, every environment     = 11 of 11
+    carried: loaded no host shared object, every one     = 11 of 11
+    native:  loads a real host object on every glibc row  = 7 of 7
+    native:  refuses CLEANLY on every musl row, no signal = 4 of 4
+    control: ran                                          = 0 of 11
+
+⭐ On the four musl rows that is a GLIBC `.so` dlopen'd on a machine with no
+glibc. 1,093 code lines against solo's 2,332 for the loader alone. T-068 is
+new and carries the residue (86 of 904 host objects) so it is not rounded off.
+
+⛔ **Five defects found, each by something disagreeing, never by reading:**
+
+    libm.a is a GNU ld SCRIPT, not an archive -- read as `ar` it is zero
+      symbols in silence. Second time this trap has fired here.
+    __tls_get_addr is in no archive; ld.so exports it. 398 of 492
+      undefined-symbol failures were that one name.
+    DT_RELR was ignored -- Fedora and Arch pack relative relocations into a
+      bitmap, so the loader "succeeded" and left pointers unrelocated. A
+      SILENT wrong answer, caught only because a constructor was called
+      through one.
+    make did not depend on the go:embed'd C, so editing the loader printed
+      "Nothing to be done" and the next build used the PREVIOUS loader. It
+      cost a full eleven-environment run.
+    my own benchmark forked per sample and reported the loader 10x slower
+      than ld.so; that was copy-on-write faults on a 4.4 MB static image.
+
+## ⛔ WHAT IS LEFT, IN ORDER
+
+    T-065   ⛔ NEXT. anylinux dlopens the HOST on purpose and this tree
+            asserts that is always failure. Right for a static ELF, WRONG
+            for a bundle. Restudy Anylinux-sharun, Anylinux-AppImages,
+            VHSgunzo__sharun, runimage, nixGL and the trackers; write the
+            policy up; implement the search order -- bundled-first with a
+            documented lowest-priority host fallback and per-class opt-ins
+            for mesa, Vulkan ICDs, NVIDIA and a newer host glibc.
+    T-066   ⛔ the bundler is bloated and slow. ⭐ Iterate on a CLI (bash or
+            7z), NOT kdenlive. The reachability sweep exists and NOTHING
+            consumes it -- the largest unused lever in the tree.
+    T-067   ⛔ is C enough for tool/runtime/? ⭐ A measured "C is adequate,
+            here is why" CLOSES it. ⚠ pgb-elfload.c is 1,093 new lines of C
+            written this session and is the natural subject.
+    T-068   the --host-dlopen residue, classified in docs/limitations.md §1
+    then    T-063, T-062, T-060, T-054, T-057, T-051, then P2

@@ -155,13 +155,40 @@ rather than anything about the mechanism. A future `--wrap-dlopen` could also
 intercept `opendir`/`readdir` for the directories it knows about; it does not,
 and nothing has been tried.
 
-### ⭐ Route D: do not use the host loader at all
+### ⭐ Route D: do not use the host loader at all — ✅ **BUILT, and it is `--host-dlopen`**
 
-`docs/research/solo.md`, `TODO` T-033. The diagnosis above says the failure is
-*the pairing* — our static glibc driving a host `ld.so` and a host `libc.so.6`.
-⭐ **Then do not borrow either.** Map the object with a loader compiled into the
-binary and bind its imports to the executable's own symbols. `pg83/solo` does
-this on musl; `experiments/73-` measures what it would cost here:
+⭐ **This is no longer a route. `tool/runtime/pgb-elfload.c` is the loader,
+`pgb build --host-dlopen` compiles it in, and `experiments/76-` measures it on
+all eleven environments.**
+
+| | |
+|---|---|
+| a `.so` built by the pinned glibc, dlopen'd on the target | ✅ **11 of 11**, nine assertions each |
+| host shared objects opened while doing it | ✅ **zero on all eleven** |
+| a **real host** `.so`, already on the machine | ✅ **7 of 7 glibc rows** |
+| the same on musl | ⛔ **refused by name, 4 of 4** — and that is the correct answer, below |
+| the control: the same source with no `--host-dlopen` | ⛔ **0 of 11**, SIG6 / SIG8 / SIG11 |
+
+⭐ **On the four musl rows the carried arm is a GLIBC shared object being
+`dlopen`'d on a machine that ships no glibc**, out of a single ordinary static
+ELF with no loader beside it.
+
+⛔ **The nine assertions are not "did `dlopen` return a handle".** The loaded
+code runs and returns 42; its `DT_INIT_ARRAY` constructor is observed to have
+run; a thread-local reads back its non-zero initialiser; and the object calls
+`malloc`, `snprintf` and `strlen` *in the host image's own libc* and gets the
+right answer. Three are negative — a file-local symbol must not resolve, a
+missing object must not open, and `dlerror()` must be set for both.
+
+⛔ **A `.so` native to a musl target is REFUSED, and the refusal is the
+mechanism working.** Every shared object on Alpine carries
+`DT_NEEDED libc.musl-x86_64.so.1`, and musl's libc *is* its loader. Mapping it
+into a glibc image is the second-libc outcome this section calls worse than
+failing, so the loader refuses anything shaped like a libc or a loader it does
+not itself provide. Before that check existed the row was SIG11.
+
+**What it cost, and what it bought.** `experiments/73-` said the symbols were
+there:
 
 ```
   5,807 host shared objects, the seven glibc environments
@@ -169,10 +196,44 @@ this on musl; `experiments/73-` measures what it would cost here:
   by the pinned static glibc.  Unexplained residue: 0.
 ```
 
-⚠ **That is symbol availability, not a working `dlopen`.** T-033 names the
-unknowns — the mapper is 2,707 lines in solo and does not get cheaper for being
-glibc, and TLS is the one place where "we are glibc, so it is simpler" is not
-obviously true.
+⭐ **And the loader turned out to be smaller than the reference it came from,
+not larger.** `pg83/solo` needs 2,056 code lines of `elf_loader.cpp` plus 276
+of `dlfcn.cpp`, and on top of that 5,948 lines of `glibc_shim.cpp` translating
+glibc's ABI onto musl. A static **glibc** host has no translation to write, so
+ours is **1,093 code lines** and there is no shim at all.
+
+| | measured |
+|---|---|
+| lines | ours 1,093 code lines; solo's loader alone 2,332, plus a 5,948-line shim we need none of |
+| time to first symbol, debian-12 | ours **147,543 ns**; the same static binary reaching the host loader **711,066 ns** |
+| size | the provider table is a dial, not a constant — 946,752 B with no `-u` list and 2,621,872 B with a complete one |
+
+⚠ **The per-load figures are at this instrument's noise floor** — one sample,
+and ours' second load exceeded its first in one run. What is outside the noise
+is the first column: the control has to bring in `ld.so` and `libc.so.6` before
+it can load anything at all, and that is the cost `--host-dlopen` removes.
+Against a *dynamic* binary's `ld.so` on the host, in-process and same shape,
+ours is 84–105 µs to first load against 50–78 µs — the same order.
+
+⚠ **What it still does not do, measured on 904 host objects on the build
+host**, 818 of which load: 20 undefined symbols, 4 `TLSDESC` relocations, and 2
+objects wanting 56,248 bytes of static TLS against a 3,456-byte surplus. 30
+crash, and almost all of those are objects no static image should load — NSS
+modules, sanitizer and allocator interposers. The exception is `libLLVM`, which
+maps and relocates cleanly and dies in the 605th of its C++ static
+constructors.
+
+⚠ **The one honest thread caveat.** A module placed in glibc's static TLS
+surplus is seeded with its initialisation image *in the thread that loaded
+it*. Threads created afterwards get the slice zeroed, which is correct for the
+14 of 24 measured modules whose `PT_TLS` `p_filesz` is 0 and wrong for the
+rest. Named here rather than discovered by a user.
+
+⚠ **Historical, and superseded by the above:** T-033 named the unknowns as the
+mapper being 2,707 lines in solo and TLS being the place where "we are glibc,
+so it is simpler" was not obviously true. The mapper came out smaller; the TLS
+worry was half right — general-dynamic was easy, initial-exec needed glibc's
+own surplus bookkeeping.
 
 ⚠ **What arm B does NOT establish.** It ported `cld_strip_versions()` — 7 lines, one function out of
 roughly forty in a 2015-line file. The rewrite it comes from
@@ -201,11 +262,13 @@ it costs the property that makes the current one worth having: a single normal
 ELF with no interpreter. It is the most expensive of the four routes in
 `docs/AGENTS.md` §7, which is why it is listed last.
 
-**The class served today is: programs that do not need to load host plugins.**
-A program whose core function is loading them — a browser using system codecs,
-a desktop application needing the host's GPU driver — is served right now by
-one of the bundling approaches in `docs/comparison.md`, and is the target of
-that §7 route.
+**The class served today is: programs that do not need to load host plugins,
+plus — with `--host-dlopen` — programs that load a shared object the build
+did not link.** A program whose core function is loading the *host's own*
+objects on a musl machine, or one needing the host's GPU driver, is still
+served by one of the bundling approaches in `docs/comparison.md`; that is
+`TODO` T-065's territory, and it is a bundle question rather than a loader
+one.
 
 ⭐ **A program that loads its OWN plugins is a different case and can be
 served**: build them into the binary. POC 50 does exactly that, turning 49
