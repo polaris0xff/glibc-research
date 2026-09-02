@@ -217,11 +217,24 @@ GATE 5 - the experiment suite, against the Go pgb
                                  agree with the undebloated one on 11 of 11)
   87-concurrent-build-options 0  matched expectation
   88-nonix-end-to-end         0  matched expectation (25 cases)
+  86-bundler-vs-anylinux      0  matched expectation (7 cases; see below)
 
-  ⛔ NO ROW YET: 86-bundler-vs-anylinux and 90-kdenlive-vs-enhanced were
-    never started -- both build a kdenlive-sized closure and the session's
-    disk allowance ran out on poc/91-qt-xcb first. Nothing here is
-    extrapolated from them.
+  ⭐ 86-bundler-vs-anylinux, session of 2026-09-02b. Both arms built, both
+    ran on 11 of 11, and NEITHER loaded a host shared object:
+
+      payload  jq-1.8.2 on both sides -- nixpkgs' build and Arch's
+      P  ours, one command from a package name   11,471,610 B, 7 store paths
+      A  hand-built Anylinux route                4,006,916 B, 68 libraries
+         ratio                                    ⛔ 2.86x, and ours is the
+                                                  BIGGER one
+
+    ⚠ Recorded as it came out rather than framed: the debloat level was
+    `safe`, and the size gap is the same one T-055 is about. The two arms
+    are also not the same build of jq -- nixpkgs' against Arch's -- which
+    the experiment says itself.
+
+  ⛔ NO ROW YET: 90-kdenlive-vs-enhanced. It builds a kdenlive-sized closure
+    and has not been started. Nothing here is extrapolated from it.
 
   ⚠ Three of these failed on their first run against the Go pgb and each
     failure was a real defect, not a harness difference:

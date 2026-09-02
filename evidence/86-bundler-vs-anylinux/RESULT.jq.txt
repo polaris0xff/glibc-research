@@ -1,0 +1,15 @@
+86 - our bundler against a hand-built Anylinux AppImage
+
+subject: jq   (arm P: nixpkgs jq-1.8.2, arm A: Arch jq-1.8.2)
+
+  ARTEFACT                            BYTES  NOTE
+  P  ours (nixpkgs closure)        11471610  7 store paths, --debloat safe
+  A  hand-built (Arch)              4006916  68 libraries deployed
+     ratio P/A                        2.86x
+
+ran on the eleven: P 11/11   A 11/11
+host shared objects: P 11/11 clean   A 11/11 clean
+
+per-environment startup and object columns: /home/user/glibc-research/evidence/86-bundler-vs-anylinux/per-environment.jq.txt
+
+conditions: 2026-09-02T07:32:12Z, Linux 6.18.44-fc-v22

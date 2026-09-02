@@ -31,3 +31,47 @@ evidence     : /home/user/glibc-research/evidence/86-bundler-vs-anylinux
   ENVIRONMENT         LIBC   | P:res    P:h   P:cold   P:warm   | A:res    A:h   A:cold   A:warm  
   alpine-3.22         musl   | ok       0     138ms    15ms     | ok       0     62ms     9ms     
   alpine-3.20         musl   | ok       0     141ms    12ms     | ok       0     64ms     10ms    
+  alpine-3.10         musl   | ok       0     128ms    19ms     | ok       0     66ms     10ms    
+  voidlinux-musl      musl   | ok       0     149ms    17ms     | ok       0     65ms     9ms     
+  debian-11           glibc  | ok       0     140ms    15ms     | ok       0     66ms     8ms     
+  debian-12           glibc  | ok       0     146ms    12ms     | ok       0     64ms     11ms    
+  ubuntu-20.04        glibc  | ok       0     137ms    12ms     | ok       0     63ms     9ms     
+  rockylinux-8        glibc  | ok       0     130ms    14ms     | ok       0     73ms     14ms    
+  opensuse-leap-15.6  glibc  | ok       0     138ms    15ms     | ok       0     74ms     13ms    
+  fedora-42           glibc  | ok       0     143ms    15ms     | ok       0     70ms     13ms    
+  archlinux-latest    glibc  | ok       0     141ms    18ms     | ok       0     68ms     13ms    
+
+  h = HOST shared objects the payload process opened. Objects the
+  artefact brought with it are counted separately and are in
+  per-environment.txt -- for both arms those are the bundled ld.so,
+  libc and the application's own libraries.
+
+  ⭐ cold is one chroot enter with a COLD dwarfs mount, guaranteed by
+  reaping the rootfs first. warm is (six invocations - cold) / 5, taken
+  inside ONE enter with the mount left alive -- which is what a real
+  user gets and what the first version of this instrument destroyed by
+  reaping between runs. experiments/40-'s noise floor applies: a
+  difference at or under it is "no difference measurable".
+
+  ok    arm P ran on every environment                 = 11
+  ok    arm A ran on every environment                 = 11
+  ok    arm P loaded no host shared object             = 11
+  ok    arm A loaded no host shared object             = 11
+
+-- ⛔ what this does NOT establish --------------------------------
+  not the same build   arm P ships nixpkgs' jq, arm A ships Arch's;
+                       jq-1.8.2 and jq-1.8.2. Same release here, which is luck
+                       rather than design -- different compilers,
+                       flags and dependency versions either way.
+  not a GUI            none of the eleven has a display, so what runs
+                       here is the subject's non-graphical path; the
+                       GL case is experiments/85- and 89-.
+  debloat level        safe -- experiments/89- measures what each
+                       level removes and shows on eleven rows that
+                       the removal cost nothing.
+  one machine, one day
+
+-- result ----------------------------------------------------
+pass=7 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------
