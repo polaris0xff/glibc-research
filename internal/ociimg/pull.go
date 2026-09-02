@@ -20,7 +20,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -28,6 +27,7 @@ import (
 
 	"github.com/polaris0xff/glibc-research/internal/fail"
 	"github.com/polaris0xff/glibc-research/internal/logx"
+	"github.com/polaris0xff/glibc-research/internal/zstd"
 )
 
 var log = logx.New("oci")
@@ -376,8 +376,7 @@ func openLayer(path, mediaType string) (io.ReadCloser, error) {
 		return nil, err
 	}
 	if strings.Contains(mediaType, "zstd") {
-		f.Close()
-		return openZstd(path)
+		return &closerPair{io.NopCloser(zstd.NewReader(f)), f}, nil
 	}
 	if strings.Contains(mediaType, "gzip") || mediaType == "" {
 		var magic [4]byte
@@ -398,41 +397,11 @@ func openLayer(path, mediaType string) (io.ReadCloser, error) {
 			}
 			return &closerPair{zr, f}, nil
 		case magic == [4]byte{0x28, 0xb5, 0x2f, 0xfd}:
-			f.Close()
-			return openZstd(path)
+			return &closerPair{io.NopCloser(zstd.NewReader(f)), f}, nil
 		}
 		return f, nil
 	}
 	return f, nil
-}
-
-// openZstd shells out, because zstd is not in the standard library. The error
-// says what is missing rather than reporting a corrupt layer.
-func openZstd(path string) (io.ReadCloser, error) {
-	tool := ""
-	for _, cand := range []string{"zstd", "unzstd", "zstdcat"} {
-		if _, err := exec.LookPath(cand); err == nil {
-			tool = cand
-			break
-		}
-	}
-	if tool == "" {
-		return nil, fmt.Errorf("this layer is zstd-compressed and no zstd binary is on PATH")
-	}
-	args := []string{"-dc", path}
-	if tool == "zstdcat" {
-		args = []string{path}
-	}
-	cmd := exec.Command(tool, args...)
-	out, err := cmd.StdoutPipe()
-	if err != nil {
-		return nil, err
-	}
-	cmd.Stderr = os.Stderr
-	if err := cmd.Start(); err != nil {
-		return nil, err
-	}
-	return &cmdReader{ReadCloser: out, cmd: cmd}, nil
 }
 
 type closerPair struct {
@@ -443,19 +412,6 @@ type closerPair struct {
 func (c *closerPair) Close() error {
 	err := c.ReadCloser.Close()
 	if e := c.under.Close(); err == nil {
-		err = e
-	}
-	return err
-}
-
-type cmdReader struct {
-	io.ReadCloser
-	cmd *exec.Cmd
-}
-
-func (c *cmdReader) Close() error {
-	err := c.ReadCloser.Close()
-	if e := c.cmd.Wait(); err == nil {
 		err = e
 	}
 	return err

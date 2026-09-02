@@ -21,6 +21,7 @@ import (
 	"github.com/polaris0xff/glibc-research/internal/selftest"
 	"github.com/polaris0xff/glibc-research/internal/verifyx"
 	"github.com/polaris0xff/glibc-research/internal/wrapper"
+	"github.com/polaris0xff/glibc-research/internal/zstd"
 )
 
 func runCommand(c *cfg.Config, cmd string, args []string) error {
@@ -267,6 +268,9 @@ func selftestCommand(c *cfg.Config, args []string) error {
 	}
 	if want("elf") {
 		all.Merge(elfSelftest())
+	}
+	if want("zstd") {
+		all.Merge(zstd.Selftest())
 	}
 	if want("nix-nar") {
 		all.Merge(nixx.Selftest(nixFixtureDir(c)))

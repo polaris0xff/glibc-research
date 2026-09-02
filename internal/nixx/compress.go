@@ -1,8 +1,9 @@
 // compress.go — decompression for the binary-cache protocol.
 //
-// gzip and bzip2 are in the standard library. xz and zstd are not, so they are
-// decoded by the corresponding command-line tool; when neither is present the
-// error names the missing decoder rather than reporting the archive as corrupt.
+// gzip and bzip2 come from the standard library and zstd from internal/zstd,
+// so the three schemes cache.nixos.org actually serves need nothing on the
+// host. xz is decoded by the command-line tool; when it is absent the error
+// names the missing decoder rather than reporting the archive as corrupt.
 //
 // SPDX-License-Identifier: MIT
 package nixx
@@ -14,6 +15,8 @@ import (
 	"io"
 	"os"
 	"os/exec"
+
+	"github.com/polaris0xff/glibc-research/internal/zstd"
 )
 
 // Decompress wraps r according to a narinfo Compression field.
@@ -33,8 +36,7 @@ func Decompress(r io.Reader, compression string) (io.ReadCloser, error) {
 		return pipeThrough(r, "xz", []string{"xz", "unxz", "xzcat"},
 			"xz-compressed and no xz decoder on PATH")
 	case "zstd", "zst":
-		return pipeThrough(r, "zstd", []string{"zstd", "unzstd", "zstdcat"},
-			"zstd-compressed and no zstd decoder on PATH")
+		return io.NopCloser(zstd.NewReader(r)), nil
 	}
 	return nil, fmt.Errorf("unsupported compression: %s", compression)
 }
@@ -52,7 +54,7 @@ func pipeThrough(r io.Reader, kind string, candidates []string, missing string) 
 		return nil, fmt.Errorf("%s (tried: %v)", missing, candidates)
 	}
 	args := []string{"-dc"}
-	if tool == "xzcat" || tool == "zstdcat" || tool == "unxz" || tool == "unzstd" {
+	if tool == "xzcat" || tool == "unxz" {
 		args = []string{"-c"}
 	}
 	cmd := exec.Command(tool, args...)
@@ -86,12 +88,10 @@ func (d *decoderPipe) Close() error {
 // `pgb doctor`.
 func HaveDecoder(compression string) bool {
 	switch compression {
-	case "", "none", "gzip", "bzip2", "bz2":
+	case "", "none", "gzip", "bzip2", "bz2", "zstd", "zst":
 		return true
 	case "xz":
 		return anyOnPath("xz", "unxz", "xzcat")
-	case "zstd", "zst":
-		return anyOnPath("zstd", "unzstd", "zstdcat")
 	}
 	return false
 }
