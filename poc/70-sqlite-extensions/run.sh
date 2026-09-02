@@ -44,7 +44,7 @@
 # `sqlite3_base_init` ON PURPOSE. Two plugins colliding on their entry point
 # is a thing upstreams deliberately do.
 #
-# ⭐ Fixed in tool/lib/wrappers.sh by giving each plugin the namespace the
+# ⭐ Fixed in internal/wrapper/dlopen.go by giving each plugin the namespace the
 # loader would have given it: every symbol a plugin object defines is renamed
 # with `objcopy --redefine-syms` to a per-plugin prefix, and the table maps
 # the ORIGINAL name to the renamed one. That is RTLD_LOCAL, at link time.

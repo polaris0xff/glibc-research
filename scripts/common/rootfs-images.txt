@@ -11,14 +11,15 @@
 # LIBC is the libc the DISTRIBUTION ships, which is what a portable binary is
 # being tested against. It is not the libc the binary was built with.
 #
-# Fetch them all:      sh scripts/common/fetch-rootfs.sh
-# Fetch one:           sh scripts/common/fetch-rootfs.sh alpine-3.22
+# Fetch them all:      pgb rootfs fetch
+# Fetch one:           pgb rootfs fetch alpine-3.22
+# List what is here:   pgb rootfs list
 # Where they land:     $PGB_ROOTFS_DIR, default /var/lib/pgb-rootfs
 #
 # arm64 note: every row resolves on arm64 too EXCEPT the digests, which are
-# amd64-specific. Pass --arch arm64 to fetch-rootfs.sh to re-resolve by tag;
-# that trades the pin for the architecture and the script says so on the way
-# out. docs/research/architecture.md records what was and was not run there.
+# amd64-specific. `pgb rootfs fetch --arch arm64` re-resolves by tag; that
+# trades the pin for the architecture and says so on the way out.
+# docs/research/architecture.md records what was and was not run there.
 
 alpine:3.22                      alpine-3.22          musl   sha256:7c8cb692ae09657cbc4a3f3cbd0e8d5a2690ba38386aaaf252dbb060bf5eb2e6
 alpine:3.20                      alpine-3.20          musl   sha256:c64c687cbea9300178b30c95835354e34c4e4febc4badfe27102879de0483b5e

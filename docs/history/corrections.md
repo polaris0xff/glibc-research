@@ -308,7 +308,7 @@ a number was wrong.
 
 **Now:** the two beds are described as sharing a filesystem rather than an
 environment, and `TODO` T-015 carries applying the image config's `Env` in
-`oci-pull.sh` so they can be made to agree deliberately rather than by luck.
+`internal/ociimg` so they can be made to agree deliberately rather than by luck.
 
 ## C11 — "the docker arm and the untraced run report the same thing"
 

@@ -86,8 +86,8 @@ printf -- '-- the two bundles -----------------------------------------------\n'
 # `--name eglinfo-nogl` so the two artefacts would not collide under
 # $PGB_APPIMAGE_CACHE -- and mesa-demos has no binary called `eglinfo-nogl`, so
 # the bundler fell back to the first thing in bin/ and packed `quadstrip-flat`.
-# The control arm would have been a different program. tool/nix-appimage.sh now
-# refuses that (and has a selftest for it); the collision is avoided the
+# The control arm would have been a different program. `pgb bundle appimage`
+# refuses that now (and has a selftest for it); the collision is avoided the
 # correct way, by moving the cache.
 A_CACHE="$CACHE"
 B_CACHE="${PGB_APPIMAGE_CACHE_NOGL:-${CACHE}-nogl}"

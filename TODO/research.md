@@ -202,10 +202,11 @@ fetch patchelf's own closure from cache.nixos.org**, so "not installed" is no
 longer a blocker for either tool.
 
 **The two questions, and they are different.**
-- **patchelf** does what `elf-needed.py` does and much more (interpreter,
-  RPATH, soname, shrinking). ⚠ It is also famous for producing binaries that
-  break in subtle ways when it has to grow a section, which is exactly why
-  `elf-needed.py` refuses to move anything. Decide per edit, not per tool.
+- **patchelf** does what `internal/elfx/needed.go` does and much more
+  (interpreter, RPATH, soname, shrinking). ⚠ It is also famous for producing
+  binaries that break in subtle ways when it has to grow a section, which is
+  exactly why `internal/elfx/needed.go` refuses to move anything. Decide per
+  edit, not per tool.
 - **patsh** patches store paths in **shell scripts**, which is the gap
   `internal/bundle/appimage.go` currently *names and does not fill*: a nixpkgs
   `bin/x` that is a wrapper script is followed to its ELF and the wrapper's
@@ -225,8 +226,8 @@ move anything, which is exactly the case patchelf is famous for getting wrong.
 `internal/nixx/fetch.go` can fetch patchelf's closure, so availability is
 no longer the argument; the argument is that the bundler's only ELF edit is the
 one edit that needs no section growth. ⚠ **Revisit per edit, not per tool**: an
-RPATH or interpreter rewrite is patchelf's job and `elf-needed.py` must not
-grow one.
+RPATH or interpreter rewrite is patchelf's job and `internal/elfx/needed.go`
+must not grow one.
 
 ⛔ **patsh: no, and the reason is that nixpkgs no longer produces the thing it
 patches.** patsh rewrites `/nix/store` paths **in shell scripts**. Two
@@ -263,7 +264,8 @@ program and packed. The AppImage then failed with
 — which reads like a bug in sharun. It asks whether the file is a *wrapper*
 before asking whether it is an ELF now.
 
-**Measured**: `sh tool/nix-appimage.sh mpv` reports
+**Measured** with the shell bundler this predates, now `pgb bundle appimage`
+and retired to `HISTORY/`: `sh tool/nix-appimage.sh mpv` reports
 `bin/mpv is a nixpkgs wrapper -> mpv` and `4 variable(s) lifted out of the
 wrapper into .env`, and the artefact runs: `mpv v0.41.0`, decoding an ffmpeg
 lavfi test pattern with `VO: [null] 64x48 rgb24`.
@@ -316,7 +318,7 @@ same release on both sides by luck rather than design.
 
 | | arm P — **ours, one command** | arm A — hand-built Anylinux |
 |---|---|---|
-| how | `sh tool/nix-appimage.sh jq` | install the distro package on Arch, `quick-sharun.sh`, `--make-appimage` |
+| how | `sh tool/nix-appimage.sh jq` (the retired shell bundler; `pgb bundle appimage` now) | install the distro package on Arch, `quick-sharun.sh`, `--make-appimage` |
 | size | **12,230,824 B** (7 store paths) | **4,006,946 B** (68 libraries) |
 | cold start | 162–198 ms | 79–107 ms |
 | warm start | 11–22 ms | 9–16 ms |

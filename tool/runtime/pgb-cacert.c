@@ -186,7 +186,7 @@ static const char *pgb_cacert_materialise(void)
 
 /* ⭐ THE ANCHOR. A constructor that nothing references is dropped from an
  * archive, and a trust-store fix that silently did not link is precisely the
- * failure this file exists to prevent. tool/lib/wrappers.sh forces it with
+ * failure this file exists to prevent. internal/wrapper/flags.go forces it with
  * -Wl,-u,pgb_cacert_anchor, the same technique pgb-nssfix.c uses. */
 const char pgb_cacert_anchor[] = "pgb-cacert";
 

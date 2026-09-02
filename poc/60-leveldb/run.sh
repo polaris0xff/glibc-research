@@ -30,8 +30,9 @@
 #     undefined reference to `__wrap_iconv_open'
 #     ... in .text._ZSt24__narrow_multibyte_charsPKcP15__locale_struct
 #
-#   That is a defect this POC found, not a property of C++. tool/lib/wrappers.sh
-#   forces the archive member in with -Wl,-u for the C++ drivers only.
+#   That is a defect this POC found, not a property of C++.
+#   internal/wrapper/flags.go forces the archive member in with -Wl,-u for the
+#   C++ drivers only.
 
 . "$(dirname "$0")/../common.sh"
 

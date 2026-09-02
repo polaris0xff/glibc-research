@@ -331,8 +331,8 @@ What was wrong was the *claim* that the beds are the same environment.
 
 **Approach.** `internal/ociimg` already parses the manifest; the config blob it
 points at carries `Env`, `Cmd`, `Entrypoint` and `WorkingDir`. Record them
-into `.oci-provenance`, and have `rootfs-run.sh` apply `Env` unless the caller
-overrides it.
+into `.oci-provenance`, and have `internal/rootfs` (`pgb rootfs run`) apply
+`Env` unless the caller overrides it.
 
 ⛔ **Applying it must be a decision, not a default that appears silently.** A
 bed that starts exporting `LANG` changes what every locale-sensitive result

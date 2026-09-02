@@ -148,7 +148,8 @@ is what lets `./configure`'s shared-library probes still work; anything else =
 executable link. `sh pgb explain` prints every injected flag.
 
 **Build environment:** pinned `debian:12` (glibc 2.36) by manifest digest,
-unpacked by `oci-pull.sh` and entered by `chroot`. Verified not to be host
+unpacked by `internal/ociimg` (`pgb rootfs pull`) and entered by `chroot`.
+Verified not to be host
 contamination: output `.comment` reads `GCC: (Debian 12.2.0-14+deb12u1)` where
 a host build reads `Ubuntu 13.3.0`.
 
@@ -249,10 +250,14 @@ for p in poc/*/run.sh; do sh "$p"; done
 ```
 
 Requires root + `CAP_SYS_ADMIN` (the bed is `unshare --mount` + `chroot`),
-`curl`, `python3`, `strace`, a C toolchain, and **about 10 GiB free** —
-`bootstrap.sh` checks every one of those before starting anything and refuses
-with the number, rather than failing halfway through a 2.3 GiB download. First
-POC run builds OpenSSL and CPython; budget ~30 minutes.
+`curl`, `tar`, `xz` and **about 10 GiB free**; `pgb verify` additionally needs
+`strace`, and the environment builds meson with the `python3` inside it.
+
+⚠ **`pgb bootstrap` preflights only what it can act on** — `curl`, `tar`, `xz`,
+the images file, root, `unshare` and the free-space floor — and refuses with the
+number rather than failing halfway through a 2.3 GiB download. It does **not**
+check `strace` or a C toolchain; `pgb doctor` is what reports those. First POC
+run builds OpenSSL and CPython; budget ~30 minutes.
 
 ⚠ **`experiments/60-` needs more than the others**, and skips the arms it
 cannot build rather than failing: `cargo` plus `musl-gcc` and the
@@ -464,9 +469,6 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
    each dependency will go, and report what landed where.
    [`design/toolchain.md`](design/toolchain.md) is the design, the
    static-first/bundle-last rule, and the language decision.
-   ⛔ **Split `pgb` into `tool/lib/*.sh` before writing the planner** — it is
-   one file near a thousand lines already and the planner is the part that
-   grows.
 2. **Get CI green.** ⚠ It is not unrun — it ran ten times and was red every
    time, and three tracked files said the opposite. The nine green rows and the
    segfaulting control are a real result; the two red rows are GitHub's Node.js
@@ -476,8 +478,8 @@ program that does not links none of it (940 KiB vs 2.1 MiB, same source).
    `docker run --entrypoint`, and **generates** its matrix from
    `scripts/common/rootfs-images.txt` so CI and the local bed cannot be two
    different beds again.
-3. **aarch64.** `oci-pull.sh --arch arm64` and `fetch-rootfs.sh --arch arm64`
-   exist and re-resolve by tag, which trades the digest pin away and says so.
+3. **aarch64.** `pgb rootfs pull --arch arm64` and `pgb rootfs fetch --arch
+   arm64` re-resolve by tag, which trades the digest pin away and says so.
    Nothing has been run. Expect IFUNC and CPU-baseline questions that x86_64
    did not raise.
 4. **Reach the host-plugin class.** ⭐ **Four** routes now. None has been tried

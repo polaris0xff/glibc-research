@@ -3,9 +3,10 @@
 #
 # ⛔ TWO `pgb build`s AT ONCE, WITH DIFFERENT OPTIONS. T-058.
 #
-# The defect: `make_wrappers` wrote ONE directory, `$PGB_STATE/bin`, and the
-# chroot branch of `tool/lib/build.sh` bind-mounts `$PGB_STATE` INTO the build
-# environment. The wrappers embed $CF and $LF, which depend on
+# The defect: the wrappers were written to ONE directory, `$PGB_STATE/bin`, and
+# the chroot branch of the build driver (`internal/buildx/build.go`) bind-mounts
+# `$PGB_STATE` INTO the build environment. The wrappers embed $CF and $LF, which
+# depend on
 # --embed-terminfo, --embed-cacert, --embed-locale, --no-iconv and
 # --wrap-dlopen. So two concurrent builds with different options shared one set
 # of flags, last writer wins, and NEITHER BUILD REPORTED ANYTHING: the loser
