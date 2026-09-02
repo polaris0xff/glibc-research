@@ -3,9 +3,9 @@ alpine-3.20: refused | /pgb-ext/filefuncs.so
 alpine-3.10: refused | /pgb-ext/filefuncs.so 
 voidlinux-musl: refused | /pgb-ext/filefuncs.so 
 debian-11: refused | /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
-debian-12: LOADED | /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
+debian-12: refused | /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
 ubuntu-20.04: refused | /lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 /lib/x86_64-linux-gnu/libc.so.6 /pgb-ext/filefuncs.so 
 rockylinux-8: refused | /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
 opensuse-leap-15.6: refused | /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
-fedora-42: refused | /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
-archlinux-latest: LOADED | /pgb-ext/filefuncs.so /usr/lib/ld-linux-x86-64.so.2 /usr/lib/libc.so.6 
+fedora-42: LOADED | /lib64/ld-linux-x86-64.so.2 /lib64/libc.so.6 /pgb-ext/filefuncs.so 
+archlinux-latest: refused | /pgb-ext/filefuncs.so /usr/lib/ld-linux-x86-64.so.2 /usr/lib/libc.so.6 

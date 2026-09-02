@@ -121,10 +121,12 @@ about**: ours loads **zero host shared objects on 11 of 11**, the competitor on
 [`docs/AGENTS.md`](docs/AGENTS.md) §13 has the routes.
 
 ⚠ **`dlopen` of a *host* shared object is host-dependent, and success is the
-worse outcome.** gawk's own extension loads on Debian 12 and Arch — dragging
-the host loader and libc into the process — and is refused on the other nine.
-Four untried routes to fixing it are listed in `docs/AGENTS.md` §7;
-none has been shown to be closed.
+worse outcome.** ⭐ Measured at the current pin, gawk's own extension loads on
+**exactly one of eleven — Fedora 42, the row whose host glibc equals the
+build's** — dragging the host loader and libc into the process. Below glibc
+2.33 it is refused with an honest link error; in between it takes a SIGFPE.
+`docs/limitations.md` §1 has the messages. Four untried routes to fixing it are
+listed in `docs/AGENTS.md` §7; none has been shown to be closed.
 
 ⭐ **Static linking says nothing about data, and all five are now closed.**
 Five distinct host data dependencies were found: gconv, locale, terminfo, CA

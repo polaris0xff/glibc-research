@@ -62,18 +62,51 @@ handed to it, or one that only exports data — is not affected by this, and
 points it at `filefuncs.so` — gawk's *own* extension, produced by that same
 build, correct for that gawk version — placed on disk beside the binary.
 
-| outcome | environments |
-|---|---|
-| **LOADED** | Debian 12, Arch Linux |
-| refused | Ubuntu 20.04, Rocky 8, openSUSE Leap 15.6, Fedora 42, Debian 11, Alpine ×3, Void musl |
+⭐ **Re-measured 2026-09-02 at the glibc 2.41 pin, with the failure MESSAGE
+read out of each row rather than only the outcome** — which is what turned an
+eleven-row table into a rule:
 
-⚠ **The two that "work" are the problem.** On those, the trace shows the host's
-`ld-linux-x86-64.so.2` and `libc.so.6` mapped into the process alongside the
-statically linked glibc. That is the two-libc state every other mechanism here
-exists to prevent; it simply has not crashed yet.
+| host glibc | outcome | what it actually said |
+|---|---|---|
+| 2.28 (Rocky 8), 2.31 (Debian 11) | refused | `libc.so.6: version 'GLIBC_2.33' not found (required by filefuncs.so)` — an honest link error |
+| 2.36 (Debian 12), 2.38 (openSUSE Leap), 2.44 (Arch) | ⛔ **SIGFPE** | `gawk: fatal: floating point exception` — §2's second libc, in the process, of a *different version* |
+| ⭐ **2.41 (Fedora 42)** | **LOADED** | ⭐ **the one row whose host glibc equals the build's** |
+| musl ×4 | refused | no glibc to borrow |
+
+⚠ **The row that "works" is the problem**, and it moved with the pin. On it the
+trace shows the host's `ld-linux-x86-64.so.2` and `libc.so.6` mapped into the
+process alongside the statically linked glibc — the two-libc state every other
+mechanism here exists to prevent, which simply has not crashed yet.
+
+⭐ **And that is the finding: it loads exactly where the host glibc version
+equals the build's.** At the 2.36 pin the loading row was **Debian 12, glibc
+2.36**; at 2.41 it is **Fedora 42, glibc 2.41**. The plain path does not
+"sometimes work" — it works on the machine that happens to run the compiler's
+own libc, which is not a property anything can be built on.
+
+⛔ **One row is NOT explained by that rule and is recorded rather than
+smoothed over.** At the 2.36 pin **Arch Linux also LOADED**, and Arch ships
+glibc 2.44 — no equality there. At 2.41 it takes the SIGFPE the rule predicts.
+⚠ Re-measuring the 2.36/Arch pair needs the old build environment rebuilt, and
+it has not been done; until it is, the equality rule is supported by three
+readings (2.36→Debian 12, 2.41→Fedora 42, and every other row faulting) and
+contradicted by one.
 
 **Reproduce:** `sh poc/10-gawk/run.sh`, then read
-`evidence/poc/10-gawk/observation.txt`.
+`evidence/poc/10-gawk/observation.txt`. For the messages above, run the
+extension by hand in a target root:
+
+```sh
+./pgb rootfs run /var/lib/pgb-rootfs/debian-12 \
+  --copy evidence/poc/10-gawk/gawk:/gawk \
+  --copy evidence/poc/10-gawk/ext/filefuncs.so:/pgb-ext/filefuncs.so \
+  -- /bin/sh -c 'AWKLIBPATH=/pgb-ext /gawk -l filefuncs "BEGIN{print 1}"'
+```
+
+⛔ **`AWKLIBPATH` is not optional in that command.** Without it gawk reports
+`cannot open shared library 'filefuncs' for reading: No such file or
+directory` on every row — a *search path* failure that looks exactly like a
+*load* failure and would have made all eleven rows agree for the wrong reason.
 
 ### Does cross-libc-dlopen's rewrite fix this? One function of it does not.
 
@@ -208,8 +241,8 @@ hand-built `.dynsym` under `-static-pie` is still never consulted.
 there:
 
 ```
-  5,807 host shared objects, the seven glibc environments
-  90.8% - 97.8% of every GLIBC_/GCC_-versioned import already definable
+  6,007 host shared objects, the seven glibc environments (6,392 in all eleven)
+  90.8% - 99.3% of every GLIBC_/GCC_-versioned import already definable
   by the pinned static glibc.  Unexplained residue: 0.
 ```
 

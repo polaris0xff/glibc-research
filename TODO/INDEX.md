@@ -74,7 +74,7 @@ is in [`PROGRESS.md`](PROGRESS.md) "Work order"; this is why it is that order.
    - **T-064** is first because it is the project's thesis. `limitations.md` §1
      is the one measured, unfixed failure and the reason `REQUIREMENTS.md`
      part 1 is not met. ⭐ The evidence is already in hand: `experiments/73-`
-     says 90.8–97.8% of host imports are definable by our own static glibc and
+     says 90.8–99.3% of host imports are definable by our own static glibc and
      the unexplained residue is **zero**, and `experiments/72-` says the host
      loader can never be the answer because a static binary's dynamic symbol
      table is empty. The loader has to be ours.

@@ -187,8 +187,8 @@ runtime. ⛔ **A static glibc host has no translation to do**, and `73-`
 measures how much of the demand its own libc already meets:
 
 ```
-  5,807 host shared objects, the seven glibc environments
-  90.8% - 97.8% of every GLIBC_/GCC_-versioned import already definable
+  6,007 host shared objects, the seven glibc environments (6,392 in all 11)
+  90.8% - 99.3% of every GLIBC_/GCC_-versioned import already definable
   class E, the unexplained residue                          = 0
 ```
 
@@ -351,13 +351,15 @@ not a spike. `docs/limitations.md` §1 is the project's one measured, unfixed
 failure and the reason `REQUIREMENTS.md` part 1 is not met.
 
 **Problem.** A static glibc binary cannot `dlopen` a host shared object. Where
-it succeeds — Debian 12 and Arch, measured in `poc/10-gawk` — the success is
-the *worse* outcome: the host loader and a second libc enter the process.
+it succeeds — ⭐ **exactly the row whose host glibc equals the build's**, which
+is Fedora 42 at the 2.41 pin and was Debian 12 at 2.36, measured in
+`poc/10-gawk` — the success is the *worse* outcome: the host loader and a
+second libc enter the process. `docs/limitations.md` §1.
 
 **Premise, and it is already measured rather than hoped for.**
 
-- `experiments/73-` parsed **5,807 real host shared objects** across the seven
-  glibc environments: **90.8%–97.8%** of every `GLIBC_`/`GCC_`-versioned import
+- `experiments/73-` parsed **6,392 real host shared objects**, 6,007 of them
+  across the seven glibc environments: **90.8%–99.3%** of every `GLIBC_`/`GCC_`-versioned import
   is already definable by the pinned static glibc, and the unexplained residue
   is **zero**. The symbols are there.
 - `experiments/72-` measured why the host loader can never be the answer: a
@@ -478,44 +480,94 @@ them, one fork each, through `tool/runtime/pgb-elfload.c`.
 **Category** runtime · **Priority** P1 · **Effort** M · **Status** open
 
 ⛔ **This exists so T-064's residue is carried as work rather than rounded off
-in a summary.** 818 of 904 load; these are the rest, ranked by how many objects
-demand each, which is `pg83/solo`'s `dev/abi_demand.py` shape.
+in a summary.** ⚠ **The title's `86 of 904` is the number this entry was
+OPENED on, and it is not reproducible** — that sweep was ad-hoc and never
+committed, which is what `experiments/93-host-object-residue.sh` was written to
+replace. The title is left as the entry's own history; everything below is the
+harness's.
 
-⭐ **The first row is already done and the count has moved**: crashes 30 → 10,
-because 24 of them were objects no static image should load and are now named
-refusals rather than signals.
+## ⭐ THE HARNESS, AND WHAT IT MEASURES — `experiments/93-host-object-residue.sh`
+
+One `timeout`ed fork per object, so a crash leaves the rest measurable, and it
+classifies **from the loader's own `el_err()` strings** rather than from an
+exit status, with anything it cannot classify **printed rather than absorbed**.
+⚠ **The population is this HOST's shared objects, so the count moves with the
+machine** — `docs/AGENTS.md` §0b's conditions rule, in a count.
+
+    93 - host shared objects through pgb-elfload
+    host        : Linux 6.18.44-fc-v22        objects : 1527
+
+    ok=446  refused=119  failed=917  crash=45  hang=0
+
+      undefined              889      served-by-image        10
+      not-an-object           96      refused-interposer      9
+      crash                   45      refused-nss             4
+      missing-dep             27      other                   1
+
+## ⛔ THE PROVE WAS THE WRONG QUESTION, AND THE CONTROL IS WHAT SETTLED IT
+
+This entry's Prove asked for **the crash count at zero**. ⛔ Driving it there
+directly would have been wrong twice over, because *"our loader crashed on N
+objects"* is not a defect count: **some host objects cannot be loaded
+standalone by ANY loader.**
+
+⭐ **So 93- builds a second, ORDINARY DYNAMIC probe** — same source, same
+`dlopen`, the host's real `ld.so` — and runs it on every object that crashed
+ours:
+
+    of 46 objects that crashed this loader, glibc's own crashed on 45
+
+The 45 are **xtables extensions**. Their `DT_INIT_ARRAY` calls
+`xtables_register_target()`, and `libxtables` dereferences `xt_params` —
+verified an 8-byte GLOBAL OBJECT in its `.bss`, which only the iptables
+**program** assigns. Outside iptables it is NULL and the fault is at
+`si_addr=0x18`, an offset into the struct it points at. **Not our defect.**
+
+⭐ **THE ONE THAT DIFFERED IS A REAL DEFECT, AND IT WOULD HAVE BEEN BURIED
+AMONG 45 NON-DEFECTS**: gprofng's `libgp-collector.so`, which glibc loads
+cleanly and we segfaulted on, deterministically, 4 of 4. It **defines `mmap`
+and imports `dlsym`/`dlvsym`** — the `LD_PRELOAD` interposer signature — so it
+chains through `RTLD_NEXT`, which a static image does not have and
+`pgb-dlopen.c` already reports as its own error. Declined by name with the
+other interposers now. `libgp-collectorAPI.so`, the API half, is not an
+interposer and still loads.
+
+⛔ **AND THE TEMPTING WRONG FIX IS RECORDED SO NOBODY RE-DERIVES IT.** A rule
+declining `libxt_ libipt_ libip6t_ libebt_ libarpt_` was written, measured, and
+**taken out**: it drives the crash count to zero and drops `ok (loaded)` from
+**446 to 377**, because 69 xtables modules load fine. That trades 69 measured
+successes for a green number. ⚠ 93- measures **loading**, not behaviour, and
+unmeasured is not a licence.
+
+**So the Prove is restated, and it passes:**
+
+> ⭐ **Nothing may crash this loader that glibc's loader loads.** `DIFFER = 0`,
+> and it is a *falsifiable* zero: remove the `libgp-collector` refusal and the
+> control fails at 1, naming the object and printing that glibc loads it at
+> exit 0. `hang = 0` is asserted separately — a refusal with a message is the
+> loader working, a signal is it failing, and the two are never summed.
+
+## ⛔ WHAT IS LEFT, RANKED BY WHAT IT WOULD BUY
 
 | n | what | route |
 |---|---|---|
-| ✅ **24 of the 30 crashes** — `libnss_*` and the allocator/sanitizer interposers | ⭐ **DONE.** `el_refused_class()` refuses both families by name: `docs/AGENTS.md` §14 already says keeping NSS out IS the fix, and an interposer must be present *before* libc initialises, which in this image it already has. **Crashes 30 → 10, and 24 are now named refusals.** Re-swept, 904 objects: `ok=818 fail=76 crash=10` |
-| ⛔ **10 crashes left, and they are 5 distinct libraries** — `libLLVM-17`, `libLLVM.so.20.1`, `libclang-18`, `liblldb-18`, `libgprofng` (each counted twice, `/lib` and `/usr/lib` being the same file) | ⭐ **This is the real residue and it is one family: large C++ libraries with hundreds of static constructors.** `libLLVM-17` maps and relocates cleanly and dies in the **605th** of 604+ `DT_INIT_ARRAY` entries. Nothing else in 904 objects behaves like this |
-| 20 | **undefined symbol** | the demand-ranked worklist. Read them out of `evidence/` and decide per name whether it is class B (host glibc newer than the pin), class S (in `libc.so.6`, never in `libc.a` — `libtirpc.a` is already in the pinned environment and defines the sunrpc half), or genuinely another library's |
-| 4 | **`R_X86_64_TLSDESC`** | needs a resolver trampoline. solo implements it; `lib/elf_loader.cpp` at `79451211` is the read |
-| 2 | **static TLS surplus exhausted** — one object wants 56,248 bytes against ~3,168 bytes of HEADROOM (T-072: `_dl_tls_static_size` is not the surplus) | glibc sizes the surplus from `glibc.rtld.optional_static_tls`. Whether a static binary can raise its own before `__libc_setup_tls` runs is the question, and it is not yet answered |
-| 1 | ⭐ **`libLLVM`**, which maps and relocates cleanly and dies in the **605th** of its C++ static constructors | the one that is genuinely about the loader rather than about policy. It is the only crasher that is an ordinary library, and it is where the next real defect probably is |
+| **889** | **undefined symbol** — by far the largest class | ⭐ **`experiments/73-` is the instrument that already classifies these**, and it has just been re-run at the 2.41 pin: class A (host `ld.so` owns it), class B (host glibc newer than the pin — now **5 distinct symbols**, all on `archlinux-latest`), class S (in `libc.so.6`, never in `libc.a` — 50 symbols), class D (not the host libc's either), class E (**empty**). ⛔ The two harnesses have never been **joined**: 73- ranks symbols across eleven environments and 93- names objects on one host. Joining them is this row's work, and it turns 889 into a per-symbol worklist with a measured population behind each |
+| **96** | **not-an-object** | ⚠ **not a failure and possibly not even a miss.** `libc.so`, `libm.a` and friends in `/usr/lib` may be GNU **ld scripts**, not ELF — three independent sightings, `docs/history/corrections.md` C18. Confirm the whole 96 is that class rather than assuming it |
+| **45** | **crash** | ✅ **explained, and not ours** — the control above. They stay visible rather than being refused into invisibility |
+| **27** | **missing-dep** | a `DT_NEEDED` the image neither provides nor can find. Decide per object whether the dependency is one a bundle would legitimately carry (`design/host-fallback.md`'s four classes) or one no static image should pull in |
+| **10** | **served-by-image** | ⭐ **not a failure at all** — the object names a `DT_NEEDED` the image already satisfies, so it is ANSWERED rather than opened. This is the mechanism that keeps a second libc out, counted |
+| **13** | **refused by name** — 9 interposers, 4 `libnss_*` | ✅ **policy, and the policy is measured.** `docs/AGENTS.md` §14: keeping NSS out **is** the fix. An interposer must be present before libc initialises, which in this image it already has |
+| **1** | ⛔ **unrecognised by the classifier** — `libsyslookup.so`, *"relocation names symbol 1 of 1"* | the one row that says the classifier is incomplete. It is **printed rather than absorbed**, which is why it is visible at all |
 
-⚠ **And one that is not a count.** A module placed in glibc's static TLS
-surplus is seeded with its initialisation image in the thread that loaded it;
-threads created afterwards see zeros. Correct for the 14 of 24 measured modules
-whose `PT_TLS` `p_filesz` is 0, wrong for the other 10. ⭐ The route is
-`-Wl,--wrap=pthread_create`, which `pgb` already uses for four other
-mechanisms — seed the new thread's slices on the way in.
+⚠ **And two things that are not counts.**
 
-**Prove.** The sweep re-run with a row per class, the crash count at zero
-because each is a named refusal rather than a signal, and `libLLVM` either
-loading or its 605th constructor explained.
-
-⭐ **THE HARNESS NOW EXISTS: `experiments/93-host-object-residue.sh`**, written
-2026-09-02d. ⛔ **And writing it exposed something about the numbers above:**
-the 904-object sweep this entry is built on was **ad-hoc and never committed**,
-so `818 of 904`, `ok=818 fail=76 crash=10` and the 86 are quoted in four
-places with no command that reproduces them — which `docs/AGENTS.md` §0b
-forbids in a document, and which made T-068's own Prove impossible to carry
-out. 93- is one `timeout`ed fork per object, so a crash leaves the rest
-measurable, and it classifies **from the loader's own `el_err()` strings**
-rather than from an exit status, with anything it cannot classify printed
-rather than absorbed.
-
-⚠ **93- has not been RUN yet** — it was written while the test bed was
-occupied by `experiments/90-`. Until it runs, the counts in this entry remain
-the previous session's, uncorroborated.
+1. **A module placed in glibc's static TLS surplus is seeded with its
+   initialisation image in the thread that loaded it**; threads created
+   afterwards see zeros. Correct for the modules whose `PT_TLS` `p_filesz` is 0,
+   wrong for the rest. ⭐ The route is `-Wl,--wrap=pthread_create`, which `pgb`
+   already uses for four other mechanisms — seed the new thread's slices on the
+   way in. The surplus itself is **T-072**.
+2. ⛔ **`R_X86_64_TLSDESC` needs a resolver trampoline.** solo implements it;
+   `lib/elf_loader.cpp` at `79451211` is the read. ⚠ It did not appear as a
+   named reason in this run's classification, which is a statement about this
+   host's objects and not about the relocation.

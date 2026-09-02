@@ -91,8 +91,9 @@ is part of step (b) above.
 ## ⛔ Machine notes
 
 - 4 cores, uid 0, 15 GiB RAM, **30 GiB free at session start**. Go 1.24.7.
-  Kernel `6.18.44-fc-v24` — ⚠ **`evidence/93-*/RESULT.txt` was measured on
-  `-fc-v22`, a different container with a different set of host objects.**
+  Kernel `6.18.44-fc-v24` — ⚠ **`evidence/93-host-object-residue/RESULT.txt`
+  was measured on `-fc-v22`, a different container with a different set of
+  host objects.**
 - ⛔ **`make` depends on `tool/runtime/*.c`.**
 - ⛔ **DISK IS BINDING.** Delete the previous build tree before the next.
 - **Absent on a fresh container:** nix→installed by bootstrap, zstd, musl-gcc,

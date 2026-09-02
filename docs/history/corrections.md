@@ -710,6 +710,43 @@ instrument-dependent is recorded and surfaced, never gated on.
 
 ---
 
+## C22 — "the build environment is pinned at glibc 2.36", and the numbers taken there
+
+**Superseded 2026-09-02f, T-070.** The pin moved to `debian:13` / **glibc
+2.41**, gcc 12.2.0 → 14.2.0, with all four measured costs at zero. The pages in
+`docs/` carry the 2.41 reading; this is the 2.36 one, kept so a number quoted
+from an older commit can be placed.
+
+| | at the 2.36 pin | at 2.41 |
+|---|---|---|
+| `experiments/73-` provider symbols | 7,074 | **7,566** |
+| class B, distinct symbols | **20**, 14 of them `__isoc23_*` at `GLIBC_2.38` | **5**, at `GLIBC_2.42`/`2.43`, `archlinux-latest` alone |
+| opensuse-leap-15.6 served | 993 (97.9%) | **1005 (99.1%)** |
+| fedora-42 served | 961 (97.8%) | **976 (99.3%)** |
+| archlinux-latest served | 1198 (94.3%) | **1213 (95.5%)** |
+| debian-11 served | 905 (93.4%) | 905 (93.4%) |
+| ⚠ debian-12 served | 851 (94.6%) | **849 (94.3%)** — the one measured cost |
+| ubuntu-20.04 / rockylinux-8 | 893 / 1049 | unchanged |
+| class C, class E | empty on all 11 | empty on all 11 |
+| POC 10's host-extension `dlopen` | LOADED on **Debian 12 and Arch** | LOADED on **Fedora 42** alone |
+
+⛔ **AND A NUMBER THAT DISAGREED WITH ITS OWN TABLE.** `docs/research/solo.md`
+said *"5,807 objects across the seven glibc ones"* directly above a table whose
+seven glibc rows sum to **6,007** — and the eleven rows to **6,392**. The
+figure had been copied into `limitations.md`, `REQUIREMENTS.md`, `AGENTS.md`
+and two `TODO/` entries. ⚠ Its companion range, *"90.8%–97.8%"*, was wrong in a
+second way: 97.8% was fedora's, while opensuse's 97.9% was the actual maximum.
+Both corrected against the file the numbers come from.
+
+⭐ **What this cost, and it is the reason T-070's landing has three steps.** The
+name `pgb-env-debian12` had **nine** copies in code — eight experiments plus
+`cfg.go` — and the digest **two** more in CI, one of them an `env.BUILD_IMAGE`
+that nothing had ever read. Changing `cfg.go` alone would have left every one
+of them measuring the old glibc **and saying nothing**. `TODO/check.sh` now
+fails on a copy.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

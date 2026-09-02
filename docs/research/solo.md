@@ -193,7 +193,7 @@ All at `79451211`, under `references/pg83__solo/tree/`.
 
 | | |
 |---|---|
-| **`lib/glibc_shim.cpp` (5,948 lines) and `lib/glibc_stubs.cpp`** | ⭐ The whole point of taking this route *here*. They translate glibc's ABI onto a musl runtime. A static **glibc** host has no translation to do — `73-` measures 90.8%–97.8% of the demand already definable, with every remainder named. Porting the bridge would be porting the solution to a problem this project does not have. |
+| **`lib/glibc_shim.cpp` (5,948 lines) and `lib/glibc_stubs.cpp`** | ⭐ The whole point of taking this route *here*. They translate glibc's ABI onto a musl runtime. A static **glibc** host has no translation to do — `73-` measures 90.8%–99.3% of the demand already definable, with every remainder named. Porting the bridge would be porting the solution to a problem this project does not have. |
 | **`lib/musl_tls.c` (the static TLS pad)** | ⛔ **The most musl-coupled file in the tree, and the hardest part to replace.** It includes `ext/musl/src/internal/pthread_impl.h`, writes `libc.tls_head` and `libc.tls_size` directly, and relies on musl's `__copy_tls` seeding each new thread. glibc's equivalent is `_dl_tls_static_surplus` and `__libc_setup_tls`, which is a different mechanism with different invariants. ⚠ **Cost this honestly before planning a loader**: it is the one piece where "we are glibc, so it is simpler" is *not* obviously true. |
 | **`ext/` (musl, LLVM runtimes, Vulkan, zlib, libpng) and `build.py`** | A whole vendored toolchain and a bespoke build system. `pgb` has a pinned environment already. |
 | **The Vulkan demo and its ICD discovery** | It is solo's proof, not a mechanism. GPU drivers are not this project's class. |
@@ -259,7 +259,7 @@ It is cheaper than route C and the best-evidenced of the four.
 | A — `--wrap` on `dlopen` against a compiled-in table | ✅ **built**, `--wrap-dlopen`, 11 of 11. Serves a program's **own** plugins. Unchanged. |
 | B — port `cross-libc-dlopen`'s full rewrite | ⚠ **weakened.** `73-`'s second control shows what stripping versions off a named provider does: the loader asserts. T-031 keeps its other two steps, but the one `50-` ported is now measured to be actively harmful where it bites. |
 | C — carry a loader (tier 2) | unchanged, and still gives up the single ordinary ELF. |
-| ⭐ **D — compile a loader IN, resolve against our own static glibc** | **new.** No second libc, no `ld.so`, still one ordinary ELF, and `73-` measures the symbol demand as 90.8%–97.8% already met with zero unexplained residue. |
+| ⭐ **D — compile a loader IN, resolve against our own static glibc** | **new.** No second libc, no `ld.so`, still one ordinary ELF, and `73-` measures the symbol demand as 90.8%–99.3% already met with zero unexplained residue. |
 
 ⛔ **Route D is not free and the write-up must not read as if it were.** What
 is measured is that the *names* resolve. What is not measured is any of:
