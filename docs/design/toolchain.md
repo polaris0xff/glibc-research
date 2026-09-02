@@ -95,117 +95,149 @@ fifth mediocre bundler. That is a real option and it should stay on the table.
 
 ## Language and structure
 
-⭐ **The driver stays POSIX `sh`, and the reason is a hard constraint rather
-than a preference.** `pgb build` re-enters itself *inside* the build
-environment as `pgb __inner-build`. Whatever the driver is written in has to
-exist in that environment — and in every target rootfs `pgb verify` reaches.
-`sh` always does. Python, Rust and Go do not: installing a runtime into the
-pinned image to run the build tool changes the environment whose contents are
-the whole point of pinning it.
+⭐ **`pgb` is one statically linked Go binary and nothing else.** The driver,
+the compiler wrappers it puts on `PATH`, the nixpkgs planner, the verifier and
+the bundler are all the same executable. It is built with `CGO_ENABLED=0`, so
+it links no libc of its own, and it carries the C runtime sources it compiles
+into a build inside itself. Nothing has to be cloned beside it and no
+interpreter has to exist anywhere it runs.
 
-Two more requirements point the same way. The brief requires the tool not be a
-black box — a shell script is readable by the person debugging it, at the
-moment they are debugging it. And most of the work is orchestrating other
-programs: `git`, `curl`, `tar`, `chroot`, `gcc`, `ld`. That is what a shell is
-for.
-
-⚠ **What `sh` is bad at is exactly what is coming next**: dependency graph
-resolution, ELF analysis, and parsing package metadata (`APKINDEX`, `dpkg`
-control files, PKGBUILDs, JSON). Writing those in shell would be slow to run
-and worse to trust.
-
-⭐ **So the split is by where the code has to run, not by taste:**
-
-| runs | language | why |
-|---|---|---|
-| **inside** the build environment or a target rootfs | POSIX `sh`, no bashisms | it is the only thing guaranteed present |
-| **outside**, on the build host | a real language, or an existing tool | we control that toolchain, and the work needs data structures |
-
-⛔ **And the driver has to be split now, before it grows.** `pgb` is one file
-approaching a thousand lines and the planner has not been written yet. The
-proposed layout, sourced rather than executed so the re-entry stays one
-process:
-
-```
-pgb                    entry point: option parsing and dispatch only
-tool/lib/common.sh     say/die/verbose, path and engine resolution
-tool/lib/env.sh        env create/info -- OCI pull, chroot, libiconv
-tool/lib/wrappers.sh   compiler wrapper generation, runtime objects
-tool/lib/build.sh      build, __inner-build, shell
-tool/lib/verify.sh     verify, and the trace attribution it depends on
-tool/lib/source.sh     spec resolution: URL or package name to a source tree
-tool/lib/deps.sh       dependency planning, static-first
+```sh
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -o pgb ./cmd/pgb
 ```
 
-⚠ **Before writing a new ELF or dependency analyser, check `references/`.**
-`leleliu008/elftool` is already vendored and manipulates ELF files from the
-command line; `ppkg`'s `core/wrappers/` are compiler wrappers in C solving the
-same problem `pgb`'s shell wrappers solve. The brief's instruction is to reuse
-and patch before reinventing, and it applies here.
+### The constraint that used to decide this, and the measurement that settled it
 
-## ⭐ The ruling, and the measurement that changed its reasoning
+⛔ **"The driver must be `sh` because `sh` is the only thing that exists in a
+target rootfs" is measured false.** `experiments/70-carried-helper.sh` builds
+the same helper — open a file on whatever filesystem it landed on, parse it,
+report — several ways and **carries** each into the eleven pinned target
+rootfs plus the pinned build environment. `sh`, plain `gcc -static`, C built
+by `pgb`, Rust `+crt-static` and Rust musl all run on **12 of 12**. Nothing is
+installed anywhere; the binary is copied in and executed.
 
-⛔ **The constraint this page rested on is measured FALSE.** The paragraph
-above says `sh` is chosen because "whatever the driver is written in has to
-exist in that environment", and that Python, Rust and Go "do not". T-011
-flagged that as an untested assumption. `experiments/70-carried-helper.sh`
-tested it: the same helper — open a file on whatever filesystem it landed on,
-parse it, report — built five ways and **carried into** the eleven pinned
-target rootfs plus the pinned build environment.
+⚠ **The constraint was never "does the language exist there", it was "can
+something be *put* there"** — and putting a static binary somewhere and having
+it run is this project's entire output. `evidence/70-carried-helper/RESULT.txt`
+is the table.
 
-| arm | ran on |
+⚠ **What experiment 70 does not show.** It measures whether a helper
+**executes**, not whether it is correct on every libc path — which is why the
+plain `gcc -static` arm scores 12 of 12 where `ci/probe.c` fails on 11 of 11.
+A helper that resolved a hostname or converted an encoding would need `pgb`'s
+mechanisms like anything else. Availability, and nothing more.
+
+### Why Go
+
+The work is orchestration — `git`, `curl`, `tar`, `chroot`, `gcc`, `ld` — over
+data structures: dependency graphs, ELF tables, package metadata, a ~400 MB
+JSON index, NAR streams and Ed25519 signatures. Shell is good at the first
+half and bad at the second; Python was carrying the second half at the cost of
+an interpreter dependency in the product.
+
+| rank | language | port speed | runtime | single-binary delivery | fit |
+|---:|---|---|---|---|---|
+| **1** | **Go** | **excellent** | very good | **excellent**, `CGO_ENABLED=0` | **chosen** |
+| 2 | Rust | fair | excellent | excellent, musl target | best for maximum rigour |
+| 3 | Nim | excellent from Python | very good | needs validation | fastest-looking, highest delivery risk |
+
+⭐ **Go wins on the combination, not on any single axis.** Imperative shell and
+Python translate to it almost line for line; `os/exec` gives literal argv,
+environment and pipes with no word splitting to re-derive; and the standard
+library already contains what this toolchain needs — `debug/elf`,
+`archive/tar`, `encoding/json`, `crypto/ed25519`, `crypto/sha256`, `net/http`,
+the compression primitives, and `embed` for the carried assets. Goroutines
+replace `bootstrap`'s hand-rolled parallel jobs.
+
+⚠ **What it costs.** A garbage-collected runtime makes a larger baseline
+binary than C or Rust and gives less deterministic memory behaviour — which
+does not matter for a CLI dominated by subprocesses and streaming I/O. Mount
+namespaces, `ptrace` and process groups need deliberate Linux-specific code
+rather than borrowed shell. And Go refuses to guess: every pipeline that
+genuinely wanted shell semantics now says `sh -c` out loud.
+
+⛔ **Rust is the better answer to a different question.** If the priority order
+were correctness and low-level performance first and port speed second — a
+high-assurance NAR/ELF parser, or a future in-process loader — Rust wins, and
+it is the one compiled candidate this repository had already measured. It
+loses here on translation cost across ~9,000 lines of orchestration. Nim is a
+reasonable spike and not a foundation: its static cross-libc delivery is
+untested by this project and it is likelier to pull in C libraries, which is
+the one thing the port exists to remove. Zig links statically beautifully and
+reuses the C sources directly, but it is furthest from the dominant
+constraint, which was translating a large body of imperative code quickly.
+
+### What "one binary" can and cannot mean
+
+`pgb` replaces the checked-in shell and Python runtime and embeds the C
+runtime sources, the rootfs manifest and its fixtures. ⛔ **It does not
+replace the build toolchain, and was never going to.** `pgb` still orchestrates
+GCC, binutils, make/CMake/Meson/autotools, git and HTTP sources, and a
+chroot or container engine. The claim is **one distributable controller**, not
+a compiler and a container stack packed into an executable.
+
+⚠ **The C runtime pieces stay C.** They are the measured mechanisms — NSS
+override, the iconv wrap, the embedded locale, the dlopen table, the tracer —
+and they are carried as byte-identical embedded sources, compiled and cached
+exactly as before. Rewriting them is a separate project and is not part of
+removing shell and Python from the product.
+
+### The structure
+
+```text
+pgb
+├── CLI dispatch: doctor/env/build/verify/nix/bundle/elf/rootfs/selftest
+├── hidden re-entry: __inner-build, __inner-shell, __rootfs-inner
+├── compiler-wrapper mode, selected by argv[0]
+├── embedded assets: the runtime C and headers, the rootfs manifest
+└── internal/
+    ├── proc      exact argv, environment, pipes, status and signals
+    ├── cfg       configuration, the engine boundary, paths
+    ├── logx      levels, per-subsystem debug, timestamped output
+    ├── fail      the exit-code contract: 0 ok, 1 ran and failed, 2 could not
+    ├── wrapper   compile/link classification, flag injection, the runtime objects
+    ├── buildx    build, shell, the re-entry inside the environment
+    ├── envx      environment creation and its stamp; the libiconv build
+    ├── rootfs    the private mount namespace, mounts and chroot
+    ├── ociimg    the registry client and the whiteout merge
+    ├── nixx      drv, plan, index, NAR, signatures, fetch
+    ├── elfx      DT_NEEDED reading and rewriting, symbol tables
+    ├── verifyx   static inspection, the tracer, the matrix run
+    └── bundle    the reachability sweep and the AppImage assembly
+```
+
+⭐ **The wrappers are the binary under another name.** `cc`, `gcc`, `c++`,
+`g++` and `cpp` are symlinks to `pgb`, which dispatches on `argv[0]` and reads
+one JSON manifest written when the wrapper directory was created. A build
+system that calls the compiler ten thousand times starts no shell at all.
+
+⛔ **The namespace work is native.** `pgb rootfs run` re-execs itself with
+`CLONE_NEWNS` and does its own mounts and `chroot`, so there is no `unshare`,
+no `mount` and no `sh` in the path into a target. It keeps the `chroot`
+convention on the way out: **127** when the command does not exist, **126**
+when it exists and cannot be executed.
+
+### How the port was accepted
+
+⛔ **"The new language is faster" was never the bar.** `pgb build` spends its
+wall time in downloads, `configure`, GCC and linking; replacing the controller
+does not make GCC compile Qt faster. The port was accepted against workload
+gates, each measured against the retired implementation rather than against a
+claim, and recorded in `evidence/92-go-port/RESULT.txt`:
+
+| gate | what it compares |
 |---|---|
-| `sh` (the incumbent) | **12 of 12** |
-| `c-pgb` (positive control) | **12 of 12** |
-| `c-plain-static` | 12 of 12 |
-| **`rust-gnu-static`** (`+crt-static`) | **12 of 12** |
-| **`rust-musl-static`** | **12 of 12** |
+| 1 | `nix index`: identical output from the real ~400 MB nixpkgs input, with wall time and peak RSS |
+| 2 | `nix nar`: identical archives, hashes, extraction **and signature decisions**, on fixtures and on a real `cache.nixos.org` object |
+| 3 | `doctor`, `env info`, `nix plan`, `verify`: output and exit-code parity |
+| 4 | the wrapper hot path: the same source through both toolchains, byte for byte |
+| 5 | the complete 11-target matrix and all nine POCs |
+| 6 | the artefact itself: statically linked, no `PT_INTERP`, no `DT_NEEDED` |
 
-⭐ **A carried-in Rust helper is exactly as available as `sh` is**, on every
-environment this project targets and inside the build environment `pgb build`
-re-enters. Nothing had to be installed anywhere. ⚠ **Not installing it is the
-whole point** — the constraint was never really "does the language exist
-there", it was "can something be *put* there", and this project's entire
-output is the answer to that.
+⚠ **The retired shell and Python tree is the oracle, and it is kept.** It sits
+under `HISTORY/<commit>/` unedited, so any gate can be re-measured rather than
+re-argued. `HISTORY/README.md` says what it is.
 
-⚠ **What experiment 70 does NOT show.** It measures whether a helper
-**executes**, not whether it is correct on every libc path. Its subject only
-opens and parses a file — which is why the plain `gcc -static` arm also scores
-12 of 12, where `ci/probe.c` fails on 11 of 11. A helper that resolved a
-hostname or converted an encoding would need `pgb`'s mechanisms like anything
-else. The result is about availability and nothing more.
-
-### The decision, re-argued on what survives
-
-⭐ **The driver stays POSIX `sh` — but not for the reason above, and the door
-this page had closed is measured open.**
-
-Two of the three original arguments survive intact and neither is about
-availability. Most of what the driver does is orchestrating other programs —
-`git`, `curl`, `tar`, `chroot`, `gcc`, `ld` — which is what a shell is for;
-and the brief requires the tool not be a black box, which a shell script
-readable by the person debugging it at the moment they are debugging it
-satisfies better than a compiled binary. What is left of the third argument is
-much smaller than it looked: a Rust helper costs a Rust toolchain **on the
-build host**, and a ~4 MB artefact to carry, rather than costing anything on
-the target. That is a real cost and a modest one.
-
-⛔ **So "the alternative loses on bootstrap" is withdrawn as written**, and
-with it any reading of this page that says the planner cannot be written in a
-real language. It can. `experiments/70-` is the evidence, and the honest
-statement of the split is now:
-
-| runs | language | why |
-|---|---|---|
-| the **driver** — orchestration, re-entry, the engine boundary | POSIX `sh` | it is what the work is, and it stays readable while being debugged |
-| the **planner** — dependency graphs, ELF analysis, package metadata | a real language, **carried in** as a static binary | the work needs data structures, and ⭐ availability is no longer an argument against it |
-
-⚠ **One circularity to name before anyone builds it.** A carried-in planner
-has to be built before it can be carried, and if it is built by `pgb` then
-`pgb` needs it to build itself. The escape is ordinary — build the helper with
-a plain static toolchain first, and use `pgb` only to make it portable — but
-it is a bootstrap step somebody has to write down, and this is that sentence.
-
-⛔ **This ruling replaces "a decision to confirm".** It is confirmed, its
-stated reason is corrected, and the measurement that corrected it is in the
-tree. `TODO/toolchain.md` T-011.
+⭐ **The experiments and the POCs stay in shell.** They are the independent
+acceptance harness: rewriting them in the same language as the subject would
+remove the thing that measured the subject. They call `pgb` and nothing else.

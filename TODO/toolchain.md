@@ -1060,17 +1060,14 @@ that means something nobody wanted. `docs/history/corrections.md` C16.
 
 ### The reading, in this order
 
-1. ⭐ [`../docs/design/porting-report.md`](../docs/design/porting-report.md) —
-   **read it in full before writing any Go.** The commissioned analysis, at
-   commit `2e4c6169`: the ranked language comparison (Go 1, Rust 2, Nim 3, and
-   why Zig is not in the top three), the measured porting surface (22 files,
-   8,982 lines of product shell + Python; 37 more of experiments and POCs), what
-   "single binary" can and cannot mean, the recommended package layout, the
-   nine-step migration sequence, and ⛔ **the six workload gates the port must
-   pass**, which are not "does it compile".
-   ⚠ **Delete this file once the port has landed and its content has moved into
-   `design/toolchain.md`** — the operator asked for that explicitly. It is a
-   session artefact, not a permanent document.
+1. ⭐ [`design/toolchain.md`](../docs/design/toolchain.md) "Language and
+   structure" — **read it in full before writing any Go.** The ranked language
+   comparison (Go 1, Rust 2, Nim 3, and why Zig is not in the top three), what
+   "single binary" can and cannot mean, the package layout, and ⛔ **the six
+   workload gates the port must pass**, which are not "does it compile".
+   ⚠ It was written from a commissioned analysis of the tree at commit
+   `2e4c6169`, which T-061 folded in and then deleted at the operator's
+   request; the design page is now the only copy.
 2. [`design/toolchain.md`](../docs/design/toolchain.md) — the CURRENT language
    decision (T-011), which this entry overturns. ⭐ Overturning it is the
    operator's call and it is recorded, not argued: the report is the argument.

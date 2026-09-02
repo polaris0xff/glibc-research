@@ -25,7 +25,8 @@ and the entries.
 reading order, the six operator requirements beyond "port it", and the six
 workload gates that stand in for "done". ⛔ **Do not start from this file's
 summary of it.** Read the entry, then
-[`../docs/design/porting-report.md`](../docs/design/porting-report.md) in full.
+[`../docs/design/toolchain.md`](../docs/design/toolchain.md) "Language and
+structure", which is where the decision and the gates now live.
 
 ⚠ **Everything else in this file is context for the session AFTER that one.**
 An entry below that touches shell or Python under `tool/` or `scripts/` is work
@@ -162,6 +163,6 @@ treat it as gone.
    `RULES.md` §Git outranks it and every commit is on `main`.
    `git ls-remote --heads origin` lists `refs/heads/main` and nothing else.
 2. ⚠ **A GPU** — **T-059**, not a question. Every GL row is `swrast`.
-3. ⚠ **`docs/design/porting-report.md` is a session artefact.** The operator
-   asked for it to be removed once it is not needed. ⛔ **T-061 deletes it**
-   when its content has moved into `design/toolchain.md` — not before.
+3. ⭐ **The porting report is gone, as the operator asked.** Its content is
+   in `docs/design/toolchain.md` "Language and structure" and T-061 deleted
+   the file.

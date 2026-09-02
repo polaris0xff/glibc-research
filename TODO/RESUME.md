@@ -17,8 +17,8 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 # ⛔ THIS SESSION: T-061, THE GO PORT, AND NOTHING ELSE
 
 **Read [`toolchain.md`](toolchain.md) §T-061, then
-[`../docs/design/porting-report.md`](../docs/design/porting-report.md) IN
-FULL.** Port the tooling to Go, reach parity, ship one static `pgb`.
+[`../docs/design/toolchain.md`](../docs/design/toolchain.md) "Language and
+structure".** Port the tooling to Go, reach parity, ship one static `pgb`.
 
 ## ⭐ Operator rulings taken at the start of THIS session
 
