@@ -240,10 +240,19 @@ func Info(c *cfg.Config) error {
 		logx.Say("  %-22s %s", "state", "NOT created -- run: pgb env create")
 	}
 	logx.Say("")
-	logx.Say("  why this image: glibc 2.36. At or above 2.34 the 'files' and 'dns'")
-	logx.Say("  NSS services are implemented inside libc, which is what leaves the")
-	logx.Say("  NSS override with nothing to dlopen. Below that floor it would move")
-	logx.Say("  the dlopen rather than remove it -- see experiments/21.")
+	// ⛔ NO VERSION NUMBER HERE. This text used to open "glibc 2.36" and went
+	// on saying so while cfg.go pinned something else -- the glibc the image
+	// carries is printed above, out of the image's own .pgb-env, and a second
+	// copy in prose can only ever drift from it. The FLOOR is a property of
+	// glibc rather than of the pin, so it is named; the pin is not.
+	logx.Say("  why this image: a FLOOR and a CEILING. At or above glibc 2.34 the")
+	logx.Say("  'files' and 'dns' NSS services are implemented inside libc, which")
+	logx.Say("  is what leaves the NSS override with nothing to dlopen; below that")
+	logx.Say("  floor it MOVES the dlopen rather than removing it -- experiments/21.")
+	logx.Say("  Nothing pushes the pin down (the output is static and consults no")
+	logx.Say("  host glibc), and --host-dlopen pushes it up: a host object's imports")
+	logx.Say("  have to be satisfiable by ours -- experiments/73-, docs/design/")
+	logx.Say("  glibc-versions.md.")
 	return nil
 }
 

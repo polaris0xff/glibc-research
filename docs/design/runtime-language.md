@@ -129,9 +129,9 @@ would give up.
 
 | | measured |
 |---|---|
-| zig in the pinned `debian:12` | ⛔ **not packaged.** `apt-cache policy zig` returns nothing in the pinned environment |
+| zig in the pinned Debian | ⛔ **not packaged.** `apt-cache policy zig` returns nothing in the pinned environment. ⚠ Measured when the pin was `debian:12`; T-070 has since moved it to `debian:13` and Debian still does not package zig |
 | so it must be fetched | zig 0.15.2 x86_64-linux tarball **53,733,924 B**, from `ziglang.org/download/index.json` |
-| against | the pinned environment's `gcc (Debian 12.2.0-14+deb12u1)`, already there, already used for every other artefact |
+| against | the pinned environment's gcc, already there, already used for every other artefact — `12.2.0` when this was measured, `14.2.0` at the pin today |
 | and against | `pgb` itself, 11,765,820 B, which would now be smaller than its own dependency |
 
 ⚠ **And it would be a second toolchain, not a replacement.** The application

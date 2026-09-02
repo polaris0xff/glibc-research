@@ -208,11 +208,18 @@ meson and make pick them up unmodified. Each wrapper reads its own argv:
 is what lets `./configure`'s shared-library probes still work; anything else =
 executable link. `pgb explain` prints every injected flag.
 
-**Build environment:** pinned `debian:12` (glibc 2.36) by manifest digest,
-unpacked by `internal/ociimg` (`pgb rootfs pull`) and entered by `chroot`.
-Verified not to be host
-contamination: output `.comment` reads `GCC: (Debian 12.2.0-14+deb12u1)` where
-a host build reads `Ubuntu 13.3.0`.
+**Build environment:** pinned `debian:13` (glibc 2.41, gcc 14.2.0) by manifest
+digest, unpacked by `internal/ociimg` (`pgb rootfs pull`) and entered by
+`chroot`. Verified not to be host contamination: output `.comment` reads
+`GCC: (Debian 14.2.0-19) 14.2.0` where a host build reads `Ubuntu 13.3.0`.
+
+⭐ **The pin is a FLOOR and a CEILING pointing opposite ways, and it moved on
+2026-09-02** — 2.36 → 2.41, T-070, all four measured costs zero, class B
+(a host symbol newer than the pin) **20 → 5 distinct symbols**.
+[`design/glibc-versions.md`](design/glibc-versions.md) is the argument.
+⛔ **It is three constants in `internal/cfg/cfg.go` and nowhere else**;
+`TODO/check.sh` fails if a copy appears in code. The move found **nine** copies
+of the name and **two** of the digest.
 
 ## 5. Repository layout
 

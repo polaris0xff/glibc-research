@@ -250,7 +250,18 @@ func RequireCurrent(c *cfg.Config, e cfg.Engine) error {
 		fmt.Fprintln(os.Stderr, "     A build would fail inside your build system with whatever the")
 		fmt.Fprintln(os.Stderr, "     missing tool says, so it is refused here instead.")
 	}
-	return fail.Cannot("rebuild it: pgb env create   (chroot: delete %s first)", c.EnvRoot())
+	// ⚠ THE REMEDY IS PER-ENGINE, and naming the wrong one sends the reader to
+	// a directory that is already correct. The chroot environment lives under
+	// a name derived from the pin, so a pin move gives it a NEW directory and
+	// there is nothing to delete; the docker one is a single tagged image that
+	// `env create` overwrites in place. Reported on 2026-09-02 when a real pin
+	// move left the docker environment stale and this line pointed at a chroot
+	// root that had just been built correctly.
+	if e == cfg.EngineChroot {
+		return fail.Cannot("rebuild it: pgb --engine chroot env create"+
+			"   (if %s already exists at the old settings, delete it first)", c.EnvRoot())
+	}
+	return fail.Cannot("rebuild it: pgb --engine %s env create", e)
 }
 
 // onlyIn returns the words in a that are not in b. An empty b must not make

@@ -70,24 +70,29 @@ executable, the expensive half of solo does not have to be written.
 
 `experiments/73-host-dso-abi-demand.sh`,
 `evidence/73-host-dso-abi-demand/RESULT.txt`. Every ELF shared object in every
-one of the eleven pinned environments — **5,807 objects** across the seven
-glibc ones — parsed byte-wise, no `readelf`, no binutils inside the target.
-Every `GLIBC_`/`GCC_`-versioned undefined symbol checked against what the
-pinned build environment's static glibc (`libc.a`, `libm-2.36.a`, `libmvec.a`,
+one of the eleven pinned environments — **6,392 objects, 6,007 of them on the
+seven glibc ones** — parsed byte-wise, no `readelf`, no binutils inside the
+target. Every `GLIBC_`/`GCC_`-versioned undefined symbol checked against what
+the pinned build environment's static glibc (`libc.a`, `libm.a`, `libmvec.a`,
 `libpthread.a`, `librt.a`, `libdl.a`, `libutil.a`, `libresolv.a`, `libanl.a`,
-`libcrypt.a`, `libc_nonshared.a`, `libgcc.a`) can define: **7,074 symbols**.
+`libcrypt.a`, `libc_nonshared.a`, `libgcc.a`) can define: **7,566 symbols**.
+
+⭐ **Re-measured 2026-09-02 at the pin T-070 moved to** — `debian:13`, glibc
+2.41. The 2.36 reading is in `docs/history/corrections.md` C22, along with the
+`5,807` this paragraph used to claim, which disagreed with its own table by
+200 objects.
 
 | environment | objects | demand | served | | A | B | C | S | D | **E** |
 |---|---|---|---|---|---|---|---|---|---|---|
 | alpine 3.22 / 3.20 / 3.10 | 28 | 0 | 0 | n/a | 0 | 0 | 0 | 0 | 0 | **0** |
 | voidlinux-musl | 357 | 0 | 0 | n/a | 0 | 0 | 0 | 0 | 0 | **0** |
-| debian-11 | 391 | 969 | 905 | 93.4% | 4 | 0 | 0 | 42 | 18 | **0** |
-| debian-12 | 759 | 900 | 851 | 94.6% | 5 | 0 | 0 | 41 | 3 | **0** |
-| ubuntu-20.04 | 782 | 983 | 893 | 90.8% | 4 | 0 | 0 | 44 | 42 | **0** |
-| rockylinux-8 | 623 | 1084 | 1049 | 96.8% | 7 | 0 | 0 | 6 | 22 | **0** |
-| opensuse-leap-15.6 | 209 | 1014 | 993 | 97.9% | 5 | 13 | 0 | 2 | 1 | **0** |
-| fedora-42 | 463 | 983 | 961 | 97.8% | 6 | 15 | 0 | 0 | 1 | **0** |
-| archlinux-latest | 2780 | 1270 | 1198 | 94.3% | 7 | 20 | 0 | 41 | 4 | **0** |
+| debian-11 | 391 | 969 | 905 | 93.4% | 3 | 0 | 0 | 43 | 18 | **0** |
+| debian-12 | 759 | 900 | 849 | 94.3% | 6 | 0 | 0 | 42 | 3 | **0** |
+| ubuntu-20.04 | 782 | 983 | 893 | 90.8% | 3 | 0 | 0 | 45 | 42 | **0** |
+| rockylinux-8 | 623 | 1084 | 1049 | 96.8% | 6 | 0 | 0 | 7 | 22 | **0** |
+| opensuse-leap-15.6 | 209 | 1014 | **1005** | **99.1%** | 6 | **0** | 0 | 2 | 1 | **0** |
+| fedora-42 | 463 | 983 | **976** | **99.3%** | 5 | **0** | 0 | 1 | 1 | **0** |
+| archlinux-latest | 2780 | 1270 | **1213** | **95.5%** | 6 | **5** | 0 | 42 | 4 | **0** |
 
 ⭐ **Class E is empty on every environment.** Every symbol the pinned static
 glibc cannot define falls into a class with a measured reason, and the classes
@@ -96,9 +101,9 @@ are decided by the target environment's own files rather than by judgement:
 | | class | decided by | what it means |
 |---|---|---|---|
 | **A** | loader-owned | the host's own `ld.so` exports it | `__tls_get_addr`, `_rtld_global`, `_rtld_global_ro`, `__pointer_chk_guard`. **Not a gap** — a compiled-in loader provides these itself, exactly as `ld.so` does. solo does. |
-| **B** | version **ceiling** | host `libc.so.6` has it at a `GLIBC_` version newer than the pin | 20 symbols. `__isoc23_strtol` and friends plus `strlcpy`/`strlcat`, all `GLIBC_2.38`; `__memset_explicit_chk`, `GLIBC_2.43`. The object was built against a newer glibc than ours. |
-| **C** | version floor | host has it, the pinned `libc.so.6` does not | **empty everywhere.** |
-| **S** | static/shared split | both `libc.so.6` have it, `libc.a` does not | 49 symbols. See below — this is the one nobody would have predicted. |
+| **B** | version **ceiling** | host `libc.so.6` has it at a `GLIBC_` version newer than the pin | ⭐ **5 symbols, on `archlinux-latest` alone** — `__memset_explicit_chk`, `free_sized`, `free_aligned_sized` at `GLIBC_2.43`, `__inet_pton_chk` and `__inet_ntop_chk` at `GLIBC_2.42`. It was **20** at the 2.36 pin, `__isoc23_strtol` and its family at `GLIBC_2.38` making up 14 of them; T-070's move to 2.41 emptied every fixed-release environment and left the rolling one. ⚠ **This is the class that regrows with time**, and nothing else here does. |
+| **C** | version floor | host has it, the pinned `libc.so.6` does not | **empty everywhere, at both pins.** |
+| **S** | static/shared split | both `libc.so.6` have it, `libc.a` does not | 50 symbols. See below — this is the one nobody would have predicted. |
 | **D** | not the host libc's either | host `libc.so.6` does not export it | the demand is met by another library there, or not at all. |
 | **E** | unexplained | none of the above | **0**. |
 

@@ -2,8 +2,8 @@
 21 - is glibc 2.34 really the floor for the NSS override
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-01T06:41:50Z
-host kernel  : Linux 6.18.44-fc-v22
+date (UTC)   : 2026-09-02T23:31:56Z
+host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
 host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
@@ -12,18 +12,22 @@ ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
 evidence     : /home/user/glibc-research/evidence/21-glibc-version-floor
 --------------------------------------------------------------
 
-        built in debian-11: ldd (Debian GLIBC 2.31-13+deb11u14) 2.31
-        built in debian-12: ldd (Debian GLIBC 2.36-9+deb12u14) 2.36
+        built in debian-11: glibc 2.31
+        built in debian-12: glibc 2.36
+        built in pgb-env-debian13: glibc 2.41
   ok    target ships libnss_files.so.2                 = yes
 
   what each build opens on debian-11 (glibc 2.31 target):
-    BUILD glibc / arm            EXIT     HOST NSS MODULES OPENED
-    2.31 plain                   0        libnss_dns.so.2,libnss_files.so.2
-    2.31 +nssfix                 0        libnss_dns.so.2,libnss_files.so.2
-    2.36 plain                   0        none
-    2.36 +nssfix                 0        none
+    BUILD glibc / arm                EXIT     HOST NSS MODULES OPENED
+    2.31 plain                       0        libnss_dns.so.2,libnss_files.so.2
+    2.31 +nssfix                     0        libnss_dns.so.2,libnss_files.so.2
+    2.36 plain                       0        none
+    2.36 +nssfix                     0        none
+    2.41 plain   (THE PIN)           0        none
+    2.41 +nssfix (THE PIN)           0        none
 
-  ok    2.36 build + override loads no NSS module      = none
+  ok    above-floor build + override loads no NSS module (2.36) = none
+  ok    THE PIN's build + override loads no NSS module (2.41) = none
         BELOW THE FLOOR, CONFIRMED: the 2.31 build still loaded [libnss_dns.so.2,libnss_files.so.2]
           even with the override, because those services are not builtin
           before glibc 2.34. This is what the >=2.34 pin exists for.
@@ -33,6 +37,6 @@ evidence     : /home/user/glibc-research/evidence/21-glibc-version-floor
         for reference, without the override: 2.31 -> libnss_dns.so.2,libnss_files.so.2 ; 2.36 -> none
 
 -- result ----------------------------------------------------
-pass=2 fail=0 skip=0
+pass=3 fail=0 skip=0
 VERDICT: matched expectation.
 --------------------------------------------------------------

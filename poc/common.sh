@@ -53,7 +53,41 @@ poc_begin() {
   printf 'stresses      : %s\n' "${POC_STRESSES:-?}"
   printf 'date (UTC)    : %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   printf 'evidence      : %s\n' "$POC_OUT"
+  poc_record_env
   printf -- '---------------------------------------------------------------\n'
+}
+
+# ⛔ WHICH TOOLCHAIN BUILT THIS. A POC's RESULT.txt used to say what it built
+# and how it behaved on eleven environments, and nothing at all about the
+# compiler and libc that produced the binary -- so "do the POCs still pass at
+# the new pin?" could not be answered from committed evidence, only by running
+# them again. T-070 hit exactly that: `PGB_ENV_NAME=... sh poc/*/run.sh` built
+# against the INCUMBENT on a machine running dockerd and no POC output said so.
+#
+# ⚠ Read out of the environment on disk, never from cfg.go: the question is
+# what BUILT the binary, and cfg.go only says what pgb would build with. They
+# differ exactly when it matters -- when PGB_ENV_* names a candidate.
+POC_ENV_GCC=""
+poc_record_env() {
+  _pe_root=$("$PGB" env info 2>/dev/null | awk '$1=="root"{print $2; exit}')
+  _pe_stamp="$_pe_root/.pgb-env"
+  if [ -n "$_pe_root" ] && [ -f "$_pe_stamp" ]; then
+    POC_ENV_GCC=$(sed -n 's/^gcc: *//p' "$_pe_stamp" | awk '{print $NF}')
+    printf 'build env     : %s\n' "$_pe_root"
+    printf 'build image   : %s @ %s\n' \
+      "$(sed -n 's/^image: *//p'  "$_pe_stamp")" \
+      "$(sed -n 's/^digest: *//p' "$_pe_stamp")"
+    printf 'build gcc     : %s\n' "$(sed -n 's/^gcc: *//p'   "$_pe_stamp")"
+    printf 'build glibc   : %s\n' "$(sed -n 's/^glibc: *//p' "$_pe_stamp")"
+  else
+    # ⚠ An absence is not a zero. The docker engine builds from an image
+    # rather than from a rootfs on disk, so there is no stamp to read and the
+    # answer is "not recorded here", not "no environment".
+    printf 'build env     : NOT RECORDED -- no .pgb-env under %s\n' "${_pe_root:-<unknown>}"
+    printf 'build image   : %s @ %s (from pgb env info, not from a stamp)\n' \
+      "$("$PGB" env info 2>/dev/null | awk '$1=="image"{print $2; exit}')" \
+      "$("$PGB" env info 2>/dev/null | awk '$1=="digest"{print $2; exit}')"
+  fi
 }
 
 poc_check() { # label actual expected
@@ -303,6 +337,20 @@ poc_inspect() { # binary
   printf '    %-22s %s\n' DT_NEEDED "$(readelf -d "$1" 2>/dev/null | grep -c NEEDED)"
   printf '    %-22s %s\n' 'pgb runtime linked' \
     "$(strings -a "$1" 2>/dev/null | grep -qx 'pgb-runtime' && echo yes || echo NO)"
+  # ⭐ THE COMPILER THE BINARY ITSELF CARRIES, and it is ASSERTED against the
+  # environment's own recorded gcc rather than printed for someone to read.
+  # ⛔ This is the check that caught T-070 arm 5 building against the incumbent
+  # while every other line of output looked right: `.comment` said
+  # `GCC: (Debian 12.2.0-14+deb12u1)` where the named environment carried
+  # 14.2.0. Nothing else in a POC's output can tell those two apart.
+  # ⚠ A binary with no .comment reports `absent` and is NOT asserted — a
+  # stripped or `-fno-ident` link is not a wrong compiler.
+  _pi_cc=$(readelf -p .comment "$1" 2>/dev/null \
+           | sed -n 's/.*GCC: (\{0,1\}[^)]*)\{0,1\} \([0-9][0-9.]*\).*/\1/p' | head -1)
+  printf '    %-22s %s\n' '.comment gcc' "${_pi_cc:-absent}"
+  if [ -n "$_pi_cc" ] && [ -n "$POC_ENV_GCC" ]; then
+    poc_check "built by the environment's own gcc" "$_pi_cc" "$POC_ENV_GCC"
+  fi
 }
 
 poc_finish() {

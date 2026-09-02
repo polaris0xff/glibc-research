@@ -12,7 +12,7 @@ is going: `pgb build <url-or-package>`, with the tool resolving the source,
 planning the dependencies and linking statically as far as each one allows.
 
 ```sh
-./pgb env create             # a pinned Debian 12 build environment
+./pgb env create             # a pinned Debian 13 build environment (glibc 2.41)
 ./pgb build -- make          # your project's own build, unmodified
 ./pgb verify ./yourprogram   # run it on 11 real distributions
 ```

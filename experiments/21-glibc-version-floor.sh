@@ -7,7 +7,7 @@
 #
 # -- WHY THIS IS THE MOST LOAD-BEARING UNMEASURED CLAIM IN THE PROJECT --------
 #
-# The whole tool pins its build environment to Debian 12 (glibc 2.36) and the
+# The whole tool pins its build environment above glibc 2.34 and the
 # reason given everywhere is: "glibc 2.34 built the `files` and `dns` NSS
 # services into libc, so pinning the databases to those services leaves
 # nothing to dlopen."
@@ -18,9 +18,12 @@
 # every experiment in this repository reported success because it only ever
 # looked for module names it recognised as external.
 #
-# The experiment builds the SAME source against glibc 2.31 (Debian 11, below
-# the floor) and against glibc 2.36 (Debian 12, above it) and compares what
-# each one opens at run time.
+# The experiment builds the SAME source three ways -- against glibc 2.31
+# (Debian 11, below the floor), against glibc 2.36 (Debian 12, above it), and
+# against WHATEVER cfg.go PINS TODAY -- and compares what each one opens at
+# run time. ⭐ The third arm is why a pin move re-validates the floor here
+# automatically instead of leaving this file measuring a glibc the tool no
+# longer builds against.
 #
 # ⭐ THE CONTROL THAT MAKES THE ANSWER READABLE. Both binaries are run on the
 # SAME target root filesystem, so any difference between them is the build
@@ -74,34 +77,71 @@ EOF
 # ---------------------------------------------------------------------------
 # Build one arm inside a given distro rootfs, using ITS gcc and ITS glibc.
 # ---------------------------------------------------------------------------
-build_in() {   # rootfs-name  out-prefix
-  _rn="$1"; _op="$2"
+#
+# ⛔ THE VERSION LABEL IS READ OUT OF THE ENVIRONMENT, NEVER TYPED. The first
+# version of this file labelled its arms "2.31" and "2.36" as literals. That
+# was true when it was written and would have gone on printing "2.36" after
+# T-070 moved the pin to 2.41 -- a table saying one thing about a binary built
+# from another, which is the exact failure T-070 spent a session finding in
+# `PGB_ENV_NAME`. `ldd --version` inside each environment is the label now.
+build_in() {   # rootfs-name  out-prefix  [prepared]
+  _rn="$1"; _op="$2"; _prepared="${3:-}"
   _src="$ROOTFS_DIR/$_rn"
   [ -d "$_src" ] || { exp_skip "build in $_rn" "rootfs not fetched"; return 1; }
-  _env="$ROOTFS_DIR/exp21-$_rn"
-  if [ ! -f "$_env/.exp21-ready" ]; then
-    rm -rf "$_env"; cp -a "$_src" "$_env" || return 1
-    "$REPO_DIR/pgb" rootfs run "$_env" -- /bin/sh -c \
-      'export DEBIAN_FRONTEND=noninteractive; apt-get update -qq && \
-       apt-get install -y -qq --no-install-recommends gcc libc6-dev' \
-      >"$B/$_rn-apt.log" 2>&1 || { exp_skip "build in $_rn" "package install failed"; return 1; }
-    : > "$_env/.exp21-ready"
+  if [ -n "$_prepared" ]; then
+    # ⭐ The pinned build environment already HAS a compiler, so it is used in
+    # place rather than copied and apt-ed. ⚠ Nothing is written into it — see
+    # the bind mount below.
+    _env="$_src"
+  else
+    _env="$ROOTFS_DIR/exp21-$_rn"
+    if [ ! -f "$_env/.exp21-ready" ]; then
+      rm -rf "$_env"; cp -a "$_src" "$_env" || return 1
+      "$REPO_DIR/pgb" rootfs run "$_env" -- /bin/sh -c \
+        'export DEBIAN_FRONTEND=noninteractive; apt-get update -qq && \
+         apt-get install -y -qq --no-install-recommends gcc libc6-dev' \
+        >"$B/$_rn-apt.log" 2>&1 || { exp_skip "build in $_rn" "package install failed"; return 1; }
+      : > "$_env/.exp21-ready"
+    fi
   fi
-  cp "$B/probe.c" "$_env/probe.c"
-  "$REPO_DIR/pgb" rootfs run "$_env" -- /bin/sh -c \
-    'cd / && gcc -static -O2 -o /probe-plain probe.c 2>/dev/null && \
-     gcc -static -O2 -DNSSFIX -o /probe-nssfix probe.c 2>/dev/null' \
+  # ⛔ THE OUTPUT GOES INTO A BIND MOUNT, NOT INTO THE ROOTFS. The first
+  # version of this wrote the probe to `/` inside each environment and copied
+  # the results back out; the second tried `/tmp` to keep the PINNED
+  # environment clean and produced `cc1: fatal error: ... No such file or
+  # directory` on all three arms -- ⚠ `pgb rootfs run` MOUNTS A FRESH TMPFS
+  # OVER /tmp, so a file copied there from outside is not there inside.
+  # Verified by hand: `ls -la /tmp` inside shows an empty `drwxrwxrwt`.
+  # A bind mount of the experiment's own build directory has neither problem.
+  "$REPO_DIR/pgb" rootfs run "$_env" --bind "$B:$B" --workdir "$B" -- /bin/sh -c \
+    "gcc -static -O2 -o '$B/$_op-plain' probe.c && \
+     gcc -static -O2 -DNSSFIX -o '$B/$_op-nssfix' probe.c" \
     >>"$B/$_rn-build.log" 2>&1 || { exp_skip "build in $_rn" "compile failed"; return 1; }
-  cp "$_env/probe-plain"  "$B/$_op-plain"  || return 1
-  cp "$_env/probe-nssfix" "$B/$_op-nssfix" || return 1
-  _v=$("$REPO_DIR/pgb" rootfs run "$_env" -- /bin/sh -c 'ldd --version' 2>/dev/null | head -1)
-  exp_note "built in $_rn: $_v"
+  [ -f "$B/$_op-plain" ] && [ -f "$B/$_op-nssfix" ] || {
+    exp_skip "build in $_rn" "the compiler reported success and produced nothing"; return 1; }
+  # The glibc this arm was actually built against, for its label.
+  _v=$("$REPO_DIR/pgb" rootfs run "$_env" -- /bin/sh -c 'ldd --version' 2>/dev/null \
+       | head -1 | awk '{print $NF}')
+  eval "VER_$_op=\${_v:-unknown}"
+  exp_note "built in $_rn: glibc ${_v:-unknown}"
   return 0
 }
 
-HAVE_OLD=0; HAVE_NEW=0
+HAVE_OLD=0; HAVE_NEW=0; HAVE_PIN=0
+VER_old=unknown; VER_new=unknown; VER_pin=unknown
 build_in debian-11 old && HAVE_OLD=1
 build_in debian-12 new && HAVE_NEW=1
+
+# ⭐ THE THIRD ARM, AND IT IS THE ONE THAT FOLLOWS THE PIN. ENV_NAME comes from
+# lib.sh, out of internal/cfg/cfg.go, so moving the pin re-validates the NSS
+# floor here automatically instead of leaving this experiment measuring a glibc
+# the tool no longer builds against. T-070.
+# ⚠ Its rootfs is the pinned build environment, which already has gcc.
+if [ -d "$ENV_ROOT" ]; then
+  build_in "$ENV_NAME" pin prepared && HAVE_PIN=1
+else
+  exp_skip "the pinned build environment ($ENV_NAME)" \
+           "absent; run: ./pgb --engine chroot env create"
+fi
 
 if [ "$HAVE_OLD" = 0 ] || [ "$HAVE_NEW" = 0 ]; then
   exp_note "both a below-floor and an above-floor build environment are required"
@@ -116,32 +156,49 @@ exp_check "target ships libnss_files.so.2" \
   "$(ls "$TARGET"/lib/*/libnss_files.so.2 >/dev/null 2>&1 && echo yes || echo no)" yes
 
 printf '\n  what each build opens on debian-11 (glibc 2.31 target):\n'
-printf '    %-28s %-8s %s\n' 'BUILD glibc / arm' 'EXIT' 'HOST NSS MODULES OPENED'
+printf '    %-32s %-8s %s\n' 'BUILD glibc / arm' 'EXIT' 'HOST NSS MODULES OPENED'
 
 # ⛔ THIS FUNCTION RETURNS A VALUE ON STDOUT AND MUST PRINT NOTHING ELSE
 # THERE. The first version also wrote its own table row to stdout, so every
 # caller captured the row TEXT as the module list -- and the comparisons below
 # then compared two formatted table rows instead of two module lists. The row
 # goes to stderr, which is where the operator sees it and $( ) does not.
-modules_for() {  # binary label -> echoes the comma list, table row on stderr
+#
+# ⚠ THE TRACE FILE IS NAMED BY A TAG, NOT BY THE LABEL. The label carries
+# spaces and parentheses now that it is built from a version read at run time,
+# and a path composed out of it is a filename waiting to be mishandled by the
+# next thing that touches it.
+modules_for() {  # binary label tag -> echoes the comma list, table row on stderr
   cp "$1" "$TARGET/exp21-probe"
   "$REPO_DIR/pgb" rootfs run "$TARGET" -- /exp21-probe >/dev/null 2>&1
   _st=$?
-  _m=$(exp_trace_opens "$TARGET" /exp21-probe "$B/tr-$2.txt" \
+  _m=$(exp_trace_opens "$TARGET" /exp21-probe "$B/tr-$3.txt" \
        | grep -oE 'libnss_[a-z0-9_]*\.so[^"]*' | sort -u | tr '\n' ',' | sed 's/,$//')
   rm -f "$TARGET/exp21-probe"
-  printf '    %-28s %-8s %s\n' "$2" "$_st" "${_m:-none}" >&2
+  printf '    %-32s %-8s %s\n' "$2" "$_st" "${_m:-none}" >&2
   printf '%s' "${_m:-none}"
 }
 
-OLD_PLAIN=$(modules_for "$B/old-plain"  "2.31 plain")
-OLD_FIX=$(modules_for   "$B/old-nssfix" "2.31 +nssfix")
-NEW_PLAIN=$(modules_for "$B/new-plain"  "2.36 plain")
-NEW_FIX=$(modules_for   "$B/new-nssfix" "2.36 +nssfix")
+OLD_PLAIN=$(modules_for "$B/old-plain"  "$VER_old plain"   old-plain)
+OLD_FIX=$(modules_for   "$B/old-nssfix" "$VER_old +nssfix" old-nssfix)
+NEW_PLAIN=$(modules_for "$B/new-plain"  "$VER_new plain"   new-plain)
+NEW_FIX=$(modules_for   "$B/new-nssfix" "$VER_new +nssfix" new-nssfix)
+PIN_PLAIN=unmeasured; PIN_FIX=unmeasured
+if [ "$HAVE_PIN" = 1 ]; then
+  PIN_PLAIN=$(modules_for "$B/pin-plain"  "$VER_pin plain   (THE PIN)" pin-plain)
+  PIN_FIX=$(modules_for   "$B/pin-nssfix" "$VER_pin +nssfix (THE PIN)" pin-nssfix)
+fi
 
 printf '\n'
 # ⭐ THE ASSERTION THE PROJECT'S PIN RESTS ON.
-exp_check "2.36 build + override loads no NSS module" "$NEW_FIX" none
+exp_check "above-floor build + override loads no NSS module ($VER_new)" "$NEW_FIX" none
+if [ "$HAVE_PIN" = 1 ]; then
+  # ⛔ THE ONE THAT ACTUALLY GATES THE SHIPPED TOOL. The row above is the
+  # historical above-floor witness; this one is whatever cfg.go pins today.
+  exp_check "THE PIN's build + override loads no NSS module ($VER_pin)" "$PIN_FIX" none
+else
+  exp_skip "THE PIN's build + override" "the pinned environment is not on disk"
+fi
 
 # ⛔ THIS ONE IS DELIBERATELY NOT ASSERTED EITHER WAY. Whichever way it lands
 # is a finding, and the point of the experiment is to find out rather than to
@@ -158,16 +215,22 @@ fi
 
 if [ "$OLD_FIX" != "$NEW_FIX" ]; then
   exp_note "the two builds DIFFER, which is the build glibc and nothing else:"
-  exp_note "  2.31 + override -> $OLD_FIX"
-  exp_note "  2.36 + override -> $NEW_FIX"
+  exp_note "  $VER_old + override -> $OLD_FIX"
+  exp_note "  $VER_new + override -> $NEW_FIX"
 fi
-exp_note "for reference, without the override: 2.31 -> $OLD_PLAIN ; 2.36 -> $NEW_PLAIN"
+exp_note "for reference, without the override: $VER_old -> $OLD_PLAIN ; $VER_new -> $NEW_PLAIN"
 
 {
-  printf 'build glibc 2.31 plain   : %s\n' "$OLD_PLAIN"
-  printf 'build glibc 2.31 +nssfix : %s\n' "$OLD_FIX"
-  printf 'build glibc 2.36 plain   : %s\n' "$NEW_PLAIN"
-  printf 'build glibc 2.36 +nssfix : %s\n' "$NEW_FIX"
+  printf 'build glibc %s plain   : %s\n' "$VER_old" "$OLD_PLAIN"
+  printf 'build glibc %s +nssfix : %s\n' "$VER_old" "$OLD_FIX"
+  printf 'build glibc %s plain   : %s\n' "$VER_new" "$NEW_PLAIN"
+  printf 'build glibc %s +nssfix : %s\n' "$VER_new" "$NEW_FIX"
+  if [ "$HAVE_PIN" = 1 ]; then
+    printf 'THE PIN (%s) %s plain   : %s\n' "$ENV_NAME" "$VER_pin" "$PIN_PLAIN"
+    printf 'THE PIN (%s) %s +nssfix : %s\n' "$ENV_NAME" "$VER_pin" "$PIN_FIX"
+  else
+    printf 'THE PIN (%s) : NOT MEASURED -- environment absent\n' "$ENV_NAME"
+  fi
 } > "$EXP_OUT/floor.txt"
 
 exp_finish
