@@ -252,18 +252,53 @@ jobs:
             --entrypoint /out/probe-portable \
             '${{ matrix.image }}'
 
-      - name: Run the plain -static control, and record what it did
-        # ⚠ continue-on-error IS CORRECT HERE AND ONLY HERE. The control is
-        # EXPECTED to die on some of these -- that is the finding. Its exit
-        # status is recorded, never asserted.
-        continue-on-error: true
+      - name: Run the plain -static control, and ASSERT it fails
+        # ⛔ NOT `continue-on-error`, and this is the second version of this
+        # step. Two defects in the first one, both found by review:
+        #
+        #   1. Under GitHub's default `bash -e` shell the script ABORTS at the
+        #      failing `docker run`, so the `echo` that followed it NEVER RAN.
+        #      The exit status this step exists to record was discarded and the
+        #      red annotation was its only trace. Reproduced locally:
+        #      `bash -e -c 'set -x; false; echo "exit=$?"'` prints nothing.
+        #   2. `continue-on-error: true` tolerates ANY failure, including one
+        #      nobody expected. An image that will not pull reads exactly like
+        #      a control that segfaulted -- docs/AGENTS.md §0b's could-not-run
+        #      recorded as a ran-and-failed, which is the one thing that
+        #      section forbids.
+        #
+        # ⭐ So the control's failure is now ASSERTED rather than tolerated,
+        # which is a STRICTLY STRONGER test: docs/AGENTS.md §2 measures the
+        # plain -static probe failing on all 11, and if it ever stops failing
+        # that is news, not a pass.
         run: |
-          set -x
+          set -u
+          chmod +x out/probe-plain
+          # Pull separately so "could not run" stays distinguishable from
+          # "ran and failed". Exit 2 is this project's could-not-run code.
+          if ! docker pull -q '${{ matrix.image }}' >/dev/null 2>&1; then
+            echo "::error::could not pull ${{ matrix.image }} -- the control did NOT run"
+            exit 2
+          fi
+          set +e
           docker run --rm \
             -v "$PWD/out:/out:ro" \
             --entrypoint /out/probe-plain \
             '${{ matrix.image }}'
-          echo "plain -static exit=$? on ${{ matrix.name }} (${{ matrix.libc }})"
+          rc=$?
+          set -e
+          if [ "$rc" -gt 128 ]; then
+            echo "plain -static exit=$rc (SIGNAL $((rc - 128))) on ${{ matrix.name }} (${{ matrix.libc }})"
+          else
+            echo "plain -static exit=$rc on ${{ matrix.name }} (${{ matrix.libc }})"
+          fi
+          if [ "$rc" -eq 0 ]; then
+            echo "::error::the plain -static control PASSED on ${{ matrix.name }}."
+            echo "Either the arms are no longer independent, or ci/probe.c stopped"
+            echo "probing, or this distribution's glibc changed. All three are"
+            echo "findings and none of them is a green build. docs/AGENTS.md §2."
+            exit 1
+          fi
 
   # ---------------------------------------------------------------------------
   # 4. The tool's OWN verdict, through its own command.
@@ -295,16 +330,25 @@ jobs:
           chmod +x out/probe-portable
           ./pgb --engine docker verify ./out/probe-portable
       - name: The control must NOT pass its own verify
-        # ⚠ continue-on-error is correct here: a non-zero exit is the EXPECTED
-        # result and is what proves `verify` can still fail. A verify that
-        # passed everything would be worthless and this is the only step that
-        # would notice.
-        continue-on-error: true
+        # ⭐ A non-zero exit is the EXPECTED result and is what proves `verify`
+        # can still fail: a verify that passed everything would be worthless
+        # and this is the only step that would notice.
+        #
+        # ⛔ Asserted, not tolerated -- same two defects as the step above.
         run: |
-          set -x
+          set -u
           chmod +x out/probe-plain
+          set +e
           ./pgb --engine docker verify ./out/probe-plain
-          echo "plain control verify exit=$?  (non-zero is expected)"
+          rc=$?
+          set -e
+          echo "plain control verify exit=$rc  (non-zero is expected)"
+          if [ "$rc" -eq 0 ]; then
+            echo "::error::pgb verify PASSED the plain -static control."
+            echo "verify is no longer able to fail anything, which makes every"
+            echo "other green row in this workflow meaningless."
+            exit 1
+          fi
 
   # ---------------------------------------------------------------------------
   # 5. The experiments and selftests the runner can host.
@@ -349,5 +393,15 @@ jobs:
           "./pgb" rootfs run --selftest || \
             echo "rootfs-run selftest could not run here (needs CAP_SYS_ADMIN); recorded, not asserted"
       - name: Host probe (expected to report an incomplete bed here)
-        continue-on-error: true
-        run: sh experiments/10-probe-the-host.sh
+        # ⚠ The runner has no test bed, so experiments/10- reports one and
+        # exits non-zero. That is a could-not-run, not a failure, and this
+        # project's exit-code contract says 2 for it -- but 10- predates the
+        # contract and returns 1. Recorded with its code rather than tolerated,
+        # so a DIFFERENT non-zero here is still visible in the log.
+        run: |
+          set -u
+          set +e
+          sh experiments/10-probe-the-host.sh
+          rc=$?
+          set -e
+          echo "experiments/10- exit=$rc on the runner (no bed here; expected non-zero)"
