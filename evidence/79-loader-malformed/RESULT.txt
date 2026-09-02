@@ -1,0 +1,21 @@
+experiment 79 - the compiled-in loader against malformed ELF
+date (UTC)   : 2026-09-02T12:25:40Z
+host kernel  : Linux 6.18.44-fc-v22
+corpus from  : /usr/lib/x86_64-linux-gnu/libz.so.1
+
+00_pristine.so
+01_truncated_hdr.so is not an x86-64 ELF shared object
+02_truncated_half.so: truncated -- segment 1 wants bytes 8192..80973 of a 56500-byte file
+03_truncated_1byte.so is not an x86-64 ELF shared object
+04_empty.so is not an x86-64 ELF shared object
+05_phnum_huge.so: cannot read program headers
+06_phoff_past_eof.so: cannot read program headers
+07_phoff_unaligned.so: no PT_LOAD segment
+08_phentsize_zero.so: e_phentsize is 0, expected 56
+09_bad_magic.so is not an x86-64 ELF shared object
+10_class32.so is not an x86-64 ELF shared object
+11_machine_arm.so is not an x86-64 ELF shared object
+12_type_exec.so is not an x86-64 ELF shared object
+13_shoff_garbage.so
+14_all_ff.so is not an x86-64 ELF shared object
+15_zeros_after_hdr.so: no PT_LOAD segment

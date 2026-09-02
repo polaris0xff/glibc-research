@@ -149,6 +149,9 @@ static void el_dbg(const char *fmt, ...)
 
 /* ------------------------------------------------------------ loaded object */
 
+/* An upper bound on a .dynsym, used only to stop a corrupt hash chain
+ * running off the end of a mapping. libLLVM's is ~100k. */
+#define EL_MAX_SYMS   (1u << 22)
 #define EL_MAX_OBJS   64
 #define EL_MAX_NEEDED 32
 
@@ -190,6 +193,10 @@ struct el_obj {
     long   tls_tpoff;
 
     unsigned char *relro;  size_t relrosz;
+
+    /* The mapped range, kept so a relocation cannot be talked into writing
+     * outside it. See el_in_map(). */
+    unsigned char *map_lo, *map_hi;
 
     struct el_obj *needed[EL_MAX_NEEDED];
     int            nneeded;
@@ -409,6 +416,22 @@ static int el_soname_served(const char *soname)
     return 0;
 }
 
+/* ⛔ A RELOCATION'S r_offset IS ATTACKER-CONTROLLED DATA, NOT A PROMISE.
+ *
+ * Every write below computes `where = base + r_offset` and stores through it.
+ * Nothing in the ELF format stops r_offset naming an address outside the
+ * object's own mapping, and a loader that trusts it will happily write eight
+ * bytes anywhere in the address space on behalf of a file it just found on
+ * disk. This is the check that makes that a named refusal instead.
+ *
+ * ⚠ Bounds are the MAPPED range, not the span from base: a PT_LOAD set can
+ * start at a non-zero p_vaddr, so `base` itself may point below the mapping. */
+static int el_in_map(const struct el_obj *o, const void *p, size_t len)
+{
+    const unsigned char *q = p;
+    return o->map_lo && q >= o->map_lo && len <= (size_t)(o->map_hi - q);
+}
+
 /* ------------------------------------------------------------ symbol tables */
 
 static uint32_t el_gnu_hash(const char *s)
@@ -447,8 +470,16 @@ static uint32_t el_gnu_symcount(const uint32_t *gh)
             last = buckets[i];
     if (last < symoffset)
         return symoffset;
-    while (!(chain[last - symoffset] & 1))
+    /* ⛔ BOUNDED. This walk runs to a terminator bit that a corrupt table need
+     * not contain, and it is reading a mapping whose end is a page boundary --
+     * so an unbounded version reads off the end and takes SIGSEGV. The cap is
+     * the count no real object exceeds; a table that needs more than this is
+     * one this loader declines to characterise. */
+    while (!(chain[last - symoffset] & 1)) {
+        if (last - symoffset >= EL_MAX_SYMS)
+            return 0;
         last++;
+    }
     return last + 1;
 }
 
@@ -465,7 +496,7 @@ static const char *el_defver(const struct el_obj *o, uint32_t si)
     vi = o->versym[si] & 0x7fff;
     if (vi <= 1)
         return NULL;
-    for (vd = o->verdef;; ) {
+    for (vd = o->verdef; el_in_map(o, vd, sizeof *vd); ) {
         if ((vd->vd_ndx & 0x7fff) == vi) {
             const Elf64_Verdaux *aux =
                 (const Elf64_Verdaux *)((const char *)vd + vd->vd_aux);
@@ -475,6 +506,7 @@ static const char *el_defver(const struct el_obj *o, uint32_t si)
             return NULL;
         vd = (const Elf64_Verdef *)((const char *)vd + vd->vd_next);
     }
+    return NULL;   /* walked out of the mapping: no version rather than a guess */
 }
 
 /* A definition in `o` matching `name`, honouring the version rule. Returns the
@@ -515,8 +547,10 @@ static const Elf64_Sym *el_lookup_in(const struct el_obj *o, const char *name,
         n = buckets[h % nbuckets];
         if (n < symoffset)
             return NULL;
-        for (;;) {
+        for (; el_in_map(o, &chain[n - symoffset], sizeof(uint32_t)); n++) {
             uint32_t c = chain[n - symoffset];
+            if (!el_in_map(o, &o->symtab[n], sizeof(Elf64_Sym)))
+                return NULL;
             if ((c | 1) == (h | 1)) {
                 const Elf64_Sym *s = &o->symtab[n];
                 if (s->st_shndx != SHN_UNDEF &&
@@ -527,8 +561,11 @@ static const Elf64_Sym *el_lookup_in(const struct el_obj *o, const char *name,
             }
             if (c & 1)
                 return NULL;
-            n++;
         }
+        /* ⚠ Fell out of the mapping instead of hitting a terminator: the hash
+         * table and the segments disagree. A miss, never a guess. */
+        if (!sym)
+            return NULL;
     } else if (o->elf_hash) {
         const uint32_t *eh = o->elf_hash;
         uint32_t nbucket = eh[0], nchain = eh[1];
@@ -574,7 +611,7 @@ static const char *el_refver(const struct el_obj *o, uint32_t si)
     vi = o->versym[si] & 0x7fff;
     if (vi <= 1)
         return NULL;
-    for (vn = o->verneed;; ) {
+    for (vn = o->verneed; el_in_map(o, vn, sizeof *vn); ) {
         const Elf64_Vernaux *aux =
             (const Elf64_Vernaux *)((const char *)vn + vn->vn_aux);
         int i;
@@ -589,6 +626,7 @@ static const char *el_refver(const struct el_obj *o, uint32_t si)
             return NULL;
         vn = (const Elf64_Verneed *)((const char *)vn + vn->vn_next);
     }
+    return NULL;
 }
 
 /* ⭐ THE RESOLUTION ORDER, not an approximation of it (solo's mechanism 2,
@@ -781,6 +819,21 @@ static int el_reloc_one(struct el_obj *o, const Elf64_Rela *r)
     const char *name = NULL, *ver = NULL;
     void *val = NULL;
     int found = 0, weak = 0;
+
+    /* ⛔ Refused before anything is written. Eight bytes is the widest store
+     * any case below makes. */
+    if (type != R_X86_64_NONE && !el_in_map(o, where, 8)) {
+        el_err("pgb-elfload: %s: relocation at offset 0x%llx is outside the "
+               "object's own mapping", o->soname,
+               (unsigned long long)r->r_offset);
+        return -1;
+    }
+
+    if (si && o->nsyms && si >= o->nsyms) {
+        el_err("pgb-elfload: %s: relocation names symbol %u of %u",
+               o->soname, si, o->nsyms);
+        return -1;
+    }
 
     if (si) {
         const Elf64_Sym *s = &o->symtab[si];
@@ -982,17 +1035,29 @@ static void el_apply_relr(struct el_obj *o)
         uint64_t e = o->relr[i];
         if ((e & 1) == 0) {
             where = (uint64_t *)(o->base + e);
+            if (!el_in_map(o, where, 8))
+                goto out_of_range;
             *where++ += (uint64_t)(uintptr_t)o->base;
         } else if (where) {
             uint64_t bits = e >> 1;
             int b;
             for (b = 0; bits; b++, bits >>= 1)
-                if (bits & 1)
+                if (bits & 1) {
+                    if (!el_in_map(o, &where[b], 8))
+                        goto out_of_range;
                     where[b] += (uint64_t)(uintptr_t)o->base;
+                }
             where += 63;
         }
     }
     el_dbg("pgb-elfload: %s: applied %zu DT_RELR words\n", o->soname, n);
+    return;
+out_of_range:
+    /* ⚠ Reported and STOPPED, not skipped. A RELR bitmap that walks off the
+     * mapping means the table and the segments disagree, and the words
+     * already applied are as suspect as the one that overran. */
+    el_err("pgb-elfload: %s: DT_RELR walked outside the object's mapping",
+           o->soname);
 }
 
 static int el_relocate(struct el_obj *o)
@@ -1037,7 +1102,41 @@ static int el_map(struct el_obj *o, int fd, const Elf64_Ehdr *eh,
 {
     size_t minva = (size_t)-1, maxva = 0;
     unsigned char *base;
+    struct stat st;
     int i;
+
+    /* ⛔ A TRUNCATED OBJECT PASSES EVERY HEADER CHECK AND THEN KILLS THE
+     * PROCESS. mmap of a short file succeeds -- the mapping exists -- and the
+     * first touch of a page past the last full page of the file raises
+     * SIGBUS, which arrives with no message and no dlerror().
+     *
+     * ⚠ MEASURED: a real libz.so.1 truncated to half its length was accepted
+     * by this loader, mapped, and killed the process with SIG7. It is not an
+     * exotic input either -- a partial download or a full disk produces
+     * exactly it. So the file's real length is checked against every segment
+     * BEFORE anything is mapped. */
+    if (fstat(fd, &st) != 0) {
+        el_err("pgb-elfload: %s: cannot stat", o->path);
+        return -1;
+    }
+    for (i = 0; i < eh->e_phnum; i++) {
+        if (ph[i].p_type != PT_LOAD)
+            continue;
+        if (ph[i].p_filesz > (uint64_t)st.st_size ||
+            ph[i].p_offset > (uint64_t)st.st_size - ph[i].p_filesz) {
+            el_err("pgb-elfload: %s: truncated -- segment %d wants bytes "
+                   "%llu..%llu of a %lld-byte file", o->path, i,
+                   (unsigned long long)ph[i].p_offset,
+                   (unsigned long long)(ph[i].p_offset + ph[i].p_filesz),
+                   (long long)st.st_size);
+            return -1;
+        }
+        if (ph[i].p_memsz < ph[i].p_filesz) {
+            el_err("pgb-elfload: %s: segment %d has p_memsz < p_filesz",
+                   o->path, i);
+            return -1;
+        }
+    }
 
     for (i = 0; i < eh->e_phnum; i++) {
         if (ph[i].p_type != PT_LOAD)
@@ -1061,8 +1160,10 @@ static int el_map(struct el_obj *o, int fd, const Elf64_Ehdr *eh,
                maxva - minva);
         return -1;
     }
-    o->base = base - minva;
-    o->span = maxva - minva;
+    o->base   = base - minva;
+    o->span   = maxva - minva;
+    o->map_lo = base;
+    o->map_hi = base + (maxva - minva);
 
     for (i = 0; i < eh->e_phnum; i++) {
         const Elf64_Phdr *p = &ph[i];
@@ -1411,6 +1512,16 @@ static struct el_obj *el_load(const char *path, const struct el_obj *req)
         eh.e_machine != EM_X86_64 ||
         (eh.e_type != ET_DYN)) {
         el_err("pgb-elfload: %s is not an x86-64 ELF shared object", path);
+        close(fd);
+        return NULL;
+    }
+    /* ⛔ e_phentsize IS READ, NOT ASSUMED. Every pread below strides by
+     * sizeof(Elf64_Phdr); a file declaring a different entry size would be
+     * parsed at the wrong offsets and produce segments made of adjacent
+     * fields. Cheap to check, silently wrong to skip. */
+    if (eh.e_phnum && eh.e_phentsize != sizeof(Elf64_Phdr)) {
+        el_err("pgb-elfload: %s: e_phentsize is %u, expected %zu", path,
+               (unsigned)eh.e_phentsize, sizeof(Elf64_Phdr));
         close(fd);
         return NULL;
     }
