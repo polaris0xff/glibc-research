@@ -272,6 +272,7 @@ func selftestSuites(c *cfg.Config) []suite {
 		{"bootstrap", func() *selftest.Report { return bootstrapx.Selftest(c) }},
 		{"bundle-sweep", bundle.Selftest},
 		{"bundle-hostpolicy", bundle.HostPolicySelftest},
+		{"bundle-manifest-roots", bundle.ManifestSelftest},
 		{"bundle-appimage", func() *selftest.Report { return bundle.AppImageSelftest(c) }},
 	}
 }

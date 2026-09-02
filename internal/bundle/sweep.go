@@ -232,6 +232,30 @@ func Sweep(o SweepOptions) (*SweepResult, error) {
 		}
 	}
 
+	// ⛔ A LIBRARY NAMED IN A JSON MANIFEST IS A ROOT, and leaving it out is
+	// the same defect as the MLT one, aimed at the GL stack.
+	//
+	// libglvnd finds its vendor by reading share/glvnd/egl_vendor.d/*.json and
+	// dlopen'ing the "library_path" it names; the Vulkan loader does the same
+	// with share/vulkan/icd.d/*.json. Those libraries sit in lib/ ITSELF, not
+	// in a plugin subdirectory -- and the plugin-directory rule above skips
+	// `p == root` deliberately, so lib/ is never one. Nothing carries
+	// DT_NEEDED libEGL_mesa.so.0 either, because nothing links against a
+	// vendor library.
+	//
+	// ⚠ So without this, a bundle's GL stack is UNREACHABLE by construction: a
+	// sweep that deletes on reachability removes libEGL_mesa.so.0 and
+	// libGLX_mesa.so.0, the integrity check passes because no DT_NEEDED points
+	// at them, and the bundle fails at run time with `eglInitialize failed` --
+	// which is a symptom TODO/research.md already records from an earlier
+	// cause. docs/history/corrections.md C20 is the same shape.
+	for _, r := range librariesNamedInManifests(o.Dir) {
+		if p, ok := index[r]; ok {
+			roots = append(roots, p)
+		}
+	}
+	roots = uniq(roots)
+
 	// Everything in a plugin directory is a root of its own closure.
 	for dir := range pluginDirs {
 		entries, err := os.ReadDir(dir)
@@ -411,4 +435,50 @@ func uniq(in []string) []string {
 		out = append(out, s)
 	}
 	return out
+}
+
+// manifestLibrary matches the library a vendor or ICD JSON names. The value
+// may be a bare soname (what `pgb bundle` rewrites them to) or an absolute
+// path (what nixpkgs ships); only the base name is wanted either way.
+var manifestLibrary = regexp.MustCompile(`"library_path"\s*:\s*"([^"]+)"`)
+
+// manifestGlobs are the JSON trees whose contents name libraries by path.
+var manifestGlobs = []string{
+	"share/glvnd/egl_vendor.d/*.json",
+	"share/vulkan/icd.d/*.json",
+	"share/vulkan/implicit_layer.d/*.json",
+	"share/vulkan/explicit_layer.d/*.json",
+	"etc/OpenCL/vendors/*.icd",
+}
+
+// librariesNamedInManifests returns the base names those manifests name.
+//
+// ⚠ Read with a regexp rather than a JSON parser on purpose: these files are
+// third-party, occasionally have comments or trailing commas, and a parse
+// error here must not cost the bundle its GL stack. A regexp that finds
+// nothing degrades to the previous behaviour; a strict parser that refuses the
+// file would delete the libraries it could not read about.
+func librariesNamedInManifests(dir string) []string {
+	var out []string
+	for _, g := range manifestGlobs {
+		matches, _ := filepath.Glob(filepath.Join(dir, g))
+		for _, f := range matches {
+			data, err := os.ReadFile(f)
+			if err != nil {
+				continue
+			}
+			for _, m := range manifestLibrary.FindAllSubmatch(data, -1) {
+				out = append(out, filepath.Base(string(m[1])))
+			}
+			// An .icd file may be a bare soname on one line, no JSON at all.
+			if strings.HasSuffix(f, ".icd") {
+				for _, line := range strings.Fields(string(data)) {
+					if IsSharedObject(line) {
+						out = append(out, filepath.Base(line))
+					}
+				}
+			}
+		}
+	}
+	return uniq(out)
 }

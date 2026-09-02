@@ -671,6 +671,45 @@ run before a size number is believed.
 
 ---
 
+## C21 — "the plain -static control fails on all 11"
+
+**Then:** `docs/AGENTS.md` §2 stated it flatly, and CI's control steps carried
+`continue-on-error: true` so that the control could die without failing the
+build.
+
+**The disagreement, and it took two defects to surface:**
+
+1. ⛔ **The exit code was never recorded.** The step's comment said *"Its exit
+   status is recorded, never asserted"*, and the recording did not happen:
+   GitHub's default shell for `run:` is `bash -e`, so the script aborted at the
+   failing `docker run` and the `echo "plain -static exit=$?"` after it never
+   executed. Reproduced: `bash -e -c 'set -x; false; echo "exit=$?"'` prints
+   nothing. **So nobody had ever seen the control's exit code on any row of any
+   run.** The red annotation was its only trace, and an annotation says a step
+   failed, not how.
+2. Replacing `continue-on-error` with an assertion made the codes visible for
+   the first time, and CI reported: **`the plain -static control PASSED on
+   debian-12`**.
+
+**Now:** the claim is instrument-dependent and §2 says the mechanism itself,
+one paragraph above the sentence that was wrong: the iconv failure lands *"where
+the host gconv path matches the build's"*, and is *"11 of 12 encodings silently
+unavailable"* where it does not. The chroot bed builds and runs in the same
+place; **CI builds on the Ubuntu runner and runs in a debian-12 container**, so
+the paths do not match, the iconv arm degrades quietly, and the probe exits 0.
+
+⭐ **Both halves are corrections and the second is the smaller one.** §2 now
+names its instrument. But the finding that matters is the first: a step that
+claimed to record something recorded nothing, for the entire life of the
+workflow, and `continue-on-error` made the silence look deliberate. The control
+now records its code on every row and warns when it is zero.
+
+⚠ **And the assertion that replaced it was ALSO too strong to start with** —
+it failed the build on that first passing row. A control whose behaviour is
+instrument-dependent is recorded and surfaced, never gated on.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

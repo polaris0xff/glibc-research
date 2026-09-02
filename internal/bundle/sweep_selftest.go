@@ -155,3 +155,96 @@ func containsSuffix(list []string, want string) bool {
 	}
 	return false
 }
+
+// ManifestSelftest proves a library reachable ONLY through a vendor or ICD
+// JSON survives the sweep.
+//
+// ⛔ THE CASE THIS EXISTS FOR. libglvnd loads its vendor by reading
+// share/glvnd/egl_vendor.d/*.json and dlopen'ing the library_path it names.
+// That library lives in lib/ ITSELF -- not a plugin subdirectory -- and
+// nothing in the bundle carries DT_NEEDED on it. So before the manifest rule
+// it was unreachable by construction, and a sweep that deletes on
+// reachability would remove the GL stack while every DT_NEEDED still
+// resolved. The negative arm is what makes this a measurement: an ordinary
+// unreferenced library in the same directory must STILL be unreachable, or
+// the rule is just "keep everything in lib/".
+func ManifestSelftest() *selftest.Report {
+	r := selftest.New("bundle-manifest-roots")
+	if !proc.Look("cc") {
+		r.Skip("no C compiler, so no fixture with real DT_NEEDED can be built")
+		return r
+	}
+	dir, err := os.MkdirTemp("", "pgb-manifest-selftest-")
+	if err != nil {
+		r.Fail("tempdir", err.Error(), "created")
+		return r
+	}
+	defer os.RemoveAll(dir)
+
+	app := filepath.Join(dir, "AppDir")
+	lib := filepath.Join(app, "lib")
+	vend := filepath.Join(app, "share", "glvnd", "egl_vendor.d")
+	icd := filepath.Join(app, "share", "vulkan", "icd.d")
+	src := filepath.Join(dir, "src")
+	for _, d := range []string{filepath.Join(app, "shared", "bin"), lib, vend, icd, src} {
+		if err := os.MkdirAll(d, 0o755); err != nil {
+			r.Fail("mkdir "+d, err.Error(), "created")
+			return r
+		}
+	}
+	w := func(n, body string) bool {
+		if err := os.WriteFile(filepath.Join(src, n), []byte(body), 0o644); err != nil {
+			r.Fail("write "+n, err.Error(), "created")
+			return false
+		}
+		return true
+	}
+	if !w("main.c", "int main(void){return 0;}\n") ||
+		!w("vendor.c", "int eglvendor(void){return 1;}\n") ||
+		!w("icdlib.c", "int vkicd(void){return 2;}\n") ||
+		!w("orphan.c", "int orphan(void){return 3;}\n") {
+		return r
+	}
+	build := func(args ...string) bool {
+		res, err := (&proc.Cmd{Argv: append([]string{"cc"}, args...), Subsys: "bundle"}).Output()
+		if err != nil || res.Failed() {
+			r.Fail("cc "+strings.Join(args, " "), strings.TrimSpace(string(res.Stderr)), "built")
+			return false
+		}
+		return true
+	}
+	// The vendor library, the ICD library and an ORPHAN, all in lib/, none of
+	// them referenced by DT_NEEDED from anything.
+	if !build("-shared", "-fPIC", "-o", filepath.Join(lib, "libEGL_fixture.so.0"), filepath.Join(src, "vendor.c")) ||
+		!build("-shared", "-fPIC", "-o", filepath.Join(lib, "libvulkan_fixture.so"), filepath.Join(src, "icdlib.c")) ||
+		!build("-shared", "-fPIC", "-o", filepath.Join(lib, "liborphan.so"), filepath.Join(src, "orphan.c")) ||
+		!build("-o", filepath.Join(app, "shared", "bin", "prog"), filepath.Join(src, "main.c")) {
+		return r
+	}
+	// The manifests. One names a bare soname (what pgb rewrites them to), the
+	// other an absolute path (what nixpkgs ships) -- both must resolve.
+	_ = os.WriteFile(filepath.Join(vend, "50_fixture.json"),
+		[]byte(`{"file_format_version":"1.0.0","ICD":{"library_path":"libEGL_fixture.so.0"}}`), 0o644)
+	_ = os.WriteFile(filepath.Join(icd, "fixture_icd.x86_64.json"),
+		[]byte(`{"file_format_version":"1.0.0","ICD":{"library_path":"/nix/store/zzz-mesa/lib/libvulkan_fixture.so","api_version":"1.3"}}`), 0o644)
+
+	res, err := Sweep(SweepOptions{Dir: app})
+	if err != nil {
+		r.Fail("sweep", err.Error(), "ran")
+		return r
+	}
+	unreachable := map[string]bool{}
+	for _, u := range res.Unreachable {
+		unreachable[filepath.Base(u)] = true
+	}
+	// ⭐ The two named in manifests must survive.
+	r.CheckBool("a library named by an EGL vendor JSON is reachable",
+		unreachable["libEGL_fixture.so.0"], false)
+	r.CheckBool("a library named by a Vulkan ICD JSON, by ABSOLUTE path, is reachable",
+		unreachable["libvulkan_fixture.so"], false)
+	// ⛔ And the negative: an unreferenced library in the SAME directory must
+	// still be unreachable, or the rule is "keep everything in lib/".
+	r.CheckBool("an unreferenced library beside them is STILL unreachable",
+		unreachable["liborphan.so"], true)
+	return r
+}

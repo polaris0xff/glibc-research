@@ -168,7 +168,11 @@ Measured, plain `gcc -static`, across the 11 pinned environments:
 | `iconv_open` | **SIGFPE/SIGABRT on Debian 11/12 and Ubuntu 20.04** where the host gconv path matches the build's; 11 of 12 encodings silently unavailable where it does not. **There is no working case.** |
 | `setlocale` UTF-8 | `ANSI_X3.4-1968` on all 4 musl environments |
 
-A probe exercising NSS **and** iconv (`ci/probe.c`) fails on **all 11**.
+A probe exercising NSS **and** iconv (`ci/probe.c`) fails on **all 11** *in the
+chroot bed*. ⚠ **That is an instrument-dependent number and CI measures it
+differently**: building on the runner and running in a container, the gconv
+paths do not match, the iconv arm degrades silently instead of dying, and the
+control **exits 0 on debian-12**. `history/corrections.md` C21.
 
 ## 3. Success criterion
 

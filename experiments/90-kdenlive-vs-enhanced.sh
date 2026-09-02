@@ -81,7 +81,28 @@ if [ ! -s "$ENH" ]; then
     || { exp_note "could not fetch $ENH_URL"; exit 2; }
   chmod +x "$ENH"
 fi
+# ⛔ REBUILD WHEN THE BUNDLER IS NEWER THAN THE ARTEFACT, not only when the
+# artefact is missing.
+#
+# ⚠ MEASURED, BY BEING BURNED BY IT. The previous rule was `[ ! -s "$OURS" ]`.
+# A bundler fix was committed, this experiment was re-run to verify it, and the
+# run reported the SAME byte count to the digit -- 267,390,365 -- because the
+# cached artefact from the broken run was reused and the fix was never
+# exercised. A re-run that cannot see a code change is not a re-run; it is the
+# previous run with a new date on it.
+#
+# ⭐ Same staleness rule pgb uses for its own runtime objects: newer input
+# means rebuild. `PGB_KEEP_ARTEFACT=1` forces reuse for someone deliberately
+# re-measuring the same bytes.
+_rebuild=no
 if [ ! -s "$OURS" ]; then
+  _rebuild=yes
+elif [ -z "${PGB_KEEP_ARTEFACT:-}" ] && [ "$BUNDLER" -nt "$OURS" ]; then
+  _rebuild=yes
+  exp_note "the bundler is newer than the cached artefact: rebuilding"
+  rm -f "$OURS"
+fi
+if [ "$_rebuild" = yes ]; then
   exp_note "building ours: ./pgb bundle appimage kdenlive --with-program melt"
   PGB_APPIMAGE_CACHE="$CACHE" "$BUNDLER" bundle appimage kdenlive \
     --with-program melt --with-program ffmpeg >"$B/build-ours.log" 2>&1 || true
