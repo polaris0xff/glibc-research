@@ -545,3 +545,54 @@ program**, leaving 85-, 86- and 89-'s zero-host-object rows untouched.
 
 ⛔ **The entry stays open.** It closes when the three columns are measured
 again after 1–3, whichever way they come out.
+
+---
+
+## T-063 — miniflux with an embedded PostgreSQL, against onelf's ~70 MB
+
+**Source** operator, 2026-09-02: *"prove pgb can build something as complex as
+this"*, naming
+`../references/QaidVoid__onelf/tree/docs/guide/examples/miniflux.md`.
+**Category** poc · **Priority** P1 · **Effort** L · **Status** open
+
+⛔ **THE SUBJECT IS CHOSEN FOR WHAT IT IS NOT: ONE PROGRAM.** onelf's
+walkthrough produces a single ~70 MB artefact that starts a private postgres on
+a unix socket, initialises the cluster on first run, runs miniflux's
+migrations, seeds an admin user, serves HTTP on `127.0.0.1:8080` and shuts
+postgres down cleanly. Two programs, five postgres helpers, a share tree and a
+set of `dlopen`'d extensions.
+
+**What each part asks of pgb**
+
+| part | what it demands |
+|---|---|
+| two programs + `initdb`, `pg_ctl`, `pg_isready`, `psql`, `createdb`, `createuser` | the bundler already carries several programs; the entry point is the open question |
+| ⛔ **`$libdir` is computed at RUN TIME** from the build-time relationship between `bindir` and `pkglibdir` | get it wrong and initdb dies with `could not access file "dict_snowball"`. ⭐ This is what `--wrap-dlopen` is for: compiling the extension table in REMOVES the path problem rather than reproducing it |
+| a share tree found through `PGSHAREDIR` | data, not code — the `--embed-*` question |
+| symlink farms | onelf's guide insists on `cp -L`; a nix closure does not have this problem, and that is a point in pgb's favour worth stating |
+| ⛔ a **shell orchestrator** as the entry point | which is the thing pgb's whole argument is against. ⭐ The interesting question is whether pgb can do it with NO SHELL in the delivery path, and the honest answer may be "not yet" |
+
+**Premise, measured before either arm was attempted.** ⭐ **The two halves are
+not equally hard, and the POC says so rather than implying otherwise.**
+`pgb nix plan miniflux` reports `buildInputs: []` and
+`nativeBuildInputs: [go-1.26.5, install-shell-files]` — miniflux 2.3.3 is a
+**pure Go program**, already a static ELF, and none of pgb's four mechanisms
+apply to it. `pgb nix plan postgresql` reports **16 buildInputs**, among them
+`icu4c`, `libxml2`, `llvm` (for the JIT output) and the configure flag
+`--with-systemd` — which asks a static binary to link a library whose purpose
+is `dlopen`, and which `internal/nixx`'s dep-skip list refuses for that reason.
+⛔ **The whole difficulty is PostgreSQL.**
+
+**Two arms.**
+
+- **arm S — static.** `pgb nix build postgresql` and `miniflux`, one static ELF
+  per program, `--wrap-dlopen` for the extensions. ⛔ Attempted FIRST, and if
+  nixpkgs' postgres will not build statically the deliverable is **which
+  dependency refused**, named and recorded — not a quiet fall through to arm B.
+- **arm B — bundle.** `pgb bundle appimage` over the same closure.
+
+**Prove.** The artefact starts postgres, runs the migrations, answers an HTTP
+request on `127.0.0.1:8080` and shuts down cleanly, measured on at least
+Debian 12 and Alpine 3.22 through `pgb rootfs run`, plus a table comparing
+size, first-launch and second-launch time against onelf's stated ~70 MB.
+`poc/92-miniflux/`, exit-code contract 0/1/2 like every other POC.
