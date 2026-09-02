@@ -1,0 +1,105 @@
+POC 92-miniflux -- ARM S, WHERE IT ACTUALLY STOPS
+=================================================
+date (UTC): 2026-09-02, session 2026-09-02b
+subject   : postgresql 18.6 and miniflux 2.3.3, both from nixpkgs 26.11pre-git
+command   : pgb nix plan postgresql --out pg.plan
+            NIX_MAX_ROUNDS=24 pgb nix build --plan pg.plan --configure --without-icu
+
+⛔ THE QUESTION THIS ARM EXISTS TO ANSWER, from T-063: can nixpkgs' postgres be
+built statically at all, and if not, WHICH DEPENDENCY REFUSES.
+
+⭐ THE ANSWER IS NOT "NO".
+---------------------------------------------------------------------------
+A statically linked PostgreSQL 18.6 server binary exists and RUNS:
+
+  src/backend/postgres    63,889,168 bytes
+  file                    ELF 64-bit LSB executable, x86-64, statically linked
+  PT_INTERP               absent  (readelf -l | grep -c INTERP  ->  0)
+  DT_NEEDED               0       (readelf -d | grep -c NEEDED  ->  0)
+
+  $ ./postgres --version
+  postgres (PostgreSQL) 18.6
+
+  $ pgb rootfs run /var/lib/pgb-rootfs/alpine-3.22 -- /postgres --version
+  postgres (PostgreSQL) 18.6
+
+⭐ That second line is the product: PostgreSQL's server, built against glibc,
+answering on Alpine, which ships no glibc.
+
+⚠ THE HALF THAT IS NOT DONE: `make` then fails in src/interfaces (libpq and
+ecpg, the CLIENT libraries). The server built; the full `make install` that
+would give initdb, pg_ctl, psql and the rest did not complete. Nothing here
+claims the miniflux stack runs -- that is the rest of T-063.
+
+WHAT IT TOOK, AND WHAT EACH STEP MEASURED
+---------------------------------------------------------------------------
+15 dependencies build static without argument: zlib, ncurses, readline,
+openssl, libxml2, libxcrypt, sqlite, lz4 and the rest of the tree under them.
+
+⛔ THE PLAN ENABLES FIFTEEN OPTIONAL FEATURES A STATIC BUILD CANNOT HAVE, and
+the adaptation loop had to remove them one per round. It could not, at the
+start of this session, remove ANY of them: the first one stopped it dead with
+`pgb: the build failed and pgb has no adaptation for it`. Five defects in the
+loop were fixed to get from there to here, each with a carried selftest
+(`pgb selftest nix-diagnose`, 15 cases):
+
+  round 1   drop --with-llvm        the message named the FLAG, and the loop
+                                    only knew how to spell one from a LIBRARY
+                                    (`llvm-config` -> --with-llvm-config, miss)
+  round 2   drop --with-liburing    PKG_CHECK_MODULES names a pkg-config module
+  round 3   drop --with-libcurl     and a version constraint is not part of a name
+  round 4   drop --with-libnuma     `library 'libnuma' is required for ...`
+  round 5   drop --with-zstd
+  round 6   drop --with-python      ⛔ `could not find shared library for Python`
+                                    -- not a missing input: a STATIC build asked
+                                    for a shared object, which it cannot have
+  round 7   add --without-readline  ⚠ see below, this one is NOT a missing dep
+  round 8   drop --with-gssapi      the feature is named at the END of the line
+  round 9   drop --with-pam
+  round 10  drop --with-uuid=e2fs   ⚠ a flag carrying a VALUE; exact matching missed it
+  round 11  drop --with-systemd
+  round 12  drop --with-tcl         `Tcl shell not found` -- the FIRST word is
+                                    the feature; the token before "not found"
+                                    is "shell"
+  round 13  drop --with-perl
+
+  ⛔ AND THE DEFAULT ROUND BUDGET IS 8. The loop reported `gave up after 8
+  rounds` with nine flags still to remove; NIX_MAX_ROUNDS=24 is what let it
+  finish. A budget below the number of optional features a distro plan enables
+  reads as "this package cannot be built" and is not that.
+
+TWO RUNGS THAT ARE REAL WORK, NOT PATTERNS
+---------------------------------------------------------------------------
+⛔ 1. readline is NOT missing, and the loop's answer to it is a workaround.
+
+  configure: error: readline library not found
+
+with libreadline.a AND libncursesw.a both present in the prefix. AC_SEARCH_LIBS
+probes `-lreadline` alone; libreadline.a's ncurses references go unresolved;
+configure concludes the library is absent. It is the STATIC LINK ORDER problem
+-- the same one poc/91-qt-xcb met with libX11.a/libxcb.a/libXau.a and answered
+with `-Wl,--start-group`. Dropping readline builds a psql with no line editing,
+which is a smaller loss than it looks for a server bundle and is still a
+workaround for a defect that has a real fix.
+
+⛔ 2. ICU is C++ and postgres is C.
+
+  libicuuc.a(lstmbe.ao): undefined reference to `operator delete(void*, unsigned long)'
+  libicuuc.a(unifilt.ao): undefined reference to `vtable for __cxxabiv1::__class_type_info'
+  collect2: error: ld returned 1 exit status
+
+A shared libicuuc carries `DT_NEEDED libstdc++.so.6` and the loader resolves
+it. An ARCHIVE carries nothing, and a C link line adds no C++ runtime. This is
+the same class poc/60-leveldb found from the other side, and internal/wrapper
+already knows the distinction -- `LinkFlags` takes a `cxx bool`. What it does
+not do is notice that a C link has pulled in a C++ archive. ⭐ Until it does,
+`--without-icu` is the way past, and that is what the run above used.
+
+MINIFLUX, FOR COMPLETENESS
+---------------------------------------------------------------------------
+  pgb nix plan miniflux   buildInputs: []
+                          nativeBuildInputs: [go-1.26.5, install-shell-files]
+
+⭐ Pure Go. Already a static ELF, and NOT ONE of pgb's four mechanisms applies
+to it. The whole difficulty of this subject is PostgreSQL, and a write-up that
+presented one artefact and implied both halves were hard would be wrong.

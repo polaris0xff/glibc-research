@@ -596,3 +596,42 @@ request on `127.0.0.1:8080` and shuts down cleanly, measured on at least
 Debian 12 and Alpine 3.22 through `pgb rootfs run`, plus a table comparing
 size, first-launch and second-launch time against onelf's stated ~70 MB.
 `poc/92-miniflux/`, exit-code contract 0/1/2 like every other POC.
+
+## ⭐ ARM S IS NOT "NO" — a static postgres exists and runs on Alpine
+
+Session of 2026-09-02b. Full record: `../evidence/poc/92-miniflux/ARM-S-FINDINGS.txt`.
+
+    src/backend/postgres   63,889,168 B, statically linked
+    PT_INTERP absent, DT_NEEDED 0
+    ./postgres --version                                  -> PostgreSQL 18.6
+    pgb rootfs run alpine-3.22 -- /postgres --version      -> PostgreSQL 18.6
+
+⭐ **PostgreSQL's server, built against glibc, answering on a distribution that
+ships no glibc.** 15 dependencies build static without argument.
+
+⚠ **The half that is NOT done:** `make` then fails in `src/interfaces` (libpq,
+ecpg — the CLIENT libraries), so the `make install` that would give `initdb`,
+`pg_ctl`, `psql`, `createdb` and `createuser` did not complete. ⛔ Nothing yet
+claims the miniflux stack runs.
+
+**What it took.** The plan enables fifteen optional features a static build
+cannot have, and the adaptation loop removed thirteen of them one per round —
+after **five defects in the loop** were fixed this session, each with a carried
+selftest (`pgb selftest nix-diagnose`). ⛔ **And the default round budget is 8**,
+which reported `gave up after 8 rounds` with nine flags still to go;
+`NIX_MAX_ROUNDS=24` is what finished it. A budget below the number of optional
+features a distro plan enables reads as "this package cannot be built".
+
+**Two rungs left that are real work rather than patterns:**
+
+1. ⛔ **readline is not missing.** `libreadline.a` and `libncursesw.a` are both
+   in the prefix; `AC_SEARCH_LIBS` probes `-lreadline` alone and the archive's
+   ncurses references go unresolved. It is the **static link-order** problem
+   `poc/91-qt-xcb` answered with `-Wl,--start-group`. Dropping readline is a
+   workaround for a defect that has a real fix.
+2. ⛔ **ICU is C++ and postgres is C.** `libicuuc.a` needs `operator delete`
+   and the `__cxxabiv1` vtables; a shared libicuuc carries
+   `DT_NEEDED libstdc++.so.6` and an archive carries nothing. `internal/wrapper`
+   already takes a `cxx bool` in `LinkFlags` — what it does not do is notice
+   that a **C link pulled in a C++ archive**. `--without-icu` is the way past
+   until it does.
