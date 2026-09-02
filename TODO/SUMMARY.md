@@ -9,68 +9,67 @@ thing was not measured this says so rather than giving a number.
 
 | row | before | after |
 |---|---|---|
-| **Elapsed** | 2026-09-02T02:20Z | 2026-09-02T03:5xZ — **≈1h35m**, ⚠ **interrupted twice by the operator**, so this is not a planned session's shape |
-| **Commits** | `2e4c6169` | `79c7e054` — **3 commits**, every one on `main`, pushed as they landed |
-| **Work** | measurement work in flight | ⚠ **0 entries closed, 1 opened (T-061, P0)**, 2 defects fixed, 6 documentation defects fixed. ⛔ **The assigned measurement work was stopped, not finished** |
-| **Changes** | — | **22 files**, 2,082 insertions(+), 231 deletions(-) |
-| **Size** | — | **32,552 lines** of shell, Python, C and markdown, excluding `references/` and `evidence/` |
-| **Checks** | `sh TODO/check.sh` green | green. ⭐ **Plus a new second gate**, `sh scripts/common/check-docs.sh`, also green |
-| **Cost** | — | ⚠ **not metered.** What can be pointed at: two small reference files fetched (`tss/main.rs`, `stamp.ps1`), one onelf control package packed (46 MB), 31 nixpkgs dependencies built for T-060. Disk 7–9 GiB free throughout. No paid service used |
-| **Health** | 33 entries, 15 open | **34 entries, 16 open.** ⛔ **One new P0.** Tree clean, `main` pushed, no `ephemeral-*` branches, no branch debt |
+| **Elapsed** | 2026-09-02T04:0xZ | 2026-09-02T05:5xZ — **≈2h**, ended by an operator checkpoint rather than by the work finishing |
+| **Commits** | `184b1c56` | `894bfaec` — **19 commits**, every one on `main` |
+| **Work** | T-061 open, nothing written | ⭐ **the whole toolchain ported to Go**, 5 defects found in code that had been trusted, gates 1/2/3/4/6 met, gate 5 at 9 POCs + 19 experiments |
+| **Changes** | — | **166 files**, 30,540 insertions(+), 1,353 deletions(-) |
+| **Size** | — | **17,690 lines** of Go replacing **8,343** of shell and Python, which are retired under `HISTORY/` rather than deleted |
+| **Checks** | both gates green | green. ⭐ **124 carried selftests**, up from 72 |
+| **Cost** | — | ⚠ **not metered.** What can be pointed at: the real 399,356,002-byte `packages.json` fetched once, a 648,570-byte `cache.nixos.org` NAR, mesa and Qt closures for the bundler experiments. ⛔ **The session's disk allowance ran out**, which is what stopped `poc/91-qt-xcb`. No paid service used |
+| **Health** | 34 entries, 16 open | **34 entries, 16 open.** T-061 is substantially landed and stays open for its remainder. Tree clean, `main` pushed |
 
 ## What actually happened
 
-⛔ **Two operator interrupts, and the session's shape is theirs, not a plan.**
+⭐ **`pgb` is one statically linked Go binary.** The driver, the compiler
+wrappers it puts on `PATH`, the nixpkgs planner, the verifier and the bundler
+are the same executable, built `CGO_ENABLED=0`, carrying the C runtime sources
+it compiles. There is nothing to clone beside it: a copy alone in an empty
+directory builds a static binary and passes its own selftests.
 
-1. **Measurement work** (the assigned task): diagnosed the boost failure in
-   T-060's nix closure and the onelf arm of `experiments/90-`. Both turned out
-   to be defects in **our own** code, not in the things being measured.
-2. **Interrupt 1 — the documentation review.** `docs/` had gone thirteen
-   commits without an edit while five entries changed state.
-3. **Interrupt 2 — T-061.** The operator read the porting report and made the
-   Go port a P0 that pre-empts everything.
+The shell and Python were moved with `git mv` into `HISTORY/<commit>/<original
+path>`, per the operator's ruling, and every gate was measured against them
+rather than against a claim.
 
-## The two defects, because both were misattributed first
+## The five defects, all found by a measurement disagreeing
 
-| what it looked like | what it was |
-|---|---|
-| `pgb: 1: .built: not found`, at the exact moment boost's round 1 began — read for an hour as a broken boost build | a COMMENT inside a double-quoted `_cmd="..."` assignment named a file in backticks. Backticks in double quotes are command substitution; the composing shell ran `.built`. **boost was never failing.** ⭐ This defect is the entire argument for T-061 |
-| `experiments/90-`'s onelf arm: `Aborted`, no output, three runs — recorded as "onelf cannot run our payload" | onelf dispatches on **argv[0]'s basename** and falls back to the package default **silently**. The symlink was named `melt-onelf`, matched nothing, and ran **kdenlive** — which needs a display and died in `QMessageLogger::fatal`. Through a symlink named `melt` the same bundle answers in 0.4 s |
+⛔ **None of these was found by reading the code.**
 
-⭐ **The onelf control is the part that makes it a finding rather than a
-guess**: a 141 MB, 188-library onelf package of the same nixpkgs ffmpeg, same
-`[bundle] skip`, same compression level, runs on this machine. So the abort was
-never about the payload or the host.
+1. **`nix-plan.py` was not deterministic.** An output store path can be
+   claimed by more than one derivation — 14 of them in git's graph — and the
+   Python was last-writer-wins over document order. Ten shuffles of the same
+   graph: 4 gave one plan, 6 gave another. The Go planner sorts the claimants
+   and gives one plan 10 times out of 10.
+2. **The shell bootstrap built the wrong environment.** It called `pgb env
+   create` with no engine after starting dockerd, so the "chroot environment"
+   it produced was a second docker one.
+3. **`pgb nix deps` did not converge from a cold prefix.** `poc/91-qt-xcb` was
+   five X libraries short because libxcb was attempted before xcb-proto
+   existed; a second run would have fixed it, which is not convergence.
+4. **Requirement 3 was written and never wired.** `internal/logx/stamp.go` had
+   the columns, the parser and the heartbeat, and nothing called
+   `NewStamper`: `pgb --ts build` printed no timestamps at all.
+5. **`pgb selftest <typo>` printed "0 cases, all pass".**
 
-## The documentation review
+## zstd, because the environment has none
 
-⭐ **The mechanical half is a script now**, per `reviews.md`:
-`scripts/common/check-docs.sh` — dead links, backticked repo paths, cited
-evidence, referenced experiment numbers, quoted entry counts, and the vendored
-set's own unresolved-link list. Six real defects on the way to green:
+cache.nixos.org serves NARs as `.nar.zst` and the pinned build environment
+carries no `zstd` binary, so `pgb nix build` inside it stopped dead. The
+retired Python reached `libzstd.so.1` through ctypes and `CGO_ENABLED=0` has
+no equivalent. `internal/zstd` decodes RFC 8878 with nothing outside the
+standard library, measured byte-identical against the reference encoder over
+120 frames at levels 1 to 22, whole and one byte at a time; 572 truncations
+refused, and of 400 flipped bytes none decoded to different content without an
+error. ⚠ `xz` still shells out.
 
-| # | defect |
-|---|---|
-| 1 | `docs/research/solo.md` said their CI *"has six jobs"* and named six. It has **nine**; three were dropped with nothing saying so. ⭐ The conclusion survives and is **re-derived beside the correction** |
-| 2 | three files cited upstream's own limits document as though the path were ours |
-| 3 | `docs/comparison.md` and `docs/design/toolchain.md` cited experiment 63 as if it existed — it is a number T-013 reserves and nothing more |
-| 4 | `docs/history/corrections.md` and `docs/research/prior-art.md` cited onelf's guide by its upstream path, not the vendored one a reader can open |
-| 5 | `gate.md` and `reviews.md` were required reading that **this tree did not have**, for a whole session |
-| 6 | `TODO/PROGRESS.md` described the session before last |
+## What was NOT done
 
-## What was NOT done, and it is most of the assigned work
+⛔ **Gate 5 is not complete and nothing is extrapolated.** `poc/91-qt-xcb`'s
+cold re-run confirmed the dependency fix — all 22 X packages built, the static
+xcb link and the qtbase configure both passed — and then died at Qt object
+1,538 of 1,644 with `cannot write PCH file: No space left on device`.
+`experiments/86-` and `experiments/90-` were never started, for the same
+reason. `experiments/90-`'s recorded onelf row is still the wrong one.
 
-- ⛔ **`experiments/90-` is fixed and NOT re-run.** The recorded onelf row is
-  the wrong one. **T-055 stays open with the wrong number in its evidence.**
-- ⛔ **T-060 rung 1 did not finish.** 31 dependencies, boost in flight, on
-  ephemeral `/var/tmp`. Rungs 2 and 3 untouched.
-- ⛔ **The kdenlive bundle was not shrunk.** The 488,934,276-byte unreachable
-  figure was measured and the sweep that produced it **was not committed**.
-- ⛔ **The three deep reviews were not run as three separate passes.** The
-  documentation review covered lens 1 (the door sweep, over `docs/`) and lens 3
-  (the claim audit, which found the solo.md count). ⚠ **Lens 2, the guard
-  mutation, was run only on the new checker** — its rules were planted and seen
-  to fire while it was being written — **and not on anything else.** Saying it
-  covered all three would be the fabrication `reviews.md` warns about.
-- **Anything on a GPU**, **KF6**, **kdenlive static**, **a 32-bit
-  application** — all untouched, all carried as open entries.
+⛔ **The operator's post-port instruction has not been started**: codegraph,
+the deprecation sweep, two deep reviews, retiring `tmp/`, and a
+`docs/AGENTS.md` a session with no memory can start from alone.
