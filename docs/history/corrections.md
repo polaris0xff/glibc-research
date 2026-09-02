@@ -560,6 +560,117 @@ the competitor carried the verdict.
 
 ---
 
+## C17 — "a loader that reports success has relocated the object"
+
+**Then:** `pgb-elfload.c` read `DT_RELA` and `DT_JMPREL` and treated that as
+the relocation set. On nine of eleven environments it was.
+
+**The disagreement:** `experiments/76-`'s native arm was **SIG11 on exactly
+Fedora 42 and Arch and nowhere else**. The loader's own trace said why in one
+line:
+
+```
+pgb-elfload:   init_array[0] 0x670
+```
+
+where every working row printed a mapped address. `0x670` is the **unrelocated
+vaddr**.
+
+**Now:** those distributions build with `ld -z pack-relative-relocs`, which
+compresses the `R_X86_64_RELATIVE` entries — the overwhelming majority of any
+shared object's relocations — into a bitmap under **`DT_RELR`**. A loader
+reading only `DT_RELA` finds almost nothing to apply, **reports success**, and
+hands back an object whose pointers still hold link-time offsets.
+
+⛔ **The lesson is the failure MODE, not the missing tag.** This was not a
+crash the loader could report; it was a silent wrong answer that only became
+visible because a constructor happened to be called through one of the
+unrelocated pointers. Had `libz` been the only test object, the tag would still
+be unimplemented and the loader would still look correct.
+
+---
+
+## C18 — "a linker script in `/usr/lib` is an archive"
+
+**Then, TWICE.** `docs/research/solo.md` already warned that this trap fired
+once. It fired again in a new instrument: the provider-table generator read
+`/usr/lib/x86_64-linux-gnu/libm.a` with `readelf`, got **zero symbols in
+silence**, and produced a table of 4,891 names instead of 7,216 — every maths
+symbol missing.
+
+**The disagreement:** the 904-object sweep failed on `pow@GLIBC_2.29` for a
+third of the objects it tried, and `readelf -sW libm.a | grep pow` returned
+nothing at all.
+
+**Now:** `libm.a` is `GROUP ( libm-2.39.a libmvec.a )`, ASCII text.
+`elfx.ExpandLinkerScripts` resolves it, and `internal/elfx/provider.go` carries
+the note so a third occurrence is a documentation failure rather than a
+discovery.
+
+⚠ **`elfx.DefinedExternalSymbols` still does not expand ld scripts**, and that
+is deliberate: it reads objects a *build* produced, which are never scripts.
+The two readers are separate because their inputs are.
+
+---
+
+## C19 — "forking per sample makes each measurement cold, which is what we want"
+
+**Then:** the first time-to-first-symbol measurement forked for every sample so
+each `dlopen` would be a genuine cold load, and reported:
+
+| | best of 200 |
+|---|---|
+| the compiled-in loader | 673,989 ns |
+| the host `ld.so` | 64,484 ns |
+
+⛔ **Ten times slower**, and it would have gone into T-064's entry as a failure
+against the "faster to first symbol" half of its bar.
+
+**The disagreement:** loading two *different* objects in one process gave
+84,130 ns and 41,118 ns — the same order as `ld.so`, not ten times it.
+
+**Now:** the fork was the measurement. The subject is a 4.4 MB static binary
+with a 7,216-entry provider table in `.data.rel.ro`; its child pays
+copy-on-write faults that a 16 KB dynamic binary never does, and the clock
+starts after the fork but the faults land inside the timed region. The arms
+were not comparable at all.
+
+⭐ **The lesson: a control that differs from the subject in a way the
+instrument touches is not a control.** `experiments/78-` and `76-` now measure
+two loads in one process, and `76-` carries the caveat in its own output.
+
+---
+
+## C20 — "a debloat rule that passes the integrity check is safe"
+
+**Then:** the reachability sweep was wired into `debloat()`, every DT_NEEDED in
+the bundle still resolved, `jq` got 57.4% smaller and answered its workload
+byte-identically on every arm.
+
+**The disagreement:** `experiments/90-` — ours rendered **0 bytes of MP4**
+where the previous run rendered 4,149.
+
+**Now:** `Build()` writes `.env` **after** `debloat()`, so the sweep read a
+file that did not exist, saw no plugin directories, and classified kdenlive's
+MLT modules as unreachable. They are loaded by name at run time through
+`MLT_REPOSITORY` and nothing links against them — which is precisely the case
+the sweep reads `.env` to learn about. `DropUnreachable` now runs after
+`writeEnv` and before `integrity`.
+
+⛔ **The integrity check could not have caught this**, and that is the point: it
+asserts that every `DT_NEEDED` resolves, and a deleted plugin has no
+`DT_NEEDED` pointing at it. A structural check is only as wide as the structure
+it knows about.
+
+⭐ **And the methodology lesson is worth more than the fix.** `TODO` T-066 says
+to iterate on a CLI instead of kdenlive, and that was right — four measured
+iterations in the time one kdenlive build takes. But **`jq` did not catch this
+and could not**: a CLI with no plugin directories has nothing at risk. The fast
+subject is for iterating; the plugin-heavy one is the control, and it has to
+run before a size number is believed.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |
