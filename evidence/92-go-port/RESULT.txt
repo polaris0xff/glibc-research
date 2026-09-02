@@ -126,8 +126,8 @@ calls. rc=0 and the verdict line is the row.
   50-python                  0    123s  builds and works across the matrix
   80-mlt                     0    183s  builds and works across the matrix
   90-qt                      0    594s  builds and works across the matrix
-  91-qt-xcb                          -  ⚠ the cold re-run RAN OUT OF DISK at
-                                        Qt object 1,538 of 1,644; see below
+  91-qt-xcb                  0   1429s  builds and works across the matrix
+                                        (27 assertions; see below)
 
   ⛔ 91-qt-xcb FAILED FIRST, ON A COLD PREFIX, AND THE DEFECT WAS OURS.
   `pgb nix deps` stops recursing at NIX_DEP_DEPTH, so libxcb was attempted
@@ -147,10 +147,36 @@ calls. rc=0 and the verdict line is the row.
     rung 3  qtbase configures with xcb                 ok
     rung 3  qtbase builds                              FAILED
 
-  ⚠ AND THE FAILURE IS THIS MACHINE, NOT THE TOOL. Verbatim, at Qt object
+  ⚠ AND THE FAILURE WAS THIS MACHINE, NOT THE TOOL. Verbatim, at Qt object
   1,538 of 1,644: `fatal error: cannot write PCH file: No space left on
-  device`. The session's disk allowance was spent. The row stays blank
-  rather than being called a pass: nothing was measured past that point.
+  device`. That session's disk allowance was spent, and the row was left
+  blank rather than called a pass: nothing had been measured past that point.
+
+  ⭐ THE ROW IS FILLED NOW, on a container whose /var/tmp came up empty.
+  Session of 2026-09-02b, 1,429 s end to end, all 1,644 objects:
+
+    rung 1  22 packages of the X stack, cold prefix       ok
+    rung 2b a static xcb + xkbcommon-x11 program links    ok, no PT_INTERP
+    rung 3  qtbase configures with xcb                    ok
+    rung 3  qtbase builds (1,644 objects) and installs    ok
+    rung 4  the application, on a real X server           ok
+
+    QPA platform plugin                       xcb
+    primary screen from the X server          1024x768
+    QWidget::show() produced a QWindow        winId=2097159
+    the X server exposed the window           exposed
+    QWidget::grab() of the mapped window      320x240
+    QSslSocket::supportsSsl()                 OpenSSL 3.6.3 9 Jun 2026
+    QSQLITE driver + a real query round trip  日本
+
+    pass=27 fail=0 skip=0, and 11 of 11 environments with NO host .so
+    loaded in any of them.
+
+  ⚠ THE DIFFERENCE WAS NOT MORE DISK, and it is worth saying because the
+  next session will meet the same ceiling. The allowance is comparable;
+  what changed is that the failing session had already run nine POCs and
+  twenty-one experiments into /var/tmp/pgb-poc before starting Qt. This one
+  started clean. Peak was 6.5 GiB for the qtbase build tree alone.
 
 
 GATE 5 - the experiment suite, against the Go pgb
