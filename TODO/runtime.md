@@ -457,7 +457,7 @@ failed build attempts on this machine, so nothing here has executed it.
 
 **What is left, measured on 904 host objects on the build host** (818 load):
 20 undefined symbols, 4 `TLSDESC`, 2 objects wanting 56,248 bytes of static TLS
-against a 3,456-byte surplus, and 30 crashes that are almost all objects no
+against ~3,168 bytes of headroom, and 30 crashes that are almost all objects no
 static image should load — NSS modules, sanitizer and allocator interposers.
 The exception is `libLLVM`, which maps and relocates cleanly and dies in the
 605th of its C++ static constructors. ⚠ These are **T-068**, not this entry.
@@ -491,7 +491,7 @@ refusals rather than signals.
 | ⛔ **10 crashes left, and they are 5 distinct libraries** — `libLLVM-17`, `libLLVM.so.20.1`, `libclang-18`, `liblldb-18`, `libgprofng` (each counted twice, `/lib` and `/usr/lib` being the same file) | ⭐ **This is the real residue and it is one family: large C++ libraries with hundreds of static constructors.** `libLLVM-17` maps and relocates cleanly and dies in the **605th** of 604+ `DT_INIT_ARRAY` entries. Nothing else in 904 objects behaves like this |
 | 20 | **undefined symbol** | the demand-ranked worklist. Read them out of `evidence/` and decide per name whether it is class B (host glibc newer than the pin), class S (in `libc.so.6`, never in `libc.a` — `libtirpc.a` is already in the pinned environment and defines the sunrpc half), or genuinely another library's |
 | 4 | **`R_X86_64_TLSDESC`** | needs a resolver trampoline. solo implements it; `lib/elf_loader.cpp` at `79451211` is the read |
-| 2 | **static TLS surplus exhausted** — one object wants 56,248 bytes against a 3,456-byte surplus | glibc sizes the surplus from `glibc.rtld.optional_static_tls`. Whether a static binary can raise its own before `__libc_setup_tls` runs is the question, and it is not yet answered |
+| 2 | **static TLS surplus exhausted** — one object wants 56,248 bytes against ~3,168 bytes of HEADROOM (T-072: `_dl_tls_static_size` is not the surplus) | glibc sizes the surplus from `glibc.rtld.optional_static_tls`. Whether a static binary can raise its own before `__libc_setup_tls` runs is the question, and it is not yet answered |
 | 1 | ⭐ **`libLLVM`**, which maps and relocates cleanly and dies in the **605th** of its C++ static constructors | the one that is genuinely about the loader rather than about policy. It is the only crasher that is an ordinary library, and it is where the next real defect probably is |
 
 ⚠ **And one that is not a count.** A module placed in glibc's static TLS

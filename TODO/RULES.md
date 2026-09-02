@@ -241,3 +241,37 @@ touching the same rootfs may not.
 does not touch the bed or the wrappers. `internal/bundle/appimage.go` is closure
 fetching and dwarfs packing, so a bundle builds happily beside a compile. The
 serialisation only binds where the shared resource is.
+
+## ⛔ AND THE SHARED RESOURCE IS SOMETIMES THE CLOCK, NOT THE BED
+
+⚠ **Learned on 2026-09-02d, by ruining a measurement.** The rule above is
+about the *rootfs*, and reasoning from it — "this does not touch the bed, so
+it can overlap" — is what cost run 6 of `experiments/90-` its timing columns.
+
+⛔ **Some arms are WALL-CLOCK ON THE BUILD HOST, and nothing about them
+involves the bed at all.** `experiments/90-`'s render and startup arms time
+`melt` on the host, between `packing with uruntime + dwarfs` and the start of
+the eleven-environment matrix. During that window a session ran `go build`
+twice, two full `pgb selftest`s, several `codegraph sync`es and both record
+gates, on four cores.
+
+⭐ **The control is what exposed it, and it is worth seeing why.** The
+competitor's artefact is a fixed file that did not change between run 5 and
+run 6, and its render time went **2,033 ms → 13,680 ms**. No property of
+either bundle can move a number that does not depend on either bundle. ⚠ Had
+only *our* number moved, the obvious reading — "`--debloat aggressive` made it
+slower" — would have been wrong and publishable.
+
+**So, before starting anything on this machine, ask which of the two it
+competes for:**
+
+| the experiment is measuring | what must be idle |
+|---|---|
+| exit status, counts, sizes, traced opens | the **bed** — that rootfs and nothing else |
+| ⛔ **milliseconds** | the **whole machine** |
+
+⚠ **`experiments/40-`'s noise floor does not save you here.** It bounds
+run-to-run noise on an otherwise idle box; it says nothing about a box running
+a Go build. And ⭐ **the contaminated numbers are still worth recording** — as
+contaminated, with the control that shows it — because a deleted measurement
+teaches the next session nothing.

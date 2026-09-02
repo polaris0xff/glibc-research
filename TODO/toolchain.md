@@ -1260,6 +1260,37 @@ after each iteration/improvements."*
 | kdenlive render | 4,947 ms | 2,033 ms | ⛔ **2.43×** |
 | kdenlive cold start | 300 ms | 61 ms | ⛔ **4.92×** |
 
+⭐ **AND `aggressive` MOVES IT — run 6, same day.** With sweep deletion on,
+`DropUnreachable` removed **1,712 objects, 227.4 MiB**, and the artefact came
+out at **426,528,098 B = 2.22×**, against `safe`'s 2.45×. ⛔ **It still
+rendered**, 4,149 bytes of MP4, byte-for-byte what `safe` produced — which is
+the measurement runs 1 and 3 failed at, and the first evidence that the three
+sweep fixes hold on a plugin-heavy subject.
+
+⚠ **Run 6's render and startup MILLISECONDS are contaminated and are not
+quoted here.** The competitor's fixed artefact moved 2,033 → 13,680 ms in the
+same window, which is the control saying the machine was loaded rather than
+the bundle slower. `RULES.md` §"the shared resource is sometimes the clock".
+
+### ⛔ AppDir bytes are NOT artefact bytes, and the ratio is about 6 to 1
+
+The two runs differ by roughly **250 MiB of AppDir** — the sweep's 227.4 MiB
+plus `aggressive`'s extra Vulkan drivers, `nouveau` 21.4 MiB and `virtio`
+1.9 MiB — and by **42.4 MiB of artefact**:
+
+    safe        AppDir 2.53 GiB -> 2.16 GiB      artefact 471,033,944 B
+    aggressive  AppDir 2.53 GiB -> 2.07 GiB      artefact 426,528,098 B
+                then the sweep: -227.4 MiB       delta      44,505,846 B
+
+⭐ **So a debloat rule is worth about a sixth of its raw size on the thing a
+user downloads**, because dwarfs at `zstd:level=19` was already compressing
+what got deleted. ⚠ **This reframes the whole lever**: "489 MB of kdenlive's
+`lib/` is unreachable", the number that opened this entry, is worth ~80 MB of
+artefact, not 489. ⛔ It does not make debloating pointless — it means the
+remaining 2.22× cannot be closed by deletion alone, which is the same
+conclusion the "where the closure comes from" argument reaches by another
+route.
+
 ⛔ **THE kdenlive ROWS ARE RUN 5's (2026-09-02d, `safe`) AND THEY SUPERSEDE
 WHAT WAS HERE.** The previous figures — 477,191,058 B, 3,559 ms, 181 ms — came
 from before the five-run sequence in which runs 1 through 4 were each invalid
@@ -1625,7 +1656,7 @@ is most likely to say no.
 
 ---
 
-## T-072 — the static TLS surplus is 3,456 bytes and one real library wants 56,248
+## T-072 — the static TLS headroom is ~3,168 bytes and one real library wants 56,248
 
 **Source** the residue of `experiments/76-` and T-068.
 **Category** toolchain · **Priority** P1 · **Effort** M · **Status** open
@@ -1691,9 +1722,11 @@ cross-check.
 
 ### ⚠ And it explains a number this tree quotes two different ways
 
-`docs/limitations.md` says the surplus is **3,456** bytes; this entry's body and
-`docs/design/glibc-versions.md` say `_dl_tls_static_size = 3264`. ⭐ **Both are
-right, and the probe above is why:** `_dl_tls_static_size` is the program's own
+⚠ **Corrected 2026-09-02d, in four places.** `docs/limitations.md`, this
+entry's title, `TODO/INDEX.md` and `TODO/runtime.md` all called the surplus
+**3,456** bytes, while this entry's body and `docs/design/glibc-versions.md`
+said `_dl_tls_static_size = 3264`. ⭐ **Both numbers were right, and the probe
+above is why:** `_dl_tls_static_size` is the program's own
 `PT_TLS` **plus** the surplus, so it moves with the binary — 3,264 for the
 probe, 68,864 for the padded one. ⛔ **It is not the surplus**, and quoting it
 as one invites the reader to conclude that a bigger binary has more room, which

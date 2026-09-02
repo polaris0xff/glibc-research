@@ -61,7 +61,7 @@ pretending to be one.
 | T-069 | P1 | S | done | research | ⭐ The supplied working paper, swept: useful, and it names the gap `experiments/76-` closed |
 | T-070 | P0 | M | open | toolchain | ⛔ The glibc pin is a FLOOR at 2.36 and the class B ceiling widens yearly |
 | T-071 | P0 | L | open | research | ⛔ EGL from a nixpkgs closure: four failures, all in DATA rather than code |
-| T-072 | P1 | M | open | toolchain | The static TLS surplus is 3,456 bytes; one real library wants 56,248 |
+| T-072 | P1 | M | open | toolchain | The static TLS headroom is ~3,168 bytes; one real library wants 56,248 |
 
 ## The argument behind the ordering
 

@@ -48,6 +48,45 @@ minutes. `./pgb bootstrap --detach` does all of it in parallel;
                                       experiments/93- (host-object residue),
                                       experiments/85-'s new data-coherence arm
 
+## ⭐ RUN 6, `aggressive` — THE THREE SWEEP FIXES ARE PROVEN
+
+⛔ **This is what runs 1 and 3 died on, and it now passes.** With sweep
+deletion on, `DropUnreachable` removed **1,712 objects, 227.4 MiB**, and:
+
+    integrity   every DT_NEEDED in the bundle resolves inside it
+    manifests   8 name only libraries present in the bundle
+    ours rendered a real MP4 = yes     4,149 bytes
+
+⭐ **4,149 bytes is byte-for-byte what run 5 rendered at `safe`.** MLT's
+modules and libSDL3 survived a sweep that deleted 1,712 objects around them.
+
+    size   ours 426,528,098 B   against E's 191,900,604 B   = 2.22x
+           (safe was 471,033,944 B = 2.45x, so the sweep bought 9.4%)
+
+⛔ **BUT RUN 6's TIMING COLUMNS ARE CONTAMINATED AND I CONTAMINATED THEM.**
+
+    ours   render   4,947 ms (run 5)  ->  24,074 ms (run 6)
+    enh    render   2,033 ms          ->  13,680 ms
+
+⭐ **E is a FIXED artefact that did not change between the runs and it moved
+6.7×.** Nothing about either bundle explains that: the machine was loaded, by
+me — `go build`, two full `pgb selftest`s, `codegraph sync` and both gates,
+during the render and startup arms, on 4 cores.
+
+⚠ **The rule this produces, and `RULES.md` does not yet say it:**
+`experiments/90-`'s render and startup arms are **wall-clock on the BUILD
+HOST**, so "not touching the bed" is not sufficient. Nothing heavy may run
+anywhere on the machine between `packing with uruntime + dwarfs` and the start
+of the eleven-environment matrix. ⛔ **A same-day safe-vs-aggressive timing
+comparison still needs a re-run with the machine to itself.**
+
+⭐ Size, correctness, the sweep/integrity/manifest lines and the eleven-row
+matrix are unaffected — they are counts and exit statuses, not clocks.
+
+⭐ **And arm O now names its blocker instead of shrugging:** `onelf did not
+build: ... (musl-gcc is also absent)`. The rust `x86_64-unknown-linux-musl`
+target was the first blocker and is installed; `musl-gcc` is the second.
+
 ## ⭐ KDENLIVE IS VALIDATED — RUN 5, `safe`, exit 0, pass=8 fail=0 skip=1
 
 ⛔ **The first bundle in five runs that renders.** `evidence/90-.../RESULT.txt`:

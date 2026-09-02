@@ -234,7 +234,10 @@ ours is 84–105 µs to first load against 50–78 µs — the same order.
 
 ⚠ **What it still does not do, measured on 904 host objects on the build
 host**, 818 of which load: 20 undefined symbols, 4 `TLSDESC` relocations, and 2
-objects wanting 56,248 bytes of static TLS against a 3,456-byte surplus. 30
+objects wanting 56,248 bytes of static TLS against ~3,168 bytes of surplus
+HEADROOM -- `_dl_tls_static_size - _dl_tls_static_used`, and NOT
+`_dl_tls_static_size` itself, which includes the program's own PT_TLS and so
+moves with the binary (TODO T-072). 30
 crash, and almost all of those are objects no static image should load — NSS
 modules, sanitizer and allocator interposers. The exception is `libLLVM`, which
 maps and relocates cleanly and dies in the 605th of its C++ static
