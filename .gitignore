@@ -48,3 +48,7 @@ evidence/poc/*/link.log
 # the experiment; ⛔ A BUILT BINARY IS NOT EVIDENCE, IT IS OUTPUT.
 evidence/*/*.AppImage
 evidence/*/AppDir*/
+
+# The Go build products. `go build -o pgb ./cmd/pgb` produces the tool itself.
+/pgb-go
+/pgb.bin
