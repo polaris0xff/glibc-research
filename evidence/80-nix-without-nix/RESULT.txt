@@ -1,5 +1,5 @@
 experiment 80 - reaching nixpkgs with no nix
-date            : 2026-09-02T04:21:52Z
+date            : 2026-09-02T04:36:25Z
 channel         : nixpkgs-unstable
 revision        : 26.11pre1063758.e8be7818e19a
 subject         : /nix/store/9ipfvwnqp1q8ijnmi5sxvlx9r8w34lw3-bash-5.3p15

@@ -572,6 +572,12 @@ func (b *Builder) depKey() string {
 // BuildDeps walks the plan's dependency graph, building each into the shared
 // static prefix depth first: a dependency's own dependencies go in before it
 // does, or it configures against a prefix that does not have them yet.
+//
+// The walk stops at DepDepth, so a dependency whose own inputs live below that
+// cut can only build once a sibling has put them in the prefix. Passes are
+// therefore repeated while one is still making progress: a cold prefix
+// converges within a single invocation instead of needing the caller to run
+// the command again.
 func (b *Builder) BuildDeps(p *Plan, depth int) error {
 	if depth > b.DepDepth {
 		return nil
@@ -581,17 +587,33 @@ func (b *Builder) BuildDeps(p *Plan, depth int) error {
 			return err
 		}
 	}
+	for pass := 0; ; pass++ {
+		built, missing := b.depPass(p, depth, pass)
+		if missing == 0 || built == 0 || depth > 1 {
+			return nil
+		}
+		logx.Say("dep retry   %d still missing, %d landed this pass", missing, built)
+	}
+}
+
+// depPass builds every dependency it can, and reports how many landed and how
+// many are still absent from the prefix.
+func (b *Builder) depPass(p *Plan, depth, pass int) (built, missing int) {
 	for _, dep := range p.Deps {
 		if dep.Name == "" {
 			continue
 		}
 		short := shortDepName(dep.Name)
 		if b.depSkipped(short) {
-			logx.Say("dep skip    %s (in the skip list)", dep.Name)
+			if pass == 0 {
+				logx.Say("dep skip    %s (in the skip list)", dep.Name)
+			}
 			continue
 		}
 		if _, err := os.Stat(filepath.Join(b.Prefix, ".built", short)); err == nil {
-			logx.Say("dep have    %s", short)
+			if pass == 0 {
+				logx.Say("dep have    %s", short)
+			}
 			continue
 		}
 		if dep.Drv == "" {
@@ -601,9 +623,12 @@ func (b *Builder) BuildDeps(p *Plan, depth int) error {
 		logx.Say("dep build   %s  (depth %d)", short, depth)
 		if err := b.buildDep(dep.Drv, short, depth); err != nil {
 			logx.Warnf("dep FAILED  %s -- %v", short, err)
+			missing++
+			continue
 		}
+		built++
 	}
-	return nil
+	return built, missing
 }
 
 func (b *Builder) buildDep(drv, short string, depth int) error {
