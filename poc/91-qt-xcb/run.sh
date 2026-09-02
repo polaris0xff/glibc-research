@@ -398,11 +398,16 @@ int main(int argc, char **argv)
         db.setDatabaseName(QStringLiteral(":memory:"));
         bool opened = db.open();
         QSqlQuery q(db);
+        // ⛔ QStringLiteral TREATS ITS BYTES AS LATIN-1, so a UTF-8 escape in
+        // the SQL text went in as two mojibake characters and came back as
+        // `\u00e6\u00a5\u00e6\u00ac` -- a FAILURE that was the test's, not
+        // the database's. Both sides are built with fromUtf8 from the same
+        // constant now, so the assertion is about the round trip.
+        const QString jp = QString::fromUtf8("\xe6\x97\xa5\xe6\x9c\xac");
         bool made = opened && q.exec(QStringLiteral("create table t(a text)"))
-                    && q.exec(QStringLiteral("insert into t values('\xe6\x97\xa5\xe6\x9c\xac')"))
+                    && q.exec(QStringLiteral("insert into t values('") + jp + QStringLiteral("')"))
                     && q.exec(QStringLiteral("select a from t")) && q.next();
-        check("a real SQLite query round trip", made && q.value(0).toString()
-                  == QString::fromUtf8("\xe6\x97\xa5\xe6\x9c\xac"),
+        check("a real SQLite query round trip", made && q.value(0).toString() == jp,
               made ? q.value(0).toString() : QStringLiteral("<no row>"));
     }
 
@@ -418,8 +423,16 @@ EOF
 
 if [ ! -x "$APP/build/qtxcbprobe" ]; then
   POC_PGB_FLAGS="--bind $PREFIX" \
+  # ⛔ THE APPLICATION LINK NEEDS THE SAME TAIL AS THE CONFIG TEST DID, and for
+  # the same reason one layer out: Qt's own CMake config for a STATIC build
+  # records `XCB::XCB` but not libxcb's transitive libXau/libXdmcp, so the
+  # probe failed with `undefined reference to XauGetBestAuthByAddr` after
+  # qtbase itself had built and installed perfectly.
   poc_in_env "cd $APP && cmake -S . -B build -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_PREFIX_PATH='$INST;$PREFIX' && cmake --build build --parallel \$(nproc)" \
+      -DCMAKE_PREFIX_PATH='$INST;$PREFIX' \
+      -DCMAKE_CXX_STANDARD_LIBRARIES='-L$PREFIX/lib $STATIC_TAIL' \
+      -DCMAKE_C_STANDARD_LIBRARIES='-L$PREFIX/lib $STATIC_TAIL' \
+      && cmake --build build --parallel \$(nproc)" \
     >>"$LOG" 2>&1 \
     || { poc_check "the probe builds against static Qt" failed ok
          rung_failed "probe build" "cmake failed for the application" "$LOG"; poc_finish; }

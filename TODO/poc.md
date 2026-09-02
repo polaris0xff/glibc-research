@@ -387,6 +387,71 @@ ordering argument says POCs are for.
 rung 2 a Qt program against a real display (xcb, and its plugin under
 `--wrap-dlopen`); rung 3 KDE Frameworks 6; rung 4 kdenlive.
 
+## ⭐ RUNG 2 IS CLOSED: A STATIC Qt 6 APPLICATION OPENS A REAL WINDOW
+
+⛔ **The operator's ruling on `poc/90-qt`, 2026-09-01e, and it was right:**
+*"That is not a Qt application, it is a Qt library that links. A Qt POC that
+never opens a window and never loads a real platform plugin has not reached the
+rung T-054 names."*
+
+`poc/91-qt-xcb`, **26 assertions, 0 failures, 0 skips**,
+`evidence/poc/91-qt-xcb/RESULT.txt`.
+
+| | `poc/90-qt` (rung 1) | ⭐ `poc/91-qt-xcb` (rung 2) |
+|---|---|---|
+| QPA | offscreen | **xcb, talking to a real X server** |
+| window | none | **a mapped, resized, EXPOSED QWidget** |
+| network | `-no-network` | **QtNetwork with OpenSSL 3.6.3 LINKED IN** |
+| sql | `-no-sql` | **QtSql, QSQLITE, a real query round trip** |
+| dependencies | none outside the tarball | **20 X libraries built static by pgb from the nixpkgs plan** |
+
+    libqxcb.a          17,004 bytes -- the REAL platform plugin, as an archive
+    the probe          47,188,344 bytes, no PT_INTERP, 0 DT_NEEDED
+    the matrix         11 of 11 pass, host shared objects loaded: NONE
+
+⭐ **What the probe asserts, inside every one of the eleven**, against an
+`Xvfb` reached over loopback TCP (the bed shares the host's network namespace,
+so no socket has to be staged into eleven root filesystems):
+
+    QPA platform plugin              xcb          <- not offscreen
+    primary screen from the X server 1024x768     <- the server answered
+    QWidget::show() produced a QWindow, with a native id
+    the X server EXPOSED the window               <- an offscreen QPA cannot
+    QWidget::grab() of the mapped window          320x240
+    QSslSocket::supportsSsl()        OpenSSL 3.6.3 9 Jun 2026
+    QSQLITE driver registered, and a UTF-8 round trip through a real query
+    QApplication::exec() returned 0
+
+⛔ **Qt's own config test had to be answered with evidence rather than argued
+with.** `TEST_xcb_syslibs` is a `try_compile` whose link line Qt composes from
+an `XCB::XCB` target that carries no transitive information for a static
+libxcb, so it failed on link order alone — a cycle between `libX11.a`,
+`libxcb.a` and `libXau.a`. ⭐ **The POC therefore links its own static xcb +
+xkbcommon-x11 program first, in a `--start-group`, and only passes
+`-DTEST_xcb_syslibs=ON` if that link succeeded.** An override nobody checked is
+a way of making a build succeed by lying to it.
+
+⚠ **What rung 2 does NOT include, stated rather than discovered later:**
+
+- **OpenGL.** `libglvnd` is a dispatch layer whose whole purpose is to `dlopen`
+  a vendor — `docs/limitations.md` §1 from the GL side — and T-052's answer for
+  that is a **bundle** (`experiments/85-`, `89-`). A Qt *widget* application
+  uses the raster paint engine and does not need it.
+- **`--wrap-dlopen` on the QPA plugin.** A static Qt emits its plugins as
+  **archives**, so `Q_IMPORT_PLUGIN` puts the platform plugin in the link and
+  `dlopen` is never called. There is nothing to intercept. T-054's phrasing
+  predates that measurement; the rung it was reaching for — a REAL platform
+  plugin rather than a stub — is what this POC does.
+- **Fonts.** With `-no-fontconfig` Qt warns `Cannot find font directory` and
+  renders with no system font. Nothing asserted here needs a glyph; a Qt
+  application that displays text would want `--embed`-style font carriage or
+  fontconfig, and that is the next thing to try.
+
+⛔ **Rungs 3 (KF6) and 4 (kdenlive) are still untouched**, and the entry stays
+open for them. What rung 2 removes is the doubt: a static Qt **application**,
+not a library that links.
+
+
 ## T-055 — If static will not reach it, a kdenlive bundle that BEATS the field
 
 **Source** operator, 2026-09-01c: *"if impossible, pivot to
