@@ -1,62 +1,76 @@
-# SUMMARY.md — the session of 2026-09-01d
+# SUMMARY.md — the session of 2026-09-02
 
 ⛔ **Saved as well as printed**, per
 [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md), so it
-survives the chat scrolling away. It is the fastest orientation into what the
-last session actually did. Overwritten each session.
+survives the chat scrolling away. Overwritten each session.
 
 ⭐ **Every cell is grounded in something that can be pointed at**, and where a
 thing was not measured this says so rather than giving a number.
 
 | row | before | after |
 |---|---|---|
-| **Elapsed** | 2026-09-01T18:10Z | 2026-09-01T19:35Z — **≈1h25m** |
-| **Commits** | `544bfa61` | `60f997e8` — **11 commits**, every one on `main`, pushed as they landed |
-| **Work** | 4 required POCs assigned, 30 entries, 17 open, 13 done | ⭐ **4 of 4 completed**, **0 deferred, 0 failed**. 32 entries, 17 open, 15 done — T-032 and T-052 closed, T-058 and T-059 opened |
-| **Changes** | — | **64 files**, 2,840 insertions(+), 440 deletions(-) |
-| **Size** | 25,702 lines | **27,299 lines** (+1,597), excluding `references/` and `evidence/` |
-| **Checks** | `sh TODO/check.sh` green | green. Plus **9 selftests re-run, all pass** (bootstrap, oci-pull, rootfs-run, mine-repo, nix-fetch, nix-appimage, nix-drv, nix-nar, elf-needed) |
-| **Cost** | — | ⚠ **not metered.** What can be pointed at: qtbase 6.11.1 source (50.6 MB) and two mesa-demos closures (392 MB each, one from cache) fetched from cache.nixos.org; a jq closure (39 MB); Arch `pacman -Sy base-devel` in the test bed; four pinned anylinux tools. Disk went from 29 GiB free to ~15 GiB. No paid service was used. |
-| **Health** | ⛔ acceptance bar: 6 of 9 issues closed | ⭐ **8 of 9 closed**, one left (host plugins). **5 tool defects + 2 instrument defects found and fixed**; **2 new debts, both carried as open entries** (T-058, T-059). Tree **clean**, `main` pushed, no `ephemeral-*` branches, **no branch debt**. |
+| **Elapsed** | 2026-09-02T02:20Z | 2026-09-02T03:5xZ — **≈1h35m**, ⚠ **interrupted twice by the operator**, so this is not a planned session's shape |
+| **Commits** | `2e4c6169` | `79c7e054` — **3 commits**, every one on `main`, pushed as they landed |
+| **Work** | measurement work in flight | ⚠ **0 entries closed, 1 opened (T-061, P0)**, 2 defects fixed, 6 documentation defects fixed. ⛔ **The assigned measurement work was stopped, not finished** |
+| **Changes** | — | **22 files**, 2,082 insertions(+), 231 deletions(-) |
+| **Size** | — | **32,552 lines** of shell, Python, C and markdown, excluding `references/` and `evidence/` |
+| **Checks** | `sh TODO/check.sh` green | green. ⭐ **Plus a new second gate**, `sh scripts/common/check-docs.sh`, also green |
+| **Cost** | — | ⚠ **not metered.** What can be pointed at: two small reference files fetched (`tss/main.rs`, `stamp.ps1`), one onelf control package packed (46 MB), 31 nixpkgs dependencies built for T-060. Disk 7–9 GiB free throughout. No paid service used |
+| **Health** | 33 entries, 15 open | **34 entries, 16 open.** ⛔ **One new P0.** Tree clean, `main` pushed, no `ephemeral-*` branches, no branch debt |
 
-## The four required POCs, discharged
+## What actually happened
 
-| # | required | result | evidence |
-|---|---|---|---|
-| 1 | `poc/90-qt` — Qt 6, static | ✅ **11 of 11, zero host objects** | 19 assertions, 0 fail |
-| 2 | `experiments/85-opengl` | ✅ **Mesa/swrast on 11 of 11**, control clean | 7 assertions, 0 fail |
-| 3 | `experiments/86-bundler-vs-anylinux` | ✅ **both 11 of 11; ours 3.05× the size** | 7 assertions, 0 fail |
-| 4 | `poc/20` + `poc/30` reruns | ✅ **11 of 11 each** | 12 assertions each, 0 fail |
+⛔ **Two operator interrupts, and the session's shape is theirs, not a plan.**
 
-## The seven defects, because "7" is not a finding
+1. **Measurement work** (the assigned task): diagnosed the boost failure in
+   T-060's nix closure and the onelf arm of `experiments/90-`. Both turned out
+   to be defects in **our own** code, not in the things being measured.
+2. **Interrupt 1 — the documentation review.** `docs/` had gone thirteen
+   commits without an edit while five entries changed state.
+3. **Interrupt 2 — T-061.** The operator read the porting report and made the
+   Go port a P0 that pre-empts everything.
 
-⭐ **Five were in the tools and two were in this session's own instruments.**
-Every one produced a plausible result while being wrong — that is the pattern,
-and it is why building above the current class is worth more than the features
-it produces.
+## The two defects, because both were misattributed first
 
-| # | defect | what it looked like |
-|---|---|---|
-| 1 | pgb appended `-march=x86-64` **after** the caller's argv | *"x86 intrinsics support missing. **Check your compiler settings.**"* — Qt blaming the user for pgb's flag |
-| 2 | `make_wrappers` opened with `rm -rf` on a directory bind-mounted into a **running** build | `cc: not found` from inside somebody else's ninja, minutes in |
-| 3 | `nix-appimage.sh` fell back to the first binary in `bin/` when `--name` missed | packed `quadstrip-flat` instead of `eglinfo`, and said so in one line among eleven |
-| 4 | `nix-appimage.sh` read nixpkgs' `out` output | `no entry point in ...-jq-1.8.2/bin` — reads like a broken package, is a wrong output |
-| 5 | `pgb-cacert.c` missing `<stdio.h>` | implicit `snprintf`; a warning under gcc 12, an **error** under C23 |
-| 6 | 86-'s startup instrument reaped between runs, killing the dwarfs mount | both arms **~14,500 ms** where the real warm figure is **17 ms** |
-| 7 | two runs on the shared bed at once | `poc/30-curl`'s voidlinux row came back **SIG9** with nothing wrong with the binary |
+| what it looked like | what it was |
+|---|---|
+| `pgb: 1: .built: not found`, at the exact moment boost's round 1 began — read for an hour as a broken boost build | a COMMENT inside a double-quoted `_cmd="..."` assignment named a file in backticks. Backticks in double quotes are command substitution; the composing shell ran `.built`. **boost was never failing.** ⭐ This defect is the entire argument for T-061 |
+| `experiments/90-`'s onelf arm: `Aborted`, no output, three runs — recorded as "onelf cannot run our payload" | onelf dispatches on **argv[0]'s basename** and falls back to the package default **silently**. The symlink was named `melt-onelf`, matched nothing, and ran **kdenlive** — which needs a display and died in `QMessageLogger::fatal`. Through a symlink named `melt` the same bundle answers in 0.4 s |
 
-⚠ **And two assertion defects inside `poc/90-qt` itself**, caught before its
-evidence was committed: the plugin archive was looked for at nixpkgs'
-`INSTALL_PLUGINSDIR` rather than Qt's own default (reporting a FAILURE for a
-plugin built correctly), and the "no shared libraries" check was scoped to
-`libQt6*.so`, which would have passed a Qt whose *plugins* were still shared —
-the half that POC is about.
+⭐ **The onelf control is the part that makes it a finding rather than a
+guess**: a 141 MB, 188-library onelf package of the same nixpkgs ffmpeg, same
+`[bundle] skip`, same compression level, runs on this machine. So the abort was
+never about the payload or the host.
 
-## What was NOT measured
+## The documentation review
 
-- **Anything on a GPU.** Every GL row is `swrast`. **T-059.**
-- **Qt against a real display.** `-no-xcb`; the offscreen QPA is what ran.
-  T-054 rung 2.
-- **KF6 and kdenlive.** Untouched. T-054 rungs 3 and 4.
-- **A second machine or kernel.** One machine, one day, as every number in
-  this tree still is.
+⭐ **The mechanical half is a script now**, per `reviews.md`:
+`scripts/common/check-docs.sh` — dead links, backticked repo paths, cited
+evidence, referenced experiment numbers, quoted entry counts, and the vendored
+set's own unresolved-link list. Six real defects on the way to green:
+
+| # | defect |
+|---|---|
+| 1 | `docs/research/solo.md` said their CI *"has six jobs"* and named six. It has **nine**; three were dropped with nothing saying so. ⭐ The conclusion survives and is **re-derived beside the correction** |
+| 2 | three files cited upstream's own limits document as though the path were ours |
+| 3 | `docs/comparison.md` and `docs/design/toolchain.md` cited experiment 63 as if it existed — it is a number T-013 reserves and nothing more |
+| 4 | `docs/history/corrections.md` and `docs/research/prior-art.md` cited onelf's guide by its upstream path, not the vendored one a reader can open |
+| 5 | `gate.md` and `reviews.md` were required reading that **this tree did not have**, for a whole session |
+| 6 | `TODO/PROGRESS.md` described the session before last |
+
+## What was NOT done, and it is most of the assigned work
+
+- ⛔ **`experiments/90-` is fixed and NOT re-run.** The recorded onelf row is
+  the wrong one. **T-055 stays open with the wrong number in its evidence.**
+- ⛔ **T-060 rung 1 did not finish.** 31 dependencies, boost in flight, on
+  ephemeral `/var/tmp`. Rungs 2 and 3 untouched.
+- ⛔ **The kdenlive bundle was not shrunk.** The 488,934,276-byte unreachable
+  figure was measured and the sweep that produced it **was not committed**.
+- ⛔ **The three deep reviews were not run as three separate passes.** The
+  documentation review covered lens 1 (the door sweep, over `docs/`) and lens 3
+  (the claim audit, which found the solo.md count). ⚠ **Lens 2, the guard
+  mutation, was run only on the new checker** — its rules were planted and seen
+  to fire while it was being written — **and not on anything else.** Saying it
+  covered all three would be the fabrication `reviews.md` warns about.
+- **Anything on a GPU**, **KF6**, **kdenlive static**, **a 32-bit
+  application** — all untouched, all carried as open entries.
