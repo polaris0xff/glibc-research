@@ -115,7 +115,9 @@ render() {  # artefact tag -> ms, or -1
   rm -f "$WORK/$_t.mp4"
   _s=$(date +%s%N)
   # shellcheck disable=SC2086
-  timeout -k 10 "$RUN_TIMEOUT" "$_a" melt $(printf '%s' "$MELT_ARGS" | sed "s|%OUT%|$WORK/$_t.mp4|") \
+  case "$_a" in *melt-onelf) _sel="" ;; *) _sel="melt" ;; esac
+  # shellcheck disable=SC2086
+  timeout -k 10 "$RUN_TIMEOUT" "$_a" $_sel $(printf '%s' "$MELT_ARGS" | sed "s|%OUT%|$WORK/$_t.mp4|") \
     >"$B/render.$_t.log" 2>&1 || { printf '%s' -1; return; }
   _e=$(date +%s%N)
   [ -s "$WORK/$_t.mp4" ] || { printf '%s' -1; return; }
@@ -141,7 +143,8 @@ start_ms() {  # artefact n -> total ms for n invocations
   _a="$1"; _n="$2"; _i=0
   _s=$(date +%s%N)
   while [ "$_i" -lt "$_n" ]; do
-    "$_a" melt -version >/dev/null 2>&1 || { printf '%s' -1; return; }
+    case "$_a" in *melt-onelf*) "$_a" -version ;; *) "$_a" melt -version ;; esac >/dev/null 2>&1 \
+      || { printf '%s' -1; return; }
     _i=$((_i + 1))
   done
   _e=$(date +%s%N)
@@ -154,7 +157,9 @@ start_ms() {  # artefact n -> total ms for n invocations
 # nothing has run before is cold by construction.
 cold_of() {  # artefact -> ms with a genuinely cold mount
   _c="$WORK/cold-$(basename "$1")"
-  rm -f "$_c"; cp "$1" "$_c"; chmod +x "$_c"
+  # ⚠ `cp -L`: arm O is invoked through a SYMLINK named after its entrypoint,
+  # and copying the link would copy a dangling name.
+  rm -f "$_c"; cp -L "$1" "$_c"; chmod +x "$_c"
   _r=$(start_ms "$_c" 1)
   rm -f "$_c"
   printf '%s' "$_r"
@@ -166,7 +171,8 @@ cold_of() {  # artefact -> ms with a genuinely cold mount
 # for the competitor, a number that cannot be a duration and was printed
 # anyway. Warm is now: one run to warm the mount, then N runs timed, divided.
 warm_of() {  # artefact -> ms per run once the mount is warm
-  "$1" melt -version >/dev/null 2>&1 || { printf '%s' -1; return; }
+  case "$1" in *melt-onelf*) "$1" -version ;; *) "$1" melt -version ;; esac >/dev/null 2>&1 \
+    || { printf '%s' -1; return; }
   _t=$(start_ms "$1" "$WARM_RUNS")
   [ "$_t" = -1 ] && { printf '%s' -1; return; }
   printf '%s' $(( _t / WARM_RUNS ))
@@ -220,21 +226,33 @@ else
     cp -al "$OURDIR"/lib/. "$D/lib/" 2>/dev/null || cp -a "$OURDIR"/lib/. "$D/lib/"
     [ -d "$OURDIR/share" ] && { cp -al "$OURDIR/share" "$D/share" 2>/dev/null || cp -a "$OURDIR/share" "$D/share"; }
     [ -d "$OURDIR/store" ] && { cp -al "$OURDIR/store" "$D/store" 2>/dev/null || cp -a "$OURDIR/store" "$D/store"; }
-    _ep=""
-    for _p in "$OURDIR"/shared/bin/*; do
-      _n=$(basename "$_p"); [ "$_n" = kdenlive ] && continue
-      _ep="$_ep --entrypoint $_n=bin/$_n"
-    done
+    # ⭐ ONELF GETS THE SAME INFORMATION sharun GETS, and at the same
+    # compression. `tool/onelf-recipe.py` turns our `.env` into `[env]` --
+    # ${SHARUN_DIR} becomes ${ONELF_DIR}, a live ${VAR} becomes $${VAR}, and
+    # repeated keys are folded because TOML cannot repeat one -- and sets
+    # `[compression] level = 19` to match the dwarfs zstd level our own packer
+    # uses. onelf's default is 12; comparing those would measure a default.
+    # ⛔ Without the environment this arm fails the way OURS did before T-053:
+    # melt starts, answers -version, and cannot find its modules.
+    python3 "$REPO_DIR/tool/onelf-recipe.py" "$OURDIR" kdenlive --level 19 \
+      > "$D/onelf.toml" 2>>"$B/onelf-pack.log" || true
+    cp "$D/onelf.toml" "$B/onelf.toml"
     exp_note "packing $(ls "$D/lib" | wc -l) libraries and $(ls "$D/bin" | wc -l) programs with onelf"
-    # shellcheck disable=SC2086
-    "$ONELF_BIN" pack "$D" -o "$ONELF" --command bin/kdenlive --name kdenlive $_ep \
-      >>"$B/onelf-pack.log" 2>&1 || exp_note "onelf pack failed; see $B/onelf-pack.log"
+    ( cd "$D" && "$ONELF_BIN" build -o "$ONELF" ) >>"$B/onelf-pack.log" 2>&1 \
+      || exp_note "onelf build failed; see $B/onelf-pack.log"
   fi
   if [ -s "$ONELF" ]; then
     chmod +x "$ONELF"
     O_SZ=$(wc -c < "$ONELF")
-    O_R=$(render "$ONELF" onelf); O_MP4=$( [ -f "$WORK/onelf.mp4" ] && wc -c < "$WORK/onelf.mp4" || echo 0)
-    O_COLD=$(cold_of "$ONELF"); O_WARM=$(warm_of "$ONELF")
+    # ⛔ onelf DISPATCHES ON argv[0], NOT ON argv[1]. `pack --entrypoint
+    # name=path` is "selected via argv[0]" in its own schema, so
+    # `./pkg melt -version` runs KDENLIVE with `melt` as an argument -- which
+    # is why this arm's first run reported `Aborted` and no MP4. A symlink
+    # named after the entrypoint is how onelf is meant to be invoked, and it
+    # is also how sharun works, so the two runtimes agree on the mechanism.
+    ln -sf "$ONELF" "$WORK/melt-onelf"
+    O_R=$(render "$WORK/melt-onelf" onelf); O_MP4=$( [ -f "$WORK/onelf.mp4" ] && wc -c < "$WORK/onelf.mp4" || echo 0)
+    O_COLD=$(cold_of "$WORK/melt-onelf"); O_WARM=$(warm_of "$WORK/melt-onelf")
     exp_check "onelf packed the same payload" "$([ "$O_SZ" -gt 1000 ] && echo yes || echo no)" yes
     exp_check "and it rendered a real MP4"    "$([ "${O_MP4:-0}" -gt 1000 ] && echo yes || echo no)" yes
     printf '  %-34s %14s   %8s ms render   %6s ms cold  %5s ms warm\n' \

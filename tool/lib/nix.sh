@@ -1033,8 +1033,15 @@ nix_try_build() {   # srcdir flags log hooks [install]
       # rejects `--prefix`, printing its own key list instead of an error.
       _cmd="cd \"\$(pgb_build_root configure Makefile Makefile.in bootstrap.sh CMakeLists.txt)\" &&
             if [ -x ./bootstrap.sh ] && { [ -f ./Jamroot ] || [ -f ./bootstrap.jam ] || [ -f ./boost-build.jam ]; }; then
+              # ⛔ b2 RETURNS NON-ZERO WHEN ANY TARGET FAILED, AND A LIBRARY SET
+              # ALWAYS HAS ONE. Measured on boost 1.89.0: it copied 18,512
+              # targets, put every libboost_*.a in the prefix -- and exited
+              # non-zero, so pgb wrote no `.built` marker and the NEXT run
+              # spent twenty-five minutes building it again. The success test
+              # is therefore what landed, not what b2 thought of the run.
               ./bootstrap.sh --prefix=$NIX_PREFIX --without-libraries=python &&
-              ./b2 -j $_j link=static runtime-link=static threading=multi variant=release --prefix=$NIX_PREFIX ${_in:+install};
+              { ./b2 -j $_j link=static runtime-link=static threading=multi variant=release --prefix=$NIX_PREFIX ${_in:+install} || true; } &&
+              ls $NIX_PREFIX/lib/libboost_system.a >/dev/null 2>&1;
             elif [ -x ./configure ] && grep -q oconfigure ./configure 2>/dev/null; then
               ./configure PREFIX=$NIX_PREFIX $_fl && make -j $_j $_instcmd;
             elif [ -x ./configure ]; then ./configure --prefix=$NIX_PREFIX --disable-shared --enable-static $_fl && make -j $_j $_instcmd;
@@ -1106,6 +1113,25 @@ nix_diagnose() {   # log srcdir flags -> a fix directive, or nothing
   # the decision this loop would otherwise have to search for.
   # ⚠ Only `-Dname=false|disabled` is taken. A suggestion to ENABLE something
   # is a different sentence and is not acted on.
+  # ⭐ AND MESON NAMES AN OPTION IT DOES NOT HAVE, which is the other half of
+  # the same courtesy. nix's components are seven meson subprojects over one
+  # source tree, so a component's own `-Dcpuid=enabled` is meaningless at the
+  # TOP of that tree and meson says exactly that:
+  #
+  #   meson.build:4:0: ERROR: Unknown option: "cpuid".
+  #
+  # Dropping the flag it names is a targeted change; guessing which of a
+  # dozen flags to remove is the search this loop must not become.
+  _munk=$(grep -oE 'ERROR: Unknown option: "[A-Za-z0-9_-]+"' "$_lg" 2>/dev/null \
+          | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+  if [ -n "$_munk" ]; then
+    for _f in $_flags; do
+      case "$_f" in
+        -D"$_munk"=*) printf 'drop:%s\n' "$_f"; return 0 ;;
+      esac
+    done
+  fi
+
   _mopt=$(grep -oE 'with -D[A-Za-z0-9_-]+=(false|disabled)' "$_lg" 2>/dev/null \
           | head -1 | sed 's/^with //')
   if [ -n "$_mopt" ]; then
