@@ -207,7 +207,7 @@ exp_check "and an exact attribute reports that instead" \
 # ARM 5 -- ⭐ THE ENTRY: a host with a toolchain, no nix, no /nix, no root.
 # ---------------------------------------------------------------------------
 printf -- '\n-- arm 5: plan + fetch + BUILD inside a host with neither -----\n'
-ENVROOT="$ROOTFS_DIR/pgb-env-debian12"
+ENVROOT="$ENV_ROOT"      # lib.sh, out of internal/cfg/cfg.go. T-070.
 if [ ! -d "$ENVROOT" ]; then
   exp_skip "arm5: the end-to-end build" "no $ENVROOT (./pgb --engine chroot env create)"
 else

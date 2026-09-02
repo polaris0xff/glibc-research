@@ -22,6 +22,53 @@ REPO_DIR=$(cd "$EXP_DIR/.." && pwd)
 ROOTFS_DIR="${PGB_ROOTFS_DIR:-/var/lib/pgb-rootfs}"
 OUT_DIR="${PGB_EVIDENCE_DIR:-$REPO_DIR/evidence}"
 
+# ---------------------------------------------------------------------------
+# ⛔ ONE SOURCE OF TRUTH FOR THE PINNED BUILD ENVIRONMENT, AND IT IS cfg.go.
+#
+# Eight experiments each carried `pgb-env-debian12` as their own fallback.
+# T-070 measured the glibc pin move and found that changing `cfg.go` alone
+# would have left every one of them looking at the OLD environment, in two
+# ways and neither of them loud:
+#
+#   - on a machine where that directory is gone they skip, which is an exit 2
+#     nobody reads as a regression;
+#   - on a machine where it is still on disk -- every machine that ever built
+#     it -- they MEASURE THE OLD GLIBC AND SAY NOTHING.
+#
+# The second is not hypothetical: it is what `PGB_ENV_NAME` did to arm 5 of
+# `experiments/91-` on 2026-09-02e, caught only by reading `.comment` out of a
+# binary the POC had just produced. TODO/toolchain.md T-070.
+#
+# ⛔ AN UNREADABLE OR UNPARSABLE cfg.go IS exit 2, NOT AN EMPTY STRING. An
+# empty name makes "$ROOTFS_DIR/$ENV_NAME" the rootfs directory ITSELF, which
+# exists, so every `[ -d ... ]` guard downstream passes and the experiment
+# chroots into a tree holding eleven distributions.
+PGB_CFG_GO="$REPO_DIR/internal/cfg/cfg.go"
+
+# exp_cfg_const NAME -> the string value of that Go constant on stdout.
+# ⛔ Returns non-zero rather than calling `exit`: this runs inside `$(...)`,
+# which is a SUBSHELL, and an `exit` there ends the subshell and leaves the
+# caller running with an empty variable -- the exact silent-empty-name failure
+# the block above exists to prevent. The caller must check, and does.
+exp_cfg_const() {
+  [ -r "$PGB_CFG_GO" ] || {
+    printf 'lib.sh: cannot read %s\n' "$PGB_CFG_GO" >&2; return 2; }
+  _cc_v=$(sed -n 's/^[[:space:]]*'"$1"'[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' \
+          "$PGB_CFG_GO" | head -1)
+  [ -n "$_cc_v" ] || {
+    printf 'lib.sh: %s defines no %s\n' "$PGB_CFG_GO" "$1" >&2; return 2; }
+  printf '%s' "$_cc_v"
+}
+
+# The pinned build environment's directory name, overridable for a candidate
+# pin the way `experiments/91-` does. Set once at source time: it is read by
+# nine scripts and it cannot change under a running experiment.
+PGB_ENV_NAME_DEFAULT=$(exp_cfg_const DefaultEnvName) || exit 2
+[ -n "$PGB_ENV_NAME_DEFAULT" ] || {
+  printf 'lib.sh: DefaultEnvName came back empty\n' >&2; exit 2; }
+ENV_NAME="${PGB_ENV_NAME:-$PGB_ENV_NAME_DEFAULT}"
+ENV_ROOT="$ROOTFS_DIR/$ENV_NAME"
+
 PASS=0
 FAIL=0
 SKIP=0

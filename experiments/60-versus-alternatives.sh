@@ -82,7 +82,10 @@ exp_begin "60 - head to head against the alternatives (REQUIREMENTS.md part 2)"
 ITERATIONS="${PGB_VS_ITERS:-100}"
 ROUNDS="${PGB_VS_ROUNDS:-3}"
 
-ENV_ROOT="$ROOTFS_DIR/${PGB_ENV_NAME:-pgb-env-debian12}"
+# ENV_ROOT and ENV_NAME come from lib.sh, which reads the pinned build
+# environment's name out of internal/cfg/cfg.go. T-070: this file used to
+# carry its own `pgb-env-debian12` fallback and would not have followed a pin
+# move.
 MUSL_ROOT="$ROOTFS_DIR/alpine-3.22"
 RR="$REPO_DIR/pgb"
 # ⛔ PINNED, FOR THE SAME REASON scripts/common/rootfs-images.txt IS PINNED.

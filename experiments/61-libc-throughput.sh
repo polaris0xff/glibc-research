@@ -66,7 +66,7 @@ ROUNDS="${PGB_BENCH_ROUNDS:-3}"
 SCALE="${PGB_BENCH_SCALE:-1}"
 MATRIX_SCALE="${PGB_BENCH_MATRIX_SCALE:-1}"
 
-ENV_ROOT="$ROOTFS_DIR/${PGB_ENV_NAME:-pgb-env-debian12}"
+# ENV_ROOT comes from lib.sh, out of internal/cfg/cfg.go. T-070.
 RR="$REPO_DIR/pgb"
 B="$EXP_OUT/build"
 rm -rf "$B"; mkdir -p "$B" || exit 2

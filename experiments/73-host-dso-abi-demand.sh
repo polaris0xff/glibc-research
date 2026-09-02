@@ -121,8 +121,9 @@ WORK="$EXP_OUT/build"
 rm -rf "$WORK"; mkdir -p "$WORK" || exit 2
 RESULT="$EXP_OUT/RESULT.txt"
 
-ENV_NAME="${PGB_ENV_NAME:-pgb-env-debian12}"
-ENV_ROOT="$ROOTFS_DIR/$ENV_NAME"
+# ENV_NAME and ENV_ROOT come from lib.sh, out of internal/cfg/cfg.go, and
+# PGB_ENV_NAME still overrides — which is how experiments/91- measures a
+# candidate pin with this experiment. T-070.
 
 command -v python3 >/dev/null 2>&1 || { exp_skip "python3" "absent"; exp_finish; }
 command -v nm >/dev/null 2>&1      || { exp_skip "nm" "absent"; exp_finish; }

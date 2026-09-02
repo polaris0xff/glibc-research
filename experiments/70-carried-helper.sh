@@ -179,7 +179,9 @@ while read -r ref name libc digest; do
   case "$ref" in ''|\#*) continue ;; esac
   [ -d "$ROOTFS_DIR/$name" ] && TARGETS="$TARGETS $name:$libc"
 done < "$REPO_DIR/scripts/common/rootfs-images.txt"
-[ -d "$ROOTFS_DIR/pgb-env-debian12" ] && TARGETS="$TARGETS pgb-env-debian12:glibc"
+# The pinned build environment is a twelfth target. Its name comes from
+# lib.sh, out of internal/cfg/cfg.go, so it follows a pin move. T-070.
+[ -d "$ENV_ROOT" ] && TARGETS="$TARGETS $ENV_NAME:glibc"
 
 [ -n "$TARGETS" ] || { printf 'no rootfs fetched: "./pgb" rootfs fetch\n'; exit 2; }
 

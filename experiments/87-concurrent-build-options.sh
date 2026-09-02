@@ -90,7 +90,7 @@ exp_note "engine pgb would choose on its own: ${engine:-unknown}"
 # must use. Running them under docker measures the container boundary instead
 # and passes for the wrong reason -- which is exactly what the first run of
 # this experiment did.
-CHROOT_ENV="$ROOTFS_DIR/pgb-env-debian12"
+CHROOT_ENV="$ENV_ROOT"   # lib.sh, out of internal/cfg/cfg.go. T-070.
 if [ -d "$CHROOT_ENV" ]; then
   ENG=chroot
 else

@@ -61,7 +61,7 @@
 exp_begin "62 - pgb against Anylinux-AppImages, the competitive AppImage"
 
 ARCH_ROOT="$ROOTFS_DIR/archlinux-latest"
-ENV_ROOT="$ROOTFS_DIR/${PGB_ENV_NAME:-pgb-env-debian12}"
+# ENV_ROOT comes from lib.sh, out of internal/cfg/cfg.go. T-070.
 RR="$REPO_DIR/pgb"
 QS="$REPO_DIR/references/pkgforge-dev__Anylinux-AppImages/tree/useful-tools/quick-sharun.sh"
 ANYLINUX_C="$REPO_DIR/references/pkgforge-dev__Anylinux-AppImages/tree/useful-tools/lib/anylinux.c"

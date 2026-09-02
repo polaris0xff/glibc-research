@@ -194,8 +194,19 @@ exp_check "the fetched binary's loader is an absolute store path" "$interp_class
 # taken inside a rootfs that has no /nix at all -- the pinned build
 # environment, or any of the eleven -- where the kernel's ENOENT is the real
 # answer rather than an argument.
+#
+# ⛔ TWO OF THE THREE CANDIDATES THIS LOOP USED TO NAME COULD NEVER MATCH.
+# They were `debian12` and `alpine322`; the local names in
+# scripts/common/rootfs-images.txt are `debian-12` and `alpine-3.22`, so those
+# two `[ -d ]` tests were dead and the arm rested entirely on the third,
+# `pgb-env-debian12` — itself a hardcoded copy of a name that lives in
+# internal/cfg/cfg.go. Both halves fixed here: ENV_ROOT comes from lib.sh, and
+# the rest of the list is READ OUT OF THE IMAGES FILE rather than retyped, so
+# it cannot drift from it again. T-070.
 NOSTORE=""
-for cand in "$ROOTFS_DIR/pgb-env-debian12" "$ROOTFS_DIR/debian12" "$ROOTFS_DIR/alpine322"; do
+for cand in "$ENV_ROOT" $(awk 'NF>=4 && $1 !~ /^#/ {print $2}' \
+                          "$REPO_DIR/scripts/common/rootfs-images.txt"); do
+  case "$cand" in /*) ;; *) cand="$ROOTFS_DIR/$cand" ;; esac
   [ -d "$cand" ] && [ ! -d "$cand/nix/store" ] && { NOSTORE="$cand"; break; }
 done
 if [ -n "$NOSTORE" ]; then
