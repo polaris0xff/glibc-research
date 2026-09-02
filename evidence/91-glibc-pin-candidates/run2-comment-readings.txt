@@ -1,0 +1,9 @@
+gcc read from the binaries run 2 actually produced, since neither POC
+keeps one in its evidence directory (so arm 5 reports them unmeasured):
+
+  70-sqlite/sqlite3-wrapped                        gcc 14.2.0
+  70-sqlite/sqlite3-control                        gcc 14.2.0
+  80-kdenlive/melt-static                          gcc 14.2.0
+  80-kdenlive/inst/bin/ffmpeg                      gcc 14.2.0
+
+the candidate environment carries gcc 14.2.0, glibc 2.41.
