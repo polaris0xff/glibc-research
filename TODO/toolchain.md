@@ -1887,18 +1887,74 @@ weak or strong:
 ⚠ `pgb_dlopen_libs` and the two provider-table symbols were already weak; they
 are the pattern this fix follows rather than a new one.
 
-⛔ **So the pin has NOT moved and `cfg.go` is untouched.** ⭐ **Eight of the ten
-POCs BUILD AND RUN at 2.41**, and the two that did not were stopped by this
-repository's own link bug rather than by the pin. The four measurable costs are
-still zero: the kernel floor did not move, class C is empty on every row at
-both pins, the NSS floor holds, and now eight real projects — up to a static
-Qt 6 with a mapped X window — build and pass their full matrices under a
-toolchain two major gcc versions newer.
+### ⭐ RUN 2 — the last two, and the arm is COMPLETE at 10 of 10
 
-⚠ **The ruling waits for the last two**, which are re-running against the fix.
-⛔ **Eight is not ten**, and the two outstanding are precisely the two that
-exercise `--wrap-dlopen`, which is where today's defect lived — so they are the
-rows least safe to extrapolate.
+Re-run against the link fix, same environment and same digest:
+
+    70-sqlite-extensions   ok   pass=20 fail=0
+    80-mlt                 ok   pass=21 fail=0
+
+⚠ Both report `unmeasured` in the gcc column because neither keeps a binary in
+its evidence directory. The compiler was then read from the binaries they
+actually produced (`evidence/91-*/run2-comment-readings.txt`):
+
+    70-sqlite/sqlite3-wrapped   gcc 14.2.0     80-kdenlive/melt-static      gcc 14.2.0
+    70-sqlite/sqlite3-control   gcc 14.2.0     80-kdenlive/inst/bin/ffmpeg  gcc 14.2.0
+
+⭐ **So 8 of the 10 are verified by `.comment`**; the two Qt POCs retain no
+binary and are carried on their own 20 and 27 assertions instead. ⛔ That is
+stated rather than rounded up to "all ten verified".
+
+## ⭐ THE RULING — all four costs are measured, and every one is zero
+
+| what the move could have cost | measured | verdict |
+|---|---|---|
+| the kernel floor a static binary declares | `.note.ABI-tag` **3.2.0** at both pins, two instruments agreeing | no cost |
+| class C — a symbol the newer glibc REMOVED | **empty on all 11 rows at BOTH pins** | no cost |
+| the NSS floor the whole project rests on | `none` at 2.41, with `experiments/21-`'s 2.31 arm firing as the control | holds |
+| ten real projects under gcc 12.2.0 → **14.2.0** | ⭐ **10 of 10 build and pass their full matrices** | no cost |
+
+⭐ **And what it buys:** class B — a host symbol newer than the pin — goes
+**20 → 5 distinct symbols**, and the five that remain are at `GLIBC_2.42`/`2.43`
+on `archlinux-latest` alone. Every fixed-release environment measured empties.
+
+⚠ **The one measured cost, reported rather than rounded off:** `debian-12`
+serves **two fewer** symbols at 2.41, 851 → 849. Net across the seven glibc
+rows is **+40 served, −2**.
+
+⛔ **THE RULING IS: MOVE THE PIN.** Nothing measured argues against it and one
+thing argues for it.
+
+### ⛔ AND THE PIN IS NOT ONE CONSTANT, IT IS NINE — which is why cfg.go is still untouched
+
+⭐ **Found while costing the move, and it is the same defect this entry already
+paid for once.** `cfg.go` holds `DefaultEnvImage`, `DefaultEnvDigest` and
+`DefaultEnvName` — but **eight shell files hardcode the environment NAME as
+their own fallback**, and they would not follow it:
+
+    experiments/60-  61-  62-  73-     ENV_ROOT="$ROOTFS_DIR/${PGB_ENV_NAME:-pgb-env-debian12}"
+    experiments/70-  80-  87-  88-     the path written out literally
+
+⛔ **Change `cfg.go` alone and those eight keep looking for
+`pgb-env-debian12`.** On a machine where that directory is gone they skip — an
+exit 2 nobody reads as a regression. ⚠ On a machine where it is still on disk,
+which is every machine that ever built it, **they measure 2.36 while the tool
+builds 2.41 and say nothing** — which is precisely the failure this same entry
+hit today with `PGB_ENV_NAME`, wearing different clothes.
+
+⭐ **So the move lands in this order, and not otherwise:**
+
+1. one source of truth for the default environment name — the eight read it out
+   of `cfg.go`, as `experiments/91-` already does with `sed`, rather than each
+   carrying its own copy;
+2. then `cfg.go`;
+3. then re-run the matrices, because ⛔ **every committed `RESULT.txt` in
+   `evidence/` says `pinned build glibc : 2.36`** and would describe an
+   environment the tool no longer builds.
+
+⛔ **Step 1 requires editing `experiments/lib.sh`, which `experiments/85-` is
+sourcing right now**, and this tree's rule is that a running shell script is
+not edited. The ruling is recorded; the edit is the next thing to land.
 
 ---
 
