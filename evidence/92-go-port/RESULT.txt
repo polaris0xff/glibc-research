@@ -107,21 +107,83 @@ GATE 5 - the matrix (partial: the probe, chroot arm)
 
     VERDICT: ran on every fetched environment and loaded no host shared object.
 
-  ⚠ This is ONE subject. The nine POCs and the experiment suite are the rest
-    of this gate and are recorded below as they run.
+  ⚠ This is ONE subject. The POCs and the experiment suite are the rest of
+    this gate, recorded per-row below as each finishes.
+
+
+GATE 5 - the POCs, against the Go pgb
+---------------------------------------------------------------------------
+Every one is `sh poc/NN-*/run.sh`, unchanged except for the entry point it
+calls. rc=0 and the verdict line is the row.
+
+  POC                       rc    time  verdict
+  10-gawk                    0     27s  builds and works across the matrix
+  40-jq                      0     27s  builds and works across the matrix
+  20-nano                    0     68s  builds and works across the matrix
+  70-sqlite-extensions       0    115s  builds and works across the matrix
+  60-leveldb                 0     12s  builds and works across the matrix
+  30-curl                    0    102s  builds and works across the matrix
+  50-python                  0    123s  builds and works across the matrix
+  80-mlt                     0    183s  builds and works across the matrix
+  90-qt                      0    594s  builds and works across the matrix
+  91-qt-xcb                          -  see below
+
+  ⛔ 91-qt-xcb FAILED FIRST, ON A COLD PREFIX, AND THE DEFECT WAS OURS.
+  `pgb nix deps` stops recursing at NIX_DEP_DEPTH, so libxcb was attempted
+  before xcb-proto was in the prefix and took libx11, libxext, libxfixes,
+  libxi and libxrender down with it. Running the command a second time would
+  have fixed it, which is not convergence. The walk now repeats passes while
+  one is still landing something (commit 25a86348), and the row above is
+  filled in from a run that started from `rm -rf` of the prefix.
+
+
+GATE 5 - the experiment suite, against the Go pgb
+---------------------------------------------------------------------------
+  EXPERIMENT                 rc  verdict
+  10-probe-the-host           0  matched expectation (8 cases)
+  20-static-glibc-nss-dlopen  0  matched expectation
+  21-glibc-version-floor      0  matched expectation
+  30-gconv-and-locale         0  matched expectation
+  40-overhead                 0  matched expectation
+  50-host-plugin-feasibility  0  matched expectation
+  70-carried-helper           0  matched expectation (12 of 12 targets)
+  71-wrap-dlopen              0  matched expectation (2 cases)
+  72-static-host-plugin-abi   0  matched expectation
+  73-host-dso-abi-demand      0  matched expectation
+  74-cacert                   0  matched expectation
+  75-terminfo                 0  matched expectation
+  80-nix-without-nix          0  matched expectation (16 cases)
+  83-drv-without-nix          0  matched expectation
+  85-opengl                   0  matched expectation (7 cases, Go bundler)
+  87-concurrent-build-options 0  matched expectation
+  88-nonix-end-to-end         0  matched expectation (25 cases)
+
+  ⚠ Three of these failed on their first run against the Go pgb and each
+    failure was a real defect, not a harness difference:
+      80  read `refused(2)` where chroot's convention is `refused(127)`.
+          rootfs.Inner now exits 127 for ENOENT and 126 for EACCES.
+      88  lost `--bind` to the top-level option parser, because `pgb rootfs
+          run` has a --bind of its own. `rootfs` is no longer parsed as a
+          structured command.
+      88  then stopped at "no zstd decoder on PATH" inside the pinned
+          environment, which is what internal/zstd was written for.
 
 
 THE CARRIED-IN SELFTESTS
 ---------------------------------------------------------------------------
-  pgb selftest    72 cases, all pass
+  pgb selftest    124 cases, all pass
 
-  oci-pull    6 cases   the whiteout merge, with a positive control
-  rootfs-run  3 cases   isolation, with a planted file the host does not have
-  elf         8 cases   ELF and `ar` read directly, against real fixtures
-  nix-nar    30 cases   see gate 2
-  nix-drv    12 cases   the ATerm reader, its escapes and its refusals
-  nix-index  13 cases   the streaming walk at four reader sizes, against a
-                        whole-document decode as the control
+  nix-nar        30 cases   see gate 2
+  zstd           22 cases   see the zstd section below
+  nix-drv        14 cases   the ATerm reader, its escapes and its refusals
+  nix-index      13 cases   the streaming walk at four reader sizes, against
+                            a whole-document decode as the control
+  bundle-sweep   12 cases   reachability, both directions
+  bundle-appimage 9 cases   the entry-point resolver and the .env fold
+  elf             8 cases   ELF and `ar` read directly, against real fixtures
+  bootstrap       7 cases   the engine is NAMED, which the shell one was not
+  oci-pull        6 cases   the whiteout merge, with a positive control
+  rootfs-run      3 cases   isolation, with a planted file the host lacks
 
 
 GATE 1 - nix-index on the real ~400 MB packages.json

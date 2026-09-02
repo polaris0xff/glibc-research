@@ -1,66 +1,764 @@
 attr        qt6.qtbase
 prefix      /var/tmp/pgb-poc/91-qt-xcb/prefix
-dep skip    at-spi2-core-2.60.6-dev (in NIX_DEP_SKIP)
-dep skip    gtk+3-3.24.52-dev (in NIX_DEP_SKIP)
-dep skip    mariadb-connector-c-3.3.5-dev (in NIX_DEP_SKIP)
-dep skip    libpq-18.4-dev (in NIX_DEP_SKIP)
-dep have    libxml2
-dep skip    libxslt-1.1.45-dev (in NIX_DEP_SKIP)
-dep have    openssl
-dep skip    sqlite-3.53.3-dev (in NIX_DEP_SKIP)
-dep skip    zlib-1.3.2-dev (in NIX_DEP_SKIP)
-dep skip    libglvnd-1.7.0-dev (in NIX_DEP_SKIP)
-dep skip    vulkan-headers-1.4.357.0 (in NIX_DEP_SKIP)
-dep skip    vulkan-loader-1.4.357.0-dev (in NIX_DEP_SKIP)
-dep skip    harfbuzz-13.2.1-dev (in NIX_DEP_SKIP)
-dep skip    icu4c-78.3-dev (in NIX_DEP_SKIP)
-dep skip    libjpeg-turbo-3.1.4.1-dev (in NIX_DEP_SKIP)
-dep skip    libpng-apng-1.6.58-dev (in NIX_DEP_SKIP)
-dep skip    pcre2-10.47-dev (in NIX_DEP_SKIP)
-dep skip    zstd-1.5.7-dev (in NIX_DEP_SKIP)
-dep skip    libb2-0.98.1 (in NIX_DEP_SKIP)
-dep skip    md4c-0.5.3-dev (in NIX_DEP_SKIP)
-dep skip    double-conversion-3.4.0-dev (in NIX_DEP_SKIP)
-dep skip    libproxy-0.5.12-dev (in NIX_DEP_SKIP)
-dep skip    dbus-1.16.2-dev (in NIX_DEP_SKIP)
-dep skip    glib-2.88.3-dev (in NIX_DEP_SKIP)
-dep skip    unixodbc-2.3.14 (in NIX_DEP_SKIP)
-dep skip    psqlodbc-18.00.0002 (in NIX_DEP_SKIP)
-dep skip    sqlite-connector-odbc-0.99991 (in NIX_DEP_SKIP)
-dep skip    mariadb-connector-odbc-3.2.6 (in NIX_DEP_SKIP)
-dep skip    systemd-261.1-dev (in NIX_DEP_SKIP)
-dep skip    util-linux-2.42.2-dev (in NIX_DEP_SKIP)
-dep skip    mtdev-1.1.7 (in NIX_DEP_SKIP)
-dep skip    lksctp-tools-1.0.21 (in NIX_DEP_SKIP)
-dep skip    libselinux-3.10-dev (in NIX_DEP_SKIP)
-dep skip    libsepol-3.11-dev (in NIX_DEP_SKIP)
-dep skip    lttng-ust-2.15.1-dev (in NIX_DEP_SKIP)
-dep skip    libthai-0.1.30-dev (in NIX_DEP_SKIP)
-dep skip    libdrm-2.4.134-dev (in NIX_DEP_SKIP)
-dep skip    mesa-libgbm-26.1.3 (in NIX_DEP_SKIP)
-dep skip    libdatrie-2019-12-20-dev (in NIX_DEP_SKIP)
-dep skip    systemd-minimal-libs-261.1-dev (in NIX_DEP_SKIP)
-dep skip    fontconfig-2.18.2-dev (in NIX_DEP_SKIP)
-dep skip    freetype-2.14.3-dev (in NIX_DEP_SKIP)
-dep have    libx11
-dep skip    libxcomposite-0.4.7-dev (in NIX_DEP_SKIP)
-dep have    libxext
-dep have    libxi
-dep have    libxrender
+dep skip    at-spi2-core-2.60.6-dev (in the skip list)
+dep skip    gtk+3-3.24.52-dev (in the skip list)
+dep skip    mariadb-connector-c-3.3.5-dev (in the skip list)
+dep skip    libpq-18.4-dev (in the skip list)
+dep build   libxml2  (depth 1)
+dep build   find-xml-catalogs-hook  (depth 2)
+pgb: dep FAILED  find-xml-catalogs-hook -- its source could not be fetched
+patches     1 applied (-p1)
+repointed --exec-prefix=/02qcpld1y6xhs5gz9bchpxaw0xdhmsp5dv88lh25r2ss44kh8dxz -> --exec-prefix=/var/tmp/pgb-poc/91-qt-xcb/prefix
+pgb: dropped shared-library flag: --enable-shared
+build system: autoreconf pkg-config (configureFlags)
+round 1: configure --exec-prefix=/var/tmp/pgb-poc/91-qt-xcb/prefix --disable-static --without-icu --without-python --without-http --without-zlib --without-docs
+round 1: built
+dep ok      libxml2 -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep skip    libxslt-1.1.45-dev (in the skip list)
+dep build   openssl  (depth 1)
+patches     3 applied (-p1)
+round 1: configure shared --libdir=lib --openssldir=etc/ssl enable-ec_nistp_64_gcc_128 enable-ktls
+round 1: built
+dep ok      openssl -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep skip    sqlite-3.53.3-dev (in the skip list)
+dep skip    zlib-1.3.2-dev (in the skip list)
+dep skip    libglvnd-1.7.0-dev (in the skip list)
+dep skip    vulkan-headers-1.4.357.0 (in the skip list)
+dep skip    vulkan-loader-1.4.357.0-dev (in the skip list)
+dep skip    harfbuzz-13.2.1-dev (in the skip list)
+dep skip    icu4c-78.3-dev (in the skip list)
+dep skip    libjpeg-turbo-3.1.4.1-dev (in the skip list)
+dep skip    libpng-apng-1.6.58-dev (in the skip list)
+dep skip    pcre2-10.47-dev (in the skip list)
+dep skip    zstd-1.5.7-dev (in the skip list)
+dep skip    libb2-0.98.1 (in the skip list)
+dep skip    md4c-0.5.3-dev (in the skip list)
+dep skip    double-conversion-3.4.0-dev (in the skip list)
+dep skip    libproxy-0.5.12-dev (in the skip list)
+dep skip    dbus-1.16.2-dev (in the skip list)
+dep skip    glib-2.88.3-dev (in the skip list)
+dep skip    unixodbc-2.3.14 (in the skip list)
+dep skip    psqlodbc-18.00.0002 (in the skip list)
+dep skip    sqlite-connector-odbc-0.99991 (in the skip list)
+dep skip    mariadb-connector-odbc-3.2.6 (in the skip list)
+dep skip    systemd-261.1-dev (in the skip list)
+dep skip    util-linux-2.42.2-dev (in the skip list)
+dep skip    mtdev-1.1.7 (in the skip list)
+dep skip    lksctp-tools-1.0.21 (in the skip list)
+dep skip    libselinux-3.10-dev (in the skip list)
+dep skip    libsepol-3.11-dev (in the skip list)
+dep skip    lttng-ust-2.15.1-dev (in the skip list)
+dep skip    libthai-0.1.30-dev (in the skip list)
+dep skip    libdrm-2.4.134-dev (in the skip list)
+dep skip    mesa-libgbm-26.1.3 (in the skip list)
+dep skip    libdatrie-2019-12-20-dev (in the skip list)
+dep skip    systemd-minimal-libs-261.1-dev (in the skip list)
+dep skip    fontconfig-2.18.2-dev (in the skip list)
+dep skip    freetype-2.14.3-dev (in the skip list)
+dep build   libx11  (depth 1)
+dep build   xorgproto  (depth 2)
+patches     1 applied (-p1)
+build system: meson ninja pkg-config (mesonFlags)
+round 1: configure -Dlegacy=true
+round 1: built
+dep ok      xorgproto -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libpthread-stubs  (depth 2)
+patches     0 applied (-p1)
+round 1: configure 
+round 1: built
+dep ok      libpthread-stubs -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=trigraphs... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=array-bounds... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=write-strings... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking whether make supports nested variables... (cached) yes
+  checking whether to build developer documentation... yes
+  checking for doxygen... no
+  configure: WARNING: doxygen not found - documentation targets will be skipped
+  configure: WARNING: dot not found - doxygen targets will be skipped
+  checking for check >= 0.9.6... no
+  checking for xcb-proto >= 1.17.0... no
+  configure: error: Package requirements (xcb-proto >= 1.17.0) were not met:
+  
+  Package 'xcb-proto', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables XCBPROTO_CFLAGS
+  and XCBPROTO_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxcb -- the parent will have to do without it
+dep build   xtrans  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      xtrans -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep have    xorgproto
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking for sys/ioctl.h... yes
+  checking for sys/socket.h... yes
+  checking for __builtin_popcountl... yes
+  checking for strtol... yes
+  checking for seteuid... yes
+  checking for reallocarray... yes
+  checking whether issetugid is declared... no
+  checking for issetugid... no
+  checking for getresuid... yes
+  checking for shmat... yes
+  checking for launchd... no
+  checking for getpwuid_r in -lc... yes
+  checking for poll... yes
+  checking keysym definitions...  /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/keysymdef.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/XF86keysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/Sunkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/DECkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/HPkeysym.h
+  checking if XLOCALEDIR support should be enabled... yes
+  checking for BIGFONT... yes
+  checking for getpagesize... yes
+  checking for working mmap... yes
+  checking for nl_langinfo... yes
+  checking for X11... no
+  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+  
+  Package 'xcb', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables X11_CFLAGS
+  and X11_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libx11 -- the parent will have to do without it
+dep skip    libxcomposite-0.4.7-dev (in the skip list)
+dep build   libxext  (depth 1)
+dep build   libx11  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking for sys/ioctl.h... yes
+  checking for sys/socket.h... yes
+  checking for __builtin_popcountl... yes
+  checking for strtol... yes
+  checking for seteuid... yes
+  checking for reallocarray... yes
+  checking whether issetugid is declared... no
+  checking for issetugid... no
+  checking for getresuid... yes
+  checking for shmat... yes
+  checking for launchd... no
+  checking for getpwuid_r in -lc... yes
+  checking for poll... yes
+  checking keysym definitions...  /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/keysymdef.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/XF86keysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/Sunkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/DECkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/HPkeysym.h
+  checking if XLOCALEDIR support should be enabled... yes
+  checking for BIGFONT... yes
+  checking for getpagesize... yes
+  checking for working mmap... yes
+  checking for nl_langinfo... yes
+  checking for X11... no
+  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+  
+  Package 'xcb', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables X11_CFLAGS
+  and X11_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libx11 -- the parent will have to do without it
+dep have    xorgproto
+dep have    xorgproto
+dep build   libxau  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxau -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking whether to build functional specifications... yes
+  checking for xmlto... no
+  configure: WARNING: xmlto not found - documentation targets will be skipped
+  checking for fop... configure: WARNING: fop not found - documentation targets will be skipped
+  no
+  checking for xsltproc... no
+  checking for X.Org SGML entities >= 1.8... configure: WARNING: xsltproc not found - cannot transform XML documents
+  no
+  checking whether to act as if malloc(0) can return NULL... yes
+  checking for XEXT... no
+  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.1.99) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables XEXT_CFLAGS
+  and XEXT_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxext -- the parent will have to do without it
+dep build   libxi  (depth 1)
+dep have    xorgproto
+dep build   libx11  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking for sys/ioctl.h... yes
+  checking for sys/socket.h... yes
+  checking for __builtin_popcountl... yes
+  checking for strtol... yes
+  checking for seteuid... yes
+  checking for reallocarray... yes
+  checking whether issetugid is declared... no
+  checking for issetugid... no
+  checking for getresuid... yes
+  checking for shmat... yes
+  checking for launchd... no
+  checking for getpwuid_r in -lc... yes
+  checking for poll... yes
+  checking keysym definitions...  /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/keysymdef.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/XF86keysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/Sunkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/DECkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/HPkeysym.h
+  checking if XLOCALEDIR support should be enabled... yes
+  checking for BIGFONT... yes
+  checking for getpagesize... yes
+  checking for working mmap... yes
+  checking for nl_langinfo... yes
+  checking for X11... no
+  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+  
+  Package 'xcb', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables X11_CFLAGS
+  and X11_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libx11 -- the parent will have to do without it
+dep build   libxext  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking whether to build functional specifications... yes
+  checking for xmlto... no
+  configure: WARNING: xmlto not found - documentation targets will be skipped
+  checking for fop... no
+  configure: WARNING: fop not found - documentation targets will be skipped
+  checking for xsltproc... no
+  configure: WARNING: xsltproc not found - cannot transform XML documents
+  checking for X.Org SGML entities >= 1.8... no
+  checking whether to act as if malloc(0) can return NULL... yes
+  checking for XEXT... no
+  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.1.99) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables XEXT_CFLAGS
+  and XEXT_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxext -- the parent will have to do without it
+dep build   libxfixes  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=nonnull... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=init-self... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=main... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=missing-braces... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=sequence-point... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=return-type... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=trigraphs... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=array-bounds... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=write-strings... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking for FIXESEXT... no
+  configure: error: Package requirements (xproto >= 7.0.22 fixesproto >= 6.0 xextproto x11 >= 1.6) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables FIXESEXT_CFLAGS
+  and FIXESEXT_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxfixes -- the parent will have to do without it
+dep have    xorgproto
+dep build   libx11  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking for sys/ioctl.h... yes
+  checking for sys/socket.h... yes
+  checking for __builtin_popcountl... yes
+  checking for strtol... yes
+  checking for seteuid... yes
+  checking for reallocarray... yes
+  checking whether issetugid is declared... no
+  checking for issetugid... no
+  checking for getresuid... yes
+  checking for shmat... yes
+  checking for launchd... no
+  checking for getpwuid_r in -lc... yes
+  checking for poll... yes
+  checking keysym definitions...  /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/keysymdef.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/XF86keysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/Sunkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/DECkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/HPkeysym.h
+  checking if XLOCALEDIR support should be enabled... yes
+  checking for BIGFONT... yes
+  checking for getpagesize... yes
+  checking for working mmap... yes
+  checking for nl_langinfo... yes
+  checking for X11... no
+  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+  
+  Package 'xcb', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables X11_CFLAGS
+  and X11_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libx11 -- the parent will have to do without it
+dep build   libxext  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking whether to build functional specifications... yes
+  checking for xmlto... no
+  configure: WARNING: xmlto not found - documentation targets will be skipped
+  checking for fop... no
+  checking for xsltproc... no
+  checking for X.Org SGML entities >= 1.8... configure: WARNING: fop not found - documentation targets will be skipped
+  configure: WARNING: xsltproc not found - cannot transform XML documents
+  no
+  checking whether to act as if malloc(0) can return NULL... yes
+  checking for XEXT... no
+  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.1.99) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables XEXT_CFLAGS
+  and XEXT_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxext -- the parent will have to do without it
+dep build   libxfixes  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=nonnull... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=init-self... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=main... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=missing-braces... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=sequence-point... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=return-type... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=trigraphs... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=array-bounds... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=write-strings... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking for FIXESEXT... no
+  configure: error: Package requirements (xproto >= 7.0.22 fixesproto >= 6.0 xextproto x11 >= 1.6) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables FIXESEXT_CFLAGS
+  and FIXESEXT_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxfixes -- the parent will have to do without it
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking whether to build documentation... yes
+  checking whether to build functional specifications... yes
+  checking for xmlto... no
+  configure: WARNING: xmlto not found - documentation targets will be skipped
+  checking for fop... no
+  configure: WARNING: fop not found - documentation targets will be skipped
+  configure: WARNING: xsltproc not found - cannot transform XML documents
+  checking for xsltproc... no
+  checking for X.Org SGML entities >= 1.8... no
+  checking for asciidoc... no
+  configure: WARNING: asciidoc not found - documentation targets will be skipped
+  checking whether to act as if malloc(0) can return NULL... yes
+  checking for xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.0.3 xext >= 1.0.99.1 inputproto >= 2.3.99.1... no
+  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.0.3 xext >= 1.0.99.1 inputproto >= 2.3.99.1) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  Package 'xext', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables XI_CFLAGS
+  and XI_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxi -- the parent will have to do without it
+dep build   libxrender  (depth 1)
+dep have    xorgproto
+dep build   libx11  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking for sys/ioctl.h... yes
+  checking for sys/socket.h... yes
+  checking for __builtin_popcountl... yes
+  checking for strtol... yes
+  checking for seteuid... yes
+  checking for reallocarray... yes
+  checking whether issetugid is declared... no
+  checking for issetugid... no
+  checking for getresuid... yes
+  checking for shmat... yes
+  checking for launchd... no
+  checking for getpwuid_r in -lc... yes
+  checking for poll... yes
+  checking keysym definitions...  /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/keysymdef.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/XF86keysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/Sunkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/DECkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/HPkeysym.h
+  checking if XLOCALEDIR support should be enabled... yes
+  checking for BIGFONT... yes
+  checking for getpagesize... yes
+  checking for working mmap... yes
+  checking for nl_langinfo... yes
+  checking for X11... no
+  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+  
+  Package 'xcb', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables X11_CFLAGS
+  and X11_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libx11 -- the parent will have to do without it
+dep have    xorgproto
+dep build   libx11  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking for sys/ioctl.h... yes
+  checking for sys/socket.h... yes
+  checking for __builtin_popcountl... yes
+  checking for strtol... yes
+  checking for seteuid... yes
+  checking for reallocarray... yes
+  checking whether issetugid is declared... no
+  checking for issetugid... no
+  checking for getresuid... yes
+  checking for shmat... yes
+  checking for launchd... no
+  checking for getpwuid_r in -lc... yes
+  checking for poll... yes
+  checking keysym definitions...  /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/keysymdef.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/XF86keysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/Sunkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/DECkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/HPkeysym.h
+  checking if XLOCALEDIR support should be enabled... yes
+  checking for BIGFONT... yes
+  checking for getpagesize... yes
+  checking for working mmap... yes
+  checking for nl_langinfo... yes
+  checking for X11... no
+  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+  
+  Package 'xcb', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables X11_CFLAGS
+  and X11_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libx11 -- the parent will have to do without it
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=init-self... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=main... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=missing-braces... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=sequence-point... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=return-type... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=trigraphs... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=array-bounds... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=write-strings... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-2814651800/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking whether to act as if malloc(0) can return NULL... yes
+  checking for RENDER... no
+  configure: error: Package requirements (x11 >= 1.6 renderproto >= 0.9) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables RENDER_CFLAGS
+  and RENDER_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxrender -- the parent will have to do without it
+dep build   libxcb  (depth 1)
+dep have    libpthread-stubs
+dep have    libxau
+dep build   libxdmcp  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxdmcp -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   xcb-proto  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      xcb-proto -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxkbcommon  (depth 1)
+dep build   xkeyboard-config  (depth 2)
+patches     0 applied (-p1)
+build system: meson ninja pkg-config (mesonFlags)
+round 1: configure -Dxorg-rules-symlinks=true
+round 1: built
+dep ok      xkeyboard-config -> /var/tmp/pgb-poc/91-qt-xcb/prefix
 dep have    libxcb
-dep have    libxkbcommon
+dep have    libxml2
+dep skip    wayland-1.26.0-dev (in the skip list)
+dep skip    wayland-protocols-1.49 (in the skip list)
+patches     0 applied (-p1)
+pgb: dropped store-path flag: -Dxkb-config-root=/nix/store/9ndc176kmp1fz9ja64zxwq5r2r3g6695-xkeyboard-config-2.48/etc/X11/xkb
+pgb: dropped store-path flag: -Dx-locale-root=/nix/store/62qx8cgv8h24cq4vgh5ipyflwg1naykl-libx11-1.8.13/share/X11/locale
+build system: meson ninja pkg-config (mesonFlags)
+round 1: configure -Dxkb-config-extra-path=/etc/xkb -Denable-docs=true -Denable-wayland=true
+round 1: FAILED -> add:-Denable-wayland=false
+round 2: configure -Dxkb-config-extra-path=/etc/xkb -Denable-docs=true -Denable-wayland=true -Denable-wayland=false
+round 2: FAILED -> add:-Denable-docs=false
+round 3: configure -Dxkb-config-extra-path=/etc/xkb -Denable-docs=true -Denable-wayland=true -Denable-wayland=false -Denable-docs=false
+round 3: built
+dep ok      libxkbcommon -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb-util  (depth 1)
+dep have    libxcb
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-util -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb-image  (depth 1)
+dep have    xorgproto
+dep have    libxcb
 dep have    libxcb-util
-dep have    libxcb-image
-dep have    libxcb-keysyms
-dep have    libxcb-render-util
-dep have    libxcb-wm
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-image -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb-keysyms  (depth 1)
+dep have    libxcb
+dep have    xorgproto
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-keysyms -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb-render-util  (depth 1)
+dep have    libxcb
+dep have    xorgproto
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-render-util -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb-wm  (depth 1)
+dep have    libxcb
+dep have    xorgproto
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-wm -> /var/tmp/pgb-poc/91-qt-xcb/prefix
 dep have    libxdmcp
-dep skip    libxtst-1.2.5 (in NIX_DEP_SKIP)
-dep have    libxcb-cursor
-dep skip    libepoxy-1.5.10-dev (in NIX_DEP_SKIP)
-dep skip    cups-2.4.19-dev (in NIX_DEP_SKIP)
-dep skip    wayland-1.26.0-dev (in NIX_DEP_SKIP)
-dep skip    wayland-scanner-1.26.0-dev (in NIX_DEP_SKIP)
+dep skip    libxtst-1.2.5 (in the skip list)
+dep build   libxcb-cursor  (depth 1)
+dep have    libxcb
+dep have    libxcb-image
+dep have    libxcb-render-util
+dep have    xorgproto
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-cursor -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep skip    libepoxy-1.5.10-dev (in the skip list)
+dep skip    cups-2.4.19-dev (in the skip list)
+dep skip    wayland-1.26.0-dev (in the skip list)
+dep skip    wayland-scanner-1.26.0-dev (in the skip list)
+dep retry   4 still missing, 10 landed this pass
+dep build   libx11  (depth 1)
+dep have    xorgproto
+dep have    libpthread-stubs
+dep have    libxcb
+dep have    xtrans
+dep have    xorgproto
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libx11 -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxext  (depth 1)
+dep have    libx11
+dep have    xorgproto
+dep have    xorgproto
+dep have    libxau
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxext -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxi  (depth 1)
+dep have    xorgproto
+dep have    libx11
+dep have    libxext
+dep build   libxfixes  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxfixes -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep have    xorgproto
+dep have    libx11
+dep have    libxext
+dep have    libxfixes
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxi -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxrender  (depth 1)
+dep have    xorgproto
+dep have    libx11
+dep have    xorgproto
+dep have    libx11
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxrender -> /var/tmp/pgb-poc/91-qt-xcb/prefix
 
 built into  /var/tmp/pgb-poc/91-qt-xcb/prefix
   ok    libpthread-stubs
@@ -86,109 +784,42 @@ built into  /var/tmp/pgb-poc/91-qt-xcb/prefix
   ok    xorgproto
   ok    xtrans
 /usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a(xcb_util.o): in function `_xcb_open_tcp':
-/root/.local/state/pgb/nix-deps/1052447777/libxcb/build/libxcb-1.17.0/src/xcb_util.c:408: warning: Using 'getaddrinfo' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/root/.local/state/pgb/nix-deps/1e773b4f/libxcb/build/libxcb-1.17.0/src/xcb_util.c:408: warning: Using 'getaddrinfo' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+'/usr/bin/cmake' '-DCMAKE_PREFIX_PATH=/var/tmp/pgb-poc/91-qt-xcb/prefix' '-DTEST_xcb_syslibs=ON' '-DCMAKE_C_STANDARD_LIBRARIES=-Wl,--start-group -lxcb -lXau -lXdmcp -lxcb-xkb -lxcb-util -lxcb-image -lxcb-keysyms -lxcb-render-util -lxcb-icccm -lxcb-cursor -lxcb-render -lxcb-shm -lxcb-shape -lxcb-randr -lxcb-xfixes -lxcb-sync -lxcb-xinerama -lxcb-dri3 -lxcb-present -lxcb-glx -lxcb-xinput -lxkbcommon -lxkbcommon-x11 -Wl,--end-group -lpthread -ldl -lm' '-DCMAKE_CXX_STANDARD_LIBRARIES=-Wl,--start-group -lxcb -lXau -lXdmcp -lxcb-xkb -lxcb-util -lxcb-image -lxcb-keysyms -lxcb-render-util -lxcb-icccm -lxcb-cursor -lxcb-render -lxcb-shm -lxcb-shape -lxcb-randr -lxcb-xfixes -lxcb-sync -lxcb-xinerama -lxcb-dri3 -lxcb-present -lxcb-glx -lxcb-xinput -lxkbcommon -lxkbcommon-x11 -Wl,--end-group -lpthread -ldl -lm' '-DQT_INTERNAL_CALLED_FROM_CONFIGURE:BOOL=TRUE' '-DFEATURE_testlib=OFF' '-DCMAKE_INSTALL_PREFIX=/var/tmp/pgb-poc/91-qt-xcb/inst' '-DQT_QPA_PLATFORMS=xcb' '-DQT_QPA_DEFAULT_PLATFORM=xcb' '-DBUILD_SHARED_LIBS=OFF' '-DQT_BUILD_EXAMPLES=FALSE' '-DQT_BUILD_TESTS=FALSE' '-DCMAKE_BUILD_TYPE=Release' '-DFEATURE_force_bundled_libs=ON' '-DFEATURE_xcb=ON' '-DFEATURE_xkbcommon=ON' '-DINPUT_bundled_xcb_xinput=yes' '-DINPUT_opengl=no' '-DFEATURE_dbus=OFF' '-DFEATURE_glib=OFF' '-DFEATURE_icu=OFF' '-DINPUT_openssl=linked' '-DFEATURE_sql_sqlite=ON' '-DFEATURE_system_sqlite=OFF' '-DFEATURE_cups=OFF' '-DFEATURE_fontconfig=OFF' '-DFEATURE_libudev=OFF' '-G' 'Ninja' '/var/tmp/pgb-poc/91-qt-xcb/qtbase'
 -- The CXX compiler identification is GNU 12.2.0
+-- The C compiler identification is GNU 12.2.0
 -- Detecting CXX compiler ABI info
 -- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: /root/.local/state/pgb/bin-3966734765/c++ - skipped
+-- Check for working CXX compiler: /root/.local/state/pgb/bin-2814651800/c++ - skipped
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
--- Performing Test CMAKE_HAVE_LIBC_PTHREAD
--- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
--- Found Threads: TRUE  
--- Using Qt bundled ZLIB.
--- Found WrapZLIB: TRUE (found version "6.11.1") 
--- Performing Test HAVE_STDATOMIC
--- Performing Test HAVE_STDATOMIC - Success
--- Found WrapAtomic: TRUE  
--- Looking for backtrace
--- Looking for backtrace - found
--- backtrace facility detected in default set of libraries
--- Found Backtrace: /usr/include  
--- Using Qt bundled PCRE2.
--- Found WrapPCRE2: TRUE (found version "6.11.1") 
--- Performing Test HAVE_GETTIME
--- Performing Test HAVE_GETTIME - Success
--- Performing Test HAVE_SHM_OPEN_SHM_UNLINK
--- Performing Test HAVE_SHM_OPEN_SHM_UNLINK - Success
--- Found WrapRt: TRUE  
--- Using Qt bundled PNG.
--- Found WrapPNG: TRUE (found version "6.11.1") 
--- Using Qt bundled Harfbuzz.
--- Found WrapHarfbuzz: TRUE (found version "6.11.1") 
--- Using Qt bundled Freetype.
--- Found WrapFreetype: TRUE (found version "6.11.1") 
--- Found XKB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxkbcommon.a (found suitable version "1.13.2", minimum required is "0.9.0") 
--- Using Qt bundled Jpeg.
--- Found WrapJpeg: TRUE (found version "6.11.1") 
--- Found OpenSSL: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libcrypto.a (found version "3.6.3")  
--- Found WrapOpenSSLHeaders: /var/tmp/pgb-poc/91-qt-xcb/prefix/include (found version "3.6.3") 
--- Found WrapOpenSSL: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libcrypto.a (found version "3.6.3") 
--- Checking for module 'xkbcommon-x11>=0.4.1'
---   Found xkbcommon-x11, version 1.13.2
--- XCB: CURSOR requires XCB
--- Found XCB_XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a (found version "1.17.0") 
--- Found XCB_CURSOR: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a (found version "0.1.6") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a (found version "1.17.0") found components: CURSOR 
--- XCB: ICCCM requires XCB
--- Found XCB_ICCCM: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a (found version "0.4.2") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a (found version "1.17.0") found components: ICCCM 
--- XCB: UTIL requires XCB
--- Found XCB_UTIL: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a (found version "0.4.1") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a (found version "1.17.0") found components: UTIL 
--- XCB: IMAGE requires XCB;SHM;AUX
--- XCB: IMAGE requires XCB;SHM;AUX
--- XCB: IMAGE requires XCB;SHM;AUX
--- Found XCB_SHM: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a (found version "1.17.0") 
--- Found XCB_AUX: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a (found version "0.4.1") 
--- Found XCB_IMAGE: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a (found version "0.4.1") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a (found version "1.17.0") found components: IMAGE 
--- XCB: KEYSYMS requires XCB
--- Found XCB_KEYSYMS: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a (found version "0.4.1") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a (found version "1.17.0") found components: KEYSYMS 
--- XCB: RANDR requires XCB
--- Found XCB_RANDR: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-randr.a (found version "1.17.0") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-randr.a (found version "1.17.0") found components: RANDR 
--- XCB: RENDER requires XCB
--- Found XCB_RENDER: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render.a (found version "1.17.0") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-randr.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render.a (found version "1.17.0") found components: RENDER 
--- XCB: RENDERUTIL requires XCB;RENDER
--- XCB: RENDERUTIL requires XCB;RENDER
--- Found XCB_RENDERUTIL: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render-util.a (found version "0.3.10") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-randr.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render-util.a (found version "1.17.0") found components: RENDERUTIL 
--- XCB: SHAPE requires XCB
--- Found XCB_SHAPE: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shape.a (found version "1.17.0") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-randr.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shape.a (found version "1.17.0") found components: SHAPE 
--- XCB: SHM requires XCB
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-randr.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shape.a (found version "1.17.0") found components: SHM 
--- XCB: SYNC requires XCB
--- Found XCB_SYNC: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-sync.a (found version "1.17.0") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-randr.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shape.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-sync.a (found version "1.17.0") found components: SYNC 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-randr.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shape.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-sync.a (found suitable version "1.17.0", minimum required is "1.11") found components: XCB 
--- XCB: XFIXES requires XCB;RENDER;SHAPE
--- XCB: XFIXES requires XCB;RENDER;SHAPE
--- XCB: XFIXES requires XCB;RENDER;SHAPE
--- Found XCB_XFIXES: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-xfixes.a (found version "1.17.0") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-randr.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shape.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-sync.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-xfixes.a (found version "1.17.0") found components: XFIXES 
--- XCB: XKB requires XCB
--- Found XCB_XKB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-xkb.a (found version "1.17.0") 
--- Found XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-cursor.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-icccm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shm.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-image.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-keysyms.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-randr.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-render-util.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-shape.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-sync.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-xfixes.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb-xkb.a (found version "1.17.0") found components: XKB 
--- Found X11_XCB: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libX11-xcb.a (found version "1.8.13") 
--- Found X11: /var/tmp/pgb-poc/91-qt-xcb/prefix/include   
--- Looking for XOpenDisplay in /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libX11.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libXext.a
--- Looking for XOpenDisplay in /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libX11.a;/var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libXext.a - not found
--- Looking for dnet_ntoa in dnet
--- Looking for dnet_ntoa in dnet - not found
--- Looking for dnet_ntoa in dnet_stub
--- Looking for dnet_ntoa in dnet_stub - not found
--- Looking for gethostbyname
--- Looking for gethostbyname - found
--- Looking for connect
--- Looking for connect - found
--- Looking for remove
--- Looking for remove - found
--- Looking for shmat
--- Looking for shmat - found
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /root/.local/state/pgb/bin-2814651800/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- The ASM compiler identification is GNU
+-- Found assembler: /root/.local/state/pgb/bin-2814651800/cc
+-- CMAKE_BUILD_TYPE was already explicitly set to: 'Release'
+
+-- Configuration summary has been written to /var/tmp/pgb-poc/91-qt-xcb/build/config.summary
+
+Note: Using static linking will disable the use of dynamically loaded plugins. Make sure to import all needed static plugins, or compile needed modules into the library.
+Note: Disabling X11 Accessibility Bridge: D-Bus or AT-SPI is missing.
+
+-- 
+
+Qt is now configured for building. Just run 'cmake --build . --parallel'
+
+Once everything is built, you must run 'cmake --install .'
+Qt will be installed into '/var/tmp/pgb-poc/91-qt-xcb/inst'
+
+To configure and build other Qt modules, you can use the following convenience script:
+        /var/tmp/pgb-poc/91-qt-xcb/inst/bin/qt-configure-module
+
+If reconfiguration fails for some reason, try removing 'CMakeCache.txt' from the build directory
+Alternatively, you can add the --fresh flag to your CMake flags.
+
 -- Configuring done
 -- Generating done
 CMake Warning:
@@ -197,22 +828,1390 @@ CMake Warning:
     CMAKE_C_STANDARD_LIBRARIES
 
 
--- Build files have been written to: /var/tmp/pgb-poc/91-qt-xcb/app/build
-[ 25%] Automatic MOC and UIC for target qtxcbprobe
-[ 25%] Built target qtxcbprobe_autogen
-[ 50%] Building CXX object CMakeFiles/qtxcbprobe.dir/qtxcbprobe_autogen/mocs_compilation.cpp.o
-[ 75%] Building CXX object CMakeFiles/qtxcbprobe.dir/main.cpp.o
-[100%] Linking CXX executable qtxcbprobe
-/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/inst/lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+-- Build files have been written to: /var/tmp/pgb-poc/91-qt-xcb/build
+[1/1644] Generating mkspecs/qmodule.pri
+[2/1644] Generating ../../../mkspecs/modules/qt_ext_pcre2.pri
+[3/1644] Generating ../../mkspecs/modules/qt_lib_core_private.pri
+[4/1644] Generating ../../../mkspecs/modules/qt_ext_libpng.pri
+[5/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_chartables.c.o
+[6/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_chkdint.c.o
+[7/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile_cgroup.c.o
+[8/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_auto_possess.c.o
+[9/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_config.c.o
+[10/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_context.c.o
+[11/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile_class.c.o
+[12/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_error.c.o
+[13/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_extuni.c.o
+[14/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_find_bracket.c.o
+[15/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_dfa_match.c.o
+[16/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_maketables.c.o
+[17/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile.c.o
+[18/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match_data.c.o
+[19/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match_next.c.o
+[20/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_newline.c.o
+[21/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_ord2utf.c.o
+[22/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_pattern_info.c.o
+[23/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_script_run.c.o
+[24/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_serialize.c.o
+[25/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_string_utils.c.o
+[26/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_study.c.o
+[27/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_substitute.c.o
+[28/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_substring.c.o
+[29/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_tables.c.o
+[30/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_ucd.c.o
+[31/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_valid_utf.c.o
+[32/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_xclass.c.o
+[33/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcapistd_16.c.o
+[34/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jccolor_16.c.o
+[35/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcdiffct_16.c.o
+[36/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jclossls_16.c.o
+[37/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcmainct_16.c.o
+[38/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcprepct_16.c.o
+[39/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match.c.o
+[40/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcsample_16.c.o
+[41/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdapistd_16.c.o
+[42/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jddiffct_16.c.o
+[43/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdcolor_16.c.o
+[44/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdlossls_16.c.o
+[45/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdpostct_16.c.o
+[46/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdmainct_16.c.o
+[47/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jutils_16.c.o
+[48/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcapistd_12.c.o
+[49/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdsample_16.c.o
+[50/1644] Linking C static library lib/libQt6BundledLibjpeg16bits.a
+[51/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcdiffct_12.c.o
+[52/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jccolor_12.c.o
+[53/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jclossls_12.c.o
+[54/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcmainct_12.c.o
+[55/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcprepct_12.c.o
+[56/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcsample_12.c.o
+[57/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdapistd_12.c.o
+[58/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jddiffct_12.c.o
+[59/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdlossls_12.c.o
+[60/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdmainct_12.c.o
+[61/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdcolor_12.c.o
+[62/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdpostct_12.c.o
+[63/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jutils_12.c.o
+[64/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdsample_12.c.o
+[65/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jccoefct_12.c.o
+[66/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcdctmgr_12.c.o
+[67/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jddctmgr_12.c.o
+[68/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdcoefct_12.c.o
+[69/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jfdctfst_12.c.o
+[70/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jfdctint_12.c.o
+[71/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctflt_12.c.o
+[72/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdmerge_12.c.o
+[73/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctfst_12.c.o
+[74/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctred_12.c.o
+[75/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jquant1_12.c.o
+[76/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctint_12.c.o
+[77/1644] Generating ../../../mkspecs/modules/qt_ext_libjpeg.pri
+[78/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jquant2_12.c.o
+[79/1644] Linking C static library lib/libQt6BundledLibjpeg12bits.a
+[80/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_jit_compile.c.o
+[81/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcapistd.c.o
+[82/1644] Linking C static library lib/libQt6BundledPcre2.a
+[83/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcdiffct.c.o
+[84/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcmainct.c.o
+[85/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jclossls.c.o
+[86/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jccolor.c.o
+[87/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcprepct.c.o
+[88/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcsample.c.o
+[89/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdapistd.c.o
+[90/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jddiffct.c.o
+[91/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdlossls.c.o
+[92/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdmainct.c.o
+[93/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdpostct.c.o
+[94/1644] Building CXX object src/tools/syncqt/CMakeFiles/syncqt.dir/main.cpp.o
+[95/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jutils.c.o
+[96/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdsample.c.o
+[97/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdcolor.c.o
+[98/1644] Linking CXX executable libexec/syncqt
+[99/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jccoefct.c.o
+[100/1644] Running syncqt.cpp for module: QtPng
+[101/1644] Running syncqt.cpp for module: QtZlib
+[102/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcdctmgr.c.o
+[103/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jddctmgr.c.o
+[104/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jfdctfst.c.o
+[105/1644] Running syncqt.cpp for module: QtCore
+[106/1644] Generating version linker script for target Core
+[107/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jfdctint.c.o
+[108/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdcoefct.c.o
+[109/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdmerge.c.o
+[110/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qassert.cpp.o
+[111/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qalloc.cpp.o
+[112/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qabstractfileengine.cpp.o
+[113/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qtenvironmentvariables.cpp.o
+[114/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfile.cpp.o
+[115/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qdir.cpp.o
+[116/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfiledevice.cpp.o
+[117/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystemengine.cpp.o
+[118/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystementry.cpp.o
+[119/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfileinfo.cpp.o
+[120/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine_iterator.cpp.o
+[121/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine.cpp.o
+[122/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qiodevice.cpp.o
+[123/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qsystemerror.cpp.o
+[124/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qcborcommon.cpp.o
+[125/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qmetatype.cpp.o
+[126/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qcoreapplication.cpp.o
+[127/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qcborstreamwriter.cpp.o
+[128/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsoncbor.cpp.o
+[129/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonarray.cpp.o
+[130/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsondocument.cpp.o
+[131/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qcborvalue.cpp.o
+[132/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonobject.cpp.o
+[133/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonparser.cpp.o
+[134/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonwriter.cpp.o
+[135/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonvalue.cpp.o
+[136/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qbytearraylist.cpp.o
+[137/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qtextstream.cpp.o
+[138/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qbytearraymatcher.cpp.o
+[139/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qbytearray.cpp.o
+[140/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qlatin1stringmatcher.cpp.o
+[141/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qlocale_tools.cpp.o
+[142/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qregularexpression.cpp.o
+[143/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstringbuilder.cpp.o
+[144/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstringconverter.cpp.o
+[145/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstringlist.cpp.o
+[146/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qlocale.cpp.o
+[147/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qgregoriancalendar.cpp.o
+[148/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qcalendar.cpp.o
+[149/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qdatetime.cpp.o
+[150/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qlocaltime.cpp.o
+[151/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstring.cpp.o
+[152/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qromancalendar.cpp.o
+[153/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qtimezone.cpp.o
+[154/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qarraydata.cpp.o
+[155/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qcommandlineoption.cpp.o
+[156/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qringbuffer.cpp.o
+[157/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qcommandlineparser.cpp.o
+[158/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qhash.cpp.o
+[159/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystemengine_unix.cpp.o
+[160/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_auto_possess.c.o
+[161/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_chartables.c.o
+[162/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_chkdint.c.o
+[163/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystemiterator_unix.cpp.o
+[164/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qcore_unix.cpp.o
+[165/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_compile_cgroup.c.o
+[166/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_config.c.o
+[167/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_context.c.o
+[168/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_compile_class.c.o
+[169/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_error.c.o
+[170/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_extuni.c.o
+[171/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_find_bracket.c.o
+[172/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_jit_compile.c.o
+[173/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_maketables.c.o
+[174/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine_unix.cpp.o
+[175/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_match_data.c.o
+[176/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_newline.c.o
+[177/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_ord2utf.c.o
+[178/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_pattern_info.c.o
+[179/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_compile.c.o
+[180/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_script_run.c.o
+[181/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_string_utils.c.o
+[182/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_dfa_match.c.o
+[183/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_serialize.c.o
+[184/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_substring.c.o
+[185/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_tables.c.o
+[186/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_ucd.c.o
+[187/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_valid_utf.c.o
+[188/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_study.c.o
+[189/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_substitute.c.o
+[190/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_xclass.c.o
+[191/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/collectjson.cpp.o
+[192/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_match.c.o
+[193/1644] Linking CXX static library src/tools/bootstrap/libBootstrap.a
+[194/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/parser.cpp.o
+[195/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/generator.cpp.o
+[196/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/main.cpp.o
+[197/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/token.cpp.o
+[198/1644] Building CXX object src/tools/tracepointgen/CMakeFiles/tracepointgen.dir/tracepointgen.cpp.o
+[199/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/preprocessor.cpp.o
+[200/1644] Building CXX object src/tools/tracegen/CMakeFiles/tracegen.dir/helpers.cpp.o
+[201/1644] Building CXX object src/tools/tracegen/CMakeFiles/tracegen.dir/etw.cpp.o
+[202/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/moc.cpp.o
+[203/1644] Linking CXX executable libexec/moc
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x20): warning: Using 'getgrgid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0x20): warning: Using 'getpwuid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[204/1644] Building CXX object src/tools/tracegen/CMakeFiles/tracegen.dir/panic.cpp.o
+[205/1644] Building CXX object src/tools/tracepointgen/CMakeFiles/tracepointgen.dir/parser.cpp.o
+[206/1644] Linking CXX executable libexec/tracepointgen
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x20): warning: Using 'getgrgid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0x20): warning: Using 'getpwuid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[207/1644] Building CXX object src/tools/tracegen/CMakeFiles/tracegen.dir/qtheaders.cpp.o
+[208/1644] Building CXX object src/tools/tracegen/CMakeFiles/tracegen.dir/tracegen.cpp.o
+[209/1644] Building CXX object src/tools/tracegen/CMakeFiles/tracegen.dir/lttng.cpp.o
+[210/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/adler32.c.o
+[211/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/compress.c.o
+[212/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/crc32.c.o
+[213/1644] Building CXX object src/tools/tracegen/CMakeFiles/tracegen.dir/ctf.cpp.o
+[214/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/gzclose.c.o
+[215/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/gzlib.c.o
+[216/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/deflate.c.o
+[217/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/gzread.c.o
+[218/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/gzwrite.c.o
+[219/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/inffast.c.o
+[220/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/infback.c.o
+[221/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/inftrees.c.o
+[222/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/trees.c.o
+[223/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/inflate.c.o
+[224/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/uncompr.c.o
+[225/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/zutil.c.o
+[226/1644] Linking C static library lib/libQt6BundledZLIB.a
+[227/1644] Generating .rcc/qmimeprovider_database.cpp
+[228/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jidctflt.c.o
+[229/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jidctfst.c.o
+[230/1644] Building CXX object src/tools/tracegen/CMakeFiles/tracegen.dir/provider.cpp.o
+[231/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jidctint.c.o
+[232/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jidctred.c.o
+[233/1644] Linking CXX executable libexec/tracegen
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x20): warning: Using 'getgrgid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0x20): warning: Using 'getpwuid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[234/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jquant1.c.o
+[235/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jaricom.c.o
+[236/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jquant2.c.o
+[237/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcapimin.c.o
+[238/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcarith.c.o
+[239/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcicc.c.o
+[240/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcinit.c.o
+[241/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jclhuff.c.o
+[242/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcmarker.c.o
+[243/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcmaster.c.o
+[244/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcomapi.c.o
+[245/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcparam.c.o
+[246/1644] Building CXX object src/tools/cmake_automoc_parser/CMakeFiles/cmake_automoc_parser.dir/main.cpp.o
+[247/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jcphuff.c.o
+[248/1644] Linking CXX executable libexec/cmake_automoc_parser
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x20): warning: Using 'getgrgid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0x20): warning: Using 'getpwuid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[249/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jctrans.c.o
+[250/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdapimin.c.o
+[251/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdatadst.c.o
+[252/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdarith.c.o
+[253/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdatasrc.c.o
+[254/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdicc.c.o
+[255/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdinput.c.o
+[256/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdlhuff.c.o
+[257/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdhuff.c.o
+[258/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdmaster.c.o
+[259/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdmarker.c.o
+[260/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdtrans.c.o
+[261/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jerror.c.o
+[262/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jdphuff.c.o
+[263/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jfdctflt.c.o
+[264/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jmemnobs.c.o
+[265/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jpeg_nbits.c.o
+[266/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jmemmgr.c.o
+[267/1644] Running syncqt.cpp for module: QtJpeg
+[268/1644] Generating ../../../mkspecs/modules/qt_ext_freetype.pri
+[269/1644] Generating ../../../mkspecs/modules/qt_ext_harfbuzz.pri
+[270/1644] Running syncqt.cpp for module: QtFreetype
+[271/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg.dir/jchuff.c.o
+[272/1644] Linking C static library lib/libQt6BundledLibjpeg.a
+[273/1644] Automatic MOC for target Core
+[274/1644] Generating prl file for target Core
+[275/1644] Generating kernel/moc_qobject.cpp, kernel/moc_qobject.cpp.json
+[276/1644] Running AUTOMOC file extraction for target Core
+[277/1644] Running moc --collect-json for target Core
+[278/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-aat-map.cc.o
+[279/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/hb-dummy.cc.o
+[280/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qsimd.cpp.o
+[281/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/cmake_pch.hxx.gch
+[282/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/Core_autogen/mocs_compilation.cpp.o
+[283/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsocketnotifier.cpp.o
+[284/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/compat/removed_api.cpp.o
+[285/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/archdetect.cpp.o
+[286/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qalloc.cpp.o
+[287/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qassert.cpp.o
+[288/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qcompare.cpp.o
+[289/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qhash.cpp.o
+[290/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qendian.cpp.o
+[291/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qfloat16.cpp.o
+[292/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qhooks.cpp.o
+[293/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qlibraryinfo.cpp.o
+[294/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qmalloc.cpp.o
+[295/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qlogging.cpp.o
+[296/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qnumeric.cpp.o
+[297/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qoperatingsystemversion.cpp.o
+[298/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-aat-layout.cc.o
+[299/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qsysinfo.cpp.o
+[300/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qtypes.cpp.o
+[301/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qrandom.cpp.o
+[302/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/q23utility.cpp.o
+[303/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsystemsemaphore.cpp.o
+[304/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qtenvironmentvariables.cpp.o
+[305/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsharedmemory.cpp.o
+[306/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qabstractfileengine.cpp.o
+[307/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qglobal.cpp.o
+[308/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qbuffer.cpp.o
+[309/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qtipccommon.cpp.o
+[310/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdataurl.cpp.o
+[311/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdebug.cpp.o
+[312/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdiriterator.cpp.o
+[313/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfile.cpp.o
+[314/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfiledevice.cpp.o
+[315/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdirlisting.cpp.o
+[316/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdir.cpp.o
+[317/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfileinfo.cpp.o
+[318/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemengine.cpp.o
+[319/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfileselector.cpp.o
+[320/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystementry.cpp.o
+[321/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfsfileengine_iterator.cpp.o
+[322/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfsfileengine.cpp.o
+[323/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qloggingcategory.cpp.o
+[324/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qipaddress.cpp.o
+[325/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qiodevice.cpp.o
+[326/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qlockfile.cpp.o
+[327/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qnoncontiguousbytedevice.cpp.o
+[328/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qresource_iterator.cpp.o
+[329/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qloggingregistry.cpp.o
+[330/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qsavefile.cpp.o
+[331/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstandardpaths.cpp.o
+[332/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstorageinfo.cpp.o
+[333/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qresource.cpp.o
+[334/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qtemporaryfile.cpp.o
+[335/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qtemporarydir.cpp.o
+[336/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurlquery.cpp.o
+[337/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurlidna.cpp.o
+[338/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurlrecode.cpp.o
+[339/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qabstractnativeeventfilter.cpp.o
+[340/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qassociativeiterable.cpp.o
+[341/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurl.cpp.o
+[342/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qabstracteventdispatcher.cpp.o
+[343/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qbasictimer.cpp.o
+[344/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qzip.cpp.o
+[345/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qcoreevent.cpp.o
+[346/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qchronotimer.cpp.o
+[347/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qelapsedtimer.cpp.o
+[348/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qdeadlinetimer.cpp.o
+[349/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qiterable.cpp.o
+[350/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmath.cpp.o
+[351/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetaassociation.cpp.o
+[352/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qeventloop.cpp.o
+[353/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetacontainer.cpp.o
+[354/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetasequence.cpp.o
+[355/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetaobject.cpp.o
+[356/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetaobjectbuilder.cpp.o
+[357/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qcoreapplication.cpp.o
+[358/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qobjectcleanuphandler.cpp.o
+[359/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmimedata.cpp.o
+[360/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsequentialiterable.cpp.o
+[361/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qproperty.cpp.o
+[362/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsignalmapper.cpp.o
+[363/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsystemerror.cpp.o
+[364/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtestsupport_core.cpp.o
+[365/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsingleshottimer.cpp.o
+[366/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtimer.cpp.o
+[367/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qobject.cpp.o
+[368/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qfactoryinterface.cpp.o
+[369/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtranslator.cpp.o
+[370/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetatype.cpp.o
+[371/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qpluginloader.cpp.o
+[372/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/quuid.cpp.o
+[373/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborcommon.cpp.o
+[374/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qvariant.cpp.o
+[375/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qdatastream.cpp.o
+[376/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcbordiagnostic.cpp.o
+[377/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonarray.cpp.o
+[378/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qfactoryloader.cpp.o
+[379/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsondocument.cpp.o
+[380/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonobject.cpp.o
+[381/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsoncbor.cpp.o
+[382/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborvalue.cpp.o
+[383/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonparser.cpp.o
+[384/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qxmlutils.cpp.o
+[385/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonwriter.cpp.o
+[386/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qanystringview.cpp.o
+[387/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qbytearraylist.cpp.o
+[388/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qbytearraymatcher.cpp.o
+[389/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonvalue.cpp.o
+[390/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlatin1stringmatcher.cpp.o
+[391/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qcollator.cpp.o
+[392/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qtextstream.cpp.o
+[393/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qbytearray.cpp.o
+[394/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringbuilder.cpp.o
+[395/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlocale_tools.cpp.o
+[396/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringlist.cpp.o
+[397/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringtokenizer.cpp.o
+[398/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringconverter.cpp.o
+[399/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringview.cpp.o
+[400/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qtextboundaryfinder.cpp.o
+[401/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qvsnprintf.cpp.o
+[402/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qunicodetools.cpp.o
+[403/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qrunnable.cpp.o
+[404/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qatomicwait.cpp.o
+[405/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlocale.cpp.o
+[406/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthread.cpp.o
+[407/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qsemaphore.cpp.o
+[408/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthreadpool.cpp.o
+[409/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qgregoriancalendar.cpp.o
+[410/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstring.cpp.o
+[411/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qjuliancalendar.cpp.o
+[412/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qcalendar.cpp.o
+[413/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qlocaltime.cpp.o
+[414/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qdatetime.cpp.o
+[415/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qmilankoviccalendar.cpp.o
+[416/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qromancalendar.cpp.o
+[417/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcontiguouscache.cpp.o
+[418/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qbitarray.cpp.o
+[419/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qfreelist.cpp.o
+[420/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qarraydata.cpp.o
+[421/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qfunctionaltools_impl.cpp.o
+[422/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezone.cpp.o
+[423/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qmargins.cpp.o
+[424/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qpoint.cpp.o
+[425/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qrefcount.cpp.o
+[426/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qrect.cpp.o
+[427/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qline.cpp.o
+[428/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qshareddata.cpp.o
+[429/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qringbuffer.cpp.o
+[430/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qsize.cpp.o
+[431/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qtyperevision.cpp.o
+[432/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qsharedpointer.cpp.o
+[433/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/quniquehandle_types.cpp.o
+[434/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qversiontagging.cpp.o
+[435/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qxmlstreamgrammar.cpp.o
+[436/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qversionnumber.cpp.o
+[437/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qanimationgroup.cpp.o
+[438/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcryptographichash.cpp.o
+[439/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qabstractanimation.cpp.o
+[440/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qparallelanimationgroup.cpp.o
+[441/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qpauseanimation.cpp.o
+[442/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qsequentialanimationgroup.cpp.o
+[443/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qpropertyanimation.cpp.o
+[444/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qxmlstream.cpp.o
+[445/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qrandomaccessasyncfile.cpp.o
+[446/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qvariantanimation.cpp.o
+[447/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qiooperation.cpp.o
+[448/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemiterator_unix.cpp.o
+[449/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfsfileengine_unix.cpp.o
+[450/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemengine_unix.cpp.o
+[451/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qcore_unix.cpp.o
+[452/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qlockfile_unix.cpp.o
+[453/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtimerinfo_unix.cpp.o
+[454/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qrandomaccessasyncfile_threadpool.cpp.o
+In file included from /usr/include/c++/12/algorithm:60,
+                 from /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/global/qflags.h:11,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/qflags.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/global/qglobal.h:50,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/qglobal.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/global/qt_pch.h:21,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/src/corelib/CMakeFiles/Core.dir/cmake_pch.hxx:5,
+                 from <command-line>:
+In static member function 'static _Tp* std::__copy_move<_IsMove, true, std::random_access_iterator_tag>::__copy_m(const _Tp*, const _Tp*, _Tp*) [with _Tp = QSpan<std::byte>; bool _IsMove = false]',
+    inlined from '_OI std::__copy_move_a2(_II, _II, _OI) [with bool _IsMove = false; _II = const QSpan<byte>*; _OI = QSpan<byte>*]' at /usr/include/c++/12/bits/stl_algobase.h:495:30,
+    inlined from '_OI std::__copy_move_a1(_II, _II, _OI) [with bool _IsMove = false; _II = const QSpan<byte>*; _OI = QSpan<byte>*]' at /usr/include/c++/12/bits/stl_algobase.h:522:42,
+    inlined from '_OI std::__copy_move_a(_II, _II, _OI) [with bool _IsMove = false; _II = const QSpan<byte>*; _OI = QSpan<byte>*]' at /usr/include/c++/12/bits/stl_algobase.h:529:31,
+    inlined from '_OI std::copy(_II, _II, _OI) [with _II = const QSpan<byte>*; _OI = QSpan<byte>*]' at /usr/include/c++/12/bits/stl_algobase.h:620:7,
+    inlined from 'void QVLABase<T>::assign_impl(qsizetype, void*, Iterator, Iterator, std::forward_iterator_tag) [with Iterator = const QSpan<std::byte>*; T = QSpan<std::byte>]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/tools/qvarlengtharray.h:871:24,
+    inlined from 'void QVLABase<T>::assign_impl(qsizetype, void*, Iterator, Iterator) [with Iterator = const QSpan<std::byte>*; T = QSpan<std::byte>]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/tools/qvarlengtharray.h:910:16,
+    inlined from 'QVarLengthArray<T, Prealloc>& QVarLengthArray<T, Prealloc>::assign(InputIterator, InputIterator) [with InputIterator = const QSpan<std::byte>*; typename std::enable_if<std::is_convertible<typename std::iterator_traits<_InputIterator>::iterator_category, std::input_iterator_tag>::value, bool>::type <anonymous> = true; T = QSpan<std::byte>; long long int Prealloc = 10]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/tools/qvarlengtharray.h:544:24,
+    inlined from 'QVarLengthArray<T, Prealloc>::QVarLengthArray(InputIterator, InputIterator) [with InputIterator = const QSpan<std::byte>*; typename std::enable_if<std::is_convertible<typename std::iterator_traits<_InputIterator>::iterator_category, std::input_iterator_tag>::value, bool>::type <anonymous> = true; T = QSpan<std::byte>; long long int Prealloc = 10]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/tools/qvarlengtharray.h:370:15,
+    inlined from 'QtPrivate::QIOOperationDataStorage::QIOOperationDataStorage(QSpan<const QSpan<std::byte> >)' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/io/qiooperation_p_p.h:53:16,
+    inlined from 'virtual QIOVectoredReadOperation* QRandomAccessAsyncFileThreadPoolBackend::readInto(qint64, QSpan<const QSpan<std::byte> >)' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/io/qrandomaccessasyncfile_threadpool.cpp:254:71:
+/usr/include/c++/12/bits/stl_algobase.h:431:30: warning: 'void* __builtin_memcpy(void*, const void*, long unsigned int)' specified bound between 9223372036854775808 and 18446744073709551615 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
+  431 |             __builtin_memmove(__result, __first, sizeof(_Tp) * _Num);
+      |             ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In static member function 'static _Tp* std::__copy_move<_IsMove, true, std::random_access_iterator_tag>::__copy_m(const _Tp*, const _Tp*, _Tp*) [with _Tp = QSpan<const std::byte, 18446744073709551615>; bool _IsMove = false]',
+    inlined from '_OI std::__copy_move_a2(_II, _II, _OI) [with bool _IsMove = false; _II = const QSpan<const byte, 18446744073709551615>*; _OI = QSpan<const byte, 18446744073709551615>*]' at /usr/include/c++/12/bits/stl_algobase.h:495:30,
+    inlined from '_OI std::__copy_move_a1(_II, _II, _OI) [with bool _IsMove = false; _II = const QSpan<const byte, 18446744073709551615>*; _OI = QSpan<const byte, 18446744073709551615>*]' at /usr/include/c++/12/bits/stl_algobase.h:522:42,
+    inlined from '_OI std::__copy_move_a(_II, _II, _OI) [with bool _IsMove = false; _II = const QSpan<const byte, 18446744073709551615>*; _OI = QSpan<const byte, 18446744073709551615>*]' at /usr/include/c++/12/bits/stl_algobase.h:529:31,
+    inlined from '_OI std::copy(_II, _II, _OI) [with _II = const QSpan<const byte, 18446744073709551615>*; _OI = QSpan<const byte, 18446744073709551615>*]' at /usr/include/c++/12/bits/stl_algobase.h:620:7,
+    inlined from 'void QVLABase<T>::assign_impl(qsizetype, void*, Iterator, Iterator, std::forward_iterator_tag) [with Iterator = const QSpan<const std::byte, 18446744073709551615>*; T = QSpan<const std::byte, 18446744073709551615>]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/tools/qvarlengtharray.h:871:24,
+    inlined from 'void QVLABase<T>::assign_impl(qsizetype, void*, Iterator, Iterator) [with Iterator = const QSpan<const std::byte, 18446744073709551615>*; T = QSpan<const std::byte, 18446744073709551615>]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/tools/qvarlengtharray.h:910:16,
+    inlined from 'QVarLengthArray<T, Prealloc>& QVarLengthArray<T, Prealloc>::assign(InputIterator, InputIterator) [with InputIterator = const QSpan<const std::byte, 18446744073709551615>*; typename std::enable_if<std::is_convertible<typename std::iterator_traits<_InputIterator>::iterator_category, std::input_iterator_tag>::value, bool>::type <anonymous> = true; T = QSpan<const std::byte, 18446744073709551615>; long long int Prealloc = 10]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/tools/qvarlengtharray.h:544:24,
+    inlined from 'QVarLengthArray<T, Prealloc>::QVarLengthArray(InputIterator, InputIterator) [with InputIterator = const QSpan<const std::byte, 18446744073709551615>*; typename std::enable_if<std::is_convertible<typename std::iterator_traits<_InputIterator>::iterator_category, std::input_iterator_tag>::value, bool>::type <anonymous> = true; T = QSpan<const std::byte, 18446744073709551615>; long long int Prealloc = 10]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/tools/qvarlengtharray.h:370:15,
+    inlined from 'QtPrivate::QIOOperationDataStorage::QIOOperationDataStorage(QSpan<const QSpan<const std::byte, 18446744073709551615> >)' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/io/qiooperation_p_p.h:56:16,
+    inlined from 'virtual QIOVectoredWriteOperation* QRandomAccessAsyncFileThreadPoolBackend::writeFrom(qint64, QSpan<const QSpan<const std::byte, 18446744073709551615> >)' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/io/qrandomaccessasyncfile_threadpool.cpp:269:71:
+/usr/include/c++/12/bits/stl_algobase.h:431:30: warning: 'void* __builtin_memcpy(void*, const void*, long unsigned int)' specified bound between 9223372036854775808 and 18446744073709551615 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
+  431 |             __builtin_memmove(__result, __first, sizeof(_Tp) * _Num);
+      |             ~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+[455/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qatomic.cpp.o
+[456/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthread_unix.cpp.o
+[457/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qlatch.cpp.o
+[458/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qmutex.cpp.o
+[459/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qeventdispatcher_unix.cpp.o
+[460/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qreadwritelock.cpp.o
+[461/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qwaitcondition_unix.cpp.o
+[462/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qexception.cpp.o
+[463/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthreadstorage.cpp.o
+[464/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qresultstore.cpp.o
+[465/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qfuturewatcher.cpp.o
+[466/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcommandlineoption.cpp.o
+[467/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/bignum-dtoa.cc.o
+[468/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/cached-powers.cc.o
+[469/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qfutureinterface.cpp.o
+[470/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/bignum.cc.o
+[471/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/fixed-dtoa.cc.o
+[472/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/fast-dtoa.cc.o
+[473/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/double-to-string.cc.o
+[474/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/strtod.cc.o
+[475/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/string-to-double.cc.o
+[476/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcommandlineparser.cpp.o
+[477/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qeasingcurve.cpp.o
+[478/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qtimeline.cpp.o
+[479/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qcollator_posix.cpp.o
+[480/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlocale_unix.cpp.o
+[481/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qhijricalendar.cpp.o
+[482/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qislamiccivilcalendar.cpp.o
+[483/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qregularexpression.cpp.o
+[484/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qjalalicalendar.cpp.o
+[485/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezoneprivate.cpp.o
+[486/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qdatetimeparser.cpp.o
+[487/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemwatcher.cpp.o
+[488/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezoneprivate_tz.cpp.o
+[489/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemwatcher_polling.cpp.o
+[490/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemwatcher_inotify.cpp.o
+[491/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezonelocale.cpp.o
+[492/1644] Building C object src/corelib/CMakeFiles/Core.dir/io/forkfd_qt.c.o
+[493/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qprocess.cpp.o
+[494/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qprocess_unix.cpp.o
+[495/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstandardpaths_unix.cpp.o
+[496/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstorageinfo_linux.cpp.o
+[497/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qsettings.cpp.o
+[498/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qitemselectionmodel.cpp.o
+[499/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qrangemodel.cpp.o
+[500/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qabstractitemmodel.cpp.o
+[501/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qabstractproxymodel.cpp.o
+[502/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qidentityproxymodel.cpp.o
+[503/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qconcatenatetablesproxymodel.cpp.o
+[504/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qtransposeproxymodel.cpp.o
+[505/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qelfparser_p.cpp.o
+[506/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qstringlistmodel.cpp.o
+[507/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qlibrary.cpp.o
+[508/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsharedmemory_posix.cpp.o
+[509/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsharedmemory_systemv.cpp.o
+[510/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qlibrary_unix.cpp.o
+[511/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsystemsemaphore_systemv.cpp.o
+[512/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsystemsemaphore_posix.cpp.o
+[513/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborstreamwriter.cpp.o
+[514/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborstreamreader.cpp.o
+[515/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimemagicrule.cpp.o
+[516/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qsortfilterproxymodel.cpp.o
+[517/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimedatabase.cpp.o
+[518/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimeglobpattern.cpp.o
+[519/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimemagicrulematcher.cpp.o
+[520/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qpermissions.cpp.o
+[521/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimetype.cpp.o
+[522/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngerror.c.o
+[523/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngget.c.o
+[524/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngmem.c.o
+[525/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngpread.c.o
+[526/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/png.c.o
+[527/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngrio.c.o
+[528/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngread.c.o
+[529/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimetypeparser.cpp.o
+[530/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngset.c.o
+[531/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngrutil.c.o
+[532/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngtrans.c.o
+[533/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngwio.c.o
+[534/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngrtran.c.o
+[535/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngwtran.c.o
+[536/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/autofit/afadjust.c.o
+[537/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/autofit/afgsub.c.o
+[538/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngwrite.c.o
+[539/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngwutil.c.o
+[540/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftbbox.c.o
+[541/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftbdf.c.o
+[542/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimeprovider.cpp.o
+[543/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftbitmap.c.o
+[544/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftcid.c.o
+[545/1644] Linking CXX static library lib/libQt6Core.a
+[546/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftfstype.c.o
+[547/1644] Linking CXX static library lib/libQt6BundledLibpng.a
+[548/1644] Automatic MOC for target rcc
+[549/1644] Building CXX object src/tools/rcc/CMakeFiles/rcc.dir/rcc_autogen/mocs_compilation.cpp.o
+[550/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftgasp.c.o
+[551/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/autofit/autofit.c.o
+[552/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftbase.c.o
+[553/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftglyph.c.o
+[554/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftgxval.c.o
+[555/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftinit.c.o
+[556/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftotval.c.o
+[557/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftmm.c.o
+[558/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftpatent.c.o
+[559/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftpfr.c.o
+[560/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftsynth.c.o
+[561/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/fttype1.c.o
+[562/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftwinfnt.c.o
+[563/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftstroke.c.o
+[564/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/bzip2/ftbzip2.c.o
+[565/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/cache/ftcache.c.o
+[566/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/bdf/bdf.c.o
+[567/1644] Building CXX object src/tools/rcc/CMakeFiles/rcc.dir/main.cpp.o
+[568/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/cid/type1cid.c.o
+[569/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/gzip/ftgzip.c.o
+[570/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/lzw/ftlzw.c.o
+[571/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/pcf/pcf.c.o
+[572/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/cff/cff.c.o
+[573/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/pfr/pfr.c.o
+[574/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/psnames/psnames.c.o
+[575/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/pshinter/pshinter.c.o
+[576/1644] Building CXX object src/tools/rcc/CMakeFiles/rcc.dir/rcc.cpp.o
+[577/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/raster/raster.c.o
+[578/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/sdf/sdf.c.o
+[579/1644] Linking CXX executable libexec/rcc
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
 qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0x9e1): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
-/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/inst/lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
 qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1c8): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
-/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/inst/lib/libQt6Widgets.a(qfiledialog.cpp.o): in function `qt_tildeExpansion(QString const&)':
-qfiledialog.cpp:(.text._Z17qt_tildeExpansionRK7QString+0x1a6): warning: Using 'getpwnam_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
-/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/inst/lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
 qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xcc): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
-/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/inst/lib/libQt6Network.a(qhostinfo.cpp.o): in function `QHostInfoAgent::lookup(QString const&)':
-qhostinfo.cpp:(.text._ZN14QHostInfoAgent6lookupERK7QString+0x1a1): warning: Using 'getaddrinfo' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
-/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libcrypto.a(libcrypto-lib-bio_sock.o): in function `BIO_gethostbyname':
-bio_sock.c:(.text+0x52): warning: Using 'gethostbyname' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
-[100%] Built target qtxcbprobe
+[580/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/svg/svg.c.o
+[581/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/smooth/smooth.c.o
+[582/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/psaux/psaux.c.o
+[583/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/type42/type42.c.o
+[584/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/winfonts/winfnt.c.o
+[585/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftdebug.c.o
+[586/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/builds/unix/ftsystem.c.o
+[587/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/type1/type1.c.o
+[588/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/sfnt/sfnt.c.o
+[589/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-blob.cc.o
+[590/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/truetype/truetype.c.o
+[591/1644] Linking CXX static library lib/libQt6BundledFreetype.a
+[592/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-buffer-verify.cc.o
+[593/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-buffer-serialize.cc.o
+[594/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-buffer.cc.o
+[595/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-draw.cc.o
+[596/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-fallback-shape.cc.o
+[597/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-face-builder.cc.o
+[598/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-map.cc.o
+[599/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-number.cc.o
+[600/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-outline.cc.o
+[601/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-face.cc.o
+[602/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-paint.cc.o
+[603/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-paint-bounded.cc.o
+[604/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-font.cc.o
+[605/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-paint-extents.cc.o
+[606/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-shape.cc.o
+[607/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-shape-plan.cc.o
+[608/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-shaper.cc.o
+[609/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-set.cc.o
+[610/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-style.cc.o
+[611/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-cff-common.cc.o
+[612/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-input.cc.o
+[613/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-instancer-iup.cc.o
+[614/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-cff1.cc.o
+[615/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-instancer-solver.cc.o
+[616/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-cff2.cc.o
+[617/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset.cc.o
+[618/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-plan.cc.o
+[619/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-plan-layout.cc.o
+[620/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-serialize.cc.o
+[621/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-table-cff.cc.o
+[622/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-table-color.cc.o
+[623/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-table-other.cc.o
+[624/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-unicode.cc.o
+[625/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-cff1-table.cc.o
+[626/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-plan-var.cc.o
+[627/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-table-var.cc.o
+[628/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-cff2-table.cc.o
+[629/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-table-layout.cc.o
+[630/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-color.cc.o
+[631/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-map.cc.o
+[632/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-math.cc.o
+[633/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-meta.cc.o
+[634/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-face.cc.o
+[635/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-name.cc.o
+[636/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-metrics.cc.o
+[637/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-font.cc.o
+[638/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shape.cc.o
+[639/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shape-normalize.cc.o
+[640/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shape-fallback.cc.o
+[641/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-default.cc.o
+[642/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-hangul.cc.o
+[643/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-hebrew.cc.o
+[644/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-indic-table.cc.o
+[645/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-khmer.cc.o
+[646/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-indic.cc.o
+[647/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-myanmar.cc.o
+[648/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-syllabic.cc.o
+[649/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-arabic.cc.o
+[650/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-thai.cc.o
+[651/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-vowel-constraints.cc.o
+[652/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-layout.cc.o
+[653/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-use.cc.o
+[654/1644] Running syncqt.cpp for module: QtHarfbuzz
+[655/1644] Running syncqt.cpp for module: QtConcurrent
+[656/1644] Generating version linker script for target Concurrent
+[657/1644] Automatic MOC for target Concurrent
+[658/1644] Generating prl file for target Concurrent
+[659/1644] Running AUTOMOC file extraction for target Concurrent
+[660/1644] Running moc --collect-json for target Concurrent
+[661/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-tag.cc.o
+[662/1644] Running syncqt.cpp for module: QtSql
+[663/1644] Generating version linker script for target Sql
+[664/1644] Generating ../../mkspecs/modules/qt_lib_sql_private.pri
+[665/1644] Automatic MOC for target Sql
+[666/1644] Generating prl file for target Sql
+[667/1644] Running AUTOMOC file extraction for target Sql
+[668/1644] Running moc --collect-json for target Sql
+[669/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-var.cc.o
+[670/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/compat/removed_api.cpp.o
+[671/1644] Running syncqt.cpp for module: QtNetwork
+[672/1644] Generating version linker script for target Network
+[673/1644] Generating ../../mkspecs/modules/qt_lib_network_private.pri
+[674/1644] Building CXX object src/concurrent/CMakeFiles/Concurrent.dir/cmake_pch.hxx.gch
+[675/1644] Building CXX object src/concurrent/CMakeFiles/Concurrent.dir/Concurrent_autogen/mocs_compilation.cpp.o
+[676/1644] Building CXX object src/concurrent/CMakeFiles/Concurrent.dir/qtconcurrentfilter.cpp.o
+[677/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/OT/Var/VARC/VARC.cc.o
+[678/1644] Linking CXX static library lib/libQt6BundledHarfbuzz.a
+[679/1644] Building CXX object src/concurrent/CMakeFiles/Concurrent.dir/qtconcurrentiteratekernel.cpp.o
+[680/1644] Building CXX object src/concurrent/CMakeFiles/Concurrent.dir/qtconcurrentrun.cpp.o
+[681/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/cmake_pch.hxx.gch
+[682/1644] Building CXX object src/concurrent/CMakeFiles/Concurrent.dir/qtconcurrentmap.cpp.o
+[683/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/Sql_autogen/mocs_compilation.cpp.o
+[684/1644] Building CXX object src/concurrent/CMakeFiles/Concurrent.dir/qtconcurrentthreadengine.cpp.o
+[685/1644] Linking CXX static library lib/libQt6Concurrent.a
+[686/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlcachedresult.cpp.o
+[687/1644] Automatic MOC for target Network
+[688/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlerror.cpp.o
+[689/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqldriverplugin.cpp.o
+[690/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqldriver.cpp.o
+[691/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlfield.cpp.o
+[692/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlindex.cpp.o
+[693/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlquery.cpp.o
+[694/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqldatabase.cpp.o
+[695/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/models/qsqlrelationaldelegate.cpp.o
+[696/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlrecord.cpp.o
+[697/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlresult.cpp.o
+[698/1644] Generating prl file for target Network
+[699/1644] Running AUTOMOC file extraction for target Network
+[700/1644] Running moc --collect-json for target Network
+[701/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/models/qsqlquerymodel.cpp.o
+[702/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/models/qsqltablemodel.cpp.o
+[703/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/models/qsqlrelationaltablemodel.cpp.o
+[704/1644] Linking CXX static library lib/libQt6Sql.a
+[705/1644] Running syncqt.cpp for module: QtXml
+[706/1644] Building C object src/network/CMakeFiles/Network.dir/__/3rdparty/libpsl/src/lookup_string_in_fixed_set.c.o
+[707/1644] Generating version linker script for target Xml
+[708/1644] Generating ../../mkspecs/modules/qt_lib_xml_private.pri
+[709/1644] Automatic MOC for target uic
+[710/1644] Automatic MOC for target Xml
+[711/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/uic_autogen/mocs_compilation.cpp.o
+[712/1644] Running AUTOMOC file extraction for target Xml
+[713/1644] Generating prl file for target Xml
+[714/1644] Running moc --collect-json for target Xml
+[715/1644] Building CXX object src/network/CMakeFiles/Network.dir/compat/removed_api.cpp.o
+[716/1644] Building CXX object src/xml/CMakeFiles/Xml.dir/compat/removed_api.cpp.o
+[717/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/cpp/cppwritedeclaration.cpp.o
+[718/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/cpp/cppwriteincludes.cpp.o
+[719/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/customwidgetsinfo.cpp.o
+[720/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/databaseinfo.cpp.o
+[721/1644] Building CXX object src/network/CMakeFiles/Network.dir/cmake_pch.hxx.gch
+[722/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/cpp/cppwriteinitialization.cpp.o
+[723/1644] Building CXX object src/network/CMakeFiles/Network.dir/Network_autogen/mocs_compilation.cpp.o
+[724/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qabstractnetworkcache.cpp.o
+[725/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhsts.cpp.o
+[726/1644] Building CXX object src/xml/CMakeFiles/Xml.dir/cmake_pch.hxx.gch
+[727/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhstspolicy.cpp.o
+[728/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/driver.cpp.o
+[729/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccesscache.cpp.o
+[730/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccessauthenticationmanager.cpp.o
+[731/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccesscachebackend.cpp.o
+[732/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccessfilebackend.cpp.o
+[733/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccessbackend.cpp.o
+[734/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkcookiejar.cpp.o
+[735/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkfile.cpp.o
+[736/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkcookie.cpp.o
+[737/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpheadershelper.cpp.o
+[738/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpheaderparser.cpp.o
+[739/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccessmanager.cpp.o
+[740/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkreplydataimpl.cpp.o
+[741/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkreply.cpp.o
+[742/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkreplyfileimpl.cpp.o
+[743/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpheaders.cpp.o
+In file included from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/qbytearrayview.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/text/qbytearray.h:16,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/qbytearray.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/text/qstringview.h:11,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/qstringview.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/text/qchar.h:730,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/qchar.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/text/qstring.h:15,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/qstring.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/kernel/qcoreapplication.h:9,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/include/QtCore/qcoreapplication.h:1,
+                 from /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/../corelib/global/qt_pch.h:31,
+                 from /var/tmp/pgb-poc/91-qt-xcb/build/src/network/CMakeFiles/Network.dir/cmake_pch.hxx:5,
+                 from <command-line>:
+In function 'constexpr qsizetype QtPrivate::lengthHelperPointer(const Char*) [with Char = char]',
+    inlined from 'constexpr QByteArrayView::QByteArrayView(const Pointer&) [with Pointer = const char*; typename std::enable_if<QtPrivate::IsCompatibleByteArrayPointer<Pointer>::value, bool>::type <anonymous> = true]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/text/qbytearrayview.h:166:58,
+    inlined from 'static std::optional<QHttpHeaders::WellKnownHeader> HeaderName::toWellKnownHeader(QByteArrayView)' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp:725:42,
+    inlined from 'HeaderName::HeaderName(QAnyStringView)' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp:710:51:
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/text/qbytearrayview.h:78:16: warning: 'strlen' argument missing terminating nul [-Wstringop-overread]
+   78 |     while (data[i] != Char(0))
+      |            ~~~~^
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp: In constructor 'HeaderName::HeaderName(QAnyStringView)':
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp:93:23: note: referenced argument declared here
+   93 | static constexpr auto headerNames = qOffsetStringArray(
+      |                       ^~~~~~~~~~~
+In function 'constexpr qsizetype QtPrivate::lengthHelperPointer(const Char*) [with Char = char]',
+    inlined from 'constexpr QByteArrayView::QByteArrayView(const Pointer&) [with Pointer = const char*; typename std::enable_if<QtPrivate::IsCompatibleByteArrayPointer<Pointer>::value, bool>::type <anonymous> = true]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/text/qbytearrayview.h:166:58,
+    inlined from 'static std::optional<QHttpHeaders::WellKnownHeader> HeaderName::toWellKnownHeader(QByteArrayView)' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp:725:42,
+    inlined from 'HeaderName::HeaderName(QAnyStringView)' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp:710:51:
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/text/qbytearrayview.h:78:16: warning: 'strlen' argument missing terminating nul [-Wstringop-overread]
+   78 |     while (data[i] != Char(0))
+      |            ~~~~^
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp: In constructor 'HeaderName::HeaderName(QAnyStringView)':
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp:93:23: note: referenced argument declared here
+   93 | static constexpr auto headerNames = qOffsetStringArray(
+      |                       ^~~~~~~~~~~
+In function 'constexpr qsizetype QtPrivate::lengthHelperPointer(const Char*) [with Char = char]',
+    inlined from 'constexpr QByteArrayView::QByteArrayView(const Pointer&) [with Pointer = const char*; typename std::enable_if<QtPrivate::IsCompatibleByteArrayPointer<Pointer>::value, bool>::type <anonymous> = true]' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/text/qbytearrayview.h:166:58,
+    inlined from 'static QByteArrayView QHttpHeaders::wellKnownHeaderName(WellKnownHeader)' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp:1659:43:
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/corelib/text/qbytearrayview.h:78:16: warning: 'strlen' argument missing terminating nul [-Wstringop-overread]
+   78 |     while (data[i] != Char(0))
+      |            ~~~~^
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp: In static member function 'static QByteArrayView QHttpHeaders::wellKnownHeaderName(WellKnownHeader)':
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/network/access/qhttpheaders.cpp:93:23: note: referenced argument declared here
+   93 | static constexpr auto headerNames = qOffsetStringArray(
+      |                       ^~~~~~~~~~~
+[744/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qhostaddress.cpp.o
+[745/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkreplyimpl.cpp.o
+[746/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkdatagram.cpp.o
+[747/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qauthenticator.cpp.o
+[748/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkrequest.cpp.o
+[749/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qhostinfo.cpp.o
+[750/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkinformation.cpp.o
+[751/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkinterface.cpp.o
+[752/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkproxy.cpp.o
+[753/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qabstractsocketengine.cpp.o
+[754/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qabstractsocket.cpp.o
+[755/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qnativesocketengine.cpp.o
+[756/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qtcpserver.cpp.o
+[757/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qtcpsocket.cpp.o
+[758/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qpassworddigestor.cpp.o
+[759/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qudpsocket.cpp.o
+[760/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslcertificateextension.cpp.o
+[761/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qssl.cpp.o
+[762/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslcertificate.cpp.o
+[763/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhstsstore.cpp.o
+[764/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkdiskcache.cpp.o
+[765/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/bitstreams.cpp.o
+[766/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qtlsbackend.cpp.o
+[767/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/hpack.cpp.o
+[768/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/hpacktable.cpp.o
+[769/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/http2frames.cpp.o
+[770/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/http2protocol.cpp.o
+[771/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/huffman.cpp.o
+[772/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/http2streams.cpp.o
+[773/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttp1configuration.cpp.o
+[774/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qabstractprotocolhandler.cpp.o
+[775/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qdecompresshelper.cpp.o
+[776/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qformdatabuilder.cpp.o
+[777/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttp2configuration.cpp.o
+[778/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpmultipart.cpp.o
+[779/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttp2protocolhandler.cpp.o
+[780/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpnetworkconnection.cpp.o
+[781/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttp2connection.cpp.o
+[782/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpnetworkheader.cpp.o
+[783/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpnetworkconnectionchannel.cpp.o
+[784/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpnetworkrequest.cpp.o
+[785/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpprotocolhandler.cpp.o
+[786/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpnetworkreply.cpp.o
+[787/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkrequestfactory.cpp.o
+[788/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpthreaddelegate.cpp.o
+[789/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qrestaccessmanager.cpp.o
+[790/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qtldurl.cpp.o
+[791/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qrestreply.cpp.o
+[792/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qhttpsocketengine.cpp.o
+[793/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkreplyhttpimpl.cpp.o
+[794/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qhostinfo_unix.cpp.o
+[795/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qdnslookup_dummy.cpp.o
+[796/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkinterface_linux.cpp.o
+[797/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qnativesocketengine_unix.cpp.o
+[798/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkproxy_generic.cpp.o
+[799/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qlocalserver.cpp.o
+[800/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qdnslookup.cpp.o
+[801/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qlocalsocket.cpp.o
+[802/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qsocks5socketengine.cpp.o
+[803/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qlocalserver_unix.cpp.o
+[804/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qlocalsocket_unix.cpp.o
+[805/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qocspresponse.cpp.o
+[806/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslcipher.cpp.o
+[807/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qssldiffiehellmanparameters.cpp.o
+[808/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslellipticcurve.cpp.o
+[809/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslconfiguration.cpp.o
+[810/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslerror.cpp.o
+[811/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslpresharedkeyauthenticator.cpp.o
+[812/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslkey_p.cpp.o
+[813/1644] Building CXX object src/xml/CMakeFiles/Xml.dir/Xml_autogen/mocs_compilation.cpp.o
+[814/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qdtls.cpp.o
+[815/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslserver.cpp.o
+[816/1644] Building CXX object src/xml/CMakeFiles/Xml.dir/dom/qdomhelpers.cpp.o
+[817/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslsocket.cpp.o
+[818/1644] Linking CXX static library lib/libQt6Network.a
+[819/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/main.cpp.o
+[820/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/python/pythonwritedeclaration.cpp.o
+[821/1644] Building CXX object src/xml/CMakeFiles/Xml.dir/dom/qdom.cpp.o
+[822/1644] Linking CXX static library lib/libQt6Xml.a
+[823/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/shared/language.cpp.o
+[824/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/shared/writeincludesbase.cpp.o
+[825/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/treewalker.cpp.o
+[826/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/python/pythonwriteimports.cpp.o
+[827/1644] Automatic MOC for target qlalr
+[828/1644] Building CXX object src/tools/qlalr/CMakeFiles/qlalr.dir/qlalr_autogen/mocs_compilation.cpp.o
+[829/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/validator.cpp.o
+[830/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/uic.cpp.o
+[831/1644] Building CXX object src/tools/qlalr/CMakeFiles/qlalr.dir/compress.cpp.o
+[832/1644] Building CXX object src/tools/qlalr/CMakeFiles/qlalr.dir/grammar.cpp.o
+[833/1644] Building CXX object src/tools/qlalr/CMakeFiles/qlalr.dir/dotgraph.cpp.o
+[834/1644] Building CXX object src/tools/qlalr/CMakeFiles/qlalr.dir/cppgenerator.cpp.o
+[835/1644] Building CXX object src/tools/qlalr/CMakeFiles/qlalr.dir/main.cpp.o
+[836/1644] Building CXX object src/tools/qlalr/CMakeFiles/qlalr.dir/parsetable.cpp.o
+[837/1644] Automatic MOC for target qvkgen
+[838/1644] Building CXX object src/tools/qvkgen/CMakeFiles/qvkgen.dir/qvkgen_autogen/mocs_compilation.cpp.o
+[839/1644] Building CXX object src/tools/qlalr/CMakeFiles/qlalr.dir/lalr.cpp.o
+[840/1644] Automatic MOC for target androiddeployqt
+[841/1644] Building CXX object src/tools/androiddeployqt/CMakeFiles/androiddeployqt.dir/androiddeployqt_autogen/mocs_compilation.cpp.o
+[842/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/ui4.cpp.o
+[843/1644] Linking CXX executable libexec/uic
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0x9e1): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1c8): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xcc): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[844/1644] Automatic MOC for target androidtestrunner
+[845/1644] Building CXX object src/tools/androidtestrunner/CMakeFiles/androidtestrunner.dir/androidtestrunner_autogen/mocs_compilation.cpp.o
+[846/1644] Building CXX object src/tools/qlalr/CMakeFiles/qlalr.dir/recognizer.cpp.o
+[847/1644] Linking CXX executable libexec/qlalr
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0x9e1): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1c8): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xcc): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[848/1644] Automatic MOC for target wasmdeployqt
+[849/1644] Building CXX object src/tools/wasmdeployqt/CMakeFiles/wasmdeployqt.dir/wasmdeployqt_autogen/mocs_compilation.cpp.o
+[850/1644] Building CXX object src/tools/qvkgen/CMakeFiles/qvkgen.dir/qvkgen.cpp.o
+[851/1644] Linking CXX executable libexec/qvkgen
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0x9e1): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1c8): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xcc): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[852/1644] Building CXX object src/tools/wasmdeployqt/CMakeFiles/wasmdeployqt.dir/wasmbinary.cpp.o
+[853/1644] Building CXX object src/tools/androidtestrunner/CMakeFiles/androidtestrunner.dir/main.cpp.o
+[854/1644] Linking CXX executable bin/androidtestrunner
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0x9e1): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1c8): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xcc): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[855/1644] Building CXX object src/gui/CMakeFiles/Gui_resources_1.dir/.qt/rcc/qrc_qpdf_init.cpp.o
+[856/1644] Building CXX object src/gui/CMakeFiles/Gui_resources_2.dir/.qt/rcc/qrc_gui_shaders_init.cpp.o
+[857/1644] Running syncqt.cpp for module: QtGui
+[858/1644] Generating version linker script for target Gui
+[859/1644] Generating ../../mkspecs/modules/qt_lib_gui_private.pri
+[860/1644] Building CXX object src/tools/wasmdeployqt/CMakeFiles/wasmdeployqt.dir/main.cpp.o
+[861/1644] Building CXX object src/widgets/CMakeFiles/Widgets_resources_1.dir/.qt/rcc/qrc_qstyle_init.cpp.o
+[862/1644] Building CXX object src/widgets/CMakeFiles/Widgets_resources_2.dir/.qt/rcc/qrc_qstyle1_init.cpp.o
+[863/1644] Building CXX object src/widgets/CMakeFiles/Widgets_resources_3.dir/.qt/rcc/qrc_qstyle_fusion_init.cpp.o
+[864/1644] Building CXX object src/widgets/CMakeFiles/Widgets_resources_4.dir/.qt/rcc/qrc_qmessagebox_init.cpp.o
+[865/1644] Building CXX object src/tools/wasmdeployqt/CMakeFiles/wasmdeployqt.dir/jsontools.cpp.o
+[866/1644] Running syncqt.cpp for module: QtWidgets
+[867/1644] Generating version linker script for target Widgets
+[868/1644] Generating ../../mkspecs/modules/qt_lib_widgets_private.pri
+[869/1644] Running syncqt.cpp for module: QtDeviceDiscoverySupport
+[870/1644] Generating version linker script for target DeviceDiscoverySupportPrivate
+[871/1644] Automatic MOC for target DeviceDiscoverySupportPrivate
+[872/1644] Generating prl file for target DeviceDiscoverySupportPrivate
+[873/1644] Running AUTOMOC file extraction for target DeviceDiscoverySupportPrivate
+[874/1644] Running moc --collect-json for target DeviceDiscoverySupportPrivate
+[875/1644] Linking CXX executable bin/wasmdeployqt
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0x9e1): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1c8): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xcc): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[876/1644] Building CXX object src/platformsupport/devicediscovery/CMakeFiles/DeviceDiscoverySupportPrivate.dir/DeviceDiscoverySupportPrivate_autogen/mocs_compilation.cpp.o
+[877/1644] Running syncqt.cpp for module: QtFbSupport
+[878/1644] Generating version linker script for target FbSupportPrivate
+[879/1644] Running syncqt.cpp for module: QtInputSupport
+[880/1644] Generating version linker script for target InputSupportPrivate
+[881/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport_resources_1.dir/.qt/rcc/qrc_qprintdialog_init.cpp.o
+[882/1644] Building CXX object src/printsupport/CMakeFiles/PrintSupport_resources_2.dir/.qt/rcc/qrc_qprintdialog1_init.cpp.o
+[883/1644] Running syncqt.cpp for module: QtPrintSupport
+[884/1644] Generating version linker script for target PrintSupport
+[885/1644] Generating ../../mkspecs/modules/qt_lib_printsupport_private.pri
+[886/1644] Building CXX object src/platformsupport/devicediscovery/CMakeFiles/DeviceDiscoverySupportPrivate.dir/qdevicediscovery_static.cpp.o
+[887/1644] Linking CXX static library lib/libQt6DeviceDiscoverySupport.a
+[888/1644] Generating version linker script for target QSQLiteDriverPlugin
+[889/1644] Automatic MOC for target QSQLiteDriverPlugin
+[890/1644] Generating prl file for target QSQLiteDriverPlugin
+[891/1644] Running AUTOMOC file extraction for target QSQLiteDriverPlugin
+[892/1644] Running moc --collect-json for target QSQLiteDriverPlugin
+[893/1644] Building CXX object src/plugins/sqldrivers/sqlite/CMakeFiles/QSQLiteDriverPlugin_init.dir/QSQLiteDriverPlugin_init.cpp.o
+[894/1644] Automatic MOC for target Gui
+AutoMoc: /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/kernel/qopenglcontext.h: note: No relevant classes found. No output generated.
+AutoMoc: /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/platform/unix/qdesktopunixservices.cpp: note: No relevant classes found. No output generated.
+[895/1644] Running rcc for resource qpdf
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[896/1644] Running rcc for resource gui_shaders
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[897/1644] Generating prl file for target Gui
+[898/1644] Running AUTOMOC file extraction for target Gui
+[899/1644] Running moc --collect-json for target Gui
+[900/1644] Building CXX object src/tools/androiddeployqt/CMakeFiles/androiddeployqt.dir/main.cpp.o
+[901/1644] Linking CXX executable bin/androiddeployqt
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0x9e1): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1c8): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xcc): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+[902/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/compat/removed_api.cpp.o
+[903/1644] Building C object src/gui/CMakeFiles/Gui.dir/painting/qgrayraster.c.o
+[904/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/.qt/rcc/qrc_qpdf.cpp.o
+[905/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/.qt/rcc/qrc_gui_shaders.cpp.o
+[906/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimage_ssse3.cpp.o
+[907/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qdrawhelper_ssse3.cpp.o
+[908/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qdrawhelper_sse4.cpp.o
+[909/1644] Building CXX object src/plugins/sqldrivers/sqlite/CMakeFiles/QSQLiteDriverPlugin.dir/cmake_pch.hxx.gch
+[910/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/cmake_pch.hxx.gch
+[911/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qdrawhelper_avx2.cpp.o
+[912/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/Gui_autogen/mocs_compilation.cpp.o
+[913/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qimagescale_sse4.cpp.o
+[914/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qabstractfileiconengine.cpp.o
+[915/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qbitmap.cpp.o
+[916/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qabstractfileiconprovider.cpp.o
+[917/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qbmphandler.cpp.o
+[918/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qiconengine.cpp.o
+[919/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qfonticonengine.cpp.o
+[920/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qiconengineplugin.cpp.o
+[921/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qicon.cpp.o
+[922/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qiconloader.cpp.o
+[923/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimageiohandler.cpp.o
+[924/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimage_conversions.cpp.o
+[925/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimagepixmapcleanuphooks.cpp.o
+[926/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimagereaderwriterhelpers.cpp.o
+[927/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimagereader.cpp.o
+[928/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimage.cpp.o
+[929/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimagewriter.cpp.o
+[930/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpaintengine_pic.cpp.o
+[931/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpicture.cpp.o
+[932/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpixmap.cpp.o
+[933/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpixmap_raster.cpp.o
+[934/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpixmap_blitter.cpp.o
+[935/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qplatformpixmap.cpp.o
+[936/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpixmapcache.cpp.o
+[937/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qxbmhandler.cpp.o
+[938/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qppmhandler.cpp.o
+[939/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qxpmhandler.cpp.o
+[940/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qaccessibilityhints.cpp.o
+[941/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qclipboard.cpp.o
+[942/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qeventpoint.cpp.o
+[943/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qcursor.cpp.o
+[944/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qgenericplugin.cpp.o
+[945/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qgenericpluginfactory.cpp.o
+[946/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qevent.cpp.o
+[947/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qguivariant.cpp.o
+[948/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qhighdpiscaling.cpp.o
+[949/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qinputdevice.cpp.o
+[950/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qinputdevicemanager.cpp.o
+[951/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qinputmethod.cpp.o
+[952/1644] Building C object src/plugins/sqldrivers/sqlite/CMakeFiles/QSQLiteDriverPlugin.dir/__/__/__/3rdparty/sqlite/sqlite3.c.o
+[953/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qinternalmimedata.cpp.o
+[954/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qkeymapper.cpp.o
+[955/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qoffscreensurface.cpp.o
+[956/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qpaintdevicewindow.cpp.o
+[957/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qpixelformat.cpp.o
+[958/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qpalette.cpp.o
+[959/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformclipboard.cpp.o
+[960/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qguiapplication.cpp.o
+[961/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformgraphicsbufferhelper.cpp.o
+[962/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformcursor.cpp.o
+[963/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformgraphicsbuffer.cpp.o
+[964/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatforminputcontext.cpp.o
+[965/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatforminputcontextplugin.cpp.o
+[966/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatforminputcontextfactory.cpp.o
+[967/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformintegrationplugin.cpp.o
+[968/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformintegrationfactory.cpp.o
+[969/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformintegration.cpp.o
+[970/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformdialoghelper.cpp.o
+[971/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformkeymapper.cpp.o
+[972/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformmenu.cpp.o
+[973/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformnativeinterface.cpp.o
+[974/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformoffscreensurface.cpp.o
+[975/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformservices.cpp.o
+[976/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformscreen.cpp.o
+[977/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformsessionmanager.cpp.o
+[978/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformsurface.cpp.o
+[979/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformsharedgraphicscache.cpp.o
+[980/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformsystemtrayicon.cpp.o
+[981/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformthemefactory.cpp.o
+[982/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformthemeplugin.cpp.o
+[983/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformwindow.cpp.o
+[984/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qrasterwindow.cpp.o
+[985/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformtheme.cpp.o
+[986/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qpointingdevice.cpp.o
+[987/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qsessionmanager.cpp.o
+[988/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qsurface.cpp.o
+[989/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qscreen.cpp.o
+[990/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qstylehints.cpp.o
+[991/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qsurfaceformat.cpp.o
+[992/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qtestsupport_gui.cpp.o
+[993/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/math3d/qgenericmatrix.cpp.o
+[994/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/math3d/qmatrix4x4.cpp.o
+[995/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/math3d/qquaternion.cpp.o
+[996/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qwindow.cpp.o
+[997/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qwindowsysteminterface.cpp.o
+[998/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/math3d/qvectornd.cpp.o
+[999/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qbackingstore.cpp.o
+[1000/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qbackingstoredefaultcompositor.cpp.o
+[1001/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qbezier.cpp.o
+[1002/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qbackingstorerhisupport.cpp.o
+[1003/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qblittable.cpp.o
+[1004/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qbrush.cpp.o
+[1005/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qblendfunctions.cpp.o
+[1006/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcolor.cpp.o
+[1007/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcolortrclut.cpp.o
+[1008/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcolorspace.cpp.o
+[1009/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qemulationpaintengine.cpp.o
+[1010/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcosmeticstroker.cpp.o
+[1011/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcolortransform.cpp.o
+[1012/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcompositionfunctions.cpp.o
+[1013/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qimageeffects.cpp.o
+[1014/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qimagescale.cpp.o
+[1015/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qmemrotate.cpp.o
+[1016/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qoutlinemapper.cpp.o
+[1017/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpagedpaintdevice.cpp.o
+[1018/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpagelayout.cpp.o
+[1019/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qicc.cpp.o
+[1020/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpageranges.cpp.o
+[1021/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpaintdevice.cpp.o
+[1022/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpagesize.cpp.o
+[1023/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpaintengine.cpp.o
+[1024/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpaintengine_blitter.cpp.o
+[1025/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpainterstateguard.cpp.o
+[1026/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpaintengineex.cpp.o
+[1027/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpaintengine_raster.cpp.o
+[1028/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpathclipper.cpp.o
+[1029/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpainter.cpp.o
+[1030/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpainterpath.cpp.o
+[1031/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpdfoutputintent.cpp.o
+[1032/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpathsimplifier.cpp.o
+[1033/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpen.cpp.o
+[1034/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpdfwriter.cpp.o
+[1035/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qplatformbackingstore.cpp.o
+[1036/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpolygon.cpp.o
+[1037/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qrasterizer.cpp.o
+[1038/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qstroker.cpp.o
+[1039/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpdf.cpp.o
+[1040/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpixellayout.cpp.o
+[1041/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qregion.cpp.o
+[1042/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qtextureglyphcache.cpp.o
+[1043/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qtriangulatingstroker.cpp.o
+[1044/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qtransform.cpp.o
+[1045/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/rhi/qrhinull.cpp.o
+[1046/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qtriangulator.cpp.o
+[1047/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/rhi/qrhi.cpp.o
+[1048/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/rhi/qshader.cpp.o
+[1049/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qabstracttextdocumentlayout.cpp.o
+[1050/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/rhi/qshaderdescription.cpp.o
+[1051/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qcolrpaintgraphrenderer.cpp.o
+[1052/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qdistancefield.cpp.o
+[1053/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontengineglyphcache.cpp.o
+[1054/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontengine.cpp.o
+[1055/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontmetrics.cpp.o
+[1056/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontdatabase.cpp.o
+[1057/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfragmentmap.cpp.o
+[1058/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontvariableaxis.cpp.o
+[1059/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qinputcontrol.cpp.o
+[1060/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qglyphrun.cpp.o
+[1061/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfont.cpp.o
+[1062/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontsubset.cpp.o
+[1063/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qplatformfontdatabase.cpp.o
+[1064/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qsyntaxhighlighter.cpp.o
+[1065/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qrawfont.cpp.o
+[1066/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qstatictext.cpp.o
+[1067/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextcursor.cpp.o
+[1068/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextdocumentfragment.cpp.o
+[1069/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextdocument_p.cpp.o
+[1070/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextdocumentwriter.cpp.o
+[1071/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextdocument.cpp.o
+[1072/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextdocumentlayout.cpp.o
+[1073/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextformat.cpp.o
+[1074/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtexthtmlparser.cpp.o
+[1075/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextengine.cpp.o
+[1076/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextimagehandler.cpp.o
+[1077/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextlist.cpp.o
+[1078/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextoption.cpp.o
+[1079/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qabstractlayoutstyleinfo.cpp.o
+[1080/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextobject.cpp.o
+[1081/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qastchandler.cpp.o
+[1082/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextlayout.cpp.o
+[1083/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtexttable.cpp.o
+[1084/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qdesktopservices.cpp.o
+[1085/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qlayoutpolicy.cpp.o
+[1086/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qktxhandler.cpp.o
+[1087/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qpkmhandler.cpp.o
+[1088/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qtexturefilereader.cpp.o
+[1089/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qtexturefiledata.cpp.o
+[1090/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qgridlayoutengine.cpp.o
+[1091/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qvalidator.cpp.o
+[1092/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/animation/qguivariantanimation.cpp.o
+[1093/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessiblebridge.cpp.o
+[1094/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessiblebridgeutils.cpp.o
+[1095/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessiblehelper.cpp.o
+[1096/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessiblecache.cpp.o
+[1097/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessible.cpp.o
+[1098/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessibleobject.cpp.o
+[1099/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessibleplugin.cpp.o
+[1100/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/itemmodels/qstandarditemmodel.cpp.o
+[1101/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qplatformaccessibility.cpp.o
+[1102/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qdnd.cpp.o
+[1103/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qactiongroup.cpp.o
+[1104/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qdrag.cpp.o
+[1105/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qaction.cpp.o
+[1106/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformdrag.cpp.o
+[1107/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qshapedpixmapdndwindow.cpp.o
+[1108/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qsimpledrag.cpp.o
+[1109/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qshortcut.cpp.o
+[1110/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qshortcutmap.cpp.o
+[1111/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qkeysequence.cpp.o
+[1112/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qmovie.cpp.o
+[1113/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpnghandler.cpp.o
+[1114/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qharfbuzzng.cpp.o
+[1115/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qdrawhelper_sse2.cpp.o
+[1116/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextmarkdownimporter.cpp.o
+[1117/1644] Building C object src/gui/CMakeFiles/Gui.dir/__/3rdparty/md4c/md4c.c.o
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/3rdparty/md4c/md4c.c: In function 'md_end_current_block':
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/3rdparty/md4c/md4c.c:2241:27: warning: 'label_contents_line_index' may be used uninitialized [-Wmaybe-uninitialized]
+ 2241 |                     lines + label_contents_line_index, n_lines - label_contents_line_index,
+      |                           ^
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/3rdparty/md4c/md4c.c:2158:13: note: 'label_contents_line_index' was declared here
+ 2158 |     MD_SIZE label_contents_line_index;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~
+[1118/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextodfwriter.cpp.o
+[1119/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextmarkdownwriter.cpp.o
+[1120/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcssutil.cpp.o
+[1121/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qundostack.cpp.o
+[1122/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/freetype/qfreetypefontdatabase.cpp.o
+[1123/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qundogroup.cpp.o
+[1124/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/itemmodels/qfileinfogatherer.cpp.o
+[1125/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/freetype/qfontengine_ft.cpp.o
+[1126/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qunixnativeinterface.cpp.o
+[1127/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qgenericunixeventdispatcher.cpp.o
+[1128/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qunixeventdispatcher.cpp.o
+[1129/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qcssparser.cpp.o
+[1130/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qdesktopunixservices.cpp.o
+[1131/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qtx11extras.cpp.o
+[1132/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/itemmodels/qfilesystemmodel.cpp.o
+[1133/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qgenericunixtheme.cpp.o
+[1134/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qxkbcommon_3rdparty.cpp.o
+[1135/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qgnometheme.cpp.o
+[1136/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qedidparser.cpp.o
+[1137/1644] Building CXX object src/plugins/sqldrivers/sqlite/CMakeFiles/QSQLiteDriverPlugin.dir/QSQLiteDriverPlugin_autogen/mocs_compilation.cpp.o
+[1138/1644] Building CXX object src/plugins/sqldrivers/sqlite/CMakeFiles/QSQLiteDriverPlugin.dir/qsql_sqlite_vfs.cpp.o
+[1139/1644] Building CXX object src/plugins/sqldrivers/sqlite/CMakeFiles/QSQLiteDriverPlugin.dir/smain.cpp.o
+[1140/1644] Building CXX object src/plugins/sqldrivers/sqlite/CMakeFiles/QSQLiteDriverPlugin.dir/qsql_sqlite.cpp.o
+[1141/1644] Linking CXX static library plugins/sqldrivers/libqsqlite.a
+[1142/1644] Generating version linker script for target QMinimalIntegrationPlugin
+[1143/1644] Building CXX object src/plugins/platforms/minimal/CMakeFiles/QMinimalIntegrationPlugin_init.dir/QMinimalIntegrationPlugin_init.cpp.o
+[1144/1644] Generating version linker script for target QOffscreenIntegrationPlugin
+[1145/1644] Building CXX object src/plugins/platforms/offscreen/CMakeFiles/QOffscreenIntegrationPlugin_init.dir/QOffscreenIntegrationPlugin_init.cpp.o
+[1146/1644] Generating version linker script for target QXcbIntegrationPlugin
+[1147/1644] Building CXX object src/plugins/platforms/xcb/CMakeFiles/QXcbIntegrationPlugin_init.dir/QXcbIntegrationPlugin_init.cpp.o
+[1148/1644] Generating version linker script for target QLinuxFbIntegrationPlugin
+[1149/1644] Building CXX object src/plugins/platforms/linuxfb/CMakeFiles/QLinuxFbIntegrationPlugin_init.dir/QLinuxFbIntegrationPlugin_init.cpp.o
+[1150/1644] Generating version linker script for target QVncIntegrationPlugin
+[1151/1644] Building CXX object src/plugins/platforms/vnc/CMakeFiles/QVncIntegrationPlugin_init.dir/QVncIntegrationPlugin_init.cpp.o
+[1152/1644] Generating version linker script for target QComposePlatformInputContextPlugin
+[1153/1644] Building CXX object src/plugins/platforminputcontexts/compose/CMakeFiles/QComposePlatformInputContextPlugin_init.dir/QComposePlatformInputContextPlugin_init.cpp.o
+[1154/1644] Generating version linker script for target QICOPlugin
+[1155/1644] Building CXX object src/plugins/imageformats/ico/CMakeFiles/QICOPlugin_init.dir/QICOPlugin_init.cpp.o
+[1156/1644] Generating version linker script for target QJpegPlugin
+[1157/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qxkbcommon.cpp.o
+[1158/1644] Generating version linker script for target QGifPlugin
+[1159/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qdrawhelper.cpp.o
+[1160/1644] Building CXX object src/plugins/imageformats/jpeg/CMakeFiles/QJpegPlugin_init.dir/QJpegPlugin_init.cpp.o
+[1161/1644] Generating version linker script for target QEvdevMousePlugin
+[1162/1644] Linking CXX static library lib/libQt6Gui.a
+[1163/1644] Building CXX object src/plugins/imageformats/gif/CMakeFiles/QGifPlugin_init.dir/QGifPlugin_init.cpp.o
+[1164/1644] Automatic MOC for target FbSupportPrivate
+[1165/1644] Generating prl file for target FbSupportPrivate
+[1166/1644] Running AUTOMOC file extraction for target FbSupportPrivate
+[1167/1644] Running moc --collect-json for target FbSupportPrivate
+[1168/1644] Building CXX object src/plugins/generic/evdevmouse/CMakeFiles/QEvdevMousePlugin_init.dir/QEvdevMousePlugin_init.cpp.o
+[1169/1644] Building CXX object src/plugins/generic/evdevtouch/CMakeFiles/QEvdevTouchScreenPlugin_init.dir/QEvdevTouchScreenPlugin_init.cpp.o
+[1170/1644] Automatic MOC for target InputSupportPrivate
+[1171/1644] Generating prl file for target InputSupportPrivate
+[1172/1644] Running AUTOMOC file extraction for target InputSupportPrivate
+[1173/1644] Running moc --collect-json for target InputSupportPrivate
+[1174/1644] Automatic MOC for target QMinimalIntegrationPlugin
+[1175/1644] Generating prl file for target QMinimalIntegrationPlugin
+[1176/1644] Running AUTOMOC file extraction for target QMinimalIntegrationPlugin
+[1177/1644] Running moc --collect-json for target QMinimalIntegrationPlugin
+[1178/1644] Building CXX object src/platformsupport/fbconvenience/CMakeFiles/FbSupportPrivate.dir/cmake_pch.hxx.gch
+[1179/1644] Building CXX object src/platformsupport/fbconvenience/CMakeFiles/FbSupportPrivate.dir/FbSupportPrivate_autogen/mocs_compilation.cpp.o
+[1180/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/cmake_pch.hxx.gch
+[1181/1644] Building CXX object src/platformsupport/fbconvenience/CMakeFiles/FbSupportPrivate.dir/qfbbackingstore.cpp.o
+[1182/1644] Building CXX object src/platformsupport/fbconvenience/CMakeFiles/FbSupportPrivate.dir/qfbscreen.cpp.o
+[1183/1644] Building CXX object src/platformsupport/fbconvenience/CMakeFiles/FbSupportPrivate.dir/qfbcursor.cpp.o
+[1184/1644] Building CXX object src/platformsupport/fbconvenience/CMakeFiles/FbSupportPrivate.dir/qfbvthandler.cpp.o
+[1185/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/InputSupportPrivate_autogen/mocs_compilation.cpp.o
+[1186/1644] Building CXX object src/platformsupport/fbconvenience/CMakeFiles/FbSupportPrivate.dir/qfbwindow.cpp.o
+[1187/1644] Linking CXX static library lib/libQt6FbSupport.a
+[1188/1644] Automatic MOC and UIC for target Widgets
+AutoUic: Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[1189/1644] Running rcc for resource qstyle
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[1190/1644] Running rcc for resource qstyle1
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[1191/1644] Running rcc for resource qstyle_fusion
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[1192/1644] Running rcc for resource qmessagebox
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[1193/1644] Generating prl file for target Widgets
+[1194/1644] Running AUTOMOC file extraction for target Widgets
+[1195/1644] Running moc --collect-json for target Widgets
+[1196/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/evdevkeyboard/qevdevkeyboardmanager.cpp.o
+[1197/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/evdevkeyboard/qevdevkeyboardhandler.cpp.o
+[1198/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/.qt/rcc/qrc_qstyle.cpp.o
+[1199/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/.qt/rcc/qrc_qstyle1.cpp.o
+[1200/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/.qt/rcc/qrc_qstyle_fusion.cpp.o
+[1201/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/.qt/rcc/qrc_qmessagebox.cpp.o
+[1202/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/compat/removed_api.cpp.o
+[1203/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/evdevmouse/qevdevmousehandler.cpp.o
+[1204/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/evdevmouse/qevdevmousemanager.cpp.o
+[1205/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/cmake_pch.hxx.gch
+[1206/1644] Building CXX object src/plugins/platforms/minimal/CMakeFiles/QMinimalIntegrationPlugin.dir/cmake_pch.hxx.gch
+[1207/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/Widgets_autogen/mocs_compilation.cpp.o
+[1208/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/evdevtouch/qevdevtouchmanager.cpp.o
+[1209/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/evdevtouch/qevdevtouchhandler.cpp.o

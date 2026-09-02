@@ -103,7 +103,7 @@
    A driver    : swrast
    A EGL ver   : 1.5
    A client API: OpenGL OpenGL_ES
-   A objects   : host=0 bundled=41
+   A objects   : host=0 bundled=40
    A host .so  : 
    B exit      : exit1
    B vendor    : <none>

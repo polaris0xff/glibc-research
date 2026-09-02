@@ -49,11 +49,10 @@ type Cmd struct {
 
 // Result carries the outcome of a run.
 type Result struct {
-	Code     int    // exit status; 128+N if the child died on signal N
-	Signal   int    // 0 when the child exited normally
-	Stdout   []byte // captured only by Output/Capture
-	Stderr   []byte
-	TimedOut bool
+	Code   int    // exit status; 128+N if the child died on signal N
+	Signal int    // 0 when the child exited normally
+	Stdout []byte // captured only by Output/Capture
+	Stderr []byte
 }
 
 // Failed reports a non-zero status.
