@@ -237,7 +237,20 @@ host**, 818 of which load: 20 undefined symbols, 4 `TLSDESC` relocations, and 2
 objects wanting 56,248 bytes of static TLS against ~3,168 bytes of surplus
 HEADROOM -- `_dl_tls_static_size - _dl_tls_static_used`, and NOT
 `_dl_tls_static_size` itself, which includes the program's own PT_TLS and so
-moves with the binary (TODO T-072). 30
+moves with the binary.
+
+⭐ **The static-TLS row is now ADDRESSABLE, and it is `--tls-reserve N`.**
+glibc's surplus is a constant that padding the executable cannot enlarge --
+padding raises `size` and `used` together, measured -- so `pgb-elfload.c`
+allocates initial-exec TLS out of its OWN `__thread` array first and falls back
+to the surplus. On the build host, a module whose initial-exec `PT_TLS` is
+56,248 bytes is refused without the flag and loads with `--tls-reserve 65536`;
+a reserve too small to hold it refuses rather than overflowing. ⛔ **Default 0,
+because every thread pays for the reserve whether or not anything is
+`dlopen`'d**, and ⛔ **not yet re-measured across the eleven** -- the numbers
+above are one machine. TODO T-072.
+
+The other 30
 crash, and almost all of those are objects no static image should load — NSS
 modules, sanitizer and allocator interposers. The exception is `libLLVM`, which
 maps and relocates cleanly and dies in the 605th of its C++ static
@@ -248,6 +261,9 @@ surplus is seeded with its initialisation image *in the thread that loaded
 it*. Threads created afterwards get the slice zeroed, which is correct for the
 14 of 24 measured modules whose `PT_TLS` `p_filesz` is 0 and wrong for the
 rest. Named here rather than discovered by a user.
+⛔ **`--tls-reserve` does NOT change this.** It changes where the storage comes
+from, not when it is initialised: the reserve is seeded in the loading thread
+exactly as the surplus is.
 
 ⚠ **Historical, and superseded by the above:** T-033 named the unknowns as the
 mapper being 2,707 lines in solo and TLS being the place where "we are glibc,
