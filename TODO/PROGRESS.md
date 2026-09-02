@@ -4,7 +4,7 @@
 and the entries.
 
     STATE     2026-09-02
-    COUNTS    34 entries, 15 open, 19 done
+    COUNTS    35 entries, 16 open, 19 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN, 15 jobs, and it asserts criterion 2
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)

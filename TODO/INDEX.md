@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 34  OPEN 15  DONE 19
+    TOTAL 35  OPEN 16  DONE 19
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 1 | 1 | 0 |
-| P1 | a documented capability does not work, or a flag does nothing | 25 | 8 | 17 |
+| P1 | a documented capability does not work, or a flag does nothing | 26 | 9 | 17 |
 | P2 | worth doing; nothing is wrong without it | 8 | 6 | 2 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -51,6 +51,7 @@ pretending to be one.
 | T-059 | P1 | M | open | research | GL on real hardware, and the NVIDIA case |
 | T-060 | P1 | L | open | toolchain | ⭐ Static-glibc nix: no root, no docker, no nix |
 | T-061 | P0 | XL | open | toolchain | ⛔ Port the whole toolchain to Go, and ship one static `pgb` |
+| T-062 | P1 | M | open | toolchain | Eight packages carry no selftest, `internal/wrapper` among them |
 
 ## The argument behind the ordering
 

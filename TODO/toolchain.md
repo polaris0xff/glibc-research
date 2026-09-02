@@ -1161,3 +1161,53 @@ Both were taken and neither is in an entry yet:
 
 `evidence/92-go-port/RESULT.txt`, plus a green `sh TODO/check.sh` and
 `sh scripts/common/check-docs.sh`.
+
+---
+
+## T-062 — eight packages carry no selftest, and `internal/wrapper` is one
+
+**Source** the code review of 2026-09-02, using codegraph against the suite
+registry in `../cmd/pgb/commands.go`.
+**Category** toolchain · **Priority** P1 · **Effort** M · **Status** open
+
+**Problem.** `pgb selftest` registers ten suites and reports "123 cases pass",
+which reads as coverage of the tool. Measured against the package list, the
+suites reach seven of the seventeen packages:
+
+    covered      ociimg  rootfs  elfx (via cmd/pgb)  zstd  nixx
+                 bootstrapx  bundle
+    NOT covered  ⛔ wrapper  ⛔ verifyx  ⛔ buildx  envx  cfg
+                 logx  proc  fail
+
+⛔ **`internal/wrapper` is the product.** `CompileFlags` and `LinkFlags` compose
+the flag set that every `pgb build` injects, and nothing carried in the binary
+asserts what they produce. The acceptance evidence for them is gate 4 — the
+byte-identity comparison against the retired shell — which needs a build
+environment, a network and half an hour, so it is not something a change can be
+checked against while it is being made.
+
+**Premise.** T-058 is the shape of the defect this leaves open: two concurrent
+builds shared one wrapper directory, the flag sets silently overwrote each
+other, and NEITHER BUILD REPORTED ANYTHING. It was found by an experiment that
+had to be written for it. A carried assertion over `LinkFlags` for a given
+option set would have failed the moment the flags stopped depending on the
+options.
+
+**Approach.** The offline-testable surface is already pure and needs no bed:
+
+    CompileFlags / LinkFlags   a table of option sets against the flags each
+                               must and must not contain -- --embed-terminfo,
+                               --embed-cacert, --embed-locale, --no-iconv and
+                               --wrap-dlopen are the axes T-058 named
+    ParsePluginSpec            NAME=OBJECT[,OBJECT...], and what it refuses
+    uniqueSorted, dlopenObjects, firstLine   pure helpers
+
+⚠ **`verifyx` and `buildx` are a different problem** and this entry does not
+pretend otherwise: both shell out to a bed. What can be carried is the parsing
+and the decision logic, not the run — say which, rather than reporting a suite
+that exercises neither.
+
+**Prove.** `pgb selftest --list` names a `wrapper` suite; the case count rises;
+and the suite fails when an option is disconnected from the flags it controls,
+demonstrated by disconnecting one deliberately, the way `experiments/89-` uses
+a control arm.

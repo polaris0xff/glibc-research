@@ -28,3 +28,15 @@ evidence      : /home/user/glibc-research/evidence/poc/91-qt-xcb
   ok    and it is static (no PT_INTERP)              = 0
         so Qt is told TEST_xcb_syslibs=ON, with the link above as the evidence
   ok    qtbase configures with xcb                   = ok
+  ok    qtbase installed                             = ok
+  ok    the xcb platform plugin was built (as an archive) = ok
+        17004 bytes  /var/tmp/pgb-poc/91-qt-xcb/inst/plugins/platforms/libqxcb.a
+  ok    and NOT ONE shared object under the prefix   = 0
+
+-- rung 4: an application that opens a window -------------------
+  ok    the probe builds against static Qt           = ok
+        47188304 bytes
+  ok    no PT_INTERP                                 = 0
+  ok    no DT_NEEDED                                 = 0
+
+-- rung 5: the eleven, against a real X server ------------------
