@@ -71,9 +71,9 @@ func runCommand(c *cfg.Config, cmd string, args []string) error {
 	case "bundle":
 		return bundleCommand(c, args)
 	case buildx.InnerBuild:
-		return buildx.Inner(c, args)
+		return buildx.Inner(c, args, false)
 	case buildx.InnerShell:
-		return buildx.Inner(c, []string{shellOrDefault()})
+		return buildx.Inner(c, []string{shellOrDefault()}, true)
 	case rootfs.InnerCommand():
 		return rootfs.Inner(args)
 	case envx.InnerLibiconv:

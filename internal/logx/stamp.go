@@ -84,6 +84,10 @@ func ParseColumns(spec string) ([]Column, error) {
 //	PGB_TS_COLUMNS=rel,delta
 //	PGB_TS_SEPARATOR='  '
 //	PGB_TS_HEARTBEAT=30s   ('0' or 'off' disables)
+//
+// The default follows where the output is going: on for a terminal, off when
+// it is being captured, so a redirected build log keeps the child's bytes
+// exactly as the child wrote them. PGB_TS overrides either way.
 func StampFromEnv(def StampConfig) (StampConfig, bool, error) {
 	c := def
 	if c.Separator == "" {
@@ -92,7 +96,7 @@ func StampFromEnv(def StampConfig) (StampConfig, bool, error) {
 	if c.Columns == nil {
 		c.Columns = []Column{ColRel, ColDelta}
 	}
-	on := EnvBool("PGB_TS", true)
+	on := EnvBool("PGB_TS", isTerminal(os.Stderr))
 	if v := os.Getenv("PGB_TS_COLUMNS"); v != "" {
 		cols, err := ParseColumns(v)
 		if err != nil {
@@ -187,9 +191,6 @@ func (s *Stamper) beat() {
 
 // Write implements io.Writer over whole lines.
 func (s *Stamper) Write(p []byte) (int, error) {
-	s.mu.Lock()
-	s.bytes += int64(len(p))
-	s.mu.Unlock()
 	return len(p), s.pump(strings.NewReader(string(p)))
 }
 
@@ -217,6 +218,7 @@ func (s *Stamper) Line(text string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.lines++
+	s.bytes += int64(len(text)) + 1
 	s.writeLocked(text)
 	s.last = time.Now()
 }
@@ -300,4 +302,27 @@ func humanBytes(n int64) string {
 	default:
 		return fmt.Sprintf("%.1f MiB", float64(n)/(1024*1024))
 	}
+}
+
+// isTerminal reports whether f is a character device, which is what separates
+// a person watching a build from a file collecting it.
+func isTerminal(f *os.File) bool {
+	fi, err := f.Stat()
+	return err == nil && fi.Mode()&os.ModeCharDevice != 0
+}
+
+// StreamStamper builds the timestamper for a child whose output the caller is
+// watching, or returns nil when stamping is off. A configuration error is
+// reported once and treated as off, because a build is not the place to refuse
+// to run over a log format.
+func StreamStamper() *Stamper {
+	cfg, on, err := StampFromEnv(StampConfig{Heartbeat: 30 * time.Second})
+	if err != nil {
+		Warnf("%v; timestamps disabled for this run", err)
+		return nil
+	}
+	if !on {
+		return nil
+	}
+	return NewStamper(cfg)
 }

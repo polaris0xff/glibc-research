@@ -17,6 +17,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 	"syscall"
 
 	"github.com/polaris0xff/glibc-research/internal/logx"
@@ -39,6 +40,11 @@ type Cmd struct {
 
 	// Subsys names the caller for the log line; empty means "exec".
 	Subsys string
+
+	// Stream marks a command whose output the caller is watching rather than
+	// capturing, so it is routed through the timestamper when one is
+	// configured. Stdout and Stderr are ignored when it is set.
+	Stream bool
 }
 
 // Result carries the outcome of a run.
@@ -104,8 +110,52 @@ func (c *Cmd) Run() (Result, error) {
 	}
 	c.announce()
 	cmd := c.build()
+	if c.Stream {
+		if s := logx.StreamStamper(); s != nil {
+			return c.runStamped(cmd, s)
+		}
+		cmd.Stdout, cmd.Stderr = os.Stdout, os.Stderr
+	}
 	err := cmd.Run()
 	return classify(cmd, err)
+}
+
+// runStamped puts a timestamp on every line the child writes and a heartbeat
+// on its silences. Both streams share one stamper, so the interleaving the
+// child produced is the interleaving that is printed.
+func (c *Cmd) runStamped(cmd *exec.Cmd, s *logx.Stamper) (Result, error) {
+	defer s.Close()
+	// The pipes replace whatever the caller set, and exec refuses to make one
+	// while a writer is still attached.
+	cmd.Stdout, cmd.Stderr = nil, nil
+	// This process has taken the stamping job, so a pgb further in must not
+	// take it as well: the environment carries PGB_TS and would be obeyed.
+	base := cmd.Env
+	if base == nil {
+		base = os.Environ()
+	}
+	cmd.Env = mergeEnv(base, []string{"PGB_TS=0"})
+	outPipe, err := cmd.StdoutPipe()
+	if err != nil {
+		return Result{}, err
+	}
+	errPipe, err := cmd.StderrPipe()
+	if err != nil {
+		return Result{}, err
+	}
+	if err := cmd.Start(); err != nil {
+		return Result{}, err
+	}
+	var wg sync.WaitGroup
+	wg.Add(2)
+	for _, r := range []io.Reader{outPipe, errPipe} {
+		go func(r io.Reader) {
+			defer wg.Done()
+			_ = s.Pipe(r)
+		}(r)
+	}
+	wg.Wait()
+	return classify(cmd, cmd.Wait())
 }
 
 func classify(cmd *exec.Cmd, err error) (Result, error) {

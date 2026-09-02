@@ -49,9 +49,9 @@ func Build(c *cfg.Config, argv []string) error {
 	}
 	switch engine {
 	case cfg.EngineHost:
-		return Inner(c, argv)
+		return Inner(c, argv, false)
 	case cfg.EngineChroot:
-		return enterChroot(c, argv)
+		return enterChroot(c, argv, true)
 	default:
 		return enterContainer(c, string(engine), argv, false)
 	}
@@ -66,7 +66,7 @@ func Shell(c *cfg.Config) error {
 			return fail.Cannot("no build environment. run: pgb env create")
 		}
 		c.Export()
-		return enterChroot(c, []string{shellPath()})
+		return enterChroot(c, []string{shellPath()}, false)
 	case cfg.EngineDocker, cfg.EnginePodman:
 		if err := envx.RequireCurrent(c, engine); err != nil {
 			return err
@@ -74,7 +74,7 @@ func Shell(c *cfg.Config) error {
 		c.Export()
 		return enterContainer(c, string(engine), []string{shellPath()}, true)
 	default:
-		return Inner(c, []string{shellPath()})
+		return Inner(c, []string{shellPath()}, true)
 	}
 }
 
@@ -88,7 +88,7 @@ func shellPath() string {
 // enterChroot bind-mounts the working directory, the pgb tree and the state
 // directory at the same absolute paths inside, so every absolute path a build
 // system bakes into a Makefile still resolves.
-func enterChroot(c *cfg.Config, argv []string) error {
+func enterChroot(c *cfg.Config, argv []string, stream bool) error {
 	wd, err := os.Getwd()
 	if err != nil {
 		return fail.Cannot("cannot read the working directory: %v", err)
@@ -112,13 +112,24 @@ func enterChroot(c *cfg.Config, argv []string) error {
 	}
 
 	inner := append([]string{selfInside, InnerBuild}, argv...)
-	code, err := rootfs.Run(rootfs.Options{
+	opts := rootfs.Options{
 		Root:    c.EnvRoot(),
 		Bind:    binds,
 		Workdir: wd,
 		Env:     []string{"PGB_INNER=1"},
 		Stdin:   os.Stdin,
-	}, inner)
+	}
+	// The environment's whole output is timestamped from out here, where pgb
+	// is the process talking to the terminal. The pgb inside then sees a pipe
+	// and leaves its own child's lines alone, so nothing is stamped twice.
+	if stream {
+		if st := logx.StreamStamper(); st != nil {
+			defer st.Close()
+			opts.Stdout, opts.Stderr = st, st
+			opts.Env = append(opts.Env, "PGB_TS=0")
+		}
+	}
+	code, err := rootfs.Run(opts, inner)
 	if err != nil {
 		return err
 	}
@@ -167,7 +178,8 @@ func enterContainer(c *cfg.Config, engine string, argv []string, interactive boo
 	run = append(run, "pgb-env:"+cfg.Version, selfInside, InnerBuild)
 	run = append(run, argv...)
 
-	cmd := &proc.Cmd{Argv: run, Stdin: os.Stdin, Stdout: os.Stdout, Stderr: os.Stderr, Subsys: "build"}
+	cmd := &proc.Cmd{Argv: run, Stdin: os.Stdin, Subsys: "build",
+		Stdout: os.Stdout, Stderr: os.Stderr, Stream: !interactive}
 	r, err := cmd.Run()
 	if err != nil {
 		return fail.Cannot("%s: %v", engine, err)
@@ -180,7 +192,7 @@ func enterContainer(c *cfg.Config, engine string, argv []string, interactive boo
 
 // Inner is what runs inside the environment: build the runtime, install the
 // wrappers, put them on PATH and run the caller's command.
-func Inner(c *cfg.Config, argv []string) error {
+func Inner(c *cfg.Config, argv []string, interactive bool) error {
 	if len(argv) == 0 {
 		return fail.Cannot("pgb %s needs a command", InnerBuild)
 	}
@@ -213,6 +225,7 @@ func Inner(c *cfg.Config, argv []string) error {
 		Stdin:  os.Stdin,
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
+		Stream: !interactive,
 		Subsys: "build",
 	}
 	r, err := cmd.Run()
