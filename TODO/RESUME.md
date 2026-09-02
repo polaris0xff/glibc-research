@@ -50,15 +50,33 @@ both re-run.
 
 ## In flight right now
 
-    experiments/91-  ⛔ RUNNING, arm 5, the ten POCs against
-                     pgb-env-debian-trixie. It OWNS THE BED -- do not start
-                     85-, 93- or any POC beside it. Log:
+    experiments/91-  ⛔ RUNNING, arm 5, on 90-qt. It OWNS THE BED -- do not
+                     start 85-, 93- or any POC beside it. Log:
                      scratchpad/exp91-full.log; per-POC logs under
                      evidence/91-glibc-pin-candidates/build/poc-*.log.
-                     Green so far: 10-gawk, 20-nano, both at gcc 14.2.0.
+
+                     6 of 10 green at gcc 14.2.0, verified per binary via
+                     .comment: 10-gawk 20-nano 30-curl 40-jq 50-python
+                     60-leveldb. ⛔ 70-sqlite-extensions and 80-mlt failed on
+                     a `pgb` LINK BUG, not on glibc 2.41 -- fixed in dbdef184
+                     and THEY MUST BE RE-RUN. 90-qt and 91-qt-xcb unmeasured.
+
+    ⛔ NEXT, THE MOMENT 91- EXITS, IN THIS ORDER:
+      1  make                            (./pgb is stale: dbdef184 changed
+                                          tool/runtime/*.c and internal/)
+      2  re-run the two blocked POCs at 2.41 with the four variables below
+      3  sh experiments/85-opengl.sh     T-071's Prove
+      4  sh experiments/93-host-object-residue.sh   T-068
+    ⚠ Do not `make` while 91- is running: the POCs exec ./pgb.
 
     bootstrap is COMPLETE: nix, chroot env, docker env, 11 of 11 rootfs.
     pgb-env-debian-trixie is built: glibc 2.41, gcc 14.2.0.
+
+⭐ **85-'s data-coherence arm was validated OFFLINE this session** on a
+synthetic AppDir, so its bed time is not at risk: a good bundle exits 0, and
+85-'s own negative-control `sed` makes `pgb bundle manifests` exit 1 with
+`OUTSIDE ... -> /nix/store/...`. ⭐ **93-'s classifier was audited**: all
+twelve strings it matches on exist in `tool/runtime/pgb-elfload.c`.
 
 ## ⛔ THE INCANTATION FOR A CANDIDATE ENVIRONMENT, AND THE OLD ONE WAS WRONG
 
