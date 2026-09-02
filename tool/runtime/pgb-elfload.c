@@ -1,0 +1,1234 @@
+/* pgb-elfload.c -- an ELF loader compiled INTO a static glibc executable.
+ *
+ * THE PROBLEM THIS ANSWERS, AND WHY THE OBVIOUS FIX CANNOT
+ * -------------------------------------------------------------------------
+ * A static glibc binary that calls dlopen() borrows the HOST's ld.so and
+ * libc.so.6, and that pairing is what breaks: across the eleven pinned
+ * environments it dies inside glibc's own loader on nine and "succeeds" on
+ * two, where success means a second libc is now in the process.
+ *
+ * ⛔ AND A BETTER HOST LOADER WOULD NOT HELP. experiments/72- measured why:
+ * a static executable's DYNAMIC SYMBOL TABLE IS EMPTY -- DYNSYM 0 in that
+ * table's own column -- so a host-loaded plugin has nothing to bind back to.
+ * The plugin resolves `host_api_add` against an image that exports nothing
+ * and fails with "undefined symbol" even when the loader itself works.
+ *
+ *   ARM              DYNSYM   OUTCOME
+ *   dynamic-host     11       PASSED
+ *   static-host      0        FAIL dlopen: undefined symbol: host_api_add
+ *
+ * ⭐ So the loader has to be OURS, and the thing it resolves against has to
+ * be the glibc already statically linked into this executable.
+ *
+ * WHY THAT IS TRACTABLE, MEASURED RATHER THAN HOPED FOR
+ * -------------------------------------------------------------------------
+ * experiments/73- parsed 5,807 real host shared objects across the seven
+ * pinned glibc environments and checked every GLIBC_/GCC_-versioned import
+ * against what the pinned static glibc can define: 90.8%-97.8% already
+ * definable, and the UNEXPLAINED residue is zero on every environment. Every
+ * symbol that is not served falls into a class with a measured reason:
+ *
+ *   A  the host ld.so exports it     -- a compiled-in loader owns these, and
+ *                                      this file is where they are owned
+ *   B  host glibc newer than the pin -- 20 symbols, 14 of them __isoc23_*
+ *   C  the pin removed it            -- empty everywhere
+ *   S  in libc.so.6, never in libc.a -- 49 symbols, mostly sunrpc
+ *   D  not the host libc's either    -- another library's, or nobody's
+ *   E  unexplained                   -- ZERO
+ *
+ * WHAT WAS TAKEN FROM pg83/solo, AND WHAT WAS DELIBERATELY NOT
+ * -------------------------------------------------------------------------
+ * references/pg83__solo at 79451211 is a working loader of this shape, and
+ * docs/research/solo.md is the sweep. Taken: the provider table generated
+ * from a name list (lib/musl_symbols.cpp:1-12), the resolution ORDER rather
+ * than an approximation of it (lib/elf_loader.cpp:2034-2078), static
+ * providers short-circuiting the mapping entirely (lib/dlfcn.cpp:294-302),
+ * per-symbol loud failure instead of refusing the object (lib/glibc_stubs.cpp),
+ * the ldd-format internal trace (lib/elf_loader.h:21-26), and the AT_SECURE
+ * discipline (lib/elf_loader.h:11-14).
+ *
+ * ⛔ NOT taken, and this is the whole reason the route is cheaper here:
+ * lib/glibc_shim.cpp is 5,948 lines translating a guest's glibc imports onto
+ * MUSL. This executable's libc IS glibc, so there is no translation to write.
+ * lib/musl_tls.c is not taken either -- it writes musl's `libc.tls_head`
+ * directly, and glibc's equivalent is a different mechanism. TLS is handled
+ * below on glibc's own terms.
+ *
+ * ⚠ WHAT THIS FILE DOES NOT DO, stated rather than discovered later. Each is
+ * a loud, named failure, never a silent wrong answer:
+ *
+ *   - R_X86_64_TPOFF64 (initial-exec TLS) needs space in the STATIC TLS block,
+ *     which is laid out before main() and cannot be grown afterwards. It is
+ *     served from glibc's own reserved surplus when that is reachable and
+ *     refused by name when it is not. Demand is measured in experiments/76-.
+ *   - R_X86_64_TLSDESC needs a resolver trampoline; refused by name.
+ *   - Lazy binding is not implemented. Every PLT slot is bound at load, which
+ *     is what RTLD_NOW does, and RTLD_LAZY is honoured as RTLD_NOW. That is
+ *     allowed: lazy binding is an optimisation, not a contract.
+ *   - dladdr/dlinfo/dlvsym are not answered here.
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#define _GNU_SOURCE
+
+#include "pgb-elfload.h"
+
+#include <elf.h>
+#include <fcntl.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/auxv.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+/* ------------------------------------------------------------------ errors */
+
+/* ⛔ dlerror() IS PART OF THE INTERFACE. A caller that gets NULL with no
+ * message has been handed a silent failure, which is the exact failure mode
+ * this project exists to remove. Every path that returns NULL sets this. */
+static char pgb_el_errbuf[512];
+static int  pgb_el_errset;
+
+static void el_err(const char *fmt, ...)
+    __attribute__((format(printf, 1, 2)));
+
+static void el_err(const char *fmt, ...)
+{
+    va_list ap;
+    __builtin_va_start(ap, fmt);
+    vsnprintf(pgb_el_errbuf, sizeof pgb_el_errbuf, fmt, ap);
+    __builtin_va_end(ap);
+    pgb_el_errset = 1;
+}
+
+const char *pgb_elf_dlerror(void)
+{
+    if (!pgb_el_errset)
+        return NULL;
+    pgb_el_errset = 0;
+    return pgb_el_errbuf;
+}
+
+/* ------------------------------------------------------------ loaded object */
+
+#define EL_MAX_OBJS   64
+#define EL_MAX_NEEDED 32
+
+struct el_obj {
+    char        *path;          /* what we opened */
+    char        *soname;        /* DT_SONAME, or the basename */
+    unsigned char *base;        /* load bias; p_vaddr + base == run address */
+    size_t       span;          /* bytes reserved by the mapping */
+
+    const Elf64_Sym *symtab;
+    const char      *strtab;
+    const uint32_t  *gnu_hash;  /* DT_GNU_HASH, or NULL */
+    const uint32_t  *elf_hash;  /* DT_HASH, or NULL */
+    uint32_t         nsyms;     /* derived; 0 when neither hash is present */
+
+    const uint16_t  *versym;    /* DT_VERSYM */
+    const Elf64_Verdef  *verdef;
+    const Elf64_Verneed *verneed;
+
+    const Elf64_Rela *rela;     size_t relasz;
+    const Elf64_Rela *jmprel;   size_t jmprelsz;
+
+    void (**init_array)(void);  size_t init_arrayn;
+    void (**fini_array)(void);  size_t fini_arrayn;
+    void (*init)(void);
+    void (*fini)(void);
+
+    const char *runpath;        /* DT_RUNPATH, else DT_RPATH */
+    int          symbolic;      /* DT_SYMBOLIC or DF_SYMBOLIC */
+    int          textrel;
+
+    /* PT_TLS, if any. modid is this loader's own module numbering. */
+    const unsigned char *tls_image;
+    size_t tls_filesz, tls_memsz, tls_align;
+    size_t tls_modid;
+
+    unsigned char *relro;  size_t relrosz;
+
+    struct el_obj *needed[EL_MAX_NEEDED];
+    int            nneeded;
+
+    int refcount;
+    int initialised;
+};
+
+static struct el_obj *el_objs[EL_MAX_OBJS];
+static int            el_nobjs;
+
+/* Sonames answered out of the provider table instead of being mapped. Kept so
+ * pgb_elf_trace_loaded() can report them the way ldd does -- solo's mechanism
+ * 5, and the reason it matters is that a name served WITHOUT a mapping is
+ * invisible to a syscall trace. */
+static const char *el_served[EL_MAX_OBJS * EL_MAX_NEEDED];
+static int         el_nserved;
+
+/* ------------------------------------------------------------------- paging */
+
+static size_t el_pagesz(void)
+{
+    static size_t p;
+    if (!p) {
+        long v = sysconf(_SC_PAGESIZE);
+        p = v > 0 ? (size_t)v : 4096;
+    }
+    return p;
+}
+
+static size_t el_down(size_t v) { return v & ~(el_pagesz() - 1); }
+static size_t el_up(size_t v)   { return (v + el_pagesz() - 1) & ~(el_pagesz() - 1); }
+
+/* ---------------------------------------------------------- provider lookup */
+
+int pgb_elf_available(void)
+{
+    return &pgb_provider_syms[0] != NULL && pgb_provider_syms[0].name != NULL;
+}
+
+/* The executable's own static glibc, by name. The generated table is sorted,
+ * so this is a binary search: the table runs to several thousand entries and
+ * a load touches it once per undefined symbol.
+ *
+ * ⚠ A NULL addr is a name the generator listed and the LINK did not pull in
+ * -- see the weak-reference note in pgb-elfload.h. It is a miss here, and the
+ * caller reports it by name rather than guessing. */
+static void *el_provider(const char *name)
+{
+    size_t lo = 0, hi;
+
+    if (&pgb_provider_syms[0] == NULL)
+        return NULL;
+
+    for (hi = 0; pgb_provider_syms[hi].name; hi++)
+        ;
+    while (lo < hi) {
+        size_t mid = lo + (hi - lo) / 2;
+        int c = strcmp(pgb_provider_syms[mid].name, name);
+        if (c == 0)
+            return pgb_provider_syms[mid].addr;
+        if (c < 0)
+            lo = mid + 1;
+        else
+            hi = mid;
+    }
+    return NULL;
+}
+
+/* ⭐ solo's mechanism 3, and the mechanism that keeps a foreign libc OUT.
+ * Before touching the disk, a DT_NEEDED is checked against the sonames this
+ * executable already satisfies. A plugin needing libc.so.6 gets the glibc in
+ * this image, so the host's copy is never opened. */
+static int el_soname_served(const char *soname)
+{
+    const char *const *p;
+
+    if (&pgb_provider_sonames[0] == NULL)
+        return 0;
+    for (p = pgb_provider_sonames; *p; p++)
+        if (strcmp(*p, soname) == 0)
+            return 1;
+    return 0;
+}
+
+/* ------------------------------------------------------------ symbol tables */
+
+static uint32_t el_gnu_hash(const char *s)
+{
+    uint32_t h = 5381;
+    for (; *s; s++)
+        h = h * 33 + (unsigned char)*s;
+    return h;
+}
+
+static uint32_t el_sysv_hash(const char *s)
+{
+    uint32_t h = 0, g;
+    for (; *s; s++) {
+        h = (h << 4) + (unsigned char)*s;
+        if ((g = h & 0xf0000000u))
+            h ^= g >> 24;
+        h &= ~g;
+    }
+    return h;
+}
+
+/* The number of entries in .dynsym. DT_HASH states it outright; DT_GNU_HASH
+ * does not, so it is derived by finding the highest bucket and walking that
+ * chain to its terminator. Needed because dlsym over a versioned table and
+ * the verneed walk both iterate symbols by index. */
+static uint32_t el_gnu_symcount(const uint32_t *gh)
+{
+    uint32_t nbuckets = gh[0], symoffset = gh[1], bloomsz = gh[2];
+    const uint32_t *buckets = gh + 4 + bloomsz * 2;   /* bloom words are 64-bit */
+    const uint32_t *chain   = buckets + nbuckets;
+    uint32_t i, last = 0;
+
+    for (i = 0; i < nbuckets; i++)
+        if (buckets[i] > last)
+            last = buckets[i];
+    if (last < symoffset)
+        return symoffset;
+    while (!(chain[last - symoffset] & 1))
+        last++;
+    return last + 1;
+}
+
+/* Version name of symbol index `si` when it is a DEFINITION, or NULL for an
+ * unversioned one. Index 0 (local) and 1 (global, unversioned) both mean
+ * "carries no version" for matching purposes; the 0x8000 bit marks hidden. */
+static const char *el_defver(const struct el_obj *o, uint32_t si)
+{
+    uint16_t vi;
+    const Elf64_Verdef *vd;
+
+    if (!o->versym || !o->verdef)
+        return NULL;
+    vi = o->versym[si] & 0x7fff;
+    if (vi <= 1)
+        return NULL;
+    for (vd = o->verdef;; ) {
+        if ((vd->vd_ndx & 0x7fff) == vi) {
+            const Elf64_Verdaux *aux =
+                (const Elf64_Verdaux *)((const char *)vd + vd->vd_aux);
+            return o->strtab + aux->vda_name;
+        }
+        if (!vd->vd_next)
+            return NULL;
+        vd = (const Elf64_Verdef *)((const char *)vd + vd->vd_next);
+    }
+}
+
+/* A definition in `o` matching `name`, honouring the version rule. Returns the
+ * symbol or NULL.
+ *
+ * ⚠ THE VERSION RULE IS NARROWER THAN IT LOOKS, and experiments/73- asserts
+ * it in both directions. An UNVERSIONED definition satisfies a versioned
+ * reference -- that is ld.so's documented compatibility rule and it is where
+ * a compiled-in provider table sits. But the object NAMED in DT_VERNEED,
+ * rebuilt without versions, makes the real loader assert. So: match the
+ * version when both sides carry one; accept an unversioned definition
+ * otherwise; never accept a WRONG version silently. */
+static const Elf64_Sym *el_lookup_in(const struct el_obj *o, const char *name,
+                                     const char *want_ver)
+{
+    const Elf64_Sym *sym = NULL;
+    uint32_t si = 0;
+
+    if (!o->symtab || !o->strtab)
+        return NULL;
+
+    if (o->gnu_hash) {
+        const uint32_t *gh = o->gnu_hash;
+        uint32_t nbuckets = gh[0], symoffset = gh[1];
+        uint32_t bloomsz = gh[2], bloomshift = gh[3];
+        const uint64_t *bloom = (const uint64_t *)(gh + 4);
+        const uint32_t *buckets = (const uint32_t *)(bloom + bloomsz);
+        const uint32_t *chain = buckets + nbuckets;
+        uint32_t h = el_gnu_hash(name), n;
+        uint64_t word, mask;
+
+        if (!nbuckets || !bloomsz)
+            return NULL;
+        word = bloom[(h / 64) % bloomsz];
+        mask = (1ull << (h % 64)) | (1ull << ((h >> bloomshift) % 64));
+        if ((word & mask) != mask)
+            return NULL;              /* the bloom filter says no, definitively */
+        n = buckets[h % nbuckets];
+        if (n < symoffset)
+            return NULL;
+        for (;;) {
+            uint32_t c = chain[n - symoffset];
+            if ((c | 1) == (h | 1)) {
+                const Elf64_Sym *s = &o->symtab[n];
+                if (s->st_shndx != SHN_UNDEF &&
+                    strcmp(o->strtab + s->st_name, name) == 0) {
+                    sym = s; si = n;
+                    break;
+                }
+            }
+            if (c & 1)
+                return NULL;
+            n++;
+        }
+    } else if (o->elf_hash) {
+        const uint32_t *eh = o->elf_hash;
+        uint32_t nbucket = eh[0], nchain = eh[1];
+        const uint32_t *bucket = eh + 2, *chain = bucket + nbucket;
+        uint32_t n;
+
+        if (!nbucket)
+            return NULL;
+        for (n = bucket[el_sysv_hash(name) % nbucket]; n; n = chain[n]) {
+            const Elf64_Sym *s = &o->symtab[n];
+            if (n >= nchain)
+                return NULL;
+            if (s->st_shndx != SHN_UNDEF &&
+                strcmp(o->strtab + s->st_name, name) == 0) {
+                sym = s; si = n;
+                break;
+            }
+        }
+        if (!sym)
+            return NULL;
+    } else {
+        return NULL;              /* no hash table: nothing to search */
+    }
+
+    if (want_ver) {
+        const char *have = el_defver(o, si);
+        if (have && strcmp(have, want_ver) != 0)
+            return NULL;          /* wrong version stays a loud miss */
+    }
+    return sym;
+}
+
+/* Version NAME a reference at symbol index `si` asks for, or NULL. Read out of
+ * DT_VERNEED, whose Vernaux entries carry the vna_other index DT_VERSYM
+ * points at for undefined symbols. */
+static const char *el_refver(const struct el_obj *o, uint32_t si)
+{
+    uint16_t vi;
+    const Elf64_Verneed *vn;
+
+    if (!o->versym || !o->verneed)
+        return NULL;
+    vi = o->versym[si] & 0x7fff;
+    if (vi <= 1)
+        return NULL;
+    for (vn = o->verneed;; ) {
+        const Elf64_Vernaux *aux =
+            (const Elf64_Vernaux *)((const char *)vn + vn->vn_aux);
+        int i;
+        for (i = 0; i < vn->vn_cnt; i++) {
+            if ((aux->vna_other & 0x7fff) == vi)
+                return o->strtab + aux->vna_name;
+            if (!aux->vna_next)
+                break;
+            aux = (const Elf64_Vernaux *)((const char *)aux + aux->vna_next);
+        }
+        if (!vn->vn_next)
+            return NULL;
+        vn = (const Elf64_Verneed *)((const char *)vn + vn->vn_next);
+    }
+}
+
+/* ⭐ THE RESOLUTION ORDER, not an approximation of it (solo's mechanism 2,
+ * elf_loader.cpp:2034-2078). A loader that gets this wrong binds the right
+ * name to the wrong definition and fails far from the cause.
+ *
+ *   1. the requesting object itself, when it is DT_SYMBOLIC
+ *   2. the global scope, in load order
+ *   3. the requester's own dependency closure
+ *   4. the compiled-in provider table -- OUR static glibc
+ *
+ * ⚠ The provider table is LAST on purpose. A plugin that ships its own copy of
+ * a symbol and a sibling that needs it must bind to each other, exactly as
+ * they would under ld.so; falling to libc first would silently change which
+ * definition wins.
+ */
+static void *el_resolve(struct el_obj *req, const char *name, const char *ver,
+                        int *found)
+{
+    const Elf64_Sym *s;
+    int i;
+
+    *found = 0;
+
+    if (req && req->symbolic) {
+        s = el_lookup_in(req, name, ver);
+        if (s) { *found = 1; return req->base + s->st_value; }
+    }
+    for (i = 0; i < el_nobjs; i++) {
+        s = el_lookup_in(el_objs[i], name, ver);
+        if (s) { *found = 1; return el_objs[i]->base + s->st_value; }
+    }
+    if (req) {
+        for (i = 0; i < req->nneeded; i++) {
+            s = el_lookup_in(req->needed[i], name, ver);
+            if (s) { *found = 1; return req->needed[i]->base + s->st_value; }
+        }
+    }
+    {
+        void *p = el_provider(name);
+        if (p) { *found = 1; return p; }
+    }
+    return NULL;
+}
+
+/* ------------------------------------------------------------------ our TLS */
+
+/* ⭐ CLASS A OF experiments/73- IS OWNED HERE. __tls_get_addr is exported by
+ * the host's ld.so, which is exactly why a compiled-in loader has to define
+ * it rather than count it as a gap: general-dynamic TLS in a loaded object
+ * calls it, and there is no ld.so in this process to answer.
+ *
+ * The block is per (thread, module). `__thread` puts the per-thread head in
+ * the executable's OWN static TLS, which is laid out before main() and is
+ * therefore always available -- no surplus is consumed for the bookkeeping,
+ * only for the modules themselves, which are heap.
+ */
+struct el_tls_block {
+    size_t modid;
+    void  *mem;
+    struct el_tls_block *next;
+};
+
+static __thread struct el_tls_block *el_tls_head;
+static size_t el_tls_next_modid = 1;
+
+struct el_tls_index { unsigned long ti_module, ti_offset; };
+
+void *__tls_get_addr(struct el_tls_index *ti);
+
+void *__tls_get_addr(struct el_tls_index *ti)
+{
+    struct el_tls_block *b;
+    struct el_obj *o = NULL;
+    int i;
+
+    for (b = el_tls_head; b; b = b->next)
+        if (b->modid == ti->ti_module)
+            return (char *)b->mem + ti->ti_offset;
+
+    for (i = 0; i < el_nobjs; i++)
+        if (el_objs[i]->tls_modid == ti->ti_module) { o = el_objs[i]; break; }
+    if (!o)
+        return NULL;
+
+    b = calloc(1, sizeof *b);
+    if (!b)
+        return NULL;
+    b->modid = ti->ti_module;
+    b->mem = calloc(1, o->tls_memsz ? o->tls_memsz : 1);
+    if (!b->mem) { free(b); return NULL; }
+    if (o->tls_image && o->tls_filesz)
+        memcpy(b->mem, o->tls_image, o->tls_filesz);
+    b->next = el_tls_head;
+    el_tls_head = b;
+    return (char *)b->mem + ti->ti_offset;
+}
+
+/* --------------------------------------------------------------- relocation */
+
+static int el_reloc_one(struct el_obj *o, const Elf64_Rela *r)
+{
+    uint32_t type = ELF64_R_TYPE(r->r_info);
+    uint32_t si   = ELF64_R_SYM(r->r_info);
+    unsigned char *where = o->base + r->r_offset;
+    const char *name = NULL, *ver = NULL;
+    void *val = NULL;
+    int found = 0, weak = 0;
+
+    if (si) {
+        const Elf64_Sym *s = &o->symtab[si];
+        name = o->strtab + s->st_name;
+        ver  = el_refver(o, si);
+        weak = ELF64_ST_BIND(s->st_info) == STB_WEAK;
+    }
+
+    switch (type) {
+    case R_X86_64_NONE:
+        return 0;
+
+    /* B + A: no symbol involved, just the load bias. The overwhelming
+     * majority of relocations in any real .so are these. */
+    case R_X86_64_RELATIVE:
+        *(uint64_t *)where = (uint64_t)(uintptr_t)(o->base + r->r_addend);
+        return 0;
+
+    /* ⭐ An IFUNC resolver, run at relocation time exactly as ld.so runs it.
+     * glibc's string and memory routines in a host object are these, so a
+     * loader that skipped them would bind a resolver address as if it were
+     * the function and crash on first call. */
+    case R_X86_64_IRELATIVE: {
+        void *(*fn)(void) = (void *(*)(void))(uintptr_t)(o->base + r->r_addend);
+        *(uint64_t *)where = (uint64_t)(uintptr_t)fn();
+        return 0;
+    }
+
+    case R_X86_64_64:
+    case R_X86_64_GLOB_DAT:
+    case R_X86_64_JUMP_SLOT:
+        val = el_resolve(o, name, ver, &found);
+        if (!found) {
+            if (weak) { *(uint64_t *)where = 0; return 0; }
+            el_err("pgb-elfload: %s: undefined symbol: %s%s%s",
+                   o->soname, name ? name : "?", ver ? "@" : "", ver ? ver : "");
+            return -1;
+        }
+        *(uint64_t *)where = (uint64_t)(uintptr_t)val +
+                             (type == R_X86_64_64 ? (uint64_t)r->r_addend : 0);
+        return 0;
+
+    case R_X86_64_PC32:
+    case R_X86_64_PLT32:
+        val = el_resolve(o, name, ver, &found);
+        if (!found && !weak) {
+            el_err("pgb-elfload: %s: undefined symbol: %s", o->soname,
+                   name ? name : "?");
+            return -1;
+        }
+        *(uint32_t *)where = (uint32_t)((int64_t)(uintptr_t)val + r->r_addend -
+                                        (int64_t)(uintptr_t)where);
+        return 0;
+
+    case R_X86_64_32:
+    case R_X86_64_32S:
+        val = el_resolve(o, name, ver, &found);
+        if (!found && !weak) {
+            el_err("pgb-elfload: %s: undefined symbol: %s", o->soname,
+                   name ? name : "?");
+            return -1;
+        }
+        *(uint32_t *)where = (uint32_t)((uint64_t)(uintptr_t)val + r->r_addend);
+        return 0;
+
+    /* R_X86_64_COPY only appears in executables, never in the shared objects
+     * this loader maps. Named rather than silently ignored. */
+    case R_X86_64_COPY:
+        el_err("pgb-elfload: %s: R_X86_64_COPY in a shared object (%s)",
+               o->soname, name ? name : "?");
+        return -1;
+
+    /* General-dynamic TLS: the module id, then the offset within it. Our
+     * __tls_get_addr above answers the pair. */
+    case R_X86_64_DTPMOD64:
+        if (si == 0 || !name || !*name) {
+            *(uint64_t *)where = o->tls_modid;
+            return 0;
+        }
+        {
+            int i;
+            for (i = 0; i < el_nobjs; i++)
+                if (el_lookup_in(el_objs[i], name, ver)) {
+                    *(uint64_t *)where = el_objs[i]->tls_modid;
+                    return 0;
+                }
+        }
+        *(uint64_t *)where = o->tls_modid;
+        return 0;
+
+    case R_X86_64_DTPOFF64:
+        if (si == 0 || !name || !*name) {
+            *(uint64_t *)where = (uint64_t)r->r_addend;
+            return 0;
+        }
+        {
+            const Elf64_Sym *s = el_lookup_in(o, name, ver);
+            *(uint64_t *)where = (s ? s->st_value : 0) + (uint64_t)r->r_addend;
+        }
+        return 0;
+
+    /* ⛔ INITIAL-EXEC. The offset is from the thread pointer, into the STATIC
+     * TLS block, which glibc lays out before main() and which cannot be grown
+     * afterwards. Refused BY NAME rather than bound to a plausible-looking
+     * wrong offset -- solo's mechanism 4, and the difference between a loud
+     * failure and a silent corruption of another module's thread storage. */
+    case R_X86_64_TPOFF64:
+        el_err("pgb-elfload: %s: initial-exec TLS (R_X86_64_TPOFF64) for %s "
+               "needs static TLS surplus this image cannot grow",
+               o->soname, name ? name : "?");
+        return -1;
+
+    case R_X86_64_TLSDESC:
+        el_err("pgb-elfload: %s: TLSDESC relocation for %s is not implemented",
+               o->soname, name ? name : "?");
+        return -1;
+
+    default:
+        el_err("pgb-elfload: %s: unhandled relocation type %u", o->soname, type);
+        return -1;
+    }
+}
+
+static int el_relocate(struct el_obj *o)
+{
+    size_t i;
+
+    if (o->textrel) {
+        /* A DT_TEXTREL object writes into its own code, so the text segment
+         * has to be writable while that happens and is restored after. */
+        if (mprotect(o->base, o->span, PROT_READ | PROT_WRITE | PROT_EXEC) != 0) {
+            el_err("pgb-elfload: %s: DT_TEXTREL and mprotect refused", o->soname);
+            return -1;
+        }
+    }
+    for (i = 0; o->rela && i < o->relasz / sizeof(Elf64_Rela); i++)
+        if (el_reloc_one(o, &o->rela[i]) != 0)
+            return -1;
+    for (i = 0; o->jmprel && i < o->jmprelsz / sizeof(Elf64_Rela); i++)
+        if (el_reloc_one(o, &o->jmprel[i]) != 0)
+            return -1;
+    return 0;
+}
+
+/* ------------------------------------------------------------------ mapping */
+
+static int el_prot(uint32_t flags)
+{
+    return ((flags & PF_R) ? PROT_READ : 0) |
+           ((flags & PF_W) ? PROT_WRITE : 0) |
+           ((flags & PF_X) ? PROT_EXEC : 0);
+}
+
+/* Reserve the whole span PROT_NONE first, then place each PT_LOAD inside it
+ * with MAP_FIXED. Reserving in one call is what guarantees the segments keep
+ * their relative offsets -- mapping them one at a time and hoping the kernel
+ * puts them adjacent is the classic way to get a loader that works until the
+ * address space is busy. */
+static int el_map(struct el_obj *o, int fd, const Elf64_Ehdr *eh,
+                  const Elf64_Phdr *ph)
+{
+    size_t minva = (size_t)-1, maxva = 0;
+    unsigned char *base;
+    int i;
+
+    for (i = 0; i < eh->e_phnum; i++) {
+        if (ph[i].p_type != PT_LOAD)
+            continue;
+        if (ph[i].p_vaddr < minva)
+            minva = ph[i].p_vaddr;
+        if (ph[i].p_vaddr + ph[i].p_memsz > maxva)
+            maxva = ph[i].p_vaddr + ph[i].p_memsz;
+    }
+    if (minva == (size_t)-1) {
+        el_err("pgb-elfload: %s: no PT_LOAD segment", o->path);
+        return -1;
+    }
+    minva = el_down(minva);
+    maxva = el_up(maxva);
+
+    base = mmap(NULL, maxva - minva, PROT_NONE,
+                MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (base == MAP_FAILED) {
+        el_err("pgb-elfload: %s: reservation of %zu bytes failed", o->path,
+               maxva - minva);
+        return -1;
+    }
+    o->base = base - minva;
+    o->span = maxva - minva;
+
+    for (i = 0; i < eh->e_phnum; i++) {
+        const Elf64_Phdr *p = &ph[i];
+        unsigned char *seg, *fend, *mend;
+        size_t off;
+
+        if (p->p_type != PT_LOAD)
+            continue;
+        seg  = o->base + el_down(p->p_vaddr);
+        off  = el_down(p->p_offset);
+        fend = o->base + p->p_vaddr + p->p_filesz;
+        mend = o->base + p->p_vaddr + p->p_memsz;
+
+        if (p->p_filesz &&
+            mmap(seg, (size_t)(fend - seg), el_prot(p->p_flags),
+                 MAP_PRIVATE | MAP_FIXED, fd, (off_t)off) == MAP_FAILED) {
+            el_err("pgb-elfload: %s: segment %d mmap failed", o->path, i);
+            return -1;
+        }
+        /* .bss: zero the tail of the last file page, then map anonymous pages
+         * for whatever is left. Skipping the first half is the bug that makes
+         * a loaded object see another object's data in its uninitialised
+         * globals -- it only shows up when memsz crosses a page boundary. */
+        if (p->p_memsz > p->p_filesz) {
+            unsigned char *zstart = fend;
+            unsigned char *zend   = (unsigned char *)el_up((size_t)fend);
+            if (zend > mend)
+                zend = mend;
+            if (zend > zstart && (p->p_flags & PF_W))
+                memset(zstart, 0, (size_t)(zend - zstart));
+            zstart = (unsigned char *)el_up((size_t)fend);
+            zend   = (unsigned char *)el_up((size_t)mend);
+            if (zend > zstart &&
+                mmap(zstart, (size_t)(zend - zstart), el_prot(p->p_flags),
+                     MAP_PRIVATE | MAP_FIXED | MAP_ANONYMOUS, -1, 0) == MAP_FAILED) {
+                el_err("pgb-elfload: %s: bss mmap failed", o->path);
+                return -1;
+            }
+        }
+    }
+    return 0;
+}
+
+/* ------------------------------------------------------------ dynamic table */
+
+static void el_read_dynamic(struct el_obj *o, const Elf64_Dyn *dyn)
+{
+    const Elf64_Dyn *d;
+    size_t strsz = 0;
+    uint64_t soname_off = 0, runpath_off = 0, rpath_off = 0;
+    uint64_t needed_off[EL_MAX_NEEDED];
+    int nneeded_off = 0;
+    int i;
+
+    /* DT_STRTAB has to be resolved before any offset into it is meaningful,
+     * and the entries are not ordered, so this is two passes. */
+    for (d = dyn; d->d_tag != DT_NULL; d++) {
+        switch (d->d_tag) {
+        case DT_STRTAB: o->strtab = (const char *)(o->base + d->d_un.d_ptr); break;
+        case DT_STRSZ:  strsz = d->d_un.d_val; break;
+        case DT_SYMTAB: o->symtab = (const Elf64_Sym *)(o->base + d->d_un.d_ptr); break;
+        case DT_GNU_HASH: o->gnu_hash = (const uint32_t *)(o->base + d->d_un.d_ptr); break;
+        case DT_HASH:   o->elf_hash = (const uint32_t *)(o->base + d->d_un.d_ptr); break;
+        case DT_VERSYM: o->versym = (const uint16_t *)(o->base + d->d_un.d_ptr); break;
+        case DT_VERDEF: o->verdef = (const Elf64_Verdef *)(o->base + d->d_un.d_ptr); break;
+        case DT_VERNEED: o->verneed = (const Elf64_Verneed *)(o->base + d->d_un.d_ptr); break;
+        case DT_RELA:   o->rela = (const Elf64_Rela *)(o->base + d->d_un.d_ptr); break;
+        case DT_RELASZ: o->relasz = d->d_un.d_val; break;
+        case DT_JMPREL: o->jmprel = (const Elf64_Rela *)(o->base + d->d_un.d_ptr); break;
+        case DT_PLTRELSZ: o->jmprelsz = d->d_un.d_val; break;
+        case DT_INIT:   o->init = (void (*)(void))(o->base + d->d_un.d_ptr); break;
+        case DT_FINI:   o->fini = (void (*)(void))(o->base + d->d_un.d_ptr); break;
+        case DT_INIT_ARRAY: o->init_array = (void (**)(void))(o->base + d->d_un.d_ptr); break;
+        case DT_INIT_ARRAYSZ: o->init_arrayn = d->d_un.d_val / sizeof(void *); break;
+        case DT_FINI_ARRAY: o->fini_array = (void (**)(void))(o->base + d->d_un.d_ptr); break;
+        case DT_FINI_ARRAYSZ: o->fini_arrayn = d->d_un.d_val / sizeof(void *); break;
+        case DT_SONAME: soname_off = d->d_un.d_val; break;
+        case DT_RUNPATH: runpath_off = d->d_un.d_val; break;
+        case DT_RPATH:  rpath_off = d->d_un.d_val; break;
+        case DT_SYMBOLIC: o->symbolic = 1; break;
+        case DT_TEXTREL: o->textrel = 1; break;
+        case DT_FLAGS:
+            if (d->d_un.d_val & DF_SYMBOLIC) o->symbolic = 1;
+            if (d->d_un.d_val & DF_TEXTREL)  o->textrel = 1;
+            break;
+        case DT_NEEDED:
+            if (nneeded_off < EL_MAX_NEEDED)
+                needed_off[nneeded_off++] = d->d_un.d_val;
+            break;
+        default:
+            break;
+        }
+    }
+    (void)strsz;
+
+    if (o->strtab) {
+        if (soname_off)  o->soname  = strdup(o->strtab + soname_off);
+        if (runpath_off) o->runpath = o->strtab + runpath_off;
+        else if (rpath_off) o->runpath = o->strtab + rpath_off;
+    }
+    if (!o->soname) {
+        const char *b = strrchr(o->path, '/');
+        o->soname = strdup(b ? b + 1 : o->path);
+    }
+    if (o->gnu_hash)
+        o->nsyms = el_gnu_symcount(o->gnu_hash);
+    else if (o->elf_hash)
+        o->nsyms = o->elf_hash[1];
+
+    /* Kept as offsets and turned into strings only now, because the second
+     * pass is where DT_STRTAB is known to be set. */
+    o->nneeded = 0;
+    for (i = 0; i < nneeded_off; i++) {
+        o->needed[i] = NULL;   /* filled by the caller's DT_NEEDED walk */
+    }
+    o->nneeded = nneeded_off;
+    for (i = 0; i < nneeded_off; i++)
+        o->needed[i] = (struct el_obj *)(uintptr_t)needed_off[i];  /* offset for now */
+}
+
+/* --------------------------------------------------------------- the search */
+
+/* ⭐ solo's mechanism 6, and PR #4's correctness detail. A bare soname is
+ * resolved through the REQUESTER's DT_RUNPATH first -- glibc does this, and a
+ * loader that consults only its own list misses siblings reached via $ORIGIN.
+ *
+ * ⛔ AT_SECURE discipline: a set-uid process ignores the environment's search
+ * paths entirely. Checked once, from the auxiliary vector. */
+static int el_secure(void)
+{
+    static int v = -1;
+    if (v < 0)
+        v = getauxval(AT_SECURE) != 0;
+    return v;
+}
+
+static int el_exists(const char *p)
+{
+    struct stat st;
+    return stat(p, &st) == 0 && S_ISREG(st.st_mode);
+}
+
+static char *el_origin_of(const char *path)
+{
+    char *d = strdup(path), *s;
+    if (!d)
+        return NULL;
+    s = strrchr(d, '/');
+    if (s)
+        *s = '\0';
+    else
+        strcpy(d, ".");
+    return d;
+}
+
+/* Expand $ORIGIN in one search-path element and test `dir/name`. */
+static int el_try(char *out, size_t outsz, const char *dir, size_t dirlen,
+                  const char *origin, const char *name)
+{
+    char d[4096];
+    size_t n = 0;
+    size_t i = 0;
+
+    while (i < dirlen && n + 1 < sizeof d) {
+        if (dir[i] == '$' &&
+            (strncmp(dir + i, "$ORIGIN", 7) == 0 ||
+             strncmp(dir + i, "${ORIGIN}", 9) == 0)) {
+            size_t olen = strlen(origin ? origin : ".");
+            if (n + olen + 1 >= sizeof d)
+                return 0;
+            memcpy(d + n, origin ? origin : ".", olen);
+            n += olen;
+            i += (dir[i + 1] == '{') ? 9 : 7;
+            continue;
+        }
+        d[n++] = dir[i++];
+    }
+    d[n] = '\0';
+    if (!n)
+        return 0;
+    if ((size_t)snprintf(out, outsz, "%s/%s", d, name) >= outsz)
+        return 0;
+    return el_exists(out);
+}
+
+static int el_search(char *out, size_t outsz, const char *name,
+                     const struct el_obj *req)
+{
+    static const char *const sysdirs[] = {
+        "/lib/x86_64-linux-gnu", "/usr/lib/x86_64-linux-gnu",
+        "/lib64", "/usr/lib64", "/lib", "/usr/lib",
+        "/usr/local/lib", "/usr/local/lib64", NULL
+    };
+    const char *const *s;
+    char *origin = NULL;
+    int i;
+
+    if (strchr(name, '/')) {
+        if ((size_t)snprintf(out, outsz, "%s", name) >= outsz)
+            return 0;
+        return el_exists(out);
+    }
+
+    if (req)
+        origin = el_origin_of(req->path);
+
+    /* 1. the requester's DT_RUNPATH / DT_RPATH, $ORIGIN expanded */
+    if (req && req->runpath) {
+        const char *p = req->runpath;
+        while (*p) {
+            const char *c = strchr(p, ':');
+            size_t len = c ? (size_t)(c - p) : strlen(p);
+            if (len && el_try(out, outsz, p, len, origin, name)) {
+                free(origin);
+                return 1;
+            }
+            if (!c)
+                break;
+            p = c + 1;
+        }
+    }
+    /* 2. LD_LIBRARY_PATH -- ⛔ never for a set-uid process */
+    if (!el_secure()) {
+        const char *env = getenv("LD_LIBRARY_PATH");
+        while (env && *env) {
+            const char *c = strchr(env, ':');
+            size_t len = c ? (size_t)(c - env) : strlen(env);
+            if (len && el_try(out, outsz, env, len, origin, name)) {
+                free(origin);
+                return 1;
+            }
+            if (!c)
+                break;
+            env = c + 1;
+        }
+    }
+    /* 3. the ordinary system directories */
+    for (s = sysdirs; *s; s++) {
+        if ((size_t)snprintf(out, outsz, "%s/%s", *s, name) < outsz &&
+            el_exists(out)) {
+            free(origin);
+            return 1;
+        }
+    }
+    /* 4. beside the requester */
+    if (origin && (size_t)snprintf(out, outsz, "%s/%s", origin, name) < outsz &&
+        el_exists(out)) {
+        free(origin);
+        return 1;
+    }
+    for (i = 0; i < 0; i++)
+        ;
+    free(origin);
+    return 0;
+}
+
+/* ------------------------------------------------------------------ loading */
+
+static struct el_obj *el_load(const char *path, const struct el_obj *req);
+
+static struct el_obj *el_already(const char *soname)
+{
+    int i;
+    for (i = 0; i < el_nobjs; i++)
+        if (strcmp(el_objs[i]->soname, soname) == 0)
+            return el_objs[i];
+    return NULL;
+}
+
+/* Resolve the DT_NEEDED offsets stashed by el_read_dynamic into real objects,
+ * short-circuiting the ones the provider table already satisfies. */
+static int el_load_needed(struct el_obj *o)
+{
+    int i, n = o->nneeded, keep = 0;
+    uint64_t offs[EL_MAX_NEEDED];
+
+    for (i = 0; i < n; i++)
+        offs[i] = (uint64_t)(uintptr_t)o->needed[i];
+
+    for (i = 0; i < n; i++) {
+        const char *nm = o->strtab + offs[i];
+        struct el_obj *dep;
+        char found[4096];
+
+        /* ⭐ THE MECHANISM THAT KEEPS A FOREIGN LIBC OUT. */
+        if (el_soname_served(nm)) {
+            if (el_nserved < (int)(sizeof el_served / sizeof el_served[0]))
+                el_served[el_nserved++] = nm;
+            continue;
+        }
+        if ((dep = el_already(nm)) != NULL) {
+            o->needed[keep++] = dep;
+            continue;
+        }
+        if (!el_search(found, sizeof found, nm, o)) {
+            el_err("pgb-elfload: %s: cannot find %s", o->soname, nm);
+            return -1;
+        }
+        dep = el_load(found, o);
+        if (!dep)
+            return -1;
+        o->needed[keep++] = dep;
+    }
+    o->nneeded = keep;
+    return 0;
+}
+
+static struct el_obj *el_load(const char *path, const struct el_obj *req)
+{
+    struct el_obj *o;
+    Elf64_Ehdr eh;
+    Elf64_Phdr *ph = NULL;
+    const Elf64_Dyn *dyn = NULL;
+    int fd = -1, i;
+
+    (void)req;
+
+    if (el_nobjs >= EL_MAX_OBJS) {
+        el_err("pgb-elfload: more than %d objects loaded", EL_MAX_OBJS);
+        return NULL;
+    }
+    fd = open(path, O_RDONLY | O_CLOEXEC);
+    if (fd < 0) {
+        el_err("pgb-elfload: cannot open %s", path);
+        return NULL;
+    }
+    if (read(fd, &eh, sizeof eh) != (ssize_t)sizeof eh ||
+        memcmp(eh.e_ident, ELFMAG, SELFMAG) != 0 ||
+        eh.e_ident[EI_CLASS] != ELFCLASS64 ||
+        eh.e_machine != EM_X86_64 ||
+        (eh.e_type != ET_DYN)) {
+        el_err("pgb-elfload: %s is not an x86-64 ELF shared object", path);
+        close(fd);
+        return NULL;
+    }
+    ph = malloc((size_t)eh.e_phnum * sizeof(Elf64_Phdr));
+    if (!ph ||
+        pread(fd, ph, (size_t)eh.e_phnum * sizeof(Elf64_Phdr),
+              (off_t)eh.e_phoff) !=
+            (ssize_t)((size_t)eh.e_phnum * sizeof(Elf64_Phdr))) {
+        el_err("pgb-elfload: %s: cannot read program headers", path);
+        free(ph);
+        close(fd);
+        return NULL;
+    }
+
+    o = calloc(1, sizeof *o);
+    if (!o) { free(ph); close(fd); el_err("pgb-elfload: out of memory"); return NULL; }
+    o->path = strdup(path);
+
+    if (el_map(o, fd, &eh, ph) != 0) {
+        free(ph); close(fd); free(o->path); free(o);
+        return NULL;
+    }
+    close(fd);
+
+    for (i = 0; i < eh.e_phnum; i++) {
+        if (ph[i].p_type == PT_DYNAMIC)
+            dyn = (const Elf64_Dyn *)(o->base + ph[i].p_vaddr);
+        else if (ph[i].p_type == PT_TLS) {
+            o->tls_image  = o->base + ph[i].p_vaddr;
+            o->tls_filesz = ph[i].p_filesz;
+            o->tls_memsz  = ph[i].p_memsz;
+            o->tls_align  = ph[i].p_align;
+            o->tls_modid  = el_tls_next_modid++;
+        } else if (ph[i].p_type == PT_GNU_RELRO) {
+            o->relro   = o->base + el_down(ph[i].p_vaddr);
+            o->relrosz = el_up(ph[i].p_vaddr + ph[i].p_memsz) -
+                         el_down(ph[i].p_vaddr);
+        }
+    }
+    if (!dyn) {
+        el_err("pgb-elfload: %s: no PT_DYNAMIC", path);
+        free(ph); free(o->path); free(o);
+        return NULL;
+    }
+    el_read_dynamic(o, dyn);
+    free(ph);
+
+    /* Registered BEFORE relocating so that a dependency cycle terminates and
+     * so that a symbol defined here is visible to its own dependencies. */
+    el_objs[el_nobjs++] = o;
+
+    if (el_load_needed(o) != 0 || el_relocate(o) != 0) {
+        el_nobjs--;
+        return NULL;
+    }
+
+    /* RELRO after relocation, which is the whole point of the segment: the
+     * GOT is written while binding and read-only forever after. */
+    if (o->relro && o->relrosz)
+        mprotect(o->relro, o->relrosz, PROT_READ);
+    if (o->textrel)
+        mprotect(o->base, o->span, PROT_READ | PROT_EXEC);
+
+    o->refcount = 1;
+    return o;
+}
+
+static void el_init(struct el_obj *o)
+{
+    size_t i;
+
+    if (o->initialised)
+        return;
+    o->initialised = 1;
+    /* Dependencies first, which is the order ld.so uses and the order a
+     * constructor that calls into a dependency requires. */
+    for (i = 0; i < (size_t)o->nneeded; i++)
+        el_init(o->needed[i]);
+    if (o->init)
+        o->init();
+    for (i = 0; i < o->init_arrayn; i++)
+        if (o->init_array[i])
+            o->init_array[i]();
+}
+
+/* -------------------------------------------------------------- public face */
+
+void *pgb_elf_dlopen(const char *path, int flags)
+{
+    struct el_obj *o;
+    char found[4096];
+
+    (void)flags;   /* RTLD_LAZY is honoured as RTLD_NOW -- see the header. */
+    pgb_el_errset = 0;
+
+    if (!pgb_elf_available()) {
+        el_err("pgb-elfload: no provider table was compiled in "
+               "(build with --host-dlopen)");
+        return NULL;
+    }
+    if (path == NULL) {
+        el_err("pgb-elfload: dlopen(NULL) has no answer in a static image");
+        return NULL;
+    }
+    if (!el_search(found, sizeof found, path, NULL)) {
+        el_err("pgb-elfload: cannot find %s", path);
+        return NULL;
+    }
+    {
+        const char *b = strrchr(found, '/');
+        struct el_obj *have = el_already(b ? b + 1 : found);
+        if (have) { have->refcount++; return have; }
+    }
+    o = el_load(found, NULL);
+    if (!o)
+        return NULL;
+    el_init(o);
+    return o;
+}
+
+void *pgb_elf_dlsym(void *handle, const char *name)
+{
+    struct el_obj *o = handle;
+    const Elf64_Sym *s;
+    int i;
+
+    pgb_el_errset = 0;
+    if (!handle) {
+        el_err("pgb-elfload: dlsym on a NULL handle");
+        return NULL;
+    }
+    s = el_lookup_in(o, name, NULL);
+    if (s)
+        return o->base + s->st_value;
+    /* Then its dependency closure, which is what dlsym on a handle means. */
+    for (i = 0; i < o->nneeded; i++) {
+        s = el_lookup_in(o->needed[i], name, NULL);
+        if (s)
+            return o->needed[i]->base + s->st_value;
+    }
+    el_err("pgb-elfload: %s: undefined symbol: %s", o->soname, name);
+    return NULL;
+}
+
+int pgb_elf_dlclose(void *handle)
+{
+    struct el_obj *o = handle;
+
+    pgb_el_errset = 0;
+    if (!o)
+        return 0;
+    /* ⚠ Refcounted but never unmapped. Unmapping an object whose constructors
+     * registered callbacks elsewhere -- atexit, a pthread key destructor -- is
+     * how a loader turns a clean exit into a jump into unmapped memory. ld.so
+     * carries a great deal of machinery to know when that is safe; this
+     * loader does not have it, so it keeps the mapping and says so here
+     * rather than pretending. */
+    if (o->refcount > 0)
+        o->refcount--;
+    return 0;
+}
+
+void pgb_elf_trace_loaded(int fd)
+{
+    char line[512];
+    int i;
+
+    for (i = 0; i < el_nobjs; i++) {
+        int n = snprintf(line, sizeof line, "\t%s => %s (0x%016llx)\n",
+                         el_objs[i]->soname, el_objs[i]->path,
+                         (unsigned long long)(uintptr_t)el_objs[i]->base);
+        if (n > 0)
+            (void)!write(fd, line, (size_t)n);
+    }
+    /* ⭐ The names served WITHOUT a mapping, which a syscall trace cannot see
+     * because no syscall happened. This is the half that makes the internal
+     * instrument worth having beside the external one. */
+    for (i = 0; i < el_nserved; i++) {
+        int n = snprintf(line, sizeof line,
+                         "\t%s => served internally (static glibc)\n",
+                         el_served[i]);
+        if (n > 0)
+            (void)!write(fd, line, (size_t)n);
+    }
+}
