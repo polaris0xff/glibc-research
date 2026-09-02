@@ -168,7 +168,11 @@ resolve_entry() {   # storedir progname -> prints the ELF to run
   fi
   [ -n "$_re_bin" ] && [ -e "$_re_bin" ] || return 1
   _re_hops=0
-  : > "${WRAPENV:-/dev/null}"
+  # ⛔ NOT TRUNCATED HERE. This function is called once per program, and
+  # `--with-program melt` calling it a second time WIPED the 100 records the
+  # entry point's wrapper had just produced -- so kdenlive's whole environment
+  # vanished from the bundle and nothing said so. The caller truncates once,
+  # before the first call.
   while [ "$_re_hops" -lt 5 ]; do
     _re_hops=$((_re_hops + 1))
     # ⛔ THE ELF TEST HAS TO COME SECOND, AND THAT USED TO BE A BUG THAT
@@ -353,6 +357,7 @@ APPDIR="$WORK/AppDir"
 # Where resolve_entry writes what it read out of a nixpkgs wrapper. ⚠ It runs
 # in a command substitution, so a variable cannot carry this back.
 WRAPENV="$WORK/wrapper-env.tsv"
+BAKEDTSV="$WORK/baked-dirs.tsv"
 mkdir -p "$ROOT" "$CACHE/tools"
 
 # ---------------------------------------------------------------------------
@@ -441,6 +446,7 @@ rm -rf "$APPDIR"
 mkdir -p "$APPDIR/shared/bin" "$APPDIR/lib" "$APPDIR/bin" "$APPDIR/share"
 ln -sfn ../lib "$APPDIR/shared/lib"
 
+: > "$WRAPENV"; : > "$BAKEDTSV"
 ENTRY=$(resolve_entry "$ROOT/$BASE" "$PROG") || die "no entry point in $BASE/bin"
 say "entry       $ENTRY"
 cp -L "$ENTRY" "$APPDIR/shared/bin/$PROG"
@@ -959,6 +965,74 @@ if [ -s "$WRAPENV" ]; then
   done < "$WRAPENV" >> "$APPDIR/.env"
   say "wrapper env $NWENV variable(s) lifted out of the wrapper into .env"
   sed -n '1,8p' "$WRAPENV" | sed 's/^/            /'
+fi
+
+# ---------------------------------------------------------------------------
+# 5d. ⭐ COMPILED-IN STORE PATHS, DETECTED RATHER THAN GUESSED
+#
+# ⛔ A WRAPPER IS NOT THE ONLY WAY A PROGRAM LEARNS WHERE ITS PLUGINS ARE.
+# MLT bakes its module directory into libmlt at build time and nixpkgs does
+# not wrap it, because in nixpkgs the store is there. In a bundle it is not,
+# and what `melt` prints is
+#
+#   mlt_repository_init: no plugins found in
+#     "/nix/store/2zh409x885g8n711kyid6mzkicrasjxk-mlt-7.40.0/lib/mlt-7"
+#
+# after starting perfectly and answering `-version`. So a bundle can pass
+# every check this file already makes and still not render.
+#
+# ⭐ THE PATHS ARE FOUND, NOT ASSUMED: every packed program and library is
+# scanned for embedded `/nix/store/<hash>-<name>/...` strings, and each one
+# that names a directory the closure really has is copied into the bundle's
+# store shard. What is left is the VARIABLE that redirects the program there,
+# and that cannot be derived -- so it is a small table, each row naming the
+# project it serves, and anything not in it is REPORTED rather than silently
+# left broken.
+# ---------------------------------------------------------------------------
+say "scanning the packed binaries for compiled-in store paths"
+BAKED=$(
+  { ls "$APPDIR"/shared/bin/* 2>/dev/null
+    find "$APPDIR/lib" -maxdepth 1 -name 'lib*.so*' -type f 2>/dev/null; } \
+  | while IFS= read -r _f; do
+      LC_ALL=C grep -aoE '/nix/store/[a-z0-9]{32}-[A-Za-z0-9._+-]+/[A-Za-z0-9._+/-]*' "$_f" 2>/dev/null
+    done | sort -u
+)
+NBAKED=0; NBAKED_DIR=0
+for _bp in $BAKED; do
+  NBAKED=$((NBAKED + 1))
+  _bb=$(printf '%s' "$_bp" | sed -E 's|^/nix/store/([^/]+).*|\1|')
+  _bs=$(printf '%s' "$_bp" | sed -E 's|^/nix/store/[^/]+/||')
+  [ -d "$ROOT/$_bb/$_bs" ] || continue
+  _bn=$(printf '%s' "$_bb" | cut -c34-)
+  [ -d "$APPDIR/store/$_bn" ] || {
+    mkdir -p "$APPDIR/store"
+    cp -aL "$ROOT/$_bb" "$APPDIR/store/$_bn" 2>/dev/null || continue
+  }
+  NBAKED_DIR=$((NBAKED_DIR + 1))
+  printf '%s\t%s\n' "$_bn" "$_bs" >> "$WORK/baked-dirs.tsv"
+done
+say "baked paths $NBAKED found, $NBAKED_DIR of them naming a real directory"
+
+# The override table. ⚠ Each row is a project's own documented variable; a
+# directory that matches no row is named in the warning below so the gap is
+# visible rather than mysterious.
+if [ -s "$WORK/baked-dirs.tsv" ]; then
+  _known=""
+  while IFS="$(printf '\t')" read -r _n _sub; do
+    case "$_sub" in
+      lib/mlt-*)      printf 'MLT_REPOSITORY=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known MLT_REPOSITORY" ;;
+      share/mlt-*)    printf 'MLT_DATA=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"
+                      printf 'MLT_PROFILES_PATH=${SHARUN_DIR}/store/%s/%s/profiles\n' "$_n" "$_sub" >> "$APPDIR/.env"
+                      printf 'MLT_PRESETS_PATH=${SHARUN_DIR}/store/%s/%s/presets\n' "$_n" "$_sub" >> "$APPDIR/.env"
+                      _known="$_known MLT_DATA" ;;
+      lib/frei0r-*)   printf 'FREI0R_PATH=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known FREI0R_PATH" ;;
+      lib/ladspa*)    printf 'LADSPA_PATH=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known LADSPA_PATH" ;;
+      lib/gstreamer-*) printf 'GST_PLUGIN_SYSTEM_PATH_1_0=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known GST_PLUGIN_SYSTEM_PATH_1_0" ;;
+      lib/babl-*)     printf 'BABL_PATH=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known BABL_PATH" ;;
+      lib/gegl-*)     printf 'GEGL_PATH=${SHARUN_DIR}/store/%s/%s\n' "$_n" "$_sub" >> "$APPDIR/.env"; _known="$_known GEGL_PATH" ;;
+    esac
+  done < "$WORK/baked-dirs.tsv"
+  [ -n "$_known" ] && say "overrides  $(printf '%s' "$_known" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
 fi
 
 # ---------------------------------------------------------------------------

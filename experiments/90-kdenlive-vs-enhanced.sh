@@ -147,19 +147,32 @@ start_ms() {  # artefact n -> total ms for n invocations
   _e=$(date +%s%N)
   printf '%s' $(( (_e - _s) / 1000000 ))
 }
-cold_of() {  # artefact -> ms, with the mount reaped first
-  pkill -f "$(basename "$1")" >/dev/null 2>&1
-  sleep 1
-  start_ms "$1" 1
+# ⛔ NOT `pkill -f`. `docs/AGENTS.md` §14: the artefact's path is in this
+# runner's own command line, so a full-command-line match kills the
+# experiment. ⭐ A cold mount is obtained WITHOUT killing anything, by giving
+# the cold run its own copy: uruntime keys its mount on the image, so a file
+# nothing has run before is cold by construction.
+cold_of() {  # artefact -> ms with a genuinely cold mount
+  _c="$WORK/cold-$(basename "$1")"
+  rm -f "$_c"; cp "$1" "$_c"; chmod +x "$_c"
+  _r=$(start_ms "$_c" 1)
+  rm -f "$_c"
+  printf '%s' "$_r"
 }
-P_COLD=$(cold_of "$OURS"); P_TOT=$(start_ms "$OURS" $((WARM_RUNS + 1)))
-E_COLD=$(cold_of "$ENH");  E_TOT=$(start_ms "$ENH"  $((WARM_RUNS + 1)))
-warm_of() { # total cold n -> ms
-  [ "$1" = -1 ] && { printf '%s' -1; return; }
-  printf '%s' $(( ($1 - $2) / $3 ))
+# ⛔ THE WARM FIGURE IS MEASURED, NOT SUBTRACTED. `86-`'s arithmetic --
+# (n+1 runs − cold) / n -- assumes the cold run is part of the same series.
+# Here the cold run is deliberately a DIFFERENT FILE (see cold_of), so
+# subtracting it produced NEGATIVE warm times: -489 ms for ours and -298 ms
+# for the competitor, a number that cannot be a duration and was printed
+# anyway. Warm is now: one run to warm the mount, then N runs timed, divided.
+warm_of() {  # artefact -> ms per run once the mount is warm
+  "$1" melt -version >/dev/null 2>&1 || { printf '%s' -1; return; }
+  _t=$(start_ms "$1" "$WARM_RUNS")
+  [ "$_t" = -1 ] && { printf '%s' -1; return; }
+  printf '%s' $(( _t / WARM_RUNS ))
 }
-P_WARM=$(warm_of "$P_TOT" "$P_COLD" "$WARM_RUNS")
-E_WARM=$(warm_of "$E_TOT" "$E_COLD" "$WARM_RUNS")
+P_COLD=$(cold_of "$OURS"); P_WARM=$(warm_of "$OURS")
+E_COLD=$(cold_of "$ENH");  E_WARM=$(warm_of "$ENH")
 printf '  %-34s %10s ms cold   %8s ms warm\n' "P  ours"     "$P_COLD" "$P_WARM"
 printf '  %-34s %10s ms cold   %8s ms warm\n' "E  enhanced" "$E_COLD" "$E_WARM"
 
