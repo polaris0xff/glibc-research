@@ -170,6 +170,7 @@ struct el_obj {
 
     const Elf64_Rela *rela;     size_t relasz;
     const Elf64_Rela *jmprel;   size_t jmprelsz;
+    const uint64_t   *relr;     size_t relrsz;
 
     void (**init_array)(void);  size_t init_arrayn;
     void (**fini_array)(void);  size_t fini_arrayn;
@@ -879,6 +880,52 @@ static int el_reloc_one(struct el_obj *o, const Elf64_Rela *r)
     }
 }
 
+/* ⛔ DT_RELR IS NOT OPTIONAL ON A MODERN DISTRIBUTION, and skipping it is a
+ * SILENT wrong answer rather than a failure.
+ *
+ * `ld -z pack-relative-relocs` compresses the R_X86_64_RELATIVE entries -- the
+ * overwhelming majority of any shared object's relocations -- into a bitmap
+ * under DT_RELR, and Fedora and Arch build with it. A loader that reads only
+ * DT_RELA finds almost no relocations to apply, reports success, and hands
+ * back an object whose pointers still hold link-time offsets.
+ *
+ * ⚠ MEASURED, AND THE SHAPE OF THE EVIDENCE IS THE POINT. experiments/76-'s
+ * native arm was SIG11 on exactly Fedora 42 and Arch and nowhere else, and the
+ * loader's own trace showed why: `init_array[0] 0x670` where every working row
+ * printed a mapped address. 0x670 is the unrelocated vaddr. The object had
+ * "loaded" and its constructor pointer was a small integer.
+ *
+ * The encoding: an even entry is an address to relocate and becomes the
+ * cursor; an odd entry is a bitmap of the next 63 words after the cursor.
+ */
+#ifndef DT_RELR
+#define DT_RELR    36
+#define DT_RELRSZ  35
+#define DT_RELRENT 37
+#endif
+
+static void el_apply_relr(struct el_obj *o)
+{
+    size_t n = o->relrsz / sizeof(uint64_t), i;
+    uint64_t *where = NULL;
+
+    for (i = 0; i < n; i++) {
+        uint64_t e = o->relr[i];
+        if ((e & 1) == 0) {
+            where = (uint64_t *)(o->base + e);
+            *where++ += (uint64_t)(uintptr_t)o->base;
+        } else if (where) {
+            uint64_t bits = e >> 1;
+            int b;
+            for (b = 0; bits; b++, bits >>= 1)
+                if (bits & 1)
+                    where[b] += (uint64_t)(uintptr_t)o->base;
+            where += 63;
+        }
+    }
+    el_dbg("pgb-elfload: %s: applied %zu DT_RELR words\n", o->soname, n);
+}
+
 static int el_relocate(struct el_obj *o)
 {
     size_t i;
@@ -891,6 +938,8 @@ static int el_relocate(struct el_obj *o)
             return -1;
         }
     }
+    if (o->relr && o->relrsz)
+        el_apply_relr(o);
     for (i = 0; o->rela && i < o->relasz / sizeof(Elf64_Rela); i++)
         if (el_reloc_one(o, &o->rela[i]) != 0)
             return -1;
@@ -1014,6 +1063,8 @@ static void el_read_dynamic(struct el_obj *o, const Elf64_Dyn *dyn)
         case DT_RELA:   o->rela = (const Elf64_Rela *)(o->base + d->d_un.d_ptr); break;
         case DT_RELASZ: o->relasz = d->d_un.d_val; break;
         case DT_JMPREL: o->jmprel = (const Elf64_Rela *)(o->base + d->d_un.d_ptr); break;
+        case DT_RELR:   o->relr = (const uint64_t *)(o->base + d->d_un.d_ptr); break;
+        case DT_RELRSZ: o->relrsz = d->d_un.d_val; break;
         case DT_PLTRELSZ: o->jmprelsz = d->d_un.d_val; break;
         case DT_INIT:   o->init = (void (*)(void))(o->base + d->d_un.d_ptr); break;
         case DT_FINI:   o->fini = (void (*)(void))(o->base + d->d_un.d_ptr); break;
