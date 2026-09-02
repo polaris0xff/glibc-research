@@ -5,99 +5,86 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-02, refreshed mid-session (recovery session)
-    TREE           main, clean, at 5e8b79fc or later
+    LAST WRITTEN   2026-09-02b, at session end
+    TREE           main, clean
     BRANCH         ⛔ main. The harness named `claude/glibc-pgb-recovery-6dleai`;
                    RULES.md §Git outranks it, as the operator has ruled twice.
-                   That branch already exists on the remote at the same commit
-                   and is left alone — the git proxy refuses remote deletes.
-    CI             ⭐ GREEN. Run 96 on e44a6519, workflow `portability`.
+                   That branch was already on the remote when this session
+                   started and is left alone — the git proxy refuses deletes.
+    CI             green at session start (run 96); re-check the run for
+                   whatever commit you start from.
 
 ---
 
-# ⛔ THE PREVIOUS SESSION DIED ON DISK. THIS ONE IS A RECOVERY.
+# ⛔ TWO THINGS A FRESH SESSION CANNOT INFER AND BOTH COST TIME
 
-⚠ The session before this one terminated itself after `poc/91-qt-xcb` filled
-the disk at Qt object 1,538 of 1,644 (`cannot write PCH file: No space left on
-device`). It had already pushed everything it did; **nothing was lost**.
-
-⚠ **The clone came up SHALLOW**, grafted at `21e7dc06`, which makes local
+⚠ **The clone comes up SHALLOW**, grafted at `21e7dc06`, which makes local
 `main` look like an unrelated history with 22 orphan commits. It is not:
 `git fetch --unshallow` proves `b77e0333` is a plain ancestor of `origin/main`
-and `git log origin/main..main` is empty. ⛔ **Do not "recover" those commits;
-do not force-push.** Unshallow first, then fast-forward.
+and `git log origin/main..main` is empty. ⛔ **Do not "recover" those commits
+and do not force-push.** Unshallow, then fast-forward.
 
-# ⛔ THE CONTAINER IS FRESH. NOTHING IS BOOTSTRAPPED.
+⚠ **The container is fresh: nothing is bootstrapped**, and it costs ~25
+minutes. `/var/tmp` empty, `/var/lib/pgb-rootfs` absent, no `/nix`, no build
+environment, dockerd not running. `./pgb bootstrap --detach` does all of it in
+parallel; `./pgb bootstrap --check` says when it is ready.
 
-⚠ **A fresh session cannot infer this and it costs ~25 minutes.** This
-container came up with `/var/tmp` **empty**, `/var/lib/pgb-rootfs` absent, no
-build environment, no `/nix`, and dockerd not running.
-
-    make                            ✅ builds ./pgb, 15 s
-    ./pgb selftest                  ✅ 123 pass, 1 could not run (no zstd), exit 2
-    sh TODO/check.sh                ✅ exit 0 (codegraph absent — install it)
-    sh scripts/common/check-docs.sh ✅ exit 0
-    disk                            30 GiB available at session start
+    make                            builds ./pgb, ~15 s
+    ./pgb selftest                  138 pass, 1 could not run (no zstd), exit 2
+    make check                      selftests + both record gates, exits 0
+    disk                            ~30 GiB at session start
 
 ## ⛔ WHAT IS LEFT, IN ORDER
 
-The work order is `PROGRESS.md`; this is only the short form.
+The work order is `PROGRESS.md`; this is the short form.
 
-1. **Gate 5's three missing rows.** ⭐ `poc/91-qt-xcb` is **DONE** — rc=0,
-   1,429 s, 27 assertions, 11 of 11 (commit 5e8b79fc). `experiments/86-` is
-   running. `experiments/90-` has not started and is the kdenlive-sized one.
-   ⛔ Never two Qt- or kdenlive-sized builds at once, and delete the previous
-   build tree first — Qt's alone was 6.5 GiB.
-2. **`experiments/90-`'s onelf row is the wrong one.** Its argv[0] defect was
-   fixed and the three-arm run has not been repeated since. Running 90 once
-   covers both this and gate 5's third row.
-3. **The operator's post-port instruction.** ⭐ Codegraph installed and the
-   gate reports the index current. ⭐ Deprecation sweep done (aa3b7474,
-   4376c735). ⭐ Documents retired: answered — nothing qualifies, `tmp/README.md`
-   says why. ⭐ `docs/AGENTS.md` §0b is the cold start. ⚠ The two deep reviews
-   are PARTLY done: pass 1 over the Go tree found T-062 and eight defects'
-   worth of dead code; the docs pass repointed every retired tool name.
-4. **The miniflux proof** — miniflux plus an embedded PostgreSQL, its
-   `dlopen`'d extensions and its share tree, against onelf's ~70 MB. It lands
-   as POC 92 and a new `TODO/` entry. ⚠ Take **T-063**; T-062 is used.
-5. Then the backlog: T-055, T-060 rungs 2–3, T-054 rungs 3–4, T-057 item 2,
-   T-051, then P2 by category.
+1. **T-063, and it is closest to done.** ⭐ Arm S has a **static PostgreSQL
+   18.6 that runs on Alpine** (no `PT_INTERP`, no `DT_NEEDED`). ⚠ What is
+   missing: `src/interfaces` (libpq, ecpg) does not build, so `initdb`,
+   `pg_ctl` and `psql` do not exist yet. Then arm B, then the stack actually
+   serving HTTP on Debian 12 and Alpine 3.22.
+   Full record: `../evidence/poc/92-miniflux/ARM-S-FINDINGS.txt`.
+2. **T-062** — eight packages carry no carried selftest, `internal/wrapper`
+   first. It is the product, and gate 4 is its only acceptance.
+3. Then T-055, T-060 rungs 2–3, T-054 rungs 3–4, T-057 item 2, T-051.
 
-⭐ **Gate 4 was re-measured and holds byte-for-byte.** The modernize pass
-touched `internal/wrapper`, which no carried selftest covers (that is T-062),
-so `ci/probe.c` was rebuilt through the chroot engine: 2,177,320 bytes,
-sha256 `251cec644a142ac68915793b2a3dbd161e5659aa605921dc66762109ec6a5f16`,
-identical to the recorded row. The rewrites are neutral on the wrapper path.
+⭐ **Two pieces of real work are named but are not entries**, because both are
+one clear fix inside T-063 arm S:
+
+    static link order    AC_SEARCH_LIBS probes -lreadline alone, so
+                         libreadline.a's ncurses references go unresolved and
+                         configure calls the library absent. poc/91-qt-xcb
+                         answered the same class with -Wl,--start-group
+    a C link that pulled libicuuc.a needs `operator delete` and the __cxxabiv1
+    in a C++ archive     vtables. LinkFlags already takes a `cxx bool`; what it
+                         does not do is notice this case
 
 ## ⛔ Machine notes a fresh session cannot infer
 
-- **Go 1.24.7 is at `/usr/local/go/bin/go`.** `make` builds `./pgb`;
-  `make check` runs the selftests and both record gates.
-- ⛔ **DISK IS THE BINDING CONSTRAINT.** The allowance is per-session, so `df`
-  reads a large filesystem with a small "Avail". Delete under
-  `/var/tmp/pgb-poc`, `/var/tmp/pgb-appimage*` and `/var/tmp/pgb-nix-cache`
-  before starting anything kdenlive- or Qt-sized.
-- **nix, zstd, musl-gcc, podman and codegraph are ABSENT** on a fresh
-  container. `docker` IS present. `gh` is absent — the harness's GitHub MCP
-  tools are the authenticated route.
-- ⚠ `xz` is still shelled out by pgb; the build environment has it and a
-  target rootfs does not.
+- **Go 1.24.7 at `/usr/local/go/bin/go`.** `make` builds `./pgb`; `make check`
+  runs the selftests and both record gates.
+- ⛔ **DISK IS THE BINDING CONSTRAINT.** ⚠ And the lesson from the session that
+  died on it: what mattered was not the allowance but the leftovers. Qt needs
+  6.5 GiB for its build tree alone, so **delete the previous build tree before
+  starting the next big one** — `/var/tmp/pgb-poc`, `/var/tmp/pgb-appimage*`,
+  `/var/tmp/t055`, `/var/tmp/pgb-nix-cache`.
+- ⛔ **Never two Qt- or kdenlive-sized builds at once.**
+- **Absent on a fresh container:** nix, zstd, musl-gcc, podman, codegraph, gh.
+  `docker` IS present. Install codegraph with
+  `sh scripts/common/install-codegraph.sh` or `TODO/check.sh` reports it absent.
+- ⚠ **`experiments/90-`'s onelf arm needs a toolchain this container lacked**:
+  `rustup target add x86_64-unknown-linux-musl` and `apt-get install
+  musl-tools`. Without both, arm O skips.
+- ⚠ **An experiment writes its own `RESULT.txt`.** Redirecting stdout onto the
+  same path collides with it and loses the run — save stdout as `run.log`
+  (or `run.<app>.log`), which is what the tracked evidence already does.
+- ⚠ `xz` is still shelled out by pgb; the build environment has it, a target
+  rootfs does not.
 - 4 cores, ~15 GiB RAM, uid 0.
 - ⛔ **Never edit a shell script while it is running** — `sh` re-reads from a
-  byte offset. Copy the tree to `/var/tmp/frozen-<what>` or wait.
+  byte offset. Copy the tree aside or wait.
 
 ## In flight right now
 
-    (nothing running)
-
-    bootstrap                    ⭐ COMPLETE: nix, chroot env, docker env,
-                                 11 of 11 rootfs, dockerd up
-
-⭐ **GATE 5 IS COMPLETE.** All three missing rows landed this session:
-`poc/91-qt-xcb` (27 assertions, 11/11), `experiments/86-` (7 cases) and
-`experiments/90-` (10 cases, **0 skipped** — the onelf arm ran for the first
-time). Evidence in `evidence/92-go-port/RESULT.txt`.
-
-⚠ **This machine had to be extended for arm O** and a fresh container will not
-have it: `rustup target add x86_64-unknown-linux-musl` and
-`apt-get install musl-tools`. Without both, the onelf arm skips.
+    (nothing — every job this session started finished and its row is
+     in the evidence file)

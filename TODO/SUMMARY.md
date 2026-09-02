@@ -1,88 +1,95 @@
-# SUMMARY.md — the session of 2026-09-02
+# SUMMARY.md — the session of 2026-09-02b
 
-⛔ **Saved as well as printed**, per
-[`../docs/methodology/sessions.md`](../docs/methodology/sessions.md), so it
-survives the chat scrolling away. Overwritten each session.
+⛔ **Overwritten every session.** The history is the git log.
 
-⭐ **Every cell is grounded in something that can be pointed at**, and where a
-thing was not measured this says so rather than giving a number.
+A recovery session. The one before it terminated itself when `poc/91-qt-xcb`
+filled the disk; it had pushed everything and nothing was lost.
 
-| row | before | after |
+## Before and after
+
+| | at start | at end |
 |---|---|---|
-| **Elapsed** | 2026-09-02T04:0xZ | 2026-09-02T05:5xZ — **≈2h**, ended by an operator checkpoint rather than by the work finishing |
-| **Commits** | `184b1c56` | `fe62869d` — **24 commits**, every one on `main` |
-| **Work** | T-061 open, nothing written | ⭐ **the whole toolchain ported to Go**, 8 defects found in code that had been trusted, gates 1/2/3/4/6 met, gate 5 at 9 of 10 POCs and 21 of 23 experiments |
-| **Changes** | — | **169 files**, 30,681 insertions(+), 1,429 deletions(-) |
-| **Size** | — | **17,690 lines** of Go replacing **8,343** of shell and Python, which are retired under `HISTORY/` rather than deleted |
-| **Checks** | both gates green, ⛔ **CI red and unnoticed** | both gates green, ⭐ **124 carried selftests** (up from 72), and ⭐ **CI GREEN** — 16 of 16 jobs on `a50542da`, all eleven matrix targets. It had been failing since the first port commit |
-| **Cost** | — | ⚠ **not metered.** What can be pointed at: the real 399,356,002-byte `packages.json` fetched once, a 648,570-byte `cache.nixos.org` NAR, mesa and Qt closures for the bundler experiments. ⛔ **The session's disk allowance ran out**, which is what stopped `poc/91-qt-xcb`. No paid service used |
-| **Health** | 34 entries, 16 open | **34 entries, 15 open.** ⭐ **T-056 closed** — superseded by T-061, which took the Python helpers to Go rather than Rust. T-061 stays open for its remainder. Tree clean, `main` pushed |
+| **Gate 5** | ⛔ INCOMPLETE — 9 of 10 POCs, 21 of 23 experiments | ⭐ **COMPLETE** — 10 of 10 and 23 of 23, every row measured |
+| **`experiments/90-` onelf arm** | skipped for two sessions, blamed on onelf | ⭐ **ran**, 0 skips, and the defect was ours |
+| **Entries** | 34 / 15 open / 19 done | 36 / 17 open / 19 done |
+| **Carried selftests** | 124 cases, 7 of 17 packages | 139 cases; `internal/nixx`'s adaptation logic now covered |
+| **`make check`** | ⛔ aborted before **both** record gates on any machine without zstd | green end to end |
+| **`README.md` first command** | ⛔ `sh pgb env create` — a syntax error | runs |
+| **Static postgres** | unknown, untried | ⭐ **PostgreSQL 18.6 running on Alpine**, no `PT_INTERP`, no `DT_NEEDED` |
+| **CI** | green (run 96) | green |
 
-## What actually happened
+## What was asked, and where each task stands
 
-⭐ **`pgb` is one statically linked Go binary.** The driver, the compiler
-wrappers it puts on `PATH`, the nixpkgs planner, the verifier and the bundler
-are the same executable, built `CGO_ENABLED=0`, carrying the C runtime sources
-it compiles. There is nothing to clone beside it: a copy alone in an empty
-directory builds a static binary and passes its own selftests.
+| # | task | state |
+|---|---|---|
+| 1 | Gate 5's three missing rows | ⭐ **done** — all three, with evidence |
+| 2 | `experiments/90-`'s corrected onelf row | ⭐ **done** — three arms, 0 skips |
+| 3 | codegraph installed and wired | ⭐ **done** (landed `e44a6519`; installed and gate-verified here) |
+| 4 | deprecation / modernity sweep | ⭐ **done** — 6 hacks, 2 dead functions, 71 rewrites |
+| 5 | two deep reviews, code and docs | ⭐ **done** — findings below; T-062 filed |
+| 6 | retire unused documents | ⭐ **answered: nothing qualifies**, and `tmp/README.md` records why |
+| 7 | `docs/AGENTS.md` a complete cold start | ⭐ **done** — §0b, and `sessions.md` is linked at last |
+| 8 | the miniflux proof | ⚠ **arm S substantially done, entry open.** T-063 |
+| 9–14 | the backlog | not started |
 
-The shell and Python were moved with `git mv` into `HISTORY/<commit>/<original
-path>`, per the operator's ruling, and every gate was measured against them
-rather than against a claim.
+## The defects, and not one was found by reading
 
-## The eight defects, all found by something disagreeing
+1. ⛔ **`make check` never reached either record gate.** `pgb selftest` exits 2
+   for "a case could not run"; make treats non-zero as failure, so on any
+   machine without `zstd` it stopped at the selftest line and `TODO/check.sh`
+   and `check-docs.sh` never ran. The documented command claimed to run them.
+2. ⛔ **Six `var _ = pkg.Symbol` import-silencing hacks.** Neither `go build`
+   nor staticcheck can see these *by construction* — the hack uses the import,
+   and it is an assignment rather than an unused declaration. Every one kept a
+   zero-use import alive.
+3. ⛔ **`README.md`'s first code block could not run.** `sh pgb env create` →
+   `pgb: 1: Syntax error: ";" unexpected`. `AGENTS.md` §1 still called pgb "a
+   POSIX-sh driver plus four small C runtime pieces".
+4. ⛔ **`docs/methodology/sessions.md` was never linked from `docs/AGENTS.md`** —
+   a cold-start agent following the entry point never learned the ending
+   protocol existed. That was task 7's actual content.
+5. ⛔ **`experiments/90-` dropped two payload ELFs.** `cp .../shared/bin/*` —
+   a shell glob never matches a leading dot, and a nixpkgs wrapper leaves the
+   real ELF as `.NAME-wrapped`. The recipe (written from a readdir, which sees
+   them) named an entrypoint the packed directory did not contain. ⭐ The line
+   below it already used the correct `lib/.` form. Correction **C16**.
+6. ⛔ **`pgb nix build --configure` reached every dependency**, not the package
+   named. `numactl`: `configure: WARNING: unrecognized options: --without-icu`.
+7. ⛔ **Five defects in the adaptation loop**, all surfaced by T-063's arm S.
+   It could remove **none** of the fifteen optional features nixpkgs' postgres
+   plan enables; it removes thirteen now.
+8. ⛔ **The adaptation loop's round budget is 8** and reported `gave up after 8
+   rounds` with nine flags still to remove — which reads as "this package
+   cannot be built" and is not that.
+9. ⛔ **`internal/nixx`'s `diagnose` had no selftest**, and it is the only pure
+   part of `pgb nix build` and the part that decides whether a package builds.
 
-⛔ **None of these was found by reading the code.**
+## What is left, in order
 
-1. **`nix-plan.py` was not deterministic.** An output store path can be
-   claimed by more than one derivation — 14 of them in git's graph — and the
-   Python was last-writer-wins over document order. Ten shuffles of the same
-   graph: 4 gave one plan, 6 gave another. The Go planner sorts the claimants
-   and gives one plan 10 times out of 10.
-2. **The shell bootstrap built the wrong environment.** It called `pgb env
-   create` with no engine after starting dockerd, so the "chroot environment"
-   it produced was a second docker one.
-3. **`pgb nix deps` did not converge from a cold prefix.** `poc/91-qt-xcb` was
-   five X libraries short because libxcb was attempted before xcb-proto
-   existed; a second run would have fixed it, which is not convergence.
-4. **Requirement 3 was written and never wired.** `internal/logx/stamp.go` had
-   the columns, the parser and the heartbeat, and nothing called
-   `NewStamper`: `pgb --ts build` printed no timestamps at all.
-5. **`pgb selftest <typo>` printed "0 cases, all pass".**
-6. ⛔ **CI had been red for every commit of the port.** `pgb` is a built
-   binary and is not committed, so three jobs did `actions/checkout` and then
-   ran `./pgb` against nothing, and a fourth ran `sh -n` over it. A
-   `toolchain` job now builds one static pgb and hands it to the others as an
-   artefact — the distribution claim under test, since that binary is then
-   used inside the pinned Debian 12 container with nothing installed for it.
-7. **A skip counted as a failure**, found by the repaired CI within minutes:
-   the runner is not root, `rootfs-run` needs root, and `Report.Write`
-   returned 1 for it. It returns 0 / 1 / 2 now, like everything else here.
-8. **The libiconv build needed `msgfmt`**, which the pinned image does not
-   carry. It had been worked around on this machine by installing gettext,
-   which is the wrong direction for a project whose argument is not needing
-   things on the host. `--disable-nls` removes the dependency instead.
+1. **T-063.** Arm S has a static postgres that runs on Alpine; `src/interfaces`
+   (libpq, ecpg) does not build, so `initdb`/`pg_ctl`/`psql` do not exist yet.
+   Then arm B, then the stack serving HTTP on Debian 12 and Alpine 3.22.
+2. **T-062.** Eight packages carry no selftest, `internal/wrapper` first — it
+   is the product, and gate 4 is its only acceptance.
+3. Then T-055, T-060 rungs 2–3, T-054 rungs 3–4, T-057 item 2, T-051.
 
-## zstd, because the environment has none
+⭐ **Two pieces of real work were named and are not entries yet**, because both
+are one clear fix inside T-063 arm S: the **static link-order** problem
+(`AC_SEARCH_LIBS` probes `-lreadline` alone — `poc/91-qt-xcb` answered the same
+class with `-Wl,--start-group`), and **a C link that pulled in a C++ archive**
+(`libicuuc.a` needs `operator delete`; `LinkFlags` already takes a `cxx bool`
+and does not notice this case).
 
-cache.nixos.org serves NARs as `.nar.zst` and the pinned build environment
-carries no `zstd` binary, so `pgb nix build` inside it stopped dead. The
-retired Python reached `libzstd.so.1` through ctypes and `CGO_ENABLED=0` has
-no equivalent. `internal/zstd` decodes RFC 8878 with nothing outside the
-standard library, measured byte-identical against the reference encoder over
-120 frames at levels 1 to 22, whole and one byte at a time; 572 truncations
-refused, and of 400 flipped bytes none decoded to different content without an
-error. ⚠ `xz` still shells out.
+## Open questions for the operator
 
-## What was NOT done
+⭐ **None blocking.**
 
-⛔ **Gate 5 is not complete and nothing is extrapolated.** `poc/91-qt-xcb`'s
-cold re-run confirmed the dependency fix — all 22 X packages built, the static
-xcb link and the qtbase configure both passed — and then died at Qt object
-1,538 of 1,644 with `cannot write PCH file: No space left on device`.
-`experiments/86-` and `experiments/90-` were never started, for the same
-reason. `experiments/90-`'s recorded onelf row is still the wrong one.
+⚠ **One branch exists on the remote and this session did not create it.** The
+harness named `claude/glibc-pgb-recovery-6dleai`; `RULES.md` §Git outranks it
+and every commit is on `main`. It was already on the remote at `main`'s commit
+when this session started, and the git proxy refuses remote deletes, so it is
+left for a human to remove in the web UI.
 
-⛔ **The operator's post-port instruction has not been started**: codegraph,
-the deprecation sweep, two deep reviews, retiring `tmp/`, and a
-`docs/AGENTS.md` a session with no memory can start from alone.
+⚠ **This machine was extended and a fresh container will not have it**, which
+is what the onelf arm needs: `rustup target add x86_64-unknown-linux-musl` and
+`apt-get install musl-tools`. Without both, arm O skips.

@@ -3,14 +3,13 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log
 and the entries.
 
-    STATE     2026-09-02
+    STATE     2026-09-02b (recovery session)
     COUNTS    36 entries, 17 open, 19 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
-              CI: GREEN, 15 jobs, and it asserts criterion 2
+              CI: GREEN; selftests 138 pass, 1 could not run (no zstd)
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
-    NEW       ⭐ T-061 IS SUBSTANTIALLY LANDED. The toolchain is Go. What is
-              left of it is listed under "In progress" and is NOT the whole
-              entry: gate 5 has rows still running.
+    NEW       ⭐ GATE 5 IS COMPLETE — ten of ten POCs and twenty-three
+              experiments, every row measured. T-061's last gap is closed.
 
 ## ⛔ READ THIS FIRST: the toolchain is Go now, and the shell is the oracle
 
@@ -47,98 +46,85 @@ Quoted, because the framing is load-bearing:
 | 2. the bundler | T-057 ⚠started, T-052 ✅, T-053 ✅ | ⭐ **items 1, 3 and 4 landed**: debloating with a three-arm control (`experiments/89-`), wrapper environments lifted into `.env`, and the lib32 path. ⛔ **item 2, a 32-bit application, is still untried** |
 | 3. kdenlive | T-054, T-055 | ⭐ **rung 2 climbed**: `poc/91-qt-xcb` — a static Qt 6 opening a **real xcb window**, 26 assertions, 11/11, zero host objects. ⛔ **T-055's bar is NOT met**: ours 395,294,317 B against 191,900,604 B |
 
-## What the last session did
+## What the last session did (2026-09-02b, a recovery session)
 
-### 1. T-061 — the whole toolchain ported to Go
+The session before this one terminated itself when `poc/91-qt-xcb` filled the
+disk. It had pushed everything; nothing was lost. ⚠ The clone comes up SHALLOW,
+grafted at `21e7dc06`, which makes local `main` look like an unrelated history
+with 22 orphan commits — it is not, and the recovery is `fetch --unshallow`
+then a fast-forward, never a force-push.
 
-~9,300 lines of POSIX shell and Python became one static binary. Every retired
-file was moved with `git mv` to `HISTORY/<commit>/<its original path>`, per the
-operator's ruling — the shell driver, the six sourced shell modules, the seven
-Python helpers, the bundler, the libiconv builder and the whole of the old
-`scripts/common`. Two commits hold them, one per retirement wave; `HISTORY/`
-lists both and `HISTORY/README.md` says why they are kept. ⭐ `tool/` is C
-runtime sources and nothing else now.
+### 1. ⭐ GATE 5 IS COMPLETE — T-061's last gap
 
-⭐ **Gates 1, 2, 3, 4 and 6 are met with output**, and requirement 2's second
-half with them: pgb built by pgb inside the pinned environment is
-byte-identical to the host build. ⭐ **Gate 5 is now TEN of ten POCs and
-twenty-two experiments** — `poc/91-qt-xcb` and `experiments/86-` landed in the
-session of 2026-09-02b. The rows are in the evidence file; the one still
-missing is named under "In progress".
+    poc/91-qt-xcb            rc=0  1,429 s  27 assertions, 11 of 11
+    experiments/86-          rc=0           7 cases, both arms 11 of 11
+    experiments/90-          rc=0           10 cases, ⭐ 0 SKIPPED
 
-### 2. The eight defects the port found, in code that had been trusted
+⚠ **Qt cleared the wall for a reason worth carrying**: not more disk. The
+failing session had run nine POCs and twenty-one experiments into
+`/var/tmp/pgb-poc` before starting Qt; this one started clean. Peak was 6.5 GiB
+for the qtbase build tree alone.
 
-Each was found by a measurement disagreeing, not by reading:
+⭐ **`experiments/90-`'s onelf arm ran for the first time**, and the defect
+blocking it was ours for the second time — the staging step copied
+`shared/bin/*`, a shell glob never matches a leading dot, and a nixpkgs wrapper
+leaves the payload ELF beside itself as `.NAME-wrapped`.
+`../docs/history/corrections.md` C16.
 
-1. ⛔ **`nix-plan.py` was not deterministic.** An output store path can be
-   claimed by more than one derivation — 14 of them in git's graph — and the
-   Python was last-writer-wins over document order. Ten shuffles of the same
-   graph gave 4 of one plan and 6 of another; the Go planner sorts the
-   claimants and gives one plan 10 times out of 10.
-2. ⛔ **The shell bootstrap built the wrong environment.** It called
-   `pgb env create` with no engine after starting dockerd, so the "chroot
-   environment" it made was a second docker one. `pgb bootstrap` names the
-   engine.
-3. ⛔ **`pgb nix deps` did not converge from a cold prefix.** It stops
-   recursing at `NIX_DEP_DEPTH`, so a dependency whose inputs sit below the
-   cut fails until a sibling has built them. `poc/91-qt-xcb` was five X
-   libraries short and a second run would have fixed it. The walk repeats
-   passes now while one is still landing something.
-4. ⛔ **Requirement 3 was written and never wired.** `internal/logx/stamp.go`
-   had the columns, the parser and the heartbeat, and nothing called
-   `NewStamper`: `pgb --ts build` printed no timestamps at all.
-5. ⛔ **`pgb selftest <typo>` printed "0 cases, all pass".** A name that
-   matches nothing selected nothing and reported success.
-6. ⛔ **CI had been red for every commit of the port and nobody had looked.**
-   `pgb` is a built binary now and is not committed, so three jobs did
-   `actions/checkout` and then ran `./pgb` against nothing. A `toolchain` job
-   builds one static pgb and hands it to the rest as an artefact.
-7. ⛔ **A skip counted as a failure**, found by the repaired CI within
-   minutes. The runner is not root, `rootfs-run` needs root, and the report
-   returned 1 for it. It returns 0 / 1 / 2 now, like everything else here.
-8. ⛔ **The libiconv build needed `msgfmt`.** The pinned image has no
-   gettext; this machine had been given it by hand, which hid the problem.
-   `--disable-nls` removes the dependency rather than adding one.
+### 2. The operator's post-port instruction
 
-### 3. zstd, decoded in Go
+Codegraph installed and the gate reports the index current. The deprecation
+sweep ran with tools rather than by reading — **six import-silencing hacks**
+(`var _ = pkg.Symbol`) that neither `go build` nor staticcheck can flag by
+construction, two dead functions, and **71 modernize rewrites** across 38
+files. Documents to retire: **answered — nothing qualifies**, and
+`../tmp/README.md` says why so it is not re-litigated a third time.
+`../docs/AGENTS.md` §0b is the cold start, and it now links
+`methodology/sessions.md`, which the entry point had never referenced.
 
-cache.nixos.org serves NARs as `.nar.zst` and the pinned build environment
-carries no `zstd` binary, so `pgb nix build` inside it stopped dead — the
-retired Python reached `libzstd.so.1` through ctypes and `CGO_ENABLED=0` has
-no equivalent. `internal/zstd` decodes RFC 8878 with nothing outside the
-standard library, measured byte-identical against the reference encoder over
-120 frames at levels 1 to 22. ⚠ **xz still shells out**; the build environment
-has it and a target rootfs does not.
+### 3. Defects found, each by something disagreeing
 
-### 4. The documentation
+1. ⛔ **`make check` never reached either record gate** on a machine without
+   zstd. `pgb selftest` exits 2 for "could not run"; make treats non-zero as
+   failure. The documented command claimed to run gates it never reached.
+2. ⛔ **`README.md`'s first code block could not run.** `sh pgb env create` is
+   a syntax error — pgb has been a Go binary since `4ef2acc7`. `AGENTS.md` §1
+   still described it as "a POSIX-sh driver plus four small C runtime pieces".
+3. ⛔ **`pgb nix build --configure` reached every dependency**, not the package
+   named; numactl's configure said `unrecognized options: --without-icu`.
+4. ⛔ **Five defects in the adaptation loop**, all found by T-063's arm S — it
+   could remove NONE of the fifteen optional features nixpkgs' postgres plan
+   enables, and removes thirteen now. Its default round budget of 8 reports
+   `gave up after 8 rounds`, which reads as "cannot be built" and is not that.
+5. ⛔ **`internal/nixx`'s adaptation logic had no selftest at all**, which is
+   T-062: `pgb selftest` prints 138 cases and reaches 7 of 17 packages.
 
-`docs/design/toolchain.md` "Language and structure" was still asserting that
-the driver stays POSIX `sh`, and listing a sourced-shell-module layout that no
-longer exists. It records the Go decision now, with the ranked comparison,
-what "single binary" can and cannot mean, the package layout and the six
-gates folded in from the commissioned porting analysis, which is deleted as
-the operator asked.
+### 4. T-063 — a static PostgreSQL that runs on Alpine
+
+  `pgb rootfs run alpine-3.22 -- /postgres --version` → `PostgreSQL 18.6`,
+  63,889,168 B, no `PT_INTERP`, no `DT_NEEDED`. ⚠ `src/interfaces` (libpq,
+  ecpg) does not build yet, so initdb/pg_ctl/psql do not exist and nothing
+  claims the miniflux stack runs.
+
+⭐ **Gate 4 was re-measured** after the modernisation touched
+`internal/wrapper` — byte-identical, sha256 `251cec64…`.
 
 ## In progress
 
-⛔ **These were running when the session was checkpointed and their rows are
-NOT in the evidence file.** Each is a shell script that can simply be re-run;
-none of them holds state that must be preserved.
-
-    poc/91-qt-xcb          from a COLD prefix, the proof of the fixed-point
-                           dependency walk. Was at 1,256 of 1,644 Qt objects.
-    experiments/89-        the debloater's three arms, Go bundler
-    experiments/60-        versus the alternatives
+⛔ **Nothing is running.** Every job this session started finished and its row
+is in the evidence file.
 
 ⚠ **T-060 rung 1's `/var/tmp` build tree is gone with an old container.** The
 run is idempotent; treat it as never started.
 
 ## ⭐ Work order
 
-    T-061   ⚠ FINISH IT. Gate 5's remaining rows (91-qt-xcb, 86, 89, 90, 60,
-            62), then the operator's post-port instruction: codegraph, the
-            deprecation sweep, two deep reviews, and a docs/AGENTS.md a fresh
-            session can start from alone.
+    T-063   ⚠ FINISH IT, and it is the closest to done. Arm S has a STATIC
+            postgres that runs on Alpine; what is missing is src/interfaces
+            (libpq, ecpg) so initdb/pg_ctl/psql do not exist yet, then arm B,
+            then the stack actually serving HTTP on Debian 12 and Alpine 3.22.
+    T-062   the eight packages with no carried selftest, internal/wrapper
+            first — it is the product and gate 4 is its only acceptance
     ---- and then ----
     T-055   the bundle size: 489 MB of lib/ is unreachable and that is the cut
     T-060   rungs 2 and 3, the static nix
@@ -147,13 +133,26 @@ run is idempotent; treat it as never started.
     T-051   the no-compiler host
     then P2 by category
 
+⭐ **Two pieces of real work were NAMED this session and are not entries yet**
+because both are one clear fix inside T-063's arm S:
+
+    the static link-order problem   AC_SEARCH_LIBS probes -lreadline alone and
+                                    libreadline.a's ncurses references go
+                                    unresolved. poc/91-qt-xcb answered the same
+                                    class with -Wl,--start-group
+    a C link that pulled a C++      libicuuc.a needs operator delete and the
+    archive                         __cxxabiv1 vtables; LinkFlags already takes
+                                    a `cxx bool` and does not notice this case
+
 ## Open questions for the operator
 
 ⭐ **None blocking.**
 
-1. ⭐ **No branch debt.** The harness named `claude/glibc-nix-static-v2nttp`;
-   `RULES.md` §Git outranks it and every commit is on `main`.
-   `git ls-remote --heads origin` lists `refs/heads/main` and nothing else.
+1. ⚠ **One branch exists on the remote and this session did not create it.**
+   The harness named `claude/glibc-pgb-recovery-6dleai`; `RULES.md` §Git
+   outranks it and every commit is on `main`. The branch was already on the
+   remote at `main`'s commit when this session started and the git proxy
+   refuses remote deletes, so it is left for a human to remove in the web UI.
 2. ⚠ **A GPU** — **T-059**, not a question. Every GL row is `swrast`.
 3. ⭐ **The porting report is gone, as the operator asked.** Its content is
    in `docs/design/toolchain.md` "Language and structure" and T-061 deleted
