@@ -1555,17 +1555,41 @@ the seven glibc rows is **+40 served, −2**. ⛔ Class C being empty is the
 stronger statement: nothing a host object wants was *removed* by the newer
 glibc, on any row.
 
+**⭐ And the NSS floor holds at 2.41 — the arm that could still have vetoed.**
+
+The `experiments/21-` probe, built against 2.41 in `pgb-env-debian-trixie`, run
+on the `debian-11` target that really ships `libnss_files.so.2`:
+
+| build glibc / arm | host NSS modules opened |
+|---|---|
+| 2.31 plain | `libnss_dns.so.2`, `libnss_files.so.2` |
+| 2.31 + nssfix | `libnss_dns.so.2`, `libnss_files.so.2` |
+| 2.36 plain | none |
+| 2.36 + nssfix | none |
+| **2.41 plain** | **none** |
+| **2.41 + nssfix** | **none** |
+
+⛔ **THE 2.31 ROWS ARE THE CONTROL AND THEY ARE WHY THE 2.41 ROWS MEAN
+ANYTHING.** Both 2.41 arms print `none`, and so does 2.36 — because at or above
+2.34 the services are inside libc and there is nothing to open with or without
+the override. ⚠ **A "none" from an instrument that cannot see modules would look
+exactly the same**, which is not hypothetical here: a first attempt at this
+measurement had an unquoted shell variable, read a trace file that did not
+exist, and printed `none` for every arm. `experiments/21-` supplies the arm that
+can fail, on the same target and the same method, and it fires.
+
 **⛔ What is NOT yet measured, and the ruling waits on it.**
 
 | | |
 |---|---|
-| the NSS floor at 2.41 | ⚠ the probes are BUILT against 2.41 and were not RUN: the target is `debian-11`, which is in the bed, and the bed was occupied. **This is the one that can still veto** — the pin exists for it |
-| the ten POCs at 2.41 | `pgb-env-debian-trixie` exists and carries the full package list; ⚠ a newer glibc deprecates as well as adds, and gcc goes 12.2.0 → 14.2.0 with it, which is the larger of the two changes |
+| the ten POCs at 2.41 | `pgb-env-debian-trixie` exists and carries the full package list; ⚠ a newer glibc deprecates as well as adds, and **gcc goes 12.2.0 → 14.2.0** with it, which is the larger of the two changes and the one likelier to reject old source |
 
-⛔ **So the pin has NOT moved and `cfg.go` is untouched.** On the evidence so
-far the move is indicated — the cost side is a kernel floor that did not move
-and a class C that is empty — but "indicated" is not "measured", and the two
-rows above are what stands between them.
+⛔ **So the pin has NOT moved and `cfg.go` is untouched.** Three of the four
+measurable costs have come back at zero — the kernel floor did not move, class
+C is empty on every row at both pins, and the NSS floor holds — so the move is
+**indicated**. ⚠ "Indicated" is not "measured": the POC row is what stands
+between them, and it is the row where a toolchain two major gcc versions newer
+is most likely to say no.
 
 ---
 

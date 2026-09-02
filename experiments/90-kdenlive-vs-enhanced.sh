@@ -94,19 +94,49 @@ fi
 # ⭐ Same staleness rule pgb uses for its own runtime objects: newer input
 # means rebuild. `PGB_KEEP_ARTEFACT=1` forces reuse for someone deliberately
 # re-measuring the same bytes.
+#
+# ⛔ AND ON THE BUILD OPTIONS, NOT ONLY ON THE MTIME -- WHICH IS THE SAME
+# DEFECT AGAIN, IN A NEW COSTUME. The mtime rule above catches a changed
+# BUNDLER. It does not catch a changed INVOCATION, and nothing in the cache
+# path mentions one: `$CACHE/kdenlive/kdenlive-anylinux-x86_64.AppImage` is the
+# same file whatever `--debloat` was. So running this experiment again with
+# `PGB_APPIMAGE_DEBLOAT=aggressive` against an artefact built at `safe` would
+# have reused the `safe` bytes and reported them as the aggressive row --
+# silently, and to the digit, exactly as run 2 did.
+#
+# ⚠ It matters here specifically because sweep deletion is gated on
+# `aggressive` (`internal/bundle/appimage.go`), so `safe` and `aggressive` are
+# the two arms this experiment most needs to tell apart.
+#
+# ⭐ The fix is T-058's, one level up: key the cache on the options themselves.
+# A stamp file beside the artefact records what produced it, and a different
+# stamp is a rebuild.
+_opts="debloat=${PGB_APPIMAGE_DEBLOAT:-safe}"
+_stamp="$CACHE/kdenlive/.pgb-build-options"
 _rebuild=no
+_why=
 if [ ! -s "$OURS" ]; then
   _rebuild=yes
-elif [ -z "${PGB_KEEP_ARTEFACT:-}" ] && [ "$BUNDLER" -nt "$OURS" ]; then
+elif [ -n "${PGB_KEEP_ARTEFACT:-}" ]; then
+  :
+elif [ "$(cat "$_stamp" 2>/dev/null)" != "$_opts" ]; then
   _rebuild=yes
-  exp_note "the bundler is newer than the cached artefact: rebuilding"
-  rm -f "$OURS"
+  _why="the cached artefact was built with [$(cat "$_stamp" 2>/dev/null)], this run wants [$_opts]"
+elif [ "$BUNDLER" -nt "$OURS" ]; then
+  _rebuild=yes
+  _why="the bundler is newer than the cached artefact"
 fi
 if [ "$_rebuild" = yes ]; then
-  exp_note "building ours: ./pgb bundle appimage kdenlive --with-program melt"
+  [ -n "$_why" ] && { exp_note "$_why: rebuilding"; rm -f "$OURS"; }
+  exp_note "building ours ($_opts): ./pgb bundle appimage kdenlive --with-program melt"
+  mkdir -p "$CACHE/kdenlive"
   PGB_APPIMAGE_CACHE="$CACHE" "$BUNDLER" bundle appimage kdenlive \
     --with-program melt --with-program ffmpeg >"$B/build-ours.log" 2>&1 || true
+  # ⛔ Stamped only AFTER the artefact exists, so a build that died half way
+  # does not leave a stamp claiming those options were measured.
+  [ -s "$OURS" ] && printf '%s\n' "$_opts" > "$_stamp"
 fi
+exp_note "artefact built with: $(cat "$_stamp" 2>/dev/null || echo unknown)"
 [ -s "$OURS" ] || { exp_note "ours did not build; see $B/build-ours.log"; exit 2; }
 chmod +x "$OURS"
 
@@ -255,13 +285,33 @@ ONELF_BIN="$ONELF_SRC/target/release/onelf"
 ONELF="$WORK/kdenlive-onelf.bin"
 OURDIR="$CACHE/kdenlive/AppDir"
 if [ ! -x "$ONELF_BIN" ]; then
+  # ⛔ ITS PREREQUISITE IS A RUST TARGET, NOT A COMPILER, AND THE ERROR DOES
+  # NOT SAY SO WHERE ANYONE READS IT. onelf builds a musl runtime, so it needs
+  # the `x86_64-unknown-linux-musl` std, and a fresh container has only the gnu
+  # one. What that produced was `error[E0463]: can't find crate for core`
+  # eighteen lines into a cargo log, and what the table said was "onelf did not
+  # build" -- which reads like a defect in onelf. ⭐ So the prerequisite is
+  # added when it can be, and named exactly when it cannot.
+  if command -v rustup >/dev/null 2>&1 &&
+     ! rustup target list --installed 2>/dev/null | grep -q x86_64-unknown-linux-musl; then
+    exp_note "adding the rust target onelf needs: x86_64-unknown-linux-musl"
+    rustup target add x86_64-unknown-linux-musl >>"$B/onelf-build.log" 2>&1 || true
+  fi
   command -v cargo >/dev/null 2>&1 && \
     ( cd "$ONELF_SRC" && ONELF_MUSL_CC=musl-gcc cargo build --release ) \
       >>"$B/onelf-build.log" 2>&1 || true
 fi
 O_SZ=0; O_R=-1; O_COLD=-1; O_WARM=-1; O_MP4=0
 if [ ! -x "$ONELF_BIN" ]; then
-  exp_skip "arm O (onelf)" "onelf did not build; see $B/onelf-build.log"
+  # ⚠ The reason, not just the absence: three different things stop this build
+  # and only one of them is about onelf.
+  _o_why="see $B/onelf-build.log"
+  command -v cargo >/dev/null 2>&1 || _o_why="cargo is absent"
+  command -v rustup >/dev/null 2>&1 &&
+    ! rustup target list --installed 2>/dev/null | grep -q x86_64-unknown-linux-musl &&
+    _o_why="the rust target x86_64-unknown-linux-musl is absent"
+  command -v musl-gcc >/dev/null 2>&1 || _o_why="$_o_why (musl-gcc is also absent)"
+  exp_skip "arm O (onelf)" "onelf did not build: $_o_why"
 elif [ ! -d "$OURDIR" ]; then
   exp_skip "arm O (onelf)" "our AppDir is not on disk to repack"
 else
