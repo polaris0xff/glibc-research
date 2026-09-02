@@ -18,7 +18,7 @@ evidence says you must.
 
 | tier | output | serves | cost | status |
 |---|---|---|---|---|
-| **1** | one static ELF, no interpreter | programs not loading host plugins | none beyond size | ✅ **measured**, 11/11 on five real projects |
+| **1** | one static ELF, no interpreter | programs not loading host plugins | none beyond size | ✅ **measured**, 11/11 on ten real projects |
 | **2** | bundled-glibc **dynamic** binary + directory, with `cross-libc-dlopen` preloaded | programs that must load **host** plugins | not one file; carries a loader; ⛔ **and gconv, unless the tier-1 iconv wrap comes with it** | ⛔ design only |
 | **3** | tier 2 collapsed to one file via a memfd bootstrap | same as tier 2, single-file | not a plain ELF any more | ⛔ design only |
 

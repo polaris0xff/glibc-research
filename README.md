@@ -56,17 +56,26 @@ injected flag and the experiment behind it.
 
 ## Evidence
 
-Five real projects, stock tarballs, stock `./configure`, **no source patches**,
-each passing a real functional test on all 11 environments while loading zero
-host shared objects:
+**Ten real projects**, stock tarballs, stock `./configure`, **no source
+patches**, each passing a real functional test on all 11 environments while
+loading zero host shared objects:
 
 | project | what it stresses |
 |---|---|
 | **GNU awk** 5.3.1 | locale, iconv, and a `dlopen` extension API |
 | **GNU nano** 8.2 + ncurses 6.5 | terminfo data, a static dependency chain, multibyte |
-| **curl** 8.11.0 + OpenSSL 3.0.15 | `getaddrinfo`/NSS, real DNS, real TLS, CA bundles |
+| **curl** 8.11.0 + OpenSSL | `getaddrinfo`/NSS, real DNS, real TLS, CA bundles |
 | **jq** 1.7.1 + oniguruma | Unicode round-trip, surrogate pairs |
-| **CPython** 3.12.7 | 49 extension modules linked *in*, empty `lib-dynload`, NSS via `socket`/`pwd` |
+| **CPython** 3.12.7 | 49 extension modules linked *in*, empty `lib-dynload` |
+| **LevelDB** 1.23 | C++ static init, exceptions, RTTI, iostreams/locale |
+| **SQLite** 3.47.0 + 15 extensions | `dlopen` by user path, `dlsym` by derived name |
+| **MLT** 7.30.0 + ffmpeg 7.1 | a 142 MB static libavcodec, 8 `dlopen`'d modules |
+| **Qt 6.11.1** | a very large C++ build, static plugin import, QPA |
+| ⭐ **Qt 6.11.1 + xcb** | a **real X window**, OpenSSL linked into QtNetwork, QtSql |
+
+⭐ The largest is a static Qt 6 application that opens a mapped, exposed window
+through the real xcb plugin and does a SQLite round trip returning `日本` — on
+all 11 environments, with zero host shared objects.
 
 ```sh
 for p in poc/*/run.sh; do sh "$p"; done
@@ -92,14 +101,22 @@ plain static build to carry it.
 
 ## Open problems
 
-⚠ **`pgb` does not beat an anylinux AppImage and does not run in more places.**
-On the same 11 environments both run everywhere and both deliver glibc's
-throughput. `pgb` is smaller and simpler in shape — one file, no mount, no
-extraction, nothing written — and
+⚠ **`pgb`'s static output does not beat an anylinux AppImage on portability
+and does not run in more places.** On the same 11 environments both run
+everywhere and both deliver glibc's throughput. `pgb` is smaller and simpler in
+shape — one file, no mount, no extraction, nothing written — and
 [Anylinux-AppImages](https://github.com/pkgforge-dev/Anylinux-AppImages)
 reaches software `pgb` does not yet: as its own guide puts it, *"Compile
 statically! Sure, that works, go and compile all of kdenlive statically and get
-back to me once you get it done."* Closing that is the work, not the boundary —
+back to me once you get it done."*
+
+⛔ **And where `pgb` bundles instead, it is bigger and slower.** Measured
+against `kdenlive-AppImage-Enhanced`, same upstream release
+([`experiments/90-`](experiments/90-kdenlive-vs-enhanced.sh)): ours
+477,191,058 B against 191,900,604, renders 3,559 ms against 1,323 and starts
+181 ms against 52. ⭐ **The one column it wins is the one this project is
+about**: ours loads **zero host shared objects on 11 of 11**, the competitor on
+4 of 11. Closing the other three is the work, not the boundary —
 [`docs/comparison.md`](docs/comparison.md) has both columns and
 [`docs/AGENTS.md`](docs/AGENTS.md) §13 has the routes.
 
@@ -109,10 +126,11 @@ the host loader and libc into the process — and is refused on the other nine.
 Three untried routes to fixing it are listed in `docs/AGENTS.md` §13 item 4;
 none has been shown to be closed.
 
-⚠ **Static linking says nothing about data.** Five distinct host data
-dependencies were found: gconv ✅ and locale ✅ are solved; **terminfo** and
-**CA bundles** are open, and both have the same proven shape waiting
-(`--embed-locale`'s mechanism plus `TERMINFO`/`SSL_CERT_FILE`).
+⭐ **Static linking says nothing about data, and all five are now closed.**
+Five distinct host data dependencies were found: gconv, locale, terminfo, CA
+bundles and NSS. Each has a mechanism — `--embed-locale`, `--embed-terminfo`,
+`--embed-cacert`, the iconv `--wrap` and the NSS override — and `pgb explain`
+prints every flag it injects and the experiment behind it.
 
 Everything measured, everything not measured, and every claim that was made
 and then disproved: [`docs/limitations.md`](docs/limitations.md) and
@@ -129,16 +147,20 @@ and then disproved: [`docs/limitations.md`](docs/limitations.md) and
 | [`docs/comparison.md`](docs/comparison.md) | the head-to-head: every way to ship the same program, same 11 environments |
 | [`docs/research/prior-art.md`](docs/research/prior-art.md) | the reference sweep, verdicts and provenance |
 | `experiments/` | numbered, re-runnable. Exit 0 matched, 1 did not, 2 could not run |
-| `poc/` | the five projects |
-| `references/` | the corpus: 12 upstream trees and their trackers, tracked |
+| `poc/` | the ten projects, and `92-miniflux` in progress |
+| `references/` | the corpus: 32 upstream trees and their trackers, tracked |
 | `evidence/` | the committed output of every experiment and POC |
 
 ## Requirements
 
-root and `CAP_SYS_ADMIN` (the test bed is `unshare --mount` + `chroot`, because
-this was developed on a machine with no container daemon), plus `curl`,
-`python3`, `strace` and a C toolchain. `pgb doctor` reports what is missing.
-Docker and Podman engines exist in the tool and are **untested**.
+`make` builds `./pgb` — it is one static Go binary and is **not committed**.
+
+Running the test bed needs root and `CAP_SYS_ADMIN` (`unshare --mount` +
+`chroot`), plus `curl`, `tar` and `xz`; `pgb verify` also needs `strace`.
+`pgb doctor` reports what is missing and `pgb bootstrap` prepares a fresh
+machine. The **docker** engine is exercised on every CI run
+(`pgb verify --engine docker`, with a deliberately failing control); the
+**podman** engine shares that code path and is untested.
 
 ## Licence
 

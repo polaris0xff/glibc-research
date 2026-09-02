@@ -56,24 +56,36 @@ pretending to be one.
 
 ## The argument behind the ordering
 
-⭐ **Recorded so it can be re-derived rather than re-argued.**
+⭐ **Recorded so it can be re-derived rather than re-argued.** The order itself
+is in [`PROGRESS.md`](PROGRESS.md) "Work order"; this is why it is that order.
 
-0. ⛔ **T-061 IS THE ONLY P0 AND IT OUTRANKS EVERY ROW BELOW.** The operator,
-   2026-09-02: the next session ports the tooling to Go and reaches parity, and
-   *"the next session after that will return back to usual tasks."* An entry
-   that changes shell or Python in `tool/` or `scripts/` before that port is
-   work that will be thrown away.
-1. **Harder POCs first (T-001..T-003).** The operator's instruction, and it is
-   right for a reason worth writing down: every mechanism in `tool/runtime/`
-   exists because something broke. Five passing POCs cannot tell you where the
-   next defect is. ⛔ **A tree of only-passing POCs is a demo.**
-2. **Then the split (T-010) and the language ruling (T-011).** Both are S, both
-   block T-012, and T-010 gets harder every time `pgb` grows. ⚠ **This may be
-   bumped above the POCs** — the operator flagged it — and the trigger is
-   whether the POC work starts wanting planner code that has nowhere to live.
-3. **T-030 before T-031.** Same goal, one is M and proven prior art, the other
-   is L and a research port. Cheapest first.
-4. **T-040 early despite being unglamorous.** It is S, and it is the only way
-   the docker/podman engines and the workflow's own YAML get exercised at all.
-5. **T-012 last of the P1s** because it is XL, which per `authoring.md` means
-   it is not really one entry. Split it before starting.
+0. ⭐ **T-061 is landed and no longer outranks anything.** The toolchain is one
+   static Go binary, the shell and Python it replaced are the oracle under
+   `../HISTORY/`, and ⭐ **all six workload gates are met** — gate 5 completed
+   in the session of 2026-09-02b with ten of ten POCs and twenty-three
+   experiments. The entry stays open only for what the operator adds to it.
+1. **T-063 first, because it is closest to done and it is the operator's
+   newest instruction.** Arm S already has a static PostgreSQL 18.6 running on
+   Alpine; what is missing is `src/interfaces`, so `initdb`/`pg_ctl`/`psql` do
+   not exist yet and nothing yet claims the miniflux stack runs. ⚠ An entry
+   that is one build away from an answer is worth more than one that is ten.
+2. **T-062 next, and it is the cheapest insurance in the tree.** Eight
+   packages carry no selftest and `internal/wrapper` is one of them — it
+   composes every flag `pgb build` injects, and its only acceptance is gate 4,
+   which needs a bed, a network and half an hour. ⛔ **A change to the product
+   cannot currently be checked while it is being made.**
+3. **T-055 before the remaining rungs.** `experiments/90-` measured the gap and
+   it is size-dominated: the artefact is 2.49x the competitor and start and
+   render both track size. The reachability sweep exists and ⛔ **nothing
+   consumes it**, which is the single largest lever and is already written.
+4. **T-060, T-054, T-057 and T-051 by goal.** Each is a rung on one of the
+   operator's three goals and each has evidence per rung; take the goal that
+   is furthest from its bar.
+5. **P2 by category last.** Nothing is wrong without them.
+
+⚠ **Two pieces of real work are named in `PROGRESS.md` and are deliberately
+NOT entries**, because each is one clear fix inside T-063 arm S: the static
+**link-order** problem (`AC_SEARCH_LIBS` probes `-lreadline` alone;
+`poc/91-qt-xcb` answered the same class with `-Wl,--start-group`) and **a C
+link that pulled in a C++ archive** (`libicuuc.a` needs `operator delete`;
+`LinkFlags` already takes a `cxx bool`). File them if they outgrow that.

@@ -231,7 +231,7 @@ claim, and recorded in `evidence/92-go-port/RESULT.txt`:
 | 2 | `nix nar`: identical archives, hashes, extraction **and signature decisions**, on fixtures and on a real `cache.nixos.org` object |
 | 3 | `doctor`, `env info`, `nix plan`, `verify`: output and exit-code parity |
 | 4 | the wrapper hot path: the same source through both toolchains, byte for byte |
-| 5 | the complete 11-target matrix and all nine POCs |
+| 5 | the complete 11-target matrix and all ten POCs |
 | 6 | the artefact itself: statically linked, no `PT_INTERP`, no `DT_NEEDED` |
 
 ⚠ **The retired shell and Python tree is the oracle, and it is kept.** It sits
