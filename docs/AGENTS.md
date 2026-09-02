@@ -155,46 +155,51 @@ a host build reads `Ubuntu 13.3.0`.
 ## 5. Repository layout
 
 ```
-pgb                       the tool: the manual, the config, and dispatch
-tool/lib/*.sh             the tool's body. SOURCED, so `pgb build` and
-                          `pgb verify` stay one process across the engine
-                          boundary: common, wrappers, env, build, verify
-tool/runtime/*.c          the four mechanisms, and pgb-trace.c, the
-                          carried-in tracer `pgb verify` uses where strace
-                          cannot follow the subject
-tool/lib/nix.sh           `pgb nix`: nixpkgs plans, pgb builds static glibc
-tool/nix-plan.py          a nixpkgs derivation -> a pgb build plan
-tool/nix-drv.py           nix's ATerm .drv format               (selftest)
-tool/elf-needed.py        rewrite an absolute DT_NEEDED         (selftest)
+pgb                       ⭐ THE TOOL, and it is a BUILD PRODUCT: one static
+                          Go binary. `make` builds it; it is gitignored
+cmd/pgb/                  option parsing and command dispatch
+internal/logx             levels, per-subsystem debug, the composed command
+                          printed before it runs, and the timestamped stream
+internal/proc             every child process, argv arrays only
+internal/cfg              settings, and the option handoff across an engine
+internal/wrapper          the runtime objects, the injected flags, the wrapper
+                          directory, the --wrap-dlopen table, `pgb explain`.
+                          ⭐ The wrappers are pgb itself under another name
+internal/envx             the environment stamp, env create/info, libiconv
+internal/buildx           build, shell, the __inner-* re-entry points
+internal/verifyx          the matrix, the strace reader and the carried tracer
+internal/rootfs           unshare+chroot done natively; fetch the bed
+internal/ociimg           the registry client and the whiteout merge
+internal/elfx             ELF and `ar` read directly, not through nm/readelf
+internal/nixx             NAR, nix-base32, ed25519, ATerm, the package index,
+                          the planner, the dependency walk, the build rounds
+internal/bootstrapx       `pgb bootstrap`: a fresh machine, in parallel
+internal/selftest         the shape every carried-in selftest reports in
+assets.go                 the C runtime sources and the pinned target list,
+                          EMBEDDED, so a distributed pgb carries them
+tool/runtime/*.c          the four mechanisms, and pgb-trace.c, the carried-in
+                          tracer `pgb verify` uses where strace cannot follow
 tool/nix-appimage.sh      the bundler: uruntime+dwarfs+sharun (--selftest)
-tool/lib/nix.sh           `pgb nix`: nixpkgs plans, pgb builds
-tool/nix-plan.py          a nixpkgs derivation -> a pgb build plan
-tool/nix-drv.py           nix's ATerm .drv format               (selftest)
-tool/elf-needed.py        rewrite an absolute DT_NEEDED         (selftest)
-tool/nix-appimage.sh      the bundler: uruntime+dwarfs+sharun (--selftest)
+tool/nix-wrapper.py       a nixpkgs wrapper's environment, read back
+tool/onelf-recipe.py      an onelf recipe from a bundle
 ci/probe.c                the binary CI runs on 11 distributions
 scripts/common/
-  bootstrap.sh            ⭐ a fresh machine, in parallel      (--selftest)
-  oci-pull.sh             OCI image -> rootfs, no daemon      (--selftest)
-  rootfs-run.sh           chroot into one, private mount ns   (--selftest)
-  fetch-rootfs.sh         materialise the test bed
   rootfs-images.txt       the 11 environments, pinned by digest
   mine-repo.sh            reference-sweep fetcher, vendored    (--selftest)
-  nix-fetch.sh            nixpkgs closures with NO nix         (--selftest)
-  nix-nar.py              NAR, nix-base32, ed25519, narinfo      (selftest)
-  nix-fetch.sh            nixpkgs closures with NO nix         (--selftest)
-  nix-nar.py              NAR, nix-base32, ed25519, narinfo    (selftest)
-scripts/build-libiconv.sh GNU libiconv 1.18, pinned
+  check-docs.sh           the documentation gate
 experiments/lib.sh        conditions block, assertions, pid-attributed tracing
 experiments/NN-*.sh       numbered; exit 0 matched, 1 did not, 2 could not run
-docs/REQUIREMENTS.md      the operator's acceptance bar, and how far short it is
+docs/REQUIREMENTS.md      the operator's acceptance bar, and how far short
 docs/methodology/         vendored, pinned; binding on experiments and sweeps
 TODO/                     the work: PROGRESS, INDEX, RULES, RESUME, entries
 TODO/check.sh             the gate; run before every commit
 poc/common.sh             the POC contract
-poc/NN-*/run.sh           the five proof-of-concept projects
+poc/NN-*/run.sh           the proof-of-concept projects
 evidence/                 committed RESULT.txt per experiment and POC
-references/               13 upstream trees + trackers, tracked, PROVENANCE.md each
+HISTORY/<commit>/         ⛔ the shell and Python the Go port replaced. Kept
+                          because it is the ORACLE every byte-identical
+                          comparison was made against. Nothing here runs
+references/               13 upstream trees + trackers, tracked, PROVENANCE.md
 .github/workflows/portability.yml
 docs/                     see §11
 tmp/START.md              the original brief
@@ -202,38 +207,44 @@ tmp/START.md              the original brief
 
 ## 6. Running it
 
-⭐ **On a fresh machine, ONE command, and read this file while it runs:**
+⭐ **`pgb` is a build product. Two commands and the machine is working:**
 
 ```sh
-sh scripts/common/bootstrap.sh --detach   # nix + build env + 11 rootfs, PARALLEL
-sh scripts/common/bootstrap.sh --check    # is it ready yet
+make                                 # CGO_ENABLED=0 go build -o pgb ./cmd/pgb
+./pgb bootstrap --detach             # build env + 11 rootfs + nix, PARALLEL
+./pgb bootstrap --check              # is it ready yet
 ```
 
-⛔ **Serially those steps are ~25 minutes of watching** — nix ~7, `pgb env
-create` ~8, `fetch-rootfs.sh` ~10 — and nothing in them depends on anything
-else in them. **Two sessions paid that** before the script existed. It is
-resumable (each step skipped when its artefact is on disk, checked by looking
-at the disk rather than at a marker it wrote), and `--check` changes nothing.
+⛔ **Serially those steps are ~25 minutes of watching** — nix ~7, the build
+environment ~8, the bed ~10 — and nothing in them depends on anything else in
+them. **Two sessions paid that** before it was parallel. It is resumable (each
+step skipped when its artefact is on disk, checked by looking at the disk
+rather than at a marker it wrote), and `--check` changes nothing.
 
 ⛔ **It also starts dockerd AND builds the docker environment, together,
-because starting the daemon alone breaks every build.** `pick_engine` prefers
-docker the moment `docker info` succeeds, so a started daemon with no docker
-environment makes `pgb build` refuse — reproduced here, which is why the two
-are one step and not two. `--no-docker` leaves the daemon alone.
+because starting the daemon alone breaks every build.** Engine detection
+prefers docker the moment `docker info` succeeds, so a started daemon with no
+docker environment makes `pgb build` refuse — reproduced here, which is why
+the two are one step and not two. `--no-docker` leaves the daemon alone.
+⚠ And the chroot environment is created with its engine NAMED, for the same
+reason: the shell predecessor called `pgb env create` with no engine right
+after starting dockerd, so what it reported as the chroot environment was a
+second docker one.
 
 The steps it runs, if you ever need them by hand:
 
 ```sh
-sh pgb doctor                        # what this machine can do
-sh scripts/common/fetch-rootfs.sh    # the test bed, ~2.3 GiB, digest-pinned
-sh pgb env create                    # pinned build env + static libiconv
+./pgb doctor                         # what this machine can do
+./pgb rootfs fetch                   # the test bed, ~2.3 GiB, digest-pinned
+./pgb --engine chroot env create     # pinned build env + static libiconv
 
 for e in experiments/*.sh; do case $e in */lib.sh) ;; *) sh "$e";; esac; done
 for p in poc/*/run.sh; do sh "$p"; done
 
-sh pgb build -- make                 # your project, unmodified
-sh pgb verify ./yourprogram          # run it on all 11
-sh pgb nix build jq                  # or: let nixpkgs plan it
+./pgb build -- make                  # your project, unmodified
+./pgb verify ./yourprogram           # run it on all 11
+./pgb nix build jq                   # or: let nixpkgs plan it
+./pgb selftest                       # every carried-in selftest, offline
 ```
 
 Requires root + `CAP_SYS_ADMIN` (the bed is `unshare --mount` + `chroot`),

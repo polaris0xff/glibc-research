@@ -1,4 +1,4 @@
-iterations=400 rounds=7
-native  size=16304 build_ms=59
-static  size=1057760 build_ms=94
-pgb     size=2138296 build_ms=247
+iterations=200 rounds=5
+native  size=16304 build_ms=48
+static  size=1057760 build_ms=161
+pgb     size=2150704 build_ms=522

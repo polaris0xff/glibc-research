@@ -96,3 +96,52 @@
       (rewrote 4 version tag(s))
     A plain  LOADED   /usr/lib64/libkdb5.so
     B strip  LOADED   /tmp/pgb-stripped-2637.so
+      (rewrote 3 version tag(s))
+    A plain  LOADED   /usr/lib/libz.so.1.3.2
+    B strip  LOADED   /tmp/pgb-stripped-17585.so
+      (rewrote 4 version tag(s))
+    A plain  LOADED   /usr/lib/libssl.so.3
+    B strip  LOADED   /tmp/pgb-stripped-17603.so
+      (rewrote 2 version tag(s))
+    A plain  LOADED   /usr/lib/libtls-standalone.so.1.0.0
+    B strip  LOADED   /tmp/pgb-stripped-17621.so
+      (rewrote 2 version tag(s))
+    A plain  LOADED   /usr/lib64/libxbps.so.5
+    B strip  LOADED   /tmp/pgb-stripped-17640.so
+      (rewrote 4 version tag(s))
+  pgb-plugin-probe: dl-call-libc-early-init.c:37: _dl_call_libc_early_init: Assertion `sym != NULL' failed.
+    A plain  KILLED   /usr/lib/x86_64-linux-gnu/libgnutls.so.30.29.1
+             -> signal 6 inside the loader, before any dlerror
+  pgb-plugin-probe: dl-call-libc-early-init.c:37: _dl_call_libc_early_init: Assertion `sym != NULL' failed.
+    B strip  KILLED   /tmp/pgb-stripped-17658.so
+             -> signal 6 inside the loader, before any dlerror
+      (rewrote 4 version tag(s))
+    A plain  LOADED   /usr/lib/x86_64-linux-gnu/libattr.so.1.1.2501
+    B strip  LOADED   /tmp/pgb-stripped-17676.so
+      (rewrote 4 version tag(s))
+  pgb-plugin-probe: dl-call-libc-early-init.c:37: _dl_call_libc_early_init: Assertion `sym != NULL' failed.
+    A plain  KILLED   /usr/lib/x86_64-linux-gnu/libmvec-2.31.so
+             -> signal 6 inside the loader, before any dlerror
+  pgb-plugin-probe: dl-call-libc-early-init.c:37: _dl_call_libc_early_init: Assertion `sym != NULL' failed.
+    B strip  KILLED   /tmp/pgb-stripped-17695.so
+             -> signal 6 inside the loader, before any dlerror
+      (rewrote 2 version tag(s))
+  pgb-plugin-probe: ../sysdeps/x86_64/dl-machine.h:487: elf_machine_rela_relative: Assertion `ELFW(R_TYPE) (reloc->r_info) == R_X86_64_RELATIVE' failed.
+    A plain  KILLED   /usr/lib64/libpcreposix.so.0.0.6
+             -> signal 6 inside the loader, before any dlerror
+  pgb-plugin-probe: ../sysdeps/x86_64/dl-machine.h:487: elf_machine_rela_relative: Assertion `ELFW(R_TYPE) (reloc->r_info) == R_X86_64_RELATIVE' failed.
+    B strip  KILLED   /tmp/pgb-stripped-17714.so
+             -> signal 6 inside the loader, before any dlerror
+      (rewrote 2 version tag(s))
+    A plain  KILLED   /usr/lib64/libusb-1.0.so.0.3.0
+             -> signal 8 inside the loader, before any dlerror
+    B strip  KILLED   /tmp/pgb-stripped-17732.so
+             -> signal 8 inside the loader, before any dlerror
+      (rewrote 4 version tag(s))
+    A plain  KILLED   /usr/lib64/libelf-0.194.so
+             -> signal 8 inside the loader, before any dlerror
+    B strip  KILLED   /tmp/pgb-stripped-17750.so
+             -> signal 8 inside the loader, before any dlerror
+      (rewrote 4 version tag(s))
+    A plain  LOADED   /usr/lib64/libkdb5.so
+    B strip  LOADED   /tmp/pgb-stripped-17769.so

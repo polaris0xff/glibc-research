@@ -1,19 +1,19 @@
 experiment 70 - can a helper written in a real language be carried in?
-date (UTC)   : 2026-09-01T12:17:05Z
+date (UTC)   : 2026-09-02T04:17:53Z
 host kernel  : Linux 6.18.44-fc-v22
 rustc        : rustc 1.94.1 (e408947bf 2026-03-25)
 cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
 
-TARGET                 LIBC   sh                c-plain-static    c-pgb             rust-gnu-static   rust-musl-static 
-alpine-3.22            musl   ok                ok                ok                ok                ok               
-alpine-3.20            musl   ok                ok                ok                ok                ok               
-alpine-3.10            musl   ok                ok                ok                ok                ok               
-voidlinux-musl         musl   ok                ok                ok                ok                ok               
-debian-11              glibc  ok                ok                ok                ok                ok               
-debian-12              glibc  ok                ok                ok                ok                ok               
-ubuntu-20.04           glibc  ok                ok                ok                ok                ok               
-rockylinux-8           glibc  ok                ok                ok                ok                ok               
-opensuse-leap-15.6     glibc  ok                ok                ok                ok                ok               
-fedora-42              glibc  ok                ok                ok                ok                ok               
-archlinux-latest       glibc  ok                ok                ok                ok                ok               
-pgb-env-debian12       glibc  ok                ok                ok                ok                ok               
+TARGET                 LIBC   sh                c-plain-static    rust-gnu-static  
+alpine-3.22            musl   ok                ok                ok               
+alpine-3.20            musl   ok                ok                ok               
+alpine-3.10            musl   ok                ok                ok               
+voidlinux-musl         musl   ok                ok                ok               
+debian-11              glibc  ok                ok                ok               
+debian-12              glibc  ok                ok                ok               
+ubuntu-20.04           glibc  ok                ok                ok               
+rockylinux-8           glibc  ok                ok                ok               
+opensuse-leap-15.6     glibc  ok                ok                ok               
+fedora-42              glibc  ok                ok                ok               
+archlinux-latest       glibc  ok                ok                ok               
+pgb-env-debian12       glibc  ok                ok                ok               

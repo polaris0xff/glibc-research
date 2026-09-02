@@ -4,10 +4,10 @@ control 952536 bytes, embedded 981944 bytes (+29408)
 TERM=xterm-256color, TERMINFO and TERMINFO_DIRS unset
 
 TARGET               LIBC   CONTROL   EMBEDDED  TERMINFO SET TO
-alpine-3.22 musl NONE found /tmp/pgb-terminfo-9874
-alpine-3.20 musl NONE found /tmp/pgb-terminfo-9940
-alpine-3.10 musl NONE found /tmp/pgb-terminfo-10006
-voidlinux-musl musl NONE found /tmp/pgb-terminfo-10087
+alpine-3.22 musl NONE found /tmp/pgb-terminfo-11717
+alpine-3.20 musl NONE found /tmp/pgb-terminfo-11779
+alpine-3.10 musl NONE found /tmp/pgb-terminfo-11839
+voidlinux-musl musl NONE found /tmp/pgb-terminfo-11907
 debian-11 glibc found found <unset>
 debian-12 glibc found found <unset>
 ubuntu-20.04 glibc found found <unset>

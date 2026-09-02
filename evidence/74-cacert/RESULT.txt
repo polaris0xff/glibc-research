@@ -7,9 +7,9 @@ alpine-3.22 musl 119 certs 119 certs no /etc/ssl/certs/ca-certificates.crt
 alpine-3.20 musl 145 certs 145 certs no /etc/ssl/certs/ca-certificates.crt
 alpine-3.10 musl NONE 149 certs no /etc/ssl/cert.pem
 voidlinux-musl musl 143 certs 143 certs no /etc/ssl/certs/ca-certificates.crt
-debian-11 glibc NONE 302 certs yes /tmp/pgb-cacert-20588.pem
-debian-12 glibc NONE 302 certs yes /tmp/pgb-cacert-20673.pem
-ubuntu-20.04 glibc NONE 302 certs yes /tmp/pgb-cacert-20758.pem
+debian-11 glibc NONE 302 certs yes /tmp/pgb-cacert-10764.pem
+debian-12 glibc NONE 302 certs yes /tmp/pgb-cacert-10845.pem
+ubuntu-20.04 glibc NONE 302 certs yes /tmp/pgb-cacert-10925.pem
 rockylinux-8 glibc NONE 142 certs no /etc/pki/tls/certs/ca-bundle.crt
 opensuse-leap-15.6 glibc NONE 145 certs no /etc/ssl/ca-bundle.pem
 fedora-42 glibc 146 certs 146 certs no /etc/ssl/certs/ca-certificates.crt

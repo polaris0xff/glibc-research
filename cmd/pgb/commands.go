@@ -10,6 +10,7 @@ import (
 
 	"github.com/polaris0xff/glibc-research/internal/bootstrapx"
 	"github.com/polaris0xff/glibc-research/internal/buildx"
+	"github.com/polaris0xff/glibc-research/internal/bundle"
 	"github.com/polaris0xff/glibc-research/internal/cfg"
 	"github.com/polaris0xff/glibc-research/internal/envx"
 	"github.com/polaris0xff/glibc-research/internal/fail"
@@ -66,6 +67,8 @@ func runCommand(c *cfg.Config, cmd string, args []string) error {
 		return buildRootCommand(args)
 	case "bootstrap":
 		return bootstrapCommand(c, args)
+	case "bundle":
+		return bundleCommand(c, args)
 	case buildx.InnerBuild:
 		return buildx.Inner(c, args)
 	case buildx.InnerShell:
@@ -127,6 +130,23 @@ func rootfsCommand(c *cfg.Config, args []string) error {
 		return fail.Cannot("pgb rootfs needs a subcommand (run, fetch, pull, list)")
 	}
 	sub, rest := args[0], args[1:]
+	// Each subcommand answers --selftest for the part of the bed it owns, so a
+	// caller can probe one piece without running the whole set.
+	if len(rest) == 1 && (rest[0] == "--selftest" || rest[0] == "selftest") {
+		var r *selftest.Report
+		switch sub {
+		case "run":
+			r = rootfs.Selftest()
+		case "pull":
+			r = ociimg.Selftest()
+		default:
+			return fail.Cannot("pgb rootfs %s has no selftest", sub)
+		}
+		if r.Print() != 0 {
+			return fail.Exit(1)
+		}
+		return nil
+	}
 	switch sub {
 	case "run":
 		o, argv, err := rootfs.ParseOptions(rest)
@@ -259,6 +279,9 @@ func selftestCommand(c *cfg.Config, args []string) error {
 	}
 	if want("bootstrap") {
 		all.Merge(bootstrapx.Selftest(c))
+	}
+	if want("bundle-sweep") {
+		all.Merge(bundle.Selftest())
 	}
 	if all.Print() != 0 {
 		return fail.Exit(1)
