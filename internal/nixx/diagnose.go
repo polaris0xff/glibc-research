@@ -29,6 +29,10 @@ var (
 	// missing thing off. Taking the flag from the message is targeted; trying
 	// flags until one works is the search this loop must not become.
 	autoconfSuggestion = regexp.MustCompile("use `(--(?:disable|without)-[A-Za-z0-9_-]+)'")
+	// The same courtesy without autoconf's quoting, which postgres writes as
+	// `Use --without-readline to disable readline support.` Anchored on a
+	// following " to " so a flag merely mentioned in prose is not taken.
+	plainSuggestion = regexp.MustCompile(`(?i)use (--(?:disable|without)-[A-Za-z0-9_-]+) to `)
 	// The error names the library and the flag that asked for it is spelled
 	// from its name.
 	configureMissing = regexp.MustCompile(`configure: error: ((?:lib)?[A-Za-z0-9_+-]+) (?:was not found|not found)`)
@@ -37,7 +41,38 @@ var (
 	// spelling it gives --with-llvm-config and the drop misses. When the fatal
 	// line NAMES the option, that name is the answer and no spelling is needed.
 	configureNamesFlag = regexp.MustCompile(`configure: error:[^\n]*?(--(?:with|enable)-[A-Za-z0-9_+-]+)`)
+	// PKG_CHECK_MODULES names the pkg-config module and no flag at all:
+	// `configure: error: Package requirements (liburing) were not met`. The
+	// module list can carry version constraints, so only the first token of
+	// each entry is a name.
+	pkgConfigMissing = regexp.MustCompile(`configure: error: Package requirements \(([^)]+)\) were not met`)
+	// A third spelling of the same fact, quoting the library instead:
+	// `configure: error: library 'libnuma' is required for NUMA support`.
+	configureRequiresLib = regexp.MustCompile(`configure: error: library '([^']+)' is required`)
+	// ⛔ A DIFFERENT KIND OF REFUSAL, and worth separating from the three
+	// above: this one is not a missing package but a static build being asked
+	// for a SHARED object that cannot exist in it. postgres' language bindings
+	// say it as `could not find shared library for Python`. The flag still has
+	// to come off, but the reason is structural rather than an absent input.
+	configureWantsShared = regexp.MustCompile(`configure: error: could not find shared library for ([A-Za-z0-9_+-]+)`)
 )
+
+// flagForName returns the drop directive for the option that asked for a
+// dependency named in an error, trying the conventional spellings with and
+// without a lib prefix. It answers "" when the build carries none of them,
+// which keeps this targeted rather than a search over the flag list.
+func flagForName(name string, has func(string) bool) string {
+	for _, cand := range []string{
+		"--with-" + name, "--enable-" + name,
+		"--with-" + strings.TrimPrefix(name, "lib"),
+		"--enable-" + strings.TrimPrefix(name, "lib"),
+	} {
+		if has(cand) {
+			return "drop:" + cand
+		}
+	}
+	return ""
+}
 
 // optionalDep maps a fatal configure message to the flag nixpkgs used to turn
 // that optional dependency on. autoconf says it more than one way, so the
@@ -99,6 +134,31 @@ func diagnose(logFile string, flags []string) string {
 		return "drop:" + m[1]
 	}
 
+	// A pkg-config module maps to the flag that asked for it by name.
+	if m := pkgConfigMissing.FindStringSubmatch(text); m != nil {
+		for _, entry := range strings.Split(m[1], ",") {
+			fields := strings.Fields(entry)
+			if len(fields) == 0 {
+				continue
+			}
+			if d := flagForName(fields[0], has); d != "" {
+				return d
+			}
+		}
+	}
+
+	if m := configureRequiresLib.FindStringSubmatch(text); m != nil {
+		if d := flagForName(m[1], has); d != "" {
+			return d
+		}
+	}
+
+	if m := configureWantsShared.FindStringSubmatch(text); m != nil {
+		if d := flagForName(strings.ToLower(m[1]), has); d != "" {
+			return d
+		}
+	}
+
 	if m := configureMissing.FindStringSubmatch(text); m != nil {
 		name := m[1]
 		bare := strings.TrimPrefix(name, "lib")
@@ -111,6 +171,9 @@ func diagnose(logFile string, flags []string) string {
 	}
 
 	if m := autoconfSuggestion.FindStringSubmatch(text); m != nil && !has(m[1]) {
+		return "add:" + m[1]
+	}
+	if m := plainSuggestion.FindStringSubmatch(text); m != nil && !has(m[1]) {
 		return "add:" + m[1]
 	}
 

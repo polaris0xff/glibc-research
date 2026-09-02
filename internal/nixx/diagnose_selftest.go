@@ -43,6 +43,7 @@ func DiagnoseSelftest() *selftest.Report {
 	// flag out of "llvm-config" gives --with-llvm-config, which is not in the
 	// list, and the drop misses while the message plainly says --with-llvm.
 	pgFlags := []string{"--with-openssl", "--with-libxml", "--with-icu", "--with-llvm", "--with-pam"}
+	pgFlags2 := []string{"--with-openssl", "--with-liburing", "--with-libcurl"}
 	r.Check("postgres' llvm-config error drops the flag the MESSAGE names",
 		say("pg", "configure: error: llvm-config not found, but required when "+
 			"compiling --with-llvm, specify with LLVM_CONFIG=\n", pgFlags),
@@ -55,6 +56,34 @@ func DiagnoseSelftest() *selftest.Report {
 			[]string{"--with-something", "--with-icu"}),
 		"drop:--with-something")
 
+	// ⛔ THE ONE THAT STOPPED IT NEXT. PKG_CHECK_MODULES names the pkg-config
+	// module in parentheses and no flag at all, so neither of the two rules
+	// above can see it.
+	r.Check("a pkg-config module maps to the flag that asked for it",
+		say("pkg", "configure: error: Package requirements (liburing) were not met:\n"+
+			"No package 'liburing' found\n", pgFlags2),
+		"drop:--with-liburing")
+	// The same message with a version constraint and more than one module: the
+	// name is the first token of an entry, not the whole entry.
+	r.Check("a version constraint is not part of the module name",
+		say("pkgver", "configure: error: Package requirements (libzstd >= 1.4.0, liburing) were not met:\n",
+			[]string{"--with-openssl", "--with-zstd"}),
+		"drop:--with-zstd")
+
+	// A third spelling of the same fact, quoting the library instead.
+	r.Check("a quoted 'library X is required' maps to its flag",
+		say("reqlib", "configure: error: library 'libnuma' is required for NUMA support\n",
+			[]string{"--with-openssl", "--with-libnuma"}),
+		"drop:--with-libnuma")
+
+	// ⛔ A STATIC BUILD ASKED FOR A SHARED OBJECT. Not a missing package: a
+	// structural refusal, and the capitalised language name has to be folded
+	// to match the flag.
+	r.Check("'could not find shared library for Python' drops --with-python",
+		say("shared", "configure: error: could not find shared library for Python\n",
+			[]string{"--with-openssl", "--with-python"}),
+		"drop:--with-python")
+
 	// ⛔ AND THE SILENCES, which are the half a pattern change breaks quietly.
 	r.Check("a flag the message names but the build does not carry is not dropped",
 		say("absent", "configure: error: llvm-config not found, but required when "+
@@ -65,12 +94,28 @@ func DiagnoseSelftest() *selftest.Report {
 		"")
 	r.Check("a missing log file says nothing",
 		diagnose(filepath.Join(dir, "does-not-exist.log"), pgFlags), "")
+	// ⛔ The unquoted suggestion is anchored on a following " to ", so a flag
+	// merely named in prose is not mistaken for advice.
+	r.Check("a flag mentioned in prose is not taken as a suggestion",
+		say("prose", "configure: error: something failed\n"+
+			"see the manual for --without-readline and other options\n", pgFlags),
+		"")
 
 	// autoconf's own suggestion is taken as an ADD, and only for a disable.
 	r.Check("autoconf's `use --without-x' suggestion is added, not dropped",
 		say("suggest", "configure: error: something\nuse `--without-tcl' to disable\n",
 			[]string{"--with-openssl"}),
 		"add:--without-tcl")
+
+	// ⛔ postgres writes the same courtesy unquoted, and this is the rung that
+	// stopped arm S at readline: libreadline.a and libncursesw.a were BOTH in
+	// the prefix, and AC_SEARCH_LIBS probes -lreadline alone, so the archive's
+	// ncurses references go unresolved and configure calls the library absent.
+	r.Check("postgres' unquoted 'Use --without-readline to disable' is added",
+		say("plain", "configure: error: readline library not found\n"+
+			"Use --without-readline to disable readline support.\n",
+			[]string{"--with-openssl"}),
+		"add:--without-readline")
 
 	return r
 }
