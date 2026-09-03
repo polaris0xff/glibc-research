@@ -46,45 +46,68 @@ the branch you are on AND `git status` after `git checkout main`.
 
 ## In flight right now
 
-    ⏳ R1, THE TEN POCs — 8 of 10 green (10,20,30,40,50,60,70,80), 90-qt
-       building, 91-qt-xcb after it. PGB_ENGINE=chroot, matching the engine
-       every committed RESULT.txt names.
-         runner  scratchpad/run-pocs.sh, staging in scratchpad/poc-run/
-         ⛔ DO NOT REBUILD ./pgb UNTIL IT FINISHES — a POC invokes ./pgb many
-            times and a mid-run swap makes the result describe two binaries.
-         Each POC's stdout is copied to evidence/poc/<name>/RESULT.txt as it
-         completes, so a death here loses at most the running POC.
+    ⏳ R3 — T-063 arm S with `--without-icu` REMOVED. RUNNING on the bed.
+         cmd   cd /var/tmp/pgb-r3 && NIX_MAX_ROUNDS=24 \
+               /home/user/glibc-research/pgb nix build --plan /var/tmp/pgb-r3/pg.plan
+         log   scratchpad/r3-postgres.log   (plan already produced: pg.plan)
+         ⛔ NOTHING ELSE MAY TOUCH pgb-env-debian13 WHILE IT RUNS.
+         ⭐ WHAT TO READ OFF IT: the plan carries `--with-icu`. The question is
+            whether the adaptation loop KEEPS it. If postgres builds with
+            `--with-icu` still on the final configure line, the C++-archive fix
+            (elfx.NeedsCXXRuntime) is proved on the real subject. If the loop
+            drops it, the fix did not reach this case and that is the finding.
 
-    ✅ R2 DONE and pushed (ac43d08c, CI green).
-    ✅ B1 DONE and pushed (1dc6e49e, CI in progress at the time of writing).
+    ⛔ OWED AS SOON AS THE BED IS FREE, and it is small:
+       re-run poc/70-sqlite-extensions, poc/80-mlt and poc/91-qt-xcb. Their
+       committed RESULT.txt files describe runs WITHOUT the new
+       `poc_check_built_by_env` assertion. Build trees for 80 and 91 are still
+       on disk, so the re-runs are minutes, not the full build.
+       ⚠ 90-qt's build tree was DELETED to make room for R3 (3.6 GB). Its
+       evidence is committed; a re-run costs ~14 minutes.
 
-    NEXT, in order:
-      R3  T-063 arm S with --without-icu REMOVED  ⛔ needs the build rootfs,
-          so it CANNOT start until R1 finishes — both use pgb-env-debian13.
-            pgb nix plan postgresql --out pg.plan
-            NIX_MAX_ROUNDS=24 pgb nix build --plan pg.plan   (no --without-icu)
-      T-062  buildx, logx, proc selftests — pure Go, no bed, can overlap
-      then T-075's two placements, T-057, T-060, T-054, T-051, T-012
+## ✅ DONE AND PUSHED THIS SESSION (all CI-green where CI has reported)
+
+    R1   ⭐ TEN OF TEN POCs, 167 assertions, fail=0 skip=0, 55 min. The debt
+         is cleared: the link hot path change is validated on ten real
+         projects across eleven environments.  516a6cf7
+    R2   the soname scan's control shared code with its subject; separating
+         them found a HARDLINKED root-of-itself. selfKeys keys on dev:ino now.
+         ⚠ Corrected the same day: NOT reachable through pgb's own output
+         (0 of 284 files hardlinked in a jq AppDir).  ac43d08c, fba4a3c8
+    B1   ⭐ ROUTE B COSTED, and it OVERTURNS the argument against it: the whole
+         -mini set forces 161 of 676 kdenlive closure paths (23.8%) from
+         source, qtbase alone 78 (11.5%) -- not "the entire KDE/Qt subtree".
+         experiments/95-.  1dc6e49e
+    B3   ⭐ the fixpoint lever, as a MEASURING DEVICE (`pgb bundle sweep
+         --fixpoint`), +978,576 B on jq. ⭐ The two levers are ADDITIVE.
+         ⭐ And it inherits the baseline's risk rather than adding one --
+         measured, 0 reachable objects mention the seven it drops.
+         71b5e3b5, 489cb3f8, 49f9df01
+    T-062 ✅ CLOSED. buildx, logx, proc covered; every package now has a
+         suite. 375 -> 516 cases, each proved able to fail.  6f445c0a
+    T-075 ✅ CLOSED. experiments/96-: LD_DEBUG prints NOTHING when ld.so
+         arrives as a library, even at `all`, and even though ld.so IS in the
+         process. Both remaining placements refused, with the reason.  5e447ebf
+    T-057 ⚠ "no 32-bit path" was STALE -- lib32 is implemented; the
+         measurement is what is missing. elfClass now covered.  761dbbfe
+    POC harness: three of the ten never asserted which compiler built their
+         binary. Split out as poc_check_built_by_env.  724c738d
 
 ## ⛔ WHAT IS LEFT — READ PROGRESS.md, IT IS THE WORK ORDER
 
-    ---- 0. ⛔ THE DEBT THE LAST SESSION TOOK ON. FIRST. ----
-    R1  ⛔ RUN THE TEN POCs. The wrapper's link hot path changed (every link
-        now scans its .a/.o inputs via elfx.NeedsCXXRuntime) and nothing ran
-        the acceptance harness against it.
-    R2  ⚠ `bundle-soname-scan`'s oracle now SHARES selfKeys() with the subject,
-        so their equivalence cannot catch a defect inside it.
-    R3  ⚠ T-063 arm S with `--without-icu` REMOVED -- the C++ fix is proved on
-        a synthetic subject, not on postgres.
+    The debt (R1, R2, R3) is done or running. T-066 is still the last open P0.
 
-    ---- 1. T-066 P0, and the ROUTE ORDER CHANGED ----
-    ⭐ Route A's ceiling is MEASURED at 23.3% and the gap is 2.22x, so the
-    allowlist cannot finish the job. ⛔ COST ROUTE B FIRST: how many store
-    paths in kdenlive's closure are downstream of qtbase and mesa? That needs
-    only the closure, no rebuild, no AppDir.
-
-    ---- 2. then T-062 (buildx/logx/proc), T-075's two placements, T-057,
-            T-060, T-054, T-051, T-012 ----
+    B1b ⛔ COST ROUTE B IN WALL CLOCK. B1 says 161 of 676 paths, which is
+        affordable in COUNT; one of them is qtbase and Qt does not build in a
+        minute. That number decides whether the bundle stays one command.
+    B2  ⭐ THEN the allowlist, now bounded AND now worth more than it looked:
+        route B is cheaper than the entry assumed, so the two compose.
+    B3b ⛔ the fixpoint's control. ⚠ NOT one command -- PROGRESS.md carries
+        the three things a planner needs first (it is not wireable into 89-
+        as it stands, 89- builds three mesa-demos bundles, and its assertion
+        is an EGL one that never touches what the fixpoint drops).
+    then T-057 (a 32-bit application through lib32 -- the code EXISTS, the
+        measurement does not), T-060, T-054, T-051, T-012.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 
