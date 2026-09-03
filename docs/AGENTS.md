@@ -311,7 +311,12 @@ The steps it runs, if you ever need them by hand:
 ./pgb --engine chroot env create     # pinned build env + static libiconv
 
 for e in experiments/*.sh; do case $e in */lib.sh) ;; *) sh "$e";; esac; done
-for p in poc/*/run.sh; do sh "$p"; done
+sh poc/run-all.sh                    # ⭐ the acceptance suite, the ten POCs
+sh poc/run-all.sh --rebuild          # ⛔ after ANY change to the wrapper's
+                                     # compile or link path: without it the
+                                     # POCs reuse binaries the OLD toolchain
+                                     # produced and report ten green rows that
+                                     # say nothing about the change
 
 ./pgb build -- make                  # your project, unmodified
 ./pgb verify ./yourprogram           # run it on all 11
