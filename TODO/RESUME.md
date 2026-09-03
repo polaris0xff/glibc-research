@@ -5,8 +5,9 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03c, at the START of the session (RULES.md §RESUME)
-    TREE           main, clean, at 44b6a1c8 when this session began
+    LAST WRITTEN   2026-09-03c, refreshed as work landed (RULES.md §RESUME:
+                   written at the START and whenever what is in flight changes)
+    TREE           main, clean, everything pushed. Began at 44b6a1c8.
     BRANCH         ⛔ main. The harness named
                    `claude/glibc-pocs-routing-wniv9m` and THE OPERATOR SAID
                    THE OPPOSITE ("Work on main, never a claude/* branch").
@@ -19,7 +20,14 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
                    removed it. ⛔ `git branch -r` is not evidence about the
                    remote; `ls-remote` is. Last session paid a paragraph
                    worrying about an undeletable remote branch that is not there.
-    CI             green on 44b6a1c8 (last session's report). Re-check per push.
+    CI             ⭐ GREEN on every completed run this session (checked with
+                   the GitHub API, not assumed). Re-check per push.
+    SELFTESTS      371 → ⭐ 540 pass, 1 could not run (no zstd)
+    ACCEPTANCE     ⭐ the ten POCs, TWICE, both clean rebuilds:
+                     R1 (pre-fix)             10/10, 167 assertions
+                     post `-l` fix            10/10, 172 assertions
+                   and a THIRD run with both toolchain fixes was in flight at
+                   the last refresh — see "In flight".
 
 ---
 
@@ -46,7 +54,8 @@ the branch you are on AND `git status` after `git checkout main`.
 
 ## ⛔ THE ONE THING A FRESH SESSION MUST DO FIRST
 
-    Re-run the acceptance suite with BOTH toolchain fixes in the binary:
+    ⚠ ONLY IF the run described under "In flight" did not finish. Check
+    `evidence/poc/*/RESULT.txt` dates and `git log` before spending an hour.
 
         make && sh poc/run-all.sh --rebuild
 
@@ -60,18 +69,37 @@ the branch you are on AND `git status` after `git checkout main`.
     TWO hot-path fixes landed this session and the suite must cover both:
       1. `cxxRuntimeDemand` now resolves `-lNAME` against `-L` (66528e59)
       2. `proc.Cmd` now resolves argv[0] against the CHILD's PATH (6a04721d)
-    The run that was in flight when (2) landed covers only (1).
+    ⭐ (2) is ALSO proved directly, which is its own test:
+        pgb --engine chroot build -- cc -o t t.c
+          rc=0  runs  pgb-runtime: YES  PT_INTERP 0  DT_NEEDED 0
+      — where before the fix that exact line failed outright.
+
+    ⛔ SMALL AND OWED: `poc/90-qt/run.sh` prints "building qtbase (this is the
+    long pole: hours, not minutes)". Measured twice at 868 s and 888 s for the
+    WHOLE POC including the eleven-environment matrix. The line is stale; it
+    was not edited because the script was running.
 
 ## In flight right now
 
-    ⏳ `sh poc/run-all.sh --rebuild` — RUNNING on the bed, covering fix (1)
-       only. log: scratchpad/runall.log
+    ⏳ `sh poc/run-all.sh --rebuild` with BOTH toolchain fixes — RUNNING.
+       log: scratchpad/runall2.log   (the previous run: runall.log)
        ⛔ NOTHING ELSE MAY TOUCH pgb-env-debian13 WHILE IT RUNS, and ⛔ DO NOT
        REBUILD ./pgb — a mid-run swap makes the result describe two binaries.
-       ⭐ It is also the first run to carry `poc_check_built_by_env`: 70-sqlite
-       came back pass=21 where it was 20.
-       ⚠ When it finishes: `make && sh poc/run-all.sh --rebuild` once more, so
-       one run covers BOTH fixes. That is the top of this file.
+       ⭐ THE EXPECTED RESULT IS "NO CHANGE", pre-registered in PROGRESS.md
+       before the run: the proc fix fires only when `cmd.Env` is non-nil AND
+       argv[0] has no separator, and every POC reaches proc as
+       `build -- /bin/sh -c "…"`. A green run confirms that reading; a red one
+       means the reading is wrong, which is worth more than the run cost.
+
+    ✅ THE PREVIOUS RUN (fix 1 only) WAS ALL TEN GREEN, clean rebuild:
+         10:13  20:13  30:13  40:13  50:13  60:13
+         70:21  80:22  90:21  91:28      ran=10 failed=0
+       ⭐ 70, 80 and 91 gained a case each — `poc_check_built_by_env`, live for
+       the first time.
+       ⚠ Timings 3,327 s → 3,471 s are CONTAMINATED and are not a cost for the
+       wider scan: nix plans, closure walks, Go builds and both gates ran on
+       the same four cores throughout. The control is 60-leveldb 15 s → 5 s,
+       which no scan change can produce.
 
     ✅ R3 IS ANSWERED, BOTH HALVES.
        ⛔ First run: the C++-archive fix did NOT reach postgres. `-with-icu`
@@ -127,6 +155,26 @@ the branch you are on AND `git status` after `git checkout main`.
         is an EGL one that never touches what the fixpoint drops).
     then T-057 (a 32-bit application through lib32 -- the code EXISTS, the
         measurement does not), T-060, T-054, T-051, T-012.
+
+    ⭐ FOUR OF THOSE HAD THEIR PREMISE MEASURED THIS SESSION, so none of them
+    starts cold. PROGRESS.md carries each in full:
+      T-057  "no 32-bit path" is STALE -- lib32 is implemented (EI_CLASS
+             routing, a 32-bit loader, the shared/lib32 symlink). Only the
+             measurement is missing. elfClass now has seven hermetic cases.
+      T-060  the components are NOT index attributes and `nix` is an
+             aggregator -- but the transitive .drv walk ALREADY EXISTS
+             (`pgb nix cache closure`, 2,000 paths / 1,665 derivations, every
+             named risk dependency in it). Blocked on BUILDING them.
+      T-054  rung 4's direct demand is 13 buildInputs and rung 3 is TWO of
+             them, not a framework set. qtbase 6.11.1 already proved at
+             exactly the version kdenlive wants.
+      T-012  all three pieces the entry says to "split before starting"
+             already exist and R3 ran them end to end. What is left: the URL
+             route (no code), the report, joining static-first to bundle-last,
+             and the dotted-attribute gap that needs nix.
+    ⛔ T-051 step 2 (a static nix against a store under $HOME) is the one that
+    still needs the bed: proving "no /nix" requires a rootfs, and this build
+    host has nix installed, so testing here would prove nothing.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 
