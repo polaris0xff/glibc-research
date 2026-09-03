@@ -137,13 +137,15 @@ variable:
 installed — this arm had been **skipped** for want of it, so earlier figures
 came from another machine. ⚠ `memcpy` **changes sign** between the two runs and
 is reported as *no difference measurable*; `comparison.md` has every row.
+⛔ **`evidence/61-libc-throughput/RESULT.txt` carries the SECOND run** — the
+file is overwritten each time — so the first figure in each pair above is the
+replication check and only the second is re-derivable from the tree.
 
-⭐ **The product, in one row:** on **Alpine**, where the ordinary choice is a
-musl build, a `pgb` binary does that 4-thread allocator workload in
-**6.86 ns/op** against musl's **1045.49**, and **6.38–11.43** against
-**622.99–1069.39** across all eleven. glibc's numbers on a machine that ships
-no glibc — and `pgb` costs 1.00×–1.13× against plain `gcc -static` on the same
-workloads.
+⭐ **The product, in one row:** on a machine that ships no glibc, a `pgb`
+binary does that 4-thread allocator workload in **6.25–12.32 ns/op** across all
+eleven against static musl's **622.99–1069.39** (the union of both runs; arm C
+is one round per environment). glibc's numbers where there is no glibc — and
+`pgb` costs **1.00×–1.13×** against plain `gcc -static` on the same workloads.
 
 The stack to measure against is **`Anylinux-AppImages`**: it bundles glibc, its
 loader and its gconv tree, and `experiments/62-` has it running on 11 of 11 at
@@ -448,10 +450,22 @@ experiment; none has been shown to be unreachable.
    systemd-resolved. Measured cost: on Fedora 42 a plain static binary resolves
    the machine's own hostname via `libnss_myhostname` and the pgb binary does
    not.
-3. **SIX host *data* dependencies exist and static linking touches none of
-   them.** ⚠ **It was FIVE until 2026-09-03c**, when somebody asked whether the
-   list was complete and it was not — see `REQUIREMENTS.md`'s tenth row.
-   ⭐ **Five are now solved and the sixth is shipped rather than solved**:
+3. **SEVEN host *data* dependencies exist and static linking touches none of
+   them.** ⚠ **It was FIVE until 2026-09-03c and SIX until 2026-09-03e** — each
+   time because somebody asked whether the list was complete rather than
+   whether the known rows were closed. ⛔ **The seventh is the network name
+   databases** (`/etc/services`, `/etc/protocols`): `getservbyname("http","tcp")`
+   returns **NULL on 3 of 11 — debian-11, debian-12 and ubuntu-20.04, all
+   glibc** — while all four musl environments ship the file.
+   ⭐ **It was found by a re-runnable SEARCH rather than a guess**:
+   `experiments/82-` enumerates every absolute path the pinned `libc.a` names
+   (78 at glibc 2.41), classifies each against the known rows, and prints the
+   **19** the rows do not own. ⚠ That search cannot see runtime-assembled
+   paths, other libraries' host data (terminfo and the CA bundle are invisible
+   to it **by construction**) or anything behind a host daemon — so it is a
+   snapshot of a method, not a proof of completeness. `REQUIREMENTS.md`, T-079.
+   ⭐ **Five are solved, one is shipped rather than solved, and the seventh is
+   OPEN with no mechanism**:
    gconv ✅ (static libiconv), locale ✅ (opt-in `--embed-locale`),
    terminfo ✅ (opt-in `--embed-terminfo`, `setupterm(xterm-256color)` on 11 of
    11 including three Alpines with no terminfo tree), CA bundle ✅ (opt-in
@@ -501,7 +515,7 @@ repeated here.
 | item | status |
 |---|---|
 | test bed, 11 environments | ✅ 11 of 11, digest-pinned |
-| all **39** experiments | ✅ every one measured. ⚠ **The count read 24 until 2026-09-03c**, when `ls experiments/[0-9]*-*.sh \| wc -l` was actually run against it. 38 write `evidence/<NN>-*/RESULT.txt`; `86-` writes one per subject (`RESULT.jq.txt`, `RESULT.mpv.txt`) because it runs against two. ⭐ `experiments/clock.sh` is a **library**, not an experiment — the wall-clock instrument, beside `lib.sh` |
+| all **40** experiments | ✅ every one measured. ⚠ **The count read 24 until 2026-09-03c**, when `ls experiments/[0-9]*-*.sh \| wc -l` was actually run against it. 39 write `evidence/<NN>-*/RESULT.txt`; `86-` writes one per subject (`RESULT.jq.txt`, `RESULT.mpv.txt`) because it runs against two. ⭐ `experiments/clock.sh` is a **library**, not an experiment — the wall-clock instrument, beside `lib.sh` |
 | all 10 POCs | ✅ 11 of 11 environments each, zero host shared objects. ⭐ **All ten re-run at the 2.41 pin on 2026-09-03**, and each `RESULT.txt` now names the environment, image, digest, gcc and glibc that built it |
 | NSS / iconv / locale / terminfo / CA-bundle mechanisms | ✅ 11 of 11 each |
 | `pgb` chroot and host engines | ✅ complete |

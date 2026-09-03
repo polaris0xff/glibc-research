@@ -39,7 +39,7 @@ capability axis, so the column does not depend on that choice.
 | payload clean (host `.so` opened) | 0 envs | **0 envs** | 0 envs | `63-` |
 | NSS — `getpwuid(0)` | 10 / 11 | **11 / 11** | 11 / 11 | `63-` |
 | NSS — `gethostid()` | ⛔ **SIGFPE on Arch** | ✅ **11 / 11** | ✅ 11 / 11 | `63-`, `82-` |
-| iconv — encodings accepted | 1 / 12, and **SIGABRT on 3** | ✅ **12 / 12** | 10 / 12 | `63-` |
+| iconv — encodings accepted | 1 / 12 on 8 rows, and it **CRASHES on 3** — SIGABRT on debian-11 and ubuntu-20.04, SIGFPE on debian-12 | ✅ **12 / 12** | 10 / 12 | `63-` |
 | locale — codeset **by environment** | ⛔ 0 / 11 | ⛔ **0 / 11** | ⭐ **11 / 11** | `63-` |
 | locale — codeset **when requested** | 7 / 11 | ✅ **11 / 11** | 11 / 11 | `63-` |
 | timezone — `TZ=Europe/Berlin` | 7 / 11 | ✅ **11 / 11** | 7 / 11 | `63-`, `97-` |
@@ -183,14 +183,17 @@ can matter more than any row above.
 
 | | on Alpine 3.22, malloc 4 threads |
 |---|---|
-| `pgb` | **6.86 ns** |
+| `pgb` | **6.39–6.86 ns** (both runs) |
 | anylinux AppImage | **3.66–7.20 ns** |
-| static musl | 1045.49 ns |
+| static musl | 626.42–1045.49 ns (both runs) |
 
 ⭐ **That row is the product.** On a machine that ships no glibc, both glibc
 deliveries give you glibc's numbers. ⭐ **And it travels to all eleven**: `pgb`
-does that workload in **6.38–11.43 ns** on every environment against static
-musl's **622.99–1069.39** (`experiments/61-` arm C, one round per environment).
+does that workload in **6.25–12.32 ns** on every environment against static
+musl's **622.99–1069.39** (`experiments/61-` arm C, one round per environment,
+union of both runs). ⚠ **The committed `RESULT.txt` holds the SECOND run only**
+— it is overwritten each time — so figures quoted from the first are a
+replication check rather than something a reader can re-derive from the tree.
 `pgb` adds **1.00×–1.13×** over a plain static glibc build on the same
 workloads (arm B, both runs), which is the steady-state counterpart to
 `experiments/40-`'s startup result.

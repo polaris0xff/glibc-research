@@ -14,6 +14,79 @@ commit.
 
 ---
 
+## ⭐ 0. THE GUARANTEE — what is left unsolved, and what kind of problem it is
+
+⛔ **This section is the T-080 deliverable and it replaces nothing below; §1 is
+still the field's record and is still a list of HYPOTHESES about a different
+pipeline.** What is new is that some of those rows have now been **run through
+`pgb bundle appimage`**, which is the only thing that makes them ours.
+
+> **The guarantee, stated so it can be falsified.** Of what is left unsolved in
+> a `pgb` nix bundle today, **everything measured is tooling** — a path our
+> patcher does not rewrite, an entry-point shape our reader does not resolve.
+> ⛔ **No measured failure is "nix cannot do EGL/SDL/XCB" and none is "nix
+> cannot load vulkan or nvidia".** ⚠ And two capability questions are **not
+> measured at all** rather than measured green: anything requiring a **GPU**,
+> and **Python GUI applications**, which our own tooling cannot yet bundle.
+
+| capability | status **for our pipeline** | evidence |
+|---|---|---|
+| ⭐ **GTK 3** | ✅ **MEASURED, AND IT WORKS.** `mousepad` draws real toplevel windows on a real X server, on 11 of 11, with **zero host shared objects** | `64-` arm X |
+| ⭐ **XCB / X11 client stack** | ✅ **MEASURED.** The bundled GTK connects to a real X display on 11 of 11 — both subjects, including the one that then fails for another reason | `64-` |
+| **EGL** | ⚠ **offscreen only.** *"The closure produces a working EGL display offscreen"* — `pass=10 fail=0`, every row **`swrast` and surfaceless** | `85-` |
+| **OpenGL driver stack** | ⚠ same. The bundle carries mesa and points libglvnd at itself; the negative control (`--no-gl`) cannot produce a vendor string on any row | `85-` |
+| **Vulkan** | ⛔ **NOT MEASURED. NOT CLAIMED.** The ICD mechanism is relocatable by design (§1) and the bundler writes `VK_DRIVER_FILES`, but no Vulkan call has been made here | — |
+| **NVIDIA** | ⛔ **NOT MEASURED, and not bundled by design.** The driver is taken from the HOST; `design/host-fallback.md` governs it. T-059 owns the hardware | — |
+| **SDL** | ⛔ **NOT RUN through our pipeline.** A hypothesis, graded *Excellent* by the field | §1 |
+| ⛔ **Python GUI** | ⛔ **BLOCKED BY OUR TOOLING**, and the closure is not at fault | `64-` arm P |
+| ⛔ **apps with a compiled-in data path** | ⛔ **BLOCKED BY OUR TOOLING** | `64-` arm G |
+
+### ⛔ The two blockers, both ours, both named at a line
+
+⭐ **Neither is a statement about nix.** In both, the closure fetched
+completely and every library resolved.
+
+1. **A hardcoded absolute store path to a data file.** `galculator` connects to
+   a real X server and then dies on
+   `Couldn't load /nix/store/<hash>-galculator-2.1.4/share/galculator/ui/main_frame.ui`.
+   ⭐ **That file IS in the bundle**, at `AppDir/share/galculator/ui/`. The
+   bundler sets `XDG_DATA_DIRS` to its own `share`, which serves every
+   application that *looks up* its data and cannot serve one with the path
+   baked into its `.rodata`. ⛔ **T-081's entry names this verbatim** —
+   *"shebang lines, hardcoded paths, .desktop files"*.
+2. **A script entry point.** `meld` — a Python 3 + GTK application — never
+   produces an artefact. `internal/bundle/appimage.go`'s `resolveEntry`
+   oscillates: `bin/meld` is a `makeBinaryWrapper` ELF whose target
+   `bin/.meld-wrapped` is a **Python script**; `ReadWrapper` returns nothing
+   for a script and `elfx.IsELF` is false, so `lastExistingStorePath` scans the
+   script's text and resolves back to `bin/meld`. Five hops, then
+   `no entry point` (`assemble.go:60`). ⚠ **This is the standard nixpkgs shape
+   for a Python application**, not a `meld` quirk.
+
+### ⛔ How this section corrects itself, and the correction is the point
+
+⚠ **An earlier version of `experiments/64-` scored GTK 11 of 11 GREEN.** Its
+criterion was that the program printed `Gtk-WARNING **: cannot open display:`,
+on the reasoning that the message is emitted by the bundled `libgtk-3` and so
+proves it loaded.
+
+⛔ **The operator rejected that and was right**: *"previously nixappimage
+bundled apps showed the same error on real hw with display"*. The message does
+not discriminate — it is identical when there is no display and when the
+bundle's own X stack is broken, which is the only distinction the experiment
+exists to make. ⭐ **The fix was to feed it a real display** (`Xvfb`, socket
+bound into each rootfs) and to check for a **window on the X server with
+`xwininfo`, from outside the process**. That turned 11 green rows into **0**,
+and then a second subject showed the blocker was the data path rather than GTK.
+
+⭐ **This is why the deliverable is two subjects and not one.** Same bundler,
+same GTK, same eleven environments: the application whose UI is **compiled in**
+as a GResource draws windows; the one whose UI is **a file behind an absolute
+store path** draws none. That pair is what licenses the sentence *"the
+remaining gap is tooling"* instead of leaving it a hope.
+
+---
+
 ## 1. ⭐ The capability question, answered from the field's own record
 
 `pkgforge-dev/Anylinux-AppImages` keeps `HALL-OF-FAME.md`, a per-library
