@@ -1,117 +1,76 @@
-# SUMMARY.md — the session of 2026-09-02f / 2026-09-03
+# SUMMARY.md — the session of 2026-09-03b
 
 ⛔ **Overwritten every session.** The history is the git log.
 
-⭐ **The headline: the glibc pin moved, and moving it turned over four real
-loader defects.** Host shared objects that `--host-dlopen` can load went
-**406 → 882 of 1,527** on one machine, one population, five builds — and the
-assertion that was supposed to catch two of those defects had been passing at
-zero *because of* a third.
+⭐ **The headline: the operator's `cross-libc-dlopen#28` review turned up a live
+silent-wrong-answer defect in our own loader, and a check that could not fail on
+the state it was written to catch.** ⛔ **We are not affected by upstream's
+bug** — it is an `LD_PRELOAD` interposition defect, this tool ships no preload
+shim and its output has no `PT_INTERP`. ⭐ **The defect CLASS is ours**, and it
+is the one this tree keeps paying for: *a lookup that ANSWERS when it should
+DEFER*.
+
+⭐ **And T-066, the last open P0, has route A's ceiling MEASURED**: 218.5 MiB of
+a 938.8 MiB mesa bundle is reachable only through edges two `-mini` rebuilds
+delete, against **6.3%** the sweep can prove dead.
 
 ## Before and after
 
 | | at start | at end |
 |---|---|---|
-| **the glibc pin** | ⛔ 2.36, "the move is *indicated*, `cfg.go` untouched" | ⭐ **2.41, landed**, gcc 14.2.0, and **CI green at it, 16 of 16, on all eleven** |
-| **copies of the pin in code** | ⛔ **nine** of the name, **two** of the digest — one an `env.BUILD_IMAGE` nothing had ever read | ⭐ **three constants in `cfg.go`**, and `TODO/check.sh` fails on a copy |
-| **host objects `--host-dlopen` loads** | 406 of 1,527 | ⭐ **882** |
-| **`experiments/93-`'s own control** | `DIFFER = 0` | ⭐ **`DIFFER = 0`, and this one is earned** — it read 10, then 1, then 0 as defects were fixed |
-| **the residue that is actually ours** | ⛔ "86 of 904", from a sweep nobody committed | ⭐ **257 objects, SIX symbols; 254 of them load** |
-| **`libLLVM`** | ⛔ "dies in its 605th static constructor for a reason nobody has found" | ⭐ **loads** |
-| **`experiments/21-`** | labels typed as `"2.31"`/`"2.36"` | ⭐ a **third arm that follows `cfg.go`**, every label read from the environment |
-| **a POC's `RESULT.txt`** | said nothing about what built it | ⭐ environment, image, digest, gcc, glibc — and the binary's `.comment` **asserted** against it |
-| **`pgb selftest`** | 200 cases | ⭐ **307**, `wrapper` and `cfg` new |
-| **CI** | green | ⛔ **red for seven pushes**, then green — on a gate that passed here and failed there |
-| **Entries** | 45 / 20 open / 25 done | ⭐ **45 / 17 open / 28 done** — T-068, T-070 and T-071 closed. P0: 3 open → **1** |
+| **the own-symbol table** | ⛔ ONE table, two entries with **opposite** requirements, checked first and unconditionally. Safe **by accident** | ⭐ **two tables at two points**, and `experiments/94-` asserts both directions, 11 of 11 |
+| **that defect, live?** | unknown — nothing asserted it | ⭐ **yes, and silent**: reversed, the decoy `__tls_get_addr` answered **twice** while the value still read `0x5eeded` |
+| **the host-policy selftest** | ⛔ five "is unset" assertions that were green on the **dangerous** state too | ⭐ presence-based, **and the instrument itself asserted** |
+| **the vendored `cross-libc-dlopen`** | ⛔ pinned **pre-PR-30**; T-031 proposes porting from it | ⭐ re-mined at **`793f3f3f`**, PR 30's merge commit |
+| **third-party agent files under `references/`** | ⛔ **three**, and a re-mine silently put one back | ⭐ **zero**, stripped at fetch time and **gated** |
+| **T-066 route A** | ⛔ "measure the ceiling first" — no instrument | ⭐ **`pgb bundle sweep --cut`**, and the ceiling is **218.5 MiB / 23.3%** |
+| **`DropUnreachable` on versioned libraries** | ⛔ could not drop them — every one was a **root of itself** through its own SONAME | ⭐ fixed; jq roots **40 → 28** |
+| **the `jq` bundle vs the field** | ⛔ "1.22×" — from an evidence file predating the gating change | ⭐ **1.58×** at `aggressive`, re-measured |
+| **`--tls-reserve`** | ⛔ build host only | ⭐ **11 of 11**: refuses at 0, loads at 65536, **88 bytes** on disk |
+| **`pgb selftest`** | 307 cases | ⭐ **371** — `verifyx`, `fail` and `cxx-runtime` new |
+| **a C link pulling a C++ archive** | ⛔ fails on `operator delete` | ⭐ **detected by reading the archives**, and it links |
+| **`--start-group` as the readline fix** | asserted in an entry | ⚠ **measured false**: it fixes ORDER, not ABSENCE |
+| **Entries** | 45 / 17 open / 28 done | ⭐ **48 / 16 open / 32 done** — T-072 closed, and T-073/T-074/T-075 opened and closed |
 
-## What was actually settled
+## ⛔ What was found, and again not one came from reading code
 
-| | | |
-|---|---|---|
-| **T-070** | ✅ **CLOSED** | the pin is `debian:13`/2.41. `73-` re-run independently reproduced the prediction, `21-` re-run with a pin-following arm, ⭐ **all TEN POCs** re-run through the normal path, CI green 16 of 16 |
-| **T-068** | ✅ **CLOSED** | 93- green at `pass=6 fail=0`, with the arc that earned the zero |
-| **T-071** | ✅ **CLOSED** | 85- run at last — the data-coherence arm's negative control fired on a real bundle |
-| **T-072** | ⚠ **advanced, and its premise is dented** | the object it was opened on, `liblsan.so`, is refused as a **sanitizer interposer** before TLS is considered. Zero of 71 `PT_TLS` objects want more than the surplus |
-| **T-062** | ⚠ **advanced** | `wrapper` (55 cases) and `cfg` (37). Five packages left |
+1. ⭐ **`__tls_get_addr` could lose to a loaded object, and the value would hide
+   it.** The decoy returns its own slab, so a thread-local round trip through it
+   is self-consistent: `tls=0x5eeded` in **both** columns. Only `decoy_calls` —
+   0 fixed, 2 reversed — separates them. An experiment written around the value,
+   which is the obvious way, would have measured nothing and reported a pass.
+2. ⛔ **An assertion whose own label named a distinction its helper could not
+   make.** `get()` returned `""` for a key that is absent **and** for one
+   emitted as `KEY=`, and for `__EGL_VENDOR_LIBRARY_FILENAMES` those are the
+   safe state and the dangerous one.
+3. ⛔ **A re-mine undid a recorded deliberate deletion** — and sweeping all 34
+   references found **two more** third-party agent-instruction files nobody had
+   noticed.
+4. ⛔ **A versioned library was a root of itself.** The soname scans excluded the
+   object's own *filename*, but `libunistring.so.5.2.1` carries
+   `DT_SONAME libunistring.so.5`. Nearly every ordinary shared library.
+   ⚠ The selftest had a self-naming case and it passed throughout, because its
+   fixture used a file whose name equals its SONAME.
+5. ⛔ **A committed evidence file described a build configuration that no longer
+   exists**, found with `git merge-base --is-ancestor` against the commit that
+   changed the gating. It is where T-066's "1.22×" came from.
+6. ⚠ **`LD_DEBUG_OUTPUT` writes more than one file** — `timeout` forks and is
+   itself dynamic — and glob order yields the useless one.
+7. ⚠ **`pgb bundle appimage --out` threw away a whole build** for a missing
+   output directory, reporting `mkdwarfs failed` over a log saying it wrote
+   **0 files**, which reads like the AppDir was empty.
+8. ⚠ **`--start-group` cannot fix absence**, measured in three arms.
+9. ⛔ **`$?` after a pipeline is the pipeline's status** — paid again:
+   `make 2>&1 | tail -2 && echo BUILD_OK` printed BUILD_OK over a failed build.
+10. ⛔ **`pkill -f` matched its own runner and killed two backgrounded jobs** —
+    the trap `docs/AGENTS.md` §14 already records, walked into anyway.
 
-## ⛔ Findings, and not one came from reading code
+## What is left
 
-1. ⛔ **`main` came up 18 commits behind** and `git switch` said *"up to date"* —
-   shallow clone, before the fetch.
-2. ⛔ **The record was 12 commits stale.** `TODO/runtime.md` said *"93- has not
-   been RUN yet"* twelve commits after it was run twice.
-3. ⛔ **`--host-dlopen` could not load anything using iconv.** The provider
-   table's **weak** `extern char iconv_open[]` was rewritten by `--wrap` to a
-   name no archive member was pulled for. Found by running **real host
-   objects**, which is what T-072's Prove asked for.
-4. ⛔ **A general-dynamic TLS pair's two halves searched different sets of
-   objects**, so a cross-module thread-local bound to *(right module, offset
-   0)* — one module writing into another's thread storage. Found by a SIGSEGV
-   handler, because `rip=0` names nothing.
-5. ⛔ **Defect 3 was HIDING defect 4.** Ten objects the control should have
-   caught were failing earlier, on iconv.
-6. ⛔ **The symbol lookup stopped at the first NAME match** and checked the
-   version after. A versioned table holds several entries per name.
-7. ⛔ **`_dl_mcount_wrapper_check` is in `libc.so.6` and not in `libc.a`** —
-   247 objects, refused for want of a symbol whose right implementation is to
-   do nothing.
-8. ⛔ **"Failed on 631 objects" was not a defect count.** glibc's own `ld.so`
-   fails **374** of them: plugins of a host *program*.
-9. ⛔ **CI was red for seven pushes** on a gate that asked the **disk** where
-   CI asks a fresh clone.
-10. ⛔ **`pgb rootfs run` mounts a tmpfs over `/tmp`** — a probe copied there
-    from outside is not there inside.
-11. ⛔ **A `$?` after a pipeline is the pipeline's status.** A sweep reported
-    `ok=1527 fail=0 crash=0` over a population containing 96 non-ELF files.
-12. ⛔ **`chmod 000` is not a control when you are root.**
-13. ⛔ **`docs/research/solo.md`'s "5,807 objects" disagreed with the table
-    printed beneath it**, by 200 — and its range missed its own maximum.
+⛔ **T-066 is still the last open P0**, and its premise is significantly
+advanced rather than met: the allowlist is bounded by a measured ceiling now,
+route B is uncosted, and no kdenlive AppDir exists. Then T-062 (three packages),
+T-063 (arm S re-run with `--without-icu` removed), and kdenlive.
 
-## The three deep reviews, three distinct findings
-
-⭐ `docs/methodology/reviews.md`: *"A pass that reports nothing means that pass
-was too shallow."*
-
-**1. The door sweep — "what other door reaches this code?"** Ten call sites
-reach `el_lookup_in`; I had enumerated three. ⛔ **Finding: `el_defver()` and
-`el_refver()` read `o->versym[si]` with no bounds check.** `versym` is a
-*separate array* from `symtab`, and the walk only validates `symtab`. It was
-one call after the loop before; my own fix moved it **inside** the walk and
-multiplied it. Both guarded now.
-
-**2. The guard mutation — "can my new guard actually fail?"** ⛔ **Finding: my
-own measurement is thinner than my own fix.** Two mutations:
-
-    el_accept ignores the version entirely   the motivating objects STILL LOAD
-    drop the unversioned fallback            254 of 257 -- IDENTICAL
-
-The version rule has three branches and this host's 1,527 objects exercise
-**one**. *A wrong version is never returned* holds by construction and is
-asserted by nothing. ⭐ Recorded rather than rounded up to "validated"; a
-synthetic versioned fixture would close it and is not written.
-
-**3. The claim audit — "which sentence is not backed by an artefact?"**
-⛔ **Finding: three documents quoted `ok=628` and `631 undefined` after the tree
-had moved to `882` and `376`.** `AGENTS.md` §7, `limitations.md` and
-`runtime.md`, all written a few commits before the last two fixes. ⚠ **No gate
-catches this and none can** — `check-docs.sh` asserts that a cited *path*
-exists, not that a quoted *number* is current. Corrected against the evidence
-file.
-
-⭐ **And a fourth, from the same lens applied to my own checks:** the `cfg`
-suite's container-argument case iterated `OptVars` and asked whether each was
-rendered — which `ContainerEnvArgs` also iterates. It was **theatre**, and
-dropping a variable from `OptVars` left it green. The binding direction has to
-be **derived**: diff the environment across `Export()`.
-
-## ⛔ What the next session must not read as settled
-
-- ⛔ **The version-matching fix is under-measured** — see review 2.
-- ⛔ **`--tls-reserve`'s measured benefit on real host objects is zero
-  objects.** The mechanism is sound; its justification is not.
-- ⛔ **The operator's bar for kdenlive is still NOT met** (2.22× the size), and
-  a same-day `safe` vs `aggressive` timing comparison is still owed.
-- ⚠ **Three host objects still do not load**, each for its own reason:
-  `libnsl.so.1` (class S, sunrpc), `libmvec.so.1` (class A, `_rtld_global_ro`),
-  `libcuilo.so` (`more than 64 objects loaded` — a limit of this loader's
-  object table).
+`PROGRESS.md` carries the work order; `RESUME.md` carries what a fresh session
+cannot infer.

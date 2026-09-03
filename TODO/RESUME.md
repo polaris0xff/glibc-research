@@ -5,13 +5,13 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03b, refreshed after the operator review landed
-    TREE           main, clean, at 7c79dac5 + this
+    LAST WRITTEN   2026-09-03b, at session END
+    TREE           main, clean, everything pushed
     BRANCH         ⛔ main. The harness named
                    `claude/cross-libc-dlopen-review-ukfukq`; RULES.md §Git
                    outranks it and THE OPERATOR SAID THE SAME ("Work on main,
                    never a claude/* branch"). Not created locally.
-    CI             green as of 7c79dac5 (run 33699204833, 16 of 16).
+    CI             green on every landed commit checked, through 1c72444c.
 
 ---
 
@@ -34,8 +34,14 @@ HEAD..origin/main` said **214**. Do this, in this order:
 
 ## In flight right now
 
-    ⭐ NOTHING RUNNING. Everything is committed and pushed to main.
-    CI green on every landed commit through 5d800353.
+    ⭐ NOTHING. Everything is committed and pushed to main. The bed is idle.
+
+    ⚠ Left on disk, and it is worth keeping if the container survives:
+      /var/tmp/pgb-appimage-mesa/mesa-demos/AppDir   1.2 GB, --debloat none
+      ⭐ This is the AppDir T-066 route A's ceiling was measured on. A fresh
+      container will not have it; rebuilding is ~10 minutes:
+        ./pgb bundle appimage mesa-demos --out DIR/mesa.AppImage \
+            --cache /var/tmp/pgb-appimage-mesa --debloat none
 
 ## ✅ THE OPERATOR REVIEW (cross-libc-dlopen #28 / PR 30) IS DONE, ALL FOUR
 
@@ -64,27 +70,27 @@ HEAD..origin/main` said **214**. Do this, in this order:
 
 ## ⛔ WHAT IS LEFT, IN ORDER
 
-    1  T-066 P0  ⛔ STILL THE LAST P0, premise significantly advanced.
+    1  T-066 P0  ⛔ STILL THE LAST P0. Premise significantly advanced, not met.
                  ⭐ Route A's CEILING IS MEASURED: 218.5 MiB of a 938.8 MiB
                  mesa bundle (23.3%) is reachable ONLY through edges two
                  `-mini` recipes delete, against 6.3% the sweep can prove
-                 dead. `pgb bundle sweep --cut FROM=>TO` is the instrument.
-                 ⛔ LEFT: build the allowlist (bounded by that ceiling), and
-                 cost route B. ⚠ The jq headline moved 1.22x -> 1.58x when a
-                 stale pre-gating evidence file was re-run.
-                 ⚠ A kdenlive AppDir still does not exist.
-    2  T-062 P1  THREE packages left: buildx, logx, proc. verifyx and fail
-                 landed; selftests 307 -> 359.
-    3  T-063 P1  the miniflux proof. TWO NAMED FIXES in PROGRESS.md's work
-                 order, and the second is offline-testable now that
-                 `wrapper-flags` exists:
-                   - AC_SEARCH_LIBS probes -lreadline alone and
-                     libreadline.a's ncurses refs go unresolved
-                     (poc/91-qt-xcb answered the same class with
-                      -Wl,--start-group)
-                   - a C link that pulls a C++ archive: libicuuc.a needs
-                     operator delete and the __cxxabiv1 vtables, and
-                     LinkFlags takes a `cxx bool` that does not notice
+                 dead. `pgb bundle sweep --cut FROM=>TO` is the instrument and
+                 it is validated against a known answer.
+                 ⛔ LEFT: build the allowlist (now bounded by that ceiling),
+                 and cost route B. ⚠ A kdenlive AppDir still does not exist.
+                 ⚠ ONE MORE LEVER NAMED AND NOT TAKEN: the soname string scan
+                 counts mentions from EVERY object including unreachable ones,
+                 so an unreachable libicui18n keeps libicuuc alive. Making it
+                 a fixpoint is a real lever AND a real safety question.
+    2  T-062 P1  THREE packages left: buildx, logx, proc. buildx shells out to
+                 a bed -- carry its parsing, not its run.
+    3  T-063 P1  arm S. ⭐ BOTH named blockers are now resolved or corrected:
+                 the C++-archive one is FIXED (elfx.NeedsCXXRuntime), and the
+                 readline one was CORRECTED -- --start-group fixes ORDER, not
+                 ABSENCE, measured in three arms. ⛔ NEXT: re-run arm S with
+                 `--without-icu` REMOVED and see what is actually left.
+                 The general fix for absence is the same shape as the C++ one:
+                 a symbol index over the prefix's archives.
     4  T-054/T-055  kdenlive. ⛔ The bar is NOT met: 2.22x the size, and a
                  same-day safe vs aggressive timing comparison is owed.
 
