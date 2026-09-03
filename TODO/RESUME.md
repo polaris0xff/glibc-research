@@ -132,7 +132,24 @@ the branch you are on AND `git status` after `git checkout main`.
 
 - 4 cores, uid 0, ~29 GiB free at session start. Kernel `6.18.44-fc-v24`.
 - ⛔ **`make` depends on `tool/runtime/*.c`.** Rebuild after touching the loader.
-- ⛔ **DISK IS BINDING.** Delete the previous build tree before the next.
+- ⛔ **DISK IS BINDING, AND `poc/91-qt-xcb` IS WHERE IT BITES.** Measured
+  2026-09-03c: a full `poc/run-all.sh --rebuild` took the machine from 18 GiB
+  free to **4.8 GiB** while 91 was linking Qt, and it was still falling.
+  ⭐ **What is safe to reclaim, in this order** (all rebuildable, none is
+  evidence — every committed result lives under `evidence/`):
+
+      /root/.local/state/pgb/nix-deps/<hash>   ⭐ the biggest, 4.6 GB for
+          postgres's set alone. ⛔ ONE PER OPTION SET, so check which one the
+          running build is using before deleting: `ls` it. postgres's holds
+          krb5/icu4c/curl/audit; poc/91's holds libx11/libxcb/xorgproto.
+      /root/.local/state/pgb/nix-build        a finished nix build tree
+      /root/.local/state/pgb/nix-prefix       the static prefix it installed to
+      /var/tmp/pgb-appimage-*                 AppDirs, ~10 min to rebuild
+      /var/tmp/pgb-poc/<one POC>              ⚠ costs that POC a full rebuild
+
+  ⚠ `ps aux | grep nix-deps` matches your own grep's command line — read the
+  running build's log for the path instead, or `ls` the directory and see whose
+  dependencies they are.
 - ⛔ **Do not rebuild `./pgb` while the POC suite is running** — a POC invokes
   `./pgb` many times and a mid-run swap makes the acceptance result describe
   two different binaries.
