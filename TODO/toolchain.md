@@ -281,11 +281,17 @@ the column reported a warm start — 1.02× of warm, measured.
    `URUNTIME_MOUNT`, `URUNTIME_CLEANUP` and `REUSE_CHECK_DELAY` are in the
    strings of the artefact `pgb bundle appimage` produces, with `=0`, `=2` and
    `=3` among them. It is a lever `pgb` does not **set**.
-   ⚠ **And its motivation is gone**: `experiments/84-` rules out size as the
-   reason, and ⛔ **all four are ENVIRONMENT VARIABLES read at run time**, so
-   shipping a non-default needs something beside the artefact and the brief
-   refuses that. ⭐ The knob that IS shippable was the block size, and it is
-   taken: `experiments/81-`, `-S26` → `-S18`.
+   ⛔ **AND "ENVIRONMENT VARIABLES ONLY" WAS WRONG TOO — corrected the same
+   day by reading the fork's source.** They are **compile-time constants laid
+   out as patchable ASCII**: `const URUNTIME_EXTRACT: &str =
+   "URUNTIME_EXTRACT=3"`, read back through `.replace("URUNTIME_EXTRACT=",
+   "=")`, and `strings -a` finds them **in the artefact `pgb` ships**. A
+   one-byte same-length overwrite before packing changes the mode with nothing
+   beside the artefact. ⭐ **And mode 3 means mount below 350 MB, extract
+   above — so our 565 MB kdenlive bundle is ALREADY EXTRACTING and the 6.8 MB
+   `jq` one is mounting**, which is why a lever measured on one does not
+   transfer to the other.
+   [`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md) §1.
    [`../docs/research/portable-nix-mechanisms.md`](../docs/research/portable-nix-mechanisms.md) §3.
 7. ⭐ **WHAT NOBODY HAS TRIED, and it is now the top of the list**: the two
    levers on **kdenlive**. Both are properties of the runtime and the packer,

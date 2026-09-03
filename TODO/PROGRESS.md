@@ -3,27 +3,22 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log,
 the entries, and [`../HISTORY/`](../HISTORY/).
 
-    STATE     2026-09-03c  ⚠ IN PROGRESS — refreshed as work lands, not only
-              at the end
+    STATE     2026-09-03d  ✅ COMPLETE
     COUNTS    50 entries, 15 open, 35 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
-              CI: GREEN on every push this session
-              selftests 540 pass, 1 could not run (no zstd)
+              CI: GREEN (one red push, caught and fixed — see below)
+              selftests 546 pass, 1 could not run (no zstd)
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
-    NEW       ⭐ THE BAR MOVED. The operator struck SIZE from the bundler's
-              acceptance axes and replaced it with SPEED plus one-command
-              packaging. Every size lever this project has built is now
-              UN-SCORED until it is re-measured on the clock, and the clock is
-              the column we are furthest behind on.
-              ⭐ TODO/ was stripped: 5,085 lines of entry text -> 545. The 34
-              closed entries and the long-form findings behind the open ones
-              are in HISTORY/entries/, and the gate now enforces the split
-              rather than trusting it.
-              ⛔ AND THE LIST OF NINE GLIBC QUIRKS WAS NOT COMPLETE. A TENTH
-              was found by taking "are there still some?" as a question about
-              completeness: static glibc reads the HOST's timezone database,
-              4 of 11 environments have none -- including ubuntu-20.04, which
-              is glibc -- and they do not say so. T-076, experiments/97-.
+    NEW       ⭐ THE BUNDLER IS LEVEL ON SPEED. `jq` cold start went
+              2.07× → **1.00×** against the field over eleven environments,
+              and kdenlive's cold row went **4.92× against us → 0.74× FOR
+              us**. The closure did not change; two constants in
+              `internal/bundle/appimage.go` did — uruntime `full` → `lite`
+              and the dwarfs block `-S26` → `-S18`.
+              ⛔ AND THE INSTRUMENT THAT SAID 2.07× WAS PART OF THE PROBLEM:
+              `90-`'s cold column was measuring a WARM start. uruntime keys
+              its mount on CONTENT and holds it for 5 s, so "cold by a fresh
+              copy" reused the live mount. `corrections.md` C24.
 
 ## ⛔ READ THIS FIRST
 
@@ -33,10 +28,11 @@ built `CGO_ENABLED=0`, carrying the C runtime sources it compiles. The shell
 and Python it replaced are under [`../HISTORY/`](../HISTORY/), unedited, and
 are the oracle every gate is measured against.
 
-Read [`../HISTORY/entries/toolchain.md`](../HISTORY/entries/toolchain.md)
-§T-061 for what was required, then
-[`../docs/design/toolchain.md`](../docs/design/toolchain.md) "Language and
-structure" for the decision, the architecture and the six gates.
+⭐ **Every millisecond in this tree now goes through
+[`../experiments/clock.sh`](../experiments/clock.sh)** — median of N, arms
+interleaved with a rotating start, and an **A/A control** whose ratio is the
+floor below which no row may be believed. ⛔ Do not add a timing column that
+does not use it.
 
 ## ⭐ The operator's rulings in force
 
@@ -49,9 +45,9 @@ load-bearing part.** This is the index.
 | 2026-09-01b | nixpkgs IS the planner | [`../docs/design/nix-front-end.md`](../docs/design/nix-front-end.md) |
 | 2026-09-01c | the three goals, below | this page |
 | 2026-09-02b | *"pgb bundle isn't good enough, it is bloated, slow and a complete failure"* | T-066 |
-| ⭐ **2026-09-03c** | *"us having a bigger size than anylinux-appimages and onelf is acceptable as long as ours performs better and packaging is just one command not a multiline shell script"* | [`../docs/design/toolchain.md`](../docs/design/toolchain.md) "Static first, bundle last" |
-| ⭐ **2026-09-03c** | *"we will have multiple backends, nix just being one of them"*, and a static nix is one we **publish** | [`../docs/design/nix-front-end.md`](../docs/design/nix-front-end.md) |
-| ⭐ **2026-09-03c** | *"strip away the fat … the TODO/\* must be lean and contain only what's left"* | [`../HISTORY/README.md`](../HISTORY/README.md), and `check.sh` 4b/4c |
+| 2026-09-03c | *"us having a bigger size than anylinux-appimages and onelf is acceptable as long as ours performs better and packaging is just one command not a multiline shell script"* | [`../docs/design/toolchain.md`](../docs/design/toolchain.md) |
+| 2026-09-03c | *"we will have multiple backends, nix just being one of them"* | [`../docs/design/nix-front-end.md`](../docs/design/nix-front-end.md) |
+| ⭐ **2026-09-03d** | *"Defer comparing speed/startup/performance with anylinux-appimages & onelf for now"* — and **reprioritise the remaining glibc-static and nix-bundle quirks** | this page, §"Work order" |
 
 ## ⭐ The operator's three goals
 
@@ -65,182 +61,160 @@ load-bearing part.** This is the index.
 
 | goal | entries | where it stands |
 |---|---|---|
-| 1. the builder | T-051, T-060, T-012 | ⭐ Spec resolution, build-system detection and the dependency planner all EXIST and ran end to end on postgres. ⛔ Blocked on **building nix's own closure static**, not on a tool. ⚠ And "no nix" does not hold for a dotted attribute |
-| 2. the bundler | T-057, T-066, T-055 | ⭐ One command from a package name, 11 of 11, zero host objects — ⭐ **and one-command packaging is now half the bar**. ⛔ **The other half is the clock and we lose it**: 4.92× cold start on kdenlive, ~1.9× on `jq` |
-| 3. kdenlive | T-054, T-055 | ⭐ The ENGINE is static and renders on 11 of 11. Rungs 1 and 2 (Qt 6, a real window) closed. ⛔ Rung 3 is **two** direct inputs, not a framework set. ⛔ The bundle bar is not met on the three columns the operator named |
+| 1. the builder | T-051, T-060, T-012 | ⭐ Spec resolution, build-system detection and the dependency planner all EXIST and ran end to end on postgres. ⛔ Blocked on **building nix's own closure static**, not on a tool |
+| 2. the bundler | T-057, T-066, T-055 | ⭐ **One command, 11 of 11, zero host objects, and now LEVEL ON SPEED** — `jq` 1.00× cold, kdenlive 0.74× cold. ⛔ Size is 1.70× (`jq`) and 2.95× (kdenlive) |
+| 3. kdenlive | T-054, T-055 | ⭐ **Two of the three columns are now ours**: cold start 0.74×, host objects 0 of 11 against the competitor's 4 of 11. ⛔ *smaller* is not met (2.95×) and *run faster* is **unresolved** — two runs disagree in direction |
 
-⛔ **Goal 3's operator sentence — *"smaller, load faster, run faster"* — is
-NOT amended by the 2026-09-03c ruling.** The ruling sets the general bundler
-bar; goal 3 names a specific competitor and three specific columns. ⚠ Where
-the two disagree, say which one you are measuring against.
+## ⭐ Work order — ⛔ REORDERED 2026-09-03d BY THE OPERATOR
 
-## ⭐ Work order — ⛔ REORDERED 2026-09-03c BY THE OPERATOR
+> *"1. Defer comparing speed/startup/performance with anylinux-appimages &
+> onelf for now. 2. Reprioritize fixing all remaining quirks with GLIBC Static
+> binaries and Nix Bundles."*
 
-> *"let's dedicate remaining session to reorder the leftover tasks and carry
-> out 4 deep reviews, we can leave the build from git/url deferred for now,
-> and fix all remaining GLIBC quirks if there still are some, else focus the
-> next session entirely on optimizing the nix bundler as much as possible"*
+⛔ **THE SPEED COMPARISON IS DEFERRED, NOT ABANDONED.** It was the whole of the
+previous work order and it is now parked: `jq` is level and kdenlive's cold row
+is ours, which is far enough for now. ⚠ Do not spend the next session on
+another millisecond.
 
-    ---- 0. THIS SESSION ----
+    ---- ⭐ THE NEXT SESSION'S TASK LIST, AND IT IS TWO GOALS ----
 
-    A   ✅ the operator's rulings recorded verbatim, and every claim they
-        re-score amended in place.
-    B   ✅ TODO/ stripped; HISTORY/entries/ created; the gate taught the
-        invariant and PROVED able to fail on it.
-    C   ⚠ SIX deep reviews — the operator raised it from four on 2026-09-03c
-        ("add 2 more deep reviews (thorough ones) before the kickoff prompt"):
-          1 ✅ does every claim hold when the command is run
-              -> C23: the bundler's MILLISECONDS do not re-derive, and the
-                 ruling had just made them the bar
-          2 ✅ what did the change stop measuring
-              -> four open entries lost the pointer to their own detail;
-                 fixed, and check.sh 4d now enforces it
-          3 ✅ what was deferred — the list is below, and it is short because
-                three of its items were converted into deliveries instead
-          4 ✅ is the code right
-              -> cxxCandidates skipped the SEPARATED `-l namespec`; R3's fix
-                 went halfway. Proved red, fixed, both spellings on one
-                 resolver, validated on 60-leveldb and 40-jq
-          5 ✅ the instruments: does each still measure what its comment says
-              -> exp_run_status collapsed "could not run" into "exited N";
-                 the carried note about RESULT.txt was INVERTED for 19 of 32
-                 experiments and cost a measurement the same day
-          6 ✅ the claims nobody has attacked
-              -> 7 of 32 experiments had evidence older than their own
-                 script; gate 10 now catches the class; T-077 owns the four
-                 that are too expensive to re-run now
+    G1  ⛔ GLIBC STATIC IS TRULY COMPLETE. "No edge cases exist, and our
+        static glibc binary and a native musl static binary are at
+        feature/standalone parity. No buts and no ifs." — operator.
 
-    ---- ⛔ REVIEW 3: WHAT WAS DEFERRED, NAMED PLAINLY ----
+        G1.1  ⭐ THE DELIVERABLE IS A TABLE, and it is named:
+              **"vanilla" gcc -static  vs  OURS  vs  native musl static**,
+              compared on EVERY axis they can be compared on. Not three
+              columns of prose — a matrix where every cell is a measurement
+              or a dash, `docs/comparison.md`'s rule.
+              ⚠ Candidate axes, from what this tree already measures:
+                runs / payload clean on the eleven; NSS; iconv/gconv; locale;
+                terminfo; CA bundle; timezone; dlopen of own plugins; dlopen
+                of host objects; throughput (malloc/qsort/str/snprintf/math/
+                memcpy); startup; peak RSS; artefact size; what each writes to
+                the filesystem; PT_INTERP/DT_NEEDED; what breaks it.
+              ⛔ Every row needs the MUSL column actually run, not inferred.
+              `experiments/60-` and `61-` already build musl arms — start there.
+        G1.2  ⛔ ENUMERATE THE REMAINDER RATHER THAN ASSERTING THERE IS NONE.
+              `REQUIREMENTS.md` said of its list of nine "there is no
+              unenumerated remainder" and a TENTH was found the next day by
+              asking the question properly (`grep -rn zoneinfo` returned
+              nothing, and 4 of 11 environments fail it). ⭐ The list is TEN
+              and nine are closed. **Ask again, and this time the answer has
+              to be a search, not a sentence.**
+        G1.3  ⚠ The known-open one is host `dlopen` beyond what
+              `--host-dlopen` covers, plus `--tls-reserve`'s cost. T-072.
 
-    1 ✅ CLEARED. The four operator-named references were mined AND READ the
-      same day: docs/research/portable-nix.md (findings) and
-      portable-nix-mechanisms.md (the usable half, at file and line).
-      ⚠ WHAT REMAINS DEFERRED IS THE MEASUREMENT: nothing in that sweep was
-      RUN, and the write-up says so. Three probes are named, each one command.
-    2 ⚠ T-012's git/URL route -- DEFERRED BY THE OPERATOR, not by this session.
-    3 ⚠ 60-, 61-, 62- and 88- were NOT re-run on the current pin. Their
-      committed numbers -- which include the whole head-to-head in
-      docs/comparison.md -- were measured inside glibc 2.36. Pinned in
-      evidence/STALE-EVIDENCE.txt, owned by T-077.
-    4 ⚠ THE BUNDLER'S CLOCK INSTRUMENT IS DIAGNOSED, NOT BUILT. 90- still takes
-      one sample per arm. That is N0 and it is the first thing next session.
-    5 ⚠ lookPathIn's execute-bit test diverges from exec.LookPath for a
-      non-root caller. Named in the code and deliberately NOT fixed: it cannot
-      be shown to fail here, and a fix with no assertion behind it is a change.
-    6 ⚠ --embed-tzdata carries TWENTY zones, not the database. A zone that is
-      not carried behaves exactly as before. And it WRITES to $TMPDIR, which
-      is a real cost against the "writes nothing" shape claim -- which is why
-      it, like --embed-terminfo, is opt-in.
-    7 ✅ CONVERTED RATHER THAN DEFERRED: the tenth glibc quirk was found AND
-      closed; the POC suite was re-run against the separated-`-l` fix; the
-      four stale-evidence experiments that COULD be re-run were.
-    D   ✅ THE REMAINING GLIBC QUIRKS — ANSWERED, AND THE ANSWER IS "YES,
-        THERE WAS ONE". REQUIREMENTS.md said of its nine: "there is no
-        unenumerated remainder". FALSE. `grep -rn zoneinfo` over the whole
-        tree returned NOTHING, and the row that came out of looking fails on
-        FOUR environments, one of them glibc. T-076 is open; the list is TEN
-        and is no longer described as closed.
+    G2  ⛔ NIX'S EGL / SDL / XCB ISSUES ARE SOLVED OR PATCHED, and the only
+        things left deferred for nix bundling are the two named below.
 
-    ---- 1. NEXT SESSION, and the operator scoped it: THE BUNDLER ----
+        G2.1  ⭐ THE DELIVERABLE IS A WRITE-UP WITH A GUARANTEE IN IT: that
+              everything left unsolved in our nix bundle is **tooling, size
+              or performance** — NOT that nix cannot do EGL/SDL/XCB, and NOT
+              that it cannot load vulkan or nvidia.
+              ⛔ The anylinux references must be studied extensively for this.
+              ⚠ What we have: `experiments/85-` runs EGL out of a closure at
+              pass=10 fail=0, every row `swrast` and surfaceless.
+              ⚠ What the FIELD records: of 16 `nixappimage` recipes in
+              `soarpkgs`, three are disabled and one is *"Fails to create EGL
+              Display"* (ghostty, citing NixOS/nixpkgs#9415). 13 of 16 are
+              ACTIVE including chromium, brave, discord, telegram — so the
+              baseline to beat is higher than "nix cannot do GUI".
+              📚 [`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md) §8.
+        G2.2  ⛔ THE DEBLOATER/PATCHER COVERS EVERY CASE — shebang lines,
+              hardcoded paths, `.desktop` files, anything else in a bundle.
+              ⭐ **The corpus is mined and read** (`nix-bundle-patching.md`):
+              the field does it with a FIVE-REGEX sed cascade ending in
+              "replace any store path with /", and the operator's instruction
+              is *"our debloater must find a way to get better results
+              without being so messy"*.
+              ⭐ **The route is named and it is not "nicer regexes"**: `pgb`
+              has the CLOSURE, so the rewrite can be an exact match against a
+              known finite set, and a store path with no in-bundle target is
+              a FINDING rather than a silent substitution.
+        G2.3  ⚠ ONLY THESE TWO MAY BE DEFERRED, per the operator:
+                (a) our own "static" nix, embedded in pgb or shipped beside it
+                    — T-060, T-051;
+                (b) nothing else. G2.2 is not a place to leave a remainder.
 
-    ⛔ "focus the next session entirely on optimizing the nix bundler as much
-       as possible". The bar is now SPEED and ONE COMMAND. Size is struck.
+    ---- ⛔ DEFERRED BY THE OPERATOR, 2026-09-03d ----
 
-    N0  ⛔ FIX THE INSTRUMENT FIRST — deep review 1 found the timing half of
-        the record does not re-derive. experiments/90- takes ONE SAMPLE per
-        arm; its quoted numbers are from a SUPERSEDED version of the evidence
-        file it cites; four runs give cold-start ratios of 2.52×, 3.48×, 4.92×
-        and 5.02×; and warm exceeds cold in two of them. ⭐ Every run agrees
-        on the DIRECTION — we are slower — and none pins the magnitude.
-        ⭐ experiments/86- is the shape to carry across: eleven environments,
-        a mean of five per arm, cold obtained by a fresh copy. Its jq figures
-        DO re-derive: 139 vs 67 ms cold (2.07×), 14.9 vs 10.8 warm (1.38×).
-        ⚠ Under the new bar an unpinned millisecond is worth LESS than none,
-        because it reads as measurement. docs/history/corrections.md C23.
-    N1  ⛔ THEN re-measure the levers ON THE CLOCK. --cut, --fixpoint, the
-        debloat rules, route A and route B were all costed in BYTES. Nothing
-        was measured in milliseconds, so nothing is scored against the bar.
-        ⚠ Not invalidated — un-scored.
-    N2  ⭐ THE HYPOTHESIS TO TEST FIRST, because it is the one that makes the
-        struck size work still count: on kdenlive, "start and render are
-        dominated by mounting a 398 MB dwarfs image against a 192 MB one" —
-        i.e. the size column IS the time column. ⛔ NOBODY HAS MEASURED THAT.
-        If it holds, every byte lever is a millisecond lever and the ordering
-        below is right. If it does not, the levers are worth nothing and the
-        work is elsewhere: uruntime's mount path, dwarfs settings, or the
-        selector shell.
-    N3  route B, costed and NOT yet built: the -mini set forces 161 of
-        kdenlive's 676 closure paths (23.8%) from source, and 8 of 111 on
-        mesa-demos. A floor on the biggest single path is measured — Qt with
-        xcb, TLS, network and SQL is under half an hour on four cores.
-    N4  --fixpoint into the debloat path behind its own flag, then
-        experiments/89- as its control. ⛔ Read T-066's detail first: 89- is
-        NOT one command against it, and DISK IS BINDING.
-    N5  ⛔ route A at PATH granularity is measured DEAD — 0 of jq's 7 store
-        paths are entirely unreachable. Do not build a path-level allowlist.
-        The FILE-level sweep is the lever that works and it exists.
-    N6  ⭐ xplshn/pelf IS READ and it hands N2 a lever we do not have: mount
-        below 350 MB, EXTRACT above it (appbundle-runtime.go:764). Ours is
-        398 MB, the competitor's 192 MB -- either side of somebody else's
-        production threshold. Plus two warm-start techniques: the parsed
-        config cached in an xattr ON THE ARTEFACT, and live-mount reuse.
-        docs/research/portable-nix-mechanisms.md §3-4.
+    ⛔ Speed / startup / performance against anylinux-appimages and onelf.
+       ⚠ The instruments stay: `experiments/clock.sh`, `77-`, `81-`, `84-`,
+       `86-`, `90-`, `99-` all work and all assert their own A/A control.
+       Re-running one is cheap; the DEFERRAL is on making it the work.
 
-    ---- 2. then the builder, by how foundational ----
+    ---- ⭐ FUTURE, AFTER THE NEXT SESSION — recorded so it is never lost ----
 
-    T-060  rungs 1→3, the static nix. ⭐ THE TARGET HAS A NAME NOW:
-           `nix-cli-static`, an attribute of the NIX FLAKE (not nixpkgs), which
-           is why `pgb nix cache attr nix-cli` found nothing. Rung 1 is its
-           closure built glibc-static by pgb rather than musl-static by
-           pkgsStatic.
-    T-051  ⛔ NOT the same work as T-060, corrected 2026-09-03c: a published
-           (musl) static nix already serves "enough nix on a minimal host".
-           ⚠ And `nix --store` under $HOME is NOT the route -- nix-portable
-           ships it as first choice and its tracker documents it failing on
-           Arch, Debian 11 and Debian 12 with a probe that passes first.
-    T-012  items 2, 3 and 4. ⛔ ITEM 1, the git/URL route, is DEFERRED by the
-           operator: "we can leave the build from git/url deferred for now".
+    F1  ⛔ VENDOR AND PATCH THE THIRD-PARTY RUNTIME AND TOOLING.
+        ⭐ **THE REASON IS MEASURED, NOT SPECULATIVE.** This project spent a
+        whole session discovering that the field runs a `lite` uruntime and a
+        different block size, because nothing tracked upstream's choices.
+        Both were free wins sitting in somebody else's build flags.
+        ⚠ And the pkgforge builds are ALREADY forks of upstream, so we are
+        two levels behind, not one.
+        ⭐ The things to vendor, all now in `references/`:
+          pkgforge-dev/Anylinux-AppImages     docs, guides, faqs, the index
+          pkgforge-dev/Anylinux-uruntime      ✅ MINED 5a0b4a33
+          pkgforge-dev/Anylinux-sharun        ✅ already vendored
+          pkgforge-dev/appimagetool           ✅ MINED 183c0492
+          pkgforge-dev/archlinux-pkgs-debloated  ✅ already vendored
+          pkgforge-dev/userland-execve-rust   ✅ already vendored
+        ⭐ THE METHODOLOGY IS PRESCRIBED: `Azathothas/TEMPLATE`
+        `docs/methodology/vendoring.md` (already vendored under
+        `docs/methodology/`), and the worked example is
+        `Azathothas/bit-cli` `{patches,vendor}` ✅ MINED cce81312.
+        ⛔ **And it must be WIRED INTO THE DEV CYCLE**: a script/tool/bot that
+        detects upstream's new commits and auto-diffs them. A vendored tree
+        with no drift detector is how this session's finding was possible.
 
-    ---- 3. then kdenlive ----
+    F2  ⭐ NATIVE DESKTOP INTEGRATION AND AppImage COMPATIBILITY, so third-party
+        package managers can consume our bundles as ordinary AppImages.
+        ⛔ Requires every nixappimage quirk in G2 solved first.
+        The managers to be compatible with — each must be mined and studied
+        for what it expects, then extracted and patched against:
+          mijorus/gearlever      kem-a/AppManager
+          ivan-hc/AM             pkgforge/soar
+        ⚠ `.DirIcon` and a top-level `*.desktop` are the two things every one
+        of them looks for; `nix-bundle-patching.md` §5 has the rules the field
+        uses to produce them.
+
+    ---- then the builder, by how foundational ----
+
+    T-060  rungs 1→3, the static nix. ⭐ THE TARGET HAS A NAME:
+           `nix-cli-static`, an attribute of the NIX FLAKE (not nixpkgs).
+    T-051  ⛔ NOT the same work as T-060: a published (musl) static nix already
+           serves "enough nix on a minimal host".
+    T-012  items 2, 3 and 4. ⛔ ITEM 1, the git/URL route, is DEFERRED.
+
+    ---- then kdenlive ----
 
     T-054  rung 3 (kio-extras, qqc2-desktop-style) then rung 4.
-    T-063  arm S: src/interfaces, and the generalised undefined-symbol fix
-           that readline needs and ICU already got.
+    T-063  arm S: src/interfaces, and the generalised undefined-symbol fix.
 
-    ---- 4. P2 by category ----
+    ---- P2 by category ----
 
-    T-013  ⭐ PROMOTED by the ruling — it is the instrument that measures the
-           one-command half of the bundler's bar, which is the half we win.
-    T-015  T-021  T-031  T-041
-
-⭐ **Two pieces of real work are NAMED and are not entries**, because each is
-one clear fix inside T-063 arm S:
-
-    the static link-order problem   ⚠ -Wl,--start-group fixes ORDER and
-                                    CANNOT fix ABSENCE, measured. The real
-                                    fix is the same shape as the C++ one:
-                                    read the archives' undefined symbols and
-                                    append what defines them. Not built.
-    a C link that pulled a C++      ✅ FIXED, and ⭐ PROVED on the real
-    archive                         subject 2026-09-03c: a static PostgreSQL
-                                    18.6 WITH ICU answering on Alpine.
+    T-013  T-015  T-021  T-031  T-041
 
 ## Open questions for the operator
 
 ⭐ **None blocking.**
 
-1. ⚠ **A GPU** — **T-059**, not a question. Every GL row is `swrast`.
-2. ⚠ **Docker Hub rate-limits anonymous pulls in this environment.**
-   ⭐ `pgb rootfs pull` does the anonymous-token dance and succeeds where
-   `docker pull` 429s.
-3. ⚠ **`musl-gcc` is absent**, the one remaining blocker on `experiments/90-`
-   arm O.
-4. ⚠ **`--tls-reserve` costs ~1.15 MB on EVERY `--host-dlopen` build**
-   (4,575,160 → 5,725,864 B), because the iconv wrapper must be forced out of
-   its archive whether or not the program calls iconv. A narrower fix needs
-   the provider table to reference the wrapper strongly for three names only;
-   it is not obviously worth the machinery.
+1. ⚠ **A GPU** — **T-059**, not a question. Every GL row is `swrast`, and G2.1
+   cannot claim "vulkan/nvidia work" without one. It can claim what the
+   closure does offscreen, and must say which it is claiming.
+2. ⚠ **`musl-gcc` is absent**, which skips `experiments/90-` arm O (onelf) and
+   will bite **G1.1**: the musl column of the required table needs a musl
+   toolchain, and `experiments/60-`/`61-` build their musl arms with one.
+   ⛔ Install it before starting G1, or the table has a hole in the column the
+   operator named.
+3. ⚠ **kdenlive's warm row is 114 ms against `jq`'s 8**, unexplained. ⭐ The
+   first candidate is in `nix-bundle-patching.md` §1: at 565 MB our bundle is
+   over uruntime's 350 MB `MAX_EXTRACT_SELF_SIZE`, so it **extracts** where
+   `jq` **mounts**. Different runtime path, different warm behaviour.
+4. ⚠ **Docker Hub rate-limits anonymous pulls here.** `pgb rootfs pull` does
+   the anonymous-token dance and succeeds where `docker pull` 429s.
 
-⚠ **The session narrative and the four reviews of 2026-09-03b/c are
-[`../HISTORY/sessions/2026-09-03.md`](../HISTORY/sessions/2026-09-03.md)**,
-with the annotated work order and every item that was completed.
+⚠ **The session narrative, the six reviews and every defect found in this
+session's own work are
+[`../HISTORY/sessions/2026-09-03d.md`](../HISTORY/sessions/2026-09-03d.md).**

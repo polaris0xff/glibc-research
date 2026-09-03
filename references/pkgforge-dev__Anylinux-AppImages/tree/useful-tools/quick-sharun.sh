@@ -52,10 +52,9 @@ HOOKSRC=${HOOKSRC:-https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppIm
 LD_PRELOAD_OPEN=${LD_PRELOAD_OPEN:-https://github.com/VHSgunzo/pathmap.git}
 
 OUTPATH=${OUTPATH:-$PWD}
-DWARFS_COMP="${DWARFS_COMP:-zstd:level=22 -S26 -B6}"
 OPTIMIZE_LAUNCH=${OPTIMIZE_LAUNCH:-0}
 
-APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.3.3/appimagetool-$APPIMAGE_ARCH-linux}
+APPIMAGETOOL_LINK=${APPIMAGETOOL_LINK:-https://github.com/pkgforge-dev/appimagetool/releases/download/0.3.6/appimagetool-$APPIMAGE_ARCH-linux}
 APPIMAGETOOL=${APPIMAGETOOL:-$TMPDIR/appimagetool}
 
 ANYLINUX_LIB=${ANYLINUX_LIB:-1}
@@ -194,8 +193,11 @@ _download() {
 	while [ "$COUNT" -lt 5 ]; do
 		if "$DOWNLOAD_CMD" "$@"; then
 			return 0
+		else
+			status=$?
+			_err_msg "'$DOWNLOAD_CMD $*' exited with $status"
+			_err_msg "Trying again..."
 		fi
-		_err_msg "Download failed! Trying again..."
 		COUNT=$((COUNT + 1))
 		sleep 5
 	done
@@ -1002,7 +1004,7 @@ _make_deployment_array() {
 		case "$GTK_DIR" in
 			*4*)
 				DEPLOY_OPENGL=${DEPLOY_OPENGL:-1}
-				echo 'GSETTINGS_BACKEND=keyfile' >> "$APPENV"
+				_add_gsettings_hook
 				;;
 		esac
 
@@ -1847,7 +1849,6 @@ _add_cross_libc_dlopen_lib() {
 		done
 		_echo "* cross-libc-dlopen successfully added!"
 	fi
-	:> "$APPDIR"/.foreign-dlopen-enabled
 
 	if ! grep -q 'CROSS_LIBC_DLOPEN_ROOT=' "$APPENV" 2>/dev/null; then
 		echo 'CROSS_LIBC_DLOPEN_ROOT=${SHARUN_DIR}' >> "$APPENV"
@@ -2005,6 +2006,20 @@ _add_p11kit_cert_hook() {
 	fi
 	EOF
 	chmod +x "$cert_check"
+}
+
+_add_gsettings_hook() {
+	gsettings_hook=$APPDIR/bin/set-gsettings-backend.hook
+	if [ -f "$gsettings_hook" ]; then
+		return 0
+	fi
+
+	cat <<-'EOF' > "$gsettings_hook"
+	# this forces GTK apps to use keyfile when using portable home/config mode
+	if [ -d "$APPIMAGE".config ] || [ -d "$APPIMAGE".home ]; then
+	        export GSETTINGS_BACKEND=keyfile
+	fi
+	EOF
 }
 
 _map_paths_ld_preload_open() {
@@ -2243,6 +2258,19 @@ _deploy_locale() {
 			f=${DESKTOP_ENTRY##*/}
 			f=${f%.desktop}
 			set -- "$@" ! -name "*$f*"
+
+			# also preserve gtk and libadwaita locales
+			case "$GTK_DIR" in
+				gtk-2.0) set -- "$@" ! -name 'gtk20.mo';;
+				gtk-3.0) set -- "$@" ! -name 'gtk30.mo';;
+				gtk-4.0) set -- "$@" ! -name 'gtk40.mo';;
+			esac
+
+			l=$(set -- "$DST_LIB_DIR"/libadwaita* && echo "$1")
+			if [ -f "$l" ]; then
+				set -- "$@" ! -name 'libadwaita.mo'
+			fi
+
 			find "$APPDIR"/share/locale "$@" \( -type f -o -type l \) -exec rm -f {} +
 			_remove_empty_dirs "$APPDIR"/share/locale
 		fi
@@ -3415,14 +3443,31 @@ for lib do case "$lib" in
 		_glibver=$(echo "$lib" | awk -F'-' '{print $NF}' | sed "s|\.so.*||")
 		src_glib_schema_dir=/usr/share/glib-$_glibver/schemas
 		dst_glib_schema_dir=$APPDIR/share/glib-$_glibver/schemas
-
 		_try_cp "$src_glib_schema_dir" "$dst_glib_schema_dir"
+		;;
+	*/libQt*Core.so*|*/libglib-*.so*)
 		# apps may crash when the host has no mime database
-		_try_cp /usr/share/mime "$APPDIR"/share/mime
-		rm -rf "$APPDIR"/share/mime/packages # bloat
-		# only the compiled mime database (mime.cache/magic/globs) is read by apps
-		# the *.xml files are used to generate them via update-mime-database
-		find "$APPDIR"/share/mime -type f -name '*.xml' -exec rm -f {} + || :
+		src_mime_dir=/usr/share/mime
+		dst_mime_dir=$APPDIR/share/mime
+		_try_cp "$src_mime_dir" "$dst_mime_dir"
+
+		[ -z "$_mime_updated" ] || continue
+		[ -d "$dst_mime_dir" ]  || continue
+		if update-mime-database "$dst_mime_dir" 2>/dev/null; then
+			# while glib can work with just the mime.cache, this is
+			# not the case with Qt, they still end up parsing the
+			# individual .xml files. So in a system without
+			# mime database Qt apps fail to recognize file formats
+			# Keep the audio/image/video .xml for that case
+			for d in "$dst_mime_dir"/*; do
+				[ -d "$d" ] || continue
+				case "$d" in
+					*/audio|*/image|*/video) continue;;
+					*) rm -rf "$d";;
+				esac
+			done
+			_mime_updated=1
+		fi
 		;;
 	*/gdk-pixbuf-*/*/loaders/*.so*)
 		src_gdkpixbuf_cache=$(echo "$LIB_DIR"/gdk-pixbuf-*/*/loaders.cache)
@@ -3762,7 +3807,6 @@ if [ -f "$a" ]; then
 fi
 
 _fix_electron_libc_nonsense
-_remove_static_libs
 _strip_bins_and_libs
 _check_hardcoded_lib_dirs
 _check_hardcoded_data_dirs
@@ -3880,6 +3924,7 @@ done <<-EOF
 $ADD_DIR
 EOF
 
+_remove_static_libs
 _handle_nested_bins
 _fix_shebangs
 

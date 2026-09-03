@@ -1,0 +1,52 @@
+cargo-features = ["panic-immediate-abort"]
+
+[package]
+name = "uruntime"
+version = "1.0.0"
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/VHSgunzo/uruntime"
+description = "Universal RunImage and AppImage runtime with DwarFS support"
+edition = "2021"
+
+[profile.release]
+lto = true
+debug  = false
+opt-level = "z"
+strip = "symbols"
+codegen-units = 1
+panic = "immediate-abort"
+
+[profile.dev]
+opt-level = 0
+
+[features]
+default = [
+    "dwarfs",
+]
+upx = []
+lite = []
+dwarfs = []
+appimage = []
+
+[build-dependencies]
+cfg-if = "1.0.4"
+indexmap = "2.14.0"
+zstd = { version = "0.13.3", default-features = false }
+
+[dependencies]
+which = "8.0.5"
+cfg-if = "1.0.4"
+goblin = "0.10.7"
+procfs = "0.18.0"
+num_cpus = "1.17.0"
+signal-hook = "0.4.4"
+zstd = { version = "0.13.3", default-features = false }
+xxhash-rust = { version = "0.8.18", features = [ "xxh3" ] }
+nix = { version = "0.31.3", features = [ "fs", "signal", "mount" ] }
+dotenv = { git = "https://github.com/VHSgunzo/dotenv.git" }
+memfd-exec = { git = "https://github.com/VHSgunzo/memfd-exec.git" }
+
+# zstd-sys unconditionally builds x86_64 asm, disable it for other targets
+[target.'cfg(not(target_arch = "x86_64"))'.dependencies]
+zstd = { version = "0.13.3", default-features = false, features = [ "no_asm" ] }

@@ -1,10 +1,10 @@
 # pkgforge-dev/Anylinux-AppImages
 
-Fetched 2026-09-01T05:20:55Z by `scripts/common/mine-repo.sh`.
+Fetched 2026-09-03T16:18:38Z by `scripts/common/mine-repo.sh`.
 
 | | |
 | --- | --- |
-| commit | `da7649b9443971ef70da92f532e8a2e65a9f97f6` |
+| commit | `2969cd4d2cf9eebb41108a852e6993093bc2ca77` |
 | route | proxy |
 | control | reachable (pkgforge-dev/reverse-proxies answered 200) |
 

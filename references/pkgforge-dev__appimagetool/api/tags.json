@@ -1,0 +1,92 @@
+[
+ {
+  "name": "0.3.6",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/zipball/refs/tags/0.3.6",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/tarball/refs/tags/0.3.6",
+  "commit": {
+   "sha": "183c04927f4c4c5bd757e42d9f66b5a998b44838",
+   "url": "https://api.github.com/repos/pkgforge-dev/appimagetool/commits/183c04927f4c4c5bd757e42d9f66b5a998b44838"
+  },
+  "node_id": "REF_kwDOSNOe7q9yZWZzL3RhZ3MvMC4zLjY"
+ },
+ {
+  "name": "0.3.5",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/zipball/refs/tags/0.3.5",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/tarball/refs/tags/0.3.5",
+  "commit": {
+   "sha": "0b9293a374800040c3c4eea66dffe5bda510203d",
+   "url": "https://api.github.com/repos/pkgforge-dev/appimagetool/commits/0b9293a374800040c3c4eea66dffe5bda510203d"
+  },
+  "node_id": "REF_kwDOSNOe7q9yZWZzL3RhZ3MvMC4zLjU"
+ },
+ {
+  "name": "0.3.4",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/zipball/refs/tags/0.3.4",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/tarball/refs/tags/0.3.4",
+  "commit": {
+   "sha": "b74bca366285b3678b7a83c6479d1577e3aa2d55",
+   "url": "https://api.github.com/repos/pkgforge-dev/appimagetool/commits/b74bca366285b3678b7a83c6479d1577e3aa2d55"
+  },
+  "node_id": "REF_kwDOSNOe7q9yZWZzL3RhZ3MvMC4zLjQ"
+ },
+ {
+  "name": "0.3.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/zipball/refs/tags/0.3.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/tarball/refs/tags/0.3.3",
+  "commit": {
+   "sha": "6389b7acda2d57e04a25d001ea51c0c1ad54266f",
+   "url": "https://api.github.com/repos/pkgforge-dev/appimagetool/commits/6389b7acda2d57e04a25d001ea51c0c1ad54266f"
+  },
+  "node_id": "REF_kwDOSNOe7q9yZWZzL3RhZ3MvMC4zLjM"
+ },
+ {
+  "name": "0.3.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/zipball/refs/tags/0.3.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/tarball/refs/tags/0.3.2",
+  "commit": {
+   "sha": "bfbf80a19f1aae2cafd1c1d2271dad938d8ff80a",
+   "url": "https://api.github.com/repos/pkgforge-dev/appimagetool/commits/bfbf80a19f1aae2cafd1c1d2271dad938d8ff80a"
+  },
+  "node_id": "REF_kwDOSNOe7q9yZWZzL3RhZ3MvMC4zLjI"
+ },
+ {
+  "name": "0.3.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/zipball/refs/tags/0.3.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/tarball/refs/tags/0.3.1",
+  "commit": {
+   "sha": "4979c215383b0fc172730889f3fdc5639f4fa890",
+   "url": "https://api.github.com/repos/pkgforge-dev/appimagetool/commits/4979c215383b0fc172730889f3fdc5639f4fa890"
+  },
+  "node_id": "REF_kwDOSNOe7q9yZWZzL3RhZ3MvMC4zLjE"
+ },
+ {
+  "name": "0.3.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/zipball/refs/tags/0.3.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/tarball/refs/tags/0.3.0",
+  "commit": {
+   "sha": "4d6ba842221b0f27d4bbb8931c614dc5b3d6cac2",
+   "url": "https://api.github.com/repos/pkgforge-dev/appimagetool/commits/4d6ba842221b0f27d4bbb8931c614dc5b3d6cac2"
+  },
+  "node_id": "REF_kwDOSNOe7q9yZWZzL3RhZ3MvMC4zLjA"
+ },
+ {
+  "name": "0.2.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/zipball/refs/tags/0.2.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/tarball/refs/tags/0.2.0",
+  "commit": {
+   "sha": "83a8d748fd0889e13c829c35fab2ddffedeee89c",
+   "url": "https://api.github.com/repos/pkgforge-dev/appimagetool/commits/83a8d748fd0889e13c829c35fab2ddffedeee89c"
+  },
+  "node_id": "REF_kwDOSNOe7q9yZWZzL3RhZ3MvMC4yLjA"
+ },
+ {
+  "name": "0.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/zipball/refs/tags/0.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/appimagetool/tarball/refs/tags/0.1.0",
+  "commit": {
+   "sha": "ad339136ae146084bd9ab1e2a4aca4e9784c4210",
+   "url": "https://api.github.com/repos/pkgforge-dev/appimagetool/commits/ad339136ae146084bd9ab1e2a4aca4e9784c4210"
+  },
+  "node_id": "REF_kwDOSNOe7q9yZWZzL3RhZ3MvMC4xLjA"
+ }
+]

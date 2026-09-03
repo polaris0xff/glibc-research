@@ -113,6 +113,12 @@ mode selector. The strings in the binary `pgb bundle appimage` produces include
 our own artefact. ⭐ **It is a lever `pgb` does not SET**, which is a different
 sentence and a much cheaper problem.
 
+⛔ **AND THE SECOND HALF OF THAT CORRECTION IS ALSO WRONG — see
+[`nix-bundle-patching.md`](nix-bundle-patching.md) §1.** These are not
+run-time-only environment variables: they are compile-time constants laid out
+as patchable ASCII strings, present in the artefact `pgb` ships, so a one-byte
+overwrite changes the mode with nothing beside the artefact.
+
 ⚠ **And N2 is answered, which changes what this lever is for.**
 `experiments/84-` measured that image size is not the time column: 0.0243–0.0312
 ms per MiB, so the whole 196 MiB separating the two kdenlive bundles is about

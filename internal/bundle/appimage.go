@@ -80,14 +80,27 @@ import (
 // being compared against a different runtime from the one it shipped, and
 // nothing in the record said so.
 //
-// ⚠ WHAT `lite` DROPS IS NOT ESTABLISHED HERE, and the first version of this
-// comment guessed "compression backends" without measuring it. Measured
-// instead: the same AppDir packed at `-C zstd:level=19`, `-C lzma:level=6` and
-// `-C null` runs under BOTH headers, six for six, so the reduction is not the
-// three compressors this bundler could plausibly emit. `strings` says nothing
-// either -- both binaries are packed. ⭐ The guard that does hold is
-// behavioural and it is asserted: `experiments/77-` runs the lite artefact on
-// all eleven environments and compares its output against the full one's.
+// ⭐ WHAT `lite` DROPS, SETTLED FROM THE SOURCE. The first version of this
+// comment guessed "compression backends"; a measurement could not confirm it
+// (the same AppDir at `-C zstd:level=19`, `-C lzma:level=6` and `-C null` runs
+// under BOTH headers, six for six) and the claim was withdrawn. The fork's own
+// build task list answers it -- `appimage-lite-x86_64  build x86_64 AppImage
+// uruntime (no dwarfsck, mkdwarfs)` -- and `src/main.rs:98-131` shows the
+// mechanism: lite embeds `assets/dwarfs-fuse-extract-*` where full embeds
+// `assets/dwarfs-universal-*`, and gates `dwarfsck` and `mkdwarfs` out with
+// `#[cfg(not(feature = "lite"))]`.
+// ⭐ It drops TOOLS, not codecs, which is exactly why the compressor test came
+// out six for six. `references/pkgforge-dev__Anylinux-uruntime` at
+// 5a0b4a336a89daa56902d95c328ff7a4ae673c66;
+// `docs/research/nix-bundle-patching.md` §2.
+//
+// ⛔ AND THE MODE SELECTOR IS PATCHABLE, WHICH THIS PROJECT ALSO GOT WRONG.
+// `URUNTIME_EXTRACT=3` and `URUNTIME_MOUNT=3` are compile-time constants laid
+// out as ASCII and read back through `.replace("URUNTIME_EXTRACT=", "=")`, so
+// `strings -a` finds them in the artefact this packs. Mode 3 is "mount below
+// 350 MB, EXTRACT above" -- so a jq bundle mounts and a kdenlive bundle does
+// not, and a lever measured on one does not transfer to the other. Nothing
+// here sets them yet; `nix-bundle-patching.md` §1 names the probe.
 const (
 	defaultURuntimeURL = "https://github.com/VHSgunzo/uruntime/releases/download/v0.5.9/uruntime-appimage-dwarfs-lite-%s"
 	defaultSharunURL   = "https://github.com/pkgforge-dev/Anylinux-sharun/releases/latest/download/sharun-%s"

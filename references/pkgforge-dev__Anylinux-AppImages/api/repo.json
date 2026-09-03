@@ -66,16 +66,16 @@
   "releases_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-AppImages/releases{/id}",
   "deployments_url": "https://api.github.com/repos/pkgforge-dev/Anylinux-AppImages/deployments",
   "created_at": "2024-11-23T04:36:20Z",
-  "updated_at": "2026-09-01T04:03:20Z",
-  "pushed_at": "2026-09-01T04:03:03Z",
+  "updated_at": "2026-09-03T15:37:29Z",
+  "pushed_at": "2026-09-03T15:38:22Z",
   "git_url": "git://github.com/pkgforge-dev/Anylinux-AppImages.git",
   "ssh_url": "git@github.com:pkgforge-dev/Anylinux-AppImages.git",
   "clone_url": "https://github.com/pkgforge-dev/Anylinux-AppImages.git",
   "svn_url": "https://github.com/pkgforge-dev/Anylinux-AppImages",
   "homepage": "https://pkgforge-dev.github.io/Anylinux-AppImages/",
-  "size": 3057,
-  "stargazers_count": 236,
-  "watchers_count": 236,
+  "size": 3314,
+  "stargazers_count": 238,
+  "watchers_count": 238,
   "language": "Shell",
   "has_issues": true,
   "has_projects": false,
@@ -83,11 +83,11 @@
   "has_wiki": false,
   "has_pages": true,
   "has_discussions": true,
-  "forks_count": 33,
+  "forks_count": 36,
   "mirror_url": null,
   "archived": false,
   "disabled": false,
-  "open_issues_count": 82,
+  "open_issues_count": 83,
   "license": {
     "key": "mit",
     "name": "MIT License",
@@ -104,9 +104,9 @@
 
   ],
   "visibility": "public",
-  "forks": 33,
-  "open_issues": 82,
-  "watchers": 236,
+  "forks": 36,
+  "open_issues": 83,
+  "watchers": 238,
   "default_branch": "main",
   "permissions": {
     "admin": false,
@@ -140,6 +140,6 @@
     "user_view_type": "public",
     "site_admin": false
   },
-  "network_count": 33,
-  "subscribers_count": 5
+  "network_count": 36,
+  "subscribers_count": 6
 }

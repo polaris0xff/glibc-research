@@ -1,0 +1,7 @@
+[alias]
+xtask = "run --manifest-path ./xtask/Cargo.toml --"
+
+rustflags = ["-Z", "remap-cwd-prefix="]
+
+[unstable]
+build-std = ["std", "panic_abort"]
