@@ -3,20 +3,29 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log
 and the entries.
 
-    STATE     2026-09-03b
+    STATE     2026-09-03c  ⚠ IN PROGRESS — this header is refreshed as work
+              lands, not only at the end
     COUNTS    48 entries, 15 open, 33 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
-              CI: GREEN before this session; selftests 239 pass, 1 could not
-              run (no zstd)
+              CI: GREEN on every push this session
+              selftests 371 → ⭐ 540 pass, 1 could not run (no zstd)
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
-    NEW       ⭐ THE OPERATOR'S cross-libc-dlopen REVIEW, all four items:
-              T-073 a live silent-wrong-answer defect in the loader's
-              own-symbol table; T-074 a selftest that could not fail on the
-              state it was written to catch; T-075 LD_DEBUG=bindings on the
-              dynamic control; and the vendored reference re-mined past PR 30.
-              ⭐ T-066 ROUTE A'S CEILING IS MEASURED — 218.5 MiB of 938.8 on a
-              mesa bundle, against 6.3% the sweep can prove dead — and getting
-              there found the sweep rooting versioned libraries at themselves.
+    NEW       ⭐ THE DEBT IS CLEARED. R1 ten of ten (167 assertions). R2 gave
+              the soname scan's control its own self-set and it immediately
+              found a HARDLINKED root-of-itself. ⭐ R3 PAID FOR ITSELF TWICE:
+              it proved the C++-archive fix did NOT reach postgres — the scan
+              skipped every argument beginning with `-`, and real builds name
+              archives as `-licuuc` — and after the fix produced a STATIC
+              PostgreSQL 18.6 WITH ICU (3,911 icu_78 symbols, PT_INTERP 0)
+              answering ON ALPINE.
+              ⭐ T-066 ROUTE B IS COSTED AND IT OVERTURNS THE ARGUMENT AGAINST
+              IT: the whole -mini set forces 161 of kdenlive's 676 closure
+              paths (23.8%) from source, not "the entire KDE/Qt subtree".
+              ⛔ AND ROUTE A AT PATH GRANULARITY IS MEASURED DEAD: 0 of jq's
+              7 store paths are entirely unreachable.
+              ✅ T-062 and T-075 CLOSED. ⭐ Two more live product defects
+              found and fixed: `pgb build -- cc` bypassed the wrappers
+              entirely, and the fixpoint lever landed as a measuring device.
 
 ## ⛔ READ THIS FIRST: the toolchain is Go now, and the shell is the oracle
 
