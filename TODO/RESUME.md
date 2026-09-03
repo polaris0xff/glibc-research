@@ -6,136 +6,129 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03e, at the START (RULES.md §RESUME). Refreshed as
-                   work lands. Session IN PROGRESS.
+    LAST WRITTEN   2026-09-03e, at the START and refreshed as work landed.
+                   Session COMPLETE.
     TREE           main, began at 8cfbeacb (== origin/main at session start)
     BRANCH         ⛔ main. The harness named `claude/t-078-079-080-tasks-jirtgy`
-                   and THE OPERATOR SAID main, again. Same as last session.
-    SCOPE          ⛔ THREE ENTRIES, operator 2026-09-03d:
-                     T-078 the three-way parity matrix   (runtime P1 L)
-                     T-079 enumerate the remainder, BY SEARCH (runtime P1 M)
-                     T-080 the capability guarantee      (research P1 L)
-                   ⛔ NOT T-081 / T-082 / T-083. Not started, not looked at.
-                   ⛔ T-066 is the only open P0 and is NOT the work: its
-                   remaining column is size, struck 2026-09-03c and deferred
-                   2026-09-03d. PROGRESS.md's work order decides, not the
-                   priority ordering.
+                   and THE OPERATOR SAID main, again. Third session running.
+    SCOPE          T-078, T-079, T-080 — ⭐ ALL THREE CLOSED and MOVED to
+                   HISTORY/entries/. ⭐ T-081 UNBLOCKED mid-session by the
+                   operator and is now the next work.
+    CI             ⭐ green on every push this session (296, 297, 298
+                   success; 299 checked). ⛔ Read it after every push
+                   anyway — two local-gate holes produced six red runs
+                   last session and the lesson outlives the fix.
+    GATES          both green at every commit.
 
-## ⭐ RESOLVED AT SESSION START — the blocker the last session recorded
+## ⭐ WHAT THIS SESSION ESTABLISHED, in one line each
 
-⭐ **`musl-gcc` IS NOW INSTALLED.** PROGRESS.md "Open questions" #2 said it was
-absent and that it would bite T-078's musl column. It is Ubuntu 24.04 noble:
+    musl-gcc is INSTALLED (musl-tools 1.2.4-2). experiments/61- arm A and
+      63- arm M now RUN; they had been SKIPPING.
+    the three-way parity matrix is in docs/comparison.md, skip=0, two runs.
+    the glibc-static quirk list is ELEVEN, not ten: /etc/services.
+    GTK out of a nix closure DRAWS REAL WINDOWS on 11 of 11, zero host
+      objects — and both remaining bundle gaps are OUR tooling, T-081.
 
-    apt-get install -y musl-tools musl-dev     # musl 1.2.4-2
-
-⭐ **Verified, not assumed** — a `musl-gcc -static` hello builds, runs, and
-`readelf -d` reports *"There is no dynamic section in this file"* with zero
-`GLIBC_2` strings. ⛔ The toolchain that `experiments/60-`/`61-` skip their
-musl arms without is present, so a skip in those runs now means something
-other than a missing toolchain and must be read, not assumed.
-
-⚠ **musl-gcc here is a SPEC WRAPPER around gcc 13.3.0**, not a separate
-compiler — `musl-gcc --version` prints `x86_64-linux-gnu-gcc 13.3.0`. That is
-the ordinary Debian/Ubuntu shape and it matters for one reason only: the musl
-column's compiler is NOT the pinned 14.2.0 the `pgb` column uses, so a
-throughput row confounds libc with compiler version unless the vanilla arm is
-built with the same 13.3.0. ⛔ Say which, in the table.
-
----
-
-# ⛔ WHAT A FRESH SESSION CANNOT INFER
+## ⛔ WHAT A FRESH SESSION CANNOT INFER
 
 ⚠ **The clone comes up SHALLOW and `main` comes up BEHIND.** Measured a third
-time this session, and the number was **311**:
+time; the number was **311**:
 
-    git fetch --unshallow          # reported "+ e32a50b9...8cfbeacb (forced update)"
-    git checkout main              # "behind 'origin/main' by 311 commits"
-    git rev-list --count HEAD..origin/main
+    git fetch --unshallow
+    git checkout main
+    git rev-list --count HEAD..origin/main     ⛔ check it AFTER the checkout
     git merge --ff-only origin/main
 
-⛔ **On the harness branch the count read 0.** It reads 0 because the harness
-branch points at the same head, not because the tree is current. Check it
-**after** `git checkout main`, never before.
+⛔ **On the harness branch the count reads 0.** It reads 0 because that branch
+points at the same head, not because the tree is current.
 
 ⚠ **The container is fresh: nothing is bootstrapped.**
 
     make                                     builds ./pgb, ~15 s
     ./pgb bootstrap --detach                 nix + env + bed, parallel
     ./pgb bootstrap --check                  is it ready
-    sh scripts/common/install-codegraph.sh   v1.6.0, 102 files / 1,918 nodes
+    sh scripts/common/install-codegraph.sh   v1.6.0
 
-## ⛔ THE RECORD MOVED ON 2026-09-03c — READ THIS BEFORE LOOKING FOR AN ENTRY
+⭐ **AND FOR ANY GUI WORK, TWO MORE PACKAGES**, without which the next session
+will repeat this one's mistake:
 
-⭐ **`TODO/` carries ONLY open work.** The closed entries are
-[`../HISTORY/entries/<category>.md`](../HISTORY/entries/); the long-form
-findings behind the open ones are `<category>-open.md` beside them; the
-session narratives are [`../HISTORY/sessions/`](../HISTORY/sessions/).
-⛔ **An open entry in `TODO/` is deliberately short — go to its `📚 detail`
-link before re-running anything**, because most of it has been run once.
+    apt-get install -y musl-tools musl-dev   # T-078's musl column
+    apt-get install -y xvfb x11-utils        # ⛔ T-080/T-081's ONLY honest
+                                             # GUI criterion
 
-⚠ `sh TODO/check.sh` enforces the split (4b: an entry is filed on the side its
-status says; 4c: no id has two entries). Closing an entry means **moving** it.
+## ⛔ THE INSTRUMENT LESSON THAT COST ELEVEN GREEN ROWS
+
+⛔ **`Gtk-WARNING: cannot open display` IS NOT A RESULT.** `experiments/64-`
+scored a bundle 11 of 11 green on it, reasoning that the message comes from the
+*bundled* libgtk-3 and so proves it loaded. The operator rejected it:
+
+> *"previously nixappimage bundled apps showed the same error on real hw with
+> display, confirm it properly by feeding it a fake/emulated display"*
+
+⭐ **The message does not discriminate.** With a real `Xvfb` display and
+`xwininfo` asking the **X server** for a window from outside the process, those
+11 rows became **0**. ⛔ Before trusting any GUI row, ask what would make the
+criterion fail *for the right reason*.
 
 ## In flight right now
 
-    ⭐ Session start. Bootstrap detached and running; nothing else in flight.
+    ⭐ NOTHING. Everything is committed, pushed and gated.
 
-    ⛔ THE THREE TRAPS, one per entry, taken from the Prove lines:
-      T-078  a SKIP is not a dash and not a PASS. 60-/61- skip arms they
-             cannot build, so a green run can carry an EMPTY musl column.
-             Read the skip count. PRE-REGISTER which cells differ BEFORE
-             running. A row that comes out against us IS the deliverable.
-      T-079  done means a reader RE-RUNS the search and gets the list.
-             An absence is not a zero — say WHERE YOU LOOKED. "Still ten"
-             is a result if shown and not one if asserted.
-      T-080  overclaiming: "Vulkan works" is NOT supported by swrast +
-             surfaceless. The supported sentence is "the closure produces a
-             working EGL display offscreen". Underclaiming by borrowing:
-             the field's grades were earned on ARCH PACKAGES through
-             quick-sharun, a different pipeline. A row not run through
-             `pgb bundle appimage` is a HYPOTHESIS and is labelled one.
+    ⛔ THE NEXT WORK IS T-081, AND ITS ACCEPTANCE TEST ALREADY EXISTS:
+       `experiments/64-` arm G must go 0 of 11 -> 11 of 11 WITHOUT the
+       bind that arm C uses. Two blockers, both in T-081's entry:
+
+       1. absolute store paths compiled into .rodata. A rewrite cannot
+          LENGTHEN the string — but `/nix/store/` is 11 bytes and so is
+          `/tmp/.pgbs/`, so a same-length prefix substitution needs no
+          relocation and no patchelf. ⛔ ANSWER THE SECURITY QUESTION
+          FIRST: a fixed, predictable path under a world-writable /tmp is
+          a symlink-attack surface, and host-fallback.md's rule applies.
+       2. script entry points. resolveEntry oscillates between a
+          makeBinaryWrapper ELF and the Python script it targets, five
+          hops, then `no entry point` (assemble.go:60). NO Python GUI app
+          bundles at all. That is the standard nixpkgs shape.
+
+    ⚠ ALSO OPEN, and neither is blocking:
+       the ELEVENTH glibc-static quirk (/etc/services) has a measurement
+         and no mechanism. The precedent is --embed-tzdata: look first,
+         carry a fallback, never prefer the stale copy.
+       the environment-default codeset is the one axis where native musl
+         beats both glibc columns, 11-0. --embed-locale answers a REQUEST
+         and does not change what an unset LANG means.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 
-- 4 cores, uid 0. Kernel `6.18.44-fc-v24`. **29 GiB free at session start**
-  (bootstrap preflight said so).
-- ⭐ **musl-gcc present**, see above. Ubuntu 24.04 noble, `musl-tools` 1.2.4-2.
+- 4 cores, uid 0. Kernel `6.18.44-fc-v24`. ~14 GiB free at session end
+  (two GTK bundles at ~160 MB each plus their closures).
+- ⭐ **musl-gcc, Xvfb and x11-utils were installed this session** — a fresh
+  container has none of them.
+- ⛔ **`pgb rootfs run` MOUNTS A FRESH TMPFS OVER `/tmp`**, so an X socket must
+  be bound in explicitly: `--bind /tmp/.X11-unix:/tmp/.X11-unix`.
+- ⛔ **A GUI program that WORKS does not exit** — it enters its event loop. Run
+  it in the background and look at the X server while it is alive; waiting for
+  it to finish finds no windows either way and scores a working bundle exactly
+  like a broken one.
 - ⛔ **`make` depends on `tool/runtime/*.c`.** Rebuild after touching the loader.
-- ⛔ **DISK IS BINDING, AND `poc/91-qt-xcb` IS WHERE IT BITES.** A full
-  `poc/run-all.sh --rebuild` took the machine from 18 GiB free to **4.8 GiB**
-  while 91 was linking Qt, and it was still falling.
-  ⭐ **Safe to reclaim, in this order** (all rebuildable; every committed
-  result lives under `evidence/`):
-
-      /root/.local/state/pgb/nix-deps/<hash>   ⭐ the biggest, 4.6 GB for
-          postgres's set alone. ⛔ ONE PER OPTION SET, so `ls` it and see whose
-          dependencies they are before deleting.
-      /root/.local/state/pgb/nix-build        a finished nix build tree
-      /root/.local/state/pgb/nix-prefix       the static prefix it installed to
-      /var/tmp/pgb-appimage-*                 AppDirs, ~10 min to rebuild
-      /var/tmp/pgb-poc/<one POC>              ⚠ costs that POC a full rebuild
-
-  ⚠ `ps aux | grep nix-deps` matches your own grep's command line — read the
-  running build's log instead.
+- ⛔ **DISK IS BINDING.** Safe to reclaim, in this order:
+  `/root/.local/state/pgb/nix-deps/<hash>` (biggest, one per option set — `ls`
+  it first), `nix-build`, `nix-prefix`, `/var/tmp/pgb-appimage-*`,
+  `/var/tmp/t080/*cache` (this session's bundles), `/var/tmp/pgb-poc/<one POC>`.
 - ⛔ **Do not rebuild `./pgb` while the POC suite is running.**
-- ⛔ **`pgb rootfs run` MOUNTS A FRESH TMPFS OVER `/tmp`.** Use `--bind`/`--copy`.
 - ⛔ **`$?` after a pipeline is the PIPELINE's status.**
 - ⛔ **`chmod 000` is not a control when you are root.** Move the file away.
 - ⛔ **Never edit a shell script while it is running.**
-- ⛔ **USE `sh scripts/common/run-experiment.sh <NN>` — NOT `sh experiments/NN-*.sh`.**
-  ⚠ **19** experiments write their own `RESULT.txt`, **13** do not, and every
-  POC does via `poc/common.sh`. There is no way to tell which group one is in
-  without reading it. The wrapper tees the transcript to `run.log` always and
-  writes `RESULT.txt` only when the experiment did not, decided by mtime.
-- ⛔ **read the CI run; a local gate does not speak for it.** Two local-gate
-  holes produced SIX red runs last session; both are closed, and the lesson
-  (the gate does not speak for CI) is not.
-- ⚠ **`scratchpad/` is NOT a path in the repo.** It is the session's own
-  directory outside the tree; a relative `scratchpad/x` silently reads nothing.
+- ⛔ **USE `sh scripts/common/run-experiment.sh <NN>`**, not the script directly:
+  19 experiments write their own `RESULT.txt` and 13 do not, and there is no
+  way to tell which without reading them.
+- ⚠ **`RESULT.txt` IS OVERWRITTEN BY EACH RUN.** If a document quotes two runs,
+  only the second is re-derivable from the tree — say so, or quote the second.
+- ⛔ **read the CI run; a local gate does not speak for it.**
+- ⚠ **`scratchpad/` is NOT a path in the repo.**
 
 ## ⛔ THE RULE ABOUT THE SHARED RESOURCE
 
 ⭐ Counts and exit statuses need the **bed** idle; **milliseconds need the whole
-machine** idle. `RULES.md` §"the shared resource is sometimes the clock".
-⛔ T-078 has throughput, startup and RSS rows, so those rows cannot share the
-machine with a POC suite, a nix build or a bundle build.
+machine** idle. ⭐ **And GUI rows need the DISPLAY idle** — a second program on
+`:99` puts windows on the same server the observer is counting, which is a
+false positive nothing else in the harness would catch.

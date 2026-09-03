@@ -1,117 +1,109 @@
-# SUMMARY.md — the session of 2026-09-03d
+# SUMMARY.md — the session of 2026-09-03e
 
-⛔ **Overwritten every session.** The narrative is
-[`../HISTORY/sessions/2026-09-03d.md`](../HISTORY/sessions/2026-09-03d.md);
-the work order is [`PROGRESS.md`](PROGRESS.md).
+⛔ **Overwritten every session.** The work order is
+[`PROGRESS.md`](PROGRESS.md); the closed entries are
+[`../HISTORY/entries/`](../HISTORY/entries/).
 
-    SCOPE     the operator: "focus the next session entirely on optimizing
-              the nix bundler as much as possible" (PROGRESS.md N0–N6),
-              then mid-session: defer the speed comparison, reprioritise
-              the glibc-static and nix-bundle quirks, and mine every named
-              reference with three passes each.
-    RESULT    ⭐ THE BUNDLER IS LEVEL OR AHEAD ON SPEED, on a CLI and on a
-              GUI, and the closure never changed.
+    SCOPE     three entries and nothing else, set by the operator on
+              2026-09-03d: T-078 the three-way parity matrix, T-079
+              enumerate the remaining glibc-static edge cases BY SEARCH,
+              T-080 the nix-bundle capability guarantee.
+              ⭐ MID-SESSION the operator added two things: a correction
+              to T-080's success criterion, and permission to take on
+              T-081 because it turned out to be the blocker.
+    RESULT    ⭐ ALL THREE CLOSED. Two of them came out AGAINST US, which
+              is the outcome each entry's Prove line said to report
+              rather than soften.
 
 ## ⭐ What moved
 
 | | before | after |
 |---|---|---|
-| `jq` cold start vs the field, 11 environments | 2.07× | ⭐ **1.00×**, ours faster on 6 of 11 rows |
-| kdenlive cold start vs the competitor | 4.92× against us | ⭐ **0.74× — ours is faster** |
-| kdenlive host shared objects | — | ⭐ **0 of 11**, against the competitor's 4 of 11 |
-| `jq` artefact size | 2.86× | 1.70× ⚠ (1.44×, then `-S18` cost +17.8%) |
-| kdenlive artefact size | 2.45× | ⛔ 2.95× |
+| `musl-gcc` | ⛔ **absent** — the blocker the last session recorded | ✅ installed; `experiments/61-` arm A and `63-` arm M now RUN instead of skipping |
+| the parity matrix | evidence spread over ten experiments, musl column mostly **inferred** | ⭐ one table, every cell run, `skip=0` |
+| the glibc-static quirk list | 10 found, 9 closed | ⛔ **11 found, 9 closed** — `/etc/services` |
+| GTK out of a nix closure | a hypothesis, graded *"Garbage"* by the field on a different pipeline | ⭐ **11 of 11 real windows on a real X server**, zero host objects |
+| T-081's cost | a plan | ⭐ a measurement with a positive control |
 
-⛔ **Two constants in `internal/bundle/appimage.go` did all of it**: uruntime
-`full` → `lite` (`experiments/77-`, 0.69–0.76×) and the dwarfs block `-S26`
-(64 MiB) → `-S18` (256 KiB) (`experiments/81-`, 0.66× on a large artefact).
+## ⛔ The two rows that came out against us
 
-## ⭐ The five findings behind it
+⭐ **Both are in the shipped table. Neither axis was softened until it passed.**
 
-1. **The instrument was measuring the wrong thing.** `90-`'s cold column
-   obtained "cold" by copying the artefact; uruntime keys its mount on
-   **content** and holds it **5 s**, so the copy reused the live mount and the
-   column reported a warm start — 1.02× of warm, measured. `corrections.md`
-   **C24**, and it is C23's missing mechanism.
-2. **Size is not the time column.** `experiments/84-`: a 29.6× image and a
-   138× file count each move cold start ~1.05×; image size costs
-   **0.024–0.031 ms/MiB**, so the whole 196 MiB between the two kdenlive
-   bundles is ~5 ms of a gap never seen below 129 ms. ⛔ N1's premise is gone.
-3. **We were not running the runtime we were measured against.** `86-` stages
-   the competitor's own toolchain — uruntime **lite**; we shipped **full**.
-4. **The pin was decorative.** `download` returned early whenever the
-   destination existed, whatever URL was asked for, so moving a pin changed
-   nothing on any machine that had built a bundle. Now keyed on the URL.
-5. **The dwarfs block size is a lever, and the sweep had to run three times**
-   to find its minimum — 1 MiB, then 256 KiB, both monotonic to their own
-   floor. 64 KiB is the minimum and is **not** shipped: 0.02× more for another
-   19% of the artefact.
+1. **The environment-default codeset.** With no `LANG` set, native musl static
+   answers **UTF-8 on 11 of 11** and every glibc arm — `pgb` included —
+   answers `ANSI_X3.4-1968` on **11 of 11**. ⛔ **The prediction registered
+   before the run said the opposite on both halves.** musl's minimal locale
+   support does not mean a poor codeset: its default charset *is* UTF-8.
+   Asked for `C.UTF-8` **by name**, `pgb` answers UTF-8 on 11 of 11 against
+   vanilla's 7 — but that is a different question, and it is now a separate row.
+2. **`/etc/services`** — the eleventh host-data dependency. All three columns
+   fail it on the same three environments, so it is not a row `pgb` loses *to
+   musl*; it is one nobody wins and `pgb` claims it should.
 
-## ⭐ The reference sweep, and what it corrected
+## ⭐ The operator corrected the instrument, and it cost eleven green rows
 
-Every reference the operator named is vendored and pinned; three passes each.
-⭐ **It corrected five claims this session had already published** — the
-mount/extract selector is a **patchable constant**, not an environment
-variable; `lite` drops **`dwarfsck`/`mkdwarfs`**, not codecs; the field's icon
-rule is **at least 128×128**, the opposite of what was recorded; its desktop
-rule takes the **first** match, not the smallest; and gearlever's gate is
-**GIO's content type**, not the type-2 magic (`gio info` says
-`application/vnd.appimage` for ours and the competitor's alike).
+⛔ **`experiments/64-` first scored GTK 11 of 11 GREEN.** Its criterion was
+that the program printed `Gtk-WARNING **: cannot open display:`, on the
+reasoning that the message is emitted by the *bundled* libgtk-3 and therefore
+proves it loaded.
 
-⭐ **And `experiments/99-`'s bisected 4–6 s reuse window turned out to be a
-source constant**: `REUSE_CHECK_DELAY = "5s"`.
+> *"you may be measuring the wrong success criteria. Previously nixappimage
+> bundled apps showed the same error on real hw with display, confirm it
+> properly by feeding it a fake/emulated display"*
 
-📚 [`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md),
-[`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md).
+⭐ **Right, and decisive.** The message does not discriminate: it is identical
+when there is no display and when the bundle's own X stack is broken, which is
+the only distinction the experiment exists to make. Feeding it a real display
+(`Xvfb`, socket bound into each rootfs) and asking the **X server** for a
+window — from outside the process — turned **11 green rows into 0**.
 
-## ⭐ What was built
+⭐ **A second subject then separated the causes**, and that pair is the whole
+T-080 deliverable:
 
-| | |
+| arm | subject | window on a real X server |
+|---|---|---|
+| G | `galculator` — UI is a **file** at a compiled-in store path | ⛔ **0 / 11** |
+| X | `mousepad` — UI is a **GResource compiled into the binary** | ✅ **11 / 11** |
+| ⭐ C | `galculator` **again**, with that store path made to resolve | ✅ **11 / 11** |
+
+⭐ **Arm C is the argument**: identical artefact, one variable changed, and it
+draws. So *"a hardcoded store path is what stops it"* is a **measurement**, not
+a reading of an error message — which is what licenses the guarantee's
+sentence, *the remaining gap is tooling, not capability*.
+
+## The five defects this session found in its own instruments
+
+⭐ **Every one was found by something disagreeing, none by reading.**
+
+| what | how it was caught |
 |---|---|
-| `experiments/clock.sh` | the wall-clock instrument: median of N, arms interleaved with a rotating start, and an **A/A control** whose ratio is the floor below which no row may be believed |
-| `experiments/99-` | stands it up and **asserts** the control; found C24 |
-| `experiments/84-` | is size the time column — no |
-| `experiments/77-` | the runtime, five ways, one component at a time |
-| `experiments/81-` | the dwarfs block size, seven ways, two subjects |
-| `experiments/90-` | rebuilt on the corrected protocol; kdenlive re-measured |
-| `lib.sh` `exp_pack_blocksize` | reads the block size out of the Go source so no experiment can copy a stale one |
+| `[ -e "$rootfs$path" ]` resolves an **absolute symlink against the HOST**, so Alpine's `/bin/sh -> /bin/busybox` read as absent on three rows | the file listing disagreed with a binary that ran fine |
+| the probe **buffered stdout to a pipe**, so a crash discarded every answer already computed and a row read "no output" | Arch printed nothing while its neighbours printed everything |
+| the crash counter read the **parent's** exit status, and the per-axis fork is what makes a crash survivable — it reported `crashed = 0` on a run whose rows read `SIG8` | the summary disagreed with the rows above it |
+| the UTF-8 counter **globbed the whole line**, so adding a second axis containing `UTF-8` moved the glibc arms 0 → 7 between two runs | the two-runs rule |
+| `tr -d '\r' < f1 f2` redirects `f1` and passes `f2` as an argument, so every row printed `<none>` | the trace beside it plainly showed GTK loading |
 
-## ⛔ Defects found in this session's own work
+⚠ **And two in the write-up itself**, caught by checking it against the
+evidence: `comparison.md` said vanilla iconv gives *"SIGABRT on 3"* when it is
+SIGABRT on two and SIGFPE on one; and a throughput figure was quoted from a
+first run whose `RESULT.txt` the second had already overwritten.
 
-⭐ **Every review found one.** `clk_run_twin` was dead code that also passed an
-empty argument. `90-`'s cache stamped on `[ -s ]`, so a truncated 99 MB
-artefact would have been reused as a whole one. `77-` borrowed
-`$CACHE/tools/mkdwarfs` and silently changed the meaning of three arms when the
-pin moved. `86-`'s **warm** column subtracts a cold run that is not in the
-series it divides. `92` was not a free number — `evidence/92-go-port` had it.
-`check-docs.sh` enumerated tracked files only, so a **new** document was
-unchecked by exactly the commit the gate exists to block; **CI caught that one,
-not the local gate.**
+## What is NOT claimed
 
-⛔ **And a process failure**: `experiments/90-` was edited **while running**,
-which cost a run. `sh` re-reads from a byte offset.
+⛔ **Said in the sentence, not in a footnote**, because overclaiming is the
+failure T-080 names first.
 
-## ⭐ The next session is THREE entries — the operator scoped it
+- **Vulkan and NVIDIA are not measured.** Every GL row in this tree is
+  `swrast` and surfaceless. The supported sentence is *"the closure produces a
+  working EGL display offscreen"*. **T-059** owns real hardware.
+- **SDL was never run through `pgb bundle appimage`** and stays a hypothesis.
+- **No Python GUI application bundles at all**, so the operator's own
+  counter-example is still unreached — `resolveEntry` oscillates on the
+  standard nixpkgs wrapper shape.
+- **GTK is proved on one subject**, not on GTK in general.
+- **The eleventh quirk has no mechanism yet**, only a measurement.
 
-    T-078  P1 L  runtime    the three-way parity matrix
-    T-079  P1 M  runtime    enumerate the remainder, BY SEARCH
-    T-080  P1 L  research   the capability guarantee: EGL/SDL/XCB/vulkan/NVIDIA
+## ⭐ Next
 
-⛔ **Recorded and NOT in scope**: T-081 the debloater/patcher, T-082 vendor +
-patch + drift detection, T-083 desktop integration. Each says so in its own
-text as well as here.
-
-⛔ **And T-066, the only open P0, is NOT what to start on** — its remaining
-column is size, which the operator struck and then deferred. The entry says so
-now; deep review 4 found that the priority ordering pointed at it.
-
-## ⛔ What is NOT done
-
-1. `86-`'s warm arithmetic is unverified — `clock.sh` is the shape to carry in.
-2. kdenlive's **warm** row is 3.45× against us and unexplained. First
-   candidate: at 565 MB it is over uruntime's 350 MB threshold, so it
-   **extracts** where `jq` **mounts**.
-3. kdenlive's **render** direction is unresolved — two runs disagree.
-4. `78-`, `85-`, `89-` carry evidence describing the old runtime.
-5. `defaultSharunURL` is pinned to `latest`, in a constant block whose own
-   comment says that is the thing not to do.
+⛔ **T-081, and its acceptance test already exists**: `experiments/64-` arm G
+must go **0 of 11 → 11 of 11** without the bind arm C uses.

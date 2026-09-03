@@ -79,11 +79,26 @@ bound into each rootfs) and to check for a **window on the X server with
 `xwininfo`, from outside the process**. That turned 11 green rows into **0**,
 and then a second subject showed the blocker was the data path rather than GTK.
 
-⭐ **This is why the deliverable is two subjects and not one.** Same bundler,
-same GTK, same eleven environments: the application whose UI is **compiled in**
-as a GResource draws windows; the one whose UI is **a file behind an absolute
-store path** draws none. That pair is what licenses the sentence *"the
-remaining gap is tooling"* instead of leaving it a hope.
+⭐ **This is why the deliverable is three arms and not one.** Same bundler,
+same GTK, same eleven environments:
+
+| arm | subject | window on a real X server |
+|---|---|---|
+| G | `galculator` — UI is a **file** at a compiled-in absolute store path | ⛔ **0 / 11** |
+| X | `mousepad` — UI is a **GResource compiled into the binary** | ✅ **11 / 11** |
+| ⭐ C | `galculator` **again**, with that store path made to resolve | ✅ **11 / 11** |
+
+⭐ **Arm C is what makes this a measurement rather than a reading of an error
+message.** It runs the **identical artefact** with one variable changed — the
+bundle's own `AppDir` bound at the `/nix/store/<hash>-galculator-2.1.4` the
+binary names — and it draws, on all eleven, still with **zero host shared
+objects**. ⚠ **The bind is not a fix and is not proposed as one**: it needs
+root and a mount namespace, which a user double-clicking an AppImage has
+neither of. It exists to isolate the cause, and it does.
+
+⛔ **So the sentence "the remaining gap is tooling, not capability" is earned.**
+Without arm C it would have been an inference from a log line — which is
+exactly the error the operator caught the first time.
 
 ---
 

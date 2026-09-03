@@ -2,7 +2,7 @@
 64 - GTK and Python out of a nixpkgs closure: one measured, one blocked by our own tooling
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-03T18:25:18Z
+date (UTC)   : 2026-09-03T18:54:10Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -47,9 +47,9 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
       out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
   debian-12            glibc  yes   0        0        yes      93
       out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
-  ubuntu-20.04         glibc  yes   0        0        yes      95
+  ubuntu-20.04         glibc  yes   0        0        yes      93
       out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
-  rockylinux-8         glibc  yes   0        0        yes      94
+  rockylinux-8         glibc  yes   0        0        yes      93
       out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
   opensuse-leap-15.6   glibc  yes   0        0        yes      93
       out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
@@ -64,25 +64,52 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
   ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
   alpine-3.22          musl   yes   1        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  alpine-3.20          musl   yes   2        0        yes      94
+  alpine-3.20          musl   yes   1        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  alpine-3.10          musl   yes   2        0        yes      94
+  alpine-3.10          musl   yes   1        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
   voidlinux-musl       musl   yes   1        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
   debian-11            glibc  yes   2        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  debian-12            glibc  yes   2        0        yes      94
+  debian-12            glibc  yes   1        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  ubuntu-20.04         glibc  yes   2        0        yes      94
+  ubuntu-20.04         glibc  yes   1        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
   rockylinux-8         glibc  yes   2        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  opensuse-leap-15.6   glibc  yes   2        0        yes      96
+  opensuse-leap-15.6   glibc  yes   1        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
   fedora-42            glibc  yes   2        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  archlinux-latest     glibc  yes   1        0        yes      94
+  archlinux-latest     glibc  yes   2        0        yes      94
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+
+
+-- arm C: galculator AGAIN, with the store path made to resolve ----
+
+  ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
+  alpine-3.22          musl   yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  alpine-3.20          musl   yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  alpine-3.10          musl   yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  voidlinux-musl       musl   yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  debian-11            glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  debian-12            glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  ubuntu-20.04         glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  rockylinux-8         glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  opensuse-leap-15.6   glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  fedora-42            glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  archlinux-latest     glibc  yes   2        0        yes      93
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
 
 
@@ -94,6 +121,8 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
   zero HOST shared objects                     11           11
   ⭐ A WINDOW ON THE X SERVER                  0           11
 
+  ⭐ arm C: galculator + store path     11 of 11
+
   ok    control: no target ships either program        = 22
   ok    G: GTK connected to a real display             = 11
   ok    G: libgtk-3 loaded FROM THE BUNDLE             = 11
@@ -103,6 +132,8 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
   ok    X: host shared objects, rows with zero         = 11
   ok    ⭐ X: a REAL WINDOW on the X server           = 11
   ok    ⛔ G: a real window on the X server           = 0
+  ok    ⭐ C: the SAME bundle draws once the path resolves = 11
+  ok    C: and it still loaded zero host objects       = 11
         ⭐ GTK IS NOT THE BLOCKER, AND THIS IS THE MEASUREMENT THAT SAYS SO.
            mousepad draws 11 of 11 real toplevel windows on a real X
            server, out of a nixpkgs closure, on distributions that ship no
@@ -128,6 +159,6 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
            which arm P could not build.
 
 -- result ----------------------------------------------------
-pass=14 fail=0 skip=0
+pass=16 fail=0 skip=0
 VERDICT: matched expectation.
 --------------------------------------------------------------

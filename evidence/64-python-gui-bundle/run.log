@@ -68,3 +68,97 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
   alpine-3.10          musl   yes   1        0        yes      94
       out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  voidlinux-musl       musl   yes   1        0        yes      94
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  debian-11            glibc  yes   2        0        yes      94
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  debian-12            glibc  yes   1        0        yes      94
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  ubuntu-20.04         glibc  yes   1        0        yes      94
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  rockylinux-8         glibc  yes   2        0        yes      94
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  opensuse-leap-15.6   glibc  yes   1        0        yes      94
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  fedora-42            glibc  yes   2        0        yes      94
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  archlinux-latest     glibc  yes   2        0        yes      94
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+
+
+-- arm C: galculator AGAIN, with the store path made to resolve ----
+
+  ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
+  alpine-3.22          musl   yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  alpine-3.20          musl   yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  alpine-3.10          musl   yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  voidlinux-musl       musl   yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  debian-11            glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  debian-12            glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  ubuntu-20.04         glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  rockylinux-8         glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  opensuse-leap-15.6   glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  fedora-42            glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  archlinux-latest     glibc  yes   2        0        yes      93
+      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+
+
+-- summary ---------------------------------------------------------
+  AXIS                               G galculator   X mousepad
+  rows measured                                11           11
+  GTK connected to a real X                    11           11
+  libgtk-3 loaded from bundle                  11           11
+  zero HOST shared objects                     11           11
+  ⭐ A WINDOW ON THE X SERVER                  0           11
+
+  ⭐ arm C: galculator + store path     11 of 11
+
+  ok    control: no target ships either program        = 22
+  ok    G: GTK connected to a real display             = 11
+  ok    G: libgtk-3 loaded FROM THE BUNDLE             = 11
+  ok    G: host shared objects, rows with zero         = 11
+  ok    X: GTK connected to a real display             = 11
+  ok    X: libgtk-3 loaded FROM THE BUNDLE             = 11
+  ok    X: host shared objects, rows with zero         = 11
+  ok    ⭐ X: a REAL WINDOW on the X server           = 11
+  ok    ⛔ G: a real window on the X server           = 0
+  ok    ⭐ C: the SAME bundle draws once the path resolves = 11
+  ok    C: and it still loaded zero host objects       = 11
+        ⭐ GTK IS NOT THE BLOCKER, AND THIS IS THE MEASUREMENT THAT SAYS SO.
+           mousepad draws 11 of 11 real toplevel windows on a real X
+           server, out of a nixpkgs closure, on distributions that ship no
+           GTK — with ZERO host shared objects. The field grades GTK
+           "Garbage"; through this pipeline, on this subject, it works.
+        ⛔ WHAT BLOCKS galculator IS A HARDCODED ABSOLUTE STORE PATH:
+             Couldn't load /nix/store/<hash>-galculator-2.1.4/share/...
+           The file IS in the bundle. XDG_DATA_DIRS points at the bundle and
+           serves every app that LOOKS UP its data; it cannot serve one with
+           the path baked into its .rodata.
+        ⭐ SO THE REMAINING GAP IS TOOLING, NOT CAPABILITY — T-081, whose
+           entry names "hardcoded paths" verbatim. That is the label
+           T-080's guarantee requires, and it is earned here rather than
+           asserted.
+        ⛔ ARM P (meld, Python): still not measured, and still not a skip —
+           a named tooling defect in resolveEntry, asserted above.
+        ⚠ AN EARLIER VERSION OF THIS EXPERIMENT SCORED galculator 11 of 11
+           GREEN by treating 'cannot open display' as proof GTK worked. The
+           operator rejected it: that message appears on real hardware WITH
+           a display too. A real display turned 11 green rows into 0.
+        ⚠ NOT ESTABLISHED: anything about a GPU (every GL row here is
+           swrast, T-059 owns hardware), and anything about Python GUI apps,
+           which arm P could not build.
+
+-- result ----------------------------------------------------
+pass=16 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------
