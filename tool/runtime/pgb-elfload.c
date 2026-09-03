@@ -1064,6 +1064,16 @@ static int el_reloc_one(struct el_obj *o, const Elf64_Rela *r)
                    o->soname, name ? name : "?", ver ? "@" : "", ver ? ver : "");
             return -1;
         }
+        /* ⛔ RESOLVED, AND TO ZERO. Distinct from the weak case above and far
+         * more suspicious: a lookup SUCCEEDED and handed back a null address,
+         * so nothing errors and the object gets a call target of 0. It is the
+         * shape of a defect this loader has already had once -- a provider
+         * entry whose weak extern was never linked -- and it is invisible in
+         * a crash, which reports only rip=0. */
+        if (val == NULL)
+            el_dbg("pgb-elfload: %s: %s%s%s RESOLVED TO ZERO -- a lookup "
+                   "succeeded and returned a null address\n", o->soname,
+                   name ? name : "?", ver ? "@" : "", ver ? ver : "");
         *(uint64_t *)where = (uint64_t)(uintptr_t)val +
                              (type == R_X86_64_64 ? (uint64_t)r->r_addend : 0);
         return 0;
@@ -1099,33 +1109,71 @@ static int el_reloc_one(struct el_obj *o, const Elf64_Rela *r)
         return -1;
 
     /* General-dynamic TLS: the module id, then the offset within it. Our
-     * __tls_get_addr above answers the pair. */
+     * __tls_get_addr above answers the pair.
+     *
+     * ⛔ THE TWO HALVES ARE ONE ANSWER AND MUST COME FROM ONE LOOKUP. They did
+     * not, and the bug that cost is worth stating in full because nothing about
+     * it is visible at the point of failure.
+     *
+     * DTPMOD64 searched EVERY loaded object for the symbol; DTPOFF64 searched
+     * only the object being relocated. So for a general-dynamic reference to a
+     * thread-local defined in ANOTHER module -- the ordinary case, and the one
+     * every C++ library hits -- the pair came out as
+     *
+     *     (the right module, offset 0)
+     *
+     * because the DTPOFF64 lookup missed and the code fell back to 0 without
+     * saying so. ⚠ THAT IS NOT PRIMARILY A CRASH, IT IS SILENT CORRUPTION: the
+     * referring module reads and WRITES at offset 0 of another module's thread
+     * storage, over whatever is really there. It is the exact outcome the
+     * R_X86_64_TPOFF64 case below refuses by name to avoid.
+     *
+     * ⭐ MEASURED, 2026-09-02f. libLLVM-17 stores a callable into libstdc++'s
+     * `std::__once_call` and then calls `pthread_once(flag, __once_proxy)`;
+     * `__once_proxy` reads the same variable and jumps through it. libLLVM
+     * wrote at offset 0 and libstdc++ read at offset 0x10, so the read
+     * returned 0 and the process jumped to address 0 -- rip=0, si_addr=0,
+     * naming nothing. Seven of the ten objects experiments/93- reported as
+     * "crashes this loader that glibc's loader loads" are this, and they are
+     * all the C++-heavy ones: libLLVM, libclang, liblldb, libLTO, LLVMgold. */
     case R_X86_64_DTPMOD64:
-        if (si == 0 || !name || !*name) {
-            *(uint64_t *)where = o->tls_modid;
-            return 0;
-        }
-        {
-            int i;
-            for (i = 0; i < el_nobjs; i++)
-                if (el_lookup_in(el_objs[i], name, ver)) {
-                    *(uint64_t *)where = el_objs[i]->tls_modid;
-                    return 0;
-                }
-        }
-        *(uint64_t *)where = o->tls_modid;
-        return 0;
+    case R_X86_64_DTPOFF64: {
+        struct el_obj *owner = o;
+        const Elf64_Sym *s = NULL;
+        int i;
 
-    case R_X86_64_DTPOFF64:
         if (si == 0 || !name || !*name) {
-            *(uint64_t *)where = (uint64_t)r->r_addend;
+            /* No symbol: the reference is to this object's own TLS block. */
+            *(uint64_t *)where = (type == R_X86_64_DTPMOD64)
+                                 ? o->tls_modid : (uint64_t)r->r_addend;
             return 0;
         }
-        {
-            const Elf64_Sym *s = el_lookup_in(o, name, ver);
-            *(uint64_t *)where = (s ? s->st_value : 0) + (uint64_t)r->r_addend;
+        s = el_lookup_in(o, name, ver);
+        if (!s || ELF64_ST_TYPE(s->st_info) != STT_TLS) {
+            owner = NULL;
+            for (i = 0; i < el_nobjs; i++) {
+                const Elf64_Sym *c = el_lookup_in(el_objs[i], name, ver);
+                if (c && ELF64_ST_TYPE(c->st_info) == STT_TLS) {
+                    owner = el_objs[i];
+                    s = c;
+                    break;
+                }
+            }
         }
+        if (!owner || !s) {
+            /* ⛔ REFUSED, not bound to (this module, 0). A general-dynamic
+             * pair nobody can satisfy is the same hazard as an initial-exec
+             * offset nobody can satisfy, and the case below already refuses
+             * that by name. */
+            el_err("pgb-elfload: %s: general-dynamic TLS symbol %s is defined "
+                   "nowhere in the loaded set", o->soname, name);
+            return -1;
+        }
+        *(uint64_t *)where = (type == R_X86_64_DTPMOD64)
+                             ? owner->tls_modid
+                             : s->st_value + (uint64_t)r->r_addend;
         return 0;
+    }
 
     /* ⭐ INITIAL-EXEC. The value is an offset from the thread pointer into the
      * STATIC TLS block. Three cases, in the order they are tried, and the
