@@ -1246,6 +1246,54 @@ a control arm.
                  envx  ⭐ wrapper  ⭐ cfg
     NOT covered  ⛔ verifyx  ⛔ buildx  logx  proc  fail
 
+### ⭐ 2026-09-03 — `verifyx` and `fail` are covered; THREE packages left
+
+    pgb selftest       306 cases  ->  ⭐ 359 pass, 1 could not run (no zstd)
+
+    covered      ociimg  rootfs  elfx  zstd  nixx  bootstrapx  bundle
+                 envx  wrapper  cfg  ⭐ verifyx  ⭐ fail
+    NOT covered  ⛔ buildx  logx  proc
+
+⭐ **`verifyx` was the one that mattered.** `pgb verify` decides
+`docs/AGENTS.md` §3 criterion 2 — *loads no host shared object* — and it
+decides it from four pure functions that nothing carried in the binary
+asserted. Everything else in the package shells out to a bed; these four are
+string in, verdict out. **29 cases**, and every one carrying a ⛔ is a mistake
+this tree already paid for:
+
+| case | the defect it pins |
+|---|---|
+| `/etc/ld.so.cache` is NOT a shared object | ⛔ the substring `.so` match, which **reached committed evidence** in `evidence/poc/10-gawk/RESULT.txt` on all seven glibc rows |
+| only the subject's own opens are charged to it | ⛔ the pid-attribution defect: coreutils `cp` is dynamic here, so libacl/libattr/libselinux/libc.so.6 were charged to the subject |
+| an open AFTER the subject, by another pid, is not either | the same rule in the other direction |
+| an `ENOENT` open is not a load | asking and being told no is not loading |
+| ⭐ a subject that never exec'd is UNMEASURED, not clean | ⛔ the one that must never read as a pass — `pgb verify` reports `unmeasured`, never `none` |
+| ⭐ `classifyTracerOutput` agrees with `parseStrace`, exactly | **two independent instruments, one answer.** `--engine chroot` reads strace and `--engine docker` reads the carried tracer; §9 records that both agree on all 11 rows, and that agreement is decidable offline |
+
+⛔ **THE CONTROL, AND IT IS THE HISTORICAL DEFECT ITSELF.** `soSuffix` was set
+back to the substring `\.so` and the suite was re-run:
+
+    FAIL  isSharedObject: /etc/ld.so.cache is NOT one = yes, wanted no
+    FAIL  isSharedObject: a .sources file is NOT one  = yes, wanted no
+    FAIL  classifyTracerOutput: the same objects strace's reader found
+            = /etc/ld.so.cache /usr/lib/libdemo.so.2, wanted /usr/lib/libdemo.so.2
+    3 of 343 case(s) FAILED
+
+⭐ **`fail` is out of proportion to its size**: it is the 0/1/2 contract
+`docs/AGENTS.md` §0b makes a rule of the project, read by every experiment,
+POC and gate, and nothing asserted that `pgb` produces it. 16 cases, including
+the wrapping promise the package's own doc comment makes — `internal/logx`,
+`internal/wrapper` and `internal/nixx` all rely on it.
+
+⚠ **And one surprising direction is recorded rather than left to be
+rediscovered**: `errors.As` walks the chain outside-in, so when one
+`fail.Error` wraps another the OUTER one decides. No call site in this tree
+passes a `%w` verb to `Ran` or `Cannot` (checked with grep), so the doc's
+"innermost" holds today — and the case is there to say so if that changes.
+
+⚠ **What is left is `buildx`, `logx` and `proc`**, and this entry already says
+`buildx` shells out to a bed so only its parsing can be carried.
+
 ⚠ **The entry's own list was already stale**: `envx` gained `env-stamp` on
 2026-09-02e, so it was seven and not eight.
 

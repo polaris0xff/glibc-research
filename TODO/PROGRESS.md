@@ -262,9 +262,12 @@ which described a build where `safe` also swept.
 
     T-063   the miniflux proof: arm S has a static postgres on Alpine;
             src/interfaces does not build
-    T-062   ⭐ `wrapper` (55 cases) and `cfg` (37) now have one; selftests
-            went 200 -> 307. FIVE packages left, and verifyx/buildx shell out
-            to a bed -- carry their parsing, not their run
+    T-062   ⭐ `verifyx` (29 cases) and `fail` (16) now have one too;
+            selftests went 307 -> 359. THREE packages left: buildx, logx,
+            proc. verifyx was the one that mattered -- pgb verify decides
+            criterion 2 from four pure functions and nothing asserted them.
+            The control is the historical `.so` substring defect, planted:
+            3 of 343 cases fail.
     T-060   rungs 2 and 3, the static nix
     T-054   rungs 3 (KF6) and 4 (kdenlive static)
     T-057   item 2: a 32-bit application through the lib32 path
