@@ -1,0 +1,11 @@
+# warm -- one wall-clock sample per line, nanoseconds, in the
+# order taken. -1 means the run failed and was not timed.
+12032832
+13584823
+12766605
+13517960
+14510111
+12021033
+11464924
+12069138
+11441796

@@ -1,0 +1,11 @@
+# fresh -- one wall-clock sample per line, nanoseconds, in the
+# order taken. -1 means the run failed and was not timed.
+10554246
+11655563
+12401769
+14081103
+13340038
+13095956
+11669571
+13221180
+12744141

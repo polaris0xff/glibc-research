@@ -1,0 +1,11 @@
+# cold_A -- one wall-clock sample per line, nanoseconds, in the
+# order taken. -1 means the run failed and was not timed.
+85262189
+85685967
+83759399
+81232342
+86141797
+81162469
+84565008
+84772846
+81714323

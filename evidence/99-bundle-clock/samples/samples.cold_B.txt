@@ -1,0 +1,11 @@
+# cold_B -- one wall-clock sample per line, nanoseconds, in the
+# order taken. -1 means the run failed and was not timed.
+88676206
+85934774
+79512446
+85850459
+87385758
+83764835
+81334626
+82552823
+87761044

@@ -209,6 +209,26 @@ clk_row() { # tag
 
 clk_table() { clk_header; for _t in $CLK_ARMS; do clk_row "$_t"; done; }
 
+# ⭐ THE RAW SAMPLES ARE EVIDENCE AND MUST SURVIVE THE RUN.
+# `docs/history/corrections.md` C23 could only be written because somebody
+# went back through git history for superseded versions of a RESULT file. The
+# samples behind an estimator are what makes a median re-derivable rather than
+# quotable, so they are copied out of the scratch directory -- which is
+# gitignored, correctly, because it also holds a 200 MB AppImage -- and into
+# the committed evidence beside RESULT.txt.
+clk_save() { # dest-dir  (one file per arm: samples.<tag>.txt, ns per line)
+  mkdir -p "$1" || return 1
+  for _t in $CLK_ARMS; do
+    _f=$(clk_arm_file "$_t")
+    [ -f "$_f" ] || continue
+    {
+      printf '# %s -- one wall-clock sample per line, nanoseconds, in the\n' "$_t"
+      printf '# order taken. -1 means the run failed and was not timed.\n'
+      cat "$_f"
+    } > "$1/samples.$_t.txt"
+  done
+}
+
 # ---------------------------------------------------------------------------
 # ⭐ THE A/A CONTROL -- the reason to believe any row above
 #

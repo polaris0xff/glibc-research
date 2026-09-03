@@ -48,7 +48,11 @@ set -u
 
 exp_begin "99 - the bundler's clock: the reuse window, and the protocol that missed it"
 
-WORK="$EXP_OUT/work"
+# ⛔ SCRATCH GOES IN `build/`, WHICH `.gitignore` ALREADY EXCLUDES. This read
+# `$EXP_OUT/work` until a 207 MB padded AppImage was committed and GitHub
+# refused the push at its 100 MB file limit. The raw samples are saved out
+# separately by `clk_save`, because those ARE evidence.
+WORK="$EXP_OUT/build"
 rm -rf "$WORK"; mkdir -p "$WORK" || exit 2
 RESULT="$EXP_OUT/RESULT.txt"
 PGB="$REPO_DIR/pgb"
@@ -310,6 +314,9 @@ exp_note "included, and NOTHING in the record knew it was there."
   printf '  docs/history/corrections.md C23 saw warm above cold in two of four\n'
   printf '  runs and a 20x spread in the absolute figure.\n'
 } > "$RESULT"
+cp "$WORK/window.txt" "$EXP_OUT/reuse-window.txt" 2>/dev/null || :
+clk_save "$EXP_OUT/samples"
+
 printf 'full table: %s\n' "$RESULT"
 
 exp_finish

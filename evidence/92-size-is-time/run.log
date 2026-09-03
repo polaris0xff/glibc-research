@@ -1,0 +1,66 @@
+===============================================================
+92 - is the size column the time column?
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-03T11:23:58Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/92-size-is-time
+--------------------------------------------------------------
+
+-- building the base -----------------------------------------
+  base              7331917 bytes       292 files
+-- padding, one axis at a time -------------------------------
+  bytes           217037893 bytes       293 files   (+200 MiB in ONE file)
+  inodes           10457359 bytes     40292 files   (+40000 tiny files)
+  twin              7331917 bytes       292 files   (A/A twin of base)
+
+-- every arm answers the same ---------------------------------
+  base.AppImage                            -> jq-1.8.2
+  bytes.AppImage                           -> jq-1.8.2
+  inodes.AppImage                          -> jq-1.8.2
+  twin.AppImage                            -> jq-1.8.2
+
+-- cold start, one interleave, median of 21 ------------------
+  ARM                N     MEDIAN        MIN        MAX     MAD%
+  base              21       85.3       78.4       92.7      2.8
+  bytes             21       90.2       82.4      123.5      2.0
+  twin              21       83.2       77.0       88.4      2.4
+  inodes            21       86.7       83.5       91.2      1.6
+
+  A/A control (base vs twin)  : ratio 1.03, floor 1.05, resolves no
+
+  AXIS                               GREW BY    TIME     RESOLVES
+  bytes (image size)                 29.60x     1.06x    yes
+  inodes (file count)                137.99x    1.02x    no
+
+-- assertions ------------------------------------------------
+  ok    every arm answers --version identically        = 4
+  ok    the A/A pair is NOT resolvable (the control)   = no
+  --    measured cost of image size                    = 0.0243 ms/MiB
+  --    extrapolated to kdenlive's 196 MiB             = 4.8 ms
+  --    as a share of the SMALLEST observed gap        = 3.7%
+  ok    image size explains under 10% of the kdenlive gap = yes
+  --    byte axis resolves at this N                   = yes
+  --    inode axis resolves at this N                  = no
+
+        ⛔ THE SIZE COLUMN IS NOT THE TIME COLUMN IN ANY SENSE THAT MATTERS.
+        Image size does cost something -- 0.0243 ms per MiB, at or just
+        above this instrument's floor -- but carried across the whole
+        196 MiB that separates our kdenlive bundle from the
+        competitor's it is 4.8 ms of a gap that has never been
+        observed smaller than 129 ms. The byte levers --cut,
+        --fixpoint and the debloat rules cannot close it, so the struck
+        size work stays struck and the cold cost is a FIXED price for
+        standing the mount up. TODO/PROGRESS.md N6 is where it is paid.
+
+full table: /home/user/glibc-research/evidence/92-size-is-time/RESULT.txt
+
+-- result ----------------------------------------------------
+pass=3 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------
