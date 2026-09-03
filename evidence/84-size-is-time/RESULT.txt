@@ -1,5 +1,5 @@
-experiment 92 - is the size column the time column?
-date (UTC)   : 2026-09-03T11:26:02Z
+experiment 84 - is the size column the time column?
+date (UTC)   : 2026-09-03T11:38:08Z
 host kernel  : Linux 6.18.44-fc-v24
 subject      : pgb bundle appimage jq --debloat safe
 method       : one AppDir, one axis changed at a time; every arm
@@ -8,12 +8,12 @@ instrument   : experiments/clock.sh -- median of 21, interleaved
                with a rotating start, A/A control in the same pass
 
 ARM                 BYTES      FILES  COLD_MEDIAN      RATIO RESOLVES
-base              7331917        292      85.3 ms      1.00x (reference)
-bytes           217037893        293      90.2 ms      1.06x yes
-inodes           10457359      40292      86.7 ms      1.02x no
-twin              7331917        292      83.2 ms       1.03 A/A control
+base              7331925        292      80.6 ms      1.00x (reference)
+bytes           217051710        293      86.9 ms      1.08x yes
+inodes           10447808      40292      84.1 ms      1.04x no
+twin              7331925        292      80.9 ms       1.00 A/A control
 
-A/A control  : ratio 1.03, floor 1.05, resolves no (must be "no")
+A/A control  : ratio 1.00, floor 1.05, resolves no (must be "no")
 
 THE ANSWER
   ⛔ NO, NOT IN ANY SENSE THAT MATTERS.
@@ -25,9 +25,9 @@ THE ANSWER
   floor 1.03), while the A/A control held at 1.01-1.02 in both.
   So the effect is real and it is SMALL.
 
-  Costed: 0.0243 ms per MiB of image. Carried across the 196 MiB that
+  Costed: 0.0312 ms per MiB of image. Carried across the 196 MiB that
   separates our kdenlive bundle (398 MB) from the competitor's
-  (192 MB), that is 4.8 ms -- 3.7% of the SMALLEST cold-start gap
+  (192 MB), that is 6.1 ms -- 4.7% of the SMALLEST cold-start gap
   ever observed between them (129 ms; the other three runs in
   corrections.md C23 are 2,019 / 239 / 4,758 ms, which make the
   share smaller still).

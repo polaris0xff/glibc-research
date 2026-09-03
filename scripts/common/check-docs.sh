@@ -493,8 +493,22 @@ n=0; stale=0; exempt=0
 EXEMPT_FILE=evidence/STALE-EVIDENCE.txt
 for s in experiments/[0-9]*.sh; do
   [ -e "$s" ] || continue
-  num=$(basename "$s" | sed 's/-.*//')
-  d=$(ls -d evidence/"$num"-* 2>/dev/null | head -1)
+  # ⛔ MATCH THE EVIDENCE BY THE SCRIPT'S OWN SLUG, NOT BY ITS NUMBER.
+  # This read `ls -d evidence/<num>-* | head -1` until 2026-09-03d, when a new
+  # `experiments/92-size-is-time.sh` was checked against `evidence/92-go-port`
+  # -- a legacy evidence directory under a number NO experiment uses, which
+  # sorts first. ⚠ The gate then compared a script to somebody else's run and
+  # reported it stale, which is the same shape of wrong answer it exists to
+  # catch. The numeric fallback is kept for the directories that legitimately
+  # differ in slug, and it is used ONLY when it is unambiguous.
+  base=$(basename "$s" .sh)
+  if [ -d "evidence/$base" ]; then
+    d="evidence/$base"
+  else
+    num=$(basename "$s" | sed 's/-.*//')
+    set -- evidence/"$num"-*
+    if [ "$#" -eq 1 ] && [ -d "$1" ]; then d="$1"; else d=""; fi
+  fi
   [ -n "$d" ] || continue
   n=$((n + 1))
   sc=$(git log -1 --format=%H -- "$s" 2>/dev/null)

@@ -1,5 +1,5 @@
 #!/bin/sh
-# 92-size-is-time.sh
+# 84-size-is-time.sh
 #
 # -- THE QUESTION -----------------------------------------------------------
 #
@@ -55,7 +55,7 @@ set -u
 . "$(cd "$(dirname "$0")" && pwd)/lib.sh"
 . "$(cd "$(dirname "$0")" && pwd)/clock.sh"
 
-exp_begin "92 - is the size column the time column?"
+exp_begin "84 - is the size column the time column?"
 
 # ⛔ SCRATCH GOES IN `build/`, WHICH `.gitignore` ALREADY EXCLUDES. This read
 # `$EXP_OUT/work` until a 207 MB padded AppImage was committed and GitHub
@@ -283,7 +283,7 @@ exp_note "standing the mount up. TODO/PROGRESS.md N6 is where it is paid."
 
 # ---------------------------------------------------------------------------
 {
-  printf 'experiment 92 - is the size column the time column?\n'
+  printf 'experiment 84 - is the size column the time column?\n'
   printf 'date (UTC)   : %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   printf 'host kernel  : %s\n' "$(uname -sr)"
   printf 'subject      : pgb bundle appimage %s --debloat safe\n' "$PKG"
