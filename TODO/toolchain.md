@@ -1903,6 +1903,53 @@ negatives that stop the lever being "delete more": a library the program
 NEEDS, a plugin's own dependency, and the env-named library are all still
 reachable under it. 506 → **516 cases**.
 
+### ⛔ 2026-09-03c: ROUTE A AS AN ALLOWLIST OF **PATHS** IS THE WRONG GRANULARITY, and two cheap measurements say so
+
+⭐ **The lever this entry names for route A is *"take an allowlist of paths
+rather than a closure"*. Both halves of that were measured, and neither
+supports it.**
+
+**1. On `jq`, not one store path is entirely unreachable.** Per store path, how
+many of its shared objects survive the sweep:
+
+| store path | kept | dropped | bytes dropped |
+|---|---|---|---|
+| `oniguruma-6.9.10-lib` | 1 | 0 | 0 |
+| `jq-1.8.2` | 1 | 0 | 0 |
+| ⛔ **`glibc-2.42-84`** | 8 | **269** | **8,990,808** |
+| `libidn2-2.3.8` | 1 | 0 | 0 |
+| `xgcc-15.3.0-libgcc` | 2 | 0 | 0 |
+| `jq-1.8.2-bin` | 0 | 0 | 0 |
+| `libunistring-1.4.2` | 1 | 0 | 0 |
+
+⛔ **Six of seven are 100% kept, and ONE path carries every deletable byte.**
+An allowlist choosing which store paths to fetch would have saved **nothing**
+here: all the weight is *inside* glibc — the gconv modules, the NSS modules and
+their helpers — which is a **file-level** problem the sweep already solves and a
+path-level allowlist cannot touch at all.
+
+**2. On kdenlive, the `-dev` outputs bound what path-level exclusion can
+reach.** From the same closure `experiments/95-` walked, 676 paths /
+2,941,485,288 B:
+
+    -dev outputs        80 paths (11.8%)     70,581,624 B (2.4% of bytes)
+    -debug/-doc/-man     0 paths                       0
+
+⚠ **11.8% of the paths and 2.4% of the bytes.** So even excluding every
+development output — the most obviously droppable class, and the only one
+present — moves a fortieth of the closure. ⛔ *And these are in the RUNTIME
+closure*, which means something references them at run time; that is the
+wrapper-script problem T-053 and `patsh` are aimed at, not dead weight to
+delete unexamined.
+
+⭐ **What this reorders.** B2 was *"then the allowlist, now bounded and worth
+building anyway"*. It is bounded much harder than the ceiling measurement
+implied: the ceiling said an allowlist tops out near a quarter of the tree,
+and these two say the *path*-level form of it reaches ~2% on one subject and
+**0%** on the other. ⛔ The lever that works at this granularity is the
+file-level sweep, which exists. ⚠ Neither number is kdenlive's AppDir, which
+still does not exist.
+
 #### ⭐ THE TWO LEVERS ARE ADDITIVE, and the published delta REPRODUCES
 
 Same fresh `jq` AppDir, four sweeps:

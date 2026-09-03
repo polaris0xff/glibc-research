@@ -376,7 +376,20 @@ is **costing route B**, which is where the size actually is.
         one command. gtk3 and glycin are NOT IN this closure.
     B1b ⛔ NEXT: cost route B in WALL CLOCK. One of the 161 is qtbase and Qt
         does not build in a minute. That needs a rebuild.
-    B2  ⭐ THEN the allowlist, now bounded and worth building anyway.
+    B2  ⛔ THE ALLOWLIST -- AND 2026-09-03c SAYS THE **PATH**-LEVEL FORM OF IT
+        IS THE WRONG GRANULARITY. Two cheap measurements:
+          jq       0 of 7 store paths are entirely unreachable. SIX of seven
+                   are 100% kept and ONE (glibc) carries every deletable
+                   byte -- 269 objects, 8,990,808 B, all of it INSIDE one
+                   path. A path-level allowlist saves nothing here.
+          kdenlive the -dev outputs are 80 of 676 paths (11.8%) but only
+                   70,581,624 of 2,941,485,288 B (2.4%). No -debug/-doc/-man
+                   in the closure at all. ⚠ And they are in the RUNTIME
+                   closure, so something references them -- that is T-053's
+                   wrapper-script problem, not dead weight.
+        ⭐ So the lever that works at this granularity is the FILE-level sweep,
+        which exists. A path-level allowlist should not be built on the
+        strength of the ceiling number alone.
     B3  ⭐ TAKEN 2026-09-03c AS A MEASURING DEVICE: `pgb bundle sweep
         --fixpoint`. Worth +7 files / +978,576 B on the jq AppDir (262 ->
         269 unreachable, 45.8% -> 51.4%), 3 rounds, scan set 283 -> 14.
