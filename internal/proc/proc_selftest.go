@@ -28,6 +28,7 @@ package proc
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/polaris0xff/glibc-research/internal/selftest"
@@ -178,6 +179,87 @@ func Selftest() *selftest.Report {
 	r.CheckBool("Look finds a program that exists", Look("/bin/sh"), true)
 	r.CheckBool("Look does not find one that does not",
 		Look("pgb-no-such-program-anywhere"), false)
+
+	// ---- ⛔ THE PROGRAM IS RESOLVED AGAINST THE CHILD'S PATH ---------------
+	//
+	// ⛔ THE DEFECT THIS SECTION EXISTS FOR. `exec.Command` runs LookPath
+	// against the CALLER's environment; the Env set on the Cmd is applied
+	// afterwards. `buildx.Inner` puts the WRAPPER DIRECTORY on the child's PATH
+	// — that is how the entire toolchain is injected — so
+	// `pgb build -- cc foo.c` resolved `cc` WITHOUT it and ran the real
+	// compiler with none of pgb's flags.
+	//
+	// ⚠ It never bit the POCs: `poc_in_env` runs `build -- /bin/sh -c "…"`, an
+	// absolute path that needs no lookup, and the shell then resolves `cc` out
+	// of the environment it was handed. It bit exactly when the command IS a
+	// wrapped tool, which is a documented use of `pgb build [--] CMD...`.
+	//
+	// ⭐ The end-to-end case below is the defect itself: two programs of the
+	// same name, the parent's PATH naming one and the child's Env naming the
+	// other, and the assertion is on WHICH ONE RAN.
+	td, tderr := os.MkdirTemp("", "pgb-proc-path-")
+	if tderr != nil {
+		r.Skip("proc: no tempdir, so the PATH-resolution cases did not run")
+		return r
+	}
+	defer os.RemoveAll(td)
+	mk := func(sub, body string) string {
+		d := filepath.Join(td, sub)
+		if os.MkdirAll(d, 0o755) != nil {
+			return ""
+		}
+		p := filepath.Join(d, "pgb-selftest-tool")
+		if os.WriteFile(p, []byte("#!/bin/sh\necho "+body+"\n"), 0o755) != nil {
+			return ""
+		}
+		return d
+	}
+	wrapDir, realDir := mk("wrap", "WRAPPER"), mk("real", "REAL")
+	if wrapDir == "" || realDir == "" || (!Look("/bin/sh") && !Look("sh")) {
+		r.Skip("proc: could not build the two-tool fixture")
+		return r
+	}
+
+	// lookPathIn on its own, first.
+	got, ok := lookPathIn("pgb-selftest-tool", []string{"PATH=" + wrapDir + ":" + realDir})
+	r.CheckBool("lookPathIn finds the name on the given PATH", ok, true)
+	r.Check("...and takes the FIRST directory that has it",
+		got, filepath.Join(wrapDir, "pgb-selftest-tool"))
+	got, ok = lookPathIn("pgb-selftest-tool", []string{"PATH=" + realDir + ":" + wrapDir})
+	r.Check("...order decides, not the name", got, filepath.Join(realDir, "pgb-selftest-tool"))
+	_, ok = lookPathIn("pgb-selftest-tool", []string{"HOME=/root"})
+	r.CheckBool("no PATH in the environment resolves nothing", ok, false)
+	_, ok = lookPathIn("/bin/sh", []string{"PATH=" + wrapDir})
+	r.CheckBool("a name with a separator is not looked up at all", ok, false)
+	// ⚠ A readable but non-executable file is not a program, and skipping it
+	// is what `ld`-style "found it, cannot run it" confusion comes from.
+	_ = os.MkdirAll(filepath.Join(td, "noexec"), 0o755)
+	_ = os.WriteFile(filepath.Join(td, "noexec", "pgb-selftest-tool"), []byte("x"), 0o644)
+	got, ok = lookPathIn("pgb-selftest-tool",
+		[]string{"PATH=" + filepath.Join(td, "noexec") + ":" + realDir})
+	r.CheckBool("a non-executable file is skipped", ok, true)
+	r.Check("...in favour of the next directory",
+		got, filepath.Join(realDir, "pgb-selftest-tool"))
+
+	// ⭐ END TO END, and this is the case that was failing. The parent's PATH
+	// names `real`; the Env handed to the child names `wrap` first.
+	oldPath, hadPath := os.LookupEnv("PATH")
+	_ = os.Setenv("PATH", realDir)
+	out, err := Capture2(&Cmd{
+		Argv: []string{"pgb-selftest-tool"},
+		Env:  []string{"PATH=" + wrapDir + ":" + realDir},
+	})
+	if hadPath {
+		_ = os.Setenv("PATH", oldPath)
+	} else {
+		_ = os.Unsetenv("PATH")
+	}
+	if err != nil {
+		r.Fail("a Cmd runs the program its OWN Env names", err.Error(), "WRAPPER")
+	} else {
+		// ⛔ Before the fix this printed REAL: the parent's PATH won.
+		r.Check("⭐ a Cmd runs the program its own Env's PATH names", out, "WRAPPER")
+	}
 
 	return r
 }

@@ -16,6 +16,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"sync"
 	"syscall"
@@ -73,10 +74,68 @@ func (c *Cmd) build() *exec.Cmd {
 	} else if len(c.Env) > 0 {
 		cmd.Env = mergeEnv(os.Environ(), c.Env)
 	}
+	// ⛔ THE PROGRAM IS RESOLVED AGAINST THE PATH THE CHILD WILL SEE, NOT THIS
+	// PROCESS'S, AND IT DID NOT USED TO BE.
+	//
+	// `exec.Command` runs LookPath against the CALLER's environment, and the
+	// Env set on the Cmd is applied afterwards — so a caller that hands a child
+	// a different PATH gets the program its OWN PATH names. ⚠ Measured with a
+	// probe rather than reasoned:
+	//
+	//	parent PATH = …/real       child Env PATH = …/wrap:…/real
+	//	exec.Command("mytool")  ->  Path="…/real/mytool"  "I AM THE REAL ONE"
+	//
+	// ⛔ WHAT THAT COST. `buildx.Inner` puts the WRAPPER DIRECTORY on the
+	// child's PATH — that is how the whole toolchain is injected — so
+	// `pgb build -- cc foo.c` looked `cc` up without it and ran the real
+	// compiler, with none of pgb's flags. ⚠ It never bit the POCs, because
+	// `poc_in_env` runs `build -- /bin/sh -c "…"`: an ABSOLUTE path needs no
+	// lookup, and the shell then resolves `cc` out of the environment it was
+	// handed. It bit exactly when the command IS a wrapped tool, which is a
+	// documented use of `pgb build [--] CMD...`.
+	//
+	// ⚠ Only when the caller set a PATH and the name has no separator — the
+	// two conditions under which the answer can differ. A failure to resolve is
+	// left to exec, so the error stays the one it would have given.
+	if !c.EnvOnly || len(c.Env) > 0 {
+		if p, ok := lookPathIn(c.Argv[0], cmd.Env); ok {
+			cmd.Path = p
+		}
+	}
 	cmd.Stdin = c.Stdin
 	cmd.Stdout = c.Stdout
 	cmd.Stderr = c.Stderr
 	return cmd
+}
+
+// lookPathIn resolves name against the PATH in env, which is the environment
+// the child will actually run with.
+func lookPathIn(name string, env []string) (string, bool) {
+	if name == "" || strings.ContainsRune(name, os.PathSeparator) {
+		return "", false // an explicit path is not looked up
+	}
+	var path string
+	found := false
+	for _, e := range env {
+		if v, ok := strings.CutPrefix(e, "PATH="); ok {
+			path, found = v, true
+		}
+	}
+	if !found {
+		return "", false
+	}
+	for _, dir := range filepath.SplitList(path) {
+		if dir == "" {
+			dir = "."
+		}
+		p := filepath.Join(dir, name)
+		fi, err := os.Stat(p)
+		if err != nil || fi.IsDir() || fi.Mode()&0o111 == 0 {
+			continue
+		}
+		return p, true
+	}
+	return "", false
 }
 
 // announce prints the command about to run, with the working directory and any

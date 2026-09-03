@@ -556,14 +556,30 @@ one clear fix inside T-063 arm S:
    wrapped tool** — `cc`, `gcc`, `c++`, `g++`, `cpp` — which is a documented
    use of `pgb build [--] CMD...`.
 
-   ⚠ **What is NOT yet established** is what the bypassed build produces. The
+   ⚠ **What is NOT established** is what the bypassed build produces. The
    symptom seen was `cc: fatal error: cannot execute 'cc1'` with a malformed
    `-iprefix /../lib/gcc/…`, so on this machine it FAILS rather than silently
    producing a non-portable binary — which is the better of the two outcomes
-   and must not be assumed to hold elsewhere. ⛔ The fix is to resolve `argv[0]`
-   against the PATH being handed to the child (`exec.LookPath` with that PATH,
-   or set `cmd.Path` explicitly), and the test is that
-   `pgb build -- cc -o x x.c` produces a binary carrying `pgb-runtime`.
+   and must not be assumed to hold elsewhere.
+
+   ✅ **FIXED 2026-09-03c.** `proc.Cmd.build()` resolves `argv[0]` against the
+   PATH in the environment the CHILD will run with (`lookPathIn`), and only
+   when the caller set one and the name has no separator — the two conditions
+   under which the answer can differ. A failure to resolve is left to exec, so
+   the error stays the one it would have given.
+
+   ⭐ **The end-to-end case IS the defect**: two programs of the same name, the
+   parent's PATH naming one and the child's `Env` naming the other, asserting
+   which ran. Plus `lookPathIn` pinned directly — first directory wins, order
+   decides, no PATH resolves nothing, a name with a separator is not looked up,
+   a non-executable file is skipped in favour of the next directory. 8 cases.
+
+       reversal (the resolution removed)
+         FAIL  a Cmd runs the program its own Env's PATH names = REAL, wanted WRAPPER
+
+   ⛔ **POC VALIDATION OWED**: this changes `proc`, which every child process
+   goes through. The suite running when it landed was validating the `-l`/`-L`
+   fix against a pgb without it, so the suite must run once more with both.
 
 1. ✅ **RESOLVED 2026-09-03.** The two harness-named branches this asked about
    are gone: `git ls-remote --heads origin` returns **`main` and nothing else**.
