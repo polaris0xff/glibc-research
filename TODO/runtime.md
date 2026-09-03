@@ -539,13 +539,68 @@ declining `libxt_ libipt_ libip6t_ libebt_ libarpt_` was written, measured, and
 successes for a green number. ⚠ 93- measures **loading**, not behaviour, and
 unmeasured is not a licence.
 
-**So the Prove is restated, and it passes:**
+**So the Prove is restated:**
 
-> ⭐ **Nothing may crash this loader that glibc's loader loads.** `DIFFER = 0`,
-> and it is a *falsifiable* zero: remove the `libgp-collector` refusal and the
-> control fails at 1, naming the object and printing that glibc loads it at
-> exit 0. `hang = 0` is asserted separately — a refusal with a message is the
-> loader working, a signal is it failing, and the two are never summed.
+> ⭐ **Nothing may crash this loader that glibc's loader loads.** It is a
+> *falsifiable* zero: remove the `libgp-collector` refusal and the control
+> fails at 1, naming the object and printing that glibc loads it at exit 0.
+> `hang = 0` is asserted separately — a refusal with a message is the loader
+> working, a signal is it failing, and the two are never summed.
+
+### ⛔ AND THE FIRST TIME IT PASSED, IT PASSED BECAUSE OF A DEFECT
+
+⚠ **That `DIFFER = 0` was not the loader being right.** Re-run after the
+`--host-dlopen` iconv fix (see below), the same sweep on the same machine gives
+**`DIFFER = 10`** — ten objects crash this loader that glibc's loader loads. All
+ten had been failing **earlier**, on iconv, so they never reached the code that
+crashes them.
+
+    ok=620 refused=119 failed=733 crash=55 hang=0    (was ok=446 ... crash=45)
+    FAIL  nothing crashes this loader that glibc's loader loads = 10, expected 0
+
+⭐ **Controlled on one machine, one population, the iconv fix alone:
+`ok = 406 → 620`.**
+
+### ⭐ TWO REAL LOADER DEFECTS, 2026-09-02f, and neither was found by reading
+
+**1. `--host-dlopen` could not load anything that used iconv.** The generated
+provider table declares every glibc symbol as `extern char NAME[] __attribute__
+((weak))` — an *undefined* reference — so `-Wl,--wrap=iconv_open` rewrote it to
+`__wrap_iconv_open`, and **a weak undefined reference does not pull a member out
+of an archive**. The table entry held NULL and every host object importing
+iconv failed, naming the *unwrapped* symbol. `internal/wrapper/flags.go`, and
+`internal/wrapper` gains its first selftest — 24 cases, both directions.
+
+**2. ⛔ The two halves of a general-dynamic TLS pair disagreed, silently.**
+`R_X86_64_DTPMOD64` searched every loaded object for the symbol;
+`R_X86_64_DTPOFF64` searched only the object being relocated. A reference to a
+thread-local defined in **another** module therefore came out as *(the right
+module, offset 0)*. ⚠ **That is not primarily a crash — it is one module
+reading and WRITING at offset 0 of another module's thread storage**, which is
+the exact hazard the `R_X86_64_TPOFF64` case eight lines below already refuses
+by name to avoid.
+
+⭐ **How it was found, because none of it is visible at the point of failure.**
+A `SIGSEGV` handler gave `rip=0, si_addr=0` — naming nothing — and a stack read
+put the return address one instruction after `call *%rbp` in glibc's
+`__pthread_once_slow`. ⚠ **The obvious reading, "a NULL init routine", was
+wrong**: a temporary relocation trace showed `__once_proxy` resolving correctly
+and `%rbp` equal to it, so the fault was *inside* `__once_proxy`, whose thirty
+bytes are `__tls_get_addr(&__once_call)`, load, `jmp *%rax`.
+
+    libLLVM-17   __tls_get_addr(__once_call) -> block + 0      writes here
+    libstdc++    __tls_get_addr(__once_call) -> block + 0x10   reads here
+
+⛔ **Two other suspects were ruled out by measurement, not by reading.** The 16
+weak symbols that load binds to zero: **not one** is defined anywhere in
+libLLVM's own `DT_NEEDED` closure, so glibc binds them to zero too. And a lookup
+succeeding with a null address: a new diagnostic says so explicitly, and it
+fired zero times.
+
+**Fixed**: one lookup serves both halves, and a pair nobody can satisfy is
+refused by name. Measured on the seven LLVM-family objects the control named:
+
+    before  SIGSEGV, 7 of 7        after  loaded, 7 of 7
 
 ## ⛔ WHAT IS LEFT, RANKED BY WHAT IT WOULD BUY
 

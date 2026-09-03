@@ -2148,3 +2148,42 @@ with it. The measurements above are the build host only.
 `experiments/76-` on eleven environments with a non-zero reserve, and the two
 objects from the T-068 sweep that fail today measured by name rather than by a
 synthetic subject of the same size.
+
+### ⛔ THE NAMED-OBJECT MEASUREMENT, 2026-09-02f — and the answer is not the expected one
+
+The second outstanding item is done, and it does not support the entry's own
+premise. Every `.so` under `/lib /lib64 /usr/lib /usr/lib64 /usr/local/lib` was
+read for a `PT_TLS`, and the 71 that have one were ranked by `p_memsz` and run
+through `--host-dlopen` probes built at reserve 0 and at 65536:
+
+    56248  liblsan.so.0.0.0        ⛔ REFUSED AS AN INTERPOSER, at both reserves
+     3244  libproc2.so.0.0.2       ⭐ loads at reserve 0
+     2632  libjemalloc.so.2        ⛔ refused as an interposer
+     2464  libmergedlo.so          (LibreOffice)
+     2408  libuno_sal.so.3         (LibreOffice)
+     1960  libtsan.so.2.0.0        ⛔ refused as an interposer
+      884  libmpfr.so.6.2.1        loads
+      ... 64 more, all under the headroom
+
+⭐ **`liblsan.so` IS the object this entry was opened on.** 56,248 bytes is the
+exact figure quoted as *"one wants 56,248"*, and the synthetic subject arms
+A/B/C were built to that size. ⛔ **It is a sanitizer interposer, and
+`el_refused_class()` declines it BY NAME before TLS is ever considered** —
+`docs/AGENTS.md` §14's rule that an interposer must be present before libc
+initialises. So the motivating object is served by a *different* mechanism, and
+`--tls-reserve` is not what serves it.
+
+**Measured over all 71, at reserve 0:**
+
+    objects reporting "static TLS surplus exhausted"   ⛔ ZERO
+
+⚠ **So `--tls-reserve`'s benefit on real host objects on this machine is zero
+objects.** The mechanism, its bounds check and its known-bad control are all
+sound and stay; what has changed is the *justification*, which now rests on the
+synthetic subject alone. ⛔ That is a finding, not a reason to remove it: the
+three interposers are refused by policy rather than by capability, and a host
+that ships a large-TLS library which is **not** an interposer would need it.
+
+⭐ **And the sweep that answered this found two other things it was not looking
+for**, both in T-068: `--host-dlopen` could not load any object using iconv,
+and general-dynamic TLS bound cross-module references to offset 0.
