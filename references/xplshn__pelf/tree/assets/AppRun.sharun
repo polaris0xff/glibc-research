@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# shellcheck disable=SC2086
+[ -n "$DEBUG" ] && set -$DEBUG
+
+SELF="$(readlink -f "$0")" && export SELF
+APPDIR="${SELF%/*}" && export APPDIR
+
+_sh_cat() {
+    while IFS= read -r line; do
+        echo "$line"
+    done < "$1"
+}
+
+FALLBACK="$(_sh_cat "$APPDIR/entrypoint")"
+FALLBACK="${FALLBACK##*/}"
+[ -z "$ARGV0" ] && {
+    ARGV0="${0##*/}"
+}
+
+CMD="$1"
+
+oPATH="$PATH"
+PATH="${APPDIR}/bin"
+
+# What command shall we exec?
+if _cmd="$(command -v "${ARGV0#./}")" >/dev/null 2>&1; then
+    PATH="$PATH:$oPATH"
+elif _cmd="$(command -v "$CMD")" >/dev/null 2>&1; then
+    shift
+    PATH="$PATH:$oPATH"
+elif _cmd="$(command -v "$FALLBACK")" >/dev/null 2>&1; then
+    PATH="$PATH:$oPATH"
+else
+    echo "Error: Neither ARGV0 ('${ARGV0%.*}') nor ARGS ('$CMD') are available in \$PATH"
+    exit 1
+fi
+
+exec "$_cmd" "$@"

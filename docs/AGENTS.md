@@ -391,7 +391,7 @@ experiment; none has been shown to be unreachable.
 
    ⭐ **`loaded` was 406 at the start of the session that closed this.** Four
    defects were found and fixed against that one population, and each is in
-   `TODO/runtime.md` T-068 with its control.
+   `HISTORY/entries/runtime.md` T-068 with its control.
 
    ⚠ **And "failed" is not a defect count either.** Of the objects failing with
    an undefined symbol, **glibc's own `ld.so` fails 374 of them too** — they are

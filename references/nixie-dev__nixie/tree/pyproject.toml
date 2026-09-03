@@ -1,0 +1,59 @@
+[project]
+name = "nixie"
+description = "Portable Nix script builder"
+authors = [ { "name" = "Karim Vergnes", "email" = "me@thesola.io" } ]
+license = { "file" = "LICENSE" }
+readme = "README.md"
+urls = { "Source" = "https://github.com/nixie-dev/nixie" }
+dependencies = [
+    "click",
+    "rich",
+    "click-option-group",
+    "python-dotenv",
+    "pzp>=0.0.22",
+    "gitpython"
+    ]
+dynamic = [ "version" ]
+
+[build-system]
+requires = [ "hatchling", "hatch-build-scripts" ]
+build-backend = "hatchling.build"
+
+[project.scripts]
+nixie = "nixie.cli:main"
+
+[tool.hatch.version]
+path = "nixie/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = [ "nixie" ]
+
+[[tool.hatch.build.hooks.build-scripts.scripts]]
+out_dir = "nixie/output"
+commands = [
+    "AMBER_HEADER=src/AMBER_HEADER amber build src/main.ab nix-wrapped.sh.in --minify"
+]
+artifacts = [
+    "nix-wrapped.sh.in"
+]
+
+[tool.bumpver]
+current_version = "2026.03-a1"
+version_pattern = "YYYY.0M-PYTAGNUM"
+pre_commit_hook = "./nix run . -- update"
+commit_message = "bump version {old_version} -> {new_version}"
+commit = true
+tag = false
+push = true
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'current_version = "{version}"',
+]
+"nixie/__init__.py" = [
+    "__version__ = '{version}'"
+]
+"default.nix" = [
+    'nixie_ver = "{version}";'
+]
+

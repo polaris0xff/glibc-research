@@ -39,6 +39,37 @@ that a bundler built on nix ends up shipping a container. Taking the *graph*
 and the *manifests* is the decision; taking `/nix/store` as a runtime layout is
 not, and this page is not a licence for it.
 
+## ⭐ AMENDMENT — nix is ONE BACKEND, not the architecture, operator, 2026-09-03c
+
+⛔ **Read this before treating anything below as settled.** The ruling above
+made nixpkgs the planner. It did **not** make nixpkgs the only one, and a
+later operator note says so directly:
+
+> *"do note in the future, we will have multiple backends, nix just being one
+> of them"*
+>
+> *"and if we do end up needing to bundle nix, we will probably implement a mix
+> of existing techniques by iterating/improving them and publishing a 'static'
+> nix ourself"*
+
+⭐ **What that changes for design.** Every place this project reaches into
+nixpkgs — the hydra route, the narinfo `References` graph, `pgb nix cache
+closure/attr/fetch/plan/build` — is **one implementation of a planner
+interface**, not the planner. ⛔ A change that makes a nixpkgs concept
+(a store path, a `.drv`, a narinfo field) load-bearing in code that is *not*
+under the nix backend is a design defect, and the next backend pays for it.
+⚠ Nothing here says which backends come next, so do not invent an abstraction
+for hypothetical ones; the rule is only that nix-specific facts stay on the
+nix side of the line.
+
+⭐ **And it settles the shape of the static-nix work** (T-051 step 2, T-060):
+the answer the operator expects is *not* "find a static nix" — measured
+2026-09-03c, nixpkgs ships none — but **build and publish one**, from a mix of
+the existing techniques, iterated. The reading list for that is
+`references/DavHau__nix-portable`, `references/nixie-dev__nixie` and
+`references/containerbase__nix-prebuild`, all mined 2026-09-03c and all named
+by the operator for exactly this.
+
 ## The two shapes, both from `pkgforge/soarpkgs`
 
 ⛔ **Pin `55c774a5e24d9f17af69911a4d70884dfb566626`.** The operator states that

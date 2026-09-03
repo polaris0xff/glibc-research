@@ -85,13 +85,58 @@ measured axis — and the honest candidates are:
 | axis | what "better" would have to mean |
 |---|---|
 | **shape** | still a single ordinary ELF: no mount, no extraction, nothing written to the target filesystem, no shell in the delivery path |
-| **size** | only what static linking genuinely could not absorb, rather than the whole closure |
-| **friction** | produced by the same one command, with no format-specific input from the developer |
+| ~~**size**~~ | ~~only what static linking genuinely could not absorb, rather than the whole closure~~ — ⛔ **struck by the operator, 2026-09-03c; see the amendment below** |
+| ⭐ **speed** | **faster than the field**, on the two things a user feels: how long the artefact takes to start, and how long the work inside it takes |
+| ⭐ **friction** | **one command.** Not a multiline shell script, not a `.desktop` file, not an icon, not a set of environment variables — one command, with no format-specific input from the developer |
 | **honesty** | the tool names every component it could not link statically, and why |
 
-⚠ **If a design cannot beat `sharun` + `uruntime` on at least one of those, the
-right answer is to emit an anylinux AppImage and say so**, not to ship a
-fifth mediocre bundler. That is a real option and it should stay on the table.
+## ⭐ AMENDMENT — size struck, speed and one-command promoted, operator ruling, 2026-09-03c
+
+⛔ **Two rows of the table above changed and the change is binding.** The
+ruling is quoted verbatim because it names both halves of the new bar:
+
+> *"us having a bigger size than anylinux-appimages and onelf is acceptable as
+> long as ours performs better and packaging is just one command not a
+> multiline shell script"*
+
+⭐ **What that changes.** Size was one of four candidate axes and it was the
+one `pgb`'s bundler was **losing** on — 2.86× on `jq`, 2.45× on kdenlive,
+3.05× in `experiments/86-`. It is no longer an axis. In its place the ruling
+names two conditions, and they are conjunctive: **perform better**, *and*
+**package in one command**.
+
+⚠ **This is a harder bar, not a softer one.** Under the old table a bundle
+that was merely a single ELF passed. Under the ruling it has to be *faster
+than the field*, and that is the column `pgb` is furthest behind on:
+
+| what the ruling now decides | ours | the field | |
+|---|---|---|---|
+| kdenlive cold start (`TODO/toolchain.md` T-066) | 300 ms | 61 ms | ⛔ **4.92× — the binding failure** |
+| kdenlive render | 4,947 ms | 2,033 ms | ⛔ **2.43×** |
+| `jq` cold start (`experiments/86-`) | 162–198 ms | 79–107 ms | ⛔ ~1.9× |
+| `jq` warm start | 11–22 ms | 9–16 ms | ⚠ ~1.4× |
+| ~~artefact size~~ | ~~2.86×–3.05×~~ | | ⭐ **no longer counted** |
+
+⭐ **And the second condition is already met, decisively.** `pgb bundle
+appimage kdenlive` is one command from a package name. The competitor's route
+is five separately-versioned binaries plus a 121 KB driver script, a
+`.desktop` file, an icon and about nine environment variables — that is the
+"multiline shell script" the ruling names, and it is measured, not asserted
+(`references/pkgforge-dev__Anylinux-AppImages`, and `TODO/research.md` T-057).
+So of the two conditions the bundler owes, **one is a win it can already
+publish and the other is the whole of the remaining work.**
+
+⛔ **The consequence for planning:** every size lever measured to date —
+`--cut`, `--fixpoint`, the debloat rules, route A and route B of T-066 — is
+now worth only what it buys in **startup and run time**, which is not nothing
+(fewer objects is less to mount, map and relocate) but is also not what any of
+them was measured on. ⚠ **None of the size work is invalidated; all of it is
+now un-scored until someone re-measures it on the clock.**
+
+⚠ **If a design cannot beat `sharun` + `uruntime` on shape, speed, friction or
+honesty, the right answer is to emit an anylinux AppImage and say so**, not to
+ship a fifth mediocre bundler. That is a real option and it should stay on the
+table.
 
 ## Language and structure
 

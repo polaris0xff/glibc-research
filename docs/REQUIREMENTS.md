@@ -46,6 +46,26 @@ either closed or open, below.
 carries the whole bar. The head-to-head numbers stay in
 [`comparison.md`](comparison.md) as measurement; they are no longer the test.
 
+## ⭐ AMENDMENT — the BUNDLER's bar, operator ruling, 2026-09-03c
+
+⚠ **This one is SCOPED: it changes the bundler's bar and neither part of the
+requirement above.** It is recorded here because it is an operator ruling and
+this is the page that carries them; the full amendment, with the axes table it
+rewrites, is in [`design/toolchain.md`](design/toolchain.md) "Static first,
+bundle last".
+
+> *"us having a bigger size than anylinux-appimages and onelf is acceptable as
+> long as ours performs better and packaging is just one command not a
+> multiline shell script"*
+
+⭐ **Two conditions, conjunctive: perform better, and package in one command.**
+Size is struck. ⛔ **`pgb`'s bundler meets the second and fails the first** —
+one command from a package name against five separately versioned binaries
+plus a 121 KB driver script, but 4.92× the cold start on kdenlive and about
+1.9× on `jq`. ⚠ The size ratios this page quotes in the head-to-head below
+(**2.1 MB vs 3.7 MB**) are about the **static binary**, not the bundle, and
+are untouched by the ruling.
+
 This is the project's acceptance bar. It is **not** met today: the current
 class is "programs that do not need to load host plugins"
 ([`AGENTS.md`](AGENTS.md) §7), which is broad but not everything.

@@ -1,0 +1,85 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+  merge_group:
+
+  schedule:
+    - cron: '0 1 * * *'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: ⚙️ Setup
+        uses: containerbase/internal-tools/setup@a63553af4ae5f9ff109048f6d7918b93a74107c8 # v5.0.24
+        with:
+          save-cache: true
+
+      - run: pnpm prettier
+
+  build:
+    needs:
+      - lint
+    runs-on: ${{ matrix.arch.os }}
+    name: build (${{ matrix.arch.name }})
+
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        arch:
+          - name: x86_64
+            os: ubuntu-24.04
+          - name: aarch64
+            os: ubuntu-24.04-arm
+
+    env:
+      # DISTRO: ${{ matrix.distro }} # build target, name required by binary-builder
+      ARCH: ${{ matrix.arch.name }} # build target, name required by binary-builder
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          show-progress: false
+
+      - name: binary-builder
+        uses: containerbase/internal-tools@a63553af4ae5f9ff109048f6d7918b93a74107c8 # v5.0.24
+        with:
+          command: binary-builder
+          dry-run: ${{github.ref != 'refs/heads/main'}}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  success:
+    runs-on: ubuntu-24.04
+    needs:
+      - lint
+      - build
+    timeout-minutes: 1
+    if: always()
+    steps:
+      - name: Fail for failed or cancelled build
+        if: |
+          needs.build.result == 'failure' ||
+          needs.build.result == 'cancelled'
+        run: exit 1
+      - name: Fail for failed or cancelled lint
+        if: |
+          needs.lint.result == 'failure' ||
+          needs.lint.result == 'cancelled'
+        run: exit 1

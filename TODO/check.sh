@@ -58,21 +58,42 @@ for p in P0 P1 P2 P3; do
 done
 
 # 3 + 4. rows <-> entries, and status agreement
+#
+# ⛔ AN ENTRY LIVES IN ONE OF TWO PLACES AND ITS STATUS DECIDES WHICH, from the
+# operator's instruction of 2026-09-03c: "strip away the fat, things that are
+# already resolved and fixed and just send them straight into /HISTORY/*, the
+# TODO/* must be lean and contain only what's left". An `open` entry belongs in
+# TODO/; a `done` entry belongs in HISTORY/entries/. Check 4b is what stops
+# that decaying back into one pile the moment somebody closes an entry.
+H="$D/../HISTORY/entries"
 for id in $rows; do
-  f=$(grep -rl "^## $id — " "$D"/*.md 2>/dev/null | head -1)
+  f=$(grep -rl "^## $id — " "$D"/*.md "$H"/*.md 2>/dev/null | head -1)
   if [ -z "$f" ]; then bad "$id has a row but no entry"; continue; fi
   i_st=$(awk -F'|' -v id="$id" '/^\| T-[0-9]+ \|/ {gsub(/ /,"",$2); gsub(/ /,"",$5); if ($2==id) print $5}' "$D/INDEX.md")
   e_st=$(awk -v id="$id" '$0 ~ "^## "id" — " {f=1} f && /\*\*Status\*\*/ {print; exit}' "$f" \
          | grep -oE 'Status\*\* [^ ]+( [^ ]+)?' | sed 's/Status\*\* //; s/✅ //' | tr -d ' ')
   [ "$i_st" = "$e_st" ] || bad "$id: index says '$i_st', entry says '$e_st'"
+  # 4b. the entry is filed where its status says it belongs
+  case "$f" in
+    "$H"/*) [ "$i_st" = done ] || bad "$id is '$i_st' but its entry is in HISTORY/entries; open work lives in TODO/" ;;
+    *)      [ "$i_st" = open ] || bad "$id is '$i_st' but its entry is in TODO/; closed work lives in HISTORY/entries/" ;;
+  esac
 done
-ok "every row has an entry, statuses compared"
-for f in "$D"/*.md; do
+ok "every row has an entry, statuses compared, entries filed by status"
+for f in "$D"/*.md "$H"/*.md; do
   case "$f" in */INDEX.md|*/PROGRESS.md|*/RULES.md) continue ;; esac
   grep -oE '^## (T-[0-9]+) — ' "$f" | awk '{print $2}' | while read -r eid; do
     grep -q "^| $eid |" "$D/INDEX.md" || bad "$eid has an entry but no row"
   done
 done
+# 4c. exactly one entry per id, across both halves
+dupes=$(grep -hoE '^## T-[0-9]+ — ' "$D"/*.md "$H"/*.md 2>/dev/null | awk '{print $2}' \
+        | sort | uniq -d)
+if [ -n "$dupes" ]; then
+  printf '%s\n' "$dupes" | while IFS= read -r d; do bad "$d has more than one entry"; done
+else
+  ok "no id carries two entries"
+fi
 
 # 5. PROGRESS counts
 p_line=$(awk '/^ *COUNTS/ {print}' "$D/PROGRESS.md")
@@ -81,14 +102,17 @@ case "$p_line" in
   *) bad "PROGRESS COUNTS is '$p_line'; rows say $n_rows entries, $n_open open, $n_done done" ;;
 esac
 
-# 6. links
-for f in "$D"/*.md; do
+# 6. links, in both halves of the record. ⚠ The HISTORY half is checked because
+# its files were MOVED there and every relative link in them changed depth; a
+# move that leaves ../docs/ pointing at HISTORY/docs/ breaks silently.
+for f in "$D"/*.md "$H"/*.md; do
+  b=$(dirname "$f")
   grep -oE '\]\(([^)]+)\)' "$f" 2>/dev/null | sed 's/](\(.*\))/\1/' | while read -r l; do
     case "$l" in http*|\#*) continue ;; esac
-    [ -e "$D/${l%%#*}" ] || bad "$(basename "$f") -> $l does not resolve"
+    [ -e "$b/${l%%#*}" ] || bad "$(basename "$f") -> $l does not resolve"
   done
 done
-ok "links checked"
+ok "links checked, TODO/ and HISTORY/entries/"
 
 # 7. the codegraph index, which is what an agent reads existing code with.
 # ⚠ A missing codegraph is NOT a failure: the tool is a machine convenience and

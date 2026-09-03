@@ -1,0 +1,122 @@
+[
+ {
+  "name": "v012",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v012",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v012",
+  "commit": {
+   "sha": "7eba433355a83acff4d0081bb4a59088e8293ea7",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/7eba433355a83acff4d0081bb4a59088e8293ea7"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDEy"
+ },
+ {
+  "name": "v011",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v011",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v011",
+  "commit": {
+   "sha": "9efabbf731e3e12088c7a07f41ac16fa747d644e",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/9efabbf731e3e12088c7a07f41ac16fa747d644e"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDEx"
+ },
+ {
+  "name": "v010",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v010",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v010",
+  "commit": {
+   "sha": "b5b47f1ea628ecaad5f2d95580ed393832b36dc8",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/b5b47f1ea628ecaad5f2d95580ed393832b36dc8"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDEw"
+ },
+ {
+  "name": "v009",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v009",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v009",
+  "commit": {
+   "sha": "a53a3f3f2262f38fc3c020b21acc6d7677ed9516",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/a53a3f3f2262f38fc3c020b21acc6d7677ed9516"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDA5"
+ },
+ {
+  "name": "v008",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v008",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v008",
+  "commit": {
+   "sha": "bb4710c7f60133c6135e957222057e23f7cb3dac",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/bb4710c7f60133c6135e957222057e23f7cb3dac"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDA4"
+ },
+ {
+  "name": "v007",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v007",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v007",
+  "commit": {
+   "sha": "7ebf4ca972c6613983b2698ab7ecda35308e9886",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/7ebf4ca972c6613983b2698ab7ecda35308e9886"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDA3"
+ },
+ {
+  "name": "v006",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v006",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v006",
+  "commit": {
+   "sha": "743e689e14db6fd69d9b16fd6d02bdafcaaa2145",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/743e689e14db6fd69d9b16fd6d02bdafcaaa2145"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDA2"
+ },
+ {
+  "name": "v005",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v005",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v005",
+  "commit": {
+   "sha": "b2a7c8306a4ddd9f54b2914e8b4028608cf4ed0c",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/b2a7c8306a4ddd9f54b2914e8b4028608cf4ed0c"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDA1"
+ },
+ {
+  "name": "v004",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v004",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v004",
+  "commit": {
+   "sha": "5e30895a202c8ddaaebd99b1f35521c79d685ea4",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/5e30895a202c8ddaaebd99b1f35521c79d685ea4"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDA0"
+ },
+ {
+  "name": "v003",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v003",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v003",
+  "commit": {
+   "sha": "e85232cd701bf1aa259879f1e957160237faeb20",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/e85232cd701bf1aa259879f1e957160237faeb20"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDAz"
+ },
+ {
+  "name": "v002",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v002",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v002",
+  "commit": {
+   "sha": "acd0d38ec500a00224bc51b6f029f3695ad7b4e5",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/acd0d38ec500a00224bc51b6f029f3695ad7b4e5"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDAy"
+ },
+ {
+  "name": "v001",
+  "zipball_url": "https://api.github.com/repos/DavHau/nix-portable/zipball/refs/tags/v001",
+  "tarball_url": "https://api.github.com/repos/DavHau/nix-portable/tarball/refs/tags/v001",
+  "commit": {
+   "sha": "40415f731fd618e8198603a4ac19c9fe3c7d98b9",
+   "url": "https://api.github.com/repos/DavHau/nix-portable/commits/40415f731fd618e8198603a4ac19c9fe3c7d98b9"
+  },
+  "node_id": "MDM6UmVmMzM2OTkwMDkzOnJlZnMvdGFncy92MDAx"
+ }
+]

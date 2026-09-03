@@ -1,0 +1,1912 @@
+[
+ {
+  "name": "2.35.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.35.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.35.2",
+  "commit": {
+   "sha": "c470ded3faab376d429ac3f5b330def532ee53fe",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/c470ded3faab376d429ac3f5b330def532ee53fe"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNS4y"
+ },
+ {
+  "name": "2.35.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.35.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.35.1",
+  "commit": {
+   "sha": "4e6bcaf3167aeeb039569f1e931d87c544ed340c",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/4e6bcaf3167aeeb039569f1e931d87c544ed340c"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNS4x"
+ },
+ {
+  "name": "2.35.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.35.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.35.0",
+  "commit": {
+   "sha": "f1a45b9afa9493194770977f3e668f0693f3118a",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/f1a45b9afa9493194770977f3e668f0693f3118a"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNS4w"
+ },
+ {
+  "name": "2.34.8",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.34.8",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.34.8",
+  "commit": {
+   "sha": "0f0cb7ae02abe6e8ecec7a2cd1a3bd616ec25053",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/0f0cb7ae02abe6e8ecec7a2cd1a3bd616ec25053"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNC44"
+ },
+ {
+  "name": "2.34.7",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.34.7",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.34.7",
+  "commit": {
+   "sha": "e28aff251589fa0e0c57f65ec7634e214acd3498",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/e28aff251589fa0e0c57f65ec7634e214acd3498"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNC43"
+ },
+ {
+  "name": "2.34.6",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.34.6",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.34.6",
+  "commit": {
+   "sha": "27f2787b0d4ae8179dfed83ce4e10875f518aa18",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/27f2787b0d4ae8179dfed83ce4e10875f518aa18"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNC42"
+ },
+ {
+  "name": "2.34.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.34.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.34.5",
+  "commit": {
+   "sha": "358d4868dd0a12995aaab6e5d773695f96b24942",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/358d4868dd0a12995aaab6e5d773695f96b24942"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNC41"
+ },
+ {
+  "name": "2.34.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.34.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.34.4",
+  "commit": {
+   "sha": "c3918807abb91b704f4ee9ade6b22544020c3e97",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/c3918807abb91b704f4ee9ade6b22544020c3e97"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNC40"
+ },
+ {
+  "name": "2.34.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.34.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.34.3",
+  "commit": {
+   "sha": "0ccf68c88ead6d4e54f74868fa056b3f9b2706e7",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/0ccf68c88ead6d4e54f74868fa056b3f9b2706e7"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNC4z"
+ },
+ {
+  "name": "2.34.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.34.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.34.2",
+  "commit": {
+   "sha": "89ebec15f622e236569f2d6024da1ae136c82524",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/89ebec15f622e236569f2d6024da1ae136c82524"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNC4y"
+ },
+ {
+  "name": "2.34.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.34.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.34.1",
+  "commit": {
+   "sha": "7f8ea1581c6ce94c5df3f39111825f7a736b7de9",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/7f8ea1581c6ce94c5df3f39111825f7a736b7de9"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNC4x"
+ },
+ {
+  "name": "2.34.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.34.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.34.0",
+  "commit": {
+   "sha": "b030e0c65e873c35ebddb5226ba905d5cd43782a",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/b030e0c65e873c35ebddb5226ba905d5cd43782a"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zNC4w"
+ },
+ {
+  "name": "2.33.6",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.33.6",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.33.6",
+  "commit": {
+   "sha": "e28aff251589fa0e0c57f65ec7634e214acd3498",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/e28aff251589fa0e0c57f65ec7634e214acd3498"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMy42"
+ },
+ {
+  "name": "2.33.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.33.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.33.5",
+  "commit": {
+   "sha": "03251afe1f176e22bb5d7983e03160f52e35d3dc",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/03251afe1f176e22bb5d7983e03160f52e35d3dc"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMy41"
+ },
+ {
+  "name": "2.33.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.33.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.33.4",
+  "commit": {
+   "sha": "358d4868dd0a12995aaab6e5d773695f96b24942",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/358d4868dd0a12995aaab6e5d773695f96b24942"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMy40"
+ },
+ {
+  "name": "2.33.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.33.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.33.3",
+  "commit": {
+   "sha": "a8f72f4e4686a313fb2b11a7c670d3e413937a48",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/a8f72f4e4686a313fb2b11a7c670d3e413937a48"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMy4z"
+ },
+ {
+  "name": "2.33.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.33.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.33.2",
+  "commit": {
+   "sha": "74e9c236c17fc00e3f204e166ca8a9ab8c0211a3",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/74e9c236c17fc00e3f204e166ca8a9ab8c0211a3"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMy4y"
+ },
+ {
+  "name": "2.33.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.33.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.33.1",
+  "commit": {
+   "sha": "855c85ebee3e506884fab31d57c7186e9714d0a2",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/855c85ebee3e506884fab31d57c7186e9714d0a2"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMy4x"
+ },
+ {
+  "name": "2.33.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.33.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.33.0",
+  "commit": {
+   "sha": "790aa0b153a27a67cf17b0159844f84bdaf3157c",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/790aa0b153a27a67cf17b0159844f84bdaf3157c"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMy4w"
+ },
+ {
+  "name": "2.32.8",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.32.8",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.32.8",
+  "commit": {
+   "sha": "e28aff251589fa0e0c57f65ec7634e214acd3498",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/e28aff251589fa0e0c57f65ec7634e214acd3498"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMi44"
+ },
+ {
+  "name": "2.32.7",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.32.7",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.32.7",
+  "commit": {
+   "sha": "358d4868dd0a12995aaab6e5d773695f96b24942",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/358d4868dd0a12995aaab6e5d773695f96b24942"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMi43"
+ },
+ {
+  "name": "2.32.6",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.32.6",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.32.6",
+  "commit": {
+   "sha": "dcea08bbd78513a19be619648a110c7c87e711eb",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/dcea08bbd78513a19be619648a110c7c87e711eb"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMi42"
+ },
+ {
+  "name": "2.32.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.32.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.32.5",
+  "commit": {
+   "sha": "30fb5291d3434af76c15f1f441760dc9df45866e",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/30fb5291d3434af76c15f1f441760dc9df45866e"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMi41"
+ },
+ {
+  "name": "2.32.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.32.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.32.4",
+  "commit": {
+   "sha": "adca7889d5fc0194cd726900507b27fb82ecc2e3",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/adca7889d5fc0194cd726900507b27fb82ecc2e3"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMi40"
+ },
+ {
+  "name": "2.32.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.32.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.32.3",
+  "commit": {
+   "sha": "d582bd1816eea5f7739b805cb9da9718a003de94",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/d582bd1816eea5f7739b805cb9da9718a003de94"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMi4z"
+ },
+ {
+  "name": "2.32.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.32.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.32.2",
+  "commit": {
+   "sha": "4e1579b9c5fd5851a5954f27985fc9167e34e50a",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/4e1579b9c5fd5851a5954f27985fc9167e34e50a"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMi4y"
+ },
+ {
+  "name": "2.32.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.32.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.32.1",
+  "commit": {
+   "sha": "c612b25b1ca64177424ad8062966cc8d7455bf08",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/c612b25b1ca64177424ad8062966cc8d7455bf08"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMi4x"
+ },
+ {
+  "name": "2.32.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.32.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.32.0",
+  "commit": {
+   "sha": "e4c2bf72a0afdde80d822837296e748da21e1bee",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/e4c2bf72a0afdde80d822837296e748da21e1bee"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMi4w"
+ },
+ {
+  "name": "2.31.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.31.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.31.5",
+  "commit": {
+   "sha": "e28aff251589fa0e0c57f65ec7634e214acd3498",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/e28aff251589fa0e0c57f65ec7634e214acd3498"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMS41"
+ },
+ {
+  "name": "2.31.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.31.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.31.4",
+  "commit": {
+   "sha": "358d4868dd0a12995aaab6e5d773695f96b24942",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/358d4868dd0a12995aaab6e5d773695f96b24942"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMS40"
+ },
+ {
+  "name": "2.31.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.31.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.31.3",
+  "commit": {
+   "sha": "998693ad4da1706752221a1c7c3456158b9280e7",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/998693ad4da1706752221a1c7c3456158b9280e7"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMS4z"
+ },
+ {
+  "name": "2.31.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.31.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.31.2",
+  "commit": {
+   "sha": "c1f6761f35bf39d138b2e5402f5f879bd643402e",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/c1f6761f35bf39d138b2e5402f5f879bd643402e"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMS4y"
+ },
+ {
+  "name": "2.31.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.31.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.31.1",
+  "commit": {
+   "sha": "bb86920fa93e0c3cb52455c18d2ebd7462328306",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/bb86920fa93e0c3cb52455c18d2ebd7462328306"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMS4x"
+ },
+ {
+  "name": "2.31.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.31.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.31.0",
+  "commit": {
+   "sha": "ad304a75a087c40c9ce07f0ea193775d1ba602c1",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/ad304a75a087c40c9ce07f0ea193775d1ba602c1"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMS4w"
+ },
+ {
+  "name": "2.30.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.30.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.30.5",
+  "commit": {
+   "sha": "e28aff251589fa0e0c57f65ec7634e214acd3498",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/e28aff251589fa0e0c57f65ec7634e214acd3498"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMC41"
+ },
+ {
+  "name": "2.30.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.30.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.30.4",
+  "commit": {
+   "sha": "358d4868dd0a12995aaab6e5d773695f96b24942",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/358d4868dd0a12995aaab6e5d773695f96b24942"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMC40"
+ },
+ {
+  "name": "2.30.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.30.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.30.3",
+  "commit": {
+   "sha": "bb86920fa93e0c3cb52455c18d2ebd7462328306",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/bb86920fa93e0c3cb52455c18d2ebd7462328306"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMC4z"
+ },
+ {
+  "name": "2.30.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.30.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.30.2",
+  "commit": {
+   "sha": "564bb7141e4524f22317b2eb684372740f954433",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/564bb7141e4524f22317b2eb684372740f954433"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMC4y"
+ },
+ {
+  "name": "2.30.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.30.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.30.1",
+  "commit": {
+   "sha": "152e5fde29f3920ce1c4e9679cfb8060f991ee22",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/152e5fde29f3920ce1c4e9679cfb8060f991ee22"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMC4x"
+ },
+ {
+  "name": "2.30.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.30.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.30.0",
+  "commit": {
+   "sha": "c853b6ca706d79ac72a9cfeb6a5ee11557b67c32",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/c853b6ca706d79ac72a9cfeb6a5ee11557b67c32"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zMC4w"
+ },
+ {
+  "name": "2.29.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.29.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.29.4",
+  "commit": {
+   "sha": "e28aff251589fa0e0c57f65ec7634e214acd3498",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/e28aff251589fa0e0c57f65ec7634e214acd3498"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOS40"
+ },
+ {
+  "name": "2.29.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.29.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.29.3",
+  "commit": {
+   "sha": "358d4868dd0a12995aaab6e5d773695f96b24942",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/358d4868dd0a12995aaab6e5d773695f96b24942"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOS4z"
+ },
+ {
+  "name": "2.29.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.29.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.29.2",
+  "commit": {
+   "sha": "d4ddb4d7a73bbaeecbbe6e9dd3db0147d8b5ff2f",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/d4ddb4d7a73bbaeecbbe6e9dd3db0147d8b5ff2f"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOS4y"
+ },
+ {
+  "name": "2.29.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.29.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.29.1",
+  "commit": {
+   "sha": "83bd93e214bdfd4f2c0dd504f0f667c09bcb7150",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/83bd93e214bdfd4f2c0dd504f0f667c09bcb7150"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOS4x"
+ },
+ {
+  "name": "2.29.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.29.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.29.0",
+  "commit": {
+   "sha": "c65bde170692b859295bb8f660a3311261f313ef",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/c65bde170692b859295bb8f660a3311261f313ef"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOS4w"
+ },
+ {
+  "name": "2.28.7",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.28.7",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.28.7",
+  "commit": {
+   "sha": "e28aff251589fa0e0c57f65ec7634e214acd3498",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/e28aff251589fa0e0c57f65ec7634e214acd3498"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOC43"
+ },
+ {
+  "name": "2.28.6",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.28.6",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.28.6",
+  "commit": {
+   "sha": "358d4868dd0a12995aaab6e5d773695f96b24942",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/358d4868dd0a12995aaab6e5d773695f96b24942"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOC42"
+ },
+ {
+  "name": "2.28.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.28.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.28.5",
+  "commit": {
+   "sha": "d4ddb4d7a73bbaeecbbe6e9dd3db0147d8b5ff2f",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/d4ddb4d7a73bbaeecbbe6e9dd3db0147d8b5ff2f"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOC41"
+ },
+ {
+  "name": "2.28.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.28.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.28.4",
+  "commit": {
+   "sha": "83bd93e214bdfd4f2c0dd504f0f667c09bcb7150",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/83bd93e214bdfd4f2c0dd504f0f667c09bcb7150"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOC40"
+ },
+ {
+  "name": "2.28.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.28.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.28.3",
+  "commit": {
+   "sha": "bc49d9de117404fdb735f64f5a28c3d79b43556c",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/bc49d9de117404fdb735f64f5a28c3d79b43556c"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOC4z"
+ },
+ {
+  "name": "2.28.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.28.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.28.2",
+  "commit": {
+   "sha": "580572cb7dd8b2189d1ae5bcb073d250d78ff044",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/580572cb7dd8b2189d1ae5bcb073d250d78ff044"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOC4y"
+ },
+ {
+  "name": "2.28.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.28.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.28.1",
+  "commit": {
+   "sha": "81fbe42268ecde126a3bfde7e25cff1941e94ffb",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/81fbe42268ecde126a3bfde7e25cff1941e94ffb"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOC4x"
+ },
+ {
+  "name": "2.28.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.28.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.28.0",
+  "commit": {
+   "sha": "81fbe42268ecde126a3bfde7e25cff1941e94ffb",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/81fbe42268ecde126a3bfde7e25cff1941e94ffb"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yOC4w"
+ },
+ {
+  "name": "2.27.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.27.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.27.1",
+  "commit": {
+   "sha": "26e0d02619eb9e0fbe764846a3454521490ef2d3",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/26e0d02619eb9e0fbe764846a3454521490ef2d3"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNy4x"
+ },
+ {
+  "name": "2.27.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.27.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.27.0",
+  "commit": {
+   "sha": "401ca93868764e0d4e9ef1f283b27442b7d92f10",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/401ca93868764e0d4e9ef1f283b27442b7d92f10"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNy4w"
+ },
+ {
+  "name": "2.26.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.26.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.26.4",
+  "commit": {
+   "sha": "de5708419445ef64b8c1c3e3feb657fe25e6b1e6",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/de5708419445ef64b8c1c3e3feb657fe25e6b1e6"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNi40"
+ },
+ {
+  "name": "2.26.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.26.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.26.3",
+  "commit": {
+   "sha": "6217d92924c47c4a54838e3e655abbf41d519c4a",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/6217d92924c47c4a54838e3e655abbf41d519c4a"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNi4z"
+ },
+ {
+  "name": "2.26.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.26.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.26.2",
+  "commit": {
+   "sha": "1ea96cd2e3e9281a4faa3ac4ffcb5e191c070e8e",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/1ea96cd2e3e9281a4faa3ac4ffcb5e191c070e8e"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNi4y"
+ },
+ {
+  "name": "2.26.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.26.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.26.1",
+  "commit": {
+   "sha": "51c31fe19a339ab412977d752007eb05972df471",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/51c31fe19a339ab412977d752007eb05972df471"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNi4x"
+ },
+ {
+  "name": "2.26.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.26.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.26.0",
+  "commit": {
+   "sha": "4a4b57f00b08e610ed51bc365a452c5081eff310",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/4a4b57f00b08e610ed51bc365a452c5081eff310"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNi4w"
+ },
+ {
+  "name": "2.25.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.25.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.25.5",
+  "commit": {
+   "sha": "8e9ca404cb4c47588032b0041ae9d8503385111d",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8e9ca404cb4c47588032b0041ae9d8503385111d"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNS41"
+ },
+ {
+  "name": "2.25.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.25.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.25.4",
+  "commit": {
+   "sha": "5c3ddcf7979df31d79e4f84d08ebae6dcf383107",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/5c3ddcf7979df31d79e4f84d08ebae6dcf383107"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNS40"
+ },
+ {
+  "name": "2.25.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.25.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.25.3",
+  "commit": {
+   "sha": "ca922f6b57aaca58e85ad0dff2757a62b7bf2ad5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/ca922f6b57aaca58e85ad0dff2757a62b7bf2ad5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNS4z"
+ },
+ {
+  "name": "2.25.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.25.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.25.2",
+  "commit": {
+   "sha": "eacd5b0306cb78ba5df3eea9a36527a131699584",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/eacd5b0306cb78ba5df3eea9a36527a131699584"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNS4y"
+ },
+ {
+  "name": "2.25.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.25.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.25.1",
+  "commit": {
+   "sha": "296be471f9ffb28dc92cb8031291e0b00bfb24b2",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/296be471f9ffb28dc92cb8031291e0b00bfb24b2"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNS4x"
+ },
+ {
+  "name": "2.25.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.25.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.25.0",
+  "commit": {
+   "sha": "d80bfd6ee9fd4f7f37c02a0be126b2527cd98198",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/d80bfd6ee9fd4f7f37c02a0be126b2527cd98198"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNS4w"
+ },
+ {
+  "name": "2.24.15",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.15",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.15",
+  "commit": {
+   "sha": "de5708419445ef64b8c1c3e3feb657fe25e6b1e6",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/de5708419445ef64b8c1c3e3feb657fe25e6b1e6"
+  },
+  "node_id": "REF_kwDOMhXhd7FyZWZzL3RhZ3MvMi4yNC4xNQ"
+ },
+ {
+  "name": "2.24.14",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.14",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.14",
+  "commit": {
+   "sha": "81fbe42268ecde126a3bfde7e25cff1941e94ffb",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/81fbe42268ecde126a3bfde7e25cff1941e94ffb"
+  },
+  "node_id": "REF_kwDOMhXhd7FyZWZzL3RhZ3MvMi4yNC4xNA"
+ },
+ {
+  "name": "2.24.13",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.13",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.13",
+  "commit": {
+   "sha": "1816ea6818acfaca60c92a5d24d5e7fc440cb326",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/1816ea6818acfaca60c92a5d24d5e7fc440cb326"
+  },
+  "node_id": "REF_kwDOMhXhd7FyZWZzL3RhZ3MvMi4yNC4xMw"
+ },
+ {
+  "name": "2.24.12",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.12",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.12",
+  "commit": {
+   "sha": "8e9ca404cb4c47588032b0041ae9d8503385111d",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8e9ca404cb4c47588032b0041ae9d8503385111d"
+  },
+  "node_id": "REF_kwDOMhXhd7FyZWZzL3RhZ3MvMi4yNC4xMg"
+ },
+ {
+  "name": "2.24.11",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.11",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.11",
+  "commit": {
+   "sha": "409851c7d5bc6c1e40b9b4a2113405d37b425af0",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/409851c7d5bc6c1e40b9b4a2113405d37b425af0"
+  },
+  "node_id": "REF_kwDOMhXhd7FyZWZzL3RhZ3MvMi4yNC4xMQ"
+ },
+ {
+  "name": "2.24.10",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.10",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.10",
+  "commit": {
+   "sha": "2a195d194c22eb2494d13f7ad9420879c7e13ae5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/2a195d194c22eb2494d13f7ad9420879c7e13ae5"
+  },
+  "node_id": "REF_kwDOMhXhd7FyZWZzL3RhZ3MvMi4yNC4xMA"
+ },
+ {
+  "name": "2.24.9",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.9",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.9",
+  "commit": {
+   "sha": "86276f66003686b9f1d46a57543da892320fffc7",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/86276f66003686b9f1d46a57543da892320fffc7"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNC45"
+ },
+ {
+  "name": "2.24.8",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.8",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.8",
+  "commit": {
+   "sha": "9fbb35a7abc7bedf3f9db18bd193f0ca591f298e",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/9fbb35a7abc7bedf3f9db18bd193f0ca591f298e"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNC44"
+ },
+ {
+  "name": "2.24.7",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.7",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.7",
+  "commit": {
+   "sha": "7921f142bd46d86def516b37581fbe3e233004c6",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/7921f142bd46d86def516b37581fbe3e233004c6"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNC43"
+ },
+ {
+  "name": "2.24.6",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.6",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.6",
+  "commit": {
+   "sha": "52b7046fd11072c8d0268a09278085b59dc2f535",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/52b7046fd11072c8d0268a09278085b59dc2f535"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNC42"
+ },
+ {
+  "name": "2.24.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.5",
+  "commit": {
+   "sha": "94dad003431b8590daf10a551bea5cf3f518eff7",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/94dad003431b8590daf10a551bea5cf3f518eff7"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNC41"
+ },
+ {
+  "name": "2.24.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.4",
+  "commit": {
+   "sha": "707a4e4088083cdc6c6bcede27a47e338b9cd976",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/707a4e4088083cdc6c6bcede27a47e338b9cd976"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNC40"
+ },
+ {
+  "name": "2.24.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.3",
+  "commit": {
+   "sha": "2f4e898a169e94d700051c143ddd0ff8d5bbf26b",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/2f4e898a169e94d700051c143ddd0ff8d5bbf26b"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNC4z"
+ },
+ {
+  "name": "2.24.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.2",
+  "commit": {
+   "sha": "a6a911ec80b45e7dbcbf94f23b0581814e21c1b2",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/a6a911ec80b45e7dbcbf94f23b0581814e21c1b2"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNC4y"
+ },
+ {
+  "name": "2.24.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.1",
+  "commit": {
+   "sha": "39073b6690923a849f6e6436820a92cdfc919741",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/39073b6690923a849f6e6436820a92cdfc919741"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNC4x"
+ },
+ {
+  "name": "2.24.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.24.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.24.0",
+  "commit": {
+   "sha": "39073b6690923a849f6e6436820a92cdfc919741",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/39073b6690923a849f6e6436820a92cdfc919741"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yNC4w"
+ },
+ {
+  "name": "2.23.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.23.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.23.4",
+  "commit": {
+   "sha": "2a195d194c22eb2494d13f7ad9420879c7e13ae5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/2a195d194c22eb2494d13f7ad9420879c7e13ae5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMy40"
+ },
+ {
+  "name": "2.23.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.23.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.23.3",
+  "commit": {
+   "sha": "39073b6690923a849f6e6436820a92cdfc919741",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/39073b6690923a849f6e6436820a92cdfc919741"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMy4z"
+ },
+ {
+  "name": "2.23.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.23.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.23.2",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMy4y"
+ },
+ {
+  "name": "2.23.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.23.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.23.1",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMy4x"
+ },
+ {
+  "name": "2.23.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.23.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.23.0",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMy4w"
+ },
+ {
+  "name": "2.22.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.22.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.22.4",
+  "commit": {
+   "sha": "2a195d194c22eb2494d13f7ad9420879c7e13ae5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/2a195d194c22eb2494d13f7ad9420879c7e13ae5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMi40"
+ },
+ {
+  "name": "2.22.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.22.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.22.3",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMi4z"
+ },
+ {
+  "name": "2.22.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.22.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.22.2",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMi4y"
+ },
+ {
+  "name": "2.22.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.22.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.22.1",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMi4x"
+ },
+ {
+  "name": "2.22.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.22.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.22.0",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMi4w"
+ },
+ {
+  "name": "2.21.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.21.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.21.5",
+  "commit": {
+   "sha": "2a195d194c22eb2494d13f7ad9420879c7e13ae5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/2a195d194c22eb2494d13f7ad9420879c7e13ae5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMS41"
+ },
+ {
+  "name": "2.21.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.21.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.21.4",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMS40"
+ },
+ {
+  "name": "2.21.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.21.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.21.3",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMS4z"
+ },
+ {
+  "name": "2.21.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.21.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.21.2",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMS4y"
+ },
+ {
+  "name": "2.21.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.21.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.21.1",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMS4x"
+ },
+ {
+  "name": "2.21.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.21.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.21.0",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMS4w"
+ },
+ {
+  "name": "2.20.9",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.20.9",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.20.9",
+  "commit": {
+   "sha": "2a195d194c22eb2494d13f7ad9420879c7e13ae5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/2a195d194c22eb2494d13f7ad9420879c7e13ae5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMC45"
+ },
+ {
+  "name": "2.20.8",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.20.8",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.20.8",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMC44"
+ },
+ {
+  "name": "2.20.7",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.20.7",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.20.7",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMC43"
+ },
+ {
+  "name": "2.20.6",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.20.6",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.20.6",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMC42"
+ },
+ {
+  "name": "2.20.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.20.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.20.5",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMC41"
+ },
+ {
+  "name": "2.20.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.20.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.20.4",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMC40"
+ },
+ {
+  "name": "2.20.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.20.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.20.3",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMC4z"
+ },
+ {
+  "name": "2.20.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.20.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.20.2",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMC4y"
+ },
+ {
+  "name": "2.20.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.20.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.20.1",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMC4x"
+ },
+ {
+  "name": "2.20.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.20.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.20.0",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4yMC4w"
+ },
+ {
+  "name": "2.19.7",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.19.7",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.19.7",
+  "commit": {
+   "sha": "2a195d194c22eb2494d13f7ad9420879c7e13ae5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/2a195d194c22eb2494d13f7ad9420879c7e13ae5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOS43"
+ },
+ {
+  "name": "2.19.6",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.19.6",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.19.6",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOS42"
+ },
+ {
+  "name": "2.19.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.19.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.19.5",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOS41"
+ },
+ {
+  "name": "2.19.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.19.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.19.4",
+  "commit": {
+   "sha": "32808922b6dcfd2b97803a17086bebc308b80dc5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/32808922b6dcfd2b97803a17086bebc308b80dc5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOS40"
+ },
+ {
+  "name": "2.19.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.19.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.19.3",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOS4z"
+ },
+ {
+  "name": "2.19.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.19.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.19.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOS4y"
+ },
+ {
+  "name": "2.19.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.19.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.19.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOS4x"
+ },
+ {
+  "name": "2.19.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.19.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.19.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOS4w"
+ },
+ {
+  "name": "2.18.9",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.18.9",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.18.9",
+  "commit": {
+   "sha": "2a195d194c22eb2494d13f7ad9420879c7e13ae5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/2a195d194c22eb2494d13f7ad9420879c7e13ae5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOC45"
+ },
+ {
+  "name": "2.18.8",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.18.8",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.18.8",
+  "commit": {
+   "sha": "1ad9b66fef4a74f9ca8c0679099d8248e17438d5",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/1ad9b66fef4a74f9ca8c0679099d8248e17438d5"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOC44"
+ },
+ {
+  "name": "2.18.7",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.18.7",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.18.7",
+  "commit": {
+   "sha": "7921f142bd46d86def516b37581fbe3e233004c6",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/7921f142bd46d86def516b37581fbe3e233004c6"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOC43"
+ },
+ {
+  "name": "2.18.6",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.18.6",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.18.6",
+  "commit": {
+   "sha": "2fa7dbc7f83cf092a8ea98bc64f35ba6dbd4f7be",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/2fa7dbc7f83cf092a8ea98bc64f35ba6dbd4f7be"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOC42"
+ },
+ {
+  "name": "2.18.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.18.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.18.5",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOC41"
+ },
+ {
+  "name": "2.18.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.18.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.18.4",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOC40"
+ },
+ {
+  "name": "2.18.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.18.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.18.3",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOC4z"
+ },
+ {
+  "name": "2.18.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.18.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.18.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOC4y"
+ },
+ {
+  "name": "2.18.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.18.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.18.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOC4x"
+ },
+ {
+  "name": "2.18.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.18.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.18.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xOC4w"
+ },
+ {
+  "name": "2.17.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.17.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.17.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNy4y"
+ },
+ {
+  "name": "2.17.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.17.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.17.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNy4x"
+ },
+ {
+  "name": "2.17.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.17.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.17.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNy4w"
+ },
+ {
+  "name": "2.16.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.16.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.16.3",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNi4z"
+ },
+ {
+  "name": "2.16.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.16.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.16.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNi4y"
+ },
+ {
+  "name": "2.16.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.16.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.16.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNi4x"
+ },
+ {
+  "name": "2.16.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.16.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.16.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNi4w"
+ },
+ {
+  "name": "2.15.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.15.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.15.3",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNS4z"
+ },
+ {
+  "name": "2.15.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.15.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.15.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNS4y"
+ },
+ {
+  "name": "2.15.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.15.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.15.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNS4x"
+ },
+ {
+  "name": "2.15.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.15.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.15.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNS4w"
+ },
+ {
+  "name": "2.14.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.14.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.14.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNC4x"
+ },
+ {
+  "name": "2.14.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.14.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.14.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xNC4w"
+ },
+ {
+  "name": "2.13.6",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.13.6",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.13.6",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMy42"
+ },
+ {
+  "name": "2.13.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.13.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.13.5",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMy41"
+ },
+ {
+  "name": "2.13.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.13.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.13.4",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMy40"
+ },
+ {
+  "name": "2.13.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.13.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.13.3",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMy4z"
+ },
+ {
+  "name": "2.13.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.13.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.13.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMy4y"
+ },
+ {
+  "name": "2.13.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.13.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.13.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMy4x"
+ },
+ {
+  "name": "2.13.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.13.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.13.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMy4w"
+ },
+ {
+  "name": "2.12.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.12.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.12.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMi4x"
+ },
+ {
+  "name": "2.12.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.12.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.12.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMi4w"
+ },
+ {
+  "name": "2.11.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.11.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.11.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMS4x"
+ },
+ {
+  "name": "2.11.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.11.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.11.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMS4w"
+ },
+ {
+  "name": "2.10.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.10.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.10.3",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMC4z"
+ },
+ {
+  "name": "2.10.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.10.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.10.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMC4y"
+ },
+ {
+  "name": "2.10.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.10.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.10.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMC4x"
+ },
+ {
+  "name": "2.10.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.10.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.10.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4xMC4w"
+ },
+ {
+  "name": "2.9.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.9.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.9.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi45LjI"
+ },
+ {
+  "name": "2.9.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.9.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.9.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi45LjE"
+ },
+ {
+  "name": "2.9.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.9.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.9.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi45LjA"
+ },
+ {
+  "name": "2.8.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.8.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.8.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi44LjE"
+ },
+ {
+  "name": "2.8.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.8.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.8.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi44LjA"
+ },
+ {
+  "name": "2.7.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.7.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.7.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi43LjA"
+ },
+ {
+  "name": "2.6.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.6.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.6.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi42LjE"
+ },
+ {
+  "name": "2.6.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.6.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.6.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi42LjA"
+ },
+ {
+  "name": "2.5.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.5.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.5.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi41LjE"
+ },
+ {
+  "name": "2.5.0",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.5.0",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.5.0",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi41LjA"
+ },
+ {
+  "name": "2.3.18",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.18",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.18",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zLjE4"
+ },
+ {
+  "name": "2.3.17",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.17",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.17",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zLjE3"
+ },
+ {
+  "name": "2.3.16",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.16",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.16",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zLjE2"
+ },
+ {
+  "name": "2.3.15",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.15",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.15",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zLjE1"
+ },
+ {
+  "name": "2.3.14",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.14",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.14",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zLjE0"
+ },
+ {
+  "name": "2.3.13",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.13",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.13",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zLjEz"
+ },
+ {
+  "name": "2.3.12",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.12",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.12",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zLjEy"
+ },
+ {
+  "name": "2.3.11",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.11",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.11",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zLjEx"
+ },
+ {
+  "name": "2.3.10",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.10",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.10",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd7ByZWZzL3RhZ3MvMi4zLjEw"
+ },
+ {
+  "name": "2.3.9",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.9",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.9",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4zLjk"
+ },
+ {
+  "name": "2.3.8",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.8",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.8",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4zLjg"
+ },
+ {
+  "name": "2.3.7",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.7",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.7",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4zLjc"
+ },
+ {
+  "name": "2.3.6",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.6",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.6",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4zLjY"
+ },
+ {
+  "name": "2.3.5",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.5",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.5",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4zLjU"
+ },
+ {
+  "name": "2.3.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.4",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4zLjQ"
+ },
+ {
+  "name": "2.3.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.3",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4zLjM"
+ },
+ {
+  "name": "2.3.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4zLjI"
+ },
+ {
+  "name": "2.3.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.3.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.3.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4zLjE"
+ },
+ {
+  "name": "2.2.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.2.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.2.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4yLjI"
+ },
+ {
+  "name": "2.2.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.2.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.2.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4yLjE"
+ },
+ {
+  "name": "2.1.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.1.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.1.3",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4xLjM"
+ },
+ {
+  "name": "2.1.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.1.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.1.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4xLjI"
+ },
+ {
+  "name": "2.1.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.1.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.1.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4xLjE"
+ },
+ {
+  "name": "2.0.4",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.0.4",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.0.4",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4wLjQ"
+ },
+ {
+  "name": "2.0.3",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.0.3",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.0.3",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4wLjM"
+ },
+ {
+  "name": "2.0.2",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.0.2",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.0.2",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4wLjI"
+ },
+ {
+  "name": "2.0.1",
+  "zipball_url": "https://api.github.com/repos/containerbase/nix-prebuild/zipball/refs/tags/2.0.1",
+  "tarball_url": "https://api.github.com/repos/containerbase/nix-prebuild/tarball/refs/tags/2.0.1",
+  "commit": {
+   "sha": "8933b1ff27899df1aa71780e50d2f9f73e737425",
+   "url": "https://api.github.com/repos/containerbase/nix-prebuild/commits/8933b1ff27899df1aa71780e50d2f9f73e737425"
+  },
+  "node_id": "REF_kwDOMhXhd69yZWZzL3RhZ3MvMi4wLjE"
+ }
+]

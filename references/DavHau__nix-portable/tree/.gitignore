@@ -1,0 +1,6 @@
+test/
+result*
+vm/
+.direnv/
+img
+QEMU_EFI.img

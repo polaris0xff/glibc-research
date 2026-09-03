@@ -1,0 +1,62 @@
+[
+ {
+  "name": "amber-bug",
+  "zipball_url": "https://api.github.com/repos/nixie-dev/nixie/zipball/refs/tags/amber-bug",
+  "tarball_url": "https://api.github.com/repos/nixie-dev/nixie/tarball/refs/tags/amber-bug",
+  "commit": {
+   "sha": "19c576bdd1be6f3dc2992f355fa811a9c53c6fca",
+   "url": "https://api.github.com/repos/nixie-dev/nixie/commits/19c576bdd1be6f3dc2992f355fa811a9c53c6fca"
+  },
+  "node_id": "REF_kwDOI6Upt7NyZWZzL3RhZ3MvYW1iZXItYnVn"
+ },
+ {
+  "name": "2026.03-a1",
+  "zipball_url": "https://api.github.com/repos/nixie-dev/nixie/zipball/refs/tags/2026.03-a1",
+  "tarball_url": "https://api.github.com/repos/nixie-dev/nixie/tarball/refs/tags/2026.03-a1",
+  "commit": {
+   "sha": "d14c6c370489ec13b24d65df569e7769444ebebf",
+   "url": "https://api.github.com/repos/nixie-dev/nixie/commits/d14c6c370489ec13b24d65df569e7769444ebebf"
+  },
+  "node_id": "REF_kwDOI6Upt7RyZWZzL3RhZ3MvMjAyNi4wMy1hMQ"
+ },
+ {
+  "name": "2025.02-a2",
+  "zipball_url": "https://api.github.com/repos/nixie-dev/nixie/zipball/refs/tags/2025.02-a2",
+  "tarball_url": "https://api.github.com/repos/nixie-dev/nixie/tarball/refs/tags/2025.02-a2",
+  "commit": {
+   "sha": "872e039224f881a10e5ab27db8fe9a86f5d95b79",
+   "url": "https://api.github.com/repos/nixie-dev/nixie/commits/872e039224f881a10e5ab27db8fe9a86f5d95b79"
+  },
+  "node_id": "REF_kwDOI6Upt7RyZWZzL3RhZ3MvMjAyNS4wMi1hMg"
+ },
+ {
+  "name": "2025.02-a1",
+  "zipball_url": "https://api.github.com/repos/nixie-dev/nixie/zipball/refs/tags/2025.02-a1",
+  "tarball_url": "https://api.github.com/repos/nixie-dev/nixie/tarball/refs/tags/2025.02-a1",
+  "commit": {
+   "sha": "5595f1afc81bb615d4de31aefd72bab1274a9203",
+   "url": "https://api.github.com/repos/nixie-dev/nixie/commits/5595f1afc81bb615d4de31aefd72bab1274a9203"
+  },
+  "node_id": "REF_kwDOI6Upt7RyZWZzL3RhZ3MvMjAyNS4wMi1hMQ"
+ },
+ {
+  "name": "2023.03-a15",
+  "zipball_url": "https://api.github.com/repos/nixie-dev/nixie/zipball/refs/tags/2023.03-a15",
+  "tarball_url": "https://api.github.com/repos/nixie-dev/nixie/tarball/refs/tags/2023.03-a15",
+  "commit": {
+   "sha": "73144eed6a6aac7f1c30b46daa2f0e53c5bb44f5",
+   "url": "https://api.github.com/repos/nixie-dev/nixie/commits/73144eed6a6aac7f1c30b46daa2f0e53c5bb44f5"
+  },
+  "node_id": "REF_kwDOI6Upt7VyZWZzL3RhZ3MvMjAyMy4wMy1hMTU"
+ },
+ {
+  "name": "2023.03-a14",
+  "zipball_url": "https://api.github.com/repos/nixie-dev/nixie/zipball/refs/tags/2023.03-a14",
+  "tarball_url": "https://api.github.com/repos/nixie-dev/nixie/tarball/refs/tags/2023.03-a14",
+  "commit": {
+   "sha": "e90b313ba882bc3f228ff85ec5b4c353d66bec44",
+   "url": "https://api.github.com/repos/nixie-dev/nixie/commits/e90b313ba882bc3f228ff85ec5b4c353d66bec44"
+  },
+  "node_id": "REF_kwDOI6Upt7VyZWZzL3RhZ3MvMjAyMy4wMy1hMTQ"
+ }
+]

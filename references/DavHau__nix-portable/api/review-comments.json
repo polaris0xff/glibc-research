@@ -1,0 +1,349 @@
+[
+ {
+  "url": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1067429020",
+  "pull_request_review_id": 1244570515,
+  "id": 1067429020,
+  "node_id": "PRRC_kwDOFBYPjc4_n6yc",
+  "diff_hunk": "@@ -139,7 +138,7 @@ let\n \n       echo \"build-users-group = \" > \\$dir/conf/nix.conf\n       echo \"experimental-features = nix-command flakes\" >> \\$dir/conf/nix.conf\n-      echo \"ignored-acls = security.selinux system.nfs4_acl\" >> \\$dir/conf/nix.conf\n+      echo \"ignored-acls = security.selinux system.nfs4_acl security.csm\" >> \\$dir/conf/nix.conf",
+  "path": "default.nix",
+  "commit_id": "863ebccdc140887aa1629258f35060a569509946",
+  "original_commit_id": "863ebccdc140887aa1629258f35060a569509946",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Is this setting really needed? reading the nix source code this list seems to be blocked by default already.",
+  "created_at": "2023-01-11T20:29:33Z",
+  "updated_at": "2023-01-11T20:29:33Z",
+  "html_url": "https://github.com/DavHau/nix-portable/pull/39#discussion_r1067429020",
+  "pull_request_url": "https://api.github.com/repos/DavHau/nix-portable/pulls/39",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1067429020"
+   },
+   "html": {
+    "href": "https://github.com/DavHau/nix-portable/pull/39#discussion_r1067429020"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/DavHau/nix-portable/pulls/39"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1067429020/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 141,
+  "original_line": 141,
+  "side": "RIGHT",
+  "author_association": "CONTRIBUTOR",
+  "original_position": 13,
+  "position": 13,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1118005443",
+  "pull_request_review_id": 1314599602,
+  "id": 1118005443,
+  "node_id": "PRRC_kwDOFBYPjc5Co2jD",
+  "diff_hunk": "@@ -0,0 +1,29 @@\n+name: update-flake-lock\n+on:\n+  workflow_dispatch: # allows manual triggering\n+  schedule:\n+    - cron: '0 0 * * 1,4' # Run twice a week\n+\n+jobs:\n+  lockfile:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - name: Checkout repository\n+        uses: actions/checkout@v3\n+      - name: Install Nix\n+        uses: cachix/install-nix-action@v19\n+        with:\n+          extra_nix_config: |\n+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}\n+      # `bors merge` will automerge if tests succeed\n+      # Requires this github to be installed: https://app.bors.tech/\n+      - name: Update flake.lock\n+        uses: DeterminateSystems/update-flake-lock@v16",
+  "path": ".github/workflows/update-flake-lock.yml",
+  "commit_id": "08d329e6e892a2e7e8887ef9707b857394149315",
+  "original_commit_id": "08d329e6e892a2e7e8887ef9707b857394149315",
+  "user": {
+   "login": "DavHau",
+   "id": 42246742,
+   "node_id": "MDQ6VXNlcjQyMjQ2NzQy",
+   "avatar_url": "https://avatars.githubusercontent.com/u/42246742?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/DavHau",
+   "html_url": "https://github.com/DavHau",
+   "followers_url": "https://api.github.com/users/DavHau/followers",
+   "following_url": "https://api.github.com/users/DavHau/following{/other_user}",
+   "gists_url": "https://api.github.com/users/DavHau/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/DavHau/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/DavHau/subscriptions",
+   "organizations_url": "https://api.github.com/users/DavHau/orgs",
+   "repos_url": "https://api.github.com/users/DavHau/repos",
+   "events_url": "https://api.github.com/users/DavHau/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/DavHau/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "```suggestion\r\n        uses: DeterminateSystems/update-flake-lock@a0c5484d59e7d32ccfb416fe8bae8db583b9febb # v16\r\n```\r\nI recently learned that using revision instead of tags here prevents an attacker who gained control over the included repo to inject arbitrary code. What do you think?",
+  "created_at": "2023-02-26T01:54:00Z",
+  "updated_at": "2023-02-26T01:54:00Z",
+  "html_url": "https://github.com/DavHau/nix-portable/pull/49#discussion_r1118005443",
+  "pull_request_url": "https://api.github.com/repos/DavHau/nix-portable/pulls/49",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1118005443"
+   },
+   "html": {
+    "href": "https://github.com/DavHau/nix-portable/pull/49#discussion_r1118005443"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/DavHau/nix-portable/pulls/49"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1118005443/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 21,
+  "original_line": 21,
+  "side": "RIGHT",
+  "author_association": "OWNER",
+  "original_position": 21,
+  "position": 21,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1118032838",
+  "pull_request_review_id": 1314619676,
+  "id": 1118032838,
+  "node_id": "PRRC_kwDOFBYPjc5Co9PG",
+  "diff_hunk": "@@ -0,0 +1,29 @@\n+name: update-flake-lock\n+on:\n+  workflow_dispatch: # allows manual triggering\n+  schedule:\n+    - cron: '0 0 * * 1,4' # Run twice a week\n+\n+jobs:\n+  lockfile:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - name: Checkout repository\n+        uses: actions/checkout@v3\n+      - name: Install Nix\n+        uses: cachix/install-nix-action@v19\n+        with:\n+          extra_nix_config: |\n+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}\n+      # `bors merge` will automerge if tests succeed\n+      # Requires this github to be installed: https://app.bors.tech/\n+      - name: Update flake.lock\n+        uses: DeterminateSystems/update-flake-lock@v16",
+  "path": ".github/workflows/update-flake-lock.yml",
+  "commit_id": "08d329e6e892a2e7e8887ef9707b857394149315",
+  "original_commit_id": "08d329e6e892a2e7e8887ef9707b857394149315",
+  "user": {
+   "login": "Mic92",
+   "id": 96200,
+   "node_id": "MDQ6VXNlcjk2MjAw",
+   "avatar_url": "https://avatars.githubusercontent.com/u/96200?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Mic92",
+   "html_url": "https://github.com/Mic92",
+   "followers_url": "https://api.github.com/users/Mic92/followers",
+   "following_url": "https://api.github.com/users/Mic92/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Mic92/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Mic92/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Mic92/subscriptions",
+   "organizations_url": "https://api.github.com/users/Mic92/orgs",
+   "repos_url": "https://api.github.com/users/Mic92/repos",
+   "events_url": "https://api.github.com/users/Mic92/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Mic92/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "I am wondering if dependabot can still upgrade those hashes",
+  "created_at": "2023-02-26T07:20:59Z",
+  "updated_at": "2023-02-26T07:20:59Z",
+  "html_url": "https://github.com/DavHau/nix-portable/pull/49#discussion_r1118032838",
+  "pull_request_url": "https://api.github.com/repos/DavHau/nix-portable/pulls/49",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1118032838"
+   },
+   "html": {
+    "href": "https://github.com/DavHau/nix-portable/pull/49#discussion_r1118032838"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/DavHau/nix-portable/pulls/49"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1118032838/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 21,
+  "original_line": 21,
+  "side": "RIGHT",
+  "in_reply_to_id": 1118005443,
+  "author_association": "CONTRIBUTOR",
+  "original_position": 21,
+  "position": 21,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1118038231",
+  "pull_request_review_id": 1314624486,
+  "id": 1118038231,
+  "node_id": "PRRC_kwDOFBYPjc5Co-jX",
+  "diff_hunk": "@@ -0,0 +1,29 @@\n+name: update-flake-lock\n+on:\n+  workflow_dispatch: # allows manual triggering\n+  schedule:\n+    - cron: '0 0 * * 1,4' # Run twice a week\n+\n+jobs:\n+  lockfile:\n+    runs-on: ubuntu-latest\n+    steps:\n+      - name: Checkout repository\n+        uses: actions/checkout@v3\n+      - name: Install Nix\n+        uses: cachix/install-nix-action@v19\n+        with:\n+          extra_nix_config: |\n+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}\n+      # `bors merge` will automerge if tests succeed\n+      # Requires this github to be installed: https://app.bors.tech/\n+      - name: Update flake.lock\n+        uses: DeterminateSystems/update-flake-lock@v16",
+  "path": ".github/workflows/update-flake-lock.yml",
+  "commit_id": "08d329e6e892a2e7e8887ef9707b857394149315",
+  "original_commit_id": "08d329e6e892a2e7e8887ef9707b857394149315",
+  "user": {
+   "login": "DavHau",
+   "id": 42246742,
+   "node_id": "MDQ6VXNlcjQyMjQ2NzQy",
+   "avatar_url": "https://avatars.githubusercontent.com/u/42246742?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/DavHau",
+   "html_url": "https://github.com/DavHau",
+   "followers_url": "https://api.github.com/users/DavHau/followers",
+   "following_url": "https://api.github.com/users/DavHau/following{/other_user}",
+   "gists_url": "https://api.github.com/users/DavHau/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/DavHau/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/DavHau/subscriptions",
+   "organizations_url": "https://api.github.com/users/DavHau/orgs",
+   "repos_url": "https://api.github.com/users/DavHau/repos",
+   "events_url": "https://api.github.com/users/DavHau/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/DavHau/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "It can and it will even update the version comment behind the line, according to an issue I read.",
+  "created_at": "2023-02-26T08:05:30Z",
+  "updated_at": "2023-02-26T08:05:30Z",
+  "html_url": "https://github.com/DavHau/nix-portable/pull/49#discussion_r1118038231",
+  "pull_request_url": "https://api.github.com/repos/DavHau/nix-portable/pulls/49",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1118038231"
+   },
+   "html": {
+    "href": "https://github.com/DavHau/nix-portable/pull/49#discussion_r1118038231"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/DavHau/nix-portable/pulls/49"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1118038231/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": 21,
+  "original_line": 21,
+  "side": "RIGHT",
+  "in_reply_to_id": 1118005443,
+  "author_association": "OWNER",
+  "original_position": 21,
+  "position": 21,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1416313872",
+  "pull_request_review_id": 1766168279,
+  "id": 1416313872,
+  "node_id": "PRRC_kwDOFBYPjc5UazwQ",
+  "diff_hunk": "@@ -85,8 +85,8 @@\n         };\n         ubuntu = {\n           system = \"x86_64-linux\";\n-          url = \"https://cloud-images.ubuntu.com/jammy/20230914/jammy-server-cloudimg-amd64.img\";\n-          sha256 = \"1lvhgla02g6f4ahzsczaq35ci76b54i4x5xmgywiramrqci19hxk\";\n+          url = \"https://cloud-images.ubuntu.com/noble/20231031/noble-server-cloudimg-amd64.img\";",
+  "path": "flake.nix",
+  "commit_id": "1fa859a110e1dfdcad7c2a11d3ddb65f97629582",
+  "original_commit_id": "e57037a8556019b3168d158679bf916e07b17719",
+  "user": {
+   "login": "Enzime",
+   "id": 10492681,
+   "node_id": "MDQ6VXNlcjEwNDkyNjgx",
+   "avatar_url": "https://avatars.githubusercontent.com/u/10492681?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Enzime",
+   "html_url": "https://github.com/Enzime",
+   "followers_url": "https://api.github.com/users/Enzime/followers",
+   "following_url": "https://api.github.com/users/Enzime/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Enzime/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Enzime/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Enzime/subscriptions",
+   "organizations_url": "https://api.github.com/users/Enzime/orgs",
+   "repos_url": "https://api.github.com/users/Enzime/repos",
+   "events_url": "https://api.github.com/users/Enzime/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Enzime/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "```suggestion\r\n          url = \"https://web.archive.org/web/20231205213242/https://cloud-images.ubuntu.com/noble/20231031/noble-server-cloudimg-amd64.img\";\r\n```",
+  "created_at": "2023-12-05T21:45:31Z",
+  "updated_at": "2023-12-05T21:45:36Z",
+  "html_url": "https://github.com/DavHau/nix-portable/pull/80#discussion_r1416313872",
+  "pull_request_url": "https://api.github.com/repos/DavHau/nix-portable/pulls/80",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1416313872"
+   },
+   "html": {
+    "href": "https://github.com/DavHau/nix-portable/pull/80#discussion_r1416313872"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/DavHau/nix-portable/pulls/80"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/DavHau/nix-portable/pulls/comments/1416313872/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 88,
+  "side": "RIGHT",
+  "author_association": "COLLABORATOR",
+  "original_position": 6,
+  "position": 1,
+  "subject_type": "line"
+ }
+]

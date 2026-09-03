@@ -157,7 +157,7 @@ axis from the brief, not from the instrument.
 ## C8 — "The CI workflow has never run"
 
 **Claimed** by `docs/AGENTS.md` §9 ("**WRITTEN, NEVER RUN** — no push has
-happened from a runner yet"), by §13 item 2, and by `TODO/ci.md` T-040, which
+happened from a runner yet"), by §13 item 2, and by `HISTORY/entries/ci.md` T-040, which
 called a green portable arm "a prediction, not a result".
 
 **Disproved by** the GitHub Actions API. The workflow had run **ten times** by
@@ -221,7 +221,7 @@ and asserts it parsed eleven rows, so the two beds cannot drift again. The
 build job asserts the two arms are different binaries — `pgb-runtime` present
 in one and absent in the other — because every other assertion in the file is
 made against the pgb arm, and a silently no-op `pgb` would otherwise produce
-a green run. `TODO/ci.md` T-040.
+a green run. `HISTORY/entries/ci.md` T-040.
 
 
 ## C9 — "the docker/podman engines are untested"
@@ -344,7 +344,7 @@ syscall-entry defect below, and what would find the next one.
 
 ## C12 — "a C++ build should work unchanged"
 
-**Claimed** by `TODO/poc.md` T-001's premise, and marked as read rather than
+**Claimed** by `HISTORY/entries/poc.md` T-001's premise, and marked as read rather than
 measured: "⚠ Read, not measured: `pgb`'s wrappers pass `-shared` through
 untouched and inject only at executable links, so a C++ build *should* work
 unchanged. No C++ project has been built."
@@ -555,7 +555,7 @@ isolates the PACKER — same payload, same 5,276 libraries, same zstd level:
 ⭐ **The lesson is the one C-series entry that keeps recurring: a skipped arm
 is not a result about the thing that was skipped.** This is the SECOND defect
 in this same arm blamed on onelf — the first was our symlink dispatching on
-argv[0] (`TODO/toolchain.md` T-055). Both times the instrument was wrong and
+argv[0] (`TODO/poc.md` T-055). Both times the instrument was wrong and
 the competitor carried the verdict.
 
 ---
