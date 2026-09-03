@@ -375,7 +375,23 @@ is **costing route B**, which is where the size actually is.
         binary runs, PT_INTERP 0, DT_NEEDED 0. `cxxCandidates` is split out so
         what the scan WOULD open is assertable without a filesystem; ten cases
         pin the rule.
-        ⛔ THE LINK HOT PATH CHANGED AGAIN, so the ten POCs must be re-run.
+        ⭐ AND THE RE-RUN WITH THE FIX: ICU link errors 0, the backend BUILT,
+        and the build advanced to the failure T-063 already records.
+          src/backend/postgres   101,647,216 B  (was 63,889,168 WITHOUT icu)
+          PT_INTERP 0, DT_NEEDED 0, ⭐ 3,911 icu_78 symbols in the image
+          ./postgres --version                   -> PostgreSQL 18.6
+          on alpine-3.22 (no glibc at all)       -> PostgreSQL 18.6
+        ⚠ It now stops in src/interfaces/libpq, and on a DIFFERENT kind of
+        problem: `libpq must not be calling any function which invokes exit`
+        is postgres's OWN policy check on the SHARED libpq, which a static
+        build has no use for. The next rung is "stop building the shared
+        client library", not "make it link".
+        ⛔ THE LINK HOT PATH CHANGED AGAIN, so the ten POCs must be re-run --
+        and ⛔ A PLAIN RE-RUN WOULD HAVE PROVED NOTHING: every POC skips its
+        build when the artefact exists and only five of ten honour
+        POC_REBUILD. ⭐ `poc/run-all.sh --rebuild` now exists and is the
+        command; it deletes the shared work tree so all ten build against the
+        toolchain as it is NOW.
 
     ---- 1. T-066 P0, and the route order is now ARGUED rather than assumed ----
 

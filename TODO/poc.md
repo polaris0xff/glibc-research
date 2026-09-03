@@ -750,3 +750,43 @@ features a distro plan enables reads as "this package cannot be built".
    `-L dir`, `-l:libfoo.a`, and the negatives (`-lm` with no `-L` resolves to
    nothing; `-o`'s and `-L`'s own values are not inputs; ordinary flags and
    source files name nothing).
+
+   ### ⭐ AND THE RE-RUN WITH THE FIX: A STATIC POSTGRESQL **WITH ICU**, ON ALPINE
+
+   Same command, same plan, the fixed wrapper. ⛔ **ICU link errors: 0.** The
+   backend built, and the build advanced past `src/backend` to the failure this
+   entry already records:
+
+   | | before the `-l` fix | ⭐ after |
+   |---|---|---|
+   | where it stops | ⛔ `src/backend`, linking | ⭐ `src/interfaces/libpq` |
+   | `operator delete` / `__cxxabiv1` errors | **many** | ⭐ **0** |
+   | `src/backend/postgres` | not produced | ⭐ **101,647,216 B** |
+
+       file        ELF 64-bit LSB executable, x86-64, statically linked
+       PT_INTERP   0            DT_NEEDED   0
+       icu_78 symbols in it     ⭐ 3,911
+       ./postgres --version                              -> PostgreSQL 18.6
+       pgb rootfs run alpine-3.22 -- /postgres --version -> PostgreSQL 18.6
+
+   ⭐ **101.6 MB against the 63.9 MB this entry recorded for the `--without-icu`
+   build** — the difference is ICU, and `nm` finds 3,911 of its symbols in the
+   image. **PostgreSQL's server, with ICU collation, built against glibc,
+   answering on a distribution that ships no glibc.**
+
+   ⚠ **The stopping point moved but did not go away**, and the new one is a
+   different KIND of problem — worth stating because this entry's remaining
+   rung 1 is about static link order and this is not that:
+
+       libpq.so.5.18:  U pthread_exit@GLIBC_2.2.5
+       libpq must not be calling any function which invokes exit
+       make[3]: *** [Makefile:147: libpq-refs-stamp] Error 1
+
+   ⛔ That is **postgres's own policy check** (`libpq-refs-stamp`), not a
+   linker error: it forbids `libpq.so` from referencing anything that can
+   `exit()`. It is checking the SHARED libpq, which a static build has no use
+   for. ⭐ So the next rung is not "make it link" — it is *stop building the
+   shared client library at all*, and the flag for that is postgres's own
+   (`--disable-shared` is not one of its options; the client libraries' shared
+   half is built unconditionally by `src/interfaces/*/Makefile`). ⚠ Not
+   attempted; named so the next session starts from the right question.
