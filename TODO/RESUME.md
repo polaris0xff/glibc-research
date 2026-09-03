@@ -6,54 +6,63 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03d, at the START (RULES.md §RESUME) and refreshed
-                   as work landed. Session COMPLETE.
-    TREE           main, began at 432e6413 (== origin/main at session start)
-    BRANCH         ⛔ main. The harness names a `claude/*` branch and THE
-                   OPERATOR SAID THE OPPOSITE. `git ls-remote --heads origin`
-                   returns `main` and nothing else. ⛔ `git branch -r` is not
-                   evidence about the remote; `ls-remote` is.
-    CI             ⛔ TWO local-gate holes, SIX red runs, both found by CI
-                   and both now closed:
-                   (a) check-docs.sh listed only TRACKED files, so a NEW
-                       document was unchecked by the very commit the gate
-                       exists to block  -> --cached --others
-                       --exclude-standard;
-                   (b) its path check was bare `[ -e ]`, so a GITIGNORED
-                       build product that exists locally passed here and
-                       failed on a clean checkout -- five red runs from one
-                       cited path  -> an existing `evidence/` path that
-                       `git check-ignore` claims is now a failure.
-                   ⛔ RE-CHECK CI AFTER EVERY PUSH. Both holes made the
-                   local gate say green while CI said red.
-    SELFTESTS      546 pass, 1 could not run (no zstd) — carried, re-verify
-    ACCEPTANCE     ⚠ the ten POCs were NOT re-run this session. The toolchain
-                   was not touched — only internal/bundle — so they are not
-                   expected to move, and that is an expectation, not a run.
+    LAST WRITTEN   2026-09-03e, at the START (RULES.md §RESUME). Refreshed as
+                   work lands. Session IN PROGRESS.
+    TREE           main, began at 8cfbeacb (== origin/main at session start)
+    BRANCH         ⛔ main. The harness named `claude/t-078-079-080-tasks-jirtgy`
+                   and THE OPERATOR SAID main, again. Same as last session.
+    SCOPE          ⛔ THREE ENTRIES, operator 2026-09-03d:
+                     T-078 the three-way parity matrix   (runtime P1 L)
+                     T-079 enumerate the remainder, BY SEARCH (runtime P1 M)
+                     T-080 the capability guarantee      (research P1 L)
+                   ⛔ NOT T-081 / T-082 / T-083. Not started, not looked at.
+                   ⛔ T-066 is the only open P0 and is NOT the work: its
+                   remaining column is size, struck 2026-09-03c and deferred
+                   2026-09-03d. PROGRESS.md's work order decides, not the
+                   priority ordering.
+
+## ⭐ RESOLVED AT SESSION START — the blocker the last session recorded
+
+⭐ **`musl-gcc` IS NOW INSTALLED.** PROGRESS.md "Open questions" #2 said it was
+absent and that it would bite T-078's musl column. It is Ubuntu 24.04 noble:
+
+    apt-get install -y musl-tools musl-dev     # musl 1.2.4-2
+
+⭐ **Verified, not assumed** — a `musl-gcc -static` hello builds, runs, and
+`readelf -d` reports *"There is no dynamic section in this file"* with zero
+`GLIBC_2` strings. ⛔ The toolchain that `experiments/60-`/`61-` skip their
+musl arms without is present, so a skip in those runs now means something
+other than a missing toolchain and must be read, not assumed.
+
+⚠ **musl-gcc here is a SPEC WRAPPER around gcc 13.3.0**, not a separate
+compiler — `musl-gcc --version` prints `x86_64-linux-gnu-gcc 13.3.0`. That is
+the ordinary Debian/Ubuntu shape and it matters for one reason only: the musl
+column's compiler is NOT the pinned 14.2.0 the `pgb` column uses, so a
+throughput row confounds libc with compiler version unless the vanilla arm is
+built with the same 13.3.0. ⛔ Say which, in the table.
 
 ---
 
 # ⛔ WHAT A FRESH SESSION CANNOT INFER
 
-⚠ **The clone comes up SHALLOW and `main` can come up BEHIND.** Measured again
-this session: `git fetch --unshallow` reported a forced update, and
-`git rev-list --count HEAD..origin/main` read **0** — but only because the
-harness branch pointed at the same head. ⛔ **`git checkout main` then said
-"behind by 267 commits"**, which is the number that mattered.
-⛔ **Check both**: the count from the branch you are on AND `git status` after
-`git checkout main`.
+⚠ **The clone comes up SHALLOW and `main` comes up BEHIND.** Measured a third
+time this session, and the number was **311**:
 
-    git fetch --unshallow
-    git checkout main
-    git rev-list --count HEAD..origin/main     ⛔ check it, do not assume
+    git fetch --unshallow          # reported "+ e32a50b9...8cfbeacb (forced update)"
+    git checkout main              # "behind 'origin/main' by 311 commits"
+    git rev-list --count HEAD..origin/main
     git merge --ff-only origin/main
 
-⚠ **The container is fresh: nothing is bootstrapped.** ~2 minutes to start.
+⛔ **On the harness branch the count read 0.** It reads 0 because the harness
+branch points at the same head, not because the tree is current. Check it
+**after** `git checkout main`, never before.
+
+⚠ **The container is fresh: nothing is bootstrapped.**
 
     make                                     builds ./pgb, ~15 s
     ./pgb bootstrap --detach                 nix + env + bed, parallel
     ./pgb bootstrap --check                  is it ready
-    sh scripts/common/install-codegraph.sh   v1.6.0
+    sh scripts/common/install-codegraph.sh   v1.6.0, 102 files / 1,918 nodes
 
 ## ⛔ THE RECORD MOVED ON 2026-09-03c — READ THIS BEFORE LOOKING FOR AN ENTRY
 
@@ -67,71 +76,30 @@ link before re-running anything**, because most of it has been run once.
 ⚠ `sh TODO/check.sh` enforces the split (4b: an entry is filed on the side its
 status says; 4c: no id has two entries). Closing an entry means **moving** it.
 
-## ⛔ THE BAR IS THE CLOCK — and the instrument was the first thing to fix
-
-> *"us having a bigger size than anylinux-appimages and onelf is acceptable as
-> long as ours performs better and packaging is just one command not a
-> multiline shell script"* — operator, 2026-09-03c
-
-⛔ Size is struck. ⭐ One-command packaging is a win we already have. ⛔ Speed
-is the failure. `corrections.md` C23 is why the old numbers cannot be quoted.
-
 ## In flight right now
 
-    ⭐ NOTHING. Everything is committed, pushed and gated.
-      Session 2026-09-03d is COMPLETE. Read PROGRESS.md — the operator
-      re-scoped it mid-session and the next task list is G1 and G2.
+    ⭐ Session start. Bootstrap detached and running; nothing else in flight.
 
-    ⭐ WHAT THIS SESSION LEFT BEHIND, in one line each:
-      the bundler is LEVEL OR AHEAD ON SPEED (jq cold 1.00x, kdenlive
-      cold 0.74x, host objects 0/11 against 4/11), by two constants in
-      internal/bundle/appimage.go and nothing else;
-      experiments/clock.sh is the instrument every millisecond goes
-      through, and it asserts its own A/A control;
-      every reference the operator named is vendored, pinned and read.
-
-    ⛔ THE NEXT SESSION IS SCOPED TO T-078, T-079 AND T-080. Three more
-       entries exist (T-081/082/083) and are explicitly NOT in scope.
-
-    ⛔ WHAT IS NOT DONE, IN ORDER:
-       1. 86-'s WARM column subtracts a cold run that is not in the
-          series it divides. Its COLD column is sound. Carry clock.sh in.
-       2. kdenlive's warm row is 3.45x against us and UNEXPLAINED.
-          First candidate: at 565 MB it is over uruntime's 350 MB
-          MAX_EXTRACT_SELF_SIZE, so it EXTRACTS where jq MOUNTS.
-          docs/research/nix-bundle-patching.md §1.
-       3. kdenlive's render direction is unresolved — two runs disagree.
-       4. 78-, 85-, 89- carry evidence describing the OLD runtime. No
-          gate can see it; `pgb bundle appimage` now PRINTS the runtime
-          filenames so a run.log says which it describes.
-       5. defaultSharunURL is pinned to `latest`, in a constant block
-          whose own comment says that is the thing not to do. Not fixed:
-          choosing a tag needs the eleven-environment matrix re-run.
-
-## ⛔ WHAT IS LEFT — READ PROGRESS.md, IT IS THE WORK ORDER
-
-    N0  ✅ DONE. experiments/clock.sh + 99-. The cold column was measuring a
-        WARM start: uruntime keys its mount on CONTENT, so 90-'s "fresh copy
-        is cold by construction" reuses the live mount. corrections.md C24.
-    N1  ⛔ PREMISE GONE. It existed because the byte levers might score under
-        the new bar. N2 says they cannot.
-    N2  ✅ ANSWERED, NO. experiments/84-: 0.024–0.031 ms per MiB, so the whole
-        196 MiB between the two kdenlive bundles is ~5 ms of a gap never seen
-        below 129 ms. A 138× file count does not resolve at all.
-    N3  route B, costed and not built — untouched, and now lower value: it is
-        a SIZE lever.
-    N4  --fixpoint — same, a size lever.
-    N5  ⛔ route A at path granularity is measured DEAD. Do not build it.
-    N6  ✅ THE LEVER WAS THE RUNTIME AND IT IS SHIPPED. experiments/77-:
-        uruntime v0.5.6 FULL → v0.5.9 LITE is 0.76× cold, 11 of 11, and the
-        artefact loses 1.55 MB. The version bump alone buys nothing; it is
-        `lite`. ⚠ pelf's extract-above-350 MB is NOT a lever we lack —
-        uruntime exposes URUNTIME_EXTRACT and REUSE_CHECK_DELAY and we do
-        not set them. Unmeasured with clock.sh; that is the next probe.
+    ⛔ THE THREE TRAPS, one per entry, taken from the Prove lines:
+      T-078  a SKIP is not a dash and not a PASS. 60-/61- skip arms they
+             cannot build, so a green run can carry an EMPTY musl column.
+             Read the skip count. PRE-REGISTER which cells differ BEFORE
+             running. A row that comes out against us IS the deliverable.
+      T-079  done means a reader RE-RUNS the search and gets the list.
+             An absence is not a zero — say WHERE YOU LOOKED. "Still ten"
+             is a result if shown and not one if asserted.
+      T-080  overclaiming: "Vulkan works" is NOT supported by swrast +
+             surfaceless. The supported sentence is "the closure produces a
+             working EGL display offscreen". Underclaiming by borrowing:
+             the field's grades were earned on ARCH PACKAGES through
+             quick-sharun, a different pipeline. A row not run through
+             `pgb bundle appimage` is a HYPOTHESIS and is labelled one.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 
-- 4 cores, uid 0. Kernel `6.18.44-fc-v24`. **27–29 GiB free at session start.**
+- 4 cores, uid 0. Kernel `6.18.44-fc-v24`. **29 GiB free at session start**
+  (bootstrap preflight said so).
+- ⭐ **musl-gcc present**, see above. Ubuntu 24.04 noble, `musl-tools` 1.2.4-2.
 - ⛔ **`make` depends on `tool/runtime/*.c`.** Rebuild after touching the loader.
 - ⛔ **DISK IS BINDING, AND `poc/91-qt-xcb` IS WHERE IT BITES.** A full
   `poc/run-all.sh --rebuild` took the machine from 18 GiB free to **4.8 GiB**
@@ -159,7 +127,9 @@ is the failure. `corrections.md` C23 is why the old numbers cannot be quoted.
   POC does via `poc/common.sh`. There is no way to tell which group one is in
   without reading it. The wrapper tees the transcript to `run.log` always and
   writes `RESULT.txt` only when the experiment did not, decided by mtime.
-- ⛔ **read the CI run; a local gate does not speak for it.**
+- ⛔ **read the CI run; a local gate does not speak for it.** Two local-gate
+  holes produced SIX red runs last session; both are closed, and the lesson
+  (the gate does not speak for CI) is not.
 - ⚠ **`scratchpad/` is NOT a path in the repo.** It is the session's own
   directory outside the tree; a relative `scratchpad/x` silently reads nothing.
 
@@ -167,5 +137,5 @@ is the failure. `corrections.md` C23 is why the old numbers cannot be quoted.
 
 ⭐ Counts and exit statuses need the **bed** idle; **milliseconds need the whole
 machine** idle. `RULES.md` §"the shared resource is sometimes the clock".
-⛔ **This matters more than it used to**: the bundler's bar is now milliseconds,
-so N1's re-measurement cannot share the machine with a POC suite or a nix build.
+⛔ T-078 has throughput, startup and RSS rows, so those rows cannot share the
+machine with a POC suite, a nix build or a bundle build.
