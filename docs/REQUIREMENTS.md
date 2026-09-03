@@ -99,6 +99,32 @@ parts, and **both** are required:
    | **host plugins** | `dlopen` of a host `.so` is host-dependent | ⛔ **open, and now SERVED BY A SHIPPED MECHANISM rather than untouched** — `pgb build --host-dlopen`, T-064 ✅, T-068 ✅. A `.so` built by the pinned glibc loads on **11 of 11** with zero host objects; a **real host** `.so` loads on **7 of 7 glibc rows** and is refused by name on **4 of 4 musl rows**; **882 of 1,527** host objects on the build host load. ⛔ It stays OPEN because the row says *host-dependent* and it still is. ⚠ **It was called "the last one" until 2026-09-03c**; see the row below |
    | ⭐ **timezone** | `tzset` reads the host's zone database; nothing is linked in | ✅ **closed, and it was found AND closed on 2026-09-03c** — opt-in `--embed-tzdata`; `experiments/97-` runs two arms, pass=13 fail=0. Arm A (plain `-static`) resolves `Europe/Berlin` on **7 of 11** and ⛔ **4 of 11 cannot and do not say so**, printing `Europe +0000` — the zone name **asked for**, at a UTC offset. Arm B resolves on **11 of 11** for **193,208 B** of carried zones. ⚠ A handful (20), not a database; a zone not carried is unchanged. T-076 |
 
+   | ⛔ **network name databases** | `/etc/services`, `/etc/protocols`: `getservbyname`/`getprotobyname` read a host file that a static link does not absorb | ⛔ **OPEN, found 2026-09-03e by the search T-079 asked for.** `experiments/82-`: `getservbyname("http","tcp")` returns **NULL on 3 of 11 — debian-11, debian-12, ubuntu-20.04, and ALL THREE ARE GLIBC**; all four musl environments ship the file. ⚠ **Not a restatement of NSS**: NSS is closed for *dispatch* — `__nss_configure_lookup` pins the `services` database to `files` — and that cannot conjure a `files` backing store the host does not have. Dispatch and data are two failures and only one is closed. ⭐ The failure is a **NULL return, not a wrong value**, so it is louder than gconv's and timezone's: a caller that checks sees it. `experiments/63-` confirms all three columns fail it identically |
+
+   ## ⛔ THE LIST WAS NINE, THEN TEN, AND IT IS NOW ELEVEN — 2026-09-03e
+
+   ⭐ **The eleventh was found the way T-079 required — by a SEARCH, and the
+   search is re-runnable.** `experiments/82-` enumerates every absolute path
+   the **pinned** `libc.a` names (78 of them at glibc 2.41), classifies each
+   against the rows above, and prints the residue that no row owns (19).
+   `/etc/services` was in that residue.
+
+   ⛔ **AND THE SEARCH SAYS WHERE IT DID NOT LOOK**, because an absence is not
+   a zero. It sees absolute-path string literals and environment-variable names
+   in `libc.a`. It does **not** see paths assembled at run time from `%s/%s`
+   and a variable, host data belonging to **other** static libraries — ⚠ two of
+   the closed rows, terminfo (ncurses) and the CA bundle (OpenSSL), are
+   invisible to it **by construction** — or anything reached through a host
+   daemon rather than a file.
+
+   ⚠ **A second finding from the same run, and it is NOT a new row**:
+   `gethostid()` dies with **SIGFPE on Arch**. With no `/etc/hostid` — **0 of
+   11** have one — glibc falls back to resolving the machine's own hostname,
+   which is an NSS `hosts` lookup. That is row 1 (NSS) reached through a
+   function nothing in this tree had ever called; what was under-described was
+   its **reach**, not the row. `pgb` fixes it: `experiments/63-` has
+   `hostid` answering on 11 of 11 under `pgb` and crashing under vanilla.
+
    ## ⛔ THE LIST WAS NINE AND IT IS TEN — 2026-09-03c
 
    ⚠ **This page said, of the nine: *"there is no unenumerated remainder, so
@@ -154,7 +180,7 @@ rather than as unmeasured gaps.
 | part | state | why |
 |---|---|---|
 | **1. No known environment where it fails** | ⛔ **not met** | One measured failure, and it is now the **only** one: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ **Route D was TAKEN and it SHIPPED** — `pgb build --host-dlopen`, an ELF loader compiled in (**T-064 ✅**, residue **T-068 ✅**), 11 of 11 carried with zero host objects and a real host `.so` on 7 of 7 glibc rows. ⚠ **Corrected 2026-09-03**: this cell used to point at **T-033**, an entry still marked open that describes the same route T-064 completed, and it named no shipped mechanism at all — so the bar read as though nothing had been built. ⛔ It remains not-met because the failure is *host-dependence*, and that persists: the four musl rows refuse a host object by design, and 645 of 1,527 host objects on the build host do not load (**374 of which glibc's own `ld.so` also fails** — plugins of a host program). |
-| **2. A static glibc binary with none of the issues** | ⛔ **not met, and now countable** | ⭐ **NINE of TEN** enumerated issues are closed on all eleven environments — it was six of nine before 2026-09-01d. **One** is open: host plugins. ⭐ **The tenth was found AND closed on 2026-09-03c**, which is the fastest any of them has moved. ⛔ **The claim that there is no unenumerated remainder was FALSE and is withdrawn** — the tenth row was found by one grep, on the day somebody asked whether the list was complete. The distance to the bar is ONE named problem and a method that has just been shown to miss things. |
+| **2. A static glibc binary with none of the issues** | ⛔ **not met, and the deficit GREW on 2026-09-03e** | ⭐ **NINE of ELEVEN** enumerated issues are closed on all eleven environments. **Two** are open: host plugins, and ⛔ **the network name databases** (`/etc/services`), found by `experiments/82-` on 2026-09-03e. ⛔ **The list went nine → ten → eleven on three consecutive days, each time because somebody asked whether it was complete rather than whether the known rows were closed.** ⭐ What is different this time is the method: the eleventh came from a **re-runnable search over the pinned `libc.a`**, not from one guessed grep, and that search states where it cannot see. The distance to the bar is TWO named problems. |
 
 ### The head-to-head, which is now evidence rather than the test
 
@@ -201,17 +227,19 @@ terminfo — and ⭐ **2026-09-03c opened a tenth and closed it the same day**
 the mechanism) with its residue in T-068 (closed) — ⚠ **not T-033, which this
 page pointed at until 2026-09-03 and which is a stale duplicate of the route
 T-064 took**.
-⭐ **T-079 OWNS ASKING AGAIN**, and it is an entry rather than an intention:
-the operator set it on 2026-09-03d — *"GLIBC static is truly complete, no
-edgecases exist ... No buts and no ifs."* ⛔ Its rule is that the answer must
-be a **search** with the command that produced it, never the sentence that
-failed here. `../TODO/runtime.md` T-079.
+⭐ **T-079 ASKED AGAIN ON 2026-09-03e AND THE ANSWER WAS NO.** The operator set
+it on 2026-09-03d — *"GLIBC static is truly complete, no edgecases exist ... No
+buts and no ifs."* ⛔ It is not: `experiments/82-` found an **eleventh** row,
+`/etc/services`, by the search the entry demanded rather than by the sentence
+that failed here. `../TODO/runtime.md` T-079.
 
-⛔ **NINE of TEN are closed and one is not, so this is a countable deficit
-and not a judgement.** Do not soften the one that remains: host plugins is the
-hardest of the ten, and being last does not make it small. ⚠ And do not read
-"nine of ten" as "almost done": the tenth was invisible until somebody asked
-whether the list was complete, and nothing says an eleventh is not.
+⛔ **NINE of ELEVEN are closed and TWO are not, so this is a countable deficit
+and not a judgement.** Do not soften either: host plugins is the hardest of the
+eleven, and being last does not make it small; the network name databases are
+the newest and have no mechanism at all yet. ⚠ And ⛔ **the sentence that used
+to sit here — *"nothing says an eleventh is not"* — was right within a day.**
+The list has grown on three consecutive days. Read "nine of eleven" as a
+snapshot of a search, never as a distance to done.
 
 ### What is still unmeasured, and is not counted either way
 

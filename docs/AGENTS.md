@@ -129,15 +129,21 @@ variable:
 
 | | glibc static | musl static |
 |---|---|---|
-| malloc, 4 threads | **4.53 ns/op** | 584.71 ns/op |
-| qsort | **93.20 ns/op** | 921.49 ns/op |
-| strlen/strchr/strstr | **149.14 ns/op** | 1051.09 ns/op |
+| malloc, 4 threads | **6.73 / 8.40 ns/op** | 606.39 / 704.79 ns/op |
+| qsort | **84.14 / 83.96 ns/op** | 620.81 / 607.43 ns/op |
+| strlen/strchr/strstr | **244.75 / 241.24 ns/op** | 1377.94 / 1355.08 ns/op |
+
+⭐ **Two runs, 2026-09-03e**, on the first machine here to have `musl-gcc`
+installed — this arm had been **skipped** for want of it, so earlier figures
+came from another machine. ⚠ `memcpy` **changes sign** between the two runs and
+is reported as *no difference measurable*; `comparison.md` has every row.
 
 ⭐ **The product, in one row:** on **Alpine**, where the ordinary choice is a
 musl build, a `pgb` binary does that 4-thread allocator workload in
-**4.68 ns/op** against musl's **592**. glibc's numbers on a machine that ships
-no glibc — and `pgb` costs nothing to carry them: 0.99×–1.05× against plain
-`gcc -static` on the same workloads.
+**6.86 ns/op** against musl's **1045.49**, and **6.38–11.43** against
+**622.99–1069.39** across all eleven. glibc's numbers on a machine that ships
+no glibc — and `pgb` costs 1.00×–1.13× against plain `gcc -static` on the same
+workloads.
 
 The stack to measure against is **`Anylinux-AppImages`**: it bundles glibc, its
 loader and its gconv tree, and `experiments/62-` has it running on 11 of 11 at

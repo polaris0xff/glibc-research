@@ -13,6 +13,81 @@ Evidence: `evidence/60-versus-alternatives/`, `evidence/61-libc-throughput/`,
 
 ---
 
+## ⭐ THE THREE-WAY PARITY MATRIX — vanilla `gcc -static` vs ours vs native musl static
+
+⛔ **The operator named this table, 2026-09-03d**: *"a markdown table covering
+'vanilla' GLIBC static binaries vs 'Ours' static binaries vs native MUSL static
+binaries must be compared on all possible comparisons that they can be compared
+with"*, against the claim *"our static glibc binary and a native musl static
+binary are at feature/standalone parity. No buts and no ifs."*
+
+⭐ **One probe, three builds, eleven environments, every cell run —
+`experiments/63-`, `pass=16 fail=0 skip=0`, two runs with every cell
+identical.** ⛔ **`skip=0` is the number to read first.** `60-` and `61-` skip
+arms they cannot build, so a missing musl toolchain yields a green run with an
+empty column; here every arm built and nothing was skipped.
+
+⚠ **The vanilla column is built INSIDE the pinned environment**, so it differs
+from `pgb` only by the injected mechanisms — same gcc 14.2.0, same glibc 2.41.
+A host-built vanilla arm is carried as a **control** and agrees with it on every
+capability axis, so the column does not depend on that choice.
+
+| axis | vanilla `gcc -static` | **`pgb`** | native musl static | evidence |
+|---|---|---|---|---|
+| runs on the eleven | 11 / 11 | **11 / 11** | 11 / 11 | `63-` |
+| ⛔ **rows with a crashed axis** | ⛔ **5 / 11** | ✅ **0 / 11** | ✅ 0 / 11 | `63-` |
+| payload clean (host `.so` opened) | 0 envs | **0 envs** | 0 envs | `63-` |
+| NSS — `getpwuid(0)` | 10 / 11 | **11 / 11** | 11 / 11 | `63-` |
+| NSS — `gethostid()` | ⛔ **SIGFPE on Arch** | ✅ **11 / 11** | ✅ 11 / 11 | `63-`, `82-` |
+| iconv — encodings accepted | 1 / 12, and **SIGABRT on 3** | ✅ **12 / 12** | 10 / 12 | `63-` |
+| locale — codeset **by environment** | ⛔ 0 / 11 | ⛔ **0 / 11** | ⭐ **11 / 11** | `63-` |
+| locale — codeset **when requested** | 7 / 11 | ✅ **11 / 11** | 11 / 11 | `63-` |
+| timezone — `TZ=Europe/Berlin` | 7 / 11 | ✅ **11 / 11** | 7 / 11 | `63-`, `97-` |
+| ⛔ **`/etc/services`** | ⛔ 8 / 11 | ⛔ **8 / 11** | ⛔ 8 / 11 | `63-`, `82-` |
+| terminfo | — | ✅ 11 / 11 (`--embed-terminfo`) | — | `75-` |
+| CA bundle | 5 / 11 | ✅ 11 / 11 (`--embed-cacert`) | — | `74-` |
+| `dlopen` of its OWN plugins | — | ✅ 11 / 11, zero host objects | — | `71-` |
+| `dlopen` of a HOST object | — | ✅ 11 / 11 carried; 7 / 7 glibc rows real | ⛔ refused by name | `76-` |
+| `PT_INTERP` / `DT_NEEDED` | none / none | **none / none** | none / none | `63-` |
+| artefact size (same source) | 1,148,360 B | 2,722,968 B | **237,440 B** | `63-` |
+| throughput — malloc, 4 threads | 8.40 ns | **6.4–11.4 ns on all 11** | 606–705 ns | `61-` |
+| throughput — qsort | 83.96 ns | ≈ vanilla (1.01–1.02×) | 607–621 ns | `61-` |
+| throughput — str\*, 3 ops | 241 ns | ≈ vanilla (1.01×) | 1355–1378 ns | `61-` |
+| throughput — memcpy | ⚠ **no difference measurable** | ⚠ same | ⚠ same | `61-` |
+| startup, peak RSS | ⚠ **no difference measurable** | ⚠ same | 160 µs / — | `40-`, `60-` |
+| what it writes to the filesystem | nothing | nothing, unless an `--embed-*` fires | nothing | `63-`, `97-` |
+
+### ⛔ The two rows that come out against us, reported and not softened
+
+⭐ **T-078's own rule**: *"If a row comes out against us, that row IS the
+deliverable — report it, do not soften the axis until it passes."* There are
+two, and one of them **falsified a pre-registered prediction**.
+
+1. ⛔ **The environment-default codeset, and it is the one axis where native
+   musl beats BOTH glibc columns.** With no `LANG` set — what a program gets in
+   a bare container — musl answers **UTF-8 on 11 of 11** and every glibc arm,
+   `pgb` included, answers `ANSI_X3.4-1968` on **11 of 11**. musl's minimal
+   locale support does not mean a poor codeset: its default charset *is* UTF-8,
+   unconditionally. ⚠ `--embed-locale` answers a **request** for UTF-8 and does
+   not change what an unset `LANG` means; asked for `C.UTF-8` by name, `pgb`
+   answers UTF-8 on 11 of 11 against vanilla's 7. ⛔ The prediction registered
+   before the run said the opposite on both halves; it is recorded as wrong in
+   `experiments/63-`'s header rather than rewritten.
+2. ⛔ **`/etc/services`** — the **eleventh** host-data dependency, found by
+   `experiments/82-` and open. All three columns fail it on the same three
+   environments, so it is not a row `pgb` loses *to musl* — it is a row nobody
+   wins, and `pgb` claims to be the one that should. See
+   [`REQUIREMENTS.md`](REQUIREMENTS.md).
+
+### What the matrix says about the parity claim
+
+⭐ **On every axis measured here except the environment-default codeset, `pgb`
+is level with or ahead of native musl static** — and it is ahead on iconv
+(12/12 vs 10/12), timezone (11 vs 7) and throughput (by 84× on contended
+malloc), at 11.5× the artefact size. ⛔ **The claim as stated — *"no buts and
+no ifs"* — is therefore not yet true**: there is one measured "but"
+(unset-`LANG` codeset) and one measured "if" (`/etc/services`).
+
 ## Who is actually in this race
 
 ⛔ **musl is not a rival, it is the thing being avoided.** `tmp/START.md` asks
@@ -75,15 +150,27 @@ See [`design/tiers.md`](design/tiers.md).
 Same machine, same compiler, libc the only variable. ns per operation, lower is
 better (`experiments/61-`, 3 rounds, best round).
 
-| workload | glibc static | musl static | musl slower by |
+⭐ **Re-measured on 2026-09-03e, TWICE**, on a machine where `musl-gcc` was
+installed at session start — arm A had been **skipped** for want of it, so the
+figures this table used to carry came from an earlier machine. Both runs below;
+the ratio is what carries, not the ns.
+
+| workload | glibc static | musl static | musl slower by (run 1 / run 2) |
 |---|---|---|---|
-| malloc, 4 threads | **4.53** | 584.71 | **129×** |
-| qsort | **93.20** | 921.49 | 9.9× |
-| strlen/strchr/strstr | **149.14** | 1051.09 | 7.1× |
-| malloc, 1 thread | **12.95** | 42.20 | 3.3× |
-| snprintf | **344.42** | 989.67 | 2.9× |
-| math (pow/exp/log/sin) | **28.58** | 32.07 | 1.12× |
-| memcpy, 8 B–256 KiB | **970.29** | 1036.82 | 1.07× |
+| malloc, 4 threads | **6.73 / 8.40** | 606.39 / 704.79 | **90.1× / 83.9×** |
+| qsort | **84.14 / 83.96** | 620.81 / 607.43 | 7.4× / 7.2× |
+| strlen/strchr/strstr | **244.75 / 241.24** | 1377.94 / 1355.08 | 5.6× / 5.6× |
+| malloc, 1 thread | **20.62 / 22.17** | 57.39 / 59.94 | 2.8× / 2.7× |
+| snprintf | **585.88 / 574.47** | 722.80 / 719.61 | 1.23× / 1.25× |
+| math (pow/exp/log/sin) | **43.41 / 42.86** | 47.10 / 46.44 | 1.09× / 1.08× |
+| memcpy, 8 B–256 KiB | 1019.18 / 1132.95 | 1082.06 / 1090.71 | ⚠ **1.06× / 0.96×** |
+
+⛔ **The `memcpy` row CHANGES SIGN between the two runs** — musl slower, then
+musl faster — so it is at this instrument's noise floor and must be reported as
+**"no difference measurable"**, never as a figure. That is the same rule
+[`AGENTS.md`](AGENTS.md) §10 applies to startup and peak RSS, and the sign
+change is why the rule exists. Every other row keeps its direction and its
+rough magnitude across both runs.
 
 ⭐ **glibc's advantages are where its engineering is**: per-thread malloc arenas
 against a contended allocator, and IFUNC-dispatched SIMD string routines
@@ -96,14 +183,17 @@ can matter more than any row above.
 
 | | on Alpine 3.22, malloc 4 threads |
 |---|---|
-| `pgb` | **4.34–4.68 ns** |
+| `pgb` | **6.86 ns** |
 | anylinux AppImage | **3.66–7.20 ns** |
-| static musl | 592–636 ns |
+| static musl | 1045.49 ns |
 
 ⭐ **That row is the product.** On a machine that ships no glibc, both glibc
-deliveries give you glibc's numbers. And `pgb` adds nothing over a plain static
-glibc build on the same workloads: **0.99×–1.05×** (`experiments/61-` arm B),
-which is the steady-state counterpart to `experiments/40-`'s startup result.
+deliveries give you glibc's numbers. ⭐ **And it travels to all eleven**: `pgb`
+does that workload in **6.38–11.43 ns** on every environment against static
+musl's **622.99–1069.39** (`experiments/61-` arm C, one round per environment).
+`pgb` adds **1.00×–1.13×** over a plain static glibc build on the same
+workloads (arm B, both runs), which is the steady-state counterpart to
+`experiments/40-`'s startup result.
 
 ## `pgb` against the anylinux AppImage, which is the real comparison
 
