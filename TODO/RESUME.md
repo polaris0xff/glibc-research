@@ -16,8 +16,8 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
     CI             ⭐ GREEN on every completed run this session (checked with
                    the GitHub API, not assumed). Re-check per push.
     SELFTESTS      546 pass, 1 could not run (no zstd)
-    ACCEPTANCE     ⭐ the ten POCs, THREE clean-rebuilt green runs; a FOURTH is
-                   in flight against the separated-`-l` fix — see below.
+    ACCEPTANCE     ⭐ the ten POCs, FOUR clean-rebuilt green runs this session,
+                   the last against every toolchain change in it.
 
 ---
 
@@ -73,17 +73,17 @@ before measuring anything with it.
 
 ## In flight right now
 
-    ⏳ `sh poc/run-all.sh --rebuild` — the FOURTH acceptance run, against deep
-       review 4's separated-`-l` fix and the new --embed-tzdata objects.
-       log: <scratchpad>/runall3.log
-       ⛔ NOTHING ELSE MAY TOUCH pgb-env-debian13 WHILE IT RUNS, and ⛔ DO NOT
-       REBUILD ./pgb — a mid-run swap makes the result describe two binaries.
-       ⭐ EXPECTED "NO CHANGE", pre-registered: the `-l` fix only ADDS
-       candidates for a spelling that previously produced none, and no POC
-       emits the separated form. 60-leveldb (C++) and 40-jq (C) were already
-       re-built clean and green against it, 13/13 each.
-       ⚠ THE THIRD RUN WAS TEN OF TEN, 170 assertions, fail=0 skip=0:
+    ⭐ NOTHING. Everything is committed, pushed, and gated.
+
+    ✅ THE FOURTH ACCEPTANCE RUN IS DONE AND GREEN — `poc/run-all.sh --rebuild`
+       against deep review 4's separated-`-l` fix and the --embed-tzdata
+       objects. ran=10 failed=0, 170 assertions, fail=0 skip=0:
          10:13 20:13 30:13 40:13 50:13 60:13 70:21 80:22 90:21 91:28
+       ⭐ The expectation was "no change" and it was pre-registered BEFORE the
+       run, not after. It held.
+    ⚠ FOR THE NEXT RUN: ⛔ NOTHING ELSE MAY TOUCH pgb-env-debian13 while the
+       suite runs, and ⛔ DO NOT REBUILD ./pgb mid-run — the result would
+       describe two binaries.
 
 ## ⛔ WHAT IS LEFT — READ PROGRESS.md, IT IS THE WORK ORDER
 

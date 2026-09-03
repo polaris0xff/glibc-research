@@ -128,11 +128,14 @@ build's** — dragging the host loader and libc into the process. Below glibc
 `docs/limitations.md` §1 has the messages. Four untried routes to fixing it are
 listed in `docs/AGENTS.md` §7; none has been shown to be closed.
 
-⭐ **Static linking says nothing about data, and all five are now closed.**
-Five distinct host data dependencies were found: gconv, locale, terminfo, CA
-bundles and NSS. Each has a mechanism — `--embed-locale`, `--embed-terminfo`,
-`--embed-cacert`, the iconv `--wrap` and the NSS override — and `pgb explain`
-prints every flag it injects and the experiment behind it.
+⭐ **Static linking says nothing about data, and all six are now closed.**
+Six distinct host data dependencies were found: gconv, locale, terminfo, CA
+bundles, NSS and — ⚠ **found only on 2026-09-03c, by asking whether the list
+was complete** — the **timezone database**, which four of the eleven test
+environments do not ship. Each has a mechanism — `--embed-locale`,
+`--embed-terminfo`, `--embed-cacert`, `--embed-tzdata`, the iconv `--wrap` and
+the NSS override — and `pgb explain` prints every flag it injects and the
+experiment behind it.
 
 Everything measured, everything not measured, and every claim that was made
 and then disproved: [`docs/limitations.md`](docs/limitations.md) and

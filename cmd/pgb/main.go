@@ -64,9 +64,14 @@ OPTIONS (build)
                              and carry a copy for hosts that have none
   --embed-terminfo           carry a handful of terminal descriptions, used
                              only when the host cannot describe $TERM
+  --embed-tzdata             carry a handful of timezone descriptions, used
+                             only when the host has no zone database. Without
+                             it, four of the eleven answer TZ=Europe/Berlin
+                             with "Europe +0000" -- the name asked for, at a
+                             UTC offset
   --embed-locale             embed C.UTF-8, materialised only if the host
-                             lacks it. Off by default: it is the one
-                             mechanism that writes to the filesystem
+                             lacks it. Off by default, like the two above:
+                             each writes under $TMPDIR when it fires
   --no-iconv                 do not link GNU libiconv
   --arch-baseline LEVEL      x86-64 | x86-64-v2 | x86-64-v3 (default x86-64)
   --bind DIR[:DEST]          expose an extra path inside the environment,
