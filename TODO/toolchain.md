@@ -317,10 +317,30 @@ coverage column unchanged.
 zero host shared objects both arms (`experiments/86-`, `evidence/`). ⚠ Parity
 is not "under"; the honest sentence is *no difference measurable on cold,
 possibly ahead on warm*.
-⛔ **THE ENTRY STAYS OPEN because the operator named kdenlive**, and goal 3's
-three columns — *smaller, load faster, run faster* — are unmeasured since the
-levers landed. Size also moved the WRONG way to buy the speed: 1.44× → 1.70×
-on `jq`, because `-S18` costs +17.8% of a real payload.
+⭐ **AND MET ON kdenlive TOO, the same day** — `experiments/90-` on the
+corrected protocol: cold **380.2 vs 513.9 ms, 0.74×, ours faster**, host
+objects **0 of 11 against the competitor's 4 of 11**. ⚠ Its warm row is 3.45×
+against us and unexplained, and its render direction is unresolved (two runs
+disagree). T-055 carries the table.
+
+⛔ **THE ENTRY STAYS OPEN ON ONE COLUMN ONLY: SIZE.** 1.70× on `jq` and 2.95×
+on kdenlive, and both moved the WRONG way to buy the speed — `-S18` costs
++17.8% of a real payload. Goal 3 names *smaller* for kdenlive specifically, so
+this is not nothing.
+
+⛔ **BUT DO NOT START HERE, AND THE PRIORITY SAYS OTHERWISE — read this
+first.** This entry is **P0**, so the ordering in
+[`INDEX.md`](INDEX.md) puts it above everything; its remaining column is
+**size**, which the operator **struck** on 2026-09-03c and **deferred** on
+2026-09-03d (*"Defer comparing speed/startup/performance with
+anylinux-appimages & onelf for now"*). ⚠ A P0 whose only open column is a
+deferred axis will route a session into work it was told not to do.
+⭐ **[`PROGRESS.md`](PROGRESS.md)'s work order is what decides**, and it names
+T-078 to T-081. The priority is kept at P0 because the operator set the
+premise and has not retired it — ⛔ **not** because this is what to work on
+next.
+⚠ And `experiments/84-` measured that the debloat levers cannot buy the size
+back on the clock anyway: 0.024–0.031 ms/MiB.
 
 📚 [detail](../HISTORY/entries/toolchain-open.md) — the AppDir-vs-artefact
 ratio (7.5:1), the six runs, the debloat accounting and the contaminated-clock

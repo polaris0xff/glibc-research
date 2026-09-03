@@ -201,6 +201,12 @@ terminfo — and ⭐ **2026-09-03c opened a tenth and closed it the same day**
 the mechanism) with its residue in T-068 (closed) — ⚠ **not T-033, which this
 page pointed at until 2026-09-03 and which is a stale duplicate of the route
 T-064 took**.
+⭐ **T-079 OWNS ASKING AGAIN**, and it is an entry rather than an intention:
+the operator set it on 2026-09-03d — *"GLIBC static is truly complete, no
+edgecases exist ... No buts and no ifs."* ⛔ Its rule is that the answer must
+be a **search** with the command that produced it, never the sentence that
+failed here. `../TODO/runtime.md` T-079.
+
 ⛔ **NINE of TEN are closed and one is not, so this is a countable deficit
 and not a judgement.** Do not soften the one that remains: host plugins is the
 hardest of the ten, and being last does not make it small. ⚠ And do not read
