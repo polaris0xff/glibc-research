@@ -371,8 +371,21 @@ is **costing route B**, which is where the size actually is.
         seven names sharpen the safety question: a bundle converting a CJK
         encoding reaches those helpers through iconv_open, which leaves no
         DT_NEEDED and no mention -- the libSDL3 shape.
-    B3b ⛔ NEXT: run experiments/89- against --fixpoint. That is the control,
-        and nothing may act on the lever until it passes.
+    B3b ⛔ NEXT: the control. ⚠ AND IT IS NOT ONE COMMAND -- read this before
+        planning it, because "run 89- against --fixpoint" understates it the
+        way the entry once understated route A's ceiling:
+          1. `--fixpoint` is deliberately NOT wired into `bundle appimage`,
+             so 89- CANNOT take it as an arm today. A fourth arm needs the
+             lever plumbed into the debloat path behind its own flag.
+          2. 89- builds THREE mesa-demos bundles. The AppDir at `--debloat
+             none` alone was 1.2 GB last session and each arm carries a
+             ~400 MB closure (N and A are hard-linked, S is not). Budget
+             several GB and ~10 min a bundle. ⛔ DISK IS BINDING here.
+          3. 89-'s assertion is an EGL one -- same vendor and driver on all
+             eleven. ⚠ The seven files the fixpoint drops on jq are gconv
+             helpers and libresolv, which an eglinfo subject never touches,
+             so 89- passing would NOT clear the lever for a program that
+             converts a CJK encoding. That needs a subject that does.
     B4  ⚠ A kdenlive AppDir does not exist. B1 needs only the closure.
 
     ---- 2. then, by how foundational they are ----
