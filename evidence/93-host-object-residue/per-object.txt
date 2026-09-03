@@ -54,7 +54,7 @@
 /usr/lib/libreoffice/program/libclewlo.so	ok	
 /usr/lib/libreoffice/program/libcmdmaillo.so	other	pgb-elfload: more than 64 objects loaded
 /usr/lib/libreoffice/program/libcollator_data.so	ok	
-/usr/lib/libreoffice/program/libcuilo.so	undefined	pgb-elfload: libboost_iostreams.so.1.83.0: undefined symbol: lzma_cputhreads@XZ_5.2
+/usr/lib/libreoffice/program/libcuilo.so	other	pgb-elfload: more than 64 objects loaded
 /usr/lib/libreoffice/program/libdeploymentgui.so	other	pgb-elfload: more than 64 objects loaded
 /usr/lib/libreoffice/program/libdesktop_detectorlo.so	other	pgb-elfload: more than 64 objects loaded
 /usr/lib/libreoffice/program/libdict_ja.so	ok	
@@ -540,261 +540,261 @@
 /usr/lib/systemd/user/pk-debconf-helper.socket	not-an-object	pgb-elfload: /usr/lib/systemd/user/pk-debconf-helper.socket is not an x86-64 ELF shared object
 /usr/lib/x86_64-linux-gnu/audit/sotruss-lib.so	ok	
 /usr/lib/x86_64-linux-gnu/bfd-plugins/libdep.so	ok	
-/usr/lib/x86_64-linux-gnu/cryptsetup/libcryptsetup-token-systemd-fido2.so	undefined	pgb-elfload: libcryptsetup.so.12: undefined symbol: dm_task_get_info@DM_1_02_97
-/usr/lib/x86_64-linux-gnu/cryptsetup/libcryptsetup-token-systemd-pkcs11.so	undefined	pgb-elfload: libcryptsetup.so.12: undefined symbol: dm_task_get_info@DM_1_02_97
-/usr/lib/x86_64-linux-gnu/cryptsetup/libcryptsetup-token-systemd-tpm2.so	undefined	pgb-elfload: libcryptsetup.so.12: undefined symbol: dm_task_get_info@DM_1_02_97
+/usr/lib/x86_64-linux-gnu/cryptsetup/libcryptsetup-token-systemd-fido2.so	ok	
+/usr/lib/x86_64-linux-gnu/cryptsetup/libcryptsetup-token-systemd-pkcs11.so	ok	
+/usr/lib/x86_64-linux-gnu/cryptsetup/libcryptsetup-token-systemd-tpm2.so	ok	
 /usr/lib/x86_64-linux-gnu/dri/libdril_dri.so	ok	
 /usr/lib/x86_64-linux-gnu/engines-3/afalg.so	ok	
 /usr/lib/x86_64-linux-gnu/engines-3/loader_attic.so	ok	
 /usr/lib/x86_64-linux-gnu/engines-3/padlock.so	ok	
 /usr/lib/x86_64-linux-gnu/gbm/dri_gbm.so	tlsdesc	pgb-elfload: libgallium-25.2.8-0ubuntu0.24.04.1.so: TLSDESC relocation for ? is not implemented
-/usr/lib/x86_64-linux-gnu/gconv/ANSI_X3.110.so	undefined	pgb-elfload: ANSI_X3.110.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ARMSCII-8.so	undefined	pgb-elfload: ARMSCII-8.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ASMO_449.so	undefined	pgb-elfload: ASMO_449.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/BIG5.so	undefined	pgb-elfload: BIG5.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/BIG5HKSCS.so	undefined	pgb-elfload: BIG5HKSCS.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/BRF.so	undefined	pgb-elfload: BRF.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP10007.so	undefined	pgb-elfload: CP10007.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP1125.so	undefined	pgb-elfload: CP1125.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP1250.so	undefined	pgb-elfload: CP1250.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP1251.so	undefined	pgb-elfload: CP1251.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP1252.so	undefined	pgb-elfload: CP1252.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP1253.so	undefined	pgb-elfload: CP1253.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP1254.so	undefined	pgb-elfload: CP1254.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP1255.so	undefined	pgb-elfload: CP1255.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP1256.so	undefined	pgb-elfload: CP1256.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP1257.so	undefined	pgb-elfload: CP1257.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP1258.so	undefined	pgb-elfload: CP1258.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP737.so	undefined	pgb-elfload: CP737.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP770.so	undefined	pgb-elfload: CP770.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP771.so	undefined	pgb-elfload: CP771.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP772.so	undefined	pgb-elfload: CP772.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP773.so	undefined	pgb-elfload: CP773.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP774.so	undefined	pgb-elfload: CP774.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP775.so	undefined	pgb-elfload: CP775.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CP932.so	undefined	pgb-elfload: CP932.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CSN_369103.so	undefined	pgb-elfload: CSN_369103.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/CWI.so	undefined	pgb-elfload: CWI.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/DEC-MCS.so	undefined	pgb-elfload: DEC-MCS.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-AT-DE-A.so	undefined	pgb-elfload: EBCDIC-AT-DE-A.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-AT-DE.so	undefined	pgb-elfload: EBCDIC-AT-DE.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-CA-FR.so	undefined	pgb-elfload: EBCDIC-CA-FR.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-DK-NO-A.so	undefined	pgb-elfload: EBCDIC-DK-NO-A.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-DK-NO.so	undefined	pgb-elfload: EBCDIC-DK-NO.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-ES-A.so	undefined	pgb-elfload: EBCDIC-ES-A.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-ES-S.so	undefined	pgb-elfload: EBCDIC-ES-S.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-ES.so	undefined	pgb-elfload: EBCDIC-ES.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-FI-SE-A.so	undefined	pgb-elfload: EBCDIC-FI-SE-A.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-FI-SE.so	undefined	pgb-elfload: EBCDIC-FI-SE.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-FR.so	undefined	pgb-elfload: EBCDIC-FR.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-IS-FRISS.so	undefined	pgb-elfload: EBCDIC-IS-FRISS.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-IT.so	undefined	pgb-elfload: EBCDIC-IT.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-PT.so	undefined	pgb-elfload: EBCDIC-PT.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-UK.so	undefined	pgb-elfload: EBCDIC-UK.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-US.so	undefined	pgb-elfload: EBCDIC-US.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ECMA-CYRILLIC.so	undefined	pgb-elfload: ECMA-CYRILLIC.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EUC-CN.so	undefined	pgb-elfload: EUC-CN.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EUC-JISX0213.so	undefined	pgb-elfload: EUC-JISX0213.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EUC-JP-MS.so	undefined	pgb-elfload: EUC-JP-MS.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EUC-JP.so	undefined	pgb-elfload: EUC-JP.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EUC-KR.so	undefined	pgb-elfload: EUC-KR.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/EUC-TW.so	undefined	pgb-elfload: EUC-TW.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/GB18030.so	undefined	pgb-elfload: GB18030.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/GBBIG5.so	undefined	pgb-elfload: GBBIG5.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/GBGBK.so	undefined	pgb-elfload: GBGBK.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/GBK.so	undefined	pgb-elfload: GBK.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/GEORGIAN-ACADEMY.so	undefined	pgb-elfload: GEORGIAN-ACADEMY.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/GEORGIAN-PS.so	undefined	pgb-elfload: GEORGIAN-PS.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/GOST_19768-74.so	undefined	pgb-elfload: GOST_19768-74.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/GREEK-CCITT.so	undefined	pgb-elfload: GREEK-CCITT.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/GREEK7-OLD.so	undefined	pgb-elfload: GREEK7-OLD.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/GREEK7.so	undefined	pgb-elfload: GREEK7.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/HP-GREEK8.so	undefined	pgb-elfload: HP-GREEK8.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/HP-ROMAN8.so	undefined	pgb-elfload: HP-ROMAN8.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/HP-ROMAN9.so	undefined	pgb-elfload: HP-ROMAN9.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/HP-THAI8.so	undefined	pgb-elfload: HP-THAI8.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/HP-TURKISH8.so	undefined	pgb-elfload: HP-TURKISH8.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM037.so	undefined	pgb-elfload: IBM037.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM038.so	undefined	pgb-elfload: IBM038.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1004.so	undefined	pgb-elfload: IBM1004.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1008.so	undefined	pgb-elfload: IBM1008.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1008_420.so	undefined	pgb-elfload: IBM1008_420.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1025.so	undefined	pgb-elfload: IBM1025.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1026.so	undefined	pgb-elfload: IBM1026.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1046.so	undefined	pgb-elfload: IBM1046.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1047.so	undefined	pgb-elfload: IBM1047.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1097.so	undefined	pgb-elfload: IBM1097.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1112.so	undefined	pgb-elfload: IBM1112.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1122.so	undefined	pgb-elfload: IBM1122.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1123.so	undefined	pgb-elfload: IBM1123.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1124.so	undefined	pgb-elfload: IBM1124.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1129.so	undefined	pgb-elfload: IBM1129.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1130.so	undefined	pgb-elfload: IBM1130.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1132.so	undefined	pgb-elfload: IBM1132.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1133.so	undefined	pgb-elfload: IBM1133.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1137.so	undefined	pgb-elfload: IBM1137.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1140.so	undefined	pgb-elfload: IBM1140.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1141.so	undefined	pgb-elfload: IBM1141.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1142.so	undefined	pgb-elfload: IBM1142.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1143.so	undefined	pgb-elfload: IBM1143.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1144.so	undefined	pgb-elfload: IBM1144.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1145.so	undefined	pgb-elfload: IBM1145.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1146.so	undefined	pgb-elfload: IBM1146.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1147.so	undefined	pgb-elfload: IBM1147.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1148.so	undefined	pgb-elfload: IBM1148.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1149.so	undefined	pgb-elfload: IBM1149.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1153.so	undefined	pgb-elfload: IBM1153.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1154.so	undefined	pgb-elfload: IBM1154.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1155.so	undefined	pgb-elfload: IBM1155.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1156.so	undefined	pgb-elfload: IBM1156.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1157.so	undefined	pgb-elfload: IBM1157.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1158.so	undefined	pgb-elfload: IBM1158.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1160.so	undefined	pgb-elfload: IBM1160.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1161.so	undefined	pgb-elfload: IBM1161.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1162.so	undefined	pgb-elfload: IBM1162.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1163.so	undefined	pgb-elfload: IBM1163.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1164.so	undefined	pgb-elfload: IBM1164.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1166.so	undefined	pgb-elfload: IBM1166.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1167.so	undefined	pgb-elfload: IBM1167.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM12712.so	undefined	pgb-elfload: IBM12712.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1364.so	undefined	pgb-elfload: IBM1364.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1371.so	undefined	pgb-elfload: IBM1371.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1388.so	undefined	pgb-elfload: IBM1388.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1390.so	undefined	pgb-elfload: IBM1390.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM1399.so	undefined	pgb-elfload: IBM1399.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM16804.so	undefined	pgb-elfload: IBM16804.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM256.so	undefined	pgb-elfload: IBM256.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM273.so	undefined	pgb-elfload: IBM273.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM274.so	undefined	pgb-elfload: IBM274.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM275.so	undefined	pgb-elfload: IBM275.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM277.so	undefined	pgb-elfload: IBM277.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM278.so	undefined	pgb-elfload: IBM278.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM280.so	undefined	pgb-elfload: IBM280.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM281.so	undefined	pgb-elfload: IBM281.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM284.so	undefined	pgb-elfload: IBM284.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM285.so	undefined	pgb-elfload: IBM285.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM290.so	undefined	pgb-elfload: IBM290.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM297.so	undefined	pgb-elfload: IBM297.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM420.so	undefined	pgb-elfload: IBM420.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM423.so	undefined	pgb-elfload: IBM423.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM424.so	undefined	pgb-elfload: IBM424.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM437.so	undefined	pgb-elfload: IBM437.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM4517.so	undefined	pgb-elfload: IBM4517.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM4899.so	undefined	pgb-elfload: IBM4899.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM4909.so	undefined	pgb-elfload: IBM4909.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM4971.so	undefined	pgb-elfload: IBM4971.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM500.so	undefined	pgb-elfload: IBM500.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM5347.so	undefined	pgb-elfload: IBM5347.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM803.so	undefined	pgb-elfload: IBM803.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM850.so	undefined	pgb-elfload: IBM850.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM851.so	undefined	pgb-elfload: IBM851.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM852.so	undefined	pgb-elfload: IBM852.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM855.so	undefined	pgb-elfload: IBM855.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM856.so	undefined	pgb-elfload: IBM856.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM857.so	undefined	pgb-elfload: IBM857.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM858.so	undefined	pgb-elfload: IBM858.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM860.so	undefined	pgb-elfload: IBM860.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM861.so	undefined	pgb-elfload: IBM861.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM862.so	undefined	pgb-elfload: IBM862.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM863.so	undefined	pgb-elfload: IBM863.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM864.so	undefined	pgb-elfload: IBM864.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM865.so	undefined	pgb-elfload: IBM865.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM866.so	undefined	pgb-elfload: IBM866.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM866NAV.so	undefined	pgb-elfload: IBM866NAV.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM868.so	undefined	pgb-elfload: IBM868.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM869.so	undefined	pgb-elfload: IBM869.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM870.so	undefined	pgb-elfload: IBM870.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM871.so	undefined	pgb-elfload: IBM871.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM874.so	undefined	pgb-elfload: IBM874.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM875.so	undefined	pgb-elfload: IBM875.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM880.so	undefined	pgb-elfload: IBM880.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM891.so	undefined	pgb-elfload: IBM891.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM901.so	undefined	pgb-elfload: IBM901.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM902.so	undefined	pgb-elfload: IBM902.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM903.so	undefined	pgb-elfload: IBM903.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM9030.so	undefined	pgb-elfload: IBM9030.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM904.so	undefined	pgb-elfload: IBM904.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM905.so	undefined	pgb-elfload: IBM905.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM9066.so	undefined	pgb-elfload: IBM9066.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM918.so	undefined	pgb-elfload: IBM918.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM921.so	undefined	pgb-elfload: IBM921.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM922.so	undefined	pgb-elfload: IBM922.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM930.so	undefined	pgb-elfload: IBM930.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM932.so	undefined	pgb-elfload: IBM932.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM933.so	undefined	pgb-elfload: IBM933.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM935.so	undefined	pgb-elfload: IBM935.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM937.so	undefined	pgb-elfload: IBM937.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM939.so	undefined	pgb-elfload: IBM939.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM943.so	undefined	pgb-elfload: IBM943.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IBM9448.so	undefined	pgb-elfload: IBM9448.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/IEC_P27-1.so	undefined	pgb-elfload: IEC_P27-1.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/INIS-8.so	undefined	pgb-elfload: INIS-8.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/INIS-CYRILLIC.so	undefined	pgb-elfload: INIS-CYRILLIC.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/INIS.so	undefined	pgb-elfload: INIS.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISIRI-3342.so	undefined	pgb-elfload: ISIRI-3342.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-CN-EXT.so	undefined	pgb-elfload: ISO-2022-CN-EXT.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-CN.so	undefined	pgb-elfload: ISO-2022-CN.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-JP-3.so	undefined	pgb-elfload: ISO-2022-JP-3.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-JP.so	undefined	pgb-elfload: ISO-2022-JP.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-KR.so	undefined	pgb-elfload: ISO-2022-KR.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO-IR-197.so	undefined	pgb-elfload: ISO-IR-197.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO-IR-209.so	undefined	pgb-elfload: ISO-IR-209.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO646.so	undefined	pgb-elfload: ISO646.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so	undefined	pgb-elfload: ISO8859-1.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-10.so	undefined	pgb-elfload: ISO8859-10.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-11.so	undefined	pgb-elfload: ISO8859-11.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-13.so	undefined	pgb-elfload: ISO8859-13.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-14.so	undefined	pgb-elfload: ISO8859-14.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-15.so	undefined	pgb-elfload: ISO8859-15.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-16.so	undefined	pgb-elfload: ISO8859-16.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-2.so	undefined	pgb-elfload: ISO8859-2.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-3.so	undefined	pgb-elfload: ISO8859-3.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-4.so	undefined	pgb-elfload: ISO8859-4.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-5.so	undefined	pgb-elfload: ISO8859-5.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-6.so	undefined	pgb-elfload: ISO8859-6.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-7.so	undefined	pgb-elfload: ISO8859-7.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-8.so	undefined	pgb-elfload: ISO8859-8.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-9.so	undefined	pgb-elfload: ISO8859-9.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO8859-9E.so	undefined	pgb-elfload: ISO8859-9E.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO_10367-BOX.so	undefined	pgb-elfload: ISO_10367-BOX.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO_11548-1.so	undefined	pgb-elfload: ISO_11548-1.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO_2033.so	undefined	pgb-elfload: ISO_2033.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO_5427-EXT.so	undefined	pgb-elfload: ISO_5427-EXT.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO_5427.so	undefined	pgb-elfload: ISO_5427.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO_5428.so	undefined	pgb-elfload: ISO_5428.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO_6937-2.so	undefined	pgb-elfload: ISO_6937-2.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/ISO_6937.so	undefined	pgb-elfload: ISO_6937.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/JOHAB.so	undefined	pgb-elfload: JOHAB.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/KOI-8.so	undefined	pgb-elfload: KOI-8.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/KOI8-R.so	undefined	pgb-elfload: KOI8-R.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/KOI8-RU.so	undefined	pgb-elfload: KOI8-RU.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/KOI8-T.so	undefined	pgb-elfload: KOI8-T.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/KOI8-U.so	undefined	pgb-elfload: KOI8-U.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/LATIN-GREEK-1.so	undefined	pgb-elfload: LATIN-GREEK-1.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/LATIN-GREEK.so	undefined	pgb-elfload: LATIN-GREEK.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/MAC-CENTRALEUROPE.so	undefined	pgb-elfload: MAC-CENTRALEUROPE.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/MAC-IS.so	undefined	pgb-elfload: MAC-IS.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/MAC-SAMI.so	undefined	pgb-elfload: MAC-SAMI.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/MAC-UK.so	undefined	pgb-elfload: MAC-UK.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/MACINTOSH.so	undefined	pgb-elfload: MACINTOSH.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/MIK.so	undefined	pgb-elfload: MIK.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/NATS-DANO.so	undefined	pgb-elfload: NATS-DANO.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/NATS-SEFI.so	undefined	pgb-elfload: NATS-SEFI.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/PT154.so	undefined	pgb-elfload: PT154.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/RK1048.so	undefined	pgb-elfload: RK1048.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/SAMI-WS2.so	undefined	pgb-elfload: SAMI-WS2.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/SHIFT_JISX0213.so	undefined	pgb-elfload: SHIFT_JISX0213.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/SJIS.so	undefined	pgb-elfload: SJIS.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/T.61.so	undefined	pgb-elfload: T.61.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/TCVN5712-1.so	undefined	pgb-elfload: TCVN5712-1.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/TIS-620.so	undefined	pgb-elfload: TIS-620.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/TSCII.so	undefined	pgb-elfload: TSCII.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/UHC.so	undefined	pgb-elfload: UHC.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/UNICODE.so	undefined	pgb-elfload: UNICODE.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/UTF-16.so	undefined	pgb-elfload: UTF-16.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/UTF-32.so	undefined	pgb-elfload: UTF-32.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/UTF-7.so	undefined	pgb-elfload: UTF-7.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
-/usr/lib/x86_64-linux-gnu/gconv/VISCII.so	undefined	pgb-elfload: VISCII.so: undefined symbol: _dl_mcount_wrapper_check@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/gconv/ANSI_X3.110.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ARMSCII-8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ASMO_449.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/BIG5.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/BIG5HKSCS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/BRF.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP10007.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1125.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1250.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1251.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1252.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1253.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1254.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1255.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1256.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1257.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP1258.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP737.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP770.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP771.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP772.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP773.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP774.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP775.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CP932.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CSN_369103.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/CWI.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/DEC-MCS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-AT-DE-A.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-AT-DE.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-CA-FR.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-DK-NO-A.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-DK-NO.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-ES-A.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-ES-S.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-ES.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-FI-SE-A.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-FI-SE.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-FR.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-IS-FRISS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-IT.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-PT.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-UK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EBCDIC-US.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ECMA-CYRILLIC.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-CN.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-JISX0213.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-JP-MS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-JP.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-KR.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/EUC-TW.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GB18030.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GBBIG5.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GBGBK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GBK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GEORGIAN-ACADEMY.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GEORGIAN-PS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GOST_19768-74.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GREEK-CCITT.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GREEK7-OLD.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/GREEK7.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/HP-GREEK8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/HP-ROMAN8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/HP-ROMAN9.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/HP-THAI8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/HP-TURKISH8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM037.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM038.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1004.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1008.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1008_420.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1025.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1026.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1046.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1047.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1097.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1112.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1122.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1123.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1124.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1129.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1130.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1132.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1133.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1137.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1140.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1141.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1142.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1143.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1144.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1145.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1146.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1147.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1148.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1149.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1153.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1154.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1155.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1156.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1157.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1158.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1160.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1161.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1162.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1163.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1164.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1166.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1167.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM12712.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1364.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1371.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1388.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1390.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM1399.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM16804.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM256.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM273.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM274.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM275.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM277.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM278.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM280.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM281.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM284.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM285.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM290.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM297.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM420.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM423.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM424.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM437.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM4517.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM4899.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM4909.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM4971.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM500.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM5347.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM803.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM850.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM851.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM852.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM855.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM856.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM857.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM858.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM860.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM861.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM862.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM863.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM864.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM865.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM866.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM866NAV.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM868.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM869.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM870.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM871.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM874.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM875.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM880.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM891.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM901.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM902.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM903.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM9030.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM904.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM905.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM9066.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM918.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM921.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM922.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM930.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM932.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM933.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM935.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM937.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM939.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM943.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IBM9448.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/IEC_P27-1.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/INIS-8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/INIS-CYRILLIC.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/INIS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISIRI-3342.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-CN-EXT.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-CN.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-JP-3.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-JP.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-2022-KR.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-IR-197.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO-IR-209.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO646.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-1.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-10.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-11.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-13.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-14.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-15.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-16.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-2.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-3.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-4.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-5.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-6.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-7.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-9.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO8859-9E.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_10367-BOX.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_11548-1.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_2033.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_5427-EXT.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_5427.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_5428.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_6937-2.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/ISO_6937.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/JOHAB.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/KOI-8.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/KOI8-R.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/KOI8-RU.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/KOI8-T.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/KOI8-U.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/LATIN-GREEK-1.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/LATIN-GREEK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MAC-CENTRALEUROPE.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MAC-IS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MAC-SAMI.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MAC-UK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MACINTOSH.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/MIK.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/NATS-DANO.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/NATS-SEFI.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/PT154.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/RK1048.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/SAMI-WS2.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/SHIFT_JISX0213.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/SJIS.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/T.61.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/TCVN5712-1.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/TIS-620.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/TSCII.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/UHC.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/UNICODE.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/UTF-16.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/UTF-32.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/UTF-7.so	ok	
+/usr/lib/x86_64-linux-gnu/gconv/VISCII.so	ok	
 /usr/lib/x86_64-linux-gnu/gconv/libCNS.so	ok	
 /usr/lib/x86_64-linux-gnu/gconv/libGB.so	ok	
 /usr/lib/x86_64-linux-gnu/gconv/libISOIR165.so	ok	
@@ -940,7 +940,7 @@
 /usr/lib/x86_64-linux-gnu/libappstream.so.1.0.2	ok	
 /usr/lib/x86_64-linux-gnu/libapt-pkg.so.6.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libapt-private.so.0.0.0	ok	
-/usr/lib/x86_64-linux-gnu/libarchive.so.13.7.2	undefined	pgb-elfload: libarchive.so.13: undefined symbol: lzma_stream_encoder_mt@XZ_5.2
+/usr/lib/x86_64-linux-gnu/libarchive.so.13.7.2	ok	
 /usr/lib/x86_64-linux-gnu/libargon2.so.1	ok	
 /usr/lib/x86_64-linux-gnu/libasan.so.8.0.0	refused-interposer	pgb-elfload: libasan.so.8.0.0 is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libasound.so.2.0.0	ok	
@@ -962,7 +962,7 @@
 /usr/lib/x86_64-linux-gnu/libbabeltrace.so.1.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libbfd-2.42-system.so	ok	
 /usr/lib/x86_64-linux-gnu/libblkid.so.1.1.0	ok	
-/usr/lib/x86_64-linux-gnu/libboost_iostreams.so.1.83.0	undefined	pgb-elfload: libboost_iostreams.so.1.83.0: undefined symbol: lzma_cputhreads@XZ_5.2
+/usr/lib/x86_64-linux-gnu/libboost_iostreams.so.1.83.0	ok	
 /usr/lib/x86_64-linux-gnu/libboost_locale.so.1.83.0	ok	
 /usr/lib/x86_64-linux-gnu/libboost_thread.so.1.83.0	ok	
 /usr/lib/x86_64-linux-gnu/libbrotlicommon.so.1.1.0	ok	
@@ -988,7 +988,7 @@
 /usr/lib/x86_64-linux-gnu/libcom_err.so.2.1	ok	
 /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0	ok	
 /usr/lib/x86_64-linux-gnu/libcrypto.so.3	ok	
-/usr/lib/x86_64-linux-gnu/libcryptsetup.so.12.10.0	undefined	pgb-elfload: libcryptsetup.so.12: undefined symbol: dm_task_get_info@DM_1_02_97
+/usr/lib/x86_64-linux-gnu/libcryptsetup.so.12.10.0	ok	
 /usr/lib/x86_64-linux-gnu/libctf-nobfd.so.0.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libctf.so.0.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libcups.so.2	ok	
@@ -1169,7 +1169,7 @@
 /usr/lib/x86_64-linux-gnu/libopenjp2.so.2.5.0	ok	
 /usr/lib/x86_64-linux-gnu/liborc-0.4.so.0.38.0	ok	
 /usr/lib/x86_64-linux-gnu/liborc-test-0.4.so.0.38.0	ok	
-/usr/lib/x86_64-linux-gnu/liborcus-0.18.so.0.0.0	undefined	pgb-elfload: libboost_iostreams.so.1.83.0: undefined symbol: lzma_cputhreads@XZ_5.2
+/usr/lib/x86_64-linux-gnu/liborcus-0.18.so.0.0.0	ok	
 /usr/lib/x86_64-linux-gnu/liborcus-parser-0.18.so.0.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libp11-kit.so.0.3.1	ok	
 /usr/lib/x86_64-linux-gnu/libpackagekit-glib2.so.18.1.3	ok	

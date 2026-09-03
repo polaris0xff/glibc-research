@@ -251,8 +251,40 @@ int pgb_elf_available(void)
 struct el_tls_index;
 void *__tls_get_addr(struct el_tls_index *ti);
 
+/* ⭐ CLASS S, AND IT IS 247 OF THE 257 OBJECTS IN THE REAL RESIDUE.
+ *
+ * `_dl_mcount_wrapper_check` is in `libc.so.6` and NOT in `libc.a` -- checked
+ * with nm on the pinned environment's own archive, which is what makes it
+ * experiments/73-'s class S rather than a version problem. Any object built
+ * against a shared glibc can reference it, and 247 on this host do.
+ *
+ * ⛔ Leaving it undefined REFUSES those objects, which is a much worse answer
+ * than the right one, because the right one is to do nothing. glibc's version
+ * routes a `-pg`-instrumented shared object's mcount through rtld:
+ *
+ *     void _dl_mcount_wrapper_check (void *selfpc)
+ *     { if (_dl_mcount_via_rtld) _dl_mcount (RETURN_ADDRESS (0), selfpc); }
+ *
+ * ⭐ There is no rtld in this process and no profiling to route, so the object
+ * is simply not profiled -- which is the same outcome as running it on a
+ * system where profiling is off, and is what the caller already tolerates.
+ *
+ * ⚠ MEASURED, NOT ASSUMED, and the measurement is the point. Of the 631
+ * objects this loader failed with "undefined symbol", GLIBC'S OWN ld.so also
+ * fails 374 -- they are plugins of a host PROGRAM (CPython, Perl, PostgreSQL,
+ * PHP) whose symbols live in the executable, and nobody can load them
+ * standalone. The residue that is actually ours is the other 257, and it is
+ * SIX distinct symbols. This is the first of them.
+ */
+static void el_dl_mcount_wrapper_check(void *selfpc)
+{
+    (void)selfpc;
+}
+
 static const struct pgb_provider_sym el_own_syms[] = {
     { "__tls_get_addr", (void *)(uintptr_t)&__tls_get_addr },
+    { "_dl_mcount_wrapper_check",
+      (void *)(uintptr_t)&el_dl_mcount_wrapper_check },
     { NULL, NULL }
 };
 
@@ -614,10 +646,36 @@ static const char *el_defver(const struct el_obj *o, uint32_t si)
  * rebuilt without versions, makes the real loader assert. So: match the
  * version when both sides carry one; accept an unversioned definition
  * otherwise; never accept a WRONG version silently. */
+/* el_accept decides one candidate against the wanted version.
+ *  1  take it now      0  keep looking      -1  keep looking, but remember it
+ *
+ * ⛔ THE DEFECT THIS EXISTS TO FIX. A versioned symbol table holds SEVERAL
+ * entries with the SAME NAME at different versions -- liblzma has
+ * `lzma_cputhreads@XZ_5.2.2` and `lzma_cputhreads@@XZ_5.2` at one address,
+ * libdevmapper has `dm_task_get_info@Base` and `@@DM_1_02_97`. The walk used
+ * to `break` on the first NAME match and check the version afterwards, so
+ * whichever entry the hash chain happened to yield first decided the answer:
+ * hit the wrong one and a symbol that IS defined became a loud miss. Nine of
+ * the ten objects in the real residue failed exactly this way. */
+static int el_accept(const struct el_obj *o, uint32_t n, const char *want_ver)
+{
+    const char *have;
+
+    if (!want_ver)
+        return 1;
+    have = el_defver(o, n);
+    if (!have)
+        return -1;    /* ⭐ ld.so's compatibility rule: an UNVERSIONED
+                       * definition satisfies a versioned reference -- but only
+                       * if no exact match turns up, so it is a fallback and
+                       * not an answer. */
+    return strcmp(have, want_ver) == 0 ? 1 : 0;
+}
+
 static const Elf64_Sym *el_lookup_in(const struct el_obj *o, const char *name,
                                      const char *want_ver)
 {
-    const Elf64_Sym *sym = NULL;
+    const Elf64_Sym *sym = NULL, *fallback = NULL;
     uint32_t si = 0;
 
     if (!o->symtab || !o->strtab)
@@ -650,17 +708,20 @@ static const Elf64_Sym *el_lookup_in(const struct el_obj *o, const char *name,
                 const Elf64_Sym *s = &o->symtab[n];
                 if (s->st_shndx != SHN_UNDEF &&
                     strcmp(o->strtab + s->st_name, name) == 0) {
-                    sym = s; si = n;
-                    break;
+                    int v = el_accept(o, n, want_ver);
+                    if (v == 1) { sym = s; si = n; break; }
+                    if (v == -1 && !fallback) fallback = s;
                 }
             }
             if (c & 1)
-                return NULL;
+                break;            /* end of chain: the fallback may still serve */
         }
-        /* ⚠ Fell out of the mapping instead of hitting a terminator: the hash
-         * table and the segments disagree. A miss, never a guess. */
+        /* ⚠ Falling out of the mapping instead of hitting a terminator means
+         * the hash table and the segments disagree. A miss, never a guess --
+         * and the unversioned fallback below is a MISS's answer, not a guess:
+         * it is a real definition of the right name. */
         if (!sym)
-            return NULL;
+            return fallback;
     } else if (o->elf_hash) {
         const uint32_t *eh = o->elf_hash;
         uint32_t nbucket = eh[0], nchain = eh[1];
@@ -672,24 +733,24 @@ static const Elf64_Sym *el_lookup_in(const struct el_obj *o, const char *name,
         for (n = bucket[el_sysv_hash(name) % nbucket]; n; n = chain[n]) {
             const Elf64_Sym *s = &o->symtab[n];
             if (n >= nchain)
-                return NULL;
+                break;
             if (s->st_shndx != SHN_UNDEF &&
                 strcmp(o->strtab + s->st_name, name) == 0) {
-                sym = s; si = n;
-                break;
+                int v = el_accept(o, n, want_ver);
+                if (v == 1) { sym = s; si = n; break; }
+                if (v == -1 && !fallback) fallback = s;
             }
         }
         if (!sym)
-            return NULL;
+            return fallback;
     } else {
         return NULL;              /* no hash table: nothing to search */
     }
 
-    if (want_ver) {
-        const char *have = el_defver(o, si);
-        if (have && strcmp(have, want_ver) != 0)
-            return NULL;          /* wrong version stays a loud miss */
-    }
+    /* The version was decided inside the walk, by el_accept, so that a wrong
+     * version keeps looking instead of ending the search. `si` is kept because
+     * a later reader will want it. */
+    (void)si;
     return sym;
 }
 
