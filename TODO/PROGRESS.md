@@ -419,6 +419,21 @@ is **costing route B**, which is where the size actually is.
         ⚠ A FLOOR (runtime references, not build inputs) and NOT costed in
         wall clock, which is the number that decides whether the bundle stays
         one command. gtk3 and glycin are NOT IN this closure.
+        ⭐ AND ON mesa-demos, THE SUBJECT ROUTE A's CEILING USED (the
+        experiment takes PGB_EXP95_ATTR now, one RESULT.<subject>.txt each):
+          closure 111 paths, 386,416,368 B
+          the whole -mini set   8 paths (7.2%)   156,713,352 B (40.6%)
+        ⭐ EIGHT PATHS CARRYING 40.6% OF THE BYTES -- route B's cost is
+        counted in paths and its reach in bytes, an order of magnitude apart.
+        ⛔ DO NOT subtract those percentages from route A's 23.3%: that is of
+        the AppDir library tree after assembly, this is of the closure's
+        NarSize. Different populations at different stages.
+        ⚠ A control FIRED while parameterising it -- the "nothing is
+        downstream of the top" case still seeded on the literal "kdenlive" and
+        reported "= 0, expected 1" against mesa-demos. The seed is the store
+        path's own name now.
+        ⭐ And kdenlive's counts are a RE-DERIVATION: hydra advanced to a
+        different store path between runs and 676/78/85 came out identical.
     B1b ⛔ NEXT: cost route B in WALL CLOCK. One of the 161 is qtbase and Qt
         does not build in a minute. That needs a rebuild.
     B2  ⛔ THE ALLOWLIST -- AND 2026-09-03c SAYS THE **PATH**-LEVEL FORM OF IT
