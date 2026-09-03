@@ -156,3 +156,89 @@ func elfSelftest() *selftest.Report {
 	}
 	return r
 }
+
+// cxxRuntimeSelftest checks the detector that decides whether a C link needs
+// the C++ runtime. TODO T-063.
+//
+// ⛔ WHY IT BUILDS A FIXTURE RATHER THAN ASSERTING ON A CRAFTED BYTE STRING.
+// The question is "does this archive have an UNDEFINED reference to operator
+// delete", and the only honest way to ask it is of an archive a real compiler
+// produced. ⚠ It SKIPS VISIBLY where there is no C++ compiler, the way the
+// `elf` suite above skips without one: a selftest that quietly runs nothing
+// reports success, which docs/AGENTS.md §0b calls the worst answer here.
+func cxxRuntimeSelftest() *selftest.Report {
+	r := selftest.New("cxx-runtime")
+	if !proc.Look("c++") || !proc.Look("cc") || !proc.Look("ar") {
+		r.Skip("needs c++, cc and ar to build the fixtures")
+		return r
+	}
+	dir, err := os.MkdirTemp("", "pgb-cxx-selftest-")
+	if err != nil {
+		r.Fail("tempdir", err.Error(), "a writable temporary directory")
+		return r
+	}
+	defer os.RemoveAll(dir)
+
+	write := func(name, body string) bool {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(body), 0o644); err != nil {
+			r.Fail("write "+name, err.Error(), "created")
+			return false
+		}
+		return true
+	}
+	// ⭐ THE SUBJECT: C++ with a C entry point, which is the shape libicuuc.a
+	// has and the shape that makes the driver's argv[0] rule wrong. `new` and
+	// `delete` and a vtable are what the link then cannot resolve.
+	if !write("thing.cpp", `struct Thing { virtual ~Thing() {} int v; };
+extern "C" int thing_answer(void) {
+    Thing *t = new Thing(); t->v = 42; int v = t->v; delete t; return v;
+}
+`) {
+		return r
+	}
+	// ⛔ THE NEGATIVE CONTROL, and it is the half that matters: ordinary C must
+	// NOT demand a C++ runtime. A detector that answered yes for everything
+	// would pass every positive case in this file.
+	if !write("plain.c", "int plain_answer(void){ return 42; }\n") {
+		return r
+	}
+
+	obj := filepath.Join(dir, "thing.o")
+	if res, err := proc.Quiet("c++", "-c", "-o", obj, filepath.Join(dir, "thing.cpp")); err != nil || res.Failed() {
+		r.Skip("the C++ fixture did not compile")
+		return r
+	}
+	arc := filepath.Join(dir, "libthing.a")
+	if res, err := proc.Quiet("ar", "rcs", arc, obj); err != nil || res.Failed() {
+		r.Skip("ar could not build the fixture archive")
+		return r
+	}
+	cobj := filepath.Join(dir, "plain.o")
+	if res, err := proc.Quiet("cc", "-c", "-o", cobj, filepath.Join(dir, "plain.c")); err != nil || res.Failed() {
+		r.Skip("the C fixture did not compile")
+		return r
+	}
+
+	need, sym := elfx.NeedsCXXRuntime(obj)
+	r.CheckBool("a C++ object demands the C++ runtime", need, true)
+	r.CheckBool("...and it names the symbol that says so", sym != "", true)
+
+	needA, symA := elfx.NeedsCXXRuntime(arc)
+	r.CheckBool("an ARCHIVE of it does too", needA, true)
+	r.CheckBool("...and names a symbol", symA != "", true)
+
+	// ⛔ THE NEGATIVE CONTROL.
+	needC, _ := elfx.NeedsCXXRuntime(cobj)
+	r.CheckBool("an ordinary C object does NOT", needC, false)
+
+	// ⚠ A file that is not an object at all must be a quiet no, not an error:
+	// a link line carries .a members that are not ELF, and linker scripts.
+	if write("notanobject.a", "this is not an archive\n") {
+		needN, _ := elfx.NeedsCXXRuntime(filepath.Join(dir, "notanobject.a"))
+		r.CheckBool("a file that is not an object is a quiet no", needN, false)
+	}
+	needM, _ := elfx.NeedsCXXRuntime(filepath.Join(dir, "no-such-file.a"))
+	r.CheckBool("a missing file is a quiet no", needM, false)
+
+	return r
+}

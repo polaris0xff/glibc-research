@@ -269,6 +269,7 @@ func selftestSuites(c *cfg.Config) []suite {
 		{"wrapper-flags", wrapper.FlagsSelftest},
 		{"verify-classify", verifyx.Selftest},
 		{"fail-codes", fail.Selftest},
+		{"cxx-runtime", cxxRuntimeSelftest},
 		{"zstd", zstd.Selftest},
 		{"nix-nar", func() *selftest.Report { return nixx.Selftest(nixFixtureDir(c)) }},
 		{"nix-drv", nixx.DrvSelftest},

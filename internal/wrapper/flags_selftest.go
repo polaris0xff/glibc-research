@@ -247,6 +247,31 @@ func FlagsSelftest() *selftest.Report {
 	r.Check("uniqueSorted on nothing is nothing",
 		strings.Join(uniqueSorted(nil), "|"), "")
 
+	// ---- ⭐ T-063: which link-line inputs are even considered -------------
+	//
+	// ⛔ The symbol-reading half is `cxx-runtime` in cmd/pgb, which needs a
+	// compiler and says so when it has none. THIS half is pure: given a link
+	// line, which arguments does the detector open at all? It is the half most
+	// likely to break, because it is argument parsing.
+	//
+	// ⚠ Every path below is deliberately NON-EXISTENT. NeedsCXXRuntime is a
+	// quiet no for a file it cannot read, so a path that is considered and a
+	// path that is skipped both answer "no" -- what is asserted here is the
+	// SUPPRESSION rule, where the answer differs for a reason the caller
+	// stated.
+	r.Check("cxx-demand: -nostdlib suppresses the scan entirely",
+		firstOf(cxxRuntimeDemand([]string{"-nostdlib", "libicuuc.a"})), "")
+	r.Check("cxx-demand: -nodefaultlibs suppresses it too",
+		firstOf(cxxRuntimeDemand([]string{"-nodefaultlibs", "libicuuc.a"})), "")
+	r.Check("cxx-demand: -nostartfiles suppresses it too",
+		firstOf(cxxRuntimeDemand([]string{"-nostartfiles", "libicuuc.a"})), "")
+	// ⚠ And with none of those, a missing archive is still a quiet no -- so
+	// this case says the scan RAN and found nothing, not that it was skipped.
+	r.Check("cxx-demand: an unreadable input is a quiet no",
+		firstOf(cxxRuntimeDemand([]string{"/nonexistent/libicuuc.a"})), "")
+	r.Check("cxx-demand: a flag is never opened as an input",
+		firstOf(cxxRuntimeDemand([]string{"-L/usr/lib", "-lfoo"})), "")
+
 	return r
 }
 
@@ -257,3 +282,6 @@ func quote(s string) string {
 	}
 	return "\"" + s + "\""
 }
+
+// firstOf turns the detector's (input, symbol) pair into one comparable value.
+func firstOf(a, _ string) string { return a }

@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+
+	"github.com/polaris0xff/glibc-research/internal/elfx"
 )
 
 // mode is what a command line turns out to be.
@@ -102,6 +104,42 @@ func callerLibs(args []string) []string {
 	return out
 }
 
+// ⭐ THE C++ RUNTIME A C LINK TURNS OUT TO NEED. TODO T-063.
+//
+// ⛔ THE DEFECT: the driver is chosen by argv[0], so `cc` links get the C link
+// line even when an ARCHIVE on that line needs `operator delete` and the
+// `__cxxabiv1` vtables. `libicuuc.a` is the case this was found on — a C
+// program, a C compiler, and a link that fails on a wall of undefined `_Zd*`
+// and `__cxa_*` names naming no file the developer wrote.
+//
+// ⚠ ONLY THE INPUTS ARE READ, and only on a LINK. A compile never reaches
+// here, and a build system that calls the compiler ten thousand times pays
+// this on the handful of invocations that actually link. The scan
+// short-circuits at the first marker.
+//
+// ⛔ AND `-nostdlib`/`-nodefaultlibs` SUPPRESS IT. A caller who has said it is
+// supplying its own runtime has said so deliberately, and adding one behind
+// its back is the opposite of what this tool does.
+func cxxRuntimeDemand(args []string) (string, string) {
+	for _, a := range args {
+		if a == "-nostdlib" || a == "-nodefaultlibs" || a == "-nostartfiles" {
+			return "", ""
+		}
+	}
+	for _, a := range args {
+		if strings.HasPrefix(a, "-") {
+			continue
+		}
+		if !strings.HasSuffix(a, ".a") && !strings.HasSuffix(a, ".o") {
+			continue
+		}
+		if need, sym := elfx.NeedsCXXRuntime(a); need {
+			return a, sym
+		}
+	}
+	return "", ""
+}
+
 // findManifest locates the wrapper directory this invocation came from.
 func findManifest() (*Manifest, string, error) {
 	if strings.ContainsRune(os.Args[0], os.PathSeparator) {
@@ -174,12 +212,26 @@ func Dispatch(name string, args []string) int {
 		}
 	default:
 		link := m.Link
-		if name == "c++" || name == "g++" {
+		cxxDriver := name == "c++" || name == "g++"
+		if cxxDriver {
 			link = m.LinkCXX
 		}
 		argv = append(argv, m.Compile...)
 		argv = append(argv, args...)
 		argv = append(argv, link...)
+		// ⛔ APPENDED AFTER the link flags, because a single-pass linker
+		// resolves an archive where it appears: -lstdc++ ahead of the archive
+		// that needs it resolves nothing.
+		if !cxxDriver {
+			if from, sym := cxxRuntimeDemand(args); from != "" {
+				argv = append(argv, "-lstdc++", "-lm")
+				if verbose {
+					fmt.Fprintf(os.Stderr,
+						"pgb[added -lstdc++: %s has an undefined %s and this is a C link]\n",
+						from, sym)
+				}
+			}
+		}
 		if m.WrapDlopen {
 			argv = append(argv, callerLibs(args)...)
 		}

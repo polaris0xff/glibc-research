@@ -282,9 +282,15 @@ one clear fix inside T-063 arm S:
                                     libreadline.a's ncurses references go
                                     unresolved. poc/91-qt-xcb answered the same
                                     class with -Wl,--start-group
-    a C link that pulled a C++      libicuuc.a needs operator delete and the
-    archive                         __cxxabiv1 vtables; LinkFlags already takes
-                                    a `cxx bool` and does not notice this case
+    a C link that pulled a C++      ✅ FIXED 2026-09-03. elfx.NeedsCXXRuntime
+    archive                         reads the link line's archives for an
+                                    UNDEFINED operator new/delete or an
+                                    __cxxabiv1 vtable and the wrapper appends
+                                    -lstdc++ -lm after the link flags. Fails
+                                    before, passes after; carried as
+                                    `cxx-runtime` with a negative control.
+                                    ⚠ It does not by itself build postgres
+                                    with ICU -- it removes the named blocker.
 
 ## Open questions for the operator
 

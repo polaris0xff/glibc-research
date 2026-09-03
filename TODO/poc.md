@@ -629,9 +629,46 @@ features a distro plan enables reads as "this package cannot be built".
    ncurses references go unresolved. It is the **static link-order** problem
    `poc/91-qt-xcb` answered with `-Wl,--start-group`. Dropping readline is a
    workaround for a defect that has a real fix.
-2. ⛔ **ICU is C++ and postgres is C.** `libicuuc.a` needs `operator delete`
-   and the `__cxxabiv1` vtables; a shared libicuuc carries
+2. ✅ **ICU is C++ and postgres is C — FIXED 2026-09-03.** `libicuuc.a` needs
+   `operator delete` and the `__cxxabiv1` vtables; a shared libicuuc carries
    `DT_NEEDED libstdc++.so.6` and an archive carries nothing. `internal/wrapper`
-   already takes a `cxx bool` in `LinkFlags` — what it does not do is notice
-   that a **C link pulled in a C++ archive**. `--without-icu` is the way past
-   until it does.
+   took a `cxx bool` in `LinkFlags` decided **by `argv[0]`**, which is right
+   about the SOURCES and wrong about the ARCHIVES.
+
+   ⭐ **It notices now, by reading rather than by a list of names.**
+   `elfx.NeedsCXXRuntime` walks an object or every member of an archive and
+   looks for an **undefined** reference to a symbol only the C++ runtime
+   defines — `_Znwm`, `_ZdlPv`, `__cxa_throw`, the `__cxxabiv1` type-info
+   vtables. On a C link that finds one, the wrapper appends `-lstdc++ -lm`
+   **after** the link flags, because a single-pass linker resolves an archive
+   where it appears.
+
+   ⚠ `__gxx_personality_v0` is deliberately NOT a marker: it appears in
+   anything built with exceptions enabled, including C, so it would fire on
+   links that need nothing. And `-nostdlib`/`-nodefaultlibs`/`-nostartfiles`
+   suppress the whole scan — a caller who says it supplies its own runtime has
+   said so deliberately.
+
+   ⭐ **FAILS BEFORE, PASSES AFTER**, on a C++ archive with a C entry point —
+   the shape `libicuuc.a` has:
+
+       cc -o prog main.c libcxxthing.a
+       pre-fix   rc=1  undefined reference to `operator delete(void*, unsigned long)'
+                       undefined reference to `operator new(unsigned long)'
+                       undefined reference to `vtable for __cxxabiv1::__class_type_info'
+       post-fix  rc=0  ./prog prints 42, PT_INTERP=0 DT_NEEDED=0
+
+   ⚠ **Both other paths were checked rather than assumed**: a plain C link with
+   no C++ archive is byte-for-byte unchanged in shape and 978,624 bytes against
+   the C++-archive link's 1,064,880; and a real `c++` driver link with
+   exceptions and `std::string` still builds, runs and is static.
+
+   **Carried:** `cxx-runtime` in `pgb selftest` builds the fixtures with a real
+   compiler and skips visibly without one — including ⛔ **the negative
+   control, that an ordinary C object does NOT demand a C++ runtime** — and
+   `wrapper-flags` asserts the argument-filtering half offline. 359 → **371
+   cases**.
+
+   ⚠ **This does not by itself build postgres with ICU.** It removes the named
+   blocker; `--without-icu` can come off when arm S is next run, and that run
+   is what would say whether anything else is in the way.

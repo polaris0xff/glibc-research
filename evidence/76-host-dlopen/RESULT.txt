@@ -1,5 +1,5 @@
 experiment 76 - --host-dlopen across the pinned bed
-date (UTC)   : 2026-09-03T02:23:16Z
+date (UTC)   : 2026-09-03T02:34:32Z
 host kernel  : Linux 6.18.44-fc-v24
 subject      : 5734248 bytes, PT_INTERP=0 DT_NEEDED=0
 
@@ -32,7 +32,7 @@ BIGTLS@0 / BIGTLS@64K = TODO T-072. One shared object with 56,248
            would be the loader failing rather than declining.
 
 time to first symbol, debian-12, ns -- ONE SAMPLE EACH
-  ours    first=90031 second=405535 
+  ours    first=80878 second=44892 
   ld.so   no reading
   ⚠ one sample, and ours second > ours first in at least one run, so the
   per-load figures are at this instrument noise floor and must not be

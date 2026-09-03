@@ -259,3 +259,86 @@ func dedup(in []string) []string {
 	}
 	return out
 }
+
+// ⭐ THE C++ RUNTIME DEMAND OF A C LINK. TODO T-063.
+//
+// ⛔ THE PROBLEM THIS EXISTS FOR, and it is one of the two named fixes inside
+// T-063 arm S. `pgb`'s wrappers decide whether a link is C or C++ from argv[0]
+// — `c++`/`g++` versus `cc`/`gcc` — and that is what the compiler driver
+// itself decides on. It is right about the SOURCES and wrong about the
+// ARCHIVES: a C program linking `libicuuc.a` needs `operator delete` and the
+// `__cxxabiv1` vtables, which only the C++ driver supplies, and the link fails
+// on a wall of undefined `_Zd*`/`__cxa_*` names naming no file the developer
+// wrote.
+//
+// ⚠ WHY IT IS DECIDED BY READING RATHER THAN BY A LIST OF LIBRARY NAMES.
+// "libicuuc needs libstdc++" is a fact about one release of one library;
+// "this archive has an undefined reference to operator delete" is a fact about
+// the bytes on the link line. `docs/AGENTS.md` §14's rule against name lists
+// where a structural rule exists — the same argument that moved the loader's
+// interposer refusal from a name list to a shape.
+//
+// ⚠ AND THE MARKERS ARE DELIBERATELY NARROW. `__gxx_personality_v0` is NOT
+// here: it appears in anything built with exceptions enabled, including C
+// compiled by gcc with `-fexceptions`, so it would fire on links that need
+// nothing. Every name below is defined by libstdc++ or libsupc++ and by
+// nothing else.
+var cxxRuntimeMarkers = map[string]bool{
+	"_Znwm":                                 true, // operator new(unsigned long)
+	"_Znam":                                 true, // operator new[](unsigned long)
+	"_ZdlPv":                                true, // operator delete(void*)
+	"_ZdaPv":                                true, // operator delete[](void*)
+	"_ZdlPvm":                               true, // sized operator delete
+	"__cxa_throw":                           true,
+	"__cxa_begin_catch":                     true,
+	"__cxa_pure_virtual":                    true,
+	"__cxa_allocate_exception":              true,
+	"_ZTVN10__cxxabiv117__class_type_infoE": true,
+	"_ZTVN10__cxxabiv120__si_class_type_infoE":  true,
+	"_ZTVN10__cxxabiv121__vmi_class_type_infoE": true,
+}
+
+// NeedsCXXRuntime reports whether an object or archive has an UNDEFINED
+// reference to a symbol only the C++ runtime defines, and names the first one
+// found so the caller can say why.
+//
+// ⭐ It short-circuits: a link line can carry a hundred archives and the answer
+// is the same after the first hit.
+func NeedsCXXRuntime(path string) (bool, string) {
+	var found string
+	_ = forEachObject(path, func(name string, data []byte) error {
+		if found != "" {
+			return nil
+		}
+		if s := cxxDemandInObject(data); s != "" {
+			found = s
+		}
+		return nil
+	})
+	return found != "", found
+}
+
+func cxxDemandInObject(data []byte) string {
+	f, err := elf.NewFile(bytes.NewReader(data))
+	if err != nil {
+		// An archive can hold members that are not ELF at all.
+		return ""
+	}
+	defer f.Close()
+	syms, err := f.Symbols()
+	if err != nil && !errors.Is(err, elf.ErrNoSymbols) {
+		return ""
+	}
+	for _, s := range syms {
+		// ⛔ UNDEFINED ONLY. libstdc++.a itself DEFINES these; asking "does
+		// this archive mention operator delete" would make every C++ library
+		// demand a C++ runtime it already is.
+		if s.Section != elf.SHN_UNDEF {
+			continue
+		}
+		if cxxRuntimeMarkers[s.Name] {
+			return s.Name
+		}
+	}
+	return ""
+}

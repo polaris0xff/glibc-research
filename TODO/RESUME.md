@@ -34,21 +34,8 @@ HEAD..origin/main` said **214**. Do this, in this order:
 
 ## In flight right now
 
-    ⚠ ONE THING: a `mesa-demos` bundle building in the background for T-066
-      route A's ceiling measurement.
-        cache   /var/tmp/pgb-appimage-mesa   AppDir 1.2 GB, present
-        log     the AppDir is assembled; dwarfs packing is what is left
-      ⭐ THE APPDIR IS THE PART ROUTE A NEEDS -- the artefact is not.
-      Next command, once nothing is writing to it:
-
-        ./pgb bundle sweep /var/tmp/pgb-appimage-mesa/mesa-demos/AppDir
-        ./pgb bundle sweep ... --cut 'libgallium-*.so=>libLLVM.so.*'
-
-      ⛔ Resolve the real sonames first with `pgb elf needed` -- the recipe
-      names in TODO are Arch's, not nixpkgs'.
-
-    Everything else is committed and pushed. CI green on 6831bd56, d910a431
-    and efcdd740; c5e646c7 was in progress at the last check.
+    ⭐ NOTHING RUNNING. Everything is committed and pushed to main.
+    CI green on every landed commit through 5d800353.
 
 ## ✅ THE OPERATOR REVIEW (cross-libc-dlopen #28 / PR 30) IS DONE, ALL FOUR
 
@@ -77,17 +64,28 @@ HEAD..origin/main` said **214**. Do this, in this order:
 
 ## ⛔ WHAT IS LEFT, IN ORDER
 
-    1  T-066 P0  ⛔ THE LAST P0. Measure the allowlist's ceiling FIRST
-                 (route A in the entry). Needs an AppDir, and a 7 GB one did
-                 not survive a container.
-    2  T-072 P1  experiments/76- with a non-zero --tls-reserve on the eleven.
-                 ⚠ Read the entry first: its premise is dented -- the object
-                 that motivated it is refused for a DIFFERENT reason and the
-                 benefit on real host objects is currently ZERO objects.
-    3  T-062 P1  five packages still carry no selftest.
-    4  T-063 P1  the miniflux proof: arm S has a static postgres on Alpine;
-                 src/interfaces does not build.
-    5  T-054/T-055  kdenlive. ⛔ The bar is NOT met: 2.22x the size, and a
+    1  T-066 P0  ⛔ STILL THE LAST P0, premise significantly advanced.
+                 ⭐ Route A's CEILING IS MEASURED: 218.5 MiB of a 938.8 MiB
+                 mesa bundle (23.3%) is reachable ONLY through edges two
+                 `-mini` recipes delete, against 6.3% the sweep can prove
+                 dead. `pgb bundle sweep --cut FROM=>TO` is the instrument.
+                 ⛔ LEFT: build the allowlist (bounded by that ceiling), and
+                 cost route B. ⚠ The jq headline moved 1.22x -> 1.58x when a
+                 stale pre-gating evidence file was re-run.
+                 ⚠ A kdenlive AppDir still does not exist.
+    2  T-062 P1  THREE packages left: buildx, logx, proc. verifyx and fail
+                 landed; selftests 307 -> 359.
+    3  T-063 P1  the miniflux proof. TWO NAMED FIXES in PROGRESS.md's work
+                 order, and the second is offline-testable now that
+                 `wrapper-flags` exists:
+                   - AC_SEARCH_LIBS probes -lreadline alone and
+                     libreadline.a's ncurses refs go unresolved
+                     (poc/91-qt-xcb answered the same class with
+                      -Wl,--start-group)
+                   - a C link that pulls a C++ archive: libicuuc.a needs
+                     operator delete and the __cxxabiv1 vtables, and
+                     LinkFlags takes a `cxx bool` that does not notice
+    4  T-054/T-055  kdenlive. ⛔ The bar is NOT met: 2.22x the size, and a
                  same-day safe vs aggressive timing comparison is owed.
 
 ## ⛔ Machine notes (carried forward, re-verify)
