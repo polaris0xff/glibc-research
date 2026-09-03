@@ -1,0 +1,11 @@
+== alpine-3.22 (musl)
+   A exit      : exit3
+   A vendor    : Mesa Project
+   A driver    : swrast
+   A EGL ver   : 1.5
+   A client API: OpenGL OpenGL_ES
+   A objects   : host=0 bundled=40
+   A host .so  : 
+   B exit      : exit1
+   B vendor    : <none>
+   B first line: EGL client extensions string:

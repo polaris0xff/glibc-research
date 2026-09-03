@@ -11,8 +11,9 @@ and the entries.
               throughput: glibc 4.53 ns/op vs musl 584.71 (malloc, 4 threads)
     NEW       ⭐ THE GLIBC PIN MOVED — 2.36 → 2.41, gcc 12.2.0 → 14.2.0, all
               four measured costs zero, class B 20 → 5 distinct symbols.
-              ⭐ TWO REAL LOADER DEFECTS FOUND AND FIXED, and the first was
-              HIDING the second.
+              CI green at the new pin, 16 of 16, on all eleven.
+              ⭐ FOUR REAL LOADER DEFECTS FOUND AND FIXED, and host objects
+              loading went 406 → 882 of 1,527 on one machine.
 
 ## ⛔ READ THIS FIRST: the toolchain is Go now, and the shell is the oracle
 
@@ -97,26 +98,52 @@ of the environment that produced the arm.
 `/tmp` inside a rootfs gave "compile failed" on all three arms with empty logs.
 `pgb rootfs run` **mounts a fresh tmpfs over `/tmp`**.
 
-### 3. ⭐ TWO REAL LOADER DEFECTS, and the first was hiding the second
+### 3. ⭐ FOUR REAL LOADER DEFECTS, and the first was hiding the second
+
+⭐ **One machine, one population of 1,527 host shared objects, five builds:**
+
+    at session start                          ok=406  crash=45  DIFFER=—
+    + the iconv weak-reference fix            ok=620  crash=55  DIFFER=10
+    + the general-dynamic TLS fix             ok=629  crash=46  DIFFER=1
+    + the structural interposer refusal       ok=628  crash=45  DIFFER=0
+    + class S owned, versioned lookup fixed   ok=882  crash=45  DIFFER=0
+
+`DIFFER` is `experiments/93-`'s own assertion: **objects that crash this loader
+which glibc's own loader loads**. ⚠ It read 0 before this session and the zero
+was not earned — see below.
 
 **1. `--host-dlopen` could not load anything that used iconv.** The provider
 table declares glibc symbols as **weak** undefined references; `--wrap` rewrote
 `iconv_open` to `__wrap_iconv_open`; **a weak undefined reference does not pull
-a member out of an archive**. Controlled, same machine, same 1527 objects:
-
-    ok = 406  ->  620
+a member out of an archive**, so the table entry held NULL.
 
 **2. ⛔ The two halves of a general-dynamic TLS pair disagreed, silently.**
 `DTPMOD64` searched every loaded object, `DTPOFF64` searched only one, so a
 cross-module thread-local came out as *(the right module, offset 0)*. ⚠ **Not
 primarily a crash — one module reading and WRITING at offset 0 of another
-module's thread storage.**
+module's thread storage.** The seven LLVM-family objects went from SIGSEGV 7 of
+7 to loaded 7 of 7.
 
-⭐ **The seven LLVM-family objects went from SIGSEGV 7 of 7 to loaded 7 of 7.**
+⛔ **And 93-'s control had been passing at DIFFER=0 partly BECAUSE of defect
+1** — the ten objects it should have caught were failing *earlier*, on iconv,
+and never reached the code that crashes them.
 
-⛔ **And `experiments/93-`'s control had been passing at DIFFER=0 partly
-BECAUSE of defect 1** — the ten objects it should have caught were failing
-earlier, on iconv, and never reached the code that crashes them.
+**3. The interposer refusal is decided by SHAPE now**, not by a list of names:
+*defines an allocator or `mmap` entry point AND imports `dlsym`/`dlvsym`*.
+Measured before it was written — it matches **5 of 1,527**, every one a known
+interposer, **two of them not in the name list**, zero false positives.
+
+**4. ⛔ The symbol lookup stopped at the first NAME match and checked the
+version afterwards.** A versioned symbol table holds several entries with one
+name — `lzma_cputhreads@XZ_5.2.2` beside `@@XZ_5.2` — so whichever the hash
+chain yielded first decided the answer, and a symbol that IS defined became a
+loud miss. Plus `_dl_mcount_wrapper_check`, class S, **247 objects**, now owned
+as the no-op it should be.
+
+⛔ **"Failed on 631 objects" was not a defect count either.** Of those, **glibc's
+own `ld.so` fails 374** — plugins of a host PROGRAM whose symbols live in the
+executable. The residue that was ours was 257 objects and **six symbols**; 254
+of them load now.
 
 ### 4. ⚠ T-072's motivating object is refused for a different reason
 
@@ -145,23 +172,36 @@ rests on the synthetic subject alone, and that is recorded.
    checked it.
 7. **`chmod 000` is not a control when you are root** — an unreadable-file arm
    passed until the file was moved away instead.
+8. ⛔ **CI was RED for seven pushes** on a check that passed here and failed
+   there: `check-docs.sh` asked whether a cited evidence path was on **disk**,
+   and two were gitignored build products. It asks the **repository** now.
+9. ⛔ **One of my own new checks was theatre**, found by its own control: it
+   iterated `OptVars` and asked whether each was rendered, which
+   `ContainerEnvArgs` also iterates. Dropping a variable from `OptVars` left it
+   green. The binding direction has to be **derived**.
+10. ⛔ **`el_defver`/`el_refver` read `versym[si]` unbounded** — found by the
+    door sweep, after my own change moved the call inside the symbol walk.
 
 ## ⭐ Work order
 
     ---- glibc's remaining quirks, and future-proofing ----
 
-    T-070   ⚠ P0. Steps 1 and 2 LANDED; step 3 is nearly done — 73-, 21- and
-            six POCs re-run at 2.41 and committed. ⛔ 80-mlt at 2.41 through
-            the normal POC path is what is left.
+    T-070   ⚠ P0. Steps 1, 2 and 3 LANDED. 73- and 21- re-run at 2.41, NINE
+            of ten POCs re-run through the normal POC path, and ⭐ CI green at
+            debian:13, 16 of 16, on all eleven. ⛔ 80-mlt is the tenth and is
+            queued behind experiments/85-. Close the entry when it lands.
     T-068   ✅ CLOSED. 93- green at pass=6 fail=0, and the control it passes
             read 10, then 1, then 0 as each defect was fixed.
-    T-072   P1. --tls-reserve is implemented. ⛔ experiments/76- with a
-            non-zero reserve on the eleven is still owed.
+    T-072   P1. --tls-reserve is implemented, and ⛔ its motivating object
+            turned out to be REFUSED FOR A DIFFERENT REASON: liblsan.so is a
+            sanitizer interposer. Zero of 71 PT_TLS objects on this host are
+            refused for an exhausted surplus. experiments/76- with a non-zero
+            reserve on the eleven is still owed.
 
     ---- the bundle, and the one class that is all DATA ----
 
-    T-071   ⚠ P0. Items 1, 2, 5 done. ⛔ experiments/85-'s new data-coherence
-            arm is WRITTEN AND NOT RUN -- that is this entry's Prove.
+    T-071   ⚠ P0. Items 1, 2, 5 done. experiments/85- was STARTED this
+            session and its result is the next thing to read.
     T-066   ⚠ P0. ⭐ The corpus IS MINED (34 trees). ⛔ An allowlist cannot
             reach a DT_NEEDED edge a `-mini` rebuild deletes. Measure its
             ceiling first (route A in the entry). Needs an AppDir.
@@ -170,7 +210,9 @@ rests on the synthetic subject alone, and that is recorded.
 
     T-063   the miniflux proof: arm S has a static postgres on Alpine;
             src/interfaces does not build
-    T-062   ⭐ `internal/wrapper` NOW HAS ONE (24 cases). Seven packages left
+    T-062   ⭐ `wrapper` (55 cases) and `cfg` (37) now have one; selftests
+            went 200 -> 307. FIVE packages left, and verifyx/buildx shell out
+            to a bed -- carry their parsing, not their run
     T-060   rungs 2 and 3, the static nix
     T-054   rungs 3 (KF6) and 4 (kdenlive static)
     T-057   item 2: a 32-bit application through the lib32 path
