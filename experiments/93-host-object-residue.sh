@@ -244,6 +244,37 @@ EOF
   if ! cc -o "$WORK/hostprobe" "$WORK/hostprobe.c" >"$WORK/hostprobe.log" 2>&1; then
     exp_skip "the control" "the dynamic probe did not build; see $WORK/hostprobe.log"
   else
+    # ⭐ WHICH OBJECT WON WHICH SYMBOL, IN ONE COMMAND. Taken from
+    # pkgforge-dev/cross-libc-dlopen#28, where `LD_DEBUG=bindings` settled in a
+    # single run what this tree spent four probe builds and a SIGSEGV handler
+    # on: whether `__once_proxy` had resolved to the definition it should have.
+    # The line it prints names both ends of the binding --
+    #
+    #   binding file .../libQt6Gui.so.6 ... to .../gles-fwd.so: normal symbol `glGetString'
+    #
+    # ⛔ IT CANNOT BE USED ON THE SUBJECT, and that is not a limitation of the
+    # flag. `LD_DEBUG` is read by GLIBC'S DYNAMIC LOADER; the subject here is a
+    # static binary with `tool/runtime/pgb-elfload.c` compiled in and no
+    # `PT_INTERP` at all, so there is no ld.so in the process to read it and
+    # nothing would be printed. It works HERE precisely because the control is
+    # the one dynamic thing in this file -- which is also what makes the
+    # control a control.
+    #
+    # ⚠ Captured only for an object where the two loaders DISAGREE. That is the
+    # row the assertion below fails on, and the first question anyone asks
+    # about such a row is which definition ld.so bound it to. Capturing it for
+    # all 1,527 would write hundreds of megabytes to answer a question nobody
+    # is asking about the rows that agree.
+    #
+    # ⚠ `LD_DEBUG_OUTPUT` APPENDS `.<pid>`, AND MORE THAN ONE FILE APPEARS.
+    # `timeout` forks, and it is itself a dynamic binary, so it writes a log of
+    # its OWN bindings beside the probe's. Measured here on `libz.so.1`: two
+    # files, `.22171` with 186 lines and not one mention of libz, `.22172` with
+    # 141 lines and the bindings actually wanted. ⛔ Glob order yields the
+    # useless one first, so the file is chosen by CONTENT -- the one carrying a
+    # `binding file <object>` line -- and never by position.
+    BINDLOG="$EXP_OUT/bindings"
+    rm -rf "$BINDLOG"; mkdir -p "$BINDLOG"
     : > "$WORK/control.txt"
     printf '  %-58s %s\n' 'OBJECT' 'GLIBC ld.so'
     while IFS='	' read -r cobj crest; do
@@ -256,8 +287,34 @@ EOF
         DIFFER=$((DIFFER + 1))
         printf '%s\tOURS-ONLY-exit-%s\n' "$cobj" "$hst" >> "$WORK/control.txt"
         printf '  %-58s ⛔ loads (exit %s)\n' "$cobj" "$hst"
+        bn=$(basename "$cobj")
+        LD_DEBUG=bindings LD_DEBUG_OUTPUT="$BINDLOG/$bn" \
+          timeout -k 5 "$TIMEOUT" "$WORK/hostprobe" "$cobj" \
+          >/dev/null 2>&1 </dev/null || true
+        picked=
+        for f in "$BINDLOG/$bn".*; do
+          [ -f "$f" ] || continue
+          if grep -q "binding file $cobj" "$f" 2>/dev/null; then
+            picked="$f"
+          else
+            rm -f "$f"
+          fi
+        done
+        if [ -n "$picked" ]; then
+          mv "$picked" "$BINDLOG/$bn.bindings"
+          printf '        LD_DEBUG=bindings: %s (%s lines)\n' \
+            "$BINDLOG/$bn.bindings" "$(wc -l < "$BINDLOG/$bn.bindings")"
+        else
+          # ⚠ AN ABSENCE IS NOT A ZERO. No log naming this object means the
+          # probe died before ld.so bound anything for it, which is itself the
+          # answer -- say so rather than leaving a silent gap.
+          printf '        LD_DEBUG=bindings: no log names %s (bound nothing)\n' "$cobj"
+        fi
       fi
     done < "$WORK/crashes.txt"
+    # Nothing disagreed, so nothing was captured. Leave no empty directory
+    # behind to suggest otherwise.
+    rmdir "$BINDLOG" 2>/dev/null || true
     exp_note "$(awk -F'\t' '$2=="both"{n++} END{print n+0}' "$WORK/control.txt") of $CRASH also crash glibc's own ld.so"
   fi
 fi

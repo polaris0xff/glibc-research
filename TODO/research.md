@@ -1001,3 +1001,65 @@ instruments:
 `internal/bundle/hostpolicy.go` is byte-identical to before this entry
 (`git diff --quiet`), which is the point: the fix is entirely in what the
 harness can see.
+
+---
+
+## T-075 — ⭐ LD_DEBUG=bindings on the control, because the subject cannot be asked
+
+**Source** operator, 2026-09-03, item 4 of the `cross-libc-dlopen#28` review.
+**Category** research · **Priority** P2 · **Effort** S · **Status** ✅ done
+
+**Problem.** ⚠ *Which object won this symbol* is a question this tree answers
+expensively. The session of 2026-09-03 spent **four probe builds and a SIGSEGV
+handler** establishing that `__once_proxy` had resolved to the definition it
+should have. Upstream settled the identical question on issue #28 in **one
+command**:
+
+    LD_DEBUG=bindings ./contour
+    binding file .../libQt6Gui.so.6 ... to .../gles-fwd.so: normal symbol `glGetString'
+
+**Premise.** ⛔ **It cannot be used on the subject, and that is not a limitation
+of the flag.** `LD_DEBUG` is read by glibc's dynamic loader. `pgb`'s output is a
+static binary with `tool/runtime/pgb-elfload.c` compiled in and **no
+`PT_INTERP`**, so there is no `ld.so` in the process to read it and nothing
+would be printed. ⭐ **But every control this tree runs against glibc's own
+`ld.so` is dynamic** — that is what makes it a control — so the diagnostic
+belongs there.
+
+### ✅ CLOSED 2026-09-03 — placed, and exercised
+
+`experiments/93-`'s control is an ordinary dynamic probe that answers *does
+glibc's own loader crash on this object too*. It now captures
+`LD_DEBUG=bindings` for **the objects where the two loaders DISAGREE** — the
+rows the assertion fails on, and the rows whose first follow-up question is
+which definition `ld.so` bound. Not for all 1,527: that is hundreds of
+megabytes answering a question nobody is asking about the rows that agree.
+
+⛔ **AND IT FOUND A DEFECT IN ITSELF BEFORE IT WAS COMMITTED.**
+`LD_DEBUG_OUTPUT` appends `.<pid>`, and **more than one file appears**:
+`timeout` forks and is itself dynamic, so it writes a log of its own bindings
+beside the probe's. Measured on `libz.so.1`: two files, `.22171` with 186 lines
+and **not one mention of libz**, `.22172` with 141 lines and the bindings
+actually wanted. ⚠ Glob order yields the useless one first, and the first
+version of this took it. The file is chosen by **content** now — the one
+carrying a `binding file <object>` line — never by position.
+
+⚠ **`DIFFER` is 0 today, so the new path would never have run.** It was
+exercised in a scratch copy with the branch forced and a three-object
+population; both objects produced a log naming their own bindings (214 and 212
+lines), the `timeout` decoy was deleted, and an empty directory is removed
+rather than left to suggest a capture happened. `experiments/93-` re-run
+afterwards: `ok=882 refused=122 failed=478 crash=45 hang=0`, `pass=6 fail=0`,
+and no `bindings/` directory left behind.
+
+### ⚠ Where it was NOT placed, and why — measured, not assumed
+
+| named by the operator | what was found |
+|---|---|
+| `experiments/93-`'s hostprobe | ✅ **placed and exercised.** An ordinary dynamic program; the diagnostic works and prints the expected line shape |
+| `poc/10-gawk`'s host-extension observation | ⚠ **the subject is the STATIC gawk.** Where the extension loads, the host `ld.so` enters as a *library* rather than as the program interpreter, and `LD_DEBUG` is read at `ld.so` startup. Whether it prints anything there is **unmeasured**, and this tree does not write an unverified diagnostic into a harness |
+| `experiments/62-`'s bundle arms | ⚠ **the question is already answered by `classify_trace`.** *Which objects were opened* is what decides the second-libc claim there; *which object won a symbol* is a different and less load-bearing question, and the arms run inside a rootfs under `strace` with timeouts by design, so the logs would have to be written inside the target and carried out |
+
+⛔ Both remaining rows are **open work, not a verdict**: each needs one
+measurement — does `LD_DEBUG` print anything in that configuration — before
+anything is written into those harnesses.

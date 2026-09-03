@@ -167,6 +167,35 @@ no GPU and no Alpine — cheaper than the instrument `50-` built.
 **Prove.** `experiments/51-*.sh` re-runs `50-`'s two arms plus a third carrying
 the full rewrite, and the table shows what changed on each of 11.
 
+### ⛔ READ THIS BEFORE PORTING ANYTHING — the reference moved, 2026-09-03
+
+⚠ **The vendored tree was pinned at `1cecf50e` (fetched 2026-09-01), which is
+BEFORE `pkgforge-dev/cross-libc-dlopen` PR 30 merged on 2026-09-02.** A port
+taken from that revision would have inherited a fixed bug. It is now re-mined
+at **`793f3f3f`**, PR 30's merge commit; `PROVENANCE.md` names it.
+
+⛔ **What PR 30 fixed, because it is the shape this tree keeps paying for.** On
+a host with `mesa-gl` but neither `mesa-egl` nor `mesa-gles`, `gles-fwd.so`
+found no forwarding target and kept **358 entry points as zero-returning
+stubs**. Preloaded, it won interposition and those stubs **shadowed** the real
+`glGetString` the process could still serve: a real GL context, a NULL version
+string, a black window (issue #28). The repair is one pass in
+`glfwd_fill_addr` — `dlsym(RTLD_NEXT, name)` once per name when the shim has no
+target, so a name something behind the shim can still serve is served from
+there; a miss keeps the stub.
+
+⛔ **WE ARE NOT AFFECTED BY THAT BUG and no document here may say we are.** It
+is an `LD_PRELOAD` interposition defect. This tool ships no preload shim, its
+output has no `PT_INTERP`, and `docs/AGENTS.md` §14 already refuses that route,
+so interposition cannot reach it. ⭐ **The DEFECT CLASS is ours** — a lookup
+that ANSWERS when it should DEFER — and the live instance was found and fixed
+as **T-073**.
+
+⚠ **And the route itself is still the one AGENTS.md §7 calls backwards.** Route
+B lets host objects *in*, which is the opposite direction to route D, and route
+D is shipped and measured (`--host-dlopen`, 11 of 11). `experiments/50-`
+measured no effect from the partial port. ⛔ Do not port the shim stack.
+
 ## T-033 — route D: compile an ELF loader in, resolve against our own static glibc
 
 **Source** `docs/research/solo.md`, the `pg83/solo` sweep, session of

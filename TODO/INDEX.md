@@ -3,13 +3,13 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 47  OPEN 17  DONE 30
+    TOTAL 48  OPEN 17  DONE 31
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 7 | 1 | 6 |
 | P1 | a documented capability does not work, or a flag does nothing | 32 | 11 | 21 |
-| P2 | worth doing; nothing is wrong without it | 8 | 5 | 3 |
+| P2 | worth doing; nothing is wrong without it | 9 | 5 | 4 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
 Effort: S under a day · M a few days · L a week · XL almost always two entries
@@ -64,6 +64,7 @@ pretending to be one.
 | T-072 | P1 | M | open | toolchain | The static TLS headroom is ~3,168 bytes; one real library wants 56,248 |
 | T-073 | P1 | S | done | runtime | ⭐ The own-symbol table answered where one of its two names had to defer |
 | T-074 | P1 | S | done | research | ⭐ The host-policy selftest could not fail on the state it was written to catch |
+| T-075 | P2 | S | done | research | ⭐ LD_DEBUG=bindings on the control, because the subject cannot be asked |
 
 ## The argument behind the ordering
 
