@@ -6,7 +6,7 @@ version       : 8.11.0
 sha256        : 264537d90e58d2b09dddc50944baf3c38e7089151c8986715e2aaeaaf2b8118f
 normal build  : ./configure --with-openssl && make
 stresses      : getaddrinfo/NSS, DNS, TLS, CA bundle data, 3-package dependency chain
-date (UTC)    : 2026-09-03T03:54:45Z
+date (UTC)    : 2026-09-03T05:47:13Z
 evidence      : /home/user/glibc-research/evidence/poc/30-curl
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1

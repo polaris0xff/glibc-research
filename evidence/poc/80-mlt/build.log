@@ -1084,7 +1084,6 @@ CC	libavfilter/x86/vf_idet_init.o
 CC	libavfilter/x86/vf_limiter_init.o
 CC	libavfilter/x86/vf_lut3d_init.o
 CC	libavfilter/x86/vf_maskedclamp_init.o
-CC	libavfilter/x86/vf_maskedmerge_init.o
 libavfilter/x86/vf_lut3d_init.c: In function 'ff_lut3d_init_x86':
 libavfilter/x86/vf_lut3d_init.c:63:9: warning: unused variable 'depth' [-Wunused-variable]
    63 |     int depth = desc->comp[0].depth;
@@ -1092,6 +1091,7 @@ libavfilter/x86/vf_lut3d_init.c:63:9: warning: unused variable 'depth' [-Wunused
 libavfilter/x86/vf_lut3d_init.c:62:9: warning: unused variable 'isfloat' [-Wunused-variable]
    62 |     int isfloat = desc->flags & AV_PIX_FMT_FLAG_FLOAT;
       |         ^~~~~~~
+CC	libavfilter/x86/vf_maskedmerge_init.o
 CC	libavfilter/x86/vf_nlmeans_init.o
 CC	libavfilter/x86/vf_noise.o
 CC	libavfilter/x86/vf_overlay_init.o
@@ -1148,8 +1148,8 @@ CC	libavformat/argo_brp.o
 CC	libavformat/argo_cvg.o
 CC	libavformat/asf.o
 CC	libavformat/asf_tags.o
-CC	libavformat/asfcrypt.o
 CC	libavformat/asfdec_f.o
+CC	libavformat/asfcrypt.o
 CC	libavformat/asfdec_o.o
 CC	libavformat/asfenc.o
 CC	libavformat/assdec.o
@@ -1225,7 +1225,6 @@ CC	libavformat/dfa.o
 CC	libavformat/dfpwmdec.o
 CC	libavformat/dhav.o
 CC	libavformat/diracdec.o
-CC	libavformat/dnxhddec.o
 libavformat/dashenc.c: In function 'flush_init_segment':
 libavformat/dashenc.c:594:49: warning: '%s' directive output may be truncated writing up to 1023 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
   594 |         snprintf(filename, sizeof(filename), "%s%s", c->dirname, os->initfile);
@@ -1242,12 +1241,10 @@ In function 'get_hls_playlist_name',
 libavformat/dashenc.c:488:9: note: 'snprintf' output between 13 and 1046 bytes into a destination of size 1024
   488 |         snprintf(playlist_name, string_size, "%smedia_%d.m3u8", base_url, id);
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CC	libavformat/dnxhddec.o
 CC	libavformat/dovi_isom.o
 CC	libavformat/dsfdec.o
 CC	libavformat/dsicin.o
-CC	libavformat/dss.o
-CC	libavformat/dtsdec.o
-CC	libavformat/dtshddec.o
 libavformat/dashenc.c: In function 'dash_flush':
 libavformat/dashenc.c:1957:63: warning: '%s' directive output may be truncated writing up to 1023 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
  1957 |             snprintf(os->full_path, sizeof(os->full_path), "%s%s", c->dirname, os->initfile);
@@ -1255,6 +1252,8 @@ libavformat/dashenc.c:1957:63: warning: '%s' directive output may be truncated w
 libavformat/dashenc.c:1957:13: note: 'snprintf' output between 1 and 2047 bytes into a destination of size 1024
  1957 |             snprintf(os->full_path, sizeof(os->full_path), "%s%s", c->dirname, os->initfile);
       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CC	libavformat/dss.o
+CC	libavformat/dtsdec.o
 libavformat/dashenc.c: In function 'dash_write_trailer':
 libavformat/dashenc.c:488:49: warning: 'media_' directive output may be truncated writing 6 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
   488 |         snprintf(playlist_name, string_size, "%smedia_%d.m3u8", base_url, id);
@@ -1267,8 +1266,6 @@ libavformat/dashenc.c:488:46: note: directive argument in the range [0, 21474836
 libavformat/dashenc.c:488:9: note: 'snprintf' output between 13 and 1045 bytes into a destination of size 1024
   488 |         snprintf(playlist_name, string_size, "%smedia_%d.m3u8", base_url, id);
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-CC	libavformat/dump.o
-CC	libavformat/dv.o
 libavformat/dashenc.c: In function 'dash_write_packet':
 libavformat/dashenc.c:2254:59: warning: '%s' directive output may be truncated writing up to 1023 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
  2254 |         snprintf(os->full_path, sizeof(os->full_path), "%s%s", c->dirname,
@@ -1278,6 +1275,9 @@ libavformat/dashenc.c:2254:9: note: 'snprintf' output between 1 and 2047 bytes i
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  2255 |                  os->filename);
       |                  ~~~~~~~~~~~~~
+CC	libavformat/dtshddec.o
+CC	libavformat/dump.o
+CC	libavformat/dv.o
 CC	libavformat/dvbsub.o
 CC	libavformat/dvbtxt.o
 CC	libavformat/dvenc.o
@@ -1418,7 +1418,6 @@ CC	libavformat/mmf.o
 CC	libavformat/mms.o
 CC	libavformat/mmsh.o
 CC	libavformat/mmst.o
-CC	libavformat/mods.o
 libavformat/matroskaenc.c: In function 'mkv_write_trailer':
 libavformat/matroskaenc.c:3341:79: warning: '%012.9f' directive output may be truncated writing between 12 and 320 bytes into a region of size between 8 and 14 [-Wformat-truncation=]
  3341 |                 snprintf(duration_string, sizeof(duration_string), "%02d:%02d:%012.9f",
@@ -1430,6 +1429,7 @@ libavformat/matroskaenc.c:3341:17: note: 'snprintf' output between 19 and 333 by
       |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  3343 |                          fmod(duration_sec, 60));
       |                          ~~~~~~~~~~~~~~~~~~~~~~~
+CC	libavformat/mods.o
 CC	libavformat/moflex.o
 CC	libavformat/mov.o
 CC	libavformat/mov_chan.o
@@ -1542,7 +1542,6 @@ CC	libavformat/rtmpproto.o
 CC	libavformat/rtp.o
 CC	libavformat/rtpdec.o
 CC	libavformat/rtpdec_ac3.o
-CC	libavformat/rtpdec_amr.o
 libavformat/rtmpproto.c: In function 'send_invoke_response':
 libavformat/rtmpproto.c:2001:51: warning: ' is now published' directive output may be truncated writing 17 bytes into a region of size between 1 and 128 [-Wformat-truncation=]
  2001 |         snprintf(statusmsg, sizeof(statusmsg), "%s is now published", filename);
@@ -1550,6 +1549,7 @@ libavformat/rtmpproto.c:2001:51: warning: ' is now published' directive output m
 libavformat/rtmpproto.c:2001:9: note: 'snprintf' output between 18 and 145 bytes into a destination of size 128
  2001 |         snprintf(statusmsg, sizeof(statusmsg), "%s is now published", filename);
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CC	libavformat/rtpdec_amr.o
 CC	libavformat/rtpdec_asf.o
 CC	libavformat/rtpdec_dv.o
 CC	libavformat/rtpdec_g726.o
@@ -1720,6 +1720,7 @@ CC	libavformat/vocdec.o
 CC	libavformat/vocenc.o
 CC	libavformat/vorbiscomment.o
 CC	libavformat/vpcc.o
+CC	libavformat/vpk.o
 libavformat/vorbiscomment.c: In function 'ff_vorbiscomment_write':
 libavformat/vorbiscomment.c:103:63: warning: '%03d' directive output may be truncated writing between 3 and 10 bytes into a region of size 4 [-Wformat-truncation=]
   103 |             snprintf(chapter_number, sizeof(chapter_number), "%03d", i);
@@ -1740,7 +1741,6 @@ libavformat/vorbiscomment.c:104:58: note: directive argument in the range [-999,
 libavformat/vorbiscomment.c:104:13: note: 'snprintf' output between 13 and 21 bytes into a destination of size 13
   104 |             snprintf(chapter_time, sizeof(chapter_time), "%02d:%02d:%02d.%03d", h, m, s, ms);
       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-CC	libavformat/vpk.o
 CC	libavformat/vplayerdec.o
 CC	libavformat/vqf.o
 CC	libavformat/vvc.o
@@ -1811,9 +1811,6 @@ CC	libavcodec/aasc.o
 CC	libavcodec/ac3.o
 CC	libavcodec/ac3_channel_layout_tab.o
 CC	libavcodec/ac3_parser.o
-CC	libavcodec/ac3dec_data.o
-CC	libavcodec/ac3dec_fixed.o
-CC	libavcodec/ac3dec_float.o
 In file included from libavcodec/aacsbr.c:383:
 libavcodec/aacsbr_template.c: In function 'read_sbr_grid':
 libavcodec/aacsbr_template.c:728:57: warning: writing 1 byte into a region of size 0 [-Wstringop-overflow=]
@@ -1849,6 +1846,9 @@ libavcodec/aacsbr_template.c:728:57: warning: writing 1 byte into a region of si
 libavcodec/sbr.h:106:24: note: at offset [2147483649, 4294967292] into destination object 't_env' of size 9
   106 |     uint8_t            t_env[9];
       |                        ^~~~~
+CC	libavcodec/ac3dec_data.o
+CC	libavcodec/ac3dec_fixed.o
+CC	libavcodec/ac3dec_float.o
 In file included from libavcodec/aacsbr_fixed.c:610:
 libavcodec/aacsbr_template.c: In function 'read_sbr_grid':
 libavcodec/aacsbr_template.c:728:57: warning: writing 1 byte into a region of size 0 [-Wstringop-overflow=]
@@ -2016,8 +2016,8 @@ CC	libavcodec/bsf/h264_mp4toannexb.o
 CC	libavcodec/bsf/h264_redundant_pps.o
 CC	libavcodec/bsf/h265_metadata.o
 CC	libavcodec/bsf/h266_metadata.o
-CC	libavcodec/bsf/hapqa_extract.o
 CC	libavcodec/bsf/hevc_mp4toannexb.o
+CC	libavcodec/bsf/hapqa_extract.o
 CC	libavcodec/bsf/imx_dump_header.o
 CC	libavcodec/bsf/media100_to_mjpegb.o
 CC	libavcodec/bsf/mjpeg2jpeg.o
@@ -2093,8 +2093,8 @@ CC	libavcodec/cyuv.o
 CC	libavcodec/d3d11va.o
 CC	libavcodec/dca.o
 CC	libavcodec/dca_core.o
-CC	libavcodec/dca_exss.o
 CC	libavcodec/dca_lbr.o
+CC	libavcodec/dca_exss.o
 CC	libavcodec/dca_parser.o
 CC	libavcodec/dca_sample_rate_tab.o
 CC	libavcodec/dca_xll.o
@@ -2545,7 +2545,6 @@ CC	libavcodec/pcm-blurayenc.o
 CC	libavcodec/pcm-dvd.o
 CC	libavcodec/pcm-dvdenc.o
 CC	libavcodec/pcm.o
-CC	libavcodec/pcx.o
 libavcodec/pcm.c: In function 'pcm_decode_init':
 libavcodec/pcm.c:287:5: warning: 'sample_fmts' is deprecated [-Wdeprecated-declarations]
   287 |     avctx->sample_fmt = avctx->codec->sample_fmts[0];
@@ -2555,6 +2554,7 @@ In file included from libavcodec/avcodec.h:41,
 libavcodec/codec.h:219:32: note: declared here
   219 |     const enum AVSampleFormat *sample_fmts; ///< @deprecated use avcodec_get_supported_config()
       |                                ^~~~~~~~~~~
+CC	libavcodec/pcx.o
 CC	libavcodec/pcxenc.o
 CC	libavcodec/pgssubdec.o
 CC	libavcodec/pgxdec.o
@@ -2640,7 +2640,6 @@ CC	libavcodec/sbcdec_data.o
 CC	libavcodec/sbcdsp.o
 CC	libavcodec/sbcdsp_data.o
 CC	libavcodec/sbcenc.o
-CC	libavcodec/sbrdsp.o
 libavcodec/sbcenc.c: In function 'sbc_encode_init':
 libavcodec/sbcenc.c:263:5: warning: 'supported_samplerates' is deprecated [-Wdeprecated-declarations]
   263 |     for (int i = 0; avctx->codec->supported_samplerates[i]; i++)
@@ -2656,6 +2655,7 @@ libavcodec/sbcenc.c:264:9: warning: 'supported_samplerates' is deprecated [-Wdep
 libavcodec/codec.h:217:16: note: declared here
   217 |     const int *supported_samplerates;       ///< @deprecated use avcodec_get_supported_config()
       |                ^~~~~~~~~~~~~~~~~~~~~
+CC	libavcodec/sbrdsp.o
 CC	libavcodec/sbrdsp_fixed.o
 CC	libavcodec/scpr.o
 CC	libavcodec/sga.o

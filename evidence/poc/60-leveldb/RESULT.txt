@@ -6,7 +6,7 @@ version       : 1.23
 sha256        : 9a37f8a6174f09bd622bc723b55881dc541cd50747cbd08831c2a82d620f6d76
 normal build  : cmake -S . -B build && cmake --build build
 stresses      : C++ static init, exceptions, RTTI, iostreams/locale, CMake, a static C++ dependency
-date (UTC)    : 2026-09-03T04:00:36Z
+date (UTC)    : 2026-09-03T05:53:03Z
 evidence      : /home/user/glibc-research/evidence/poc/60-leveldb
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1

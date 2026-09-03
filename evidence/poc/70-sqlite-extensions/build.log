@@ -1,12 +1,12 @@
-/usr/bin/ld: /tmp/ccxDJgwa.o: in function `find_home_dir.part.0':
+/usr/bin/ld: /tmp/cc83i7bO.o: in function `find_home_dir.part.0':
 shell.c:(.text+0xe520): warning: Using 'getpwuid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
-/usr/bin/ld: /tmp/ccp7lhOj.o: in function `unixDlOpen':
+/usr/bin/ld: /tmp/ccy8pDSr.o: in function `unixDlOpen':
 sqlite3.c:(.text+0x60ba): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
-/usr/bin/ld: /tmp/ccyeO3g4.o: in function `find_home_dir.part.0':
+/usr/bin/ld: /tmp/cc0BEL0f.o: in function `find_home_dir.part.0':
 shell.c:(.text+0xe520): warning: Using 'getpwuid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
 /usr/bin/ld: /var/tmp/pgb-poc/70-sqlite/ext/base85.o:(.bss+0x0): multiple definition of `sqlite3_api'; /var/tmp/pgb-poc/70-sqlite/ext/base64.o:(.bss+0x0): first defined here
 /usr/bin/ld: /var/tmp/pgb-poc/70-sqlite/ext/base85.o: in function `sqlite3_base_init':
 base85.c:(.text+0x7b0): multiple definition of `sqlite3_base_init'; /var/tmp/pgb-poc/70-sqlite/ext/base64.o:base64.c:(.text+0x520): first defined here
 collect2: error: ld returned 1 exit status
-/usr/bin/ld: /tmp/ccUOyJyX.o: in function `find_home_dir.part.0':
+/usr/bin/ld: /tmp/cc0Mjhv1.o: in function `find_home_dir.part.0':
 shell.c:(.text+0xe520): warning: Using 'getpwuid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking

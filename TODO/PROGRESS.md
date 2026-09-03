@@ -403,6 +403,18 @@ is **costing route B**, which is where the size actually is.
         POC_REBUILD. ⭐ `poc/run-all.sh --rebuild` now exists and is the
         command; it deletes the shared work tree so all ten build against the
         toolchain as it is NOW.
+        ✅ RUN, CLEAN REBUILD, ALL TEN GREEN:
+          10 13  20 13  30 13  40 13  50 13  60 13
+          70 21  80 22  90 21  91 28      ran=10 failed=0
+        ⭐ 70, 80 and 91 gained a case each -- the new
+        `poc_check_built_by_env` assertion, live for the first time.
+        ⚠ TIMINGS ARE CONTAMINATED AND ARE NOT A COST FOR THE WIDER SCAN.
+        Total 3,327s -> 3,471s (1.043x), but plans, closure walks, Go builds
+        and both gates ran on the same four cores throughout BOTH runs --
+        RULES.md "the shared resource is sometimes the clock". ⭐ The control
+        is 60-leveldb at 15s -> 5s, which no scan change can produce: the
+        machine's state differed between the runs. The honest statement is
+        "no cost measurable with this instrument", not 4.3%.
 
     ---- 1. T-066 P0, and the route order is now ARGUED rather than assumed ----
 

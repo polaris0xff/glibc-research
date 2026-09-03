@@ -6,7 +6,7 @@ version       : Qt 6.11.1 (qtbase) + libxcb 1.17 + xkbcommon 1.13 + OpenSSL 3
 sha256        : d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac
 normal build  : apt install qt6-base-dev && cmake && make
 stresses      : xcb QPA on a real X server, a mapped window, static OpenSSL linked into QtNetwork, QtSql/SQLite
-date (UTC)    : 2026-09-03T04:22:17Z
+date (UTC)    : 2026-09-03T06:14:53Z
 evidence      : /home/user/glibc-research/evidence/poc/91-qt-xcb
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
@@ -64,6 +64,7 @@ build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
           a real SQLite query round trip                 ok     日本
           QApplication::exec() returned 0                ok     0
         failures: 0
+  ok    built by the environment's own gcc           = 14.2.0
 
   functional test across the pinned matrix:
     ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
@@ -91,5 +92,5 @@ build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
   ok    archlinux-latest: functional test            = ok
 
 ---------------------------------------------------------------
-pass=27 fail=0 skip=0
+pass=28 fail=0 skip=0
 VERDICT: 91-qt-xcb builds and works across the matrix.

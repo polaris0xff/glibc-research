@@ -6,7 +6,7 @@ version       : SQLite 3.47.0 + 15 extensions from sqlite/sqlite ext/misc @ vers
 sha256        : 83eb21a6f6a649f506df8bd3aab85a08f7556ceed5dbd8dea743ea003fc3a957
 normal build  : cc shell.c sqlite3.c -ldl -lm; each extension: cc -shared -fPIC ext.c
 stresses      : dlopen by user-supplied path, dlsym by derived name, 15 plugins in one link, per-plugin symbol namespaces
-date (UTC)    : 2026-09-03T04:00:51Z
+date (UTC)    : 2026-09-03T05:53:08Z
 evidence      : /home/user/glibc-research/evidence/poc/70-sqlite-extensions
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
@@ -25,6 +25,7 @@ build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
 -- inspection -------------------------------------------------
   ok    PT_INTERP absent                             = 0
   ok    DT_NEEDED entries                            = 0
+  ok    built by the environment's own gcc           = 14.2.0
   ok    per-plugin sqlite3_api instances in the binary = 15
   ok    unnamespaced sqlite3_api in the binary       = 0
 
@@ -77,5 +78,5 @@ build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
   ok    the same two through --wrap-dlopen           = linked
 
 ---------------------------------------------------------------
-pass=20 fail=0 skip=0
+pass=21 fail=0 skip=0
 VERDICT: 70-sqlite-extensions builds and works across the matrix.
