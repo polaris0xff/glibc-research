@@ -1863,6 +1863,39 @@ and no mention — the same shape as the `libSDL3` miss this sweep already paid
 for once. ⭐ The gconv tree is how a *bundle* solves the gconv problem
 (`docs/AGENTS.md` §14), so this lever aims straight at it.
 
+#### ⭐ BUT THE LEVER INHERITS THE BASELINE'S RISK RATHER THAN ADDING ONE, and that is measured
+
+⭐ **The invariant: the fixpoint can only drop a library whose every supporter
+— `DT_NEEDED` or mention — is itself dropped.** It follows from the
+construction (a library survives if any *reachable* object needs or names it),
+and it was checked on the real bundle rather than argued: for each of the seven
+files, against every object still reachable under the fixpoint, resolved to
+real files — ⭐ **0 reachable objects mention any of the seven.**
+
+⭐ **`libresolv.so.2` is the case that makes the point.** Its only mentions in
+the bundle come from `libnss_dns.so.2` and `libnss_hesiod.so.2`, and those are
+`DT_NEEDED` edges — and ⛔ **the BASELINE already classifies both unreachable**.
+So the baseline was deleting the NSS modules and keeping the library they exist
+to use. ⚠ **That is an incoherence in the sweep, not a safety margin**, and the
+fixpoint removes it. The same holds for the six gconv helpers: their only
+mentions are `EUC-TW.so`, `ISO-2022-CN.so` and `ISO-2022-CN-EXT.so`, which the
+baseline drops.
+
+⛔ **So what `experiments/89-` has to clear is smaller than it looked.** The
+question is not *"is it safe to drop `libresolv`"* — it is *"was it safe to drop
+`libnss_dns`"*, which the baseline already decided and 89- already covers. The
+fixpoint takes no independent judgement. ⚠ The residual risk is unchanged and
+is the baseline's: a library reached only through `iconv_open` or a `dlopen` by
+a name nothing spells out is invisible to both.
+
+⚠ **And the check itself found the defect class this entry is about, in a
+throwaway script.** The first version subtracted the unreachable list from the
+directory listing **by name**, so `lib/libresolv.so` — a symlink to
+`libresolv.so.2` — counted as a surviving object that mentions a dropped one,
+and reported two violations. Both vanished when the sets were resolved to real
+files. ⭐ Name-based set arithmetic over a library directory is wrong in exactly
+the way `selfKeys` is written to prevent, and it is still easy to write.
+
 **Carried offline** in `bundle-sweep`: `libghost.so.1` is unreachable and its
 `.rodata` names `libhaunted.so.1`, which nothing else references. Without the
 fixpoint `libhaunted` is a root; with it, it is unreachable. ⛔ Plus the three

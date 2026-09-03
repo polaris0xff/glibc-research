@@ -386,6 +386,14 @@ is **costing route B**, which is where the size actually is.
              helpers and libresolv, which an eglinfo subject never touches,
              so 89- passing would NOT clear the lever for a program that
              converts a CJK encoding. That needs a subject that does.
+        ⭐ BUT THE BAR IS LOWER THAN IT LOOKS, and it is measured: the
+        fixpoint can only drop a library whose every supporter is itself
+        already dropped. Checked on the jq bundle by real file -- 0 reachable
+        objects mention any of the seven. libresolv.so.2's only supporters are
+        libnss_dns.so.2 and libnss_hesiod.so.2, WHICH THE BASELINE ALREADY
+        DROPS. So the lever removes an incoherence (deleting the consumer and
+        keeping the library) rather than taking a new risk, and what 89- has
+        to clear is the baseline's judgement, which it already covers.
     B4  ⚠ A kdenlive AppDir does not exist. B1 needs only the closure.
 
     ---- 2. then, by how foundational they are ----
