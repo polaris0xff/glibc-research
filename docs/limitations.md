@@ -266,9 +266,10 @@ Against a *dynamic* binary's `ld.so` on the host, in-process and same shape,
 ours is 84–105 µs to first load against 50–78 µs — the same order.
 
 ⚠ **What it still does not do, measured by `experiments/93-` on 1,527 host
-objects**, 628 of which load: **631 undefined symbols**, 3 `TLSDESC`
+objects**, ⭐ **882 of which load**: 376 undefined symbols, 3 `TLSDESC`
 relocations, 29 unfindable `DT_NEEDED`s, and one object the classifier still
-cannot name. ⭐ **Nothing crashes this loader that glibc's own loader loads**,
+cannot name. ⚠ **Of those undefined-symbol failures, glibc's own `ld.so` fails
+374 too** — plugins of a host PROGRAM, whose symbols live in the executable. ⭐ **Nothing crashes this loader that glibc's own loader loads**,
 and the 45 that do crash crash glibc too.
 
 ⛔ **The static-TLS row is NOT among them, and that is a correction.** Every

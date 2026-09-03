@@ -374,11 +374,20 @@ experiment; none has been shown to be unreachable.
 
    | `evidence/93-host-object-residue/` | 1,527 objects |
    |---|---|
-   | loaded | **628** |
+   | loaded | ⭐ **882** |
    | refused by name or by shape | 122 |
-   | failed with a reason | 732 — 631 of them an undefined symbol |
+   | failed with a reason | 478 — 376 of them an undefined symbol |
    | crashed | 45, and ⭐ **45 of 45 crash glibc's own `ld.so` too** |
    | ⛔ crashes that glibc LOADS | ⭐ **0** |
+
+   ⭐ **`loaded` was 406 at the start of the session that closed this.** Four
+   defects were found and fixed against that one population, and each is in
+   `TODO/runtime.md` T-068 with its control.
+
+   ⚠ **And "failed" is not a defect count either.** Of the objects failing with
+   an undefined symbol, **glibc's own `ld.so` fails 374 of them too** — they are
+   plugins of a host PROGRAM (CPython, Perl, PostgreSQL, PHP) whose symbols live
+   in the executable that loads them, and nobody can load those standalone.
 
    ⚠ **That zero is earned rather than asserted.** It read **10**, then **1**,
    then **0** across one session as two real loader defects were fixed — a weak

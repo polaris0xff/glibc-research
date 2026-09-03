@@ -482,7 +482,7 @@ them, one fork each, through `tool/runtime/pgb-elfload.c`.
 ## ✅ CLOSED 2026-09-03 — the Prove, run, with the arc that earned the zero
 
     sh experiments/93-host-object-residue.sh
-    ok=628 refused=122 failed=732 crash=45 hang=0
+    ok=882 refused=122 failed=478 crash=45 hang=0
     45 of 45 also crash glibc's own ld.so
     ok  nothing crashes this loader that glibc's loader loads = 0
     pass=6 fail=0 skip=0     VERDICT: matched expectation
@@ -498,7 +498,8 @@ one population of 1,527 objects, four builds:
 | at session start | 406 | 45 | — |
 | **+ the iconv fix** | 620 | 55 | ⛔ **10** |
 | **+ the general-dynamic TLS fix** | 629 | 46 | ⛔ **1** |
-| **+ the structural interposer refusal** | **628** | **45** | ⭐ **0** |
+| **+ the structural interposer refusal** | 628 | **45** | ⭐ **0** |
+| **+ `_dl_mcount_wrapper_check`, and the versioned-lookup fix** | ⭐ **882** | 45 | ⭐ **0** |
 
 ⚠ **The first `DIFFER = 0`, recorded 2026-09-02e, was not the loader being
 right** — the ten objects the control should have caught were failing earlier,
@@ -510,11 +511,46 @@ as each defect was fixed.
 `ok`, and it is the right answer — it "loaded" only because its constructor had
 not allocated yet.
 
-⛔ **What is NOT closed by this, and each has its own entry:** the 631
-`undefined` symbols (`experiments/73-` classifies them; joining the two
-harnesses is the work), the 3 `tlsdesc`, the 29 `missing-dep`, and the one
-object the classifier still cannot name. They are residue with a measured
-count, which is what this entry existed to produce.
+### ⭐ AND THE 631 UNDEFINED SYMBOLS WERE JOINED TO 73-, WHICH IS WHAT THIS ENTRY ASKED FOR
+
+⛔ **"Our loader failed on 631 objects" is not a defect count either**, and the
+control that says so is this entry's own, pointed at failures instead of
+crashes. Of the 631, **glibc's own `ld.so` also fails 374** — plugins of a host
+PROGRAM: CPython (`PyExc_ValueError`, `_Py_NoneStruct`), Perl
+(`Perl_stack_grow`), PostgreSQL (`CurrentMemoryContext`), PHP (`zend_*`).
+Their symbols live in the executable that loads them.
+
+⭐ **The residue that is ours was the other 257, and it was SIX symbols:**
+
+| symbol | objects | class | outcome |
+|---|---|---|---|
+| `_dl_mcount_wrapper_check@GLIBC_2.2.5` | **247** | S | ✅ **owned**, as a no-op |
+| `dm_task_get_info@DM_1_02_97` | 4 | version | ✅ **lookup fixed** |
+| `lzma_cputhreads@XZ_5.2` | 3 | version | ✅ |
+| `lzma_stream_encoder_mt@XZ_5.2` | 1 | version | ✅ |
+| `xdr_void@GLIBC_2.2.5` | 1 | S, sunrpc → libtirpc | ⛔ open |
+| `_rtld_global_ro@GLIBC_PRIVATE` | 1 | A, `ld.so` owns it | ⛔ open, and a fake would be a silent wrong answer |
+
+**254 of 257 load.** The three left are `libnsl.so.1`, `libmvec.so.1`, and
+`libcuilo.so`, which hits `more than 64 objects loaded` — a limit of this
+loader's object table, not a symbol problem, and the one place LibreOffice's
+dependency graph is bigger than the loader.
+
+⛔ **AND THE VERSION LOGIC IS UNDER-MEASURED, WHICH THE GUARD-MUTATION REVIEW
+FOUND AND THIS ENTRY DOES NOT ROUND OFF.** Two mutations:
+
+    el_accept ignores the version entirely   the motivating objects STILL LOAD
+    drop the unversioned fallback            254 of 257 -- IDENTICAL
+
+The three branches of the version rule are exercised by exactly one of this
+host's 1,527 objects' worth of demand. *A wrong version is never returned* holds
+by construction — exact match wins, unversioned is a fallback, wrong keeps
+looking — but nothing asserts it. ⭐ **A synthetic versioned fixture is what
+would close that, and it is not written.**
+
+⛔ **What is NOT closed, each with its own home:** the 376 `undefined` that
+remain (374 of them not ours), the 3 `tlsdesc`, the 29 `missing-dep`, the two
+named symbols above, and the one object the classifier still cannot name.
 
 ⛔ **This exists so T-064's residue is carried as work rather than rounded off
 in a summary.** ⚠ **The title's `86 of 904` is the number this entry was
