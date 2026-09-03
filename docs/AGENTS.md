@@ -266,6 +266,10 @@ TODO/                     the work: PROGRESS, INDEX, RULES, RESUME, entries
 TODO/check.sh             the gate; run before every commit
 poc/common.sh             the POC contract
 poc/NN-*/run.sh           the proof-of-concept projects
+poc/run-all.sh            ⭐ the acceptance suite as one command. `--rebuild`
+                          after ANY wrapper change: only five of the ten
+                          honour POC_REBUILD, so a plain re-run reuses
+                          binaries the old toolchain produced
 evidence/                 committed RESULT.txt per experiment and POC
 HISTORY/<commit>/         ⛔ the shell and Python the Go port replaced. Kept
                           because it is the ORACLE every byte-identical
