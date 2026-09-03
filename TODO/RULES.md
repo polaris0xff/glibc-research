@@ -216,6 +216,38 @@ recorded in the entry.** A closed entry with no output is an opinion.
 `references.md`; vendoring on `vendoring.md`.** All three are vendored under
 `../docs/methodology/`.
 
+## ⛔ AN ASSERTION YOU HAVE NOT SEEN FAIL IS NOT AN ASSERTION
+
+⭐ **When you add a check, plant the defect it exists to catch and watch it go
+red. Then remove the plant.** It costs one build and it is the only thing that
+distinguishes a check from a decoration.
+
+⛔ **This is not a style preference — it is the most common defect class in this
+tree, and the session of 2026-09-03c hit it four times in one day:**
+
+| the check | why it could not fail |
+|---|---|
+| T-074's `"unset, not set-and-empty"` | its helper returned `""` for a key that was **absent** and for one emitted as `KEY=` — the safe state and the dangerous one |
+| `bundle-soname-scan`'s equivalence | the oracle and the subject were given the **same `selfKeys()`**, so they agreed by construction |
+| `wrapper-flags`' `cxx-demand` block | every path in it is deliberately **non-existent**, so "considered" and "skipped" both answer no — and one case read *"a flag is never opened as an input"*, which is the **defect written down as the intent**. It hid `-licuuc` for as long as it existed |
+| ⭐ `check-docs.sh` gate 5b, **written that same day to catch a stale count** | its regex wanted digits touching the word, and the page writes `all **31** experiments`. It reported "1 checked", went green, and a planted wrong count passed |
+
+⚠ **The last row is the point.** A check written *that morning*, by someone who
+had just spent the day on this exact failure mode, still could not fail on the
+line it was written for — and only planting the defect found it.
+
+⭐ **What a plant looks like**, and all four were this cheap:
+
+```sh
+cp internal/x/y.go /tmp/y.bak
+# make the one-line change that reintroduces the defect
+go build -o /tmp/pgb-planted ./cmd/pgb && /tmp/pgb-planted selftest <suite>
+cp /tmp/y.bak internal/x/y.go && git status --short internal/x/y.go   # empty
+```
+
+⛔ **Record both columns.** "3 of 27 FAILED" beside "27 pass" is the evidence;
+"the selftest passes" on its own is what every one of the four above also said.
+
 ## ⛔ ONE THING AT A TIME ON THE BED, AND ONE `pgb build` AT A TIME
 
 ⚠ **Both were learned the expensive way in the session of 2026-09-01d**, on a
