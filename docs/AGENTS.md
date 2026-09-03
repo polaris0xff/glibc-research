@@ -473,17 +473,17 @@ repeated here.
 |---|---|
 | test bed, 11 environments | ✅ 11 of 11, digest-pinned |
 | all 24 experiments | ✅ every one measured; `evidence/<NN>-*/RESULT.txt` |
-| all 10 POCs | ✅ 11 of 11 environments each, zero host shared objects |
+| all 10 POCs | ✅ 11 of 11 environments each, zero host shared objects. ⭐ **All ten re-run at the 2.41 pin on 2026-09-03**, and each `RESULT.txt` now names the environment, image, digest, gcc and glibc that built it |
 | NSS / iconv / locale / terminfo / CA-bundle mechanisms | ✅ 11 of 11 each |
 | `pgb` chroot and host engines | ✅ complete |
 | `pgb` docker engine | ✅ complete — output **byte-identical** to the chroot engine for the same source |
 | `pgb` podman engine | ⚠ **untested** — no podman here; the code path is docker's except the binary name |
 | `pgb verify --engine` | ✅ chroot and docker, green on a runner; both arms agree on all 11 rows. ⚠ reports `unmeasured`, never `none`, when it cannot attach |
-| CI workflow | ✅ **green, 16 of 16 jobs**, and it asserts §3 criterion 2 rather than exit status |
+| CI workflow | ✅ **green, 16 of 16 jobs** at the 2.41 pin, and it asserts §3 criterion 2 rather than exit status. ⭐ The build image is **derived from `cfg.go`** by the `matrix` job, never retyped |
 | `pgb nix` (plan / fetch / build / deps) | ✅ works with **no nix installed at all** — `experiments/88-` plans, fetches and builds at uid 12000 in a rootfs with no `/nix` |
 | `internal/bundle` (the AppImage bundler) | ✅ uruntime + dwarfs + sharun over a nixpkgs closure. `--debloat none/safe/aggressive` = 170.6 / 147.2 / 132.9 MB, all three identical on 11 of 11 |
 | bundle vs. the field | ⚠ **behind on size and speed, ahead on cleanliness** — §7 and [`comparison.md`](comparison.md) |
-| host `dlopen` | ✅ **`--host-dlopen`**: 11 of 11, zero host objects, real host `.so` on 7 of 7 glibc rows. §7 |
+| host `dlopen` | ✅ **`--host-dlopen`**: 11 of 11, zero host objects, real host `.so` on 7 of 7 glibc rows. §7. ⭐ **882 of 1,527 host objects on the build host load**, up from 406 — four loader defects, `TODO` T-068 |
 | aarch64 | ⚠ **untested** |
 | NVIDIA / real GPU | ⚠ **untested** — every GL row is `swrast`; `TODO` T-059 |
 
@@ -588,7 +588,9 @@ classes and the entry that owns each; it is not a second work order.
 |---|---|---|
 | **`pgb build <url-or-package>`** — the toolchain the project is for | T-012 | the design and the static-first/bundle-last rule are in [`design/toolchain.md`](design/toolchain.md) |
 | ⭐ **host `dlopen`** — §7 item 1 | ✅ **T-064 CLOSED**, and ✅ **T-068 CLOSED** with it | `pgb build --host-dlopen`. `experiments/76-`: 11 of 11 carried, zero host objects, a real host `.so` on 7 of 7 glibc rows, control 0 of 11. 1,093 code lines against solo's 2,332 |
-| ⚠ **the bundle is bigger than the field** | ⛔ **T-066 (P0), advanced not met** | ⭐ **2.86× → 1.22× on `jq`** (`experiments/78-`): the reachability sweep now feeds debloat (277 objects, 12.0 MiB) and `share/i18n`, glibc's locale SOURCES, was 17 MiB of a 22 MiB bundle. ⛔ The rest is a **package-size** gap, not a bundler one |
+| ⭐ **the glibc pin, and future-proofing** | ✅ **T-070 CLOSED** | 2.36 → **2.41**, `debian:13`, gcc 14.2.0. Four measured costs at zero, class B **20 → 5**, ten of ten POCs, CI green 16 of 16. ⚠ The ceiling regrows: [`design/glibc-versions.md`](design/glibc-versions.md) rule 6 says re-cost it periodically |
+| ⭐ **EGL out of a nixpkgs closure** | ✅ **T-071 CLOSED** | `experiments/85-`, `pass=10 fail=0`, with the data-coherence arm's negative control firing on a real bundle. ⚠ Every row is `swrast` and surfaceless — T-059 owns the GPU |
+| ⚠ **the bundle is bigger than the field** | ⛔ **T-066 (P0), advanced not met — and it is now the LAST open P0** | ⭐ **2.86× → 1.22× on `jq`** (`experiments/78-`): the reachability sweep now feeds debloat (277 objects, 12.0 MiB) and `share/i18n`, glibc's locale SOURCES, was 17 MiB of a 22 MiB bundle. ⛔ The rest is a **package-size** gap, not a bundler one |
 | ⭐ **what a bundle may take from the HOST** | ✅ **T-065 CLOSED** | four classes, the search order adopted from `Anylinux-sharun`, 29 offline assertions. [`design/host-fallback.md`](design/host-fallback.md) |
 | **a host with no compiler** | T-051, T-060 | `pgb nix` already works with no nix installed; the C toolchain is the last crutch |
 | **aarch64** | T-041 | `pgb rootfs pull --arch arm64` re-resolves by tag, trading the digest pin away. ⚠ Nothing has been run — expect IFUNC and CPU-baseline questions x86_64 did not raise |
