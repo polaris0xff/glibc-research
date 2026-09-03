@@ -94,10 +94,13 @@ func (c *Cmd) build() *exec.Cmd {
 	// handed. It bit exactly when the command IS a wrapped tool, which is a
 	// documented use of `pgb build [--] CMD...`.
 	//
-	// ⚠ Only when the caller set a PATH and the name has no separator — the
-	// two conditions under which the answer can differ. A failure to resolve is
-	// left to exec, so the error stays the one it would have given.
-	if !c.EnvOnly || len(c.Env) > 0 {
+	// ⚠ ONLY WHEN THE CALLER SPECIFIED AN ENVIRONMENT. `exec.Cmd.Env == nil`
+	// means "inherit", and then this process's PATH IS the child's, so there is
+	// nothing to differ about. ⭐ And a name with a separator is not a lookup at
+	// all — `./configure`, which `envx` passes, must stay exactly that.
+	// A name this PATH cannot resolve is left as exec resolved it, so the
+	// failure is the one it would have reported.
+	if cmd.Env != nil {
 		if p, ok := lookPathIn(c.Argv[0], cmd.Env); ok {
 			cmd.Path = p
 		}
