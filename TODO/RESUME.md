@@ -46,15 +46,25 @@ the branch you are on AND `git status` after `git checkout main`.
 
 ## In flight right now
 
-    ⭐ SESSION IN PROGRESS. Bootstrap started detached; codegraph installed.
-    Nothing committed yet beyond this file.
+    ⏳ R1, THE TEN POCs — 8 of 10 green (10,20,30,40,50,60,70,80), 90-qt
+       building, 91-qt-xcb after it. PGB_ENGINE=chroot, matching the engine
+       every committed RESULT.txt names.
+         runner  scratchpad/run-pocs.sh, staging in scratchpad/poc-run/
+         ⛔ DO NOT REBUILD ./pgb UNTIL IT FINISHES — a POC invokes ./pgb many
+            times and a mid-run swap makes the result describe two binaries.
+         Each POC's stdout is copied to evidence/poc/<name>/RESULT.txt as it
+         completes, so a death here loses at most the running POC.
 
-    The work order being executed, in this order (PROGRESS.md §Work order):
-      R1  run the ten POCs against the changed link hot path   ← STARTED
-      R2  bundle-soname-scan's oracle shares selfKeys()
-      R3  T-063 arm S with --without-icu REMOVED
-      B1  T-066: kdenlive closure downstream of qtbase + mesa
-      then T-062, T-075's two placements, T-057, T-060, T-054, T-051, T-012
+    ✅ R2 DONE and pushed (ac43d08c, CI green).
+    ✅ B1 DONE and pushed (1dc6e49e, CI in progress at the time of writing).
+
+    NEXT, in order:
+      R3  T-063 arm S with --without-icu REMOVED  ⛔ needs the build rootfs,
+          so it CANNOT start until R1 finishes — both use pgb-env-debian13.
+            pgb nix plan postgresql --out pg.plan
+            NIX_MAX_ROUNDS=24 pgb nix build --plan pg.plan   (no --without-icu)
+      T-062  buildx, logx, proc selftests — pure Go, no bed, can overlap
+      then T-075's two placements, T-057, T-060, T-054, T-051, T-012
 
 ## ⛔ WHAT IS LEFT — READ PROGRESS.md, IT IS THE WORK ORDER
 

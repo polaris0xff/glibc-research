@@ -1254,6 +1254,71 @@ a control arm.
                  envx  wrapper  cfg  ⭐ verifyx  ⭐ fail
     NOT covered  ⛔ buildx  logx  proc
 
+### ✅ 2026-09-03c — `buildx`, `logx` and `proc` are covered. NOTHING IS LEFT
+
+    pgb selftest       375 cases  ->  ⭐ 506 pass, 1 could not run (no zstd)
+    pgb selftest --list                 ... proc  logx  buildx ...
+
+⭐ **Every package now has a suite**, checked by looking rather than by
+counting: `ls -d internal/*/` is **16** directories, `selftest` itself is the
+harness rather than a subject, and the two with no `*selftest*.go` of their own
+are covered from elsewhere — `bootstrapx.Selftest` lives in `bootstrap.go`,
+and `elfx` is exercised by `elfSelftest` in `cmd/pgb/elf.go`, as this entry
+already recorded.
+
+⛔ **AND EVERY ONE OF THE THREE WAS PROVED ABLE TO FAIL**, by planting a defect
+and watching it go red — the T-074 lesson, that an assertion which cannot fail
+on the state it was written to catch is worse than none:
+
+| package | planted defect | result |
+|---|---|---|
+| `proc` | `mergeEnv` appends instead of replacing in place | ⛔ **3 of 27 FAILED** |
+| `logx` | `Quote` stops escaping an embedded `'` | ⛔ **2 of 73 FAILED** |
+| `buildx` | ⭐ **T-019 itself** — drop `c.ContainerEnvArgs()` from the run line | ⛔ **2 of 32 FAILED**, naming all 18 variables |
+
+⭐ **`proc` — 27 cases, and the two functions that matter are `classify` and
+`mergeEnv`.** `classify` is the 0 / exit N / **128+signal** contract that
+`poc/common.sh` decodes as `SIG$((st-128))`; a signal that came back as a plain
+non-zero exit would turn every `SIGSEGV` in the matrix into an ordinary
+failure, and the tables separating `SIG11` from `exit1` are this project's main
+instrument. It is measured on real children — `sh -c 'exit 7'` and
+`sh -c 'kill -9 $$'` → **137, signal 9**. `mergeEnv` is the engine boundary and
+is asserted to replace **in place** rather than append, to drop an entry with no
+`=`, to carry an explicitly EMPTY value, and not to modify its base.
+
+⭐ **`logx` — 73 cases, and `Quote` is checked THROUGH A REAL SHELL.** Its whole
+contract is *"pasting this into a POSIX shell reproduces the argument"*, so the
+shell is the oracle rather than a hand-written expectation: 29 hard arguments —
+quotes, backslashes, `$`, backticks, newlines, tabs, globs, unicode, emoji, the
+empty string — go through `sh -c 'printf %s <quoted>'` and must come back byte
+for byte. ⚠ A hand-written expectation would have agreed with a wrong `Quote`.
+Also covered: `SubsysSpec`'s **round trip**, because that string is re-rendered
+into `PGB_DEBUG` for the pgb re-entered inside the environment; that selection
+narrows debug and trace **only** and never silences a warning; that `-name`
+beats `all`; and ⭐ **that `StreamStamper()` returns a stamper** — which is
+T-061's fourth defect asserted directly, the one where the columns, the parser
+and the heartbeat all existed and **nothing called `NewStamper`**, so `pgb --ts`
+printed no timestamps with every gate green.
+
+⭐ **`buildx` — 32 cases, and the load-bearing one is T-019.** A chroot inherits
+the caller's environment and a container does not, so every `PGB_OPT_*` has to
+be named with `-e`. ⛔ It once was not, and *"every documented build option
+silently did nothing"* under docker and podman. The case asserts that **every
+variable in `cfg.OptVars` that is set appears in the container's argv** — 18 of
+18 — and, in the other direction, that an **unset** one is not passed as an
+empty one, because `docker run -e NAME` with `NAME` unset sets it to `""`
+inside and T-074 is what confusing absent with set-and-empty costs.
+
+⚠ **This needed a small refactor of the product, and it is worth naming.**
+`enterChroot` and `enterContainer` composed their command lines inline and then
+ran them, so the argv could not be looked at without a bed. The composition is
+now `ChrootBinds()` and `ContainerRunArgv()`, both pure given the working
+directory, the pgb path, an existence predicate and the CA anchor — the runners
+call them and behave as before. ⛔ **That is the line T-062 draws**: the parsing
+and the decision logic are carried; the run is not, and the acceptance for the
+run is still the eleven-environment matrix and the POCs. Nothing here mounts,
+chroots or starts a container.
+
 ⭐ **`verifyx` was the one that mattered.** `pgb verify` decides
 `docs/AGENTS.md` §3 criterion 2 — *loads no host shared object* — and it
 decides it from four pure functions that nothing carried in the binary

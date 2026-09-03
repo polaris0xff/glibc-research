@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -43,6 +44,13 @@ func (r *Report) Check(name, got, want string) bool {
 // CheckBool records a boolean case.
 func (r *Report) CheckBool(name string, got, want bool) bool {
 	return r.Check(name, boolStr(got), boolStr(want))
+}
+
+// CheckInt records a numeric case. It exists so an exit status is compared as a
+// number rather than through a caller's own formatting: two spellings of the
+// same status ("7" and "07") would differ as strings and agree as integers.
+func (r *Report) CheckInt(name string, got, want int) bool {
+	return r.Check(name, strconv.Itoa(got), strconv.Itoa(want))
 }
 
 // Fail records a case that could not even be evaluated.

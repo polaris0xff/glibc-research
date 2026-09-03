@@ -368,8 +368,19 @@ is **costing route B**, which is where the size actually is.
 
     ---- 2. then, by how foundational they are ----
 
-    T-062   THREE packages left: buildx, logx, proc. buildx shells out to a
-            bed -- carry its parsing, not its run.
+    T-062   ✅ DONE 2026-09-03c. buildx, logx and proc are covered and
+            NOTHING IS LEFT: 375 -> 506 cases. Each was proved able to fail by
+            planting a defect -- and buildx's planted defect is ⭐ T-019
+            ITSELF (drop c.ContainerEnvArgs()), which goes red naming all 18
+            option variables. logx's Quote is checked THROUGH A REAL SHELL,
+            29 hard arguments round-tripped, because "paste this into a
+            terminal" is its whole contract. proc's classify is measured on
+            real children: kill -9 -> 137, signal 9.
+            ⚠ Needed a small product refactor -- ChrootBinds() and
+            ContainerRunArgv() split out of the runners so the argv can be
+            asserted without a bed. ⛔ REAL-BUILD VALIDATION STILL OWED: the
+            POC suite was running against the pre-refactor pgb when this
+            landed, so re-run one POC after rebuilding ./pgb.
     T-075   the two LD_DEBUG placements left, each needing ONE measurement
             first: does LD_DEBUG print anything when ld.so arrives as a
             LIBRARY (poc/10-gawk), and is the question worth asking in 62-

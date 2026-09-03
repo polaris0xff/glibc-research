@@ -17,6 +17,7 @@ import (
 	"github.com/polaris0xff/glibc-research/internal/logx"
 	"github.com/polaris0xff/glibc-research/internal/nixx"
 	"github.com/polaris0xff/glibc-research/internal/ociimg"
+	"github.com/polaris0xff/glibc-research/internal/proc"
 	"github.com/polaris0xff/glibc-research/internal/rootfs"
 	"github.com/polaris0xff/glibc-research/internal/selftest"
 	"github.com/polaris0xff/glibc-research/internal/verifyx"
@@ -269,6 +270,9 @@ func selftestSuites(c *cfg.Config) []suite {
 		{"wrapper-flags", wrapper.FlagsSelftest},
 		{"verify-classify", verifyx.Selftest},
 		{"fail-codes", fail.Selftest},
+		{"proc", proc.Selftest},
+		{"logx", logx.Selftest},
+		{"buildx", buildx.Selftest},
 		{"cxx-runtime", cxxRuntimeSelftest},
 		{"zstd", zstd.Selftest},
 		{"nix-nar", func() *selftest.Report { return nixx.Selftest(nixFixtureDir(c)) }},
