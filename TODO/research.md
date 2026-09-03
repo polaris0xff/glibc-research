@@ -40,22 +40,38 @@ AppRun, with the nixpkgs **closure** replacing sharun's ldd-and-strace library
 discovery. `experiments/86-` measured it against a hand-built Anylinux
 AppImage on `jq 1.8.2`: **11 of 11 both sides, 0 host objects both sides**.
 
-⭐ **RE-DERIVED FROM THE COMMITTED EVIDENCE, deep review 1, 2026-09-03c** —
-eleven environments × two arms, each a mean of five
-(`evidence/86-bundler-vs-anylinux/per-environment.jq.txt`):
+⭐ **THE SPEED HALF OF THE BAR IS MET ON THIS SUBJECT, 2026-09-03d** — eleven
+environments × two arms (`evidence/86-bundler-vs-anylinux/per-environment.jq.txt`):
 
 | | ours | the field | ratio |
 |---|---|---|---|
-| size | 11,471,610 B | 4,006,916 B | 2.86× ⭐ struck from the bar |
-| cold start | **128–149 ms**, mean 139 | **62–74 ms**, mean 67 | ⛔ **2.07×** |
-| warm start | 12–19 ms, mean 14.9 | 8–14 ms, mean 10.8 | ⛔ 1.38× |
+| size | 6,806,407 B | 4,006,949 B | 1.70× ⭐ struck from the bar |
+| cold start | 54–64 ms, mean **58.3** | 50–63 ms, mean **58.4** | ⭐ **1.00× — parity**, and ours is faster on **6 of 11 rows** |
+| warm start | 7–10 ms, mean 8.5 | 8–12 ms, mean 9.3 | ⭐ **0.92× — ours is faster** |
 
-⛔ **This entry said "162–198 ms vs 79–107 ms, about 1.9×" and no version of
-that evidence file ever carried those numbers** — 162 ms is this entry's own
-**build-host** figure, compared against an eleven-environment competitor one.
-The warm claim (~1.4×) was right. `../docs/history/corrections.md` C23.
-⭐ **`86-`'s method is the one to carry into `90-`**, which takes one sample
-per arm and whose ratios swing between 2.52× and 5.02× across four runs.
+⚠ **Read the warm row as "no difference measurable, possibly ours".** Its
+medians are equal (9 ms both) and only the means separate; `docs/AGENTS.md`
+§10's noise floor applies to a difference this size.
+
+⛔ **How it got here, because the closure did not change and neither did the
+sweep.** Two constants in `internal/bundle/appimage.go`:
+
+| | jq cold, ours vs the field | what changed |
+|---|---|---|
+| before 2026-09-03d | **2.07×** | — |
+| after `experiments/77-` | **1.28×** | uruntime v0.5.6 **full** → v0.5.9 **lite** |
+| after `experiments/81-` | ⭐ **1.00×** | dwarfs block `-S26` (64 MiB) → `-S18` (256 KiB) |
+
+⚠ **The size row moved the other way** — 1.44× after the runtime change, 1.70×
+after the block size, because smaller blocks compress worse. That is the trade
+the 2026-09-03c ruling licenses, and it is stated rather than hidden.
+
+⛔ **The earlier numbers, and why they were wrong twice.** This entry once said
+*"162–198 ms vs 79–107 ms, about 1.9×"* and no version of that evidence file
+ever carried them — 162 ms was this entry's own **build-host** figure compared
+against an eleven-environment competitor one. Deep review 1 replaced that with
+the re-derived **2.07×**, which was correct for the runtime shipping at the
+time. `../docs/history/corrections.md` C23 and C24.
 
 ⛔ **The claim, stated so it cannot drift**, and its two halves now score
 differently under the operator's ruling of 2026-09-03c:
@@ -63,14 +79,20 @@ differently under the operator's ruling of 2026-09-03c:
 | half | state |
 |---|---|
 | *"produced by one command from a package name"* | ⭐ **MET, and now a REQUIREMENT** — the ruling asks for *"one command not a multiline shell script"*, and the competitor's route is five separately versioned binaries plus a 121 KB driver script, a `.desktop`, an icon and ~nine environment variables. **Publish this.** |
-| *"within measurable distance of one"* | ⛔ **not good enough on the clock** — "performs better" means **under 1.0×**, and cold start is **2.07×** |
-| size, 3.05× | ⭐ **struck from the bar** |
+| *"performs better"* | ⭐ **MET ON THIS SUBJECT** — cold **1.00×**, warm **0.92×**, eleven environments. ⚠ Parity is not "better"; the honest sentence is *"no difference measurable on cold, possibly ahead on warm"* |
+| size | ⭐ **struck from the bar**, and it went the other way: 1.70× |
+
+⛔ **THE SUBJECT IS `jq`, AND kdenlive IS NOT MEASURED.** Both levers are
+properties of the runtime and the packer rather than of the payload, so they
+should carry — ⚠ **and "should carry" is not a measurement.** `experiments/90-`
+owns kdenlive and still uses the cold protocol `corrections.md` C24 disproves.
 
 **What is left.**
 
-1. ⚠ **Debloating** — demoted. It was the explanation for the size ratio and
-   size no longer counts. It stays open only insofar as fewer objects is less
-   to mount, map and relocate, ⛔ **which nobody has measured.**
+1. ⚠ **Debloating** — demoted twice. It was the explanation for the size ratio
+   and size no longer counts; then `experiments/84-` measured that removing
+   bytes buys **0.024–0.031 ms per MiB**, so it is not a clock lever either.
+   ⛔ Its remaining value is not startup.
 2. **OpenGL** — T-052 closed the mechanism; T-059 owns real hardware.
 3. **Wrapper scripts.** A nixpkgs `bin/x` that is a shell wrapper is followed
    to its ELF and the wrapper's ENVIRONMENT is dropped. T-053; `patsh` is

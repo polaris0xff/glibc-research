@@ -107,23 +107,42 @@ names two conditions, and they are conjunctive: **perform better**, *and*
 
 ⚠ **This is a harder bar, not a softer one.** Under the old table a bundle
 that was merely a single ELF passed. Under the ruling it has to be *faster
-than the field*, and that is the column `pgb` is furthest behind on:
+than the field* — and on the CLI subject that is now where it stands:
 
 | what the ruling now decides | ours | the field | |
 |---|---|---|---|
-| `jq` cold start — ⭐ **11 environments, mean of 5** (`experiments/86-`) | 139 ms | 67 ms | ⛔ **2.07×** |
-| `jq` warm start, same method | 14.9 ms | 10.8 ms | ⛔ **1.38×** |
-| kdenlive cold start (`TODO/toolchain.md` T-066) | 300 ms | 61 ms | ⛔ 4.92× ⚠ **one sample** |
+| `jq` cold start — ⭐ **11 environments** (`experiments/86-`) | **58.3 ms** | 58.4 ms | ⭐ **1.00×**, ours faster on **6 of 11 rows** |
+| `jq` warm start, same method | 8.5 ms | 9.3 ms | ⭐ **0.92×** — ⚠ medians are equal; read it as *no difference measurable* |
+| kdenlive cold start (`TODO/toolchain.md` T-066) | 300 ms | 61 ms | ⛔ 4.92× ⚠ **one sample, and the wrong protocol** |
 | kdenlive render | 4,947 ms | 2,033 ms | ⛔ 2.43× ⚠ **one sample** |
-| ~~artefact size~~ | ~~2.86×–3.05×~~ | | ⭐ **no longer counted** |
+| ~~artefact size~~ | ~~1.70×~~ | | ⭐ **no longer counted** |
 
-⛔ **Trust the first two rows and treat the kdenlive pair as a direction, not a
-number** — deep review 1, 2026-09-03c. `86-` takes eleven environments and a
-mean of five per arm; `90-` takes **one sample**, its numbers come from a
-superseded version of the cited evidence file, and four runs of it give
-cold-start ratios of 2.52×, 3.48×, 4.92× and 5.02× with warm above cold in two
-of them. ⭐ **Every run agrees on the direction**: we are slower.
-[`../history/corrections.md`](../history/corrections.md) C23.
+⭐ **THE FIRST TWO ROWS MOVED ON 2026-09-03d, and the closure did not change.**
+Two constants in `internal/bundle/appimage.go` did:
+
+| jq cold, ours vs the field | what changed |
+|---|---|
+| 2.07× | — |
+| **1.28×** | uruntime v0.5.6 **full** → v0.5.9 **lite** (`experiments/77-`) |
+| ⭐ **1.00×** | dwarfs block `-S26` (64 MiB) → `-S18` (256 KiB) (`experiments/81-`) |
+
+⛔ **The bundler was being compared against a runtime it did not ship.**
+`experiments/86-` stages the competitor's own toolchain out of
+`references/pkgforge-dev__Anylinux-AppImages`, and that toolchain is uruntime
+**lite**; ours was the full build, less than half as fast to stand up. Nothing
+in the record had noticed.
+
+⛔ **The kdenlive pair is a direction, not a number**, and now for two reasons.
+`90-` takes **one sample** per arm and its published figures come from a
+superseded version of the cited evidence file — four runs give cold-start
+ratios of 2.52×, 3.48×, 4.92× and 5.02×, warm above cold in two of them
+([`../history/corrections.md`](../history/corrections.md) C23). ⭐ **And C24
+found why**: its cold column obtains "cold" by copying the file, but uruntime
+keys its mount on CONTENT, so the copy reuses the live mount and the column
+reports a warm start. ⚠ **Both kdenlive rows also predate the two levers
+above**, which are properties of the runtime and the packer rather than of the
+payload and should carry — *should carry* being the reason to re-measure, not
+a substitute for it.
 
 ⭐ **And the second condition is already met, decisively.** `pgb bundle
 appimage kdenlive` is one command from a package name. The competitor's route
@@ -132,7 +151,20 @@ is five separately-versioned binaries plus a 121 KB driver script, a
 "multiline shell script" the ruling names, and it is measured, not asserted
 (`references/pkgforge-dev__Anylinux-AppImages`, and `TODO/research.md` T-057).
 So of the two conditions the bundler owes, **one is a win it can already
-publish and the other is the whole of the remaining work.**
+publish** — and on the CLI subject, ⭐ **so is the other**: `jq` cold start is
+1.00× and warm 0.92×, eleven environments, `experiments/86-`.
+
+⛔ **What remains is the SUBJECT, not the mechanism.** The bar is met on `jq`
+and unmeasured on kdenlive, whose committed figures predate both levers AND
+were taken with the protocol `../history/corrections.md` C24 disproves. Two
+things follow and neither is optional: `experiments/90-` needs the corrected
+protocol (`experiments/clock.sh`), and it needs re-running after it. Until
+then the honest sentence is *"met on a CLI, unmeasured on a GUI"*.
+
+⛔ **And the levers cost bytes.** `-S18` is +17.8% on a real payload — the size
+row went 1.44× → 1.70× to buy the last 0.28× of cold start. The ruling
+licenses that trade; goal 3 still names *smaller* for kdenlive specifically,
+so ⚠ where the two disagree, say which one you are measuring against.
 
 ⛔ **The consequence for planning:** every size lever measured to date —
 `--cut`, `--fixpoint`, the debloat rules, route A and route B of T-066 — is

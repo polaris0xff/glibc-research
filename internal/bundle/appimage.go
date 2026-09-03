@@ -80,9 +80,14 @@ import (
 // being compared against a different runtime from the one it shipped, and
 // nothing in the record said so.
 //
-// ⚠ What `lite` drops is compression backends. Safe here because the pack
-// command below is fixed at `-C zstd:level=19`, which lite reads; a bundle
-// packed with lzma or brotli would need the full runtime.
+// ⚠ WHAT `lite` DROPS IS NOT ESTABLISHED HERE, and the first version of this
+// comment guessed "compression backends" without measuring it. Measured
+// instead: the same AppDir packed at `-C zstd:level=19`, `-C lzma:level=6` and
+// `-C null` runs under BOTH headers, six for six, so the reduction is not the
+// three compressors this bundler could plausibly emit. `strings` says nothing
+// either -- both binaries are packed. ⭐ The guard that does hold is
+// behavioural and it is asserted: `experiments/77-` runs the lite artefact on
+// all eleven environments and compares its output against the full one's.
 const (
 	defaultURuntimeURL = "https://github.com/VHSgunzo/uruntime/releases/download/v0.5.9/uruntime-appimage-dwarfs-lite-%s"
 	defaultSharunURL   = "https://github.com/pkgforge-dev/Anylinux-sharun/releases/latest/download/sharun-%s"
@@ -665,7 +670,35 @@ func (b *Builder) pack() error {
 		"--no-history", "--no-create-timestamp",
 		"--header", uruntime,
 		"--input", b.AppDir, "--output", out,
-		"-C", "zstd:level=19", "-S26"},
+		// ⭐ -S18 IS A 256 KiB DWARFS BLOCK, AND IT IS THE SECOND-LARGEST
+		// LEVER IN THE BUNDLER'S COLD START. dwarfs decompresses a whole
+		// block to serve any byte in it, so the first read through a cold
+		// mount pays for one block whatever it asked for. This read -S26 --
+		// a 64 MiB block -- until 2026-09-03d, and nothing in the record
+		// said where that came from.
+		//
+		// `experiments/81-` swept it on two subjects, a 5.8 MB `jq` bundle
+		// and the same bundle plus 200 MiB, median of 15, interleaved, with
+		// an A/A control. Cold start, and the size a real (compressible)
+		// payload pays:
+		//
+		//	block     small     large     size
+		//	64 MiB    1.00x     1.00x        —   what this was
+		//	16 MiB    1.01x     1.00x    -0.0%
+		//	 4 MiB    0.97x     0.80x    +6.9%
+		//	 1 MiB    0.88x     0.73x   +11.0%
+		//	256 KiB   0.76x     0.66x   +17.8%   ⭐ here
+		//	 64 KiB   0.73x     0.64x   +36.9%
+		//	 16 KiB   0.84x     0.78x   +54.6%   the curve turns
+		//
+		// ⛔ 64 KiB is the minimum of the curve and is NOT taken. It buys
+		// 0.02x more and costs another 19% of the artefact; the operator's
+		// 2026-09-03c ruling makes size acceptable, not free, and goal 3
+		// still names "smaller" for kdenlive. ⚠ The two earlier sweeps
+		// stopped at 1 MiB and at 256 KiB and were monotonic to their own
+		// floor both times -- a sweep that has not found its minimum has
+		// measured its range, not its knob, which is why 81- goes to 16 KiB.
+		"-C", "zstd:level=19", "-S18"},
 		Stdout: lf, Stderr: lf, Subsys: "bundle"}).Run()
 	if err != nil {
 		return fail.Cannot("mkdwarfs: %v", err)

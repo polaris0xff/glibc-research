@@ -1,0 +1,17 @@
+# b26 -- one wall-clock sample per line, nanoseconds, in the
+# order taken. -1 means the run failed and was not timed.
+75158710
+69117877
+68325486
+72743170
+77570631
+81158446
+71177660
+78008146
+78479006
+75098493
+71442726
+66867342
+70344529
+72195607
+151461716

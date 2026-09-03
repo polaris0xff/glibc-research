@@ -69,6 +69,29 @@ PGB_ENV_NAME_DEFAULT=$(exp_cfg_const DefaultEnvName) || exit 2
 ENV_NAME="${PGB_ENV_NAME:-$PGB_ENV_NAME_DEFAULT}"
 ENV_ROOT="$ROOTFS_DIR/$ENV_NAME"
 
+# ⛔ THE BUNDLER'S PACK SETTINGS, READ FROM THE GO SOURCE, FOR THE SAME REASON
+# `exp_cfg_const` exists. `experiments/77-` copied `-S26` out of
+# `internal/bundle/appimage.go` into its own `pack()` and said in a comment
+# that it was "the production one" — true when it was written, false the
+# moment `81-` moved the shipped block size to `-S18`. An experiment packing
+# unlike production measures something nobody ships, and says nothing while it
+# does it.
+#
+# ⚠ Matched on the argv STRING, not on "-S" anywhere in the file: the comment
+# block above that line is a table of seven block sizes, and a loose match
+# would take whichever appeared first.
+PGB_APPIMAGE_GO="$REPO_DIR/internal/bundle/appimage.go"
+exp_pack_blocksize() {  # -> the -S exponent, or non-zero if it cannot be read
+  [ -r "$PGB_APPIMAGE_GO" ] || {
+    printf 'lib.sh: cannot read %s\n' "$PGB_APPIMAGE_GO" >&2; return 2; }
+  _pb=$(sed -n 's/.*"-C", "zstd:level=[0-9]*", "-S\([0-9][0-9]*\)".*/\1/p' \
+        "$PGB_APPIMAGE_GO" | head -1)
+  [ -n "$_pb" ] || {
+    printf 'lib.sh: %s has no recognisable -S argument\n' "$PGB_APPIMAGE_GO" >&2
+    return 2; }
+  printf '%s' "$_pb"
+}
+
 PASS=0
 FAIL=0
 SKIP=0

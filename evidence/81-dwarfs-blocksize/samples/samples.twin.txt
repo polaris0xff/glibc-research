@@ -1,0 +1,17 @@
+# twin -- one wall-clock sample per line, nanoseconds, in the
+# order taken. -1 means the run failed and was not timed.
+69533829
+70010314
+68430159
+67098245
+68680683
+73254189
+68424874
+69046332
+62118253
+61818016
+67059821
+67794887
+66070085
+67431603
+65516917

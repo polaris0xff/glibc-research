@@ -1,5 +1,5 @@
 experiment 77 - the bundler's runtime
-date (UTC)   : 2026-09-03T11:56:19Z
+date (UTC)   : 2026-09-03T12:52:15Z
 host kernel  : Linux 6.18.44-fc-v24
 subject      : one `pgb bundle appimage jq --debloat safe` AppDir,
                packed five ways. Only the runtime component changes.
@@ -7,11 +7,11 @@ instrument   : experiments/clock.sh -- median of 21, interleaved,
                A/A control in the same pass
 
 ARM                 BYTES  COLD_MEDIAN    vs OURS      FLOOR RESOLVES
-ours              7331882      84.6 ms      1.00x       1.06 (reference) v0.5.6 full + dwarfs 0.14.1, shipped until 2026-09-03d
-v059full          7360554      85.3 ms      1.01x       1.05 no
-v059lite          5779498      64.4 ms      0.76x       1.06 yes
-field             5779502      65.0 ms      0.77x       1.05 yes
-twin              7331882      84.5 ms      1.00x       1.04 A/A control
+ours              8358779      69.4 ms      1.00x       1.06 (reference) v0.5.6 full + dwarfs 0.14.1, shipped until 2026-09-03d
+v059full          8387451      69.1 ms      1.00x       1.04 no
+v059lite          6806395      47.6 ms      0.69x       1.06 yes
+field             6806407      47.9 ms      0.69x       1.07 yes
+twin              8358779      67.3 ms      0.97x       1.06 A/A control
 
 WHAT EACH ARM CHANGES
   ours       uruntime v0.5.6 FULL  + mkdwarfs 0.14.1   <- pgb until
@@ -30,4 +30,4 @@ uruntime v0.5.6 full  3,039,728 B
 uruntime v0.5.9 full  3,068,400 B
 uruntime v0.5.9 lite  1,487,344 B   <- less than half
 
-A/A control  : ratio 1.00, floor 1.04, resolves no (must be "no")
+A/A control  : ratio 1.03, floor 1.06, resolves no (must be "no")

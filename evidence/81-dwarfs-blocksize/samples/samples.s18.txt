@@ -1,0 +1,17 @@
+# s18 -- one wall-clock sample per line, nanoseconds, in the
+# order taken. -1 means the run failed and was not timed.
+49619727
+50536827
+48323031
+48791974
+47665176
+50257746
+63517866
+55018309
+49595016
+50756945
+45875319
+49122467
+47257216
+51879751
+48146171

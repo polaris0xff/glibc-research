@@ -3,7 +3,7 @@
 #
 # -- THE QUESTION -----------------------------------------------------------
 #
-# ⭐ `experiments/92-` measured that the bundler's cold start is NOT a function
+# ⭐ `experiments/84-` measured that the bundler's cold start is NOT a function
 # of what is inside the artefact: a 29.6x image and a 138x file count each move
 # it by about 1.05x, and extrapolated across the whole 196 MiB separating our
 # kdenlive bundle from the competitor's that is 4.8 ms of a gap never observed
@@ -111,6 +111,12 @@ fetch_pinned() { # url sha dest
   [ "$(sha256sum "$3" 2>/dev/null | cut -d' ' -f1)" = "$2" ] || return 1
 }
 
+# ⛔ READ BEFORE ANYTHING PRINTS IT. The first version assigned this inside the
+# packing block, below the line that reports it, and the run died on
+# `PACK_S: parameter not set` -- loudly, because `set -u` is on, which is why
+# it is on.
+PACK_S=$(exp_pack_blocksize) || exit 2
+
 printf -- '-- staging the runtimes, each pinned by sha256 ----------------\n'
 command -v curl >/dev/null 2>&1 || { printf 'no curl\n'; exit 2; }
 STAGED=yes
@@ -158,16 +164,26 @@ SHIPPED="$CACHE/tools/uruntime"
 SHIPPED_SHA=$(sha256sum "$SHIPPED" 2>/dev/null | cut -d' ' -f1)
 printf '  %-28s %s\n' "pgb ships uruntime" "${SHIPPED_SHA:-<absent>}"
 printf '  %-28s %s\n' "the fast one (v0.5.9 lite)" "$ULITE_SHA"
+printf '  %-28s -S%s (%s)\n' "block size, from the source" "$PACK_S" \
+  "$(awk -v s="$PACK_S" 'BEGIN{ b=2^s
+     if (b>=1048576) printf "%dMiB", b/1048576; else printf "%dKiB", b/1024 }')"
 
 # ---------------------------------------------------------------------------
 # pack it five ways
 # ---------------------------------------------------------------------------
 printf -- '\n-- packing, one component changed at a time ------------------\n'
+# ⛔ THE PACK COMMAND IS THE PRODUCTION ONE, AND THE BLOCK SIZE IS READ OUT OF
+# internal/bundle/appimage.go RATHER THAN COPIED. It WAS copied -- `-S26`,
+# under a comment calling it "the production one" -- and that was true until
+# `experiments/81-` moved the shipped block size to `-S18`, at which point
+# every arm here would have measured a packing nobody ships. `lib.sh`'s
+# `exp_pack_blocksize` is the same defence `exp_cfg_const` gives the pinned
+# build environment.
 pack() { # mkdwarfs header out
   "$1" --force --set-owner 0 --set-group 0 \
     --no-history --no-create-timestamp \
     --header "$2" --input "$APPDIR" --output "$3" \
-    -C zstd:level=19 -S26 >> "$WORK/mkdwarfs.log" 2>&1 || return 1
+    -C zstd:level=19 -S "$PACK_S" >> "$WORK/mkdwarfs.log" 2>&1 || return 1
   chmod +x "$3"
 }
 pack "$MKD141"      "$WORK/u056"  "$WORK/ours.AppImage"     || { printf 'pack ours failed\n';     exit 2; }

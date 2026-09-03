@@ -154,8 +154,14 @@ space: `execve` replaces it before the payload runs.
 anylinux-appimages and onelf is acceptable as long as ours performs better and
 **packaging is just one command not a multiline shell script**."* ⭐ This table
 is that half of the bar, and it is the half `pgb` wins — **publish it**.
-⚠ The other half is speed, and `pgb` loses it: 2.07× the cold start on `jq`,
-eleven environments, mean of five.
+⭐ **And as of 2026-09-03d it wins the other half too on this subject**: `jq`
+cold start is **58.3 ms against the field's 58.4** across eleven environments,
+warm **8.5 against 9.3**, `experiments/86-`. ⛔ It read **2.07×** the same
+morning; two constants in `internal/bundle/appimage.go` closed it — uruntime
+`full` → `lite` (`experiments/77-`, 1.28×) and the dwarfs block `-S26` → `-S18`
+(`experiments/81-`, 1.00×). ⚠ **Measured on a CLI and unmeasured on a GUI**:
+kdenlive's figures predate both levers and were taken with the cold protocol
+[`history/corrections.md`](history/corrections.md) C24 disproves.
 
 ⛔ **Everything above compares artefacts. `pgb` is a toolchain, so the axis it
 is actually developed along is what a developer has to know and assemble** —

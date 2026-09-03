@@ -2,7 +2,7 @@
 77 - the bundler's runtime, and it is not the one we are measured against
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-03T11:52:30Z
+date (UTC)   : 2026-09-03T12:48:44Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -22,13 +22,14 @@ evidence     : /home/user/glibc-research/evidence/77-uruntime-header
 -- the payload -----------------------------------------------
   pgb ships uruntime           cef962c299f2fa19b2b3cdf2fa1565ee8541796cc89b9a97a591f94041e8b083
   the fast one (v0.5.9 lite)   cef962c299f2fa19b2b3cdf2fa1565ee8541796cc89b9a97a591f94041e8b083
+  block size, from the source  -S18 (256KiB)
 
 -- packing, one component changed at a time ------------------
-  ours            7331882 bytes
-  v059full        7360554 bytes
-  v059lite        5779498 bytes
-  field           5779502 bytes
-  twin            7331882 bytes
+  ours            8358779 bytes
+  v059full        8387451 bytes
+  v059lite        6806395 bytes
+  field           6806407 bytes
+  twin            8358779 bytes
 
 -- every arm answers the same --------------------------------
   ours       -> jq-1.8.2
@@ -39,18 +40,18 @@ evidence     : /home/user/glibc-research/evidence/77-uruntime-header
 
 -- cold start, one interleave, median of 21 -----------------
   ARM                N     MEDIAN        MIN        MAX     MAD%
-  ours              21       84.6       74.6       89.0      2.9
-  v059full          21       85.3       79.1      101.6      2.0
-  twin              21       84.5       79.1       90.4      0.9
-  v059lite          21       64.4       57.9       68.3      3.0
-  field             21       65.0       60.1       70.3      2.5
+  ours              21       69.4       64.6      101.2      2.9
+  v059full          21       69.1       64.4       75.2      1.2
+  twin              21       67.3       60.9       92.8      2.9
+  v059lite          21       47.6       40.8       74.3      3.0
+  field             21       47.9       43.9       55.3      4.1
 
-  A/A control (ours vs twin)  : ratio 1.00, floor 1.04, resolves no
+  A/A control (ours vs twin)  : ratio 1.03, floor 1.06, resolves no
 
   ARM            MEDIAN    vs OURS      FLOOR  RESOLVES
-  v059full       85.3 ms      1.01x       1.05  no
-  v059lite       64.4 ms      0.76x       1.06  yes
-  field          65.0 ms      0.77x       1.05  yes
+  v059full       69.1 ms      1.00x       1.04  no
+  v059lite       47.6 ms      0.69x       1.06  yes
+  field          47.9 ms      0.69x       1.07  yes
 
 
 -- the eleven: does it still run -----------------------------
@@ -73,12 +74,12 @@ evidence     : /home/user/glibc-research/evidence/77-uruntime-header
   ok    the lite runtime does too                      = 11
   ok    the A/A pair is NOT resolvable (the control)   = no
   ok    pgb ships the fast runtime, not the one 'ours' measures = cef962c299f2fa19b2b3cdf2fa1565ee8541796cc89b9a97a591f94041e8b083
-  --    the competitor's stack, vs ours                = 0.77x
+  --    the competitor's stack, vs ours                = 0.69x
   --    does it resolve                                = yes
 
         ⭐ THE RUNTIME IS A REAL LEVER AND IT IS FREE. The competitor's
         own stack -- uruntime v0.5.9 lite + dwarfs 0.15.6 -- starts the
-        IDENTICAL AppDir in 0.77x of what ours does. Nothing about
+        IDENTICAL AppDir in 0.69x of what ours does. Nothing about
         the closure, the sweep or the debloat rules changed; only the
         three constants in internal/bundle/appimage.go.
 

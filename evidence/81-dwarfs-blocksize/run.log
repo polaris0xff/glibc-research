@@ -1,0 +1,96 @@
+===============================================================
+81 - the dwarfs block size, the one shippable knob left in the packer
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-03T12:52:52Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/81-dwarfs-blocksize
+--------------------------------------------------------------
+
+-- the payload -----------------------------------------------
+  header   cef962c299f2fa19
+
+-- packing at seven block sizes ------------------------------
+  ARM             BLOCK          BYTES  SUBJECT
+  s26             64MiB        5779502  jq
+  b26             64MiB      215502556  jq + 200 MiB
+  s24             16MiB        5779507  jq
+  b24             16MiB      215700394  jq + 200 MiB
+  s22              4MiB        6177320  jq
+  b22              4MiB      215887544  jq + 200 MiB
+  s20              1MiB        6413767  jq
+  b20              1MiB      216161250  jq + 200 MiB
+  s18            256KiB        6806407  jq
+  b18            256KiB      216573946  jq + 200 MiB
+  s16             64KiB        7912864  jq
+  b16             64KiB      217865777  jq + 200 MiB
+  s14             16KiB        8933197  jq
+  b14             16KiB      219592450  jq + 200 MiB
+
+-- every arm answers the same --------------------------------
+  15 of 15 arms answered jq-1.8.2
+
+-- cold start, one interleave, median of 15 -----------------
+  ARM                N     MEDIAN        MIN        MAX     MAD%
+  s26               15       66.7       64.9       75.0      1.0
+  s24               15       66.8       57.0       72.5      5.9
+  s22               15       63.0       60.2       67.5      2.3
+  s20               15       57.2       48.2       61.8      4.2
+  s18               15       49.6       45.9       63.5      2.6
+  s16               15       47.5       43.8       51.5      2.6
+  s14               15       55.0       49.5       60.2      3.3
+  twin              15       67.8       61.8       73.3      1.8
+  b26               15       72.7       66.9      151.5      5.0
+  b24               15       73.8       66.9      143.5      2.8
+  b22               15       57.6       48.9       65.8      4.3
+  b20               15       55.8       49.8       61.4      5.4
+  b18               15       48.1       43.9       54.5      3.9
+  b16               15       46.4       44.3       51.3      3.1
+  b14               15       54.7       49.9       65.1      6.3
+
+  A/A control (s26 vs twin)   : ratio 1.02, floor 1.03, resolves no
+
+  the small subject (reference s26 = 66.7 ms)
+  ARM          MEDIAN     vs REF      FLOOR  RESOLVES
+  s24          66.8 ms      1.00x       1.07  no
+  s22          63.0 ms      0.94x       1.03  yes
+  s20          57.2 ms      0.86x       1.05  yes
+  s18          49.6 ms      0.74x       1.04  yes
+  s16          47.5 ms      0.71x       1.04  yes
+  s14          55.0 ms      0.82x       1.04  yes
+
+  the large subject (reference b26 = 72.7 ms)
+  ARM          MEDIAN     vs REF      FLOOR  RESOLVES
+  b24          73.8 ms      1.01x       1.08  no
+  b22          57.6 ms      0.79x       1.09  yes
+  b20          55.8 ms      0.77x       1.10  yes
+  b18          48.1 ms      0.66x       1.09  yes
+  b16          46.4 ms      0.64x       1.08  yes
+  b14          54.7 ms      0.75x       1.11  yes
+
+-- assertions ------------------------------------------------
+  ok    every arm answers --version identically        = 15
+  --    the block size pgb ships                       = -S18
+  ok    pgb ships a block size this sweep endorses     = yes
+  ok    the A/A pair is NOT resolvable (the control)   = no
+  --    fastest block size on the large subject        = b16 (0.64x)
+  --    does it beat the 64 MiB reference              = yes
+  --    its size cost on a REAL payload                = +36.9%
+
+        ⭐ THE BLOCK SIZE IS A LEVER. On a 200 MiB artefact b16
+        starts in 0.64x of the 64 MiB reference, and it is a PACK-time
+        choice, so it travels inside the artefact and needs nothing beside
+        it. ⛔ b16 is NOT what is shipped: the minimum of the curve
+        costs +36.9% of a real payload for 0.02x more than -S18 does.
+
+full table: /home/user/glibc-research/evidence/81-dwarfs-blocksize/RESULT.txt
+
+-- result ----------------------------------------------------
+pass=3 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

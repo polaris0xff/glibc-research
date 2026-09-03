@@ -259,7 +259,16 @@ scripts/common/
   install-codegraph.sh    ⭐ the code-reading index, pinned and sha256-checked
 codegraph.json            what that index excludes and deprioritises
 experiments/lib.sh        conditions block, assertions, pid-attributed tracing
-experiments/NN-*.sh       numbered; exit 0 matched, 1 did not, 2 could not run
+experiments/clock.sh      ⭐ the WALL-CLOCK instrument, and the second library
+                          here. Median of N, arms interleaved with a rotating
+                          start, and an A/A CONTROL — one artefact under two
+                          names — whose ratio is the floor below which no row
+                          may be believed. ⛔ Every millisecond in this tree
+                          goes through it; `history/corrections.md` C24 is what
+                          the one-sample instrument before it was measuring
+experiments/NN-*.sh       numbered; exit 0 matched, 1 did not, 2 could not run.
+                          ⚠ A number can be taken by an `evidence/<NN>-*`
+                          directory with no script — `92-go-port` is one
 docs/REQUIREMENTS.md      the operator's acceptance bar, and how far short
 docs/methodology/         vendored, pinned; binding on experiments and sweeps
 TODO/                     the work: PROGRESS, INDEX, RULES, RESUME, entries
@@ -486,7 +495,7 @@ repeated here.
 | item | status |
 |---|---|
 | test bed, 11 environments | ✅ 11 of 11, digest-pinned |
-| all **36** experiments | ✅ every one measured. ⚠ **The count read 24 until 2026-09-03c**, when `ls experiments/[0-9]*-*.sh \| wc -l` was actually run against it. 35 write `evidence/<NN>-*/RESULT.txt`; `86-` writes one per subject (`RESULT.jq.txt`, `RESULT.mpv.txt`) because it runs against two. ⭐ `experiments/clock.sh` is a **library**, not an experiment — the wall-clock instrument, beside `lib.sh` |
+| all **37** experiments | ✅ every one measured. ⚠ **The count read 24 until 2026-09-03c**, when `ls experiments/[0-9]*-*.sh \| wc -l` was actually run against it. 36 write `evidence/<NN>-*/RESULT.txt`; `86-` writes one per subject (`RESULT.jq.txt`, `RESULT.mpv.txt`) because it runs against two. ⭐ `experiments/clock.sh` is a **library**, not an experiment — the wall-clock instrument, beside `lib.sh` |
 | all 10 POCs | ✅ 11 of 11 environments each, zero host shared objects. ⭐ **All ten re-run at the 2.41 pin on 2026-09-03**, and each `RESULT.txt` now names the environment, image, digest, gcc and glibc that built it |
 | NSS / iconv / locale / terminfo / CA-bundle mechanisms | ✅ 11 of 11 each |
 | `pgb` chroot and host engines | ✅ complete |
@@ -496,7 +505,8 @@ repeated here.
 | CI workflow | ✅ **green, 16 of 16 jobs** at the 2.41 pin, and it asserts §3 criterion 2 rather than exit status. ⭐ The build image is **derived from `cfg.go`** by the `matrix` job, never retyped |
 | `pgb nix` (plan / fetch / build / deps) | ✅ works with **no nix installed at all** — `experiments/88-` plans, fetches and builds at uid 12000 in a rootfs with no `/nix` |
 | `internal/bundle` (the AppImage bundler) | ✅ uruntime + dwarfs + sharun over a nixpkgs closure. `--debloat none/safe/aggressive` = 170.6 / 147.2 / 132.9 MB, all three identical on 11 of 11 |
-| bundle vs. the field | ⚠ **behind on size and speed, ahead on cleanliness** — §7 and [`comparison.md`](comparison.md) |
+| bundle vs. the field | ⭐ **LEVEL ON SPEED, ahead on cleanliness and on one-command packaging, behind on size** — and speed is the half the operator's 2026-09-03c ruling made binding. `jq` cold **58.3 ms against 58.4**, warm 8.5 against 9.3, eleven environments (`experiments/86-`). ⛔ It read **2.07×** on the morning of 2026-09-03d; two constants in `internal/bundle/appimage.go` closed it. ⚠ **Measured on a CLI, UNMEASURED on a GUI** — kdenlive's figures predate both levers and used the protocol `history/corrections.md` C24 disproves. §7 and [`comparison.md`](comparison.md) |
+| ⭐ **the bundler's two clock levers** | ✅ both shipped 2026-09-03d, both free of any change to the closure. **uruntime `full` → `lite`** (`experiments/77-`: 0.69×, and the *version* bump alone buys nothing — it is `lite`); **dwarfs block `-S26` → `-S18`**, 64 MiB → 256 KiB (`experiments/81-`: 0.66× on a 200 MiB artefact, +17.8% size). ⛔ 64 KiB is the curve's minimum and is **not** taken: 0.02× more for another 19% of the artefact |
 | host `dlopen` | ✅ **`--host-dlopen`**: 11 of 11, zero host objects, real host `.so` on 7 of 7 glibc rows. §7. ⭐ **882 of 1,527 host objects on the build host load**, up from 406 — four loader defects, `TODO` T-068 |
 | aarch64 | ⚠ **untested** |
 | NVIDIA / real GPU | ⚠ **untested** — every GL row is `swrast`; `TODO` T-059 |
@@ -604,7 +614,7 @@ classes and the entry that owns each; it is not a second work order.
 | ⭐ **host `dlopen`** — §7 item 1 | ✅ **T-064 CLOSED**, and ✅ **T-068 CLOSED** with it | `pgb build --host-dlopen`. `experiments/76-`: 11 of 11 carried, zero host objects, a real host `.so` on 7 of 7 glibc rows, control 0 of 11. 1,093 code lines against solo's 2,332 |
 | ⭐ **the glibc pin, and future-proofing** | ✅ **T-070 CLOSED** | 2.36 → **2.41**, `debian:13`, gcc 14.2.0. Four measured costs at zero, class B **20 → 5**, ten of ten POCs, CI green 16 of 16. ⚠ The ceiling regrows: [`design/glibc-versions.md`](design/glibc-versions.md) rule 6 says re-cost it periodically |
 | ⭐ **EGL out of a nixpkgs closure** | ✅ **T-071 CLOSED** | `experiments/85-`, `pass=10 fail=0`, with the data-coherence arm's negative control firing on a real bundle. ⚠ Every row is `swrast` and surfaceless — T-059 owns the GPU |
-| ⚠ **the bundle is bigger than the field** | ⛔ **T-066 (P0), advanced not met — and it is now the LAST open P0** | ⭐ **2.86× → 1.58× on `jq`** at `--debloat aggressive` (`experiments/78-`, against the field's 4,006,916 B): the reachability sweep now feeds debloat and `share/i18n`, glibc's locale SOURCES, was 17 MiB of a 22 MiB bundle. `none` 3.06×, `safe` 1.83×. ⛔ **This cell said 1.22× until 2026-09-03c**, which described a build made before `DropUnreachable` was gated to `aggressive` — so `safe` was sweeping too. The correction was made in `TODO/toolchain.md` on 2026-09-03 and **not propagated here**, which is the same defect class as the T-033 pointer. ⛔ The rest is a **package-size** gap, not a bundler one |
+| ⚠ **the bundle is bigger than the field** | ⭐ **T-066 (P0): the SPEED half is MET on a CLI, 2026-09-03d.** Still the last open P0, because kdenlive is unmeasured | ⭐ **2.86× → 1.58× on `jq`** at `--debloat aggressive` (`experiments/78-`, against the field's 4,006,916 B): the reachability sweep now feeds debloat and `share/i18n`, glibc's locale SOURCES, was 17 MiB of a 22 MiB bundle. `none` 3.06×, `safe` 1.83×. ⛔ **This cell said 1.22× until 2026-09-03c**, which described a build made before `DropUnreachable` was gated to `aggressive` — so `safe` was sweeping too. The correction was made in `TODO/toolchain.md` on 2026-09-03 and **not propagated here**, which is the same defect class as the T-033 pointer. ⛔ The rest is a **package-size** gap, not a bundler one |
 | ⭐ **what a bundle may take from the HOST** | ✅ **T-065 CLOSED** | four classes, the search order adopted from `Anylinux-sharun`, 29 offline assertions. [`design/host-fallback.md`](design/host-fallback.md) |
 | **a host with no compiler** | T-051, T-060 | `pgb nix` already works with no nix installed; the C toolchain is the last crutch |
 | **aarch64** | T-041 | `pgb rootfs pull --arch arm64` re-resolves by tag, trading the digest pin away. ⚠ Nothing has been run — expect IFUNC and CPU-baseline questions x86_64 did not raise |

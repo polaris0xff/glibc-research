@@ -1,0 +1,36 @@
+experiment 81 - the dwarfs block size
+date (UTC)   : 2026-09-03T12:56:34Z
+host kernel  : Linux 6.18.44-fc-v24
+subject      : one `pgb bundle appimage jq --debloat safe` AppDir,
+               packed at -S26 down to -S14; and the same AppDir plus
+               200 MiB of incompressible padding, at the same four.
+header       : the uruntime pgb ships, read from its own cache
+instrument   : experiments/clock.sh -- median of 15, interleaved,
+               A/A control in the same pass
+
+ARM         BLOCK          BYTES  COLD_MEDIAN      RATIO RESOLVES
+s26         64MiB        5779502      66.7 ms      1.00x (reference)
+s24         16MiB        5779507      66.8 ms      1.00x no
+s22          4MiB        6177320      63.0 ms      0.94x yes
+s20          1MiB        6413767      57.2 ms      0.86x yes
+s18        256KiB        6806407      49.6 ms      0.74x yes
+s16         64KiB        7912864      47.5 ms      0.71x yes
+s14         16KiB        8933197      55.0 ms      0.82x yes
+twin        64MiB        5779502      67.8 ms      1.02x A/A control
+b26         64MiB      215502556      72.7 ms      1.00x (reference)
+b24         16MiB      215700394      73.8 ms      1.01x no
+b22          4MiB      215887544      57.6 ms      0.79x yes
+b20          1MiB      216161250      55.8 ms      0.77x yes
+b18        256KiB      216573946      48.1 ms      0.66x yes
+b16         64KiB      217865777      46.4 ms      0.64x yes
+b14         16KiB      219592450      54.7 ms      0.75x yes
+
+A/A control  : ratio 1.02, floor 1.03, resolves no (must be "no")
+
+WHY THIS KNOB AND NOT THE RUNTIME'S OWN
+  URUNTIME_EXTRACT and REUSE_CHECK_DELAY -- the levers
+  docs/research/portable-nix-mechanisms.md §3-4 points at -- are
+  ENVIRONMENT VARIABLES read at run time. Shipping a non-default
+  would need something beside the artefact, and the brief refuses
+  that. The block size is chosen when the image is packed and
+  travels inside it.
