@@ -802,9 +802,15 @@ var dotSo = []byte(".so")
 // ITSELF through the SONAME in its own `.dynstr`, which is exactly the defect
 // this function was written to remove, in the one shape its fixture lacked.
 //
-// ⭐ REACHABLE, not hypothetical: nix optimises its store by hardlinking
-// identical files across store paths, and an AppDir assembled with `cp -al`
-// hardlinks the whole tree. Both are inputs to this sweep.
+// ⚠ WHERE IT IS REACHABLE, MEASURED RATHER THAN ASSERTED — and NOT in this
+// tool's own output. A jq AppDir built by `pgb bundle appimage` has **0 of 284**
+// files in `lib/` with a link count above 1, and the fetched store has none
+// either: NAR extraction cannot make a hardlink (the format has only regular,
+// executable, symlink and directory nodes), and the single `os.Link` in this
+// package is sharun's per-binary trick in `bin/`. ⭐ But `pgb bundle sweep`
+// takes ANY directory — a tree assembled by `cp -al`, or a real nix store with
+// `nix-store --optimise`, both of which do hardlink — so the shape reaches this
+// code from outside even though we do not produce it.
 //
 // ⭐ HOW IT WAS FOUND: `sonamesMentionedNaive` computes the self-set with
 // `os.SameFile`, which compares device and inode, and the two implementations

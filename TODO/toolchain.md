@@ -2024,13 +2024,29 @@ records, in the one shape its fixture lacked.
       pgb --selftest: 25 cases, all pass          (bundle-sweep + this one)
       pgb --selftest: 375 cases pass, 1 COULD NOT RUN here   (no zstd)
 
-⭐ **REACHABLE, NOT HYPOTHETICAL.** nix optimises its store by hardlinking
-identical files across store paths, and an AppDir assembled with `cp -al`
-hardlinks the whole tree. Both are inputs to this sweep. ⚠ **What it is worth in
-bytes on a real bundle is NOT measured** — the question is whether an AppDir this
-tool assembles actually carries a hardlinked SONAME, and that needs an AppDir.
-⛔ Do not write it up as a size win; it is a restored lever, like the symlink
-case, and the same caveat applies.
+⛔ **CORRECTED THE SAME DAY, BY MEASURING WHAT I HAD ASSERTED.** The first
+version of this section read *"REACHABLE, not hypothetical: nix optimises its
+store by hardlinking … and an AppDir assembled with `cp -al` hardlinks the whole
+tree. Both are inputs to this sweep."* ⚠ **That overstates it for THIS TOOL'S
+OUTPUT — and an AppDir was on disk to check it against.**
+
+    jq AppDir built by `pgb bundle appimage`: files in lib/ with nlink > 1
+      ⛔ 0 of 284
+    the fetched nix store beside it
+      ⛔ 0
+
+**And the reason is structural rather than luck.** NAR extraction *cannot*
+produce a hardlink — the format has only regular, executable, symlink and
+directory nodes — and the single `os.Link` in `internal/bundle` is sharun's
+per-binary trick in `bin/`, which is not a shared object. ⭐ **So the fix moves
+zero bytes on anything `pgb` currently assembles**, and it must not be written
+up as a size win.
+
+⭐ **It is still the right fix, and the reachability claim survives in a
+narrower and checkable form.** `pgb bundle sweep` takes **any directory**: a
+tree assembled with `cp -al` — which `experiments/89-`'s own `seed_cache()`
+does — or a real nix store under `nix-store --optimise`. The scan has to be
+right on the input it is *handed*, not only on the output we happen to produce.
 
 ⭐ **`os.Stat` follows symlinks, so `dev:ino` subsumes the symlink rule** — one
 key now covers the filename, the SONAME symlink, the development symlink AND a

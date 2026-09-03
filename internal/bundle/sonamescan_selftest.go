@@ -88,13 +88,17 @@ func SonameScanSelftest() *selftest.Report {
 		// itself is not evidence anything loads it.
 		"libself.so.3": "\x00libself.so.3\x00",
 		// ⛔ THE SAME SHAPE AGAIN, BUT THE SECOND NAME IS A HARDLINK. See the
-		// os.Link below: nix optimises its store by hardlinking identical
-		// files, and an AppDir assembled with `cp -al` hardlinks everything, so
-		// a bundle reaching this scan can carry a SONAME that is a hardlink
-		// rather than a symlink. `filepath.EvalSymlinks` cannot see through
-		// one — a hardlink is not a symlink, it IS the file — so the two names
-		// land in different selfKeys groups and the library becomes a root of
-		// itself, which is precisely the defect the symlink case above records.
+		// os.Link below. `filepath.EvalSymlinks` cannot see through one — a
+		// hardlink is not a symlink, it IS the file — so the two names land in
+		// different selfKeys groups and the library becomes a root of itself,
+		// which is precisely the defect the symlink case above records.
+		//
+		// ⚠ NOT a shape this tool produces, measured: a jq AppDir built by
+		// `pgb bundle appimage` has 0 of 284 files in lib/ with a link count
+		// above 1. ⭐ It is a shape `pgb bundle sweep` is HANDED, because it
+		// takes any directory — a tree assembled with `cp -al`, or a real nix
+		// store under `nix-store --optimise`. The fixture is here because the
+		// scan must be right on its input, not only on our own output.
 		"libhard.so.9.0.1": "\x00libhard.so.9\x00",
 		// ⛔ THE CASE THIS FIXTURE DID NOT HAVE, AND IT IS THE ORDINARY ONE.
 		// `libself.so.3` is a file whose NAME equals its SONAME, which is not
