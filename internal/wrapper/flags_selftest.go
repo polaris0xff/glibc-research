@@ -85,6 +85,7 @@ func FlagsSelftest() *selftest.Report {
 		// ⚠ Load() reads the environment, and a session that exported
 		// PGB_OPT_* would otherwise make this selftest measure that session.
 		c.UseIconv, c.EmbedLocale, c.EmbedCacert, c.EmbedTerminfo = true, false, false, false
+		c.EmbedTzdata = false
 		c.HostDlopen, c.WrapDlopen, c.TLSReserve = false, nil, 0
 		return c
 	}
@@ -159,6 +160,7 @@ func FlagsSelftest() *selftest.Report {
 	}
 	for _, a := range []axis{
 		{"--embed-terminfo", func(c *cfg.Config) { c.EmbedTerminfo = true }, "pgb-terminfo.o"},
+		{"--embed-tzdata", func(c *cfg.Config) { c.EmbedTzdata = true }, "pgb-tzdata.o"},
 		{"--embed-cacert", func(c *cfg.Config) { c.EmbedCacert = true }, "pgb-cacert.o"},
 		{"--embed-locale", func(c *cfg.Config) { c.EmbedLocale = true }, "pgb-locale.o"},
 		{"--wrap-dlopen", func(c *cfg.Config) { c.WrapDlopen = []string{"p=x.o"} }, "--wrap=dlsym"},

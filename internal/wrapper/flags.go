@@ -91,6 +91,10 @@ func LinkFlags(c *cfg.Config, rd string, cxx bool) []string {
 		out = append(out, "-Wl,-u,pgb_terminfo_anchor",
 			filepath.Join(rd, "pgb-terminfo.o"), filepath.Join(rd, "pgb-terminfo-data.o"))
 	}
+	if c.EmbedTzdata {
+		out = append(out, "-Wl,-u,pgb_tzdata_anchor",
+			filepath.Join(rd, "pgb-tzdata.o"), filepath.Join(rd, "pgb-tzdata-data.o"))
+	}
 	if len(c.WrapDlopen) > 0 {
 		if _, err := os.Stat(filepath.Join(rd, "pgb-dlopen-table.o")); err == nil {
 			out = append(out, "-Wl,--wrap=dlopen,--wrap=dlsym,--wrap=dlclose,--wrap=dlerror",

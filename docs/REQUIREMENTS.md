@@ -97,7 +97,7 @@ parts, and **both** are required:
    | CA bundle | no compiled-in trust store; one path works on 5 of 11 | ✅ **closed** — opt-in `--embed-cacert`; POC 30 verifies real TLS on **11/11** with the harness's own CA variables unset. T-032 |
    | terminfo | host terminal database | ✅ **closed** — opt-in `--embed-terminfo`; POC 20's `setupterm(xterm-256color)` succeeds on **11/11** with `TERMINFO`/`TERMINFO_DIRS` unset. T-032 |
    | **host plugins** | `dlopen` of a host `.so` is host-dependent | ⛔ **open, and now SERVED BY A SHIPPED MECHANISM rather than untouched** — `pgb build --host-dlopen`, T-064 ✅, T-068 ✅. A `.so` built by the pinned glibc loads on **11 of 11** with zero host objects; a **real host** `.so` loads on **7 of 7 glibc rows** and is refused by name on **4 of 4 musl rows**; **882 of 1,527** host objects on the build host load. ⛔ It stays OPEN because the row says *host-dependent* and it still is. ⚠ **It was called "the last one" until 2026-09-03c**; see the row below |
-   | ⛔ **timezone** | `tzset` reads the host's zone database; nothing is linked in | ⛔ **OPEN, AND NEW — the tenth row, found 2026-09-03c.** `experiments/97-`, pass=10 fail=0: static `libc.a` names `/usr/share/zoneinfo`, `/etc/localtime` and `TZDIR` and carries no data. **7 of 11** resolve `Europe/Berlin` correctly; ⛔ **4 of 11 cannot and do not say so** — alpine 3.10/3.20/3.22 and **ubuntu-20.04, which is glibc** — printing `Europe +0000 00`: the zone name **asked for**, with a UTC offset. T-076 |
+   | ⭐ **timezone** | `tzset` reads the host's zone database; nothing is linked in | ✅ **closed, and it was found AND closed on 2026-09-03c** — opt-in `--embed-tzdata`; `experiments/97-` runs two arms, pass=13 fail=0. Arm A (plain `-static`) resolves `Europe/Berlin` on **7 of 11** and ⛔ **4 of 11 cannot and do not say so**, printing `Europe +0000` — the zone name **asked for**, at a UTC offset. Arm B resolves on **11 of 11** for **193,208 B** of carried zones. ⚠ A handful (20), not a database; a zone not carried is unchanged. T-076 |
 
    ## ⛔ THE LIST WAS NINE AND IT IS TEN — 2026-09-03c
 
@@ -115,8 +115,8 @@ parts, and **both** are required:
    environments including a **glibc** one.
 
    ⛔ **So treat the ten as the current best enumeration and not as a closed
-   set.** The honest statement is *"ten found, eight closed, and the method
-   that found the tenth was one grep"*. ⭐ The right response is to keep
+   set.** The honest statement is *"ten found, NINE closed, and the method that
+   found the tenth was one grep"*. ⭐ The right response is to keep
    attacking it: the next candidates worth one measurement each are
    `/etc/nsswitch.conf` policy beyond what NSS covers, `libgcc_s.so.1` for
    `pthread_cancel` and `backtrace` (⚠ **0 mentions in the build host's
@@ -154,7 +154,7 @@ rather than as unmeasured gaps.
 | part | state | why |
 |---|---|---|
 | **1. No known environment where it fails** | ⛔ **not met** | One measured failure, and it is now the **only** one: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ **Route D was TAKEN and it SHIPPED** — `pgb build --host-dlopen`, an ELF loader compiled in (**T-064 ✅**, residue **T-068 ✅**), 11 of 11 carried with zero host objects and a real host `.so` on 7 of 7 glibc rows. ⚠ **Corrected 2026-09-03**: this cell used to point at **T-033**, an entry still marked open that describes the same route T-064 completed, and it named no shipped mechanism at all — so the bar read as though nothing had been built. ⛔ It remains not-met because the failure is *host-dependence*, and that persists: the four musl rows refuse a host object by design, and 645 of 1,527 host objects on the build host do not load (**374 of which glibc's own `ld.so` also fails** — plugins of a host program). |
-| **2. A static glibc binary with none of the issues** | ⛔ **not met, and now countable** | ⭐ **Eight of TEN** enumerated issues are closed on all eleven environments — it was six of nine before 2026-09-01d. **Two** are open: host plugins, and ⛔ **timezone, added 2026-09-03c**. ⛔ **The claim that there is no unenumerated remainder was FALSE and is withdrawn** — the tenth row was found by one grep, on the day somebody asked whether the list was complete. The distance to the bar is two named problems and a method that has just been shown to miss things. |
+| **2. A static glibc binary with none of the issues** | ⛔ **not met, and now countable** | ⭐ **NINE of TEN** enumerated issues are closed on all eleven environments — it was six of nine before 2026-09-01d. **One** is open: host plugins. ⭐ **The tenth was found AND closed on 2026-09-03c**, which is the fastest any of them has moved. ⛔ **The claim that there is no unenumerated remainder was FALSE and is withdrawn** — the tenth row was found by one grep, on the day somebody asked whether the list was complete. The distance to the bar is ONE named problem and a method that has just been shown to miss things. |
 
 ### The head-to-head, which is now evidence rather than the test
 
@@ -196,15 +196,16 @@ is work, not a verdict — `AGENTS.md` §7 now has **four** routes, and
 **What would move part 2 to met**, under the amended text: the open rows of the
 issues table close, each on all eleven environments with the measurement
 recorded. ⭐ **T-032 closed two of them on 2026-09-01d** — the CA bundle and
-terminfo — and ⛔ **2026-09-03c OPENED ONE**, so **two** rows are left:
-**timezone** (T-076, new) and **host plugins**, owned by T-064 (closed,
+terminfo — and ⭐ **2026-09-03c opened a tenth and closed it the same day**
+(**timezone**, T-076), so **one** row is left: **host plugins**, owned by T-064 (closed,
 the mechanism) with its residue in T-068 (closed) — ⚠ **not T-033, which this
 page pointed at until 2026-09-03 and which is a stale duplicate of the route
 T-064 took**.
-⛔ **Eight of TEN are closed and two are not, so this is a countable deficit
-and not a judgement.** Do not soften either of the two that remain: host
-plugins is the hardest of the ten, and timezone is the cheapest to fix and the
-easiest to forget, which is how it went nine sessions unnoticed.
+⛔ **NINE of TEN are closed and one is not, so this is a countable deficit
+and not a judgement.** Do not soften the one that remains: host plugins is the
+hardest of the ten, and being last does not make it small. ⚠ And do not read
+"nine of ten" as "almost done": the tenth was invisible until somebody asked
+whether the list was complete, and nothing says an eleventh is not.
 
 ### What is still unmeasured, and is not counted either way
 

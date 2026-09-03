@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 50  OPEN 16  DONE 34
+    TOTAL 50  OPEN 15  DONE 35
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 7 | 1 | 6 |
-| P1 | a documented capability does not work, or a flag does nothing | 34 | 10 | 24 |
+| P1 | a documented capability does not work, or a flag does nothing | 34 | 9 | 25 |
 | P2 | worth doing; nothing is wrong without it | 9 | 5 | 4 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -65,7 +65,7 @@ pretending to be one.
 | T-073 | P1 | S | done | runtime | ⭐ The own-symbol table answered where one of its two names had to defer |
 | T-074 | P1 | S | done | research | ⭐ The host-policy selftest could not fail on the state it was written to catch |
 | T-075 | P2 | S | done | research | ⭐ LD_DEBUG=bindings on the control, because the subject cannot be asked |
-| T-076 | P1 | M | open | runtime | ⛔ The TENTH quirk: static glibc reads the host's timezone database, and 4 of 11 have none |
+| T-076 | P1 | M | done | runtime | ⭐ The TENTH quirk, found and CLOSED the same day: `--embed-tzdata`, 11 of 11 |
 | T-077 | P1 | M | open | ci | ⛔ The head-to-head was measured on the RETIRED glibc pin, and nobody re-ran it |
 
 ## The argument behind the ordering

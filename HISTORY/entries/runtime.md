@@ -809,3 +809,111 @@ the mtime cache cannot serve the wrong object. Same shape as
 **No regression.** `experiments/93-` re-run after the change:
 `ok=882 refused=122 failed=478 crash=45 hang=0` — identical to the pre-change
 baseline in every column. `experiments/76-` `pass=4 fail=0`.
+
+## T-076 — ⭐ the TENTH quirk, FOUND AND CLOSED THE SAME DAY: the timezone database
+
+**Source** ⭐ **found 2026-09-03c** by taking the operator's *"fix all remaining
+GLIBC quirks if there still are some"* as a question about **completeness**
+rather than about the eight that are closed.
+**Category** runtime · **Priority** P1 · **Effort** M · **Status** ✅ done
+
+⛔ **`docs/REQUIREMENTS.md` said of its nine issues: *"there is no unenumerated
+remainder."* That was false, and it was the sentence that made part 2 of the
+operator's bar countable.** `grep -rn zoneinfo` over `docs/`, `TODO/`,
+`experiments/`, `poc/`, `internal/` and `tool/` returned **nothing**. Nobody
+had looked.
+
+**Measured** — `experiments/97-timezone.sh`, **pass=10 fail=0 skip=0**,
+`evidence/97-timezone/RESULT.txt`:
+
+| | |
+|---|---|
+| static `libc.a` | names `/usr/share/zoneinfo`, `/etc/localtime` and honours `TZDIR`, and carries **no data** |
+| resolve `Europe/Berlin` correctly | **7 of 11** — `CEST +0200`, hour 02 |
+| ⛔ cannot, and do not say so | **4 of 11** — alpine 3.10, 3.20, 3.22 and ⚠ **ubuntu-20.04, which is glibc** |
+
+⛔ **The failure mode is worse than "it returns UTC".** With no database glibc
+re-reads `TZ=Europe/Berlin` as a POSIX zone specification — a bare abbreviation
+with no offset — and prints:
+
+    Europe +0000 00
+
+⭐ **the zone name the caller ASKED FOR, with a UTC offset.** So `%Z`, the field
+that looks like a confirmation, is an echo of the input, and the only field
+carrying the defect is the offset. A log line reading `Europe` beside a
+timestamp two hours out is the production shape of this bug.
+
+⚠ **And it is not a musl story.** Three of the four are Alpine; the fourth is a
+Debian-family image that simply does not install `tzdata`.
+
+**What is left.**
+
+1. ⭐ **The fix has a precedent and it is the same one twice over.** `terminfo`
+   and the CA bundle are both host databases that some environments lack, and
+   both were closed by an **opt-in `--embed-*`**. `--embed-tzdata` is the
+   third of that family. ⚠ Unlike those two, glibc offers a documented hook —
+   `TZDIR` — which may make it cheaper; ⛔ that is a guess and the mechanism
+   has not been chosen.
+2. ⚠ **Decide what "correct" means when the zone is unknown.** Silently
+   answering with a UTC offset is the defect; refusing is a behaviour change
+   for programs that do not care about time zones. The `--embed-*` family's
+   answer — opt in, and be exact when you do — is the likely one.
+3. ⛔ **Size.** A full `tzdata` is ~1,800 files and a few hundred KB
+   compiled; embedding all of it is not obviously right for a program that
+   uses one zone.
+
+⭐ **AND THE METHOD MATTERS MORE THAN THE ROW.** One grep found a tenth issue
+in a list called complete. The next candidates, each worth one measurement:
+`/etc/services` and `/etc/protocols` for `getservbyname`; `libgcc_s.so.1` for
+`pthread_cancel` and `backtrace` — ⚠ **probed the same day: 0 mentions in the
+build host's `libc.a` at glibc 2.39**, so likely already dead upstream, but
+**not measured on the pinned 2.41**.
+
+**Prove.** All eleven resolve `Europe/Berlin` to `CEST +0200`, with the same
+binary, and `experiments/97-` asserts `MISSING = 0`.
+
+## ⭐ CLOSED 2026-09-03c — `--embed-tzdata`, 11 of 11
+
+⛔ **Found and fixed in one session, which is worth stating because the entry
+above was written before the fix existed and reads as though it were open.**
+
+`experiments/97-timezone.sh` now runs **two arms**, **pass=13 fail=0 skip=0**:
+
+| | arm A — plain `cc -static` | arm B — `pgb build --embed-tzdata` |
+|---|---|---|
+| resolve `Europe/Berlin` | **7 of 11** | ⭐ **11 of 11**, `CEST +0200` |
+| cannot, and do not say so | ⛔ **4 of 11** | ⭐ **0** |
+| artefact | 960,584 B | 1,153,792 B |
+| ⭐ cost of the carried zones | | **193,208 B** for 20 zones |
+
+⭐ **The control that stops arm B being vacuous is asserted, not assumed**:
+*"arm A had rows that FAILED, so arm B is not vacuous"*. Without it a run where
+every host happened to carry tzdata would look identical to a working fix.
+
+**The mechanism, and it is the terminfo one because glibc offers the same hook.**
+`tool/runtime/pgb-tzdata.c` is a constructor that (1) leaves a caller's `TZDIR`
+alone, (2) ⭐ **returns early when the host has a zone database at all — the
+host always wins**, and (3) otherwise unpacks the carried zones under `$TMPDIR`
+and points `TZDIR` at them with `setenv`'s overwrite flag 0. That is tier 2 of
+the preference order — an automatic toolchain change — and it touches no
+application source.
+
+⚠ **A HANDFUL, NOT A DATABASE, and the entry says so rather than implying
+otherwise.** `cfg.DefaultTzdataZones` carries **20** zones; tzdata is ~1,800
+files and carrying all of them would multiply a 2 MB binary.
+`PGB_TZDATA_ZONES` overrides the set at build time. ⛔ **A zone that is not
+carried behaves exactly as it did before**, which is the honest floor: this
+closes the case it carries and no other.
+
+⚠ **AND IT WRITES TO `$TMPDIR`**, which is a real cost worth naming: the
+project's shape claim is *"one ordinary ELF that mounts nothing and writes
+nothing"*, and this option, like `--embed-terminfo` before it, writes files at
+startup on hosts that need it. It is opt-in for that reason.
+
+⭐ **A carried selftest caught the change while it was being made**, which is
+what they are for: `cfg`'s *"every variable `Export()` writes is rendered as a
+container `-e` argument"* went red on `PGB_OPT_EMBED_TZDATA` the moment the
+option was exported without being added to `cfg.OptVars` — T-019's defect
+class, caught in seconds instead of three jobs later. Two more cases pin the
+link line in both directions and were proved able to fail by disabling the
+branch.

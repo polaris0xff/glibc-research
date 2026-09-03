@@ -27,6 +27,19 @@
 #   3. what ONE static binary asking for TZ=Europe/Berlin prints on each of
 #      them -- which is the only one of the three that shows the CONSEQUENCE.
 #
+# -- TWO ARMS ----------------------------------------------------------------
+#
+#   arm A  plain `cc -static`                the baseline loss
+#   arm B  `pgb build --embed-tzdata`        the candidate fix: a handful of
+#                                            zone files compiled in, unpacked
+#                                            under $TMPDIR, TZDIR pointed at
+#                                            them -- and ONLY where the host
+#                                            has no database of its own
+#
+# ⭐ ARM B CHANGES NO APPLICATION SOURCE. It is a constructor in an object the
+# link pulls in, which puts it at tier 2 of the project's preference order
+# (automatic toolchain change) rather than tier 4 (patch the application).
+#
 # ⛔ THE FAILURE MODE IS THE POINT, AND IT IS WORSE THAN "IT RETURNS UTC".
 # MEASURED, not predicted: with no database, glibc does not report an error and
 # does not print `UTC`. It re-reads `TZ=Europe/Berlin` as a POSIX zone
@@ -54,7 +67,7 @@
 set -u
 . "$(cd "$(dirname "$0")" && pwd)/lib.sh"
 
-exp_begin "97 - the timezone database: a tenth way static glibc is not self-contained"
+exp_begin "97 - the timezone database: the tenth quirk, and the fix that closes it"
 
 WORK="${PGB_EXP97_WORK:-/var/tmp/pgb-exp97}"
 rm -rf "$WORK"; mkdir -p "$WORK" || exit 2
@@ -159,11 +172,52 @@ printf '\n'
 exp_check "every fetched environment answered"        "$((HAVE+MISSING+WRONG))" "$ROWS"
 exp_check "environments that CANNOT resolve the zone" "$MISSING" 4
 exp_check "environments with a database that answer correctly" "$WRONG" 0
+MISSING_A=$MISSING
 exp_note "⛔ the $MISSING that cannot do not SAY so: they print \`Europe +0000\`,"
 exp_note "   the zone name ASKED FOR with a UTC offset. The %Z field echoes"
 exp_note "   the input, so only the offset carries the defect."
 exp_note "⚠ AND IT IS NOT A MUSL STORY: ubuntu-20.04 is glibc and is one of the"
 exp_note "   four. Three of the four are Alpine; the fourth is a Debian family"
 exp_note "   image that simply does not install tzdata."
+
+# -- arm B: the same question, built with --embed-tzdata ---------------------
+#
+# ⛔ IT NEEDS THE PINNED BUILD ENVIRONMENT, so it SKIPS rather than fails where
+# there is none. A skip is not a pass: `RULES.md` says an unrun row must stay
+# visible.
+BWORK="$WORK/armB"; mkdir -p "$BWORK"
+cp "$WORK/tz.c" "$BWORK/tz.c"
+if (cd "$BWORK" && "$REPO_DIR/pgb" build --embed-tzdata -- cc -o tz tz.c) >"$WORK/armB.log" 2>&1 \
+   && [ -x "$BWORK/tz" ]; then
+  printf '\n'
+  printf -- '-- arm B: the same program, built with --embed-tzdata ---------------\n'
+  printf '  %-20s %8s %-7s %s\n' ENVIRONMENT ZONEFILES PRINTED VERDICT
+  B_OK=0; B_BAD=0; B_ROWS=0
+  for name in $(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt"); do
+    r=$(exp_rootfs "$name") || true
+    [ -n "$r" ] || continue
+    B_ROWS=$((B_ROWS+1))
+    n=$(find "$r/usr/share/zoneinfo" -type f 2>/dev/null | wc -l | tr -d ' ')
+    out=$("$REPO_DIR/pgb" rootfs run "$r" --copy "$BWORK/tz:/tz" -- /tz 2>/dev/null | tr -d '\r')
+    off=$(printf '%s' "$out" | awk '{print $2}')
+    if [ "$off" = "+0200" ]; then v="ok"; B_OK=$((B_OK+1)); else v="⛔ STILL WRONG"; B_BAD=$((B_BAD+1)); fi
+    printf '  %-20s %8s %-7s %s\n' "$name" "$n" "${out:-<none>}" "$v"
+  done
+  printf '\n'
+  exp_check "arm B: every environment resolves Europe/Berlin" "$B_BAD" 0
+  exp_check "arm B: and every one of them was measured"       "$B_OK" "$B_ROWS"
+  # ⭐ THE CONTROL THAT SAYS ARM B DID SOMETHING. Without it, a run where both
+  # arms passed would be indistinguishable from one where the hosts all had a
+  # database and neither arm was ever tested.
+  exp_check "arm A had rows that FAILED, so arm B is not vacuous" \
+    "$([ "${MISSING_A:-0}" -gt 0 ] && echo yes || echo no)" yes
+  exp_note "arm A could not resolve on ${MISSING_A:-0} of $ROWS; arm B on $B_BAD."
+  _sz_a=$(wc -c < "$WORK/tz"); _sz_b=$(wc -c < "$BWORK/tz")
+  exp_note "size: arm A $_sz_a B, arm B $_sz_b B -- the carried zones cost $((_sz_b - _sz_a)) B"
+else
+  exp_skip "arm B: every environment resolves Europe/Berlin" "pgb build --embed-tzdata could not run: $(tail -1 "$WORK/armB.log" 2>/dev/null)"
+  exp_skip "arm B: and every one of them was measured"       "see above"
+  exp_skip "arm A had rows that FAILED, so arm B is not vacuous" "see above"
+fi
 
 exp_finish

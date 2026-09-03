@@ -181,6 +181,8 @@ func (p *parser) option(a string) (bool, error) {
 		p.c.EmbedCacert = true
 	case "--embed-terminfo":
 		p.c.EmbedTerminfo = true
+	case "--embed-tzdata":
+		p.c.EmbedTzdata = true
 	case "--no-iconv":
 		p.c.UseIconv = false
 	case "--ts":

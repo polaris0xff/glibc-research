@@ -85,6 +85,17 @@ var DefaultEnvPip = []string{"meson==1.9.1"}
 var DefaultTerminfoEntries = strings.Fields(`xterm xterm-256color xterm-color
 screen screen-256color tmux tmux-256color linux vt100 vt220 ansi rxvt putty dumb`)
 
+// DefaultTzdataZones is what --embed-tzdata carries: a handful of zones, not
+// a database. ⛔ tzdata is ~1,800 files and carrying all of them would
+// multiply a 2 MB static binary, so this closes the case it carries and no
+// other -- experiments/97- measures exactly that. Override with
+// PGB_TZDATA_ZONES at build time.
+var DefaultTzdataZones = strings.Fields(`UTC Etc/UTC
+America/New_York America/Chicago America/Denver America/Los_Angeles
+America/Sao_Paulo Europe/London Europe/Berlin Europe/Paris Europe/Moscow
+Africa/Cairo Africa/Johannesburg Asia/Kolkata Asia/Shanghai Asia/Tokyo
+Asia/Dubai Australia/Sydney Pacific/Auckland`)
+
 // Config is the whole of pgb's settings for one invocation.
 type Config struct {
 	Self  string // the directory holding the pgb binary and the repository
@@ -104,6 +115,7 @@ type Config struct {
 	EmbedLocale   bool
 	EmbedCacert   bool
 	EmbedTerminfo bool
+	EmbedTzdata   bool
 	UseIconv      bool
 	ArchBaseline  string
 	ExtraBinds    []string
@@ -143,6 +155,7 @@ func Load(self string) *Config {
 		EmbedLocale:   logx.EnvBool("PGB_OPT_EMBED_LOCALE", false),
 		EmbedCacert:   logx.EnvBool("PGB_OPT_EMBED_CACERT", false),
 		EmbedTerminfo: logx.EnvBool("PGB_OPT_EMBED_TERMINFO", false),
+		EmbedTzdata:   logx.EnvBool("PGB_OPT_EMBED_TZDATA", false),
 		UseIconv:      logx.EnvBool("PGB_OPT_USE_ICONV", true),
 		ArchBaseline:  os.Getenv("PGB_OPT_BASELINE"),
 		ExtraBinds:    strings.Fields(os.Getenv("PGB_OPT_BINDS")),
@@ -172,7 +185,8 @@ func Load(self string) *Config {
 // list, so the exporter and the container argument builder cannot drift.
 var OptVars = []string{
 	"PGB_OPT_VERBOSE", "PGB_OPT_EMBED_LOCALE", "PGB_OPT_EMBED_CACERT",
-	"PGB_OPT_EMBED_TERMINFO", "PGB_OPT_USE_ICONV", "PGB_OPT_BASELINE",
+	"PGB_OPT_EMBED_TERMINFO", "PGB_OPT_EMBED_TZDATA",
+	"PGB_OPT_USE_ICONV", "PGB_OPT_BASELINE",
 	"PGB_OPT_BINDS", "PGB_OPT_WRAP_DLOPEN", "PGB_OPT_HOST_DLOPEN",
 	"PGB_OPT_TLS_RESERVE",
 	"PGB_STATE", "PGB_LIBICONV_PREFIX", "PGB_T058_SHARED_WRAPPERS",
@@ -187,6 +201,7 @@ func (c *Config) Export() {
 	set("PGB_OPT_EMBED_LOCALE", bit(c.EmbedLocale))
 	set("PGB_OPT_EMBED_CACERT", bit(c.EmbedCacert))
 	set("PGB_OPT_EMBED_TERMINFO", bit(c.EmbedTerminfo))
+	set("PGB_OPT_EMBED_TZDATA", bit(c.EmbedTzdata))
 	set("PGB_OPT_USE_ICONV", bit(c.UseIconv))
 	set("PGB_OPT_BASELINE", c.ArchBaseline)
 	set("PGB_OPT_BINDS", strings.Join(c.ExtraBinds, " "))

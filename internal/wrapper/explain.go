@@ -103,6 +103,15 @@ LINK FLAGS
                                  carry is still reachable
 `)
 	}
+	if c.EmbedTzdata {
+		w.WriteString(`  -Wl,-u,pgb_tzdata_anchor       a handful of timezone descriptions, used
+  <pgb-tzdata.o>                 only where the host has no zone database at
+  <pgb-tzdata-data.o>            all. Four of the eleven target environments
+                                 ship none, and without this glibc answers
+                                 TZ=Europe/Berlin with "Europe +0000" -- the
+                                 name asked for, at a UTC offset. T-076
+`)
+	}
 	if c.EmbedLocale {
 		w.WriteString(`  -Wl,--wrap=setlocale           embedded C.UTF-8, materialised ONLY when the
   <pgb-locale-data.o>            host cannot answer a UTF-8 setlocale. A

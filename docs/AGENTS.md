@@ -433,14 +433,19 @@ experiment; none has been shown to be unreachable.
    systemd-resolved. Measured cost: on Fedora 42 a plain static binary resolves
    the machine's own hostname via `libnss_myhostname` and the pgb binary does
    not.
-3. **Five host *data* dependencies exist and static linking touches none of
-   them.** ⭐ **Four are now solved and the fifth is shipped rather than
-   solved**: gconv ✅ (static libiconv), locale ✅ (opt-in `--embed-locale`),
+3. **SIX host *data* dependencies exist and static linking touches none of
+   them.** ⚠ **It was FIVE until 2026-09-03c**, when somebody asked whether the
+   list was complete and it was not — see `REQUIREMENTS.md`'s tenth row.
+   ⭐ **Five are now solved and the sixth is shipped rather than solved**:
+   gconv ✅ (static libiconv), locale ✅ (opt-in `--embed-locale`),
    terminfo ✅ (opt-in `--embed-terminfo`, `setupterm(xterm-256color)` on 11 of
    11 including three Alpines with no terminfo tree), CA bundle ✅ (opt-in
    `--embed-cacert`, curl verifying real TLS on 11 of 11 with the harness's own
-   CA variables unset), a runtime's own library tree ⚠ shipped (CPython's
-   98 MiB stdlib). `TODO` T-032, closed on `poc/20-nano` and `poc/30-curl`.
+   CA variables unset), ⭐ **timezone ✅ (opt-in `--embed-tzdata`,
+   `TZ=Europe/Berlin` resolving to `CEST +0200` on 11 of 11 where a plain
+   `-static` binary silently answers `Europe +0000` on four of them —
+   `experiments/97-`, T-076)**, a runtime's own library tree ⚠ shipped
+   (CPython's 98 MiB stdlib). `TODO` T-032 and T-076.
    ⭐ **The finding that shaped both opt-in mechanisms**: most failures were
    never *"this machine has no certificates"* — the data was there on a path
    the binary had never been told about. So the first layer is to **look**, and

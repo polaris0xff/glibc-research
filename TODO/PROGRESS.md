@@ -5,7 +5,7 @@ the entries, and [`../HISTORY/`](../HISTORY/).
 
     STATE     2026-09-03c  ⚠ IN PROGRESS — refreshed as work lands, not only
               at the end
-    COUNTS    50 entries, 16 open, 34 done
+    COUNTS    50 entries, 15 open, 35 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN on every push this session
               selftests 540 pass, 1 could not run (no zstd)

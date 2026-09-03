@@ -65,6 +65,7 @@ func Selftest() *selftest.Report {
 		EmbedLocale:    true,
 		EmbedCacert:    true,
 		EmbedTerminfo:  true,
+		EmbedTzdata:    true,
 		UseIconv:       false, // the default is TRUE, so false is the signal
 		ArchBaseline:   "x86-64-v3",
 		ExtraBinds:     []string{"/a:/a", "/b:/b"},
@@ -98,6 +99,7 @@ func Selftest() *selftest.Report {
 	r.CheckBool("--embed-locale survives", back.EmbedLocale, true)
 	r.CheckBool("--embed-cacert survives", back.EmbedCacert, true)
 	r.CheckBool("--embed-terminfo survives", back.EmbedTerminfo, true)
+	r.CheckBool("--embed-tzdata survives", back.EmbedTzdata, true)
 	r.CheckBool("⛔ --no-iconv survives (the default is ON, so this is the hard one)",
 		back.UseIconv, false)
 	r.CheckBool("--host-dlopen survives", back.HostDlopen, true)
