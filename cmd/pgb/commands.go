@@ -264,6 +264,7 @@ func selftestSuites(c *cfg.Config) []suite {
 		{"oci-pull", ociimg.Selftest},
 		{"rootfs-run", rootfs.Selftest},
 		{"elf", elfSelftest},
+		{"cfg", cfg.Selftest},
 		{"env-stamp", envx.StampSelftest},
 		{"wrapper-flags", wrapper.FlagsSelftest},
 		{"zstd", zstd.Selftest},

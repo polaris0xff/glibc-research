@@ -1237,6 +1237,46 @@ and the suite fails when an option is disconnected from the flags it controls,
 demonstrated by disconnecting one deliberately, the way `experiments/89-` uses
 a control arm.
 
+### ⭐ 2026-09-03 — `wrapper` and `cfg` are covered; five packages left
+
+    pgb selftest --list      ... cfg  wrapper-flags ...
+    pgb selftest             200 cases  ->  ⭐ 306 cases pass
+
+    covered      ociimg  rootfs  elfx  zstd  nixx  bootstrapx  bundle
+                 envx  ⭐ wrapper  ⭐ cfg
+    NOT covered  ⛔ verifyx  ⛔ buildx  logx  proc  fail
+
+⚠ **The entry's own list was already stale**: `envx` gained `env-stamp` on
+2026-09-02e, so it was seven and not eight.
+
+**`wrapper-flags`, 55 cases.** The axis table T-058 named, each in **both**
+directions against a marker only that option produces, plus the wrapper
+directory keyed on the options, `ParsePluginSpec` and what it refuses,
+`IsWrapperName`, `uniqueSorted`.
+
+    CONTROL  disconnect --embed-terminfo from its object    2 of 55 FAIL
+    CONTROL  make Dir() ignore the flags (T-058's defect)   1 of 55 FAIL
+    restored                                                55 pass
+
+**`cfg`, 37 cases.** ⭐ The one property nothing else could check: **every build
+option crosses the engine boundary through the ENVIRONMENT**, because
+`pgb build` re-enters itself with only the user's command. Three places —
+`Export()`, `Load()`, `OptVars` — and nothing asserted they agreed.
+
+    CONTROL  Export() forgets --host-dlopen        1 of 37 FAIL
+    CONTROL  drop PGB_OPT_BINDS from OptVars       1 of 37 FAIL
+
+⛔ **AND THE SECOND CONTROL FOUND MY OWN CHECK TO BE THEATRE FIRST.** The first
+version iterated `OptVars` and asked whether each entry was rendered — which
+`ContainerEnvArgs` also iterates, so it was trivially true, and dropping
+`PGB_OPT_BINDS` left the suite **green**. The binding direction is the other
+one, and it has to be **derived**: diff the environment across `Export()` and
+require the set it touched to be contained in `OptVars`. A listed set would be
+a copy of `OptVars` and would agree with it by construction.
+
+⚠ **`verifyx` and `buildx` remain**, and this entry does not pretend the run
+can be carried. What can be is the parsing and the decision logic.
+
 ---
 
 ## T-066 — ⛔ P0: the bundler is bloated and slow. Rebuild it against a CLI benchmark

@@ -1416,3 +1416,538 @@ qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0x1e
 [544/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-plan.cc.o
 [545/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-plan-layout.cc.o
 [546/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-serialize.cc.o
+[547/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-table-cff.cc.o
+[548/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-table-color.cc.o
+[549/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-table-other.cc.o
+[550/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-unicode.cc.o
+[551/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-plan-var.cc.o
+[552/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-cff1-table.cc.o
+[553/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-cff2-table.cc.o
+[554/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-color.cc.o
+[555/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-table-var.cc.o
+[556/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-table-layout.cc.o
+[557/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-map.cc.o
+[558/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-math.cc.o
+[559/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-face.cc.o
+[560/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-meta.cc.o
+[561/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-name.cc.o
+[562/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-metrics.cc.o
+[563/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-font.cc.o
+[564/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shape.cc.o
+[565/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shape-normalize.cc.o
+[566/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shape-fallback.cc.o
+[567/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-default.cc.o
+[568/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-hangul.cc.o
+[569/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-hebrew.cc.o
+[570/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-indic-table.cc.o
+[571/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-indic.cc.o
+[572/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-khmer.cc.o
+[573/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-syllabic.cc.o
+[574/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-myanmar.cc.o
+[575/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-layout.cc.o
+[576/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-thai.cc.o
+[577/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-arabic.cc.o
+[578/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-vowel-constraints.cc.o
+[579/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-shaper-use.cc.o
+[580/1644] Generating version linker script for target Gui
+[581/1644] Running syncqt.cpp for module: QtDeviceDiscoverySupport
+[582/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-tag.cc.o
+[583/1644] Linking CXX static library lib/libQt6BundledFreetype.a
+[584/1644] Linking CXX executable libexec/rcc
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0xe78): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): note: the message above does not take linker garbage collection into account
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x225): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): note: the message above does not take linker garbage collection into account
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xaa): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): note: the message above does not take linker garbage collection into account
+[585/1644] Generating version linker script for target DeviceDiscoverySupportPrivate
+[586/1644] Automatic MOC for target DeviceDiscoverySupportPrivate
+[587/1644] Running AUTOMOC file extraction for target DeviceDiscoverySupportPrivate
+[588/1644] Automatic MOC for target uic
+[589/1644] Running moc --collect-json for target DeviceDiscoverySupportPrivate
+[590/1644] Generating prl file for target DeviceDiscoverySupportPrivate
+[591/1644] Running syncqt.cpp for module: QtSql
+[592/1644] Running syncqt.cpp for module: QtNetwork
+[593/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/uic_autogen/mocs_compilation.cpp.o
+[594/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-ot-var.cc.o
+[595/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/cpp/cppwritedeclaration.cpp.o
+[596/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/cpp/cppwriteincludes.cpp.o
+[597/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/OT/Var/VARC/VARC.cc.o
+[598/1644] Linking CXX static library lib/libQt6BundledHarfbuzz.a
+[599/1644] Automatic MOC for target Gui
+AutoMoc: /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/kernel/qopenglcontext.h: note: No relevant classes found. No output generated.
+AutoMoc: /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/gui/platform/unix/qdesktopunixservices.cpp: note: No relevant classes found. No output generated.
+[600/1644] Running AUTOMOC file extraction for target Gui
+[601/1644] Running moc --collect-json for target Gui
+[602/1644] Running rcc for resource qpdf
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[603/1644] Running rcc for resource gui_shaders
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[604/1644] Generating prl file for target Gui
+[605/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/customwidgetsinfo.cpp.o
+[606/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/databaseinfo.cpp.o
+[607/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/main.cpp.o
+[608/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/driver.cpp.o
+[609/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/cpp/cppwriteinitialization.cpp.o
+[610/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/python/pythonwritedeclaration.cpp.o
+[611/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/shared/language.cpp.o
+[612/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/shared/writeincludesbase.cpp.o
+[613/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/python/pythonwriteimports.cpp.o
+[614/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/treewalker.cpp.o
+[615/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/validator.cpp.o
+[616/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/uic.cpp.o
+[617/1644] Building C object src/gui/CMakeFiles/Gui.dir/painting/qgrayraster.c.o
+[618/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/.qt/rcc/qrc_qpdf.cpp.o
+[619/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/.qt/rcc/qrc_gui_shaders.cpp.o
+[620/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/cmake_pch.hxx.gch
+[621/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/compat/removed_api.cpp.o
+[622/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qabstractfileiconengine.cpp.o
+[623/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/Gui_autogen/mocs_compilation.cpp.o
+[624/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimage_ssse3.cpp.o
+[625/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qbitmap.cpp.o
+[626/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qbmphandler.cpp.o
+[627/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qabstractfileiconprovider.cpp.o
+[628/1644] Building CXX object src/tools/uic/CMakeFiles/uic.dir/ui4.cpp.o
+[629/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qiconengine.cpp.o
+[630/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qfonticonengine.cpp.o
+[631/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qiconengineplugin.cpp.o
+[632/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qicon.cpp.o
+[633/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimageiohandler.cpp.o
+[634/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qiconloader.cpp.o
+[635/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimagepixmapcleanuphooks.cpp.o
+[636/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimage_conversions.cpp.o
+[637/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimagereaderwriterhelpers.cpp.o
+[638/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimagewriter.cpp.o
+[639/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimagereader.cpp.o
+[640/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpicture.cpp.o
+[641/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpixmap.cpp.o
+[642/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpaintengine_pic.cpp.o
+[643/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qimage.cpp.o
+[644/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpixmap_raster.cpp.o
+[645/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qplatformpixmap.cpp.o
+[646/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpixmap_blitter.cpp.o
+[647/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpixmapcache.cpp.o
+[648/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qppmhandler.cpp.o
+[649/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qxbmhandler.cpp.o
+[650/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qaccessibilityhints.cpp.o
+[651/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qxpmhandler.cpp.o
+[652/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qclipboard.cpp.o
+[653/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qcursor.cpp.o
+[654/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qgenericplugin.cpp.o
+[655/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qeventpoint.cpp.o
+[656/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qgenericpluginfactory.cpp.o
+[657/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qguivariant.cpp.o
+[658/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qevent.cpp.o
+[659/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qinputdevice.cpp.o
+[660/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qinputdevicemanager.cpp.o
+[661/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qhighdpiscaling.cpp.o
+[662/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qinputmethod.cpp.o
+[663/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qinternalmimedata.cpp.o
+[664/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qkeymapper.cpp.o
+[665/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qpaintdevicewindow.cpp.o
+[666/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qoffscreensurface.cpp.o
+[667/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformclipboard.cpp.o
+[668/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qpalette.cpp.o
+[669/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qpixelformat.cpp.o
+[670/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qguiapplication.cpp.o
+[671/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformgraphicsbuffer.cpp.o
+[672/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformcursor.cpp.o
+[673/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformgraphicsbufferhelper.cpp.o
+[674/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatforminputcontext.cpp.o
+[675/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatforminputcontextfactory.cpp.o
+[676/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatforminputcontextplugin.cpp.o
+[677/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformintegrationplugin.cpp.o
+[678/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformdialoghelper.cpp.o
+[679/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformintegrationfactory.cpp.o
+[680/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformintegration.cpp.o
+[681/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformnativeinterface.cpp.o
+[682/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformmenu.cpp.o
+[683/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformkeymapper.cpp.o
+[684/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformoffscreensurface.cpp.o
+[685/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformservices.cpp.o
+[686/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformsessionmanager.cpp.o
+[687/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformscreen.cpp.o
+[688/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformsharedgraphicscache.cpp.o
+[689/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformsurface.cpp.o
+[690/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformsystemtrayicon.cpp.o
+[691/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformthemeplugin.cpp.o
+[692/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformthemefactory.cpp.o
+[693/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qrasterwindow.cpp.o
+[694/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformwindow.cpp.o
+[695/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformtheme.cpp.o
+[696/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qsessionmanager.cpp.o
+[697/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qscreen.cpp.o
+[698/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qpointingdevice.cpp.o
+[699/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qstylehints.cpp.o
+[700/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qsurface.cpp.o
+[701/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qsurfaceformat.cpp.o
+[702/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qtestsupport_gui.cpp.o
+[703/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/math3d/qgenericmatrix.cpp.o
+[704/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/math3d/qquaternion.cpp.o
+[705/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/math3d/qmatrix4x4.cpp.o
+[706/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qwindowsysteminterface.cpp.o
+[707/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qwindow.cpp.o
+[708/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/math3d/qvectornd.cpp.o
+[709/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qbackingstore.cpp.o
+[710/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qbackingstoredefaultcompositor.cpp.o
+[711/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qbezier.cpp.o
+[712/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qbackingstorerhisupport.cpp.o
+[713/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qblittable.cpp.o
+[714/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qblendfunctions.cpp.o
+[715/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qbrush.cpp.o
+[716/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcolor.cpp.o
+[717/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcolortrclut.cpp.o
+[718/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcolorspace.cpp.o
+[719/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcosmeticstroker.cpp.o
+[720/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qemulationpaintengine.cpp.o
+[721/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcolortransform.cpp.o
+[722/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qimageeffects.cpp.o
+[723/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcompositionfunctions.cpp.o
+[724/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qmemrotate.cpp.o
+[725/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qimagescale.cpp.o
+[726/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qicc.cpp.o
+[727/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpagedpaintdevice.cpp.o
+[728/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qoutlinemapper.cpp.o
+[729/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpagelayout.cpp.o
+[730/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpaintdevice.cpp.o
+[731/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpageranges.cpp.o
+[732/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpagesize.cpp.o
+[733/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpaintengine.cpp.o
+[734/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpaintengine_blitter.cpp.o
+[735/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpainterstateguard.cpp.o
+[736/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpaintengineex.cpp.o
+[737/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpaintengine_raster.cpp.o
+[738/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpathclipper.cpp.o
+[739/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpainter.cpp.o
+[740/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpainterpath.cpp.o
+[741/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpdfoutputintent.cpp.o
+[742/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpathsimplifier.cpp.o
+[743/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpdfwriter.cpp.o
+[744/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpen.cpp.o
+[745/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qplatformbackingstore.cpp.o
+[746/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpolygon.cpp.o
+[747/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qrasterizer.cpp.o
+[748/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpdf.cpp.o
+[749/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qpixellayout.cpp.o
+[750/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qstroker.cpp.o
+[751/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qregion.cpp.o
+[752/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qtextureglyphcache.cpp.o
+[753/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qtriangulatingstroker.cpp.o
+[754/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qtransform.cpp.o
+[755/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/rhi/qrhinull.cpp.o
+[756/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qtriangulator.cpp.o
+[757/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/rhi/qrhi.cpp.o
+[758/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/rhi/qshader.cpp.o
+[759/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qabstracttextdocumentlayout.cpp.o
+[760/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qcolrpaintgraphrenderer.cpp.o
+[761/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/rhi/qshaderdescription.cpp.o
+[762/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qdistancefield.cpp.o
+[763/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontengineglyphcache.cpp.o
+[764/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontengine.cpp.o
+[765/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontmetrics.cpp.o
+[766/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontvariableaxis.cpp.o
+[767/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontdatabase.cpp.o
+[768/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfragmentmap.cpp.o
+[769/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qglyphrun.cpp.o
+[770/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qinputcontrol.cpp.o
+[771/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfont.cpp.o
+[772/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qfontsubset.cpp.o
+[773/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qplatformfontdatabase.cpp.o
+[774/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qrawfont.cpp.o
+[775/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qsyntaxhighlighter.cpp.o
+[776/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qstatictext.cpp.o
+[777/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextcursor.cpp.o
+[778/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextdocumentfragment.cpp.o
+[779/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextdocument_p.cpp.o
+[780/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextdocument.cpp.o
+[781/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextdocumentwriter.cpp.o
+[782/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextdocumentlayout.cpp.o
+[783/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextformat.cpp.o
+[784/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtexthtmlparser.cpp.o
+[785/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextengine.cpp.o
+[786/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextimagehandler.cpp.o
+[787/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextlist.cpp.o
+[788/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextoption.cpp.o
+[789/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextobject.cpp.o
+[790/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qabstractlayoutstyleinfo.cpp.o
+[791/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qastchandler.cpp.o
+[792/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextlayout.cpp.o
+[793/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtexttable.cpp.o
+[794/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qdesktopservices.cpp.o
+[795/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qpkmhandler.cpp.o
+[796/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qlayoutpolicy.cpp.o
+[797/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qktxhandler.cpp.o
+[798/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qtexturefilereader.cpp.o
+[799/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qtexturefiledata.cpp.o
+[800/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qvalidator.cpp.o
+[801/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qgridlayoutengine.cpp.o
+[802/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/animation/qguivariantanimation.cpp.o
+[803/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessiblebridge.cpp.o
+[804/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessiblebridgeutils.cpp.o
+[805/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessiblehelper.cpp.o
+[806/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessible.cpp.o
+[807/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessiblecache.cpp.o
+[808/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessibleobject.cpp.o
+[809/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qaccessibleplugin.cpp.o
+[810/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/itemmodels/qstandarditemmodel.cpp.o
+[811/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/accessible/qplatformaccessibility.cpp.o
+[812/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qactiongroup.cpp.o
+[813/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qdnd.cpp.o
+[814/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qdrag.cpp.o
+[815/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qaction.cpp.o
+[816/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qplatformdrag.cpp.o
+[817/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qshapedpixmapdndwindow.cpp.o
+[818/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qsimpledrag.cpp.o
+[819/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qshortcut.cpp.o
+[820/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qkeysequence.cpp.o
+[821/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/kernel/qshortcutmap.cpp.o
+[822/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qmovie.cpp.o
+[823/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/image/qpnghandler.cpp.o
+[824/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qdrawhelper_sse2.cpp.o
+[825/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qdrawhelper_ssse3.cpp.o
+[826/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qharfbuzzng.cpp.o
+[827/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qimagescale_sse4.cpp.o
+[828/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qdrawhelper_sse4.cpp.o
+[829/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qdrawhelper_avx2.cpp.o
+[830/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextmarkdownimporter.cpp.o
+[831/1644] Building C object src/gui/CMakeFiles/Gui.dir/__/3rdparty/md4c/md4c.c.o
+In function 'md_is_link_reference_definition',
+    inlined from 'md_consume_link_reference_definitions' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/3rdparty/md4c/md4c.c:5081:28,
+    inlined from 'md_end_current_block' at /var/tmp/pgb-poc/91-qt-xcb/qtbase/src/3rdparty/md4c/md4c.c:5130:13:
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/3rdparty/md4c/md4c.c:2239:7: warning: 'label_contents_line_index' may be used uninitialized [-Wmaybe-uninitialized]
+ 2239 |     if(label_is_multiline) {
+      |       ^
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/3rdparty/md4c/md4c.c: In function 'md_end_current_block':
+/var/tmp/pgb-poc/91-qt-xcb/qtbase/src/3rdparty/md4c/md4c.c:2158:13: note: 'label_contents_line_index' was declared here
+ 2158 |     MD_SIZE label_contents_line_index;
+      |             ^~~~~~~~~~~~~~~~~~~~~~~~~
+[832/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextmarkdownwriter.cpp.o
+[833/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qcssutil.cpp.o
+[834/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qtextodfwriter.cpp.o
+[835/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qundostack.cpp.o
+[836/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/freetype/qfreetypefontdatabase.cpp.o
+[837/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qundogroup.cpp.o
+[838/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/itemmodels/qfileinfogatherer.cpp.o
+[839/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/freetype/qfontengine_ft.cpp.o
+[840/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qgenericunixeventdispatcher.cpp.o
+[841/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qunixnativeinterface.cpp.o
+[842/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/text/qcssparser.cpp.o
+[843/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qunixeventdispatcher.cpp.o
+[844/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qdesktopunixservices.cpp.o
+[845/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qtx11extras.cpp.o
+[846/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/itemmodels/qfilesystemmodel.cpp.o
+[847/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qxkbcommon_3rdparty.cpp.o
+[848/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qgenericunixtheme.cpp.o
+[849/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qgnometheme.cpp.o
+[850/1644] Running syncqt.cpp for module: QtWidgets
+[851/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/util/qedidparser.cpp.o
+[852/1644] Building CXX object src/platformsupport/devicediscovery/CMakeFiles/DeviceDiscoverySupportPrivate.dir/DeviceDiscoverySupportPrivate_autogen/mocs_compilation.cpp.o
+[853/1644] Running syncqt.cpp for module: QtFbSupport
+[854/1644] Running syncqt.cpp for module: QtInputSupport
+[855/1644] Generating version linker script for target Sql
+[856/1644] Generating version linker script for target Network
+[857/1644] Linking CXX executable libexec/uic
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): in function `QLibraryPrivate::load_sys()':
+qlibrary_unix.cpp:(.text._ZN15QLibraryPrivate8load_sysEv+0xe78): warning: Using 'dlopen' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qlibrary_unix.cpp.o): note: the message above does not take linker garbage collection into account
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x225): warning: Using 'getgrgid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): note: the message above does not take linker garbage collection into account
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0xaa): warning: Using 'getpwuid_r' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: lib/libQt6Core.a(qfilesystemengine_unix.cpp.o): note: the message above does not take linker garbage collection into account
+[858/1644] Generating version linker script for target Widgets
+[859/1644] Generating version linker script for target FbSupportPrivate
+[860/1644] Generating version linker script for target InputSupportPrivate
+[861/1644] Automatic MOC for target Sql
+[862/1644] Building CXX object src/platformsupport/devicediscovery/CMakeFiles/DeviceDiscoverySupportPrivate.dir/qdevicediscovery_static.cpp.o
+[863/1644] Linking CXX static library lib/libQt6DeviceDiscoverySupport.a
+[864/1644] Building CXX object src/gui/CMakeFiles/Gui_resources_1.dir/.qt/rcc/qrc_qpdf_init.cpp.o
+[865/1644] Building CXX object src/gui/CMakeFiles/Gui_resources_2.dir/.qt/rcc/qrc_gui_shaders_init.cpp.o
+[866/1644] Running AUTOMOC file extraction for target Sql
+[867/1644] Running moc --collect-json for target Sql
+[868/1644] Generating prl file for target Sql
+[869/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/platform/unix/qxkbcommon.cpp.o
+[870/1644] Generating ../../../mkspecs/modules/qt_ext_libjpeg.pri
+[871/1644] Running syncqt.cpp for module: QtConcurrent
+[872/1644] Automatic MOC for target Network
+[873/1644] Running AUTOMOC file extraction for target Network
+[874/1644] Running moc --collect-json for target Network
+[875/1644] Generating prl file for target Network
+[876/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/compat/removed_api.cpp.o
+[877/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/cmake_pch.hxx.gch
+[878/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/Sql_autogen/mocs_compilation.cpp.o
+[879/1644] Building CXX object src/network/CMakeFiles/Network.dir/compat/removed_api.cpp.o
+[880/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlcachedresult.cpp.o
+[881/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqldriver.cpp.o
+[882/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqldriverplugin.cpp.o
+[883/1644] Building CXX object src/gui/CMakeFiles/Gui.dir/painting/qdrawhelper.cpp.o
+[884/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlerror.cpp.o
+[885/1644] Linking CXX static library lib/libQt6Gui.a
+[886/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqldatabase.cpp.o
+[887/1644] Automatic MOC for target FbSupportPrivate
+[888/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlfield.cpp.o
+[889/1644] Running AUTOMOC file extraction for target FbSupportPrivate
+[890/1644] Running moc --collect-json for target FbSupportPrivate
+[891/1644] Generating prl file for target FbSupportPrivate
+[892/1644] Automatic MOC for target InputSupportPrivate
+[893/1644] Running AUTOMOC file extraction for target InputSupportPrivate
+[894/1644] Running moc --collect-json for target InputSupportPrivate
+[895/1644] Generating prl file for target InputSupportPrivate
+[896/1644] Automatic MOC for target XcbQpaPrivate
+[897/1644] Building CXX object src/platformsupport/fbconvenience/CMakeFiles/FbSupportPrivate.dir/cmake_pch.hxx.gch
+[898/1644] Running AUTOMOC file extraction for target XcbQpaPrivate
+[899/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlindex.cpp.o
+[900/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlquery.cpp.o
+[901/1644] Building CXX object src/platformsupport/input/CMakeFiles/InputSupportPrivate.dir/cmake_pch.hxx.gch
+[902/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlrecord.cpp.o
+[903/1644] Building CXX object src/network/CMakeFiles/Network.dir/cmake_pch.hxx.gch
+[904/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/models/qsqlrelationaldelegate.cpp.o
+[905/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/kernel/qsqlresult.cpp.o
+[906/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/models/qsqlquerymodel.cpp.o
+[907/1644] Building CXX object src/network/CMakeFiles/Network.dir/Network_autogen/mocs_compilation.cpp.o
+[908/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/models/qsqltablemodel.cpp.o
+[909/1644] Automatic MOC and UIC for target Widgets
+AutoUic: Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[910/1644] Building CXX object src/sql/CMakeFiles/Sql.dir/models/qsqlrelationaltablemodel.cpp.o
+[911/1644] Running AUTOMOC file extraction for target Widgets
+[912/1644] Running moc --collect-json for target Widgets
+[913/1644] Running rcc for resource qstyle1
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[914/1644] Running rcc for resource qstyle
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[915/1644] Running rcc for resource qstyle_fusion
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[916/1644] Running rcc for resource qmessagebox
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+[917/1644] Generating prl file for target Widgets
+[918/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qabstractnetworkcache.cpp.o
+[919/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhstspolicy.cpp.o
+[920/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhsts.cpp.o
+[921/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccessauthenticationmanager.cpp.o
+[922/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccesscache.cpp.o
+[923/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccesscachebackend.cpp.o
+[924/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccessbackend.cpp.o
+[925/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccessfilebackend.cpp.o
+[926/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkcookiejar.cpp.o
+[927/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkcookie.cpp.o
+[928/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkaccessmanager.cpp.o
+[929/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkfile.cpp.o
+[930/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/cmake_pch.hxx.gch
+[931/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpheaderparser.cpp.o
+[932/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpheadershelper.cpp.o
+[933/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkreplydataimpl.cpp.o
+[934/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkreply.cpp.o
+[935/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpheaders.cpp.o
+[936/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkreplyfileimpl.cpp.o
+[937/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkreplyimpl.cpp.o
+[938/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qauthenticator.cpp.o
+[939/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qhostaddress.cpp.o
+[940/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkdatagram.cpp.o
+[941/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkrequest.cpp.o
+[942/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qhostinfo.cpp.o
+[943/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkinformation.cpp.o
+[944/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkinterface.cpp.o
+[945/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkproxy.cpp.o
+[946/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qabstractsocketengine.cpp.o
+[947/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qnativesocketengine.cpp.o
+[948/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qabstractsocket.cpp.o
+[949/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qtcpserver.cpp.o
+[950/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qtcpsocket.cpp.o
+[951/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qpassworddigestor.cpp.o
+[952/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qudpsocket.cpp.o
+[953/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qssl.cpp.o
+[954/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslcertificateextension.cpp.o
+[955/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslcertificate.cpp.o
+[956/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhstsstore.cpp.o
+[957/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkdiskcache.cpp.o
+[958/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/bitstreams.cpp.o
+[959/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qtlsbackend.cpp.o
+[960/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/hpack.cpp.o
+[961/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/http2frames.cpp.o
+[962/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/hpacktable.cpp.o
+[963/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/http2protocol.cpp.o
+[964/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/http2streams.cpp.o
+[965/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/http2/huffman.cpp.o
+[966/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qabstractprotocolhandler.cpp.o
+[967/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qdecompresshelper.cpp.o
+[968/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttp1configuration.cpp.o
+[969/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qformdatabuilder.cpp.o
+[970/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttp2configuration.cpp.o
+[971/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpmultipart.cpp.o
+[972/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpnetworkconnection.cpp.o
+[973/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttp2protocolhandler.cpp.o
+[974/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpnetworkheader.cpp.o
+[975/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttp2connection.cpp.o
+[976/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpnetworkconnectionchannel.cpp.o
+[977/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpnetworkrequest.cpp.o
+[978/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpprotocolhandler.cpp.o
+[979/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpnetworkreply.cpp.o
+[980/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qhttpthreaddelegate.cpp.o
+[981/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkrequestfactory.cpp.o
+[982/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qrestaccessmanager.cpp.o
+[983/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qrestreply.cpp.o
+[984/1644] Building C object src/network/CMakeFiles/Network.dir/__/3rdparty/libpsl/src/lookup_string_in_fixed_set.c.o
+[985/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qtldurl.cpp.o
+[986/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qhttpsocketengine.cpp.o
+[987/1644] Building CXX object src/network/CMakeFiles/Network.dir/access/qnetworkreplyhttpimpl.cpp.o
+[988/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qhostinfo_unix.cpp.o
+[989/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qnativesocketengine_unix.cpp.o
+[990/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkinterface_linux.cpp.o
+[991/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qdnslookup_dummy.cpp.o
+[992/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qnetworkproxy_generic.cpp.o
+[993/1644] Building CXX object src/network/CMakeFiles/Network.dir/kernel/qdnslookup.cpp.o
+[994/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qlocalserver.cpp.o
+[995/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qlocalsocket.cpp.o
+[996/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qlocalserver_unix.cpp.o
+[997/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qsocks5socketengine.cpp.o
+[998/1644] Building CXX object src/network/CMakeFiles/Network.dir/socket/qlocalsocket_unix.cpp.o
+[999/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qocspresponse.cpp.o
+[1000/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslcipher.cpp.o
+[1001/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qssldiffiehellmanparameters.cpp.o
+[1002/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslellipticcurve.cpp.o
+[1003/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslconfiguration.cpp.o
+[1004/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslerror.cpp.o
+[1005/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslpresharedkeyauthenticator.cpp.o
+[1006/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslkey_p.cpp.o
+[1007/1644] Running syncqt.cpp for module: QtXml
+[1008/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/Widgets_autogen/mocs_compilation.cpp.o
+[1009/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qdtls.cpp.o
+[1010/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslserver.cpp.o
+[1011/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/compat/removed_api.cpp.o
+[1012/1644] Building CXX object src/network/CMakeFiles/Network.dir/ssl/qsslsocket.cpp.o
+[1013/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/itemviews/qfileiconprovider.cpp.o
+[1014/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qboxlayout.cpp.o
+[1015/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qgesture.cpp.o
+[1016/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qgridlayout.cpp.o
+[1017/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qgesturerecognizer.cpp.o
+[1018/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qlayoutengine.cpp.o
+[1019/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qapplication.cpp.o
+[1020/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qgesturemanager.cpp.o
+[1021/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qlayout.cpp.o
+[1022/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qlayoutitem.cpp.o
+[1023/1644] Building CXX object src/widgets/CMakeFiles/Widgets.dir/kernel/qsizepolicy.cpp.o

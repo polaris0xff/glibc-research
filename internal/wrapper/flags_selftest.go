@@ -66,9 +66,15 @@ func FlagsSelftest() *selftest.Report {
 		return r
 	}
 	defer os.RemoveAll(rd)
-	if err := os.WriteFile(filepath.Join(rd, "pgb-provider-table.o"), nil, 0o644); err != nil {
-		r.Skip("cannot write into the temporary runtime directory: " + err.Error())
-		return r
+	// ⚠ BOTH generated tables, not one. --wrap-dlopen stats pgb-dlopen-table.o
+	// and --host-dlopen stats pgb-provider-table.o, and each contributes
+	// nothing without its own. Writing only the second made the --wrap-dlopen
+	// axis below report "no" for an option that works.
+	for _, f := range []string{"pgb-provider-table.o", "pgb-dlopen-table.o"} {
+		if err := os.WriteFile(filepath.Join(rd, f), nil, 0o644); err != nil {
+			r.Skip("cannot write into the temporary runtime directory: " + err.Error())
+			return r
+		}
 	}
 
 	joined := func(c *cfg.Config, cxx bool) string {
@@ -141,5 +147,113 @@ func FlagsSelftest() *selftest.Report {
 	r.CheckBool("every link anchors the NSS constructor",
 		strings.Contains(on, "-Wl,-u,pgb_runtime_anchor"), true)
 
+	// --- ⭐ THE AXIS TABLE. T-062 names these five as the axes T-058
+	// identified, and T-058's defect was exactly an option that stopped
+	// changing the flags. Every axis is asserted in BOTH directions against a
+	// marker only that option produces, so an option wired to nothing fails
+	// here rather than three jobs later in a build environment.
+	type axis struct {
+		name   string
+		set    func(*cfg.Config)
+		marker string
+	}
+	for _, a := range []axis{
+		{"--embed-terminfo", func(c *cfg.Config) { c.EmbedTerminfo = true }, "pgb-terminfo.o"},
+		{"--embed-cacert", func(c *cfg.Config) { c.EmbedCacert = true }, "pgb-cacert.o"},
+		{"--embed-locale", func(c *cfg.Config) { c.EmbedLocale = true }, "pgb-locale.o"},
+		{"--wrap-dlopen", func(c *cfg.Config) { c.WrapDlopen = []string{"p=x.o"} }, "--wrap=dlsym"},
+		{"--host-dlopen", func(c *cfg.Config) { c.HostDlopen = true }, "pgb-provider-table.o"},
+	} {
+		c := base()
+		a.set(c)
+		with := joined(c, false)
+		r.CheckBool(a.name+" puts "+a.marker+" on the link line",
+			strings.Contains(with, a.marker), true)
+		r.CheckBool("and without it, "+a.marker+" is absent",
+			strings.Contains(on, a.marker), false)
+	}
+	// ⛔ --wrap-dlopen needs its generated table on disk before it contributes
+	// anything, exactly as --host-dlopen does. Asserted so the axis above
+	// cannot pass against a build that emitted the flags unconditionally.
+	{
+		c := base()
+		c.WrapDlopen = []string{"p=x.o"}
+		bare, err := os.MkdirTemp("", "pgb-flags-bare")
+		if err == nil {
+			defer os.RemoveAll(bare)
+			r.CheckBool("--wrap-dlopen contributes nothing without its table",
+				strings.Contains(strings.Join(LinkFlags(c, bare, false), " "), "--wrap=dlsym"), false)
+		} else {
+			r.Skip("cannot create a second temporary directory: " + err.Error())
+		}
+	}
+
+	// --- the compile side ------------------------------------------------
+	cf := strings.Join(CompileFlags(base()), " ")
+	r.CheckBool("every compile is -fno-plt", strings.Contains(cf, "-fno-plt"), true)
+	r.CheckBool("the baseline is the architecture default",
+		strings.Contains(cf, "-march="+cfg.DefaultBaseline()), true)
+	{
+		c := base()
+		c.ArchBaseline = "x86-64-v3"
+		r.CheckBool("--baseline overrides it",
+			strings.Contains(strings.Join(CompileFlags(c), " "), "-march=x86-64-v3"), true)
+	}
+
+	// --- ⭐ THE WRAPPER DIRECTORY IS KEYED ON THE OPTIONS. T-058's defect in
+	// one assertion: two option sets that produce different flags must not
+	// resolve to one directory, and one option set must be stable.
+	dirFor := func(c *cfg.Config) string { return Dir(c, BuildManifest(c, rd)) }
+	plain, term := base(), base()
+	term.EmbedTerminfo = true
+	r.CheckBool("two option sets key to different wrapper directories",
+		dirFor(plain) != dirFor(term), true)
+	r.CheckBool("and one option set is stable across calls",
+		dirFor(plain) == dirFor(base()), true)
+	// ⚠ The shared directory is `$State/bin`, NOT the same path as either
+	// option-keyed one — the first version of this case asserted it equalled
+	// the --embed-terminfo directory, which is not what the escape hatch does.
+	shared := base()
+	shared.SharedWrappers = true
+	r.Check("PGB_T058_SHARED_WRAPPERS forces the old shared directory back",
+		filepath.Base(dirFor(shared)), "bin")
+	r.CheckBool("and it is NOT one of the option-keyed directories",
+		dirFor(shared) != dirFor(plain) && dirFor(shared) != dirFor(term), true)
+
+	// --- ParsePluginSpec, and what it REFUSES -----------------------------
+	// ⚠ The refusals are the half worth asserting: a spec that parsed to an
+	// empty plugin would generate an empty table and answer dlopen with it.
+	if s, err := ParsePluginSpec("mine=a.o,b.o , c.o"); err != nil {
+		r.Fail("ParsePluginSpec accepts NAME=OBJ,OBJ", err.Error(), "no error")
+	} else {
+		r.Check("ParsePluginSpec keeps the name", s.Name, "mine")
+		r.Check("ParsePluginSpec splits and trims the objects",
+			strings.Join(s.Objects, "|"), "a.o|b.o|c.o")
+	}
+	for _, bad := range []string{"", "noequals", "=a.o", "mine=", "mine= , ,"} {
+		_, err := ParsePluginSpec(bad)
+		r.CheckBool("ParsePluginSpec refuses "+quote(bad), err != nil, true)
+	}
+
+	// --- IsWrapperName, both directions ----------------------------------
+	r.CheckBool("cc is a wrapper name", IsWrapperName("cc"), true)
+	r.CheckBool("gcc is a wrapper name", IsWrapperName("gcc"), true)
+	r.CheckBool("pgb is NOT a wrapper name", IsWrapperName("pgb"), false)
+	r.CheckBool("the empty string is NOT a wrapper name", IsWrapperName(""), false)
+
+	// --- uniqueSorted ----------------------------------------------------
+	r.Check("uniqueSorted deduplicates and orders",
+		strings.Join(uniqueSorted([]string{"b", "a", "b", "c", "a"}), "|"), "a|b|c")
+	r.Check("uniqueSorted on nothing is nothing",
+		strings.Join(uniqueSorted(nil), "|"), "")
+
 	return r
+}
+
+// quote renders a spec for a case name, so an empty one is visible.
+func quote(s string) string {
+	if s == "" {
+		return "the empty string"
+	}
+	return "\"" + s + "\""
 }
