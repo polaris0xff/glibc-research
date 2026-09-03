@@ -1,6 +1,6 @@
 #!/bin/sh
-# 95 - T-066 route B, costed: how much of kdenlive's closure does a `-mini`
-# rebuild force from source?
+# 95 - T-066 route B, costed: how much of a closure does a `-mini` rebuild
+# force from source?  Subject: $PGB_EXP95_ATTR, default kdenlive.
 #
 # ⛔ WHY THIS RUNS BEFORE THE ALLOWLIST. T-066 measured route A's ceiling on
 # 2026-09-03 -- the sweep can prove 6.3% of a bundle's library tree dead, while
@@ -42,13 +42,26 @@
 # SPDX-License-Identifier: MIT
 . "$(cd "$(dirname "$0")" && pwd)/lib.sh"
 
-exp_begin "95 - T-066 route B costed: kdenlive's closure downstream of qtbase and mesa"
+exp_begin "95 - T-066 route B costed: a closure's paths downstream of the -mini seeds"
 
 PGB="$REPO_DIR/pgb"
 [ -x "$PGB" ] || { exp_note "pgb is a build product: run make"; exit 2; }
 
-WORK="${PGB_EXP95_WORK:-/var/tmp/pgb-exp95}"
+# ⭐ THE SUBJECT IS A PARAMETER, because route A's ceiling and route B's cost
+# were first measured on DIFFERENT closures — the ceiling on `mesa-demos`, the
+# cost on `kdenlive` — and T-066 says plainly that two numbers from two
+# closures must not be subtracted from one another. One subject, both routes,
+# is the comparison worth having.
+#
+#   PGB_EXP95_ATTR=mesa-demos sh experiments/95-route-b-cost.sh
+#
+# ⚠ The RESULT file is named after the subject, the way `experiments/86-` names
+# `RESULT.jq.txt` and `RESULT.mpv.txt`: one file per subject, so a second
+# subject does not overwrite the first.
+SUBJECT="${PGB_EXP95_ATTR:-kdenlive}"
+WORK="${PGB_EXP95_WORK:-/var/tmp/pgb-exp95}/$SUBJECT"
 mkdir -p "$WORK" || exit 2
+exp_note "subject              $SUBJECT"
 
 # ⛔ THE SUBJECT IS RESOLVED THE WAY THE BUNDLER RESOLVES IT, not by picking a
 # name out of `nix cache resolve`. `internal/bundle/appimage.go:resolveTarget`
@@ -56,8 +69,8 @@ mkdir -p "$WORK" || exit 2
 # output; `pgb nix cache resolve kdenlive` lists TEN store paths for this
 # package across outputs and evaluations, and choosing among them by hand would
 # measure a closure the bundler never builds.
-ATTR=$("$PGB" nix cache attr kdenlive 2>/dev/null | sed -n 's/^Attr: *//p')
-[ -n "$ATTR" ] || { exp_note "pgb nix cache attr kdenlive answered nothing"; exit 2; }
+ATTR=$("$PGB" nix cache attr "$SUBJECT" 2>/dev/null | sed -n 's/^Attr: *//p')
+[ -n "$ATTR" ] || { exp_note "pgb nix cache attr $SUBJECT answered nothing"; exit 2; }
 exp_note "attribute            $ATTR"
 
 HYDRA="$WORK/hydra.json"
@@ -154,7 +167,13 @@ downstream() { # seeds [listfile] -> "nseed ndown bytes ntotal totalbytes"
 # way round produces a perfectly plausible table. These two say which way the
 # edges point, and they would SWAP if the graph were inverted.
 # ---------------------------------------------------------------------------
-set -- $(downstream "kdenlive")
+# ⛔ THE TOP OF THE CLOSURE IS THE STORE PATH'S OWN NAME, not the subject
+# string. ⚠ Measured the hard way: this line seeded on the literal "kdenlive"
+# and the control FAILED the first time the experiment was run against another
+# subject -- 0 seeds, 0 downstream, "expected 1". That is the control catching
+# an incomplete parameterisation, which is what it is for.
+TOPNAME=${OUTPATH#/nix/store/}; TOPNAME=${TOPNAME#*-}
+set -- $(downstream "$TOPNAME")
 TOP_DOWN=$2; TOTAL=$4; TOTAL_BYTES=$5
 exp_check "control: nothing is downstream of the top but itself" "$TOP_DOWN" 1
 
@@ -218,24 +237,33 @@ exp_note "downstream of the -mini set   $ALL_N paths, $ALL_B B"
 # downstream of qtbase is also downstream of mesa, then cutting qtbase buys no
 # rebuild that cutting mesa does not already force, and the two recipes cost
 # almost the same together as mesa does alone.
+# ⚠ A seed that matches nothing writes no list file, so the comparison is only
+# meaningful when both seeds are present. Saying "n/a" is not the same as
+# saying 0, and a closure without qtbase must not report "qtbase costs nothing
+# mesa does not already cost".
+: > "$WORK/ds-qtbase.txt"; : > "$WORK/ds-mesa.txt"
 downstream "qtbase" "$WORK/ds-qtbase.txt" >/dev/null
 downstream "mesa"   "$WORK/ds-mesa.txt"   >/dev/null
 sort "$WORK/ds-qtbase.txt" -o "$WORK/ds-qtbase.txt"
 sort "$WORK/ds-mesa.txt"   -o "$WORK/ds-mesa.txt"
-QT_ONLY=$(comm -23 "$WORK/ds-qtbase.txt" "$WORK/ds-mesa.txt" | grep -c . || true)
+if [ -s "$WORK/ds-qtbase.txt" ] && [ -s "$WORK/ds-mesa.txt" ]; then
+  QT_ONLY=$(comm -23 "$WORK/ds-qtbase.txt" "$WORK/ds-mesa.txt" | grep -c . || true)
+else
+  QT_ONLY="n/a (one of the two seeds is not in this closure)"
+fi
 exp_note "downstream of qtbase but NOT of mesa: $QT_ONLY"
 
 pct() { awk -v d="$1" -v t="$TOTAL" 'BEGIN{printf "%.1f", 100*d/t}'; }
 
-RESULT="$EXP_OUT/RESULT.txt"
+RESULT="$EXP_OUT/RESULT.$SUBJECT.txt"
 {
-  printf '95 - T-066 route B costed: kdenlive downstream of qtbase and mesa\n\n'
+  printf '95 - T-066 route B costed: %s downstream of the -mini seeds\\n\\n' "$SUBJECT"
   printf 'date: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
   printf 'kernel: %s\n' "$(uname -sr)"
   printf 'attribute: %s\n' "$ATTR"
   printf 'store path: %s\n' "$OUTPATH"
   printf '\n'
-  printf 'THE QUESTION (T-066): how many store paths in kdenlive closure are\n'
+  printf 'THE QUESTION (T-066): how many store paths in this closure are\n'
   printf 'downstream of qtbase and mesa? A nixpkgs store path is the hash of\n'
   printf 'its inputs, so a -mini rebuild of a seed invalidates every path above\n'
   printf 'it and those must be built from source.\n\n'
@@ -246,7 +274,7 @@ RESULT="$EXP_OUT/RESULT.txt"
   printf '%-30s %8s %16s %9s%%\n' 'qtbase + mesa'       "$BOTH_N" "$BOTH_B" "$(pct "$BOTH_N")"
   printf '%-30s %8s %16s %9s%%\n' 'the whole -mini set' "$ALL_N"  "$ALL_B"  "$(pct "$ALL_N")"
   printf '\ncontrols (they SWAP on an inverted graph):\n'
-  printf '  downstream of kdenlive itself   %s   (expected 1)\n' "$TOP_DOWN"
+  printf '  downstream of %s itself   %s   (expected 1)\n' "$TOPNAME" "$TOP_DOWN"
   printf '  downstream of glibc             %s of %s\n' "$GLIBC_DOWN" "$TOTAL"
   printf '\ndownstream of qtbase but NOT of mesa: %s\n' "$QT_ONLY"
   printf '\nLOWER BOUND, and it is stated because the graph is the RUNTIME\n'
@@ -254,7 +282,7 @@ RESULT="$EXP_OUT/RESULT.txt"
   printf 'rebuild along BUILD inputs, of which runtime references are a subset.\n'
   printf 'Every count above is therefore a floor on the rebuild set.\n'
   printf '\nreproduce:\n'
-  printf '  sh experiments/95-route-b-cost.sh\n'
+  printf '  PGB_EXP95_ATTR=%s sh experiments/95-route-b-cost.sh\\n' "$SUBJECT"
 } > "$RESULT"
 printf '\nwrote %s\n' "$RESULT"
 

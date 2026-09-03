@@ -2036,7 +2036,7 @@ full versioned file name.
 
 ### ⭐ 2026-09-03c: ROUTE B IS COSTED, AND IT IS FOUR TIMES CHEAPER THAN THIS ENTRY ASSUMED
 
-`experiments/95-`, `evidence/95-route-b-cost/RESULT.txt`. ⛔ **This entry's own
+`experiments/95-`, `evidence/95-route-b-cost/RESULT.kdenlive.txt`. ⛔ **This entry's own
 words were *"forces a from-source build of every dependent path — the thing
 `pgb nix` exists to avoid"*, and *"cost unknown"*. The cost is now known and
 "every dependent path" is wrong.**
@@ -2093,6 +2093,55 @@ two different closures and must not be subtracted from one another.**
 `pgb bundle appimage kdenlive` stays a one-command operation: one of those 161
 is qtbase itself, and Qt does not build in a minute. That measurement needs a
 rebuild and is the next rung, not this one.
+
+#### ⭐ AND THE SAME MEASUREMENT ON `mesa-demos` — THE SUBJECT ROUTE A's CEILING USED
+
+⛔ **The section above ends by saying the ceiling and these counts are measured
+on two different closures and must not be subtracted from one another. So the
+experiment takes the subject as a parameter now** (`PGB_EXP95_ATTR`, one
+`RESULT.<subject>.txt` each, the way `experiments/86-` does), and the same
+question was put to `mesa-demos`. `evidence/95-route-b-cost/RESULT.mesa-demos.txt`:
+
+    closure   111 paths, 386,416,368 B
+
+| a `-mini` rebuild of | paths from source | bytes | of paths | of bytes |
+|---|---|---|---|---|
+| `mesa` | **2** | 63,939,384 | 1.8% | 16.5% |
+| `icu` | 5 | 154,079,456 | 4.5% | 39.9% |
+| `libxml2` | 6 | 115,215,856 | 5.4% | 29.8% |
+| ⭐ **the whole `--add-common` set** | ⭐ **8** | **156,713,352** | **7.2%** | ⭐ **40.6%** |
+| `qtbase`, `opus`, `gtk3`, `gtk4`, `glycin` | ⚠ **NOT IN THIS CLOSURE** | — | — | — |
+
+⭐ **EIGHT PATHS OF 111, AND THEY CARRY 40.6% OF THE CLOSURE'S BYTES.** That
+asymmetry is the finding: route B's cost is counted in paths and its reach is
+counted in bytes, and on this subject the two are an order of magnitude apart.
+
+⛔ **DO NOT SUBTRACT THE PERCENTAGES FROM ROUTE A's, AND THE DENOMINATORS ARE
+WHY.** Route A's ceiling — 229,150,648 B, 23.3% — is of the **AppDir library
+tree after assembly** (938.8 MiB of files). Route B's 40.6% is of the
+**closure's NarSize** (386.4 MB). Different populations, measured at different
+stages. ⭐ What IS comparable is the shape of each lever on one subject:
+**route B costs 8 of 111 store paths from source**, and route A can only ever
+delete what nothing reaches, which is where its 23.3% ceiling comes from.
+
+⚠ **And a control fired while parameterising this**, which is the reason to
+record it: the "nothing is downstream of the top but itself" case still seeded
+on the literal string `kdenlive`, so against `mesa-demos` it found 0 seeds and
+reported **`= 0, expected 1`**. The seed is the store path's own name now. A
+control that only ever ran against the subject it was written for would have
+gone green and the whole table would have been built on a graph nobody had
+checked the orientation of.
+
+#### ⚠ AND THE `kdenlive` NUMBERS ARE A RE-DERIVATION ON A DIFFERENT BUILD
+
+Re-running the parameterised experiment resolved kdenlive to a **different
+store path** — hydra's `latest-finished` had advanced from
+`rybc03ipfn2fdncwhlp1awh4q56wjd0i` to `syyn0lv03zc71c6z6k12mivaz7qkmhc8`, the
+same version from a later evaluation. ⭐ **Every path count came out
+identical**: 676 in the closure, 78 downstream of qtbase, 85 of mesa. The byte
+totals moved by about 13 KB in 2.9 GB, consistent with a few paths rebuilt.
+⭐ So the structural answer does not depend on which evaluation was current,
+and the counts quoted above are the same on two of them.
 
 ### ⛔ 2026-09-03c: THE CONTROL WAS SHARING CODE WITH THE SUBJECT, AND FIXING THAT FOUND A SECOND ROOT-OF-ITSELF
 

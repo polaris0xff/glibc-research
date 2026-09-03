@@ -1,25 +1,23 @@
-95 - T-066 route B costed: kdenlive downstream of qtbase and mesa
-
-date: 2026-09-03T04:07:30Z
+95 - T-066 route B costed: kdenlive downstream of the -mini seeds\n\ndate: 2026-09-03T06:23:34Z
 kernel: Linux 6.18.44-fc-v24
 attribute: kdePackages.kdenlive
-store path: /nix/store/rybc03ipfn2fdncwhlp1awh4q56wjd0i-kdenlive-26.08.0
+store path: /nix/store/syyn0lv03zc71c6z6k12mivaz7qkmhc8-kdenlive-26.08.0
 
-THE QUESTION (T-066): how many store paths in kdenlive closure are
+THE QUESTION (T-066): how many store paths in this closure are
 downstream of qtbase and mesa? A nixpkgs store path is the hash of
 its inputs, so a -mini rebuild of a seed invalidates every path above
 it and those must be built from source.
 
-closure: 676 paths, 2941485288 B
+closure: 676 paths, 2941498584 B
 
 SEED                              PATHS            BYTES OF CLOSURE
-qtbase                               78        739766064      11.5%
-mesa                                 85        811935576      12.6%
-qtbase + mesa                        85        811935576      12.6%
-the whole -mini set                 161       1675619424      23.8%
+qtbase                               78        739766016      11.5%
+mesa                                 85        811935528      12.6%
+qtbase + mesa                        85        811935528      12.6%
+the whole -mini set                 161       1675619376      23.8%
 
 controls (they SWAP on an inverted graph):
-  downstream of kdenlive itself   1   (expected 1)
+  downstream of kdenlive-26.08.0 itself   1   (expected 1)
   downstream of glibc             635 of 676
 
 downstream of qtbase but NOT of mesa: 0
@@ -30,4 +28,4 @@ rebuild along BUILD inputs, of which runtime references are a subset.
 Every count above is therefore a floor on the rebuild set.
 
 reproduce:
-  sh experiments/95-route-b-cost.sh
+  PGB_EXP95_ATTR=kdenlive sh experiments/95-route-b-cost.sh\n
