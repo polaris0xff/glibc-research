@@ -448,8 +448,24 @@ is **costing route B**, which is where the size actually is.
         path's own name now.
         ⭐ And kdenlive's counts are a RE-DERIVATION: hydra advanced to a
         different store path between runs and 676/78/85 came out identical.
-    B1b ⛔ NEXT: cost route B in WALL CLOCK. One of the 161 is qtbase and Qt
-        does not build in a minute. That needs a rebuild.
+    B1b ⭐ FIRST BOUND TAKEN 2026-09-03c AT NO COST -- the POC suite already
+        builds Qt twice per acceptance run. Whole-POC wall clock (includes
+        fetch, configure, the app build AND the eleven-environment matrix, so
+        the qtbase build alone is strictly less), four cores, two runs:
+          poc/90-qt     reduced Qt (no opengl/icu/openssl/xcb/network/sql)
+                          868 s / 888 s
+          poc/91-qt-xcb the same PLUS xcb, OpenSSL in QtNetwork, QtSql
+                          1,545 s / 1,681 s
+        ⭐ So a Qt with xcb, TLS, network and SQL is UNDER HALF AN HOUR on four
+        cores, twice measured -- the right order of magnitude for the biggest
+        path route B forces, and far from prohibitive.
+        ⛔ AND IT CORRECTS poc/90-qt/run.sh, which prints "building qtbase
+        (this is the long pole: hours, not minutes)". Its own POC finishes in
+        under fifteen minutes including the matrix. ⚠ FIX OWED -- the script
+        was running when this was found and must not be edited mid-run.
+        ⚠ NOT route B's wall clock: neither is nixpkgs' qtbase, and kdenlive
+        also wants qtsvg/qtmultimedia/qtnetworkauth/qtimageformats. A floor on
+        ONE path. The remaining 160 are still unmeasured.
     B2  ⛔ THE ALLOWLIST -- AND 2026-09-03c SAYS THE **PATH**-LEVEL FORM OF IT
         IS THE WRONG GRANULARITY. Two cheap measurements:
           jq       0 of 7 store paths are entirely unreachable. SIX of seven

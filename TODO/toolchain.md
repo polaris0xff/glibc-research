@@ -2094,6 +2094,35 @@ two different closures and must not be subtracted from one another.**
 is qtbase itself, and Qt does not build in a minute. That measurement needs a
 rebuild and is the next rung, not this one.
 
+#### ⭐ B1b's FIRST BOUND, AND IT COST NOTHING: THE POC SUITE ALREADY BUILDS QT
+
+⚠ **Qtbase is the biggest single path of the 161, and this tree builds it twice
+every acceptance run.** Two clean-rebuild runs on 2026-09-03c, four cores,
+`PGB_ENGINE=chroot` — **whole-POC** wall clock, which includes fetching,
+configuring, the application build AND the eleven-environment matrix, so the
+qtbase build alone is strictly less:
+
+| | Qt configuration | run 1 | run 2 |
+|---|---|---|---|
+| `poc/90-qt` | `-static -no-opengl -no-icu -no-openssl -no-xcb -no-feature-network -no-feature-sql -qpa offscreen` | 868 s | **888 s** |
+| ⭐ `poc/91-qt-xcb` | the above **plus** xcb, OpenSSL linked into QtNetwork, QtSql | 1,545 s | **1,681 s** |
+
+⭐ **So a Qt 6.11.1 with xcb, TLS, network and SQL is under half an hour on
+four cores, twice measured.** That is the right order of magnitude for the
+biggest path route B forces, and it is a long way from prohibitive.
+
+⛔ **AND IT CORRECTS THE PROSE IN `poc/90-qt/run.sh`**, which prints
+*"building qtbase (this is the long pole: hours, not minutes)"*. ⚠ Its own POC
+completes in under fifteen minutes including the matrix, and has twice. The
+line is stale and is owed a fix.
+
+⚠ **What these numbers are NOT.** Neither is nixpkgs' qtbase: kdenlive's plan
+wants the full derivation plus `qtsvg`, `qtmultimedia`, `qtnetworkauth` and
+`qtimageformats`, and poc/90's configuration in particular disables most of
+Qt. They are a **floor on one path**, not route B's wall clock — which still
+needs the 161 built. ⭐ But a floor measured twice on the real toolchain beats
+the "Qt does not build in a minute" this entry had.
+
 #### ⭐ AND THE SAME MEASUREMENT ON `mesa-demos` — THE SUBJECT ROUTE A's CEILING USED
 
 ⛔ **The section above ends by saying the ceiling and these counts are measured
