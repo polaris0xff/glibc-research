@@ -30,6 +30,7 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+	"syscall"
 
 	"github.com/polaris0xff/glibc-research/internal/elfx"
 	"github.com/polaris0xff/glibc-research/internal/fail"
@@ -713,13 +714,28 @@ var dotSo = []byte(".so")
 // `libunistring.so.5.2.1` is `{libunistring.so, libunistring.so.5,
 // libunistring.so.5.2.1}`, which is the filename, the SONAME symlink and the
 // development symlink at once, without a rule about version suffixes.
+//
+// ⛔ AND "REAL FILE" IS THE INODE, NOT THE RESOLVED PATH — CORRECTED, AND THE
+// CORRECTION CAME FROM A DISAGREEMENT. The first version keyed the groups on
+// `filepath.EvalSymlinks(p)`, which answers "what path does this name resolve
+// to". That is the same question only while the second name is a SYMLINK.
+// ⚠ A hardlink is not a symlink: it IS the file, `EvalSymlinks` returns it
+// unchanged, and `libhard.so.9` and `libhard.so.9.0.1` — one inode, two
+// names — landed in two different groups. The library was then a ROOT OF
+// ITSELF through the SONAME in its own `.dynstr`, which is exactly the defect
+// this function was written to remove, in the one shape its fixture lacked.
+//
+// ⭐ REACHABLE, not hypothetical: nix optimises its store by hardlinking
+// identical files across store paths, and an AppDir assembled with `cp -al`
+// hardlinks the whole tree. Both are inputs to this sweep.
+//
+// ⭐ HOW IT WAS FOUND: `sonamesMentionedNaive` computes the self-set with
+// `os.SameFile`, which compares device and inode, and the two implementations
+// stopped agreeing. TODO T-066, PROGRESS.md R2.
 func selfKeys(index map[string]string) map[string]map[string]bool {
 	byReal := map[string]map[string]bool{}
 	for k, p := range index {
-		real, err := filepath.EvalSymlinks(p)
-		if err != nil {
-			real = p
-		}
+		real := fileIdentity(p)
 		if byReal[real] == nil {
 			byReal[real] = map[string]bool{}
 		}
@@ -728,16 +744,72 @@ func selfKeys(index map[string]string) map[string]map[string]bool {
 	return byReal
 }
 
-// selfSetFor returns the index keys naming the same file as o.
-func selfSetFor(groups map[string]map[string]bool, o string) map[string]bool {
-	real, err := filepath.EvalSymlinks(o)
-	if err != nil {
-		real = o
+// fileIdentity is a map key that is equal for exactly the paths naming one
+// file. `os.Stat` follows symlinks, so device+inode identifies a file through
+// a symlink AND through a hardlink, which a resolved path string cannot.
+//
+// ⚠ The fallback is the resolved path: a name that cannot be stat'd (a dangling
+// symlink, a file removed under us) still has to group with itself and with
+// nothing else, and its path string does that.
+func fileIdentity(p string) string {
+	if fi, err := os.Stat(p); err == nil {
+		if st, ok := fi.Sys().(*syscall.Stat_t); ok {
+			return fmt.Sprintf("dev:%d ino:%d", st.Dev, st.Ino)
+		}
 	}
-	if s := groups[real]; s != nil {
+	if real, err := filepath.EvalSymlinks(p); err == nil {
+		return "path:" + real
+	}
+	return "path:" + p
+}
+
+// selfSetFor returns the index keys naming the same file as o. It must key the
+// lookup exactly as selfKeys keyed the groups, or every lookup misses.
+func selfSetFor(groups map[string]map[string]bool, o string) map[string]bool {
+	if s := groups[fileIdentity(o)]; s != nil {
 		return s
 	}
 	return map[string]bool{filepath.Base(o): true}
+}
+
+// selfSetNaiveFor is the CONTROL's own answer to "which index keys name the
+// same file as o", and it deliberately shares no code with selfKeys.
+//
+// ⛔ WHY A SECOND IMPLEMENTATION AND NOT THE SHARED HELPER. When the selfKeys
+// fix landed it was applied to the fast scan AND to the naive one that exists
+// to check it, so the two still agreed exactly — but they agreed by calling
+// the same function, and the equivalence assertion could no longer catch a
+// defect inside it. A control that shares the code under test proves the
+// wrapper and nothing else. TODO T-066, and PROGRESS.md's R2.
+//
+// ⭐ THE TWO ARE DIFFERENT INSTRUMENTS, WHICH IS THE POINT. selfKeys resolves
+// PATH STRINGS with filepath.EvalSymlinks and groups on the resolved string.
+// This one asks the KERNEL: os.SameFile compares the device and inode a stat
+// returned. They answer the same question and can only disagree where path
+// resolution and inode identity disagree — which is exactly where a defect in
+// either one lives.
+//
+// ⚠ The contract is selfSetFor's, exactly: the index keys naming the same file
+// as o, or o's own base name when the index names it under no key at all.
+func selfSetNaiveFor(index map[string]string, o string) map[string]bool {
+	self := map[string]bool{}
+	oi, err := os.Stat(o)
+	if err != nil {
+		return map[string]bool{filepath.Base(o): true}
+	}
+	for k, p := range index {
+		pi, err := os.Stat(p)
+		if err != nil {
+			continue
+		}
+		if os.SameFile(oi, pi) {
+			self[k] = true
+		}
+	}
+	if len(self) == 0 {
+		self[filepath.Base(o)] = true
+	}
+	return self
 }
 
 // ⭐ THE CUT REACHES THE STRING SCAN TOO, AND IT HAS TO.
@@ -837,6 +909,11 @@ func sonamesMentionedInObjects(root string, objects []string, index map[string]s
 // every DT_NEEDED still resolving and every gate in this tree green — which is
 // exactly how the libSDL3 miss reached a run. The two implementations are
 // compared on a fixture instead.
+//
+// ⭐ AND IT COMPUTES THE SELF-SET ITSELF, with selfSetNaiveFor, because for one
+// commit it did not: the selfKeys fix was applied to both sides and the
+// equivalence assertion went on passing while proving strictly less. The
+// control now shares no code with the subject on either half of the job.
 func sonamesMentionedNaive(root string, objects []string, index map[string]string, cuts cutSet) []string {
 	needles := make([][]byte, 0, len(index))
 	names := make([]string, 0, len(index))
@@ -848,13 +925,12 @@ func sonamesMentionedNaive(root string, objects []string, index map[string]strin
 		names = append(names, n)
 	}
 	found := map[string]bool{}
-	groups := selfKeys(index)
 	for _, o := range objects {
 		data, err := os.ReadFile(o)
 		if err != nil {
 			continue
 		}
-		self := selfSetFor(groups, o)
+		self := selfSetNaiveFor(index, o)
 		for i, nd := range needles {
 			if self[names[i]] || found[names[i]] || cuts.cut(filepath.Base(o), names[i]) {
 				continue

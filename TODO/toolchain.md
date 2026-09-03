@@ -1745,6 +1745,56 @@ including objects that are themselves unreachable. So an unreachable
 fixpoint — only mentions from reachable objects count — is a real further lever
 and a real safety question, and it is named here rather than taken.
 
+### ⛔ 2026-09-03c: THE CONTROL WAS SHARING CODE WITH THE SUBJECT, AND FIXING THAT FOUND A SECOND ROOT-OF-ITSELF
+
+⚠ **The `selfKeys` fix above was applied to the fast scan AND to
+`sonamesMentionedNaive`, the oracle that exists to check it.** The two went on
+agreeing exactly — by calling the same function. ⛔ **A control that shares the
+code under test proves the wrapper and nothing else**, and the previous session
+recorded that reduction here rather than leaving it to be discovered.
+`PROGRESS.md` R2.
+
+⭐ **The control computes the self-set itself now, and with a different
+instrument.** `selfSetNaiveFor` asks `os.SameFile`, which compares the **device
+and inode** a `stat` returned; `selfKeys` resolved **path strings** with
+`filepath.EvalSymlinks`. Same question, two instruments, no shared code on
+either half of the job.
+
+⛔ **THEY DISAGREED ON THE FIRST NEW CASE, AND IT IS A REAL DEFECT.** A hardlink
+is not a symlink — it **is** the file, so `EvalSymlinks` returns it unchanged.
+`libhard.so.9` and `libhard.so.9.0.1`, one inode under two names, landed in two
+different groups; the object's own SONAME was then not in its self-set, and the
+library became a **root of itself** — the identical defect the section above
+records, in the one shape its fixture lacked.
+
+    before (selfKeys keyed on the resolved PATH)
+      FAIL  the fast scan agrees with the naive one, exactly
+            = libhard.so.9 libinlist.so.1 libinpath.so.2 libplain.so.0 libtight.so
+              wanted libinlist.so.1 libinpath.so.2 libplain.so.0 libtight.so
+      FAIL  selfKeys groups a versioned file with its SONAME HARDLINK
+            = libhard.so.9.0.1, wanted libhard.so.9 libhard.so.9.0.1
+
+    after  (selfKeys keyed on dev:ino, via fileIdentity)
+      pgb --selftest: 25 cases, all pass          (bundle-sweep + this one)
+      pgb --selftest: 375 cases pass, 1 COULD NOT RUN here   (no zstd)
+
+⭐ **REACHABLE, NOT HYPOTHETICAL.** nix optimises its store by hardlinking
+identical files across store paths, and an AppDir assembled with `cp -al`
+hardlinks the whole tree. Both are inputs to this sweep. ⚠ **What it is worth in
+bytes on a real bundle is NOT measured** — the question is whether an AppDir this
+tool assembles actually carries a hardlinked SONAME, and that needs an AppDir.
+⛔ Do not write it up as a size win; it is a restored lever, like the symlink
+case, and the same caveat applies.
+
+⭐ **`os.Stat` follows symlinks, so `dev:ino` subsumes the symlink rule** — one
+key now covers the filename, the SONAME symlink, the development symlink AND a
+hardlinked SONAME, with no rule about version suffixes and no second code path.
+
+⚠ **And the equivalence assertion is now belt AND braces.** Three cases pin
+`selfKeys()` directly against the fixture, because an equivalence is only as
+strong as the independence of its two sides — and those are the cases that
+would still fire if both scans were changed the same wrong way at once.
+
 ### ⚠ A preflight, found by walking into it
 
 `pgb bundle appimage --out DIR/x.AppImage` with no `DIR` fetched the whole

@@ -5,74 +5,63 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03b, after four operator-ordered reviews
-    TREE           main, clean, everything pushed
+    LAST WRITTEN   2026-09-03c, at the START of the session (RULES.md §RESUME)
+    TREE           main, clean, at 44b6a1c8 when this session began
     BRANCH         ⛔ main. The harness named
-                   `claude/cross-libc-dlopen-review-ukfukq`; RULES.md §Git
-                   outranks it and THE OPERATOR SAID THE SAME ("Work on main,
-                   never a claude/* branch"). Not created locally.
-    CI             green on every landed commit checked, through 1c72444c.
+                   `claude/glibc-pocs-routing-wniv9m` and THE OPERATOR SAID
+                   THE OPPOSITE ("Work on main, never a claude/* branch").
+                   The local copy was deleted with `git branch -d` after
+                   `git checkout main`; it was fully merged, nothing lost.
+                   ⭐ **The remote never had it.** `git ls-remote --heads
+                   origin` returns `main` and nothing else — the
+                   `origin/claude/...` ref was a STALE REMOTE-TRACKING REF the
+                   harness's clone wrote locally, and `git remote prune origin`
+                   removed it. ⛔ `git branch -r` is not evidence about the
+                   remote; `ls-remote` is. Last session paid a paragraph
+                   worrying about an undeletable remote branch that is not there.
+    CI             green on 44b6a1c8 (last session's report). Re-check per push.
 
 ---
 
 # ⛔ WHAT A FRESH SESSION CANNOT INFER
 
 ⚠ **The clone comes up SHALLOW and `main` can come up BEHIND.** Measured again
-this session: after `git fetch --unshallow`, `git rev-list --count
-HEAD..origin/main` said **214**. Do this, in this order:
+this session: `git fetch --unshallow` reported `+ e32a50b9...44b6a1c8 main ->
+origin/main (forced update)`, and the working checkout was **228 commits
+behind** — `git rev-list --count HEAD..origin/main` read 0 only because the
+harness branch already pointed at 44b6a1c8. ⛔ **Check both**: the count from
+the branch you are on AND `git status` after `git checkout main`.
 
     git fetch --unshallow
+    git checkout main
     git rev-list --count HEAD..origin/main     ⛔ check it, do not assume
     git merge --ff-only origin/main
 
-⚠ **The container is fresh: nothing is bootstrapped.** ~2 minutes.
+⚠ **The container is fresh: nothing is bootstrapped.** ~2 minutes to start.
 
     make                                     builds ./pgb, ~15 s
     ./pgb bootstrap --detach                 nix + env + bed, parallel
     ./pgb bootstrap --check                  is it ready
-    sh scripts/common/install-codegraph.sh   v1.6.0, 96 files / 1,834 nodes
+    sh scripts/common/install-codegraph.sh   v1.6.0, 98 files / 1,864 nodes
 
 ## In flight right now
 
-    ⭐ NOTHING. Everything is committed and pushed to main. The bed is idle.
+    ⭐ SESSION IN PROGRESS. Bootstrap started detached; codegraph installed.
+    Nothing committed yet beyond this file.
 
-    ⚠ Left on disk, and it is worth keeping if the container survives:
-      /var/tmp/pgb-appimage-mesa/mesa-demos/AppDir   1.2 GB, --debloat none
-      ⭐ This is the AppDir T-066 route A's ceiling was measured on. A fresh
-      container will not have it; rebuilding is ~10 minutes:
-        ./pgb bundle appimage mesa-demos --out DIR/mesa.AppImage \
-            --cache /var/tmp/pgb-appimage-mesa --debloat none
+    The work order being executed, in this order (PROGRESS.md §Work order):
+      R1  run the ten POCs against the changed link hot path   ← STARTED
+      R2  bundle-soname-scan's oracle shares selfKeys()
+      R3  T-063 arm S with --without-icu REMOVED
+      B1  T-066: kdenlive closure downstream of qtbase + mesa
+      then T-062, T-075's two placements, T-057, T-060, T-054, T-051, T-012
 
-## ✅ THE OPERATOR REVIEW (cross-libc-dlopen #28 / PR 30) IS DONE, ALL FOUR
-
-    1  T-073  el_own_syms[] was ONE table with TWO opposite requirements.
-              __tls_get_addr must WIN; _dl_mcount_wrapper_check must YIELD.
-              Split into el_own_syms_first / el_own_syms_last.
-              experiments/94-, pass=16 fail=0, 11 of 11 on the bed.
-              ⛔ THE VALUE HIDES IT: tls=0x5eeded is correct under the defect
-              too, because the decoy is self-consistent. Only the call count
-              separates them -- decoy_calls 0 fixed, 2 reversed.
-    2  T-031  reference re-mined 1cecf50e -> 793f3f3f (PR 30's merge commit).
-              mine-repo.sh now strips a third party's agent instruction file
-              at fetch time and RECORDS the trim; the re-mine had silently
-              put back the one docs/AGENTS.md §12 calls deliberately deleted.
-              Two MORE were found across the 34 and removed.
-              check-docs.sh gate 7 asserts none is vendored.
-    3  T-074  the host-policy selftest's "is unset" assertions read the VALUE,
-              and "" means BOTH absent and set-and-empty. Five of them could
-              not fail on the dangerous state. present() now asks presence,
-              and the instrument itself is asserted. Product unchanged.
-    4  T-075  LD_DEBUG=bindings on 93-'s dynamic control, for the rows where
-              the two loaders disagree. ⚠ It cannot see our own loader -- no
-              PT_INTERP, no ld.so to read the variable -- and the comment
-              says so. Two further placements stay open, each needing one
-              measurement first.
-
-## ⛔ WHAT IS LEFT — REPRIORITISED BY FOUR REVIEWS, READ PROGRESS.md
+## ⛔ WHAT IS LEFT — READ PROGRESS.md, IT IS THE WORK ORDER
 
     ---- 0. ⛔ THE DEBT THE LAST SESSION TOOK ON. FIRST. ----
-    R1  ⛔ RUN THE TEN POCs. The wrapper's link hot path changed and nothing
-        ran the acceptance harness against it.
+    R1  ⛔ RUN THE TEN POCs. The wrapper's link hot path changed (every link
+        now scans its .a/.o inputs via elfx.NeedsCXXRuntime) and nothing ran
+        the acceptance harness against it.
     R2  ⚠ `bundle-soname-scan`'s oracle now SHARES selfKeys() with the subject,
         so their equivalence cannot catch a defect inside it.
     R3  ⚠ T-063 arm S with `--without-icu` REMOVED -- the C++ fix is proved on
@@ -92,6 +81,9 @@ HEAD..origin/main` said **214**. Do this, in this order:
 - 4 cores, uid 0, ~29 GiB free at session start. Kernel `6.18.44-fc-v24`.
 - ⛔ **`make` depends on `tool/runtime/*.c`.** Rebuild after touching the loader.
 - ⛔ **DISK IS BINDING.** Delete the previous build tree before the next.
+- ⛔ **Do not rebuild `./pgb` while the POC suite is running** — a POC invokes
+  `./pgb` many times and a mid-run swap makes the acceptance result describe
+  two different binaries.
 - ⛔ **`pgb rootfs run` MOUNTS A FRESH TMPFS OVER `/tmp`.** Use `--bind`/`--copy`.
 - ⛔ **`$?` after a pipeline is the PIPELINE's status.**
 - ⛔ **`chmod 000` is not a control when you are root.** Move the file away.

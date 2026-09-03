@@ -327,11 +327,16 @@ is **costing route B**, which is where the size actually is.
         not ten real projects on eleven environments.
           for p in poc/*/run.sh; do sh "$p" > /tmp/$(basename $(dirname $p)).log 2>&1; done
         ⚠ Budget ~30 min for the first (OpenSSL + CPython build).
-    R2  ⚠ RESTORE WHAT `bundle-soname-scan` PROVED. The fast scan and its
-        naive oracle now SHARE selfKeys(), so their equivalence can no longer
-        catch a defect inside it. Either give the oracle its own
-        implementation of the self-set, or add cases that pin selfKeys()
-        directly against a fixture with a SONAME symlink.
+        ⏳ 2026-09-03c IN FLIGHT — PGB_ENGINE=chroot, matching the engine every
+        committed RESULT.txt names.
+    R2  ✅ DONE 2026-09-03c, AND IT FOUND A SECOND ROOT-OF-ITSELF.
+        `sonamesMentionedNaive` computes the self-set itself now, with
+        `os.SameFile` (device+inode) against `selfKeys`'s path-string
+        resolution — two instruments, no shared code. ⛔ They disagreed on the
+        first new case: a HARDLINKED SONAME. `EvalSymlinks` cannot see through
+        a hardlink, so one inode under two names landed in two groups and the
+        library became a root of itself. `selfKeys` keys on `dev:ino` now.
+        Three cases pin `selfKeys()` directly as well. T-066.
     R3  ⚠ T-063 arm S with `--without-icu` REMOVED. The C++-archive fix is
         proved on a synthetic subject; postgres is the real one.
 

@@ -20,6 +20,7 @@ package bundle
 import (
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/polaris0xff/glibc-research/internal/selftest"
@@ -86,6 +87,15 @@ func SonameScanSelftest() *selftest.Report {
 		// ⚠ Mentions its own name only: the rule is that an object naming
 		// itself is not evidence anything loads it.
 		"libself.so.3": "\x00libself.so.3\x00",
+		// ⛔ THE SAME SHAPE AGAIN, BUT THE SECOND NAME IS A HARDLINK. See the
+		// os.Link below: nix optimises its store by hardlinking identical
+		// files, and an AppDir assembled with `cp -al` hardlinks everything, so
+		// a bundle reaching this scan can carry a SONAME that is a hardlink
+		// rather than a symlink. `filepath.EvalSymlinks` cannot see through
+		// one — a hardlink is not a symlink, it IS the file — so the two names
+		// land in different selfKeys groups and the library becomes a root of
+		// itself, which is precisely the defect the symlink case above records.
+		"libhard.so.9.0.1": "\x00libhard.so.9\x00",
 		// ⛔ THE CASE THIS FIXTURE DID NOT HAVE, AND IT IS THE ORDINARY ONE.
 		// `libself.so.3` is a file whose NAME equals its SONAME, which is not
 		// what a real library looks like: `libunistring.so.5.2.1` carries
@@ -123,6 +133,18 @@ func SonameScanSelftest() *selftest.Report {
 	}
 	index["libversioned.so.7"] = filepath.Join(lib, "libversioned.so.7")
 
+	// ⭐ THE SAME RELATIONSHIP, EXPRESSED AS A HARDLINK. `libhard.so.9` and
+	// `libhard.so.9.0.1` are one inode under two names, and no symlink resolves
+	// between them.
+	if err := os.Link(filepath.Join(lib, "libhard.so.9.0.1"),
+		filepath.Join(lib, "libhard.so.9")); err != nil {
+		// ⚠ An absence is not a zero: a filesystem that refuses hardlinks
+		// leaves the case unmeasured rather than passed.
+		r.Skip("os.Link for the hardlinked SONAME: " + err.Error())
+	} else {
+		index["libhard.so.9"] = filepath.Join(lib, "libhard.so.9")
+	}
+
 	fast := sonamesMentionedInObjects(dir, paths, index, nil)
 	slow := sonamesMentionedNaive(dir, paths, index, nil)
 
@@ -158,5 +180,37 @@ func SonameScanSelftest() *selftest.Report {
 		got["libversioned.so.7"], false)
 	r.CheckBool("...nor under its own file name", got["libversioned.so.7.1.2"], false)
 	r.CheckBool("a library nothing mentions is not a root", got["libunmentioned.so.4"], false)
+
+	// ⭐ selfKeys() PINNED DIRECTLY, not through what it happens to make the
+	// two scans do.
+	//
+	// ⛔ WHY, AND IT IS THE OTHER HALF OF R2. The assertion above is an
+	// EQUIVALENCE, so it is only as strong as the independence of its two
+	// sides — and for one commit there was none, because the selfKeys fix was
+	// applied to the subject and to the control together. selfSetNaiveFor now
+	// restores that independence; these cases are the belt to its braces, and
+	// they are the ones that would still fire if both scans were changed the
+	// same wrong way at once.
+	group := func(name string) string {
+		keys := selfSetFor(selfKeys(index), filepath.Join(lib, name))
+		var out []string
+		for k := range keys {
+			out = append(out, k)
+		}
+		sort.Strings(out)
+		return strings.Join(out, " ")
+	}
+	r.Check("selfKeys groups a versioned file with its SONAME symlink",
+		group("libversioned.so.7.1.2"), "libversioned.so.7 libversioned.so.7.1.2")
+	r.Check("...and reaches the same group from the symlink",
+		group("libversioned.so.7"), "libversioned.so.7 libversioned.so.7.1.2")
+	r.Check("selfKeys leaves an unrelated library in a group of its own",
+		group("libself.so.3"), "libself.so.3")
+	if index["libhard.so.9"] != "" {
+		// ⛔ THE CASE THAT DISAGREED. Recorded as an assertion so it stays
+		// disagreed-about if the grouping ever goes back to path strings.
+		r.Check("selfKeys groups a versioned file with its SONAME HARDLINK",
+			group("libhard.so.9.0.1"), "libhard.so.9 libhard.so.9.0.1")
+	}
 	return r
 }
