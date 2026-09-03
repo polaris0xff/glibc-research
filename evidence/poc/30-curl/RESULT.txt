@@ -6,7 +6,7 @@ version       : 8.11.0
 sha256        : 264537d90e58d2b09dddc50944baf3c38e7089151c8986715e2aaeaaf2b8118f
 normal build  : ./configure --with-openssl && make
 stresses      : getaddrinfo/NSS, DNS, TLS, CA bundle data, 3-package dependency chain
-date (UTC)    : 2026-09-03T06:48:46Z
+date (UTC)    : 2026-09-03T09:49:01Z
 evidence      : /home/user/glibc-research/evidence/poc/30-curl
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
@@ -31,7 +31,7 @@ build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
   ok    alpine-3.22: functional test                 = ok
     alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
   ok    alpine-3.20: functional test                 = ok
-    alpine-3.10          musl   ok         none                         none
+    alpine-3.10          musl   ok         none                         /etc/nsswitch.conf 
   ok    alpine-3.10: functional test                 = ok
     voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
   ok    voidlinux-musl: functional test              = ok

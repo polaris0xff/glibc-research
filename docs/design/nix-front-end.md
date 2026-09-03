@@ -63,12 +63,18 @@ for hypothetical ones; the rule is only that nix-specific facts stay on the
 nix side of the line.
 
 ⭐ **And it settles the shape of the static-nix work** (T-051 step 2, T-060):
-the answer the operator expects is *not* "find a static nix" — measured
-2026-09-03c, nixpkgs ships none — but **build and publish one**, from a mix of
-the existing techniques, iterated. The reading list for that is
-`references/DavHau__nix-portable`, `references/nixie-dev__nixie` and
-`references/containerbase__nix-prebuild`, all mined 2026-09-03c and all named
-by the operator for exactly this.
+the answer the operator expects is *not* "find a static nix" but **build and
+publish one**, from a mix of the existing techniques, iterated.
+
+⚠ **THE THREE REFERENCES WERE READ THE SAME DAY AND THEY CORRECT THIS
+PARAGRAPH.** "nixpkgs ships none" is true and answers the wrong question: the
+**nix flake** publishes `nix-cli-static` (`nix-static` before nix 2.26.0), and
+`nix-portable`, `nixie` and `containerbase/nix-prebuild` all consume it. ⚠ It
+is `pkgsStatic`, i.e. musl — inferred, unmeasured, and three commands to check.
+⭐ **So "enough nix on a minimal host" (T-051) is answerable by fetching a
+published binary, and only "a static-GLIBC nix produced by pgb" (T-060) needs
+building.** Those two entries have been treated as one and they are not.
+[`../research/portable-nix.md`](../research/portable-nix.md) finding 1.
 
 ## The two shapes, both from `pkgforge/soarpkgs`
 
@@ -88,7 +94,17 @@ alone, and checking it is the first thing the mining should do.
 
 ⚠ **The operator names one thing to avoid**: *"we would have to avoid all the
 complex patching for desktop files etc, there must be a way to automatically
-get these."* ⭐ Finding that way is an open question, below.
+get these."*
+
+⭐ **ANSWERED 2026-09-03c, by reading `xplshn/pelf`'s tracker rather than by
+inventing anything.** An AppImage packager, answering the pelf maintainer in
+issue #3: *"Any appimage made with `linuxdeploy` or `appimagetool` or
+`go-appimagetool` (aka 99.99% of appimages) will have a `.DirIcon` file in the
+top level of the appimage. Sometimes that file is a symlink and one has to be
+careful when extracting it. … Same applies for the `.desktop`."* So the way is
+**convention, not patching**: lift `.DirIcon` and `*.desktop` from the AppDir
+top level, guarding the symlink case.
+[`../research/portable-nix-mechanisms.md`](../research/portable-nix-mechanisms.md) §5.
 
 ## ⛔ Not installing nix is now the interesting part
 

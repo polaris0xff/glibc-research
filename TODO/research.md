@@ -81,11 +81,22 @@ differently under the operator's ruling of 2026-09-03c:
    through it.**
 5. **Nothing is measured against a hand-built Anylinux AppImage for a GUI
    subject.** `experiments/90-` does it for kdenlive; T-055 owns that.
-6. ⭐ **An unread reference, named by the operator 2026-09-03c** —
-   [`xplshn/pelf`](../references/xplshn__pelf/PROVENANCE.md), commit
-   `d3cb5c7be01ae6a672fe480a117bb84cc65fc438`, mined the same day: *"for our
-   bundle related tooling, this reference is maybe worth a study"*. ⚠ Three
-   passes and the two write-ups are owed, ⛔ **not delegated to a sub-agent**.
+6. ⭐ **`xplshn/pelf` IS READ, 2026-09-03c** — findings in
+   [`../docs/research/portable-nix.md`](../docs/research/portable-nix.md),
+   mechanisms at file and line in
+   [`../docs/research/portable-nix-mechanisms.md`](../docs/research/portable-nix-mechanisms.md).
+   ⭐ **It is the closest thing in the corpus to our own bundler**: a Go
+   program producing dwarfs/squashfs single-file bundles, and it claims faster
+   startup than AppImage — which is the axis the operator just made binding.
+   ⛔ **Nobody has run it here.** Three things it has and we do not:
+   - a **size-thresholded startup policy** — mount below 350 MB, EXTRACT
+     above it. Our kdenlive bundle is 398 MB; the competitor's is 192 MB;
+   - the parsed runtime config cached in an **extended attribute on the
+     artefact itself**, so later starts skip re-parsing the ELF;
+   - **live-mount reuse** across invocations, exposed as `REUSE_INSTANCES`.
+7. ⭐ **AND IT ANSWERS AN OPERATOR OPEN QUESTION ABOUT `.desktop` FILES** —
+   `.DirIcon` and `*.desktop` sit at the AppDir top level in 99.99% of
+   AppImages, so they can be lifted rather than authored. `design/nix-front-end.md`.
 
 **Prove.** `evidence/86-bundler-vs-anylinux/RESULT.jq.txt` and
 `RESULT.mpv.txt` — the same application both ways, on all eleven, with size,

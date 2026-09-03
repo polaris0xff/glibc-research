@@ -96,29 +96,39 @@ cached. It did not remove it from the cases T-050 lists as out of reach.
 
 **What is left.**
 
-1. ⛔ **There is no static nix to fetch** — measured 2026-09-03c; nixpkgs
-   ships none, and seven of `nix`'s eleven `DT_NEEDED` are its own component
-   libraries, which is T-060 rung 1. ⭐ **The operator's answer is to BUILD
-   one**: *"implement a mix of existing techniques by iterating/improving
-   them and publishing a 'static' nix ourself"*.
-2. ⚠ **The `--store` half is unmeasured.** The fetched closure is
-   self-contained (all 11 `DT_NEEDED` resolve inside its 64 paths); whether
-   that nix will operate a store under `$HOME` needs a rootfs, because this
-   build host has nix installed.
+1. ⛔ **"There is no static nix to fetch" — CORRECTED 2026-09-03c BY READING
+   THE REFERENCES.** nixpkgs ships none; ⭐ **the NIX FLAKE DOES**, and three
+   projects consume it. The attribute is `nix-static` before nix 2.26.0 and
+   **`nix-cli-static`** from 2.26.0 on — `containerbase/nix-prebuild` carries
+   the boundary in production code. ⚠ **It is built through `pkgsStatic`,
+   which is musl** — inferred, not measured, and ⛔ **checking it is the first
+   thing this entry should do** (`readelf -lW`, three commands, in
+   [`../docs/research/portable-nix-mechanisms.md`](../docs/research/portable-nix-mechanisms.md) §1).
+   ⭐ **So T-051 and T-060 are NOT the same work**: a musl static nix serves
+   "enough nix on a minimal host"; only T-060 needs a glibc one.
+2. ⛔ **THE `--store` HALF IS NO LONGER UNMEASURED — SOMEBODY ELSE MEASURED IT
+   AND IT FAILS.** `nix-portable` has shipped `nix --store` as its
+   **first-choice** runtime since 2021. Its issue **#98**, nine comments,
+   three independent reporters: `error: setting up a private mount namespace:
+   Operation not permitted` on **Arch, Debian 11 and Debian 12**, on systems
+   where user namespaces demonstrably work and `bwrap` succeeds.
+   ⛔ **And its probe is a FALSE POSITIVE** — it builds a trivial derivation,
+   passes, and the real workload then fails. ⭐ **A probe must use the
+   workload, not a token.** So step 2 as written is not a route to "works on
+   a minimal host"; the FALLBACK CHAIN is — `nix --store → bwrap → proot`,
+   each probed, the answer cached.
 3. `nix-user-chroot` where namespaces are available, with the AppArmor case
    detected and named rather than hit.
 
 ⛔ **Not `curl | sh` as root.**
 
-**Reading owed** — named by the operator 2026-09-03c, all three mined the same
-day, three passes each and the two write-ups, ⛔ **not delegated to a
-sub-agent** ([`../docs/methodology/references.md`](../docs/methodology/references.md)):
-
-| reference | commit |
-|---|---|
-| [`DavHau/nix-portable`](../references/DavHau__nix-portable/PROVENANCE.md) | `91122e3d94ba51d7d83fe990fa81d3de0968fb32` |
-| [`nixie-dev/nixie`](../references/nixie-dev__nixie/PROVENANCE.md) | `d14c6c370489ec13b24d65df569e7769444ebebf` |
-| [`containerbase/nix-prebuild`](../references/containerbase__nix-prebuild/PROVENANCE.md) | `9302079d1cb625307f195273cee4632648ecbaec` |
+⭐ **THE READING IS DONE, 2026-09-03c.** All three references named by the
+operator were mined and read — findings in
+[`../docs/research/portable-nix.md`](../docs/research/portable-nix.md), the
+mechanisms with their file-and-line citations in
+[`../docs/research/portable-nix-mechanisms.md`](../docs/research/portable-nix-mechanisms.md).
+⚠ **Nothing in that sweep was RUN**, and it says so: items 1 and 2 above are
+readings, and each names the probe that would settle it.
 
 **Prove.** `pgb nix plan` and `pgb nix build` on a rootfs with no nix, no
 root and no compiler.
@@ -151,12 +161,35 @@ index attributes (`nix-cli` → no attribute; `nix` is an aggregator whose 7
 buildInputs are test-runs), but they ARE reachable — `pgb nix plan nix`
 fetches 27 derivations and 24 nix components land in the `.drv` store.
 
+⭐ **AND THE SWEEP OF 2026-09-03c EXPLAINS WHY, WHICH NARROWS THE WORK.**
+`nix-cli` is not a nixpkgs attribute because it is an attribute of the **nix
+flake**, and that flake publishes **`nix-cli-static`** (`nix-static` before nix
+2.26.0) — consumed by `nix-portable`, `nixie` and `containerbase/nix-prebuild`
+alike. ⚠ Built through `pkgsStatic`, i.e. **musl**, which is exactly the half
+this entry does not want; ⛔ **that is inferred and unmeasured, and checking it
+is three commands** ([`../docs/research/portable-nix-mechanisms.md`](../docs/research/portable-nix-mechanisms.md) §1).
+⭐ So the target has a NAME and a BUILD RECIPE now: rung 1 is
+`nix-cli-static`'s dependency closure, built glibc-static by `pgb` rather than
+musl-static by `pkgsStatic`.
+
+⚠ **AND THE OPERATOR'S NAMED SHAPE HAS A PROBLEM WORTH KNOWING.** `nixie` is
+"the shape the operator named", and its entire premise is nix's own
+local-store sandbox — the mechanism `nix-portable`'s issue #98 documents
+FAILING on Arch, Debian 11 and Debian 12, with a probe that passes first.
+`nixie` is also alpha by its own README and its Linux patch sets are empty.
+⭐ **What it IS still worth**: it is the only reference in the corpus that
+builds nix from source with patches rather than consuming a release, which is
+what rung 1 has to do. `docs/research/portable-nix.md` finding 3.
+
 ⚠ **Named risks:** boost, libgit2, libarchive, lowdown, editline, sqlite,
 curl+openssl, libsodium, brotli, toml11 and the AWS CRT. Any one can refuse
 `-static` the way MLT's `add_library(mlt SHARED)` did.
 
 ⭐ **And the operator has said what the answer looks like** — not "find a static
-nix" but publish one; see T-051's reading list, which is this entry's too.
+nix" but publish one. ⭐ **The reading is DONE** (2026-09-03c):
+[`../docs/research/portable-nix.md`](../docs/research/portable-nix.md) and its
+[mechanisms page](../docs/research/portable-nix-mechanisms.md). ⚠ Nothing in it
+was run.
 
 **Prove.** `evidence/89-static-nix/RESULT.txt`: the rung reached, with the
 dependency-by-dependency table and what stopped each one it could not build.
@@ -220,6 +253,13 @@ slower on every run — the magnitude does not.
    seven it drops.
 5. ⭐ **The `--fixpoint` lever landed as a measuring device**, not yet as a
    default.
+6. ⭐ **A LEVER WE DO NOT HAVE AT ALL, from the 2026-09-03c sweep**:
+   `xplshn/pelf` chooses **extraction over FUSE mounting above 350 MB**
+   (`appbundle-runtime.go:764`, mode 3). ⛔ **Our kdenlive bundle is 398 MB and
+   the competitor's is 192 MB** — one either side of somebody else's
+   production threshold, which is independent corroboration of the hypothesis
+   in step 0's N2. ⚠ It is a default in one project, not a benchmark.
+   [`../docs/research/portable-nix-mechanisms.md`](../docs/research/portable-nix-mechanisms.md) §3.
 
 **Prove.** A CLI subject bundled by one command, with startup and run time
 **under** the field's on the same machine on the same day, and the eleven-row

@@ -15,9 +15,9 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
                    evidence about the remote; `ls-remote` is.
     CI             ⭐ GREEN on every completed run this session (checked with
                    the GitHub API, not assumed). Re-check per push.
-    SELFTESTS      540 pass, 1 could not run (no zstd)
-    ACCEPTANCE     ⭐ the ten POCs, twice clean-rebuilt and green; a THIRD run
-                   with both toolchain fixes — see "In flight".
+    SELFTESTS      546 pass, 1 could not run (no zstd)
+    ACCEPTANCE     ⭐ the ten POCs, THREE clean-rebuilt green runs; a FOURTH is
+                   in flight against the separated-`-l` fix — see below.
 
 ---
 
@@ -62,26 +62,28 @@ status says; 4c: no id has two entries). Closing an entry means **moving** it.
 > multiline shell script"* — operator, 2026-09-03c
 
 ⛔ Size is struck. ⭐ One-command packaging is a win we already have. ⛔ Speed
-is the failure: kdenlive cold start **300 ms** against **61 ms**, render
-**4,947** against **2,033 ms**. ⚠ **Every byte lever is now un-scored** until
-re-measured in milliseconds. `docs/design/toolchain.md` carries the amendment.
+is the failure — and ⚠ **deep review 1 found the timing half of the record does
+not re-derive**: `90-` takes ONE SAMPLE per arm, its published numbers come
+from a superseded version of the evidence file it cites, four runs give
+cold-start ratios of 2.52×, 3.48×, 4.92× and 5.02×, and warm exceeds cold in
+two of them. ⭐ **Every run agrees on the DIRECTION — we are slower.** The one
+figure that re-derives is `jq`: **139 vs 67 ms cold (2.07×)**, eleven
+environments, mean of five. `corrections.md` C23; fix the instrument (N0)
+before measuring anything with it.
 
 ## In flight right now
 
-    ⏳ `sh poc/run-all.sh --rebuild` with BOTH toolchain fixes — RUNNING.
-       log: <scratchpad>/runall2.log
+    ⏳ `sh poc/run-all.sh --rebuild` — the FOURTH acceptance run, against deep
+       review 4's separated-`-l` fix and the new --embed-tzdata objects.
+       log: <scratchpad>/runall3.log
        ⛔ NOTHING ELSE MAY TOUCH pgb-env-debian13 WHILE IT RUNS, and ⛔ DO NOT
        REBUILD ./pgb — a mid-run swap makes the result describe two binaries.
-       ⭐ THE EXPECTED RESULT IS "NO CHANGE", pre-registered before the run:
-       the proc fix fires only when `cmd.Env` is non-nil AND argv[0] has no
-       separator, and every POC reaches proc as `build -- /bin/sh -c "…"`.
-       ⭐ NINE OF TEN GREEN at the last check (91-qt-xcb still running):
-         10:13  20:13  30:13  40:13  50:13  60:13  70:21  80:22  90:21
-
-    ⛔ SMALL AND OWED: `poc/90-qt/run.sh` prints "building qtbase (this is the
-    long pole: hours, not minutes)". Measured three times now at 868/888/873 s
-    for the WHOLE POC including the eleven-environment matrix. The line is
-    stale; it must not be edited while the script is running.
+       ⭐ EXPECTED "NO CHANGE", pre-registered: the `-l` fix only ADDS
+       candidates for a spelling that previously produced none, and no POC
+       emits the separated form. 60-leveldb (C++) and 40-jq (C) were already
+       re-built clean and green against it, 13/13 each.
+       ⚠ THE THIRD RUN WAS TEN OF TEN, 170 assertions, fail=0 skip=0:
+         10:13 20:13 30:13 40:13 50:13 60:13 70:21 80:22 90:21 91:28
 
 ## ⛔ WHAT IS LEFT — READ PROGRESS.md, IT IS THE WORK ORDER
 
@@ -92,27 +94,27 @@ The operator scoped the remaining session and the next one:
 > there still are some, else focus the next session entirely on optimizing the
 > nix bundler as much as possible"*
 
-    THIS SESSION   ✅ rulings recorded  ✅ TODO stripped  ⚠ four deep reviews
-                   ⚠ the remaining glibc quirks (REQUIREMENTS.md: 8 of 9
-                   closed, 1 open — and the question is whether the list of
-                   NINE is still complete, not whether the eight are green)
+    THIS SESSION   ✅ rulings recorded  ✅ TODO stripped  ✅ SIX deep reviews
+                   ✅ THE GLIBC QUIRKS: the list of nine was NOT complete. A
+                   TENTH — the timezone database — was found and CLOSED the
+                   same day (`--embed-tzdata`, 11 of 11, 193 KB for 20 zones).
+                   REQUIREMENTS.md now reads NINE OF TEN closed, ONE open.
     NEXT SESSION   ⛔ THE BUNDLER, ON THE CLOCK. PROGRESS.md N1–N6.
                    ⭐ N1 is not optional and N2 is the hypothesis to test
                    first: is the size column the time column, or not?
 
-⭐ **Four references were named by the operator on 2026-09-03c, all mined that
-day and ALL UNREAD.** Reading is owed under `docs/methodology/references.md` —
-three passes each, the two write-up files, ⛔ **not delegated to a sub-agent**:
+⭐ **The four references the operator named on 2026-09-03c were mined AND READ
+that day.** [`../docs/research/portable-nix.md`](../docs/research/portable-nix.md)
+carries the findings; `portable-nix-mechanisms.md` beside it carries the usable
+half at file and line. ⛔ **Nothing in that sweep was RUN**, and it names three
+probes that would settle its riskiest claims — start there, not with a re-read.
 
-    references/DavHau__nix-portable          91122e3d  static nix
-    references/nixie-dev__nixie              d14c6c37  static nix
-    references/containerbase__nix-prebuild   9302079d  static nix
-    references/xplshn__pelf                  d3cb5c7b  the bundler
-
-⚠ **And the operator's framing for them**: *"we will have multiple backends,
-nix just being one of them"*, and a static nix is something we **publish**
-ourselves from a mix of existing techniques — not something to go looking for.
-Measured 2026-09-03c: nixpkgs ships none.
+⚠ **Two of its findings correct things this project had written down:**
+`nix-cli-static` is an attribute of the **nix flake**, not of nixpkgs, so
+"there is no static nix to fetch" was answering the wrong question; and
+`nix --store` under `$HOME` — T-051's step 2 — is `nix-portable`'s
+**first-choice** runtime and **fails on Arch, Debian 11 and Debian 12**, with a
+probe that passes first.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 

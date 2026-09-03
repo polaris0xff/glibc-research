@@ -95,12 +95,45 @@ the two disagree, say which one you are measuring against.
           2 ✅ what did the change stop measuring
               -> four open entries lost the pointer to their own detail;
                  fixed, and check.sh 4d now enforces it
-          3 ⚠ what was deferred
-          4 ⚠ is the code right
-          5 ⚠ (added) the instruments: does each one still measure what its
-                own comment says
-          6 ⚠ (added) the claims nobody has attacked, the way the timezone
-                row was found
+          3 ✅ what was deferred — the list is below, and it is short because
+                three of its items were converted into deliveries instead
+          4 ✅ is the code right
+              -> cxxCandidates skipped the SEPARATED `-l namespec`; R3's fix
+                 went halfway. Proved red, fixed, both spellings on one
+                 resolver, validated on 60-leveldb and 40-jq
+          5 ✅ the instruments: does each still measure what its comment says
+              -> exp_run_status collapsed "could not run" into "exited N";
+                 the carried note about RESULT.txt was INVERTED for 19 of 32
+                 experiments and cost a measurement the same day
+          6 ✅ the claims nobody has attacked
+              -> 7 of 32 experiments had evidence older than their own
+                 script; gate 10 now catches the class; T-077 owns the four
+                 that are too expensive to re-run now
+
+    ---- ⛔ REVIEW 3: WHAT WAS DEFERRED, NAMED PLAINLY ----
+
+    1 ✅ CLEARED. The four operator-named references were mined AND READ the
+      same day: docs/research/portable-nix.md (findings) and
+      portable-nix-mechanisms.md (the usable half, at file and line).
+      ⚠ WHAT REMAINS DEFERRED IS THE MEASUREMENT: nothing in that sweep was
+      RUN, and the write-up says so. Three probes are named, each one command.
+    2 ⚠ T-012's git/URL route -- DEFERRED BY THE OPERATOR, not by this session.
+    3 ⚠ 60-, 61-, 62- and 88- were NOT re-run on the current pin. Their
+      committed numbers -- which include the whole head-to-head in
+      docs/comparison.md -- were measured inside glibc 2.36. Pinned in
+      evidence/STALE-EVIDENCE.txt, owned by T-077.
+    4 ⚠ THE BUNDLER'S CLOCK INSTRUMENT IS DIAGNOSED, NOT BUILT. 90- still takes
+      one sample per arm. That is N0 and it is the first thing next session.
+    5 ⚠ lookPathIn's execute-bit test diverges from exec.LookPath for a
+      non-root caller. Named in the code and deliberately NOT fixed: it cannot
+      be shown to fail here, and a fix with no assertion behind it is a change.
+    6 ⚠ --embed-tzdata carries TWENTY zones, not the database. A zone that is
+      not carried behaves exactly as before. And it WRITES to $TMPDIR, which
+      is a real cost against the "writes nothing" shape claim -- which is why
+      it, like --embed-terminfo, is opt-in.
+    7 ✅ CONVERTED RATHER THAN DEFERRED: the tenth glibc quirk was found AND
+      closed; the POC suite was re-run against the separated-`-l` fix; the
+      four stale-evidence experiments that COULD be re-run were.
     D   ✅ THE REMAINING GLIBC QUIRKS — ANSWERED, AND THE ANSWER IS "YES,
         THERE WAS ONE". REQUIREMENTS.md said of its nine: "there is no
         unenumerated remainder". FALSE. `grep -rn zoneinfo` over the whole
@@ -146,16 +179,25 @@ the two disagree, say which one you are measuring against.
     N5  ⛔ route A at PATH granularity is measured DEAD — 0 of jq's 7 store
         paths are entirely unreachable. Do not build a path-level allowlist.
         The FILE-level sweep is the lever that works and it exists.
-    N6  xplshn/pelf, mined 2026-09-03c and unread. The operator named it for
-        exactly this work.
+    N6  ⭐ xplshn/pelf IS READ and it hands N2 a lever we do not have: mount
+        below 350 MB, EXTRACT above it (appbundle-runtime.go:764). Ours is
+        398 MB, the competitor's 192 MB -- either side of somebody else's
+        production threshold. Plus two warm-start techniques: the parsed
+        config cached in an xattr ON THE ARTEFACT, and live-mount reuse.
+        docs/research/portable-nix-mechanisms.md §3-4.
 
     ---- 2. then the builder, by how foundational ----
 
-    T-060  rungs 1→3, the static nix. ⭐ The operator has said what the answer
-           looks like: PUBLISH one, from a mix of nix-portable / nixie /
-           nix-prebuild, iterated. All three mined 2026-09-03c and unread.
-    T-051  the same work seen from the other side. Its step 2 requires
-           T-060 rung 2; take whichever first knowing that.
+    T-060  rungs 1→3, the static nix. ⭐ THE TARGET HAS A NAME NOW:
+           `nix-cli-static`, an attribute of the NIX FLAKE (not nixpkgs), which
+           is why `pgb nix cache attr nix-cli` found nothing. Rung 1 is its
+           closure built glibc-static by pgb rather than musl-static by
+           pkgsStatic.
+    T-051  ⛔ NOT the same work as T-060, corrected 2026-09-03c: a published
+           (musl) static nix already serves "enough nix on a minimal host".
+           ⚠ And `nix --store` under $HOME is NOT the route -- nix-portable
+           ships it as first choice and its tracker documents it failing on
+           Arch, Debian 11 and Debian 12 with a probe that passes first.
     T-012  items 2, 3 and 4. ⛔ ITEM 1, the git/URL route, is DEFERRED by the
            operator: "we can leave the build from git/url deferred for now".
 
