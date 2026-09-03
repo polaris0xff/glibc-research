@@ -9,16 +9,20 @@
 # kdenlive bundle from the competitor's that is 4.8 ms of a gap never observed
 # smaller than 129 ms. The cost is a FIXED price for standing the runtime up.
 #
-# ⛔ SO THE RUNTIME IS THE SUBJECT, AND OURS IS NOT THE ONE WE ARE MEASURED
-# AGAINST. `internal/bundle/appimage.go` pins uruntime **v0.5.6**, the FULL
-# build; `experiments/86-`, which stages the competitor's own toolchain from
-# `references/pkgforge-dev__Anylinux-AppImages`, stages uruntime **v0.5.9
-# LITE** and dwarfs **0.15.6** against our 0.14.1. The lite runtime is
-# 1,487,344 bytes against the full one's 3,068,400 -- less than half.
+# ⛔ SO THE RUNTIME IS THE SUBJECT -- AND UNTIL 2026-09-03d OURS WAS NOT THE
+# ONE WE WERE MEASURED AGAINST. `internal/bundle/appimage.go` pinned uruntime
+# **v0.5.6**, the FULL build, and dwarfs **0.14.1**; `experiments/86-`, which
+# stages the competitor's own toolchain from
+# `references/pkgforge-dev__Anylinux-AppImages`, stages uruntime **v0.5.9 LITE**
+# and dwarfs **0.15.6**. The lite runtime is 1,487,344 bytes against the full
+# one's 3,068,400 -- less than half.
 #
-# ⚠ Nothing in the record noticed. `docs/comparison.md` and T-066 attribute the
-# jq cold-start gap to the bundle; two of the three tools in the delivery path
-# are a different build from the competitor's.
+# ⚠ Nothing in the record noticed. `docs/comparison.md` and T-066 attributed
+# the jq cold-start gap to the bundle, while two of the three tools in the
+# delivery path were a different build from the competitor's.
+#
+# ⭐ THIS EXPERIMENT IS WHY THE PIN MOVED, and it now guards the move: the
+# final assertion is a ratchet requiring `pgb` to ship the FAST runtime.
 #
 # -- HOW IT IS ASKED --------------------------------------------------------
 #
@@ -27,7 +31,8 @@
 # mkdwarfs settings -- so a difference is attributable to the component that
 # changed and to nothing else.
 #
-#   ours       v0.5.6 full header, dwarfs 0.14.1     <- what pgb ships today
+#   ours       v0.5.6 full header, dwarfs 0.14.1     <- what pgb shipped
+#                                                    until 2026-09-03d
 #   v059full   v0.5.9 full header, dwarfs 0.14.1     <- the version bump alone
 #   v059lite   v0.5.9 LITE header, dwarfs 0.14.1     <- lite vs full alone
 #   field      v0.5.9 lite header, dwarfs 0.15.6     <- the competitor's stack
@@ -87,6 +92,14 @@ ULITE_URL="https://github.com/VHSgunzo/uruntime/releases/download/v0.5.9/uruntim
 ULITE_SHA=cef962c299f2fa19b2b3cdf2fa1565ee8541796cc89b9a97a591f94041e8b083
 MKD156_URL="https://github.com/mhx/dwarfs/releases/download/v0.15.6/dwarfs-universal-0.15.6-Linux-x86_64"
 MKD156_SHA=50891c38ba359db8271819a6cbf6aaa8068681523f0c4f2b8242007a45edaa28
+# ⛔ 0.14.1 IS PINNED HERE TOO, AND IT HAS TO BE. The first version borrowed
+# `$CACHE/tools/mkdwarfs` for the three 0.14.1 arms on the reasoning that it
+# was what `pgb` shipped. ⚠ The moment the pin in appimage.go moved to 0.15.6
+# that path became 0.15.6, so three arms silently changed meaning and `field`
+# stopped differing from `v059lite` by anything at all -- they came back 63.2
+# and 63.6 ms, which reads as a measurement and was an identity.
+MKD141_URL="https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-x86_64"
+MKD141_SHA=f3a117fd6d5b7304944b199af7fdb8086a48c509ea2e9832255d8f9a54c98587
 
 fetch_pinned() { # url sha dest
   [ -f "$3" ] && [ "$(sha256sum "$3" 2>/dev/null | cut -d' ' -f1)" = "$2" ] && return 0
@@ -111,14 +124,15 @@ fetch_pinned "$ULITE_URL"  "$ULITE_SHA"  "$WORK/ulite"  || STAGED=no
 # trap experiments/90- documents: a silent fallback turns a naming mistake
 # into a claim about somebody else's tool. It goes in its own directory under
 # the name the tool answers to.
-mkdir -p "$WORK/d156"
+mkdir -p "$WORK/d156" "$WORK/d141"
 fetch_pinned "$MKD156_URL" "$MKD156_SHA" "$WORK/d156/mkdwarfs" || STAGED=no
+fetch_pinned "$MKD141_URL" "$MKD141_SHA" "$WORK/d141/mkdwarfs" || STAGED=no
 if [ "$STAGED" != yes ]; then
   printf 'could not stage the pinned runtimes (network, or a moved release)\n'
   exit 2
 fi
-chmod +x "$WORK/d156/mkdwarfs"
-for f in u056 u059 ulite d156/mkdwarfs; do
+chmod +x "$WORK/d156/mkdwarfs" "$WORK/d141/mkdwarfs"
+for f in u056 u059 ulite d141/mkdwarfs d156/mkdwarfs; do
   printf '  %-16s %10s bytes\n' "$f" "$(wc -c < "$WORK/$f")"
 done
 
@@ -135,16 +149,15 @@ if ! "$PGB" bundle appimage "$PKG" --out "$SEED" --cache "$CACHE" \
   exit 2
 fi
 APPDIR="$CACHE/$PKG/AppDir"
-MKD141="$CACHE/tools/mkdwarfs"
+MKD141="$WORK/d141/mkdwarfs"
 SHIPPED="$CACHE/tools/uruntime"
-[ -d "$APPDIR" ] && [ -x "$MKD141" ] || { printf 'no AppDir or mkdwarfs\n'; exit 2; }
+[ -d "$APPDIR" ] || { printf 'no AppDir\n'; exit 2; }
 
-# ⭐ THE ASSERTION THAT MAKES THE `ours` ARM MEAN WHAT IT SAYS: the header this
-# experiment packs as `ours` must be byte-identical to the one `pgb` just
-# fetched for itself. Without this the row is about a runtime nobody ships.
+# ⭐ WHAT pgb ACTUALLY FETCHED FOR ITSELF, read from the cache it just wrote.
+# The ratchet at the bottom compares it against the runtime measured fastest.
 SHIPPED_SHA=$(sha256sum "$SHIPPED" 2>/dev/null | cut -d' ' -f1)
 printf '  %-28s %s\n' "pgb ships uruntime" "${SHIPPED_SHA:-<absent>}"
-printf '  %-28s %s\n' "this experiment's 'ours'" "$U056_SHA"
+printf '  %-28s %s\n' "the fast one (v0.5.9 lite)" "$ULITE_SHA"
 
 # ---------------------------------------------------------------------------
 # pack it five ways
@@ -229,20 +242,71 @@ FIELD_R=$(clk_ratio "$FIELD_M" "$OURS_M")
 FIELD_RES=$(clk_resolves "$FIELD_R" "$(clk_floor field ours "$AA")")
 
 # ---------------------------------------------------------------------------
+# ⛔ THE ELEVEN -- a runtime that is 24% faster and does not start on Alpine
+# is not a faster runtime, it is a regression with a good benchmark.
+#
+# ⚠ SCOPE, STATED. This arm asks ONE question: does the artefact still run.
+# It does NOT re-measure §3 criterion 2 (zero host shared objects), because
+# that is a property of the AppDir -- sharun plus the bundled loader -- and
+# nothing here touches the AppDir: all five arms are packed from the same one.
+# `experiments/86-` owns that column and has the instrument for it
+# (`classify_trace`; docs/AGENTS.md §14 on why a bundle's trace must not be
+# attributed to one pid).
+# ---------------------------------------------------------------------------
+printf -- '\n-- the eleven: does it still run -----------------------------\n'
+printf '  %-19s %-6s | %-10s %-10s\n' ENVIRONMENT LIBC 'OURS' 'FIELD'
+ENVS=0; OURS_RAN=0; FIELD_RAN=0
+while read -r ref name libc digest; do
+  case "$ref" in ''|\#*) continue ;; esac
+  : "$ref" "$digest"
+  root=$(exp_rootfs "$name") || root=""
+  [ -n "$root" ] || { exp_skip "$name" "not fetched"; continue; }
+  ENVS=$((ENVS + 1))
+  cells=""
+  for a in ours field; do
+    rm -f "$root/probe.AppImage"
+    cp "$(arm_path "$a")" "$root/probe.AppImage"; chmod +x "$root/probe.AppImage"
+    out=$(timeout -k 5 120 "$PGB" rootfs run "$root" -- /probe.AppImage --version \
+          </dev/null 2>/dev/null | tr -d ' \n')
+    if [ "$out" = "$FIRST" ]; then
+      res=ok
+      case "$a" in ours) OURS_RAN=$((OURS_RAN + 1)) ;; *) FIELD_RAN=$((FIELD_RAN + 1)) ;; esac
+    else
+      res="${out:-no-answer}"
+    fi
+    cells="$cells$(printf ' %-10s' "$res")"
+    rm -f "$root/probe.AppImage"
+  done
+  printf '  %-19s %-6s |%s\n' "$name" "$libc" "$cells"
+done < "$REPO_DIR/scripts/common/rootfs-images.txt"
+printf '\n'
+
+# ---------------------------------------------------------------------------
 # assertions
 # ---------------------------------------------------------------------------
 printf -- '-- assertions ------------------------------------------------\n'
 exp_check "every arm answers --version identically" "$AGREE" "$NARMS"
+[ "$ENVS" -gt 0 ] || exp_skip "the eleven" "no rootfs fetched"
+if [ "$ENVS" -gt 0 ]; then
+  exp_check "ours runs on every environment fetched"  "$OURS_RAN"  "$ENVS"
+  exp_check "the lite runtime does too"               "$FIELD_RAN" "$ENVS"
+fi
 exp_check "the A/A pair is NOT resolvable (the control)" \
   "$(clk_resolves "$AA" "$AA_FLOOR")" "no"
 
-# ⭐ THE FINDING THIS EXPERIMENT EXISTS FOR, asserted as a fact about the
-# TREE rather than about the clock: pgb and the competitor's staged toolchain
-# do not run the same runtime. ⛔ It is expected to hold until somebody
-# changes cfg-equivalent constants in internal/bundle/appimage.go, at which
-# point this assertion fires and the entry is closed.
-exp_check "pgb ships the runtime this experiment calls 'ours'" \
-  "$SHIPPED_SHA" "$U056_SHA"
+# ⭐ THE RATCHET. This asserted `SHIPPED_SHA = $U056_SHA` -- "pgb ships the
+# runtime this experiment calls `ours`" -- while `ours` was still the full
+# v0.5.6 build, and it FIRED the moment `internal/bundle/appimage.go` moved to
+# lite, which is what it was written to do.
+#
+# ⛔ It now guards the other direction, and that is the version worth keeping:
+# whatever else changes, pgb must ship the runtime this experiment measures as
+# the FAST one. A revert, a merge that loses the pin, or a `download` that
+# serves a stale cached tool all make this row red -- and the last of those is
+# not hypothetical: `download` keyed its cache on the destination PATH, so the
+# pin moved and every machine with a warm cache kept packing the old runtime.
+exp_check "pgb ships the fast runtime, not the one 'ours' measures" \
+  "$SHIPPED_SHA" "$ULITE_SHA"
 
 printf '  --    %-46s = %s\n' "the competitor's stack, vs ours" "${FIELD_R}x"
 printf '  --    %-46s = %s\n' "does it resolve" "$FIELD_RES"
@@ -282,7 +346,7 @@ fi
     r=$(clk_ratio "$m" "$OURS_M")
     f=$(clk_floor "$a" ours "$AA")
     case "$a" in
-      ours) note='(reference) v0.5.6 full + dwarfs 0.14.1' ;;
+      ours) note='(reference) v0.5.6 full + dwarfs 0.14.1, shipped until 2026-09-03d' ;;
       twin) note='A/A control' ;;
       *)    note=$(clk_resolves "$r" "$f") ;;
     esac
@@ -291,13 +355,16 @@ fi
   done
   printf '\n'
   printf 'WHAT EACH ARM CHANGES\n'
-  printf '  ours       uruntime v0.5.6 FULL  + mkdwarfs 0.14.1   <- pgb today\n'
+  printf '  ours       uruntime v0.5.6 FULL  + mkdwarfs 0.14.1   <- pgb until\n'
+  printf '                                                          2026-09-03d\n'
   printf '  v059full   uruntime v0.5.9 FULL  + mkdwarfs 0.14.1   <- version only\n'
   printf '  v059lite   uruntime v0.5.9 LITE  + mkdwarfs 0.14.1   <- lite only\n'
   printf '  field      uruntime v0.5.9 LITE  + mkdwarfs 0.15.6   <- the stack\n'
   printf '                                                          experiments/86-\n'
   printf '                                                          stages for the\n'
-  printf '                                                          COMPETITOR arm\n'
+  printf '                                                          COMPETITOR arm,\n'
+  printf '                                                          and what pgb\n'
+  printf '                                                          ships now\n'
   printf '  twin       a byte copy of ours                       <- A/A control\n'
   printf '\n'
   printf 'uruntime v0.5.6 full  3,039,728 B\n'

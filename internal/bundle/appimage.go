@@ -48,10 +48,45 @@ import (
 // Pinned, and the pin is the point: `latest/download` moves under you, so two
 // runs a week apart produce AppImages with different runtimes and nothing in
 // either says so.
+//
+// ⭐ THE RUNTIME IS THE COLD-START COST, AND THE `lite` BUILD IS 24% OF IT.
+// experiments/84- measured that cold start is a fixed price for standing the
+// runtime up rather than a function of the artefact: a 29.6x image and a 138x
+// file count each move it about 1.05x. experiments/77- then packed ONE AppDir
+// five ways, changing one component at a time, median of 21, interleaved, with
+// an A/A control in the same pass:
+//
+//	v0.5.6 full  + dwarfs 0.14.1   84.6 ms   7,331,882 B  pinned until 2026-09-03d
+//	v0.5.9 full  + dwarfs 0.14.1   85.3 ms   7,360,554 B  1.01x -- the version
+//	                                                      bump alone buys
+//	                                                      NOTHING, does not
+//	                                                      resolve
+//	v0.5.9 lite  + dwarfs 0.14.1   64.4 ms   5,779,498 B  0.76x, resolves
+//	v0.5.9 lite  + dwarfs 0.15.6   65.0 ms   5,779,502 B  0.77x, resolves
+//
+// ⚠ IT IS `lite` AND ONLY `lite`. Neither the uruntime version bump nor the
+// dwarfs upgrade is distinguishable from 1.00x, and the whole 1,552,384 B the
+// artefact loses is exactly the difference between the two headers
+// (3,039,728 - 1,487,344). Size is a footnote under the operator's
+// 2026-09-03c ruling, not a result.
+//
+// ⚠ dwarfs 0.15.6 is taken anyway, and the reason is comparability rather
+// than speed: it is the mkdwarfs `experiments/86-` stages for the COMPETITOR
+// arm, so the head-to-head now differs in the closure and nothing else. It is
+// measured to cost nothing (0.76x vs 0.77x, inside the floor).
+//
+// ⛔ AND THIS IS THE STACK `experiments/86-` ALREADY STAGES FOR THE COMPETITOR
+// ARM, out of references/pkgforge-dev__Anylinux-AppImages. The bundler was
+// being compared against a different runtime from the one it shipped, and
+// nothing in the record said so.
+//
+// ⚠ What `lite` drops is compression backends. Safe here because the pack
+// command below is fixed at `-C zstd:level=19`, which lite reads; a bundle
+// packed with lzma or brotli would need the full runtime.
 const (
-	defaultURuntimeURL = "https://github.com/VHSgunzo/uruntime/releases/download/v0.5.6/uruntime-appimage-dwarfs-%s"
+	defaultURuntimeURL = "https://github.com/VHSgunzo/uruntime/releases/download/v0.5.9/uruntime-appimage-dwarfs-lite-%s"
 	defaultSharunURL   = "https://github.com/pkgforge-dev/Anylinux-sharun/releases/latest/download/sharun-%s"
-	defaultDwarfsURL   = "https://github.com/mhx/dwarfs/releases/download/v0.14.1/dwarfs-universal-0.14.1-Linux-%s"
+	defaultDwarfsURL   = "https://github.com/mhx/dwarfs/releases/download/v0.15.6/dwarfs-universal-0.15.6-Linux-%s"
 )
 
 // AppImageOptions describes one bundle.
@@ -523,8 +558,25 @@ func countEntries(dir string) int {
 // download fetches a file, falling back to the reverse proxy with the whole
 // original URL, scheme included, when the direct route refuses.
 func download(url, dst string) error {
+	// ⛔ THE CACHE IS KEYED ON THE URL, NOT ON THE PATH, AND IT HAS TO BE.
+	// This returned early whenever `dst` existed and was executable, whatever
+	// URL was asked for. So moving a pin in the const block above changed
+	// nothing on any machine that had ever built a bundle: the old tool sat in
+	// the cache and every later AppImage carried it, silently, while the source
+	// said otherwise. Found when the uruntime pin moved to the lite build on
+	// 2026-09-03d and the artefact did not change size.
+	//
+	// ⚠ The sidecar records the URL the cached file actually came from. A
+	// mismatch -- or an absent sidecar, which is every cache written before
+	// this -- re-fetches. That makes the pin binding rather than decorative,
+	// which is the whole reason the comment on the const block calls it "the
+	// point".
+	stamp := dst + ".url"
 	if fi, err := os.Stat(dst); err == nil && fi.Mode()&0o111 != 0 {
-		return nil
+		if got, err := os.ReadFile(stamp); err == nil && strings.TrimSpace(string(got)) == url {
+			return nil
+		}
+		log.Debugf("%s: cached copy is from a different URL, re-fetching", dst)
 	}
 	if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
 		return err
@@ -538,7 +590,12 @@ func download(url, dst string) error {
 		if err := os.Chmod(dst+".part", 0o755); err != nil {
 			return err
 		}
-		return os.Rename(dst+".part", dst)
+		if err := os.Rename(dst+".part", dst); err != nil {
+			return err
+		}
+		// ⛔ Written AFTER the rename. A stamp that lands first would claim a
+		// tool that is not there yet, and the next run would trust it.
+		return os.WriteFile(stamp, []byte(url+"\n"), 0o644)
 	}
 	return fmt.Errorf("could not fetch %s", url)
 }
