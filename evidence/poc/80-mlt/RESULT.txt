@@ -6,71 +6,11 @@ version       : ffmpeg 7.1, MLT 7.30.0 (kdenlive's engine)
 sha256        : ⚠ NOT PINNED -- see the note below
 normal build  : ./configure && make; cmake && make  -- both produce SHARED objects
 stresses      : a 142 MB static libavcodec, 8 dlopen'd modules, module discovery by directory listing, C++ inside a C program, PIC vs static
-date (UTC)    : 2026-09-01T15:49:03Z
+date (UTC)    : 2026-09-03T00:42:05Z
 evidence      : /home/user/glibc-research/evidence/poc/80-mlt
+build env     : /var/lib/pgb-rootfs/pgb-env-debian13
+build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
+build gcc     : gcc (Debian 14.2.0-19) 14.2.0
+build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
 ---------------------------------------------------------------
 -- rung 1: ffmpeg 7.1 -----------------------------------------
-  ok    ffmpeg builds through pgb                    = ok
-        libavcodec.a 142469780 bytes
-  ok    the ffmpeg CLI it produced is static         = 0
-        ffmpeg version 7.1 Copyright (c) 2000-2024 the FFmpeg developers
-
--- rung 2: MLT 7.30.0, kdenlive's engine -------------------
-  ok    MLT module objects built                     = 8
-  ok    the ordinary melt link fails on add_library(mlt SHARED) = attempted-static-link
-        src/framework/CMakeLists.txt:36 -- SHARED is hard-coded, so
-        BUILD_SHARED_LIBS cannot turn it off and -static cannot consume it
-  ok    the avformat SHARED module fails on PIC against static ffmpeg = pic-failure
-        libavcodec.a(cavsdsp.o): R_X86_64_PC32 against `ff_pw_5'
-        ⭐ and the same objects link into the STATIC executable below, so the
-           requirement was the shared-module SHAPE's and not the code's
-
--- the link the build system could not make --------------------
-        framework 31 objects, melt 2, 8 modules
-  ok    the static melt links                        = ok
-        melt-static 105286552 bytes
-  ok    PT_INTERP absent                             = 0
-  ok    DT_NEEDED entries                            = 0
-  ok    per-module mlt_register instances            = 8
-  ok    every plugin file is zero bytes              = 0
-
--- the matrix: eight modules, all of them empty files ----------
-
-  functional test across the pinned matrix:
-    ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
-    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
-  ok    alpine-3.22: functional test                 = ok
-    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
-  ok    alpine-3.20: functional test                 = ok
-    alpine-3.10          musl   ok         none                         none
-  ok    alpine-3.10: functional test                 = ok
-    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
-  ok    voidlinux-musl: functional test              = ok
-    debian-11            glibc  ok         none                         /etc/nsswitch.conf 
-  ok    debian-11: functional test                   = ok
-    debian-12            glibc  ok         none                         /etc/nsswitch.conf 
-  ok    debian-12: functional test                   = ok
-    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf 
-  ok    ubuntu-20.04: functional test                = ok
-    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf 
-  ok    rockylinux-8: functional test                = ok
-    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf 
-  ok    opensuse-leap-15.6: functional test          = ok
-    fedora-42            glibc  ok         none                         /etc/nsswitch.conf 
-  ok    fedora-42: functional test                   = ok
-    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf 
-  ok    archlinux-latest: functional test            = ok
-
--- the depth reached ------------------------------------------
-        ffmpeg 7.1               ✅ static, runs
-        MLT 7.30.0 / melt        ✅ static, 8 modules compiled in, renders MP4
-        Qt 6 / KDE Frameworks    ⛔ NOT ATTEMPTED -- the next rung
-        kdenlive                 ⛔ NOT ATTEMPTED
-        
-        ⭐ The engine is done. What is left is a GUI toolkit, and Qt is the
-           next thing to break: its platform plugins are the host-plugin
-           class docs/limitations.md §1 is about, and TODO T-033 is the route.
-
----------------------------------------------------------------
-pass=21 fail=0 skip=0
-VERDICT: 80-mlt builds and works across the matrix.

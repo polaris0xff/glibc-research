@@ -752,7 +752,7 @@ reproduction), and swept in
 
 **Source** ⭐ **operator, 2026-09-02c**: *"add a dedicated task to solving the
 egl issue with nix"*.
-**Category** research · **Priority** P0 · **Effort** L · **Status** open
+**Category** research · **Priority** P0 · **Effort** L · **Status** ✅ done
 
 ⛔ **This exists because EGL out of nixpkgs has failed three times, each for a
 DIFFERENT reason, and two of the three were invisible to every check the tree
@@ -875,10 +875,46 @@ manifest names a path outside it — asserted, on a bundle built by `pgb bundle
 appimage`, with a negative control that a deliberately un-rewritten manifest
 fails it.
 
-⭐ **The arm is WRITTEN (2026-09-02d)** — `experiments/85-`, four assertions
-including the negative control and a check that the control restored what it
-damaged. ⚠ **`experiments/85-` itself has not been run**, because arm A is a
-`mesa-demos` bundle and the bed was occupied by `experiments/90-`.
+## ✅ CLOSED 2026-09-03 — `experiments/85-` RUN, and the negative control fired
+
+    sh experiments/85-opengl.sh
+    ok  arm A built (bundled mesa)                              = yes
+    ok  arm B built (--no-gl)                                   = yes
+    ok  arm A: every manifest names a library present in the bundle = yes
+        manifests read: 13
+    ok  an un-rewritten manifest is CAUGHT (the control)        = caught
+        OUTSIDE  share/glvnd/egl_vendor.d/50_mesa.json
+                 -> /nix/store/00000000…-mesa/lib/libEGL_mesa.so.0
+    ok  the control restored the manifest it damaged            = yes
+    ok  arm A: surfaceless EGL reports Mesa on every environment = 11
+    ok  arm A: a driver is named on every environment           = 11
+    ok  arm A: every target agrees with the build host's exit    = 11
+    ok  arm A loaded no host shared object                      = 11
+    ok  arm B (no bundled mesa) reported NO vendor anywhere     = 0
+    pass=10 fail=0 skip=0     VERDICT: matched expectation
+
+⭐ **That is the Prove as written, on a bundle `pgb bundle appimage` built**,
+with the negative control the Prove asks for and the restore asserted. ⛔ **It
+had been "written and not run" for three sessions**; the bed was occupied each
+time.
+
+⚠ **What the run does NOT say, quoted from its own footer rather than
+paraphrased:** every row is **swrast** — this machine has no GPU — and every
+target is **surfaceless**, because none of the eleven has an X server, a
+Wayland compositor or a GBM device. It measures the GL stack **loading and
+initialising**, not anything drawn to a screen. ⚠ `A:exit3` on every row is
+`eglinfo`'s own convention — the number of platforms that failed to initialise
+(GBM, Wayland, X11), which is 3 on the build host too.
+
+**Items 3 and 4 are not closed here and are not this entry's to close:** item 3
+(the GL stack is 95 MiB of a 163 MB bundle) folds into **T-066**'s "where the
+closure comes from", and item 4's untestable half — NVIDIA against nixpkgs'
+libglvnd — is **T-059**'s and needs a GPU.
+
+### The arm, as it was written
+
+⭐ **Written 2026-09-02d** — four assertions including the negative control and
+a check that the control restored what it damaged.
 
 ⭐ **But the Prove was carried out by hand on a REAL bundle — kdenlive's, the
 one `experiments/90-` had just built — and it is stronger than a fixture:**

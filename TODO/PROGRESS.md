@@ -4,7 +4,7 @@
 and the entries.
 
     STATE     2026-09-02f / 2026-09-03
-    COUNTS    45 entries, 19 open, 26 done
+    COUNTS    45 entries, 18 open, 27 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN before this session; selftests 239 pass, 1 could not
               run (no zstd)
@@ -200,8 +200,9 @@ rests on the synthetic subject alone, and that is recorded.
 
     ---- the bundle, and the one class that is all DATA ----
 
-    T-071   ⚠ P0. Items 1, 2, 5 done. experiments/85- was STARTED this
-            session and its result is the next thing to read.
+    T-071   ✅ CLOSED. experiments/85- RUN: pass=10 fail=0, and the
+            data-coherence arm's negative control fired. Item 3 is T-066's,
+            item 4's other half is T-059's.
     T-066   ⚠ P0. ⭐ The corpus IS MINED (34 trees). ⛔ An allowlist cannot
             reach a DT_NEEDED edge a `-mini` rebuild deletes. Measure its
             ceiling first (route A in the entry). Needs an AppDir.
