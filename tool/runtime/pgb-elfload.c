@@ -620,6 +620,14 @@ static const char *el_defver(const struct el_obj *o, uint32_t si)
 
     if (!o->versym || !o->verdef)
         return NULL;
+    /* ⛔ versym IS A SEPARATE ARRAY FROM symtab, and nothing has checked that
+     * it is as long. The walk validates `&symtab[si]` against the mapping; a
+     * malformed object can give the two different lengths, and reading
+     * versym[si] on that promise is an out-of-map read of exactly the class
+     * el_in_map() exists for. Found by the door sweep of 2026-09-03, after a
+     * change moved this call INSIDE the symbol walk and multiplied it. */
+    if (!el_in_map(o, &o->versym[si], sizeof o->versym[si]))
+        return NULL;
     vi = o->versym[si] & 0x7fff;
     if (vi <= 1)
         return NULL;
@@ -763,6 +771,9 @@ static const char *el_refver(const struct el_obj *o, uint32_t si)
     const Elf64_Verneed *vn;
 
     if (!o->versym || !o->verneed)
+        return NULL;
+    /* The same bounds check as el_defver, and for the same reason. */
+    if (!el_in_map(o, &o->versym[si], sizeof o->versym[si]))
         return NULL;
     vi = o->versym[si] & 0x7fff;
     if (vi <= 1)
