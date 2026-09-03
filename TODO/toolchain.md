@@ -142,6 +142,39 @@ a plain static toolchain first and made portable by `pgb` second.
 Split before starting: spec resolution (URL or package name → source tree),
 build-system detection, and the dependency planner are separate.
 
+### ⭐ 2026-09-03c — ALL THREE OF THOSE PIECES EXIST, AND R3 RAN THEM END TO END
+
+⚠ **The entry says "split before starting" as though none of the three were
+built. They are, and the postgres run of T-063 arm S exercised all three in one
+command.** `NIX_MAX_ROUNDS=24 pgb nix build --plan pg.plan`:
+
+| the split this entry names | what ran |
+|---|---|
+| **spec resolution** | `pgb nix cache attr postgresql` → the attribute; `pgb nix plan postgresql --out pg.plan` → source, patches, buildInputs, configureFlags. ⭐ Resolved through hydra with **no nix used** |
+| **build-system detection** | ⭐ **it prints what it decided, per dependency.** Over one postgres build: `pkg-config` ×11, `cmake (cmakeFlags)` ×9, `autoreconf (configureFlags)` ×8, `meson ninja pkg-config (mesonFlags)` ×2, `cmake ninja` ×2, `autoreconf pkg-config` ×2 |
+| **the dependency planner** | **41** `dep ok` / `dep have` lines — it walked postgres's inputs, built each, and installed them into one static prefix |
+
+⭐ **So `pgb nix build <package>` already IS `pgb build <package>` for the
+nixpkgs half**, and it produced a statically linked PostgreSQL 18.6 with ICU
+that runs on Alpine. T-063 carries that result.
+
+⛔ **What is actually left, then, is narrower than "XL":**
+
+1. ⛔ **The URL route.** Nothing resolves a git URL to a source tree; every
+   route above goes through nixpkgs. This is the half with no code at all.
+2. ⚠ **The report.** `design/toolchain.md` requires the tool to *"name every
+   component it could not link statically, and why"*. The adaptation loop
+   already knows — it prints `round N: FAILED -> drop:--with-llvm` — but
+   nothing collects those into an answer for the developer.
+3. ⚠ **Joining static-first to bundle-last.** `pgb nix build` and
+   `pgb bundle appimage` are two commands with no path between them, and the
+   brief's preference order is exactly that path.
+4. ⛔ **AND THE "NO NIX" PROPERTY DOES NOT HOLD FOR EVERY SPEC**, which T-060
+   owns but T-012 inherits: `pgb nix plan kdePackages.kdenlive` reports
+   *"no nix-free route resolved … falling back to evaluation"*. The nix-free
+   index and hydra routes reach a top-level attribute; a dotted one they do
+   not.
+
 **Prove.** `pgb build <a git URL>` produces a binary that `pgb verify`
 passes on 11 of 11, with no other input from the operator.
 

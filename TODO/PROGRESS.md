@@ -594,7 +594,29 @@ is **costing route B**, which is where the size actually is.
             but not the dotted `kdePackages.` attribute, so it fell back to
             evaluation. That is the gap T-060 exists to close.
     T-051   the no-compiler host
-    T-012   pgb build <url-or-package>
+    T-012   pgb build <url-or-package>.
+            ⭐ NARROWED 2026-09-03c: the entry says "split before starting"
+            into spec resolution, build-system detection and the dependency
+            planner -- ALL THREE EXIST, and R3's postgres run exercised them
+            in one command:
+              spec resolution  `nix cache attr` + `nix plan`, via hydra,
+                               with NO NIX USED
+              build detection  it PRINTS what it decided, per dependency:
+                               pkg-config x11, cmake x9, autoreconf x8,
+                               meson ninja x2, cmake ninja x2, autoreconf
+                               pkg-config x2
+              the planner      41 dep ok/have lines into one static prefix
+            ⭐ So `pgb nix build <package>` already IS `pgb build <package>`
+            for the nixpkgs half. ⛔ WHAT IS LEFT IS NARROWER THAN "XL":
+              1. the URL route -- no code at all
+              2. the REPORT design/toolchain.md requires ("name every
+                 component it could not link statically, and why"). The
+                 adaptation loop already knows: `round N: FAILED -> drop:...`
+              3. joining static-first to bundle-last: `nix build` and
+                 `bundle appimage` have no path between them
+              4. ⛔ and "no nix" does not hold for a DOTTED attribute --
+                 kdePackages.kdenlive falls back to evaluation. T-060's gap,
+                 inherited here.
     then    P2 by category
 
 ⭐ **Two pieces of real work are NAMED and are not entries**, because each is
