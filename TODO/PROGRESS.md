@@ -649,6 +649,16 @@ one clear fix inside T-063 arm S:
        reversal (the resolution removed)
          FAIL  a Cmd runs the program its own Env's PATH names = REAL, wanted WRAPPER
 
+   ⭐ **AND IT IS PROVED ON A REAL BUILD**, which is the test this entry asked
+   for — *"`pgb build -- cc -o x x.c` produces a binary carrying
+   `pgb-runtime`"*:
+
+       pgb --engine chroot build -- cc -o t t.c
+         rc=0   runs: hi   pgb-runtime: YES   PT_INTERP 0   DT_NEEDED 0
+
+   ⛔ Before the fix the same line failed outright — `cc: fatal error: cannot
+   execute 'cc1'`, from a malformed `-iprefix /../lib/gcc/…`.
+
    ⛔ **POC VALIDATION OWED**: this changes `proc`, which every child process
    goes through. The suite running when it landed was validating the `-l`/`-L`
    fix against a pgb without it, so the suite must run once more with both.
