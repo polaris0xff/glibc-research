@@ -937,3 +937,67 @@ $ pgb bundle manifests .../kdenlive/AppDir                            exit 0
 deliberately and caught.** It is the first time this class has been detectable
 at all: the same bundle passes `integrity()` — every `DT_NEEDED` resolves —
 in both states.
+
+---
+
+## T-074 — ⭐ the host-policy selftest could not fail on the state it was written to catch
+
+**Source** operator, 2026-09-03, item 3 of the `cross-libc-dlopen#28` review:
+*"verify that the release path is asserted and not merely implemented."*
+**Category** research · **Priority** P1 · **Effort** S · **Status** ✅ done
+
+**Problem.** `internal/bundle/hostpolicy_selftest.go` asked whether a variable
+was unset by reading its VALUE:
+
+    get := func(lines []string, key string) string {
+        for _, l := range lines {
+            if v, ok := strings.CutPrefix(l, key+"="); ok { return v }
+        }
+        return ""            // ⛔ and "" for a key that is ABSENT, too
+    }
+
+⛔ **`get` returns `""` for a key that is absent AND for a key emitted as
+`KEY=`**, and for `__EGL_VENDOR_LIBRARY_FILENAMES` those two are the safe state
+and the dangerous one. `EnvLines()`'s own comment says so at length — libglvnd's
+`LoadVendors()` reads `getenv`, a non-NULL empty string takes the branch,
+`return` follows, and **the bundle gets no EGL at all**. So the assertion
+labelled *"FILENAMES is unset, not set-and-empty"* was green on both, and four
+others with it.
+
+⚠ **Not a paragraph — this is the same defect class as T-073 and as upstream's
+#28**, one level up: a *check* that answers when it cannot know. `PROGRESS.md`
+2026-09-02f finding 9 is the previous instance ("one of my own new checks was
+theatre").
+
+**What the product does.** ✅ **Correct, and it always was.** `EnvLines()` never
+emits the variable under `PGB_HOST_MESA` or for a bundle with no vendor
+directory — it is inside `if !p.Mesa` and guarded by `len(paths) > 0`. Nothing
+about the bundler changed here.
+
+⚠ **And `experiments/85-` does not cover this at all.** It measures arm A
+(bundled mesa) against arm B (`--no-gl`) and never sets `PGB_HOST_MESA`. The
+release path's only assertion was the one above, so the answer to the operator's
+question is neither "asserted" nor "merely implemented": it was asserted by an
+instrument blind to the distinction being asserted.
+
+### ✅ CLOSED 2026-09-03 — the Prove, run, with the reversal planted
+
+`present()` reports whether the key appears at all; the five "is unset"
+assertions ask it instead of `get`. ⭐ **The instrument itself is now asserted**
+— a constructed `__EGL_VENDOR_LIBRARY_FILENAMES=` line is put through both
+helpers, plus a prefix-collision negative.
+
+⛔ **THE COMPARISON THAT SETTLES IT.** One planted defect — `EnvLines()` made to
+`add("__EGL_VENDOR_LIBRARY_FILENAMES=")` under the mesa opt-in — through both
+instruments:
+
+| instrument | verdict on the planted defect |
+|---|---|
+| old, by value (`get(...) == ""`) | ⛔ **`ok ... the bundle stops pinning the EGL vendor list =`** |
+| new, by presence (`present(...) == false`) | ⭐ **`FAIL ... RELEASED, not emptied = yes, wanted no`** |
+
+    ./pgb selftest      312 cases pass, 1 COULD NOT RUN (no zstd)   [was 307]
+
+`internal/bundle/hostpolicy.go` is byte-identical to before this entry
+(`git diff --quiet`), which is the point: the fix is entirely in what the
+harness can see.

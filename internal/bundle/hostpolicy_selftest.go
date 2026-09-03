@@ -43,6 +43,31 @@ func HostPolicySelftest() *selftest.Report {
 		return ""
 	}
 
+	// ⛔ get() CANNOT ANSWER THE QUESTION THE "is unset" ASSERTIONS ASK, and
+	// every one of them used it until 2026-09-03. It returns "" for a key that
+	// is ABSENT and for a key emitted as `KEY=`, and those two are the safe
+	// state and the dangerous one:
+	//
+	//     __EGL_VENDOR_LIBRARY_FILENAMES absent   libglvnd reads DIRS  ✅
+	//     __EGL_VENDOR_LIBRARY_FILENAMES=         getenv returns a non-NULL
+	//                                             empty string, LoadVendors
+	//                                             takes the branch, returns,
+	//                                             and the bundle has NO EGL ⛔
+	//
+	// EnvLines() gets this right and its comment explains why at length. ⚠ But
+	// an assertion labelled "unset, not set-and-empty" that passes on BOTH is
+	// not measuring the property it names: the bundler could regress to
+	// emitting the empty variable — the worse of the two states — and this
+	// file would stay green. TODO T-074.
+	present := func(lines []string, key string) bool {
+		for _, l := range lines {
+			if strings.HasPrefix(l, key+"=") {
+				return true
+			}
+		}
+		return false
+	}
+
 	// ---- the default policy: bundled first, host last ----------------------
 	def := HostPolicy{}.EnvLines(full, vendors)
 
@@ -95,10 +120,10 @@ func HostPolicySelftest() *selftest.Report {
 	// ⛔ AND EMPTY IS NOT SAFE HERE — `getenv` returns a non-NULL empty
 	// string, libglvnd takes the branch, and no vendor is loaded at all. A
 	// bundle with no vendor directory must leave the variable UNSET.
-	r.Check("empty bundle: FILENAMES is unset, not set-and-empty",
-		get(bare, "__EGL_VENDOR_LIBRARY_FILENAMES"), "")
-	r.Check("empty bundle: no LIBGL_DRIVERS_PATH is claimed",
-		get(bare, "LIBGL_DRIVERS_PATH"), "")
+	r.CheckBool("empty bundle: FILENAMES is ABSENT, not emitted empty",
+		present(bare, "__EGL_VENDOR_LIBRARY_FILENAMES"), false)
+	r.CheckBool("empty bundle: no LIBGL_DRIVERS_PATH is claimed",
+		present(bare, "LIBGL_DRIVERS_PATH"), false)
 	r.CheckBool("empty bundle: VK_DRIVER_FILES names no ${SHARUN_DIR}",
 		strings.Contains(get(bare, "VK_DRIVER_FILES"), "${SHARUN_DIR}"), false)
 	r.CheckBool("empty bundle: the host fallback still exists",
@@ -106,21 +131,49 @@ func HostPolicySelftest() *selftest.Report {
 
 	// ---- the opt-ins each move exactly one class ---------------------------
 	mesa := HostPolicy{Mesa: true}.EnvLines(full, vendors)
-	r.Check("PGB_HOST_MESA: the bundle stops claiming LIBGL_DRIVERS_PATH",
-		get(mesa, "LIBGL_DRIVERS_PATH"), "")
+	r.CheckBool("PGB_HOST_MESA: the bundle stops claiming LIBGL_DRIVERS_PATH",
+		present(mesa, "LIBGL_DRIVERS_PATH"), false)
 	r.CheckBool("PGB_HOST_MESA: it is recorded in the environment",
 		get(mesa, "PGB_HOST_MESA") == "1", true)
 	// ⛔ AND IT MUST RELEASE THE VENDOR LIST TOO. The opt-in says "use the
 	// host's mesa"; pinning FILENAMES at the bundle's own vendor JSONs would
 	// override the host's configuration and hand it back the bundle's mesa,
 	// which is the opt-in doing the opposite of what it says.
-	r.Check("PGB_HOST_MESA: the bundle stops pinning the EGL vendor list",
-		get(mesa, "__EGL_VENDOR_LIBRARY_FILENAMES"), "")
+	//
+	// ⭐ AND "RELEASED" HAS TO MEAN ABSENT. This is the stand-aside behaviour
+	// the whole opt-in is for, and it is the exact shape of
+	// pkgforge-dev/cross-libc-dlopen#28: a mechanism with nothing to offer
+	// must stand aside, not answer "nothing". Emitting the variable empty
+	// would be the shim keeping its zero-returning stubs.
+	r.CheckBool("PGB_HOST_MESA: the EGL vendor list is RELEASED, not emptied",
+		present(mesa, "__EGL_VENDOR_LIBRARY_FILENAMES"), false)
+	r.CheckBool("PGB_HOST_MESA: and DIRS is released with it",
+		present(mesa, "__EGL_VENDOR_LIBRARY_DIRS"), false)
 	// ⛔ and it must NOT have moved Vulkan or glibc.
 	r.CheckBool("PGB_HOST_MESA: vulkan is untouched",
 		strings.HasPrefix(get(mesa, "VK_DRIVER_FILES"), "${SHARUN_DIR}/"), true)
-	r.Check("PGB_HOST_MESA: glibc is untouched",
-		get(mesa, "SHARUN_EXTRA_LIBRARY_PATH"), "")
+	r.CheckBool("PGB_HOST_MESA: glibc is untouched",
+		present(mesa, "SHARUN_EXTRA_LIBRARY_PATH"), false)
+
+	// ---- ⭐ THE INSTRUMENT, ASSERTED ---------------------------------------
+	//
+	// ⛔ THIS IS THE CONTROL AND IT IS THE WHOLE FINDING. Every "is unset"
+	// assertion above read the VALUE, and the value is "" in both the safe
+	// state and the dangerous one — so they were green against a bundler that
+	// emitted the empty variable, which is the state EnvLines()'s own comment
+	// calls worse than unset. A new helper is worth nothing until something
+	// shows it can see what the old one could not, so the dangerous state is
+	// constructed here on purpose and both helpers are run against it.
+	poisoned := []string{"__EGL_VENDOR_LIBRARY_FILENAMES="}
+	r.Check("control: set-and-empty still reads as \"\" BY VALUE",
+		get(poisoned, "__EGL_VENDOR_LIBRARY_FILENAMES"), "")
+	r.CheckBool("control: ...and present() sees it — that is the difference",
+		present(poisoned, "__EGL_VENDOR_LIBRARY_FILENAMES"), true)
+	r.CheckBool("control: present() is false when the key really is absent",
+		present([]string{"OTHER=1"}, "__EGL_VENDOR_LIBRARY_FILENAMES"), false)
+	r.CheckBool("control: present() does not match a key by prefix",
+		present([]string{"__EGL_VENDOR_LIBRARY_FILENAMES_X=1"},
+			"__EGL_VENDOR_LIBRARY_FILENAMES"), false)
 
 	vk := HostPolicy{Vulkan: true}.EnvLines(full, vendors)
 	r.CheckBool("PGB_HOST_VULKAN: host layers are admitted",

@@ -4,7 +4,7 @@
 and the entries.
 
     STATE     2026-09-03b
-    COUNTS    46 entries, 17 open, 29 done
+    COUNTS    47 entries, 17 open, 30 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN before this session; selftests 239 pass, 1 could not
               run (no zstd)
