@@ -1,0 +1,62 @@
+===============================================================
+98 - the published static nix: which libc, and does it run on the eleven?
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-03T10:02:54Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/98-published-static-nix
+--------------------------------------------------------------
+
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-03T10:02:54Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/98-published-static-nix
+--------------------------------------------------------------
+        subject: /var/tmp/pgb-exp98/2.35.2/bin/nix (37908480 bytes), from https://github.com/containerbase/nix-prebuild/releases/download/2.35.2/nix-2.35.2-x86_64.tar.xz
+  ok    the published nix has no PT_INTERP             = 0
+  ok    ...and no DT_NEEDED                            = 0
+        compiled-in output name: nix-static-x86_64-unknown-linux-musl
+  ok    the published static nix is built against      = musl
+        ⛔ so T-060's framing holds: the published one is the MUSL half, and
+           a static-GLIBC nix is still something this project has to build.
+        ⭐ and T-051's is answered: this binary is enough nix for a minimal
+           host, and it is one fetch.
+  ok    'GNU C Library' appears in the binary          = 1
+  ok    ...and it is a LICENCE SENTENCE, not a libc    = 1
+        ⛔ `strings | grep "GNU C Library"` IS NOT A LIBC TEST. It said
+           glibc here and the triple says musl.
+
+-- does the published static nix run where it is put? --------------
+  ENVIRONMENT            LIBC   nix --version
+  alpine-3.22            musl   nixbin (Nix) 2.35.2 ok
+  alpine-3.20            musl   nixbin (Nix) 2.35.2 ok
+  alpine-3.10            musl   nixbin (Nix) 2.35.2 ok
+  voidlinux-musl         musl   nixbin (Nix) 2.35.2 ok
+  debian-11              glibc  nixbin (Nix) 2.35.2 ok
+  debian-12              glibc  nixbin (Nix) 2.35.2 ok
+  ubuntu-20.04           glibc  nixbin (Nix) 2.35.2 ok
+  rockylinux-8           glibc  nixbin (Nix) 2.35.2 ok
+  opensuse-leap-15.6     glibc  nixbin (Nix) 2.35.2 ok
+  fedora-42              glibc  nixbin (Nix) 2.35.2 ok
+  archlinux-latest       glibc  nixbin (Nix) 2.35.2 ok
+
+  ok    every fetched environment was measured         = 11
+  ok    environments where it did NOT report its version = 0
+        ⭐ a musl-static binary running on glibc hosts is expected and is not
+           the interesting direction; it is recorded because T-051 needs to
+           know the binary works where it would be put, not why.
+
+-- result ----------------------------------------------------
+pass=7 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

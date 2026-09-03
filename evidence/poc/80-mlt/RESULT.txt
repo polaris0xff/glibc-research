@@ -6,7 +6,7 @@ version       : ffmpeg 7.1, MLT 7.30.0 (kdenlive's engine)
 sha256        : ⚠ NOT PINNED -- see the note below
 normal build  : ./configure && make; cmake && make  -- both produce SHARED objects
 stresses      : a 142 MB static libavcodec, 8 dlopen'd modules, module discovery by directory listing, C++ inside a C program, PIC vs static
-date (UTC)    : 2026-09-03T06:57:46Z
+date (UTC)    : 2026-09-03T09:55:37Z
 evidence      : /home/user/glibc-research/evidence/poc/80-mlt
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1

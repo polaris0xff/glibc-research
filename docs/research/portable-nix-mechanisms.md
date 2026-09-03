@@ -8,8 +8,9 @@ does the work, and it is written to be **used later** rather than admired now.
 findings page.** The corpus is tracked in `references/`, so a citation is
 checkable without re-fetching anything.
 
-⛔ **Nothing here was executed.** A mechanism copied out of this page is
-unverified until the session that copies it runs it.
+⛔ **Almost nothing here was executed.** §1 was measured
+(`experiments/98-published-static-nix.sh`); every other mechanism is a reading,
+and is unverified until the session that copies it runs it.
 
 ---
 
@@ -33,14 +34,15 @@ remove. For a host that merely needs *a* nix, the release artefacts of
 `containerbase/nix-prebuild` are `nix-<version>-<arch>.tar.xz` and its whole
 packaging step is one `tar -cJf`.
 
-⛔ **CHECK THIS BEFORE BUILDING ANYTHING ON IT** — the findings page marks it as
-inferred, not measured:
+✅ **CHECKED, `experiments/98-published-static-nix.sh`, pass=7 fail=0.**
+PT_INTERP 0, DT_NEEDED 0, 37,908,480 B, and `nix --version` answers on **11 of
+11**. ⛔ **Do not use `strings | grep 'GNU C Library'` as the libc test** — it
+returns 1 here, from a licence sentence, and says the opposite of the truth.
+The discriminator is the compiled-in store path:
 
 ```sh
-# is the published static nix musl or glibc?
-readelf -lW ./nix | grep -c INTERP        # expect 0
-readelf -dW ./nix | grep -c NEEDED        # expect 0
-strings -a ./nix | grep -m1 -E 'musl|GLIBC_'
+strings -a ./nix | grep -oE 'nix-static-[a-z0-9_]+-unknown-linux-[a-z0-9]+'
+# -> nix-static-x86_64-unknown-linux-musl
 ```
 
 ## 2. The runtime fallback chain, and the probe that lies
@@ -171,12 +173,14 @@ and, asked which variables an AppRun expects to be set: **"None."**
 ## ⛔ The instruments this sweep owes and does not have
 
 `methodology/references.md` §5: *"every measured claim ships with the thing that
-measured it."* ⭐ **This sweep made no measured claims**, which is why there is
-no instrument here — every finding is a reading at a cited line, and the page
-says so. ⚠ The three that most need one are listed in the findings page's
-known-weak section, each with the probe that would settle it:
+measured it."* ⭐ **One finding was measured and it shipped its instrument** —
+`experiments/98-published-static-nix.sh`, pinned by SHA-512. Every other
+finding is a reading at a cited line, and the page says so.
 
-1. is the published `nix-static` musl or glibc — §1 above, three commands;
+⚠ **What still owes an instrument**, each with the probe that would settle it:
+
+1. ~~is the published `nix-static` musl or glibc~~ ✅ **done**, and it shipped
+   its instrument: `experiments/98-published-static-nix.sh`;
 2. does `nix --store` under `$HOME` work on this project's eleven — the probe
    in §2, run with a **real** workload rather than the trivial derivation;
 3. does extract-over-mount beat mount on a 398 MB bundle — `experiments/86-`'s

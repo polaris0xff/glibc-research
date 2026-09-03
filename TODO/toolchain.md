@@ -100,12 +100,14 @@ cached. It did not remove it from the cases T-050 lists as out of reach.
    THE REFERENCES.** nixpkgs ships none; ⭐ **the NIX FLAKE DOES**, and three
    projects consume it. The attribute is `nix-static` before nix 2.26.0 and
    **`nix-cli-static`** from 2.26.0 on — `containerbase/nix-prebuild` carries
-   the boundary in production code. ⚠ **It is built through `pkgsStatic`,
-   which is musl** — inferred, not measured, and ⛔ **checking it is the first
-   thing this entry should do** (`readelf -lW`, three commands, in
-   [`../docs/research/portable-nix-mechanisms.md`](../docs/research/portable-nix-mechanisms.md) §1).
-   ⭐ **So T-051 and T-060 are NOT the same work**: a musl static nix serves
-   "enough nix on a minimal host"; only T-060 needs a glibc one.
+   the boundary in production code. ⭐ **AND IT IS MEASURED**, not inferred:
+   `experiments/98-`, pass=7 fail=0 — PT_INTERP 0, DT_NEEDED 0, target triple
+   `x86_64-unknown-linux-**musl**`, and ⭐ **`nix --version` on 11 of 11**.
+   ⛔ **The obvious probe lies**: `strings | grep 'GNU C Library'` returns 1
+   and that 1 is a licence sentence; the store path is the discriminator.
+   ⭐ **So T-051 and T-060 are NOT the same work**: this binary already serves
+   "enough nix on a minimal host" and is one pinned fetch; only T-060 needs a
+   glibc one.
 2. ⛔ **THE `--store` HALF IS NO LONGER UNMEASURED — SOMEBODY ELSE MEASURED IT
    AND IT FAILS.** `nix-portable` has shipped `nix --store` as its
    **first-choice** runtime since 2021. Its issue **#98**, nine comments,

@@ -13,13 +13,15 @@ The usable half — the lessons with the actual code lines — is
 
 | | |
 |---|---|
-| **never run** | nothing here was executed. Every claim is read at the captured commit, and the ones that matter are marked ⚠ **unverified by measurement** so the next session knows which to probe first. |
+| **mostly never run** | ⭐ **one finding was measured** — finding 1, by `experiments/98-`, which is why it now carries numbers. **Everything else is read** at the captured commit, and the claims that matter are marked ⚠ **unverified by measurement** so the next session knows which to probe first. |
 | **not fetched** | discussions, for all four. GraphQL only, no credential-free route; each `PROVENANCE.md` records it, and the gap is repeated here because a source missing without being named reads like a source that had nothing in it. |
 | **read at README + key-source + tracker depth** | `containerbase/nix-prebuild` — it is 60 lines of shell and a Dockerfile, and pass 4 over it would be padding. Said rather than implied, per `methodology/references.md`. |
 | **not compared** | none of these was benchmarked against `pgb`. `pelf` in particular is a live competitor on the axis the operator just made binding, and **nobody has run it here**. |
 
-⚠ **Assume claims remain wrong.** This is revision 1 and it already carries one
-correction of a claim this project had written down (below).
+⚠ **Assume claims remain wrong.** This is revision 1 and it already carries two
+corrections of claims this project had written down, ⛔ **and one correction of
+its own first probe** — `strings | grep 'GNU C Library'` matched a licence
+sentence and would have inverted finding 1.
 
 ---
 
@@ -75,9 +77,27 @@ nix produced by `pgb`" — is not.** Those two entries have been treated as the
 same work seen from two sides; ⛔ **they are not, and this is the finding that
 separates them.**
 
-⚠ **Unverified by measurement here**: that the published `nix-static` is musl,
-that it runs on this project's eleven, and that it operates a `--store` under
-`$HOME`. All three are one probe each and none was run.
+⭐ **TWO OF THE THREE WERE THEN MEASURED, the same day, and the sweep's
+riskiest inference held** — `experiments/98-published-static-nix.sh`,
+**pass=7 fail=0**, against `containerbase/nix-prebuild` 2.35.2 x86_64 pinned by
+SHA-512:
+
+| | |
+|---|---|
+| PT_INTERP / DT_NEEDED | **0 / 0** — genuinely static, 37,908,480 B |
+| compiled-in output name | `nix-static-x86_64-unknown-linux-**musl**` |
+| `nix --version` on the eleven | ⭐ **11 of 11**, glibc and musl rows alike |
+
+⛔ **AND THE FIRST PROBE SAID THE OPPOSITE.** `strings nix | grep -c 'GNU C
+Library'` returns **1**, and one is not zero — read as a libc test it says
+glibc. It is not a libc test: the hit is inside a **licence sentence**,
+*"component like the GNU C Library)."* ⭐ The discriminator that works is the
+nixpkgs **store path** compiled into the binary, which carries the target
+triple. Both are asserted in `98-` so nobody re-derives the trap.
+
+⚠ **Still unmeasured**: whether that binary operates a `--store` under `$HOME`
+on this project's eleven. Finding 2 says somebody else's tracker expects it
+not to.
 
 ## ⛔ FINDING 2 — THE `nix --store` ROUTE IS THE DEFAULT, AND IT FAILS IN PRODUCTION
 
@@ -254,10 +274,10 @@ tool decides which of the ten bite.
 
 1. ⛔ **Nothing here was run.** Findings 1, 2 and 4 are the ones a wrong reading
    would cost most, and each names its own probe.
-2. ⚠ **The `nix-static` / `nix-cli-static` musl question is INFERRED**, from
-   `pkgsStatic` being musl in nixpkgs. It was not checked against a fetched
-   binary. If it is wrong, T-060's premise changes completely, so ⭐ **check it
-   first**: fetch one and read its `PT_INTERP` and `DT_NEEDED`.
+2. ✅ **RESOLVED THE SAME DAY.** The musl question was inferred and is now
+   measured — `experiments/98-`, the target triple in the compiled-in store
+   path, 11 of 11 running. ⛔ **And the obvious probe was a false positive**:
+   `strings | grep 'GNU C Library'` matches a licence sentence. Finding 1.
 3. ⚠ **`pelf`'s 350 MB threshold is a default, not a measurement.** It is one
    project's judgement and may encode their dwarfs settings rather than a
    property of FUSE.
