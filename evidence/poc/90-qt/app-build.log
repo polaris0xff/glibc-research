@@ -31,7 +31,7 @@
 -- Found WrapFreetype: TRUE (found version "6.11.1")
 -- Using Qt bundled Jpeg.
 -- Found WrapJpeg: TRUE (found version "6.11.1")
--- Configuring done (1.9s)
+-- Configuring done (1.7s)
 -- Generating done (0.0s)
 -- Build files have been written to: /var/tmp/pgb-poc/90-qt/app/build
 [ 50%] Building CXX object CMakeFiles/qtprobe.dir/main.cpp.o

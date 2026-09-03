@@ -6,7 +6,7 @@ version       : 5.3.1
 sha256        : fa41b3a85413af87fb5e3a7d9c8fa8d4a20728c67651185bb49c38a7f9382b1e
 normal build  : ./configure && make
 stresses      : locale (LC_CTYPE, LC_NUMERIC), iconv, dlopen extension API
-date (UTC)    : 2026-09-03T05:45:03Z
+date (UTC)    : 2026-09-03T06:46:27Z
 evidence      : /home/user/glibc-research/evidence/poc/10-gawk
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1

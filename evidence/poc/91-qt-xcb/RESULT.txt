@@ -6,7 +6,7 @@ version       : Qt 6.11.1 (qtbase) + libxcb 1.17 + xkbcommon 1.13 + OpenSSL 3
 sha256        : d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac
 normal build  : apt install qt6-base-dev && cmake && make
 stresses      : xcb QPA on a real X server, a mapped window, static OpenSSL linked into QtNetwork, QtSql/SQLite
-date (UTC)    : 2026-09-03T06:14:53Z
+date (UTC)    : 2026-09-03T07:17:08Z
 evidence      : /home/user/glibc-research/evidence/poc/91-qt-xcb
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1

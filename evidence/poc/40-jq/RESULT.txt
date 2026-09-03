@@ -6,7 +6,7 @@ version       : 1.7.1
 sha256        : 478c9ca129fd2e3443fe27314b455e211e0d8c60bc8ff7df703873deeee580c2
 normal build  : ./configure --with-oniguruma && make
 stresses      : Unicode round-trip, surrogate pairs, optional static dependency detection
-date (UTC)    : 2026-09-03T05:49:29Z
+date (UTC)    : 2026-09-03T06:51:16Z
 evidence      : /home/user/glibc-research/evidence/poc/40-jq
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1

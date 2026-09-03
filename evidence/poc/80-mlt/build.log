@@ -674,8 +674,8 @@ GEN	libswscale/libswscale.version
 GEN	libavutil/libavutil.version
 CC	libavdevice/alldevices.o
 CC	libavdevice/avdevice.o
-CC	libavdevice/fbdev_common.o
 CC	libavdevice/fbdev_dec.o
+CC	libavdevice/fbdev_common.o
 CC	libavdevice/fbdev_enc.o
 CC	libavdevice/lavfi.o
 CC	libavdevice/oss.o
@@ -765,12 +765,12 @@ CC	libavfilter/af_flanger.o
 CC	libavfilter/af_haas.o
 CC	libavfilter/af_hdcd.o
 CC	libavfilter/af_headphone.o
+CC	libavfilter/af_join.o
 In function 'generate_min_phase_kernel',
     inlined from 'generate_kernel' at libavfilter/af_firequalizer.c:691:13:
 libavfilter/af_firequalizer.c:559:5: warning: 'memset' specified bound between 18446744069414584316 and 18446744073709551608 exceeds maximum object size 9223372036854775807 [-Wstringop-overflow=]
   559 |     memset(s->cepstrum_buf + cepstrum_len/2 + 1, 0, (cepstrum_len/2 - 1) * sizeof(*s->cepstrum_buf));
       |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-CC	libavfilter/af_join.o
 CC	libavfilter/af_loudnorm.o
 CC	libavfilter/af_mcompand.o
 CC	libavfilter/af_pan.o
@@ -1084,6 +1084,8 @@ CC	libavfilter/x86/vf_idet_init.o
 CC	libavfilter/x86/vf_limiter_init.o
 CC	libavfilter/x86/vf_lut3d_init.o
 CC	libavfilter/x86/vf_maskedclamp_init.o
+CC	libavfilter/x86/vf_maskedmerge_init.o
+CC	libavfilter/x86/vf_nlmeans_init.o
 libavfilter/x86/vf_lut3d_init.c: In function 'ff_lut3d_init_x86':
 libavfilter/x86/vf_lut3d_init.c:63:9: warning: unused variable 'depth' [-Wunused-variable]
    63 |     int depth = desc->comp[0].depth;
@@ -1091,8 +1093,6 @@ libavfilter/x86/vf_lut3d_init.c:63:9: warning: unused variable 'depth' [-Wunused
 libavfilter/x86/vf_lut3d_init.c:62:9: warning: unused variable 'isfloat' [-Wunused-variable]
    62 |     int isfloat = desc->flags & AV_PIX_FMT_FLAG_FLOAT;
       |         ^~~~~~~
-CC	libavfilter/x86/vf_maskedmerge_init.o
-CC	libavfilter/x86/vf_nlmeans_init.o
 CC	libavfilter/x86/vf_noise.o
 CC	libavfilter/x86/vf_overlay_init.o
 CC	libavfilter/x86/vf_psnr_init.o
@@ -1131,8 +1131,8 @@ CC	libavformat/aiffenc.o
 CC	libavformat/aixdec.o
 CC	libavformat/allformats.o
 CC	libavformat/alp.o
-CC	libavformat/amr.o
 CC	libavformat/amvenc.o
+CC	libavformat/amr.o
 CC	libavformat/anm.o
 CC	libavformat/apac.o
 CC	libavformat/apc.o
@@ -1141,15 +1141,15 @@ CC	libavformat/apetag.o
 CC	libavformat/apm.o
 CC	libavformat/apngdec.o
 CC	libavformat/apngenc.o
-CC	libavformat/aptxdec.o
 CC	libavformat/aqtitledec.o
+CC	libavformat/aptxdec.o
 CC	libavformat/argo_asf.o
 CC	libavformat/argo_brp.o
 CC	libavformat/argo_cvg.o
 CC	libavformat/asf.o
 CC	libavformat/asf_tags.o
-CC	libavformat/asfdec_f.o
 CC	libavformat/asfcrypt.o
+CC	libavformat/asfdec_f.o
 CC	libavformat/asfdec_o.o
 CC	libavformat/asfenc.o
 CC	libavformat/assdec.o
@@ -1223,8 +1223,6 @@ libavformat/dashenc.c:1581:9: note: 'snprintf' output between 1 and 2047 bytes i
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 CC	libavformat/dfa.o
 CC	libavformat/dfpwmdec.o
-CC	libavformat/dhav.o
-CC	libavformat/diracdec.o
 libavformat/dashenc.c: In function 'flush_init_segment':
 libavformat/dashenc.c:594:49: warning: '%s' directive output may be truncated writing up to 1023 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
   594 |         snprintf(filename, sizeof(filename), "%s%s", c->dirname, os->initfile);
@@ -1241,6 +1239,8 @@ In function 'get_hls_playlist_name',
 libavformat/dashenc.c:488:9: note: 'snprintf' output between 13 and 1046 bytes into a destination of size 1024
   488 |         snprintf(playlist_name, string_size, "%smedia_%d.m3u8", base_url, id);
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CC	libavformat/dhav.o
+CC	libavformat/diracdec.o
 CC	libavformat/dnxhddec.o
 CC	libavformat/dovi_isom.o
 CC	libavformat/dsfdec.o
@@ -1399,8 +1399,8 @@ CC	libavformat/luodatdec.o
 CC	libavformat/lvfdec.o
 CC	libavformat/lxfdec.o
 CC	libavformat/m4vdec.o
-CC	libavformat/matroska.o
 CC	libavformat/matroskadec.o
+CC	libavformat/matroska.o
 CC	libavformat/matroskaenc.o
 CC	libavformat/mca.o
 CC	libavformat/mccdec.o
@@ -1416,8 +1416,6 @@ CC	libavformat/mlvdec.o
 CC	libavformat/mm.o
 CC	libavformat/mmf.o
 CC	libavformat/mms.o
-CC	libavformat/mmsh.o
-CC	libavformat/mmst.o
 libavformat/matroskaenc.c: In function 'mkv_write_trailer':
 libavformat/matroskaenc.c:3341:79: warning: '%012.9f' directive output may be truncated writing between 12 and 320 bytes into a region of size between 8 and 14 [-Wformat-truncation=]
  3341 |                 snprintf(duration_string, sizeof(duration_string), "%02d:%02d:%012.9f",
@@ -1429,6 +1427,8 @@ libavformat/matroskaenc.c:3341:17: note: 'snprintf' output between 19 and 333 by
       |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  3343 |                          fmod(duration_sec, 60));
       |                          ~~~~~~~~~~~~~~~~~~~~~~~
+CC	libavformat/mmsh.o
+CC	libavformat/mmst.o
 CC	libavformat/mods.o
 CC	libavformat/moflex.o
 CC	libavformat/mov.o
@@ -1542,6 +1542,7 @@ CC	libavformat/rtmpproto.o
 CC	libavformat/rtp.o
 CC	libavformat/rtpdec.o
 CC	libavformat/rtpdec_ac3.o
+CC	libavformat/rtpdec_amr.o
 libavformat/rtmpproto.c: In function 'send_invoke_response':
 libavformat/rtmpproto.c:2001:51: warning: ' is now published' directive output may be truncated writing 17 bytes into a region of size between 1 and 128 [-Wformat-truncation=]
  2001 |         snprintf(statusmsg, sizeof(statusmsg), "%s is now published", filename);
@@ -1549,7 +1550,6 @@ libavformat/rtmpproto.c:2001:51: warning: ' is now published' directive output m
 libavformat/rtmpproto.c:2001:9: note: 'snprintf' output between 18 and 145 bytes into a destination of size 128
  2001 |         snprintf(statusmsg, sizeof(statusmsg), "%s is now published", filename);
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-CC	libavformat/rtpdec_amr.o
 CC	libavformat/rtpdec_asf.o
 CC	libavformat/rtpdec_dv.o
 CC	libavformat/rtpdec_g726.o
@@ -1642,7 +1642,6 @@ CC	libavformat/sol.o
 CC	libavformat/soxdec.o
 CC	libavformat/soxenc.o
 CC	libavformat/spdif.o
-CC	libavformat/spdifdec.o
 libavformat/smoothstreamingenc.c: In function 'ism_flush':
 libavformat/smoothstreamingenc.c:510:49: warning: '/temp' directive output may be truncated writing 5 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
   510 |         snprintf(filename, sizeof(filename), "%s/temp", os->dirname);
@@ -1668,6 +1667,7 @@ libavformat/smoothstreamingenc.c:546:63: warning: '/Fragments(' directive output
 libavformat/smoothstreamingenc.c:546:9: note: 'snprintf' output 15 or more bytes (assuming 1038) into a destination of size 1024
   546 |         snprintf(target_filename, sizeof(target_filename), "%s/Fragments(%s=%"PRIu64")", os->dirname, os->stream_type_tag, start_ts);
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CC	libavformat/spdifdec.o
 CC	libavformat/spdifenc.o
 CC	libavformat/srtdec.o
 CC	libavformat/srtenc.o
@@ -1811,6 +1811,9 @@ CC	libavcodec/aasc.o
 CC	libavcodec/ac3.o
 CC	libavcodec/ac3_channel_layout_tab.o
 CC	libavcodec/ac3_parser.o
+CC	libavcodec/ac3dec_data.o
+CC	libavcodec/ac3dec_fixed.o
+CC	libavcodec/ac3dec_float.o
 In file included from libavcodec/aacsbr.c:383:
 libavcodec/aacsbr_template.c: In function 'read_sbr_grid':
 libavcodec/aacsbr_template.c:728:57: warning: writing 1 byte into a region of size 0 [-Wstringop-overflow=]
@@ -1846,9 +1849,17 @@ libavcodec/aacsbr_template.c:728:57: warning: writing 1 byte into a region of si
 libavcodec/sbr.h:106:24: note: at offset [2147483649, 4294967292] into destination object 't_env' of size 9
   106 |     uint8_t            t_env[9];
       |                        ^~~~~
-CC	libavcodec/ac3dec_data.o
-CC	libavcodec/ac3dec_fixed.o
-CC	libavcodec/ac3dec_float.o
+In file included from libavcodec/ac3dec_float.c:38:
+In function 'spx_strategy',
+    inlined from 'decode_audio_block' at libavcodec/ac3dec.c:1142:24:
+libavcodec/ac3dec.c:854:37: warning: writing 1 byte into a region of size 0 [-Wstringop-overflow=]
+  854 |             s->channel_uses_spx[ch] = get_bits1(bc);
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+In file included from libavcodec/ac3dec_float.c:34:
+libavcodec/ac3dec.h: In function 'decode_audio_block':
+libavcodec/ac3dec.h:144:13: note: at offset 7 into destination object 'channel_uses_spx' of size 7
+  144 |     uint8_t channel_uses_spx[AC3_MAX_CHANNELS]; ///< channel uses spectral extension        (chinspx)
+      |             ^~~~~~~~~~~~~~~~
 In file included from libavcodec/aacsbr_fixed.c:610:
 libavcodec/aacsbr_template.c: In function 'read_sbr_grid':
 libavcodec/aacsbr_template.c:728:57: warning: writing 1 byte into a region of size 0 [-Wstringop-overflow=]
@@ -1884,17 +1895,6 @@ libavcodec/aacsbr_template.c:728:57: warning: writing 1 byte into a region of si
 libavcodec/sbr.h:106:24: note: at offset [-2147483647, -4] into destination object 't_env' of size 9
   106 |     uint8_t            t_env[9];
       |                        ^~~~~
-In file included from libavcodec/ac3dec_float.c:38:
-In function 'spx_strategy',
-    inlined from 'decode_audio_block' at libavcodec/ac3dec.c:1142:24:
-libavcodec/ac3dec.c:854:37: warning: writing 1 byte into a region of size 0 [-Wstringop-overflow=]
-  854 |             s->channel_uses_spx[ch] = get_bits1(bc);
-      |             ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
-In file included from libavcodec/ac3dec_float.c:34:
-libavcodec/ac3dec.h: In function 'decode_audio_block':
-libavcodec/ac3dec.h:144:13: note: at offset 7 into destination object 'channel_uses_spx' of size 7
-  144 |     uint8_t channel_uses_spx[AC3_MAX_CHANNELS]; ///< channel uses spectral extension        (chinspx)
-      |             ^~~~~~~~~~~~~~~~
 In file included from libavcodec/ac3dec_fixed.c:156:
 In function 'spx_strategy',
     inlined from 'decode_audio_block' at libavcodec/ac3dec.c:1142:24:
@@ -2016,8 +2016,8 @@ CC	libavcodec/bsf/h264_mp4toannexb.o
 CC	libavcodec/bsf/h264_redundant_pps.o
 CC	libavcodec/bsf/h265_metadata.o
 CC	libavcodec/bsf/h266_metadata.o
-CC	libavcodec/bsf/hevc_mp4toannexb.o
 CC	libavcodec/bsf/hapqa_extract.o
+CC	libavcodec/bsf/hevc_mp4toannexb.o
 CC	libavcodec/bsf/imx_dump_header.o
 CC	libavcodec/bsf/media100_to_mjpegb.o
 CC	libavcodec/bsf/mjpeg2jpeg.o
@@ -2093,8 +2093,8 @@ CC	libavcodec/cyuv.o
 CC	libavcodec/d3d11va.o
 CC	libavcodec/dca.o
 CC	libavcodec/dca_core.o
-CC	libavcodec/dca_lbr.o
 CC	libavcodec/dca_exss.o
+CC	libavcodec/dca_lbr.o
 CC	libavcodec/dca_parser.o
 CC	libavcodec/dca_sample_rate_tab.o
 CC	libavcodec/dca_xll.o
@@ -2545,6 +2545,8 @@ CC	libavcodec/pcm-blurayenc.o
 CC	libavcodec/pcm-dvd.o
 CC	libavcodec/pcm-dvdenc.o
 CC	libavcodec/pcm.o
+CC	libavcodec/pcx.o
+CC	libavcodec/pcxenc.o
 libavcodec/pcm.c: In function 'pcm_decode_init':
 libavcodec/pcm.c:287:5: warning: 'sample_fmts' is deprecated [-Wdeprecated-declarations]
   287 |     avctx->sample_fmt = avctx->codec->sample_fmts[0];
@@ -2554,8 +2556,6 @@ In file included from libavcodec/avcodec.h:41,
 libavcodec/codec.h:219:32: note: declared here
   219 |     const enum AVSampleFormat *sample_fmts; ///< @deprecated use avcodec_get_supported_config()
       |                                ^~~~~~~~~~~
-CC	libavcodec/pcx.o
-CC	libavcodec/pcxenc.o
 CC	libavcodec/pgssubdec.o
 CC	libavcodec/pgxdec.o
 CC	libavcodec/photocd.o
@@ -3481,7 +3481,7 @@ INSTALL	libavutil/libavutil.pc
  * SWIG
  * ClangFormat (required version == 14)
 
--- Configuring done (1.6s)
+-- Configuring done (1.8s)
 -- Generating done (0.1s)
 -- Build files have been written to: /var/tmp/pgb-poc/80-kdenlive/mlt/build
 /usr/bin/ld: /root/.local/state/pgb/runtime-x86_64-1759451593/pgb-dl-4-1-consumer_cbrts.c.o: in function `consumer_start':

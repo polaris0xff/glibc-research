@@ -6,7 +6,7 @@ version       : 8.2
 sha256        : d5ad07dd862facae03051c54c6535e54c7ed7407318783fcad1ad2d7076fffeb
 normal build  : ./configure && make (against the distro's libncursesw)
 stresses      : terminfo data, ncurses static dependency, iconv, locale, multibyte
-date (UTC)    : 2026-09-03T05:45:40Z
+date (UTC)    : 2026-09-03T06:47:08Z
 evidence      : /home/user/glibc-research/evidence/poc/20-nano
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
@@ -31,7 +31,7 @@ build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
   ok    alpine-3.22: functional test                 = ok
     alpine-3.20          musl   ok         none                         /etc/nsswitch.conf terminfo 
   ok    alpine-3.20: functional test                 = ok
-    alpine-3.10          musl   ok         none                         /etc/nsswitch.conf terminfo 
+    alpine-3.10          musl   ok         none                         terminfo 
   ok    alpine-3.10: functional test                 = ok
     voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf terminfo 
   ok    voidlinux-musl: functional test              = ok

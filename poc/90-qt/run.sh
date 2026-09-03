@@ -170,7 +170,15 @@ QT_CONFIGURE_LINE="-static -release -force-bundled-libs -no-dbus -no-opengl \
 -default-qpa offscreen -nomake examples -nomake tests"
 
 if [ ! -f "$INST/lib/libQt6Widgets.a" ]; then
-  printf '  building qtbase (this is the long pole: hours, not minutes)\n'
+  # ⚠ THIS LINE SAID "hours, not minutes" UNTIL 2026-09-03c, AND IT WAS NEVER
+  # MEASURED. Three clean-rebuild runs of the WHOLE POC -- fetch, configure,
+  # qtbase, the application AND the eleven-environment matrix -- took 868 s,
+  # 888 s and 873 s on four cores, so qtbase alone is strictly less than
+  # fifteen minutes. `poc/91-qt-xcb`, which adds xcb, OpenSSL in QtNetwork and
+  # QtSql, took 1,545 s / 1,681 s / 1,653 s: still under half an hour.
+  # ⛔ It matters because T-054 rung 4 and T-066 route B are both costed on
+  # whether Qt is affordable to build from source, and "hours" said no.
+  printf '  building qtbase (the long pole: ~10 min of this POC on four cores)\n'
   # ⚠ Guarded on CMakeCache.txt, not on the install: a re-run after a build
   # that stopped half way should not pay four minutes of configure again.
   if [ ! -f "$BLD/CMakeCache.txt" ]; then
