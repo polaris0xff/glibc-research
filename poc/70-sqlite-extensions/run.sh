@@ -194,6 +194,10 @@ poc_check "PT_INTERP absent" \
   "$(readelf -lW "$SRC/sqlite3-wrapped" 2>/dev/null | grep -c INTERP)" "0"
 poc_check "DT_NEEDED entries" \
   "$(readelf -dW "$SRC/sqlite3-wrapped" 2>/dev/null | grep -c NEEDED)" "0"
+# ⛔ This POC does its own inspection rather than calling poc_inspect, and for
+# a long time that meant it never made the one assertion that can tell a
+# binary built by the named environment from one built by the incumbent.
+poc_check_built_by_env "$SRC/sqlite3-wrapped"
 # ⭐ The namespacing, checked on the artefact rather than trusted: exactly one
 # `sqlite3_api` would mean fifteen plugins sharing one, which is the bug.
 # Fifteen prefixed ones means each has its own, which is what a .so would get.

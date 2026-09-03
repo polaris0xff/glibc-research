@@ -332,6 +332,20 @@ is **costing route B**, which is where the size actually is.
         eleven environments, not by five link shapes checked by hand.
         ⚠ Run against the pgb built at session start -- i.e. BEFORE this
         session's own buildx/sweep changes, which is what R1 was for.
+        ⛔ AND CHECKING THE RESULT FOUND A GAP IN THE HARNESS ITSELF.
+        `poc_inspect` carries the ONLY assertion that can tell a binary built
+        by the named environment from one built by the incumbent -- the
+        .comment gcc check that caught T-070 arm 5. THREE of the ten POCs
+        never call poc_inspect: 70-sqlite-extensions, 80-mlt and 91-qt-xcb
+        each inspect by hand instead. So three of the ten reported green
+        having never compared their binary's compiler to the environment's.
+        ⭐ Split out as `poc_check_built_by_env` and called from all three.
+        Verified on all four branches: right gcc -> ok, wrong env gcc -> FAIL,
+        no .comment -> SKIP, no recorded env gcc -> SKIP.
+        ⚠ The three binaries WERE correct (all read 14.2.0, checked by hand);
+        the gap was that nothing asserted it.
+        ⛔ RE-RUN OWED: those three RESULT.txt files describe runs without the
+        new assertion. Re-run 70, 80 and 91 once the bed is free.
     R2  ✅ DONE 2026-09-03c, AND IT FOUND A SECOND ROOT-OF-ITSELF.
         `sonamesMentionedNaive` computes the self-set itself now, with
         `os.SameFile` (device+inode) against `selfKeys`'s path-string
@@ -411,9 +425,12 @@ is **costing route B**, which is where the size actually is.
             real children: kill -9 -> 137, signal 9.
             ⚠ Needed a small product refactor -- ChrootBinds() and
             ContainerRunArgv() split out of the runners so the argv can be
-            asserted without a bed. ⛔ REAL-BUILD VALIDATION STILL OWED: the
-            POC suite was running against the pre-refactor pgb when this
-            landed, so re-run one POC after rebuilding ./pgb.
+            asserted without a bed. ✅ REAL-BUILD VALIDATION DONE: ./pgb
+            rebuilt with the refactor, `PGB_ENGINE=chroot sh poc/40-jq/run.sh`
+            -> pass=13 fail=0, and the .comment gcc assertion confirms it
+            built in the right environment. ⚠ CI does NOT cover this path: it
+            uses `--engine host`, which goes straight to Inner() and never
+            reaches ChrootBinds or ContainerRunArgv.
     T-075   ✅ DONE 2026-09-03c. `experiments/96-`, pass=14 fail=0. BOTH rows
             measured by one experiment, and the answer to both is NO.
             ⭐ Same source, same compiler, one -static and one not, both

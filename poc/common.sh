@@ -348,9 +348,37 @@ poc_inspect() { # binary
   _pi_cc=$(readelf -p .comment "$1" 2>/dev/null \
            | sed -n 's/.*GCC: (\{0,1\}[^)]*)\{0,1\} \([0-9][0-9.]*\).*/\1/p' | head -1)
   printf '    %-22s %s\n' '.comment gcc' "${_pi_cc:-absent}"
-  if [ -n "$_pi_cc" ] && [ -n "$POC_ENV_GCC" ]; then
-    poc_check "built by the environment's own gcc" "$_pi_cc" "$POC_ENV_GCC"
+  poc_check_built_by_env "$1"
+}
+
+# ⭐ THE TOOLCHAIN ASSERTION ON ITS OWN, so a POC that does its own inspection
+# can still make it.
+#
+# ⛔ WHY IT IS SPLIT OUT, AND IT IS A GAP THAT WAS FOUND BY COUNTING RATHER
+# THAN BY READING. This assertion is the ONLY thing in a POC's output that can
+# tell a binary built by the named environment from one built by the incumbent
+# — it is what caught T-070 arm 5, where `.comment` said `GCC: (Debian
+# 12.2.0-14+deb12u1)` and every other line looked right. ⚠ It lived inside
+# `poc_inspect`, and THREE of the ten POCs never call `poc_inspect`:
+# `70-sqlite-extensions`, `80-mlt` and `91-qt-xcb` each do their own PT_INTERP
+# and DT_NEEDED checks instead. So three of the ten reported green having never
+# compared their binary's compiler to the environment's.
+#
+# ⚠ A binary with no `.comment` SKIPS rather than passes — a stripped or
+# `-fno-ident` link is not a wrong compiler, and a silent pass would be the
+# absence-as-zero this harness exists to refuse.
+poc_check_built_by_env() { # binary
+  _cb_cc=$(readelf -p .comment "$1" 2>/dev/null \
+           | sed -n 's/.*GCC: (\{0,1\}[^)]*)\{0,1\} \([0-9][0-9.]*\).*/\1/p' | head -1)
+  if [ -z "$_cb_cc" ]; then
+    poc_skip "built by the environment's own gcc" "no .comment in $(basename "$1")"
+    return 0
   fi
+  if [ -z "$POC_ENV_GCC" ]; then
+    poc_skip "built by the environment's own gcc" "the environment recorded no gcc"
+    return 0
+  fi
+  poc_check "built by the environment's own gcc" "$_cb_cc" "$POC_ENV_GCC"
 }
 
 poc_finish() {

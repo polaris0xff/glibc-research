@@ -226,6 +226,9 @@ poc_check "the static melt links" \
 poc_note "melt-static $(wc -c < "$W/melt-static") bytes"
 poc_check "PT_INTERP absent" "$(readelf -lW "$W/melt-static" | grep -c INTERP)" "0"
 poc_check "DT_NEEDED entries" "$(readelf -dW "$W/melt-static" | grep -c NEEDED)" "0"
+# ⛔ As in poc/70: this POC inspects by hand, so without this it never compared
+# its binary's compiler against the environment's. See poc/common.sh.
+poc_check_built_by_env "$W/melt-static"
 # Every MLT module exports mlt_register; namespacing is what stops them
 # colliding, exactly as with SQLite's sqlite3_api in poc/70.
 poc_check "per-module mlt_register instances" \

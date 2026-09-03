@@ -483,6 +483,12 @@ HOSTRC=$?
 poc_check "the probe passes on the build host" "$HOSTRC" "0"
 sed 's/^/        /' "$POC_OUT/host-run.txt"
 
+# ⛔ As in poc/70 and poc/80: this POC inspects its artefacts by hand rather
+# than through poc_inspect, so without this it never compared the binary's
+# compiler against the environment's -- the one check that separates a build
+# against the named environment from a build against the incumbent.
+poc_check_built_by_env "$BIN"
+
 poc_functional_test() {
   cat <<SH
 #!/bin/sh
