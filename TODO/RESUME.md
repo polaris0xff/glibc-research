@@ -5,8 +5,8 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-02f, at session START
-    TREE           main, clean, at 764c8544
+    LAST WRITTEN   2026-09-02f/03, REFRESHED mid-session
+    TREE           main, clean, at f4147fad
     BRANCH         ⛔ main. The harness named
                    `claude/glibc-research-foundations-7pjoqe`; RULES.md §Git
                    outranks it and THE OPERATOR SAID THE SAME in the work
@@ -14,7 +14,7 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
                    local copy is deleted; the remote copy was already there at
                    main's commit and is left alone — the git proxy refuses
                    deletes.
-    CI             not yet run this session.
+    CI             pushed; not yet read this session.
 
 ---
 
@@ -47,26 +47,34 @@ and neither carries 2026-09-02e's:
 
 ## In flight right now
 
-    nothing is running on the bed.
+    ⛔ THE BED IS BUSY. A POC chain is re-running the ten POCs at the new pin,
+    ONE AT A TIME, and its matrix phase uses the eleven rootfs. Do not start
+    85-, 62-, 86- or a second POC beside it.
+      driver  scratchpad/pocchain.sh   log  scratchpad/pocchain.log
+      done    40-jq 20-nano 60-leveldb 30-curl 70-sqlite  all pass, at 2.41
+      left    90-qt (running) 50-python 91-qt-xcb
+      ⚠ 80-mlt and 10-gawk are NOT in the chain: 10-gawk was run first, by
+        hand, and 80-mlt is hours. 80-mlt is what is owed.
 
-    T-070 landing, step 1 of 3 (see the entry, "the pin is not one constant,
-    it is NINE"): eight shell files hardcode the environment NAME as their own
-    fallback and would not follow cfg.go. That edit is what this session
-    started on.
+    A host-side sweep of all 1527 host shared objects through the TLS-fixed
+    loader is also running: scratchpad/tlsfix-sweep.sh, result lands in
+    scratchpad/tlsfix-sweep.txt. It touches no rootfs.
 
-## ⛔ WHAT IS LEFT, IN ORDER (PROGRESS.md work order, re-derived)
+## ⛔ WHAT IS LEFT, IN ORDER
 
-    1  T-070 P0  the RULING IS MADE; the LANDING is not. In this order and no
-                 other: (a) one source of truth for the default environment
-                 name -- experiments/60- 61- 62- 70- 73- 80- 87- 88- each
-                 carry their own `pgb-env-debian12` fallback; (b) then
-                 cfg.go's three constants; (c) then re-run the matrices,
-                 because every committed RESULT.txt says `pinned build
-                 glibc : 2.36`.
-    2  T-068 P1  the entry is STALE -- rewrite it against the run that
-                 happened, then take the residue: 889 undefined, 27
-                 missing-dep, 1 unrecognised (`libsyslookup.so`).
-    3  T-072 P1  route D designed and costed, NOT implemented.
+    1  T-070 P0  steps 1 and 2 ARE LANDED (cfg.go is debian:13 / glibc 2.41 /
+                 pgb-env-debian13, CI derives the image, check.sh gates all
+                 three constants). Step 3 is the matrices: 73- and 21- re-run
+                 and committed, six POCs re-run and committed. ⛔ 80-mlt at
+                 2.41 through the normal POC path is what is left.
+    2  T-068 P1  ⭐ TWO REAL LOADER DEFECTS FOUND AND FIXED this session (the
+                 iconv weak-reference one and the general-dynamic TLS one).
+                 ⛔ experiments/93- MUST BE RE-RUN with both -- the committed
+                 RESULT.txt predates the TLS fix and its control fails at 10.
+    3  T-072 P1  --tls-reserve IS implemented (the record said otherwise).
+                 ⛔ Its outstanding item turned up an unexpected answer: see
+                 the entry. experiments/76- with a non-zero reserve on the
+                 eleven is still owed.
     4  T-071 P0  `sh experiments/85-opengl.sh` -- the data-coherence arm is
                  written and NOT RUN. That is the entry's Prove. Uses the bed.
     5  T-066 P0  the corpus is mined; measure the allowlist's ceiling first.
@@ -82,11 +90,12 @@ refuses without them, commit 333cb92f):
     PGB_ENV_IMAGE=debian:trixie       the stamp guard compares IMAGES, not
     PGB_ENV_DIGEST=sha256:6788062a…   names, so without these it sees a match
 
-    debian:trixie   sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
+    debian:13 = debian:trixie   sha256:6788062a…  (COMMITTED in cfg.go now)
 
-⚠ **That digest is committed nowhere in the tree yet** — it is re-resolved at
-run time by `experiments/91-` arm 1 from a rolling registry lookup. Pinning it
-is part of step (b) above.
+⭐ **That digest IS committed now** — `internal/cfg/cfg.go` is the pin, and
+`debian:13` and `debian:trixie` resolved to the same manifest digest on
+2026-09-02 with `experiments/91-`'s own control passing. ⚠ The incantation
+above is now only for measuring a *candidate* pin; the default builds 2.41.
 
 ## ⛔ Machine notes
 
