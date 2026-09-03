@@ -298,6 +298,18 @@ the column reported a warm start — 1.02× of warm, measured.
    not of the payload, so the 4.92× cold row should move the way `jq`'s did.
    `experiments/90-` carries the corrected protocol; it needs a run.
 
+⛔ **A DEFECT FOUND BY READING THE FORK'S CHANGELOG, 2026-09-03d, NOT FIXED.**
+`internal/bundle/appimage.go`'s constant block says *"Pinned, and the pin is
+the point: `latest/download` moves under you"* — and then pins **sharun** to
+`releases/latest/download`. uruntime and dwarfs carry tags; sharun does not.
+⚠ The URL-keyed cache added the same day does not help: the URL never changes,
+so a warm cache keeps whatever it has and a cold one takes whatever is current.
+⛔ **`Anylinux-sharun` is a fork whose surface SHRINKS** — it has already
+removed `lib4bin`, `sharun-aio`, `sharun-lite`, the `xdg-open` wrapper and
+`--with-wrappe`. ⚠ Not changed here because choosing a tag means re-running the
+eleven-environment matrix, which the operator deferred on 2026-09-03d.
+[`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md) §10.
+
 **Prove.** A CLI subject bundled by one command, with startup and run time
 **under** the field's on the same machine on the same day, and the eleven-row
 coverage column unchanged.

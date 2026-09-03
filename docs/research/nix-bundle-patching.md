@@ -297,6 +297,71 @@ sent upstream — it answers *"could a release retire this patch on its own?"*
 `Azathothas/TEMPLATE`. It is binding, and F1 is an application of it rather
 than a new invention.
 
+## ⭐ 10. The sharun fork's delta — a list of fixes we would otherwise rediscover
+
+`pkgforge-dev/Anylinux-sharun` at `9728d8d7` states its own delta against
+`VHSgunzo/sharun`, and several rows are things this project has already met or
+is about to.
+
+| what the fork adds | why it matters here |
+|---|---|
+| ⭐ auto-sets `MLT_REPOSITORY`, `MLT_PROFILES_PATH`, `MLT_PRESETS_PATH`, `FREI0R_PATH`, `LADSPA_PATH` | **that is kdenlive's engine.** `poc/80-mlt` and `experiments/90-` drive `melt`; this is the field's list of what MLT needs to find its modules |
+| ⭐ auto-sets `QT_XKB_CONFIG_ROOT` | the **xcb** half of the operator's "egl, sdl, xcb issues", named explicitly |
+| ⭐ `AppRun.sh` support — *"removes hard `/bin/sh` dependency from `AppRun`"* | ⭐ **this is a row in our own [`../comparison.md`](../comparison.md)**: the AppImage's delivery path picks up the host `/bin/sh` on distributions where it is dynamic. The fork fixes it |
+| `lib`/`lib32` directly instead of `shared/lib` — *"Fixes libraries that look for a relative `../share`"* | ✅ **our AppDir already does this**: `lib` at the top level with `shared/lib -> ../lib` |
+| bwrap-wrapper — intercepts `bwrap` so self-sandboxing apps (WebKitGTK) work | a class `pgb` has not met yet |
+| `SHARUN_MESA_PATH` | switch the mesa implementation at run time |
+| Bun workaround | Bun breaks when run through the dynamic linker directly |
+
+⛔ **AND THE FORK REMOVED THINGS**: `lib4bin`, `sharun-aio`, `sharun-lite`, the
+`xdg-open` wrapper and `--with-wrappe`. A fork whose surface shrinks is exactly
+the case an unpinned dependency cannot survive.
+
+### ⛔ Which is a defect in this tree, found by reading that list
+
+`internal/bundle/appimage.go`'s constant block opens with
+
+> *"Pinned, and the pin is the point: `latest/download` moves under you, so two
+> runs a week apart produce AppImages with different runtimes and nothing in
+> either says so."*
+
+and then:
+
+```go
+defaultSharunURL = "https://github.com/pkgforge-dev/Anylinux-sharun/releases/latest/download/sharun-%s"
+```
+
+⚠ **uruntime and dwarfs are pinned to a tag; sharun is pinned to `latest`.** The
+comment and the code disagree, and the URL-keyed cache added on 2026-09-03d
+does not help: the URL never changes, so a warm cache keeps whatever it fetched
+and a cold one takes whatever is current. ⛔ **Not changed here** — choosing a
+tag means re-running the eleven-environment matrix, which is the measurement
+the operator deferred on 2026-09-03d. It is named in `TODO/toolchain.md`
+instead.
+
+## ⭐ 11. `archlinux-pkgs-debloated` is a DIFFERENT LEVER CLASS from our sweep
+
+⛔ **They do not delete files. They rebuild the package without the
+dependency**, and that is why T-066's route B is expensive.
+
+| package | what the `-mini` build removes |
+|---|---|
+| `mesa-mini`, `vulkan-*-mini` | the link to `libLLVM.so` — *"making any hardware accelerated app tiny as result"* |
+| `llvm-libs-mini` | 150+ MiB → 99 MiB; `-nano` limits the targets to one arch + AMDGPU → under 70 MiB |
+| `qt6-base-mini`, `libxml2-mini` | the 30 MiB `libicudata` dependency |
+| `ffmpeg-mini` | the 20 MiB `libx265.so`, and AV1 *encoding* (decoding stays) |
+| `sdl2_image-mini` | AVIF and JPEG-XL — *"~23 MiB combined that most apps never use"* |
+| `-nano` variants | additionally built `-Os`, *"~30% smaller"*, ⚠ with a stated performance and stability risk |
+
+⭐ **The nixpkgs equivalent is an `override`**, which forces a source build —
+which is exactly `experiments/95-`'s measured cost: the whole `-mini` set
+forces **161 of kdenlive's 676 closure paths (23.8%)** from source. ⚠ The
+number now has a reason behind it rather than being a bare measurement.
+
+⛔ **And it is a SIZE lever**, so `experiments/84-` applies: it buys
+0.024–0.031 ms/MiB and cannot move the clock. Its value is size, which the
+2026-09-03c ruling struck and the 2026-09-03d ruling deprioritised further.
+
 ---
 
 ## ⛔ What this sweep did NOT establish
