@@ -698,3 +698,55 @@ features a distro plan enables reads as "this package cannot be built".
    ⚠ **This does not by itself build postgres with ICU.** It removes the named
    blocker; `--without-icu` can come off when arm S is next run, and that run
    is what would say whether anything else is in the way.
+
+   ### ⛔ 2026-09-03c — ARM S RE-RUN WITH `--without-icu` REMOVED, AND IT FOUND THE FIX DID NOT REACH THE REAL SUBJECT
+
+   ⭐ **This is why R3 was on the work order**, and the answer is the one a
+   synthetic subject could not give.
+
+       pgb nix plan postgresql --out pg.plan
+       NIX_MAX_ROUNDS=24 pgb nix build --plan pg.plan      (no --configure)
+
+   **`--with-icu` survived all 14 adaptation rounds.** The loop dropped
+   `--with-llvm`, `--with-liburing`, `--with-libcurl`, `--with-libnuma`,
+   `--with-zstd`, `--with-python`, `--with-gssapi`, `--with-uuid`,
+   `--with-systemd`, `--with-tcl`, `--with-perl` and added `--without-readline`
+   — and ICU's configure check passed every time. ⛔ **Then the BUILD failed at
+   the link**, on exactly the symbols `elfx.NeedsCXXRuntime` exists to
+   anticipate:
+
+       libicuuc.a(unifilt.ao): undefined reference to `operator delete(void*, unsigned long)'
+       libicuuc.a(lstmbe.ao):  undefined reference to `vtable for __cxxabiv1::__si_class_type_info'
+       collect2: error: ld returned 1 exit status
+
+   ⛔ **THE CAUSE, at file and line: `internal/wrapper/dispatch.go`'s
+   `cxxRuntimeDemand` skipped every argument beginning with `-`.** It only ever
+   saw archives named as literal paths. ⚠ Real builds do not name them that
+   way — postgres's own generated `src/Makefile.global` says:
+
+       ICU_LIBS = -L/…/nix-prefix/lib -licui18n -licuuc -licudata -lpthread -lm
+
+   Every one starts with `-`, so `libicuuc.a` was never opened. ⭐ **That is
+   precisely why the fix passed a synthetic subject and failed the real one**:
+   the `cxx-runtime` fixture links `cc -o prog main.c libcxxthing.a`, a literal
+   path, and `wrapper-flags`' `cxx-demand` cases used deliberately non-existent
+   paths — so "considered" and "skipped" both answered "no" and nothing could
+   tell them apart. ⛔ One case even read *"a flag is never opened as an
+   input"*: the defect written down as the intent.
+
+   ⭐ **FIXED.** `-lNAME` and `-l:NAME` now resolve against the `-L`
+   directories, `.a` only (a shared library carries its own `DT_NEEDED` on
+   libstdc++), and the system directories are deliberately not searched so a
+   link does not pay for scanning `/usr/lib`. Proved on the shape that failed,
+   through `pgb build`, against a real C++ archive:
+
+       BEFORE  cc -o prog main.c -Llib -lthing   rc=1, 2 C++ undefined refs
+       AFTER   the same line                     rc=0, prints 42,
+                                                 PT_INTERP 0, DT_NEEDED 0
+
+   **Carried:** `cxxCandidates` is split out so what the scan WOULD open is
+   observable without a filesystem, and ten cases in `wrapper-flags` pin the
+   rule — `-lNAME` against one `-L` and against several in order, a separated
+   `-L dir`, `-l:libfoo.a`, and the negatives (`-lm` with no `-L` resolves to
+   nothing; `-o`'s and `-L`'s own values are not inputs; ordinary flags and
+   source files name nothing).

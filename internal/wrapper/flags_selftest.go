@@ -269,8 +269,67 @@ func FlagsSelftest() *selftest.Report {
 	// this case says the scan RAN and found nothing, not that it was skipped.
 	r.Check("cxx-demand: an unreadable input is a quiet no",
 		firstOf(cxxRuntimeDemand([]string{"/nonexistent/libicuuc.a"})), "")
-	r.Check("cxx-demand: a flag is never opened as an input",
-		firstOf(cxxRuntimeDemand([]string{"-L/usr/lib", "-lfoo"})), "")
+
+	// ---- ⛔ WHICH INPUTS ARE CONSIDERED, WHICH THE BLOCK ABOVE CANNOT SAY ---
+	//
+	// ⛔ THE DEFECT THIS SECTION EXISTS FOR, AND IT WAS WRITTEN DOWN AS THE
+	// INTENT. Where these lines are now, one case used to read:
+	//
+	//     r.Check("cxx-demand: a flag is never opened as an input",
+	//         firstOf(cxxRuntimeDemand([]string{"-L/usr/lib", "-lfoo"})), "")
+	//
+	// It passed — because `/usr/lib/libfoo.a` does not exist, so the answer is
+	// "" whether the argument was considered or skipped. ⚠ Every path in the
+	// block above is non-existent for exactly that reason, so NOTHING there
+	// could distinguish the two, and the rule its name asserts is the wrong
+	// one: `-licuuc` IS how a real build names an archive.
+	//
+	// ⭐ MEASURED ON THE REAL SUBJECT, 2026-09-03c. postgres 18.6's own
+	// generated `src/Makefile.global`:
+	//
+	//     ICU_LIBS = -L/…/nix-prefix/lib -licui18n -licuuc -licudata -lpthread -lm
+	//
+	// Every one starts with `-`, `libicuuc.a` was never opened, and the link
+	// died on `undefined reference to 'operator delete(void*, unsigned long)'`
+	// and `vtable for __cxxabiv1::__si_class_type_info`. T-063 arm S.
+	//
+	// `cxxCandidates` returns what would be opened, so these assert the RULE
+	// rather than an outcome that is "no" either way.
+	cand := func(args ...string) string {
+		var out []string
+		for _, g := range cxxCandidates(args) {
+			out = append(out, strings.Join(g, "|"))
+		}
+		return strings.Join(out, " ")
+	}
+	r.Check("cxx-candidates: a literal archive is considered",
+		cand("main.o", "libicuuc.a"), "main.o libicuuc.a")
+	// ⭐ THE CASE THE DEFECT WAS: postgres's exact shape.
+	r.Check("cxx-candidates: -lNAME resolves against -L",
+		cand("-L/p/lib", "-licui18n", "-licuuc"),
+		"/p/lib/libicui18n.a /p/lib/libicuuc.a")
+	r.Check("cxx-candidates: a separated -L dir is used too",
+		cand("-L", "/p/lib", "-licuuc"), "/p/lib/libicuuc.a")
+	r.Check("cxx-candidates: every -L is a candidate, in order",
+		cand("-L/a", "-L/b", "-licuuc"), "/a/libicuuc.a|/b/libicuuc.a")
+	r.Check("cxx-candidates: -l:NAME names the file exactly",
+		cand("-L/p", "-l:libicuuc.a"), "/p/libicuuc.a")
+	// ⛔ WITHOUT A -L THERE IS NOTHING TO RESOLVE AGAINST, and the system
+	// directories are deliberately not searched: it would put every link's
+	// scan on /usr/lib's archives for no gain, since a C link that needs the
+	// system libstdc++ already gets it from the driver.
+	r.Check("cxx-candidates: -lNAME with no -L resolves to nothing",
+		cand("-lm", "-lpthread"), "")
+	// The negatives: a flag that takes a value must not have its value read as
+	// an input, and an ordinary flag names nothing.
+	r.Check("cxx-candidates: -o's value is not an input",
+		cand("-o", "prog.a"), "")
+	r.Check("cxx-candidates: -L's own value is not an input",
+		cand("-L", "/p/lib"), "")
+	r.Check("cxx-candidates: ordinary flags name nothing",
+		cand("-O2", "-Wall", "-static", "-DFOO=1"), "")
+	r.Check("cxx-candidates: a source file is not an input to this scan",
+		cand("main.c", "other.cpp"), "")
 
 	return r
 }

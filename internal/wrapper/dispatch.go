@@ -120,24 +120,114 @@ func callerLibs(args []string) []string {
 // ⛔ AND `-nostdlib`/`-nodefaultlibs` SUPPRESS IT. A caller who has said it is
 // supplying its own runtime has said so deliberately, and adding one behind
 // its back is the opposite of what this tool does.
+//
+// ⛔ IT ALSO RESOLVES `-lNAME` AGAINST `-L`, AND THE FIRST VERSION DID NOT —
+// WHICH IS WHY IT PASSED A SYNTHETIC SUBJECT AND FAILED THE REAL ONE.
+// The first version skipped every argument beginning with `-`, so it only ever
+// saw archives named as literal paths. ⚠ Real builds do not name them that
+// way. Measured on postgres 18.6 (T-063 arm S, 2026-09-03c), from its own
+// generated `src/Makefile.global`:
+//
+//	ICU_LIBS = -L/…/nix-prefix/lib -licui18n -licuuc -licudata -lpthread -lm
+//
+// Every one of those starts with `-`, `libicuuc.a` was never opened, and the
+// link died on a wall of `undefined reference to 'operator delete(void*,
+// unsigned long)'` and `vtable for __cxxabiv1::__si_class_type_info` — the
+// exact symbols this function exists to anticipate. ⭐ The selftest passed
+// throughout, because its fixture links `cc -o prog main.c libcxxthing.a`,
+// a literal path.
+//
+// ⚠ ONLY `.a` IS RESOLVED FROM `-l`, and only out of the `-L` directories.
+// A shared library carries its own `DT_NEEDED` on libstdc++ and needs nothing
+// from us; and not searching the default system directories keeps this off
+// `/usr/lib`'s archives, which bounds what a link pays for the scan.
 func cxxRuntimeDemand(args []string) (string, string) {
 	for _, a := range args {
 		if a == "-nostdlib" || a == "-nodefaultlibs" || a == "-nostartfiles" {
 			return "", ""
 		}
 	}
-	for _, a := range args {
-		if strings.HasPrefix(a, "-") {
-			continue
-		}
-		if !strings.HasSuffix(a, ".a") && !strings.HasSuffix(a, ".o") {
-			continue
-		}
-		if need, sym := elfx.NeedsCXXRuntime(a); need {
-			return a, sym
+	for _, group := range cxxCandidates(args) {
+		for _, p := range group {
+			if fi, err := os.Stat(p); err != nil || fi.IsDir() {
+				continue
+			}
+			if need, sym := elfx.NeedsCXXRuntime(p); need {
+				return p, sym
+			}
+			// The first -L directory holding the name is the one ld takes, so
+			// a later directory's same-named archive is not this link's.
+			break
 		}
 	}
 	return "", ""
+}
+
+// cxxCandidates is the files cxxRuntimeDemand would open, in link order, one
+// group per argument that names something.
+//
+// ⛔ IT IS SPLIT OUT BECAUSE THE SELFTEST COULD NOT SEE THE DEFECT WITHOUT IT.
+// `wrapper-flags` is the pure half — no compiler — so every path it names is
+// deliberately non-existent, and `NeedsCXXRuntime` answers "no" for a file it
+// cannot read. ⚠ **A path that is considered and a path that is skipped
+// therefore give the same answer**, which is exactly why the block asserted
+// only the suppression rule, and exactly why `-licuuc` being skipped was
+// invisible for as long as it was. One case in it even read *"a flag is never
+// opened as an input"* — the defect written down as the intent.
+//
+// ⭐ Returning the candidates makes "considered" observable without a
+// filesystem, so the rule can be pinned rather than inferred from an outcome
+// that is "no" either way.
+func cxxCandidates(args []string) [][]string {
+	var libDirs []string
+	for i, a := range args {
+		switch {
+		case a == "-L":
+			if i+1 < len(args) {
+				libDirs = append(libDirs, args[i+1])
+			}
+		case strings.HasPrefix(a, "-L"):
+			if d := strings.TrimPrefix(a, "-L"); d != "" {
+				libDirs = append(libDirs, d)
+			}
+		}
+	}
+	inDirs := func(name string) []string {
+		var out []string
+		for _, d := range libDirs {
+			out = append(out, filepath.Join(d, name))
+		}
+		return out
+	}
+	var groups [][]string
+	skipNext := false
+	for i, a := range args {
+		if skipNext {
+			skipNext = false
+			continue
+		}
+		var g []string
+		switch {
+		case a == "-L" || a == "-l" || a == "-o":
+			// The value is the next argument and is not an input.
+			skipNext = i+1 < len(args)
+		case strings.HasPrefix(a, "-l:"):
+			// `-l:libfoo.a` names the file exactly.
+			g = inDirs(strings.TrimPrefix(a, "-l:"))
+		case strings.HasPrefix(a, "-l"):
+			// ⚠ Only `.a`. A shared library carries its own DT_NEEDED on
+			// libstdc++ and needs nothing from us.
+			g = inDirs("lib" + strings.TrimPrefix(a, "-l") + ".a")
+		case strings.HasPrefix(a, "-"):
+			// Any other flag names no input.
+		case strings.HasSuffix(a, ".a"), strings.HasSuffix(a, ".o"):
+			g = []string{a}
+		}
+		if len(g) > 0 {
+			groups = append(groups, g)
+		}
+	}
+	return groups
 }
 
 // findManifest locates the wrapper directory this invocation came from.

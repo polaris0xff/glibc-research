@@ -354,8 +354,28 @@ is **costing route B**, which is where the size actually is.
         a hardlink, so one inode under two names landed in two groups and the
         library became a root of itself. `selfKeys` keys on `dev:ino` now.
         Three cases pin `selfKeys()` directly as well. T-066.
-    R3  ⚠ T-063 arm S with `--without-icu` REMOVED. The C++-archive fix is
-        proved on a synthetic subject; postgres is the real one.
+    R3  ⭐ DONE 2026-09-03c, AND IT PAID FOR ITSELF: the C++-archive fix DID
+        NOT REACH THE REAL SUBJECT, and only postgres could say so.
+        `--with-icu` survived all 14 adaptation rounds -- configure accepts it
+        -- and then the LINK died on `operator delete` and
+        `__cxxabiv1::__si_class_type_info` out of libicuuc.a.
+        ⛔ CAUSE: `cxxRuntimeDemand` skipped every argument beginning with
+        `-`, so it only ever saw archives named as LITERAL PATHS. postgres's
+        own Makefile.global says
+          ICU_LIBS = -L/…/lib -licui18n -licuuc -licudata -lpthread -lm
+        and every one of those starts with `-`. ⭐ That is exactly why the fix
+        passed a synthetic subject: its fixture is `cc -o prog main.c
+        libcxxthing.a`, a literal path.
+        ⛔ AND THE SELFTEST HAD ENCODED THE DEFECT AS THE INTENT -- one case
+        read "cxx-demand: a flag is never opened as an input", and it passed
+        because every path in that block is deliberately non-existent, so
+        "considered" and "skipped" give the same answer.
+        ⭐ FIXED: -lNAME/-l:NAME resolve against -L, .a only, system dirs not
+        searched. BEFORE rc=1 with 2 C++ undefined refs; AFTER rc=0, the
+        binary runs, PT_INTERP 0, DT_NEEDED 0. `cxxCandidates` is split out so
+        what the scan WOULD open is assertable without a filesystem; ten cases
+        pin the rule.
+        ⛔ THE LINK HOT PATH CHANGED AGAIN, so the ten POCs must be re-run.
 
     ---- 1. T-066 P0, and the route order is now ARGUED rather than assumed ----
 
