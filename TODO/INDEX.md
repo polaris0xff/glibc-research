@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 48  OPEN 15  DONE 33
+    TOTAL 48  OPEN 14  DONE 34
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 7 | 1 | 6 |
-| P1 | a documented capability does not work, or a flag does nothing | 32 | 9 | 23 |
+| P1 | a documented capability does not work, or a flag does nothing | 32 | 8 | 24 |
 | P2 | worth doing; nothing is wrong without it | 9 | 5 | 4 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -51,7 +51,7 @@ pretending to be one.
 | T-059 | P1 | M | open | research | GL on real hardware, and the NVIDIA case |
 | T-060 | P1 | L | open | toolchain | ⭐ Static-glibc nix: no root, no docker, no nix |
 | T-061 | P0 | XL | done | toolchain | Port the whole toolchain to Go, and ship one static `pgb` |
-| T-062 | P1 | M | open | toolchain | Eight packages carry no selftest, `internal/wrapper` among them |
+| T-062 | P1 | M | done | toolchain | ⭐ Every package carries a selftest now: 375 → 540 cases, each proved able to fail |
 | T-063 | P1 | L | open | poc | miniflux + an embedded PostgreSQL, against onelf's ~70 MB |
 | T-064 | P0 | XL | done | runtime | ⭐ Static glibc's `dlopen`, really solved: our own ELF loader, 11 of 11 |
 | T-065 | P0 | L | done | research | ⭐ What a bundle may take from the host: four classes, the order adopted |

@@ -1249,7 +1249,7 @@ Both were taken and neither is in an entry yet:
 
 **Source** the code review of 2026-09-02, using codegraph against the suite
 registry in `../cmd/pgb/commands.go`.
-**Category** toolchain · **Priority** P1 · **Effort** M · **Status** open
+**Category** toolchain · **Priority** P1 · **Effort** M · **Status** ✅ done
 
 **Problem.** `pgb selftest` registers ten suites and reports "123 cases pass",
 which reads as coverage of the tool. Measured against the package list, the

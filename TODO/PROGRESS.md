@@ -5,7 +5,7 @@ and the entries.
 
     STATE     2026-09-03c  ⚠ IN PROGRESS — this header is refreshed as work
               lands, not only at the end
-    COUNTS    48 entries, 15 open, 33 done
+    COUNTS    48 entries, 14 open, 34 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN on every push this session
               selftests 371 → ⭐ 540 pass, 1 could not run (no zstd)
