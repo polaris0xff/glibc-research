@@ -268,7 +268,27 @@ while IFS="$(printf '\t')" read -r f sev p; do
   if [ "$sev" = strict ]; then
     bad "$f: cites evidence that is neither tracked nor gitignored -> $p"
     broken=$((broken + 1))
-  else planned=$((planned + 1)); fi
+  else
+    # ⛔ "NAMED BY AN OPEN ENTRY" IS THE RIGHT EXEMPTION FOR WORK NOT YET DONE
+    # AND THE WRONG ONE FOR WORK DONE UNDER ANOTHER NAME, and the two are
+    # distinguishable: if the evidence DIRECTORY exists and git tracks
+    # something in it, the measurement was taken and the citation is simply
+    # wrong.
+    #
+    # ⚠ Measured 2026-09-03c, which is why this branch exists: T-057's Prove
+    # line cited `evidence/86-bundler-vs-anylinux/RESULT.txt` for months.
+    # `86-` runs against two subjects and writes `RESULT.jq.txt` and
+    # `RESULT.mpv.txt`; both were tracked, the directory was right there, and
+    # the exemption passed it every time because T-057 is open.
+    _ce_dir=$(dirname "$p")
+    if [ -d "$_ce_dir" ] && [ -n "$(git ls-files "$_ce_dir" 2>/dev/null | head -1)" ]; then
+      bad "$f: cites $p, but $_ce_dir EXISTS and is tracked -- the measurement was taken under another name:"
+      git ls-files "$_ce_dir" 2>/dev/null | sed 's|^|           |' | head -6
+      broken=$((broken + 1))
+    else
+      planned=$((planned + 1))
+    fi
+  fi
 done < "${TMPDIR:-/tmp}/check-docs.$$"
 rm -f "${TMPDIR:-/tmp}/check-docs.$$"
 [ "$broken" -eq 0 ] && ok "cited evidence is in the repository ($n checked, $planned named by open entries, $product build products)"

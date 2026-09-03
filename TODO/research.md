@@ -329,13 +329,17 @@ hand-crafted AppImage" but *"produced by one command from a package name, and
 within measurable distance of one"*. `docs/AGENTS.md` §14 governs the
 wording.
 
-**Prove.** ⚠ **Corrected 2026-09-03c**: this line cited
-`evidence/86-bundler-vs-anylinux/RESULT.txt`, which **does not exist and never
-did** — `86-` runs against two subjects and writes one file each,
-`evidence/86-bundler-vs-anylinux/RESULT.jq.txt` and `RESULT.mpv.txt`. The
-citation survived because the docs gate exempts evidence "named by an open
-entry", which is the right exemption for work not yet done and the wrong one
-here, where the work IS done under another name.
+**Prove.** `evidence/86-bundler-vs-anylinux/RESULT.jq.txt` and
+`evidence/86-bundler-vs-anylinux/RESULT.mpv.txt`.
+
+⚠ **Corrected 2026-09-03c**: this line used to cite a RESULT.txt in that
+directory, which does not exist and never did — `86-` runs against two subjects
+and writes one file each. The citation survived because the docs gate exempts
+evidence "named by an open entry", which is the right exemption for work not
+yet done and the wrong one here, where the work IS done under another name.
+⭐ **The gate can tell those apart now and does**: an exempted citation whose
+directory exists and is tracked is a FAILURE naming the files that are actually
+there. It fired on this line before it was fixed.
 
 The bar itself is unchanged: the same application as an Anylinux AppImage and
 as ours, on all eleven, with size, startup, and host-object columns — the
