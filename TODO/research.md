@@ -329,10 +329,17 @@ hand-crafted AppImage" but *"produced by one command from a package name, and
 within measurable distance of one"*. `docs/AGENTS.md` §14 governs the
 wording.
 
-**Prove.** `evidence/86-bundler-vs-anylinux/RESULT.txt`: the same application
-as an Anylinux AppImage and as ours, on all eleven, with size, startup, and
-host-object columns — the instrument in `experiments/62-` already produces
-three of those four.
+**Prove.** ⚠ **Corrected 2026-09-03c**: this line cited
+`evidence/86-bundler-vs-anylinux/RESULT.txt`, which **does not exist and never
+did** — `86-` runs against two subjects and writes one file each,
+`evidence/86-bundler-vs-anylinux/RESULT.jq.txt` and `RESULT.mpv.txt`. The
+citation survived because the docs gate exempts evidence "named by an open
+entry", which is the right exemption for work not yet done and the wrong one
+here, where the work IS done under another name.
+
+The bar itself is unchanged: the same application as an Anylinux AppImage and
+as ours, on all eleven, with size, startup, and host-object columns — the
+instrument in `experiments/62-` already produces three of those four.
 
 ## ⭐ THE DISTANCE IS MEASURED — `experiments/86-bundler-vs-anylinux.sh`
 
