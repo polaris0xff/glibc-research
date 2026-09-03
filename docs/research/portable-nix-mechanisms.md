@@ -103,8 +103,26 @@ case 3:
 
 ⛔ **Our kdenlive bundle is 398 MB; the competitor's is 192 MB.** One is over
 the line and one is under it. ⚠ It is a default in one project, not a published
-benchmark — ⭐ but it is a lever `pgb` does not have, and N2's whole question is
-whether size is time.
+benchmark.
+
+⛔ **THIS PAGE SAID "a lever `pgb` does not have" AND THAT WAS WRONG, corrected
+2026-09-03d.** `uruntime` — the runtime `pgb` already ships — carries the same
+mode selector. The strings in the binary `pgb bundle appimage` produces include
+`URUNTIME_EXTRACT`, `URUNTIME_MOUNT`, `URUNTIME_CLEANUP` and
+`REUSE_CHECK_DELAY`, with `=0`, `=2` and `=3` among them: pelf's taxonomy, in
+our own artefact. ⭐ **It is a lever `pgb` does not SET**, which is a different
+sentence and a much cheaper problem.
+
+⚠ **And N2 is answered, which changes what this lever is for.**
+`experiments/84-` measured that image size is not the time column: 0.0243–0.0312
+ms per MiB, so the whole 196 MiB separating the two kdenlive bundles is about
+5 ms of a gap never observed below 129 ms. So extract-over-mount cannot be
+motivated by *size* any more. ⚠ Whether it pays for another reason is
+**unmeasured**: a hand probe on a 7 MB `jq` bundle put `URUNTIME_EXTRACT=1`
+cold at 70–87 ms against mounting's 85–94 ms — inside the noise, and taken
+without `experiments/clock.sh`, so it is a reading and not a result.
+⭐ **The instrument to settle it exists**: `84-`'s padding machinery makes an
+artefact of any size, and `clock.sh` gives it an A/A control.
 
 ## 4. Two warm-start techniques
 
@@ -183,5 +201,9 @@ finding is a reading at a cited line, and the page says so.
    its instrument: `experiments/98-published-static-nix.sh`;
 2. does `nix --store` under `$HOME` work on this project's eleven — the probe
    in §2, run with a **real** workload rather than the trivial derivation;
-3. does extract-over-mount beat mount on a 398 MB bundle — `experiments/86-`'s
-   method, once N0 has fixed the instrument.
+3. does extract-over-mount beat mount on a large bundle — ⭐ **N0 is done**
+   (`experiments/clock.sh` and `99-`), and `84-`'s padding machinery builds
+   the large artefact, so this probe is now one experiment away rather than
+   blocked. ⚠ Its *motivation* has changed: `84-` rules out size as the
+   reason, so the question is whether extraction beats mounting at all, not
+   whether it beats it above 350 MB.

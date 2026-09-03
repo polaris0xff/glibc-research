@@ -805,11 +805,62 @@ entry's own prose, compared against an eleven-environment competitor number.
 
 **Now:** T-066, T-055 and T-057 cite the commit their numbers came from, not
 just the path. ⭐ And `PROGRESS.md` N1 — *re-measure every lever on the clock* —
-is ordered **after** fixing the instrument, because under the new bar an
-unpinned millisecond is worth less than no millisecond: it reads as
-measurement. ⚠ `experiments/86-`'s per-environment method (eleven rows, mean
-of five, cold by a fresh copy) is the shape to carry into `90-`, which takes
-one sample per arm.
+is ordered **after** fixing the instrument. ⛔ **The mechanism was found the
+next day and it is C24; the last sentence of this entry was wrong.** It read
+*"`experiments/86-`'s per-environment method (eleven rows, mean of five, cold
+by a fresh copy) is the shape to carry into `90-`"* — and *cold by a fresh
+copy* is precisely the defect.
+
+---
+
+## C24 — "a fresh copy is cold by construction", and it is a warm start
+
+⛔ **This is C23's mechanism, found by `experiments/99-` on 2026-09-03d.**
+C23 recorded that four runs of the kdenlive comparison gave cold-start ratios
+spanning 2.52×–5.02× with **warm above cold in two of them**, and named the
+cause as *"the instrument's cold/warm distinction collapsing on this
+subject"*. It did not say why it collapses.
+
+**Claimed**, in `experiments/90-`'s own comment, and repeated in C23:
+
+> *"A cold mount is obtained WITHOUT killing anything, by giving the cold run
+> its own copy: uruntime keys its mount on the image, so a file nothing has
+> run before is cold by construction."*
+
+**Disproved by** `experiments/99-`, which measures the three states side by
+side in one interleave, median of nine, with an A/A control:
+
+| protocol | median | ratio to warm | resolves |
+|---|---|---|---|
+| `90-`'s fresh copy | 12.7 ms | **1.02×** | ⛔ **no** |
+| the live mount reaped first | 85.0 ms | 6.80× | ✅ yes |
+| warm, a mount alive by construction | 12.5 ms | — | — |
+
+⭐ **uruntime keys its mountpoint on the artefact's CONTENT, not its path**, and
+leaves the mount alive for a few seconds after the process exits. A
+byte-identical copy therefore reuses it, so `cold_of()` measured a warm start
+whenever anything had run the same bytes recently — which, in `90-`, the
+render step immediately before it always had.
+
+⭐ **AND THE HIDDEN VARIABLE IS THE CLOCK ON THE WALL.** `99-` section 1: the
+same file, the same command, differing only in how many seconds have passed:
+
+| gap | 0 s | 2 s | 4 s | 6 s | 10 s |
+|---|---|---|---|---|---|
+| cold start | 13.2 ms | 14.3 | 13.5 | **82.2** | 89.0 |
+
+The mount is torn down between 4 s and 6 s after the last run — **6.24×,
+decided by nothing but elapsed time.** Two measurements of the same state
+differ only by noise, and noise has a sign; that is why warm came out above
+cold in half of C23's runs.
+
+**Now:** `experiments/clock.sh` is the instrument — median of N, arms
+interleaved with a rotating start, and an **A/A control**, one artefact under
+two names through the identical protocol, whose ratio is the floor below which
+no row may be believed. `99-` **asserts** that the A/A pair does not resolve.
+The cold protocol reaps the live mount by its mountpoint path first.
+⚠ `90-` still carries the old `cold_of()` and its committed numbers are still
+the ones C23 disclaims — `TODO/toolchain.md` T-066 owns it.
 
 ---
 
