@@ -367,7 +367,14 @@ done
 # in history/corrections.md — so a current-state count check belongs on one
 # side of it and not the other. `docs/history/` is excluded for the same
 # reason: it exists to hold what was true before.
-x_have=$(ls experiments/*.sh 2>/dev/null | grep -cv '/lib\.sh$')
+# ⛔ COUNTED BY THE NAMING RULE, NOT BY AN EXCLUSION LIST. This read
+# `ls experiments/*.sh | grep -v lib.sh` until 2026-09-03d, when a SECOND
+# library — `experiments/clock.sh`, the wall-clock instrument — was added
+# beside `lib.sh` and was counted as an experiment. ⚠ An exclusion list grows
+# once per library and is wrong in the window before somebody remembers to
+# extend it; `docs/AGENTS.md` §5 already defines an experiment as
+# `experiments/NN-*.sh`, so the check now asks that question directly.
+x_have=$(ls experiments/[0-9]*-*.sh 2>/dev/null | wc -l | tr -d ' ')
 p_all=$(ls -d poc/*/ 2>/dev/null | wc -l | tr -d ' ')
 p_wip=$(grep -c '^⚠ `poc/[0-9]' docs/AGENTS.md 2>/dev/null || echo 0)
 p_have=$((p_all - p_wip))
@@ -404,7 +411,7 @@ for f in $OURS; do
     if [ -n "$q" ]; then
       n=$((n + 1))
       if [ "$q" != "$x_have" ]; then
-        bad "$f: says '$q experiments'; the tree has $x_have (ls experiments/*.sh | grep -v lib.sh)"
+        bad "$f: says '$q experiments'; the tree has $x_have (ls experiments/[0-9]*-*.sh)"
         broken=$((broken + 1))
       fi
     fi

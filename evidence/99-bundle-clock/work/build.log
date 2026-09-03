@@ -1,0 +1,35 @@
+host policy bundled-first; host reachable at lowest priority
+  nvidia     HOST always      never bundled; its glibc floor is 10+ years old
+  mesa       bundled          set PGB_HOST_MESA=1 to prefer the host's
+  vulkan     bundled          set PGB_HOST_VULKAN=1 for host ICDs and layers
+  glibc      bundled          set PGB_HOST_GLIBC=1 only if the bundle cannot run
+resolved    jq -> /nix/store/xvd6920kffyyshg7mbw5wvfk6lg9wfkl-jq-1.8.2-bin  (hydra, no nix)
+attribute   jq
+store path  /nix/store/xvd6920kffyyshg7mbw5wvfk6lg9wfkl-jq-1.8.2-bin
+program     jq
+fetching the closure (signature and NarHash checked, no nix involved)
+closure     7 store paths
+entry       /var/tmp/pgb-appimage/jq/store/xvd6920kffyyshg7mbw5wvfk6lg9wfkl-jq-1.8.2-bin/bin/jq
+libraries   304 from the closure
+loader      ld-linux-x86-64.so.2 (the closure's own, never the host's)
+rewriting absolute DT_NEEDED entries to basenames
+patched     0 absolute DT_NEEDED entries
+pgb: the closure has no .desktop file; writing a minimal generated one
+pgb: no icon named "jq" in the closure; the AppImage will have none
+
+debloating (level: safe)
+  debloat          0 B    8  documentation and shell completions
+  debloat      4.6 MiB   41  locale catalogues (kept: none)
+  debloat     15.0 MiB    1  share/i18n (locale SOURCES; nothing here compiles locales)
+  debloat   36.4 MiB -> 16.7 MiB (54.0% off)
+apprun      sharun itself (one program: no shell, no host interpreter)
+lib.path    1 entries
+scanning the packed binaries for compiled-in store paths
+baked paths 29 strings, 10 naming a real directory, 0 carried
+env         417 -> 417 bytes after folding (5 keys)
+integrity   every DT_NEEDED in the bundle resolves inside it
+
+packing with uruntime + dwarfs
+
+built  /home/user/glibc-research/evidence/99-bundle-clock/work/jq.AppImage  (7.0 MiB)
+AppDir kept at /var/tmp/pgb-appimage/jq/AppDir

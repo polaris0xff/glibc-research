@@ -1,0 +1,68 @@
+===============================================================
+99 - the bundler's clock: the reuse window, and the protocol that missed it
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-03T11:05:36Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/99-bundle-clock
+--------------------------------------------------------------
+
+-- building the subject --------------------------------------
+  jq.AppImage                  7331882 bytes
+  twin/jq.AppImage             7331882 bytes (A/A twin)
+
+-- 1. the reuse window ---------------------------------------
+  ⭐ The SAME command, the SAME file. The only thing that changes is
+  how many seconds have passed since the previous run.
+
+     GAP_S         MS   MOUNTS
+         0       13.2        1
+         2       14.3        1
+         4       13.5        1
+         6       82.2        1
+        10       89.0        1
+
+  ⭐ THE MOUNT IS TORN DOWN BETWEEN 4s AND 6s AFTER THE LAST RUN.
+  Across that boundary the same command costs 82.2 ms instead of 13.2 ms
+  -- 6.24x, decided by nothing but elapsed time.
+
+-- 2. four protocols for one column, one interleave ----------
+  ARM                N     MEDIAN        MIN        MAX     MAD%
+  fresh              9       12.7       11.7       13.9      6.5
+  cold_A             9       85.0       81.0       90.8      0.7
+  warm               9       12.5       11.0       13.4      4.3
+  cold_B             9       84.0       80.2       93.9      2.3
+
+-- 3. the A/A control ----------------------------------------
+  cold_A and cold_B are one artefact under two names, through the
+  identical protocol. The true ratio is 1.00; what comes back is the
+  floor below which no other row in this file may be believed.
+
+  A/A ratio                   : 1.01
+  resolution floor            : 1.03   (the larger of the A/A ratio and
+                                       the two arms' combined MAD)
+  does the A/A pair resolve?  : no   ⛔ MUST be "no"
+
+  fresh-copy "cold" vs warm   : 1.02x
+  reaped cold vs warm         : 6.80x
+
+-- assertions ------------------------------------------------
+  ok    the A/A pair is NOT resolvable (the control)   = no
+  ok    90-'s fresh-copy 'cold' is indistinguishable from warm = no
+  ok    the reaped protocol DOES separate cold from warm = yes
+  ok    every arm produced a full sample set           = 9
+
+        ⚠ The reuse window is a property of uruntime, not of jq. Every
+        artefact pgb bundle appimage produces inherits it, kdenlive
+        included, and NOTHING in the record knew it was there.
+full table: /home/user/glibc-research/evidence/99-bundle-clock/RESULT.txt
+
+-- result ----------------------------------------------------
+pass=4 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

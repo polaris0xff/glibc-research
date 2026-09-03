@@ -1,0 +1,32 @@
+experiment 99 - the bundler's clock
+date (UTC)   : 2026-09-03T11:06:07Z
+host kernel  : Linux 6.18.44-fc-v24
+subject      : pgb bundle appimage jq --debloat safe, 7331882 bytes
+rounds       : 9 per arm, interleaved with a rotating start
+estimator    : median; spread reported as MAD % of median
+
+THE REUSE WINDOW (same file, same command, only elapsed time differs)
+     GAP_S         MS
+         0       13.2
+         2       14.3
+         4       13.5
+         6       82.2
+        10       89.0
+
+THREE PROTOCOLS FOR THE COLUMN LABELLED "COLD"
+  fresh copy          12.7 ms  90-'s cold_of(); ratio to warm 1.02 -- resolves: no
+  reaped              85.0 ms  the corrected protocol; ratio to warm 6.80 -- resolves: yes
+  warm                12.5 ms  a live mount, by construction
+
+THE A/A CONTROL
+  one artefact, two names, identical protocol
+  ratio 1.01, floor 1.03, resolves no (must be "no")
+
+WHY IT MATTERS
+  uruntime keys its mountpoint on the artefact's CONTENT and leaves it
+  alive for a few seconds after the process exits. A byte-identical
+  copy therefore reuses it. experiments/90-'s cold column obtained
+  "cold" by copying the file, and so reported a warm number whenever
+  anything had run the same content within the window -- which is why
+  docs/history/corrections.md C23 saw warm above cold in two of four
+  runs and a 20x spread in the absolute figure.
