@@ -91,14 +91,15 @@ not the local gate.**
 ⛔ **And a process failure**: `experiments/90-` was edited **while running**,
 which cost a run. `sh` re-reads from a byte offset.
 
-## ⭐ The next session's task list is six entries
+## ⭐ The next session is THREE entries — the operator scoped it
 
     T-078  P1 L  runtime    the three-way parity matrix
     T-079  P1 M  runtime    enumerate the remainder, BY SEARCH
     T-080  P1 L  research   the capability guarantee: EGL/SDL/XCB/vulkan/NVIDIA
-    T-081  P1 L  toolchain  the debloater/patcher, without the regex cascade
-    T-082  P2 XL toolchain  vendor + patch + drift detection
-    T-083  P2 M  toolchain  native desktop integration
+
+⛔ **Recorded and NOT in scope**: T-081 the debloater/patcher, T-082 vendor +
+patch + drift detection, T-083 desktop integration. Each says so in its own
+text as well as here.
 
 ⛔ **And T-066, the only open P0, is NOT what to start on** — its remaining
 column is size, which the operator struck and then deferred. The entry says so

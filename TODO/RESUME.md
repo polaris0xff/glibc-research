@@ -90,6 +90,9 @@ is the failure. `corrections.md` C23 is why the old numbers cannot be quoted.
       through, and it asserts its own A/A control;
       every reference the operator named is vendored, pinned and read.
 
+    ⛔ THE NEXT SESSION IS SCOPED TO T-078, T-079 AND T-080. Three more
+       entries exist (T-081/082/083) and are explicitly NOT in scope.
+
     ⛔ WHAT IS NOT DONE, IN ORDER:
        1. 86-'s WARM column subtracts a cold run that is not in the
           series it divides. Its COLD column is sound. Carry clock.sh in.

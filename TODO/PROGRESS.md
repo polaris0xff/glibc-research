@@ -78,15 +78,40 @@ another millisecond.
 
     ---- ⭐ THE NEXT SESSION'S TASK LIST, AND IT IS TWO GOALS ----
 
-    ⛔ EVERY ITEM BELOW IS A NUMBERED ENTRY. Read the entry, not this
-       summary: it carries the sources, the measurements and the traps.
+    ⛔ THREE ENTRIES ARE IN SCOPE — OPERATOR, 2026-09-03d. THREE ARE NOT.
 
-         G1.1 → T-078   the three-way parity matrix (runtime, P1, L)
-         G1.2 → T-079   enumerate the remainder BY SEARCH (runtime, P1, M)
-         G2.1 → T-080   the capability guarantee (research, P1, L)
-         G2.2 → T-081   the debloater/patcher (toolchain, P1, L)
-         F1   → T-082   vendor + patch + drift detection (toolchain, P2, XL)
-         F2   → T-083   desktop integration (toolchain, P2, M)
+         ✅ IN SCOPE, and they are the whole session:
+           T-078  runtime   P1 L   the three-way parity matrix
+           T-079  runtime   P1 M   enumerate the remainder, BY SEARCH
+           T-080  research  P1 L   the capability guarantee
+
+         ⛔ NOT THIS SESSION. Do not start them, do not "just quickly":
+           T-081  toolchain P1 L   the debloater/patcher
+           T-082  toolchain P2 XL  vendor + patch + drift detection
+           T-083  toolchain P2 M   desktop integration
+
+    ⛔ READ THE ENTRY, NOT THIS TABLE. Each carries the operator's words as
+       its Source, the measurements behind it, and — in its `Prove` line —
+       the conditions the deliverable has to meet. ⭐ Those conditions ARE
+       the acceptance test; they are written to be failable.
+
+    ⭐ HOW TO DELIVER THESE WELL, from what went wrong in the session that
+       wrote them:
+
+       1. ⛔ PRE-REGISTER the expectation before the run, not after. Every
+          strong result in this tree did; every weak one explained a number
+          once it had arrived.
+       2. ⛔ A SKIP IS NOT A PASS. 60- and 61- skip arms they cannot build.
+          Read the skip count on every run.
+       3. ⛔ TWO RUNS OR IT IS NOT A NUMBER, where a number decides
+          anything. Three claims this session flipped between runs; the ones
+          that survived were the ones run twice.
+       4. ⛔ AN ABSENCE IS NOT A ZERO. Say where you looked.
+       5. ⛔ VERIFY YOUR OWN WRITE-UP AGAINST THE SOURCE. Five claims from
+          this session's own reference sweep were wrong when checked back
+          against the files they cited.
+       6. ⛔ READ THE CI RUN. The local gate said green while CI said red
+          six times last session, through two holes that are now closed.
 
     G1  ⛔ GLIBC STATIC IS TRULY COMPLETE. "No edge cases exist, and our
         static glibc binary and a native musl static binary are at
@@ -169,7 +194,8 @@ another millisecond.
        `86-`, `90-`, `99-` all work and all assert their own A/A control.
        Re-running one is cheap; the DEFERRAL is on making it the work.
 
-    ---- ⭐ FUTURE, AFTER THE NEXT SESSION — recorded so it is never lost ----
+    ---- ⛔ NOT THE NEXT SESSION — the operator scoped it to T-078/079/080 ----
+    ---- ⭐ recorded so it is never lost ----
 
     F1  ⛔ VENDOR AND PATCH THE THIRD-PARTY RUNTIME AND TOOLING.
         ⭐ **THE REASON IS MEASURED, NOT SPECULATIVE.** This project spent a

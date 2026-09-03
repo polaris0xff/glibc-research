@@ -221,5 +221,22 @@ on the pipeline is not evidence about ours.
 
 **Prove.** A write-up whose every capability claim names the experiment behind
 it, and whose remaining gaps are each labelled **tooling**, **size** or
-**performance** — with the ones that are not so labelled named as capability
-gaps rather than omitted.
+**performance** — with the ones that are not so labelled named as **capability
+gaps** rather than omitted.
+
+⛔ **The two ways this deliverable fails, and both are easy:**
+
+- **Overclaiming.** *"Vulkan works"* is not supported by `swrast` and
+  surfaceless rows. The supported sentence today is *"the closure produces a
+  working EGL display offscreen"*. ⚠ Say which you are claiming, in the
+  sentence itself, not in a footnote.
+- **Underclaiming by borrowing.** Quoting somebody else's *"Garbage"* grade for
+  GTK or Python as if it were ours is the same error in the other direction —
+  they graded a different pipeline. ⛔ A row you have not run through
+  `pgb bundle appimage` is a **hypothesis**, and must be labelled one.
+
+⭐ **The strongest form of this deliverable is a bundle that runs.** For each
+bottom-of-the-table library, either a `pgb bundle appimage` of something that
+uses it, working on the eleven — or the named mechanism that stops it. ⚠ A
+Python GUI application is the operator's own counter-example and the obvious
+first subject.

@@ -77,8 +77,26 @@ with locale archives, a missing gconv plugin failing silently and randomly, and
 `ld-linux.so` needing a patch to stop it reading `/etc/ld.so.cache`.
 [`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md) §1.
 
-**Prove.** The matrix in `docs/comparison.md`, every cell a measurement or a
-dash, and each measurement's experiment named beside it.
+**Prove.** The matrix in `docs/comparison.md`. ⛔ **Four conditions, and the
+first three are the ones that fail:**
+
+1. **Every cell is a measurement or a dash**, and each measurement names the
+   experiment beside it. ⚠ A dash means *not measured here* and never
+   "probably fine" — that is this page's existing rule and it is the whole
+   value of the table.
+2. ⛔ **A SKIP IS NOT A DASH AND IT IS NOT A PASS.** `experiments/60-` and
+   `61-` **skip arms they cannot build** rather than failing, so a missing
+   musl toolchain produces a green run with an empty column. Check the skip
+   count on every run and report it; `docs/AGENTS.md` §0b — *a check that
+   quietly runs nothing and reports success is the worst answer this codebase
+   can give*.
+3. ⭐ **PRE-REGISTER which cells you expect to differ, before running.** Write
+   the prediction down first. This tree's strongest results are the ones where
+   *"the expectation was pre-registered BEFORE the run, not after"*, and its
+   worst are the ones where a number was explained after it arrived.
+4. ⛔ **The parity claim is the operator's and it is falsifiable: "no buts and
+   no ifs".** If a row comes out against us, that row IS the deliverable —
+   report it, do not soften the axis until it passes.
 
 ## T-079 — Enumerate the remaining glibc-static edge cases, by SEARCH
 
@@ -109,5 +127,14 @@ config, and whatever the search turns up that this sentence did not predict.
 `--tls-reserve`'s ~1.15 MB cost on every such build. T-072.
 
 **Prove.** Either a new row in `REQUIREMENTS.md` with an experiment behind it,
-or the enumeration written down with the command that produced it and what it
-looked at — ⛔ never the bare sentence that failed last time.
+or the enumeration written down with **the command that produced it and what it
+looked at** — ⛔ never the bare sentence that failed last time.
+
+⭐ **What "done" looks like, stated so it cannot be satisfied by prose:** a
+reader can re-run your search and get your list. ⚠ **An absence is not a
+zero** — if a probe found nothing, say **where it looked**, because the tenth
+row was invisible to every probe that had been run and visible to the first one
+that looked in `zoneinfo`.
+
+⛔ **And the honest outcome may be "the list is still ten".** That is a result
+if the search is shown; it is not a result if it is asserted.

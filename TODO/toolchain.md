@@ -355,6 +355,11 @@ patching/fixing, all of those were necessary, our debloater must find a way to
 get better results without being so messy."*
 **Category** toolchain · **Priority** P1 · **Effort** L · **Status** open
 
+⛔ **NOT THE NEXT SESSION — operator, 2026-09-03d.** That session is scoped
+to **T-078, T-079 and T-080** and nothing else. This entry is recorded now so
+it is not rediscovered; ⚠ it is not to be started, and not to be "just
+quickly" looked at. [`PROGRESS.md`](PROGRESS.md) carries the scope.
+
 **Problem.** ⭐ **The field's method is mined and quoted at file and line** —
 [`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md).
 It is five overlapping `sed` regexes applied in sequence, each catching what
@@ -402,6 +407,11 @@ our dev cycle where upstream's new commits/changes auto detected and
 auto-diffed."*
 **Category** toolchain · **Priority** P2 · **Effort** XL · **Status** open
 
+⛔ **NOT THE NEXT SESSION — operator, 2026-09-03d.** That session is scoped
+to **T-078, T-079 and T-080** and nothing else. This entry is recorded now so
+it is not rediscovered; ⚠ it is not to be started, and not to be "just
+quickly" looked at. [`PROGRESS.md`](PROGRESS.md) carries the scope.
+
 **Problem.** ⛔ **The cost of not having this is measured, not hypothetical.**
 This project spent a session discovering that the field runs a `lite` uruntime
 and a different block size. Both were free wins sitting in somebody else's
@@ -443,6 +453,11 @@ upstream has that we do not — and a first report from it.
 appimage 'compatibility' for our nix bundled packages, so third party package
 managers can use/integrate our bundles as native appimages."*
 **Category** toolchain · **Priority** P2 · **Effort** M · **Status** open
+
+⛔ **NOT THE NEXT SESSION — operator, 2026-09-03d.** That session is scoped
+to **T-078, T-079 and T-080** and nothing else. This entry is recorded now so
+it is not rediscovered; ⚠ it is not to be started, and not to be "just
+quickly" looked at. [`PROGRESS.md`](PROGRESS.md) carries the scope.
 
 **Problem.** ⭐ **The contract is measured, and we already meet most of it** —
 [`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md) §2.
