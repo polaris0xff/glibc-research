@@ -14,3 +14,9 @@ build gcc     : gcc (Debian 14.2.0-19) 14.2.0
 build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
 ---------------------------------------------------------------
 -- rung 1: ffmpeg 7.1 -----------------------------------------
+  ok    ffmpeg builds through pgb                    = ok
+        libavcodec.a 145351108 bytes
+  ok    the ffmpeg CLI it produced is static         = 0
+        ffmpeg version 7.1 Copyright (c) 2000-2024 the FFmpeg developers
+
+-- rung 2: MLT 7.30.0, kdenlive's engine -------------------

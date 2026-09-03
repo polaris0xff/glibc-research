@@ -791,7 +791,7 @@ and every rewrite is a place the format can change under us.
 **What this entry owns.**
 
 1. ⭐ **A control for the rewrites.** ✅ **DONE 2026-09-02d.**
-   `internal/bundle.CheckManifests` is the measurement — no manifest may name a
+   `CheckManifests` (`internal/bundle/assemble.go:631`) is the measurement — no manifest may name a
    path outside the bundle, and every library a manifest names must exist in
    it. It runs in the build as `manifestIntegrity()` (a report, like
    `integrity()`, because a closure may legitimately carry a manifest for a
