@@ -344,6 +344,83 @@ done
 [ "$broken" -eq 0 ] && ok "quoted entry counts agree with INDEX.md ($n checked)"
 
 # ---------------------------------------------------------------------------
+# 5b. quoted experiment and POC counts agree with the tree
+# ---------------------------------------------------------------------------
+# ⛔ THE SAME DEFECT AS 5, AGAINST A DIFFERENT SOURCE, AND IT HAD ALREADY
+# HAPPENED. `docs/AGENTS.md` §9 read "all 24 experiments | every one measured"
+# while `ls experiments/*.sh | grep -v lib.sh | wc -l` said 31 -- seven
+# experiments written, run and committed without the orientation page moving.
+# ⚠ Nothing pointed at it because every OTHER check passes: each experiment
+# exists, each has evidence, each is referenced correctly. Only the COUNT was
+# wrong, and a count with no source is exactly what gate 5 exists to refuse.
+#
+# ⚠ The POC count is deliberately the ones in the SUITE. `docs/AGENTS.md` §9
+# says "all 10 POCs" and `poc/92-miniflux` is in the tree and explicitly not in
+# the count (T-063 owns it), so the number compared against is the count of
+# poc/*/run.sh MINUS the ones the same page marks as in progress.
+#
+# ⛔ SCOPED TO docs/, AND NOT TO TODO/, ON PURPOSE — the first version was not,
+# and it fired on `TODO/toolchain.md`'s "all 11 environments, all 9 POCs" in
+# T-061's record of what its gate 5 covered. That sentence is CORRECT: there
+# were nine POCs then. `docs/AGENTS.md` §14 draws exactly this line — the pages
+# in §11 state the CURRENT answer, superseded findings live in the entries and
+# in history/corrections.md — so a current-state count check belongs on one
+# side of it and not the other. `docs/history/` is excluded for the same
+# reason: it exists to hold what was true before.
+x_have=$(ls experiments/*.sh 2>/dev/null | grep -cv '/lib\.sh$')
+p_all=$(ls -d poc/*/ 2>/dev/null | wc -l | tr -d ' ')
+p_wip=$(grep -c '^⚠ `poc/[0-9]' docs/AGENTS.md 2>/dev/null || echo 0)
+p_have=$((p_all - p_wip))
+n=0; broken=0
+for f in $OURS; do
+  case "$f" in
+    docs/history/*) continue ;;
+    docs/*) ;;
+    *) continue ;;
+  esac
+  while IFS= read -r line; do
+    # ⛔ IT MATCHES THE CLAIM FORM, `all N experiments`, AND NOTHING ELSE.
+    # Two earlier versions were wrong in opposite directions and both were
+    # caught by planting a wrong count:
+    #
+    #   `\([0-9]*\) experiments`         could not fail on the line it was
+    #                                    written for. These pages write
+    #                                    `all **31** experiments`, and the
+    #                                    digits do not touch the space -- `**`
+    #                                    is between. It reported "1 checked",
+    #                                    went green, and a planted 24 passed.
+    #                                    T-074 is this tree's record of an
+    #                                    assertion that cannot fail on the
+    #                                    state it was written to catch.
+    #   `\([0-9]*\)[^a-zA-Z0-9]*experi…` fired on FIVE false positives at once,
+    #                                    because a date reads the same way:
+    #                                    `2026-09-05` then a space then the
+    #                                    word is digits-punctuation-word.
+    #
+    # ⚠ Requiring `all` is narrow on purpose. It is the form every count claim
+    # in these pages actually uses, and a check with no false positives is one
+    # a later session will keep rather than route around.
+    q=$(printf '%s' "$line" | sed -n 's/.*[Aa]ll[^a-zA-Z0-9]*\([0-9][0-9]*\)[^a-zA-Z0-9]*experiments.*/\1/p')
+    if [ -n "$q" ]; then
+      n=$((n + 1))
+      if [ "$q" != "$x_have" ]; then
+        bad "$f: says '$q experiments'; the tree has $x_have (ls experiments/*.sh | grep -v lib.sh)"
+        broken=$((broken + 1))
+      fi
+    fi
+    q=$(printf '%s' "$line" | sed -n 's/.*[Aa]ll[^a-zA-Z0-9]*\([0-9][0-9]*\)[^a-zA-Z0-9]*POCs.*/\1/p')
+    if [ -n "$q" ]; then
+      n=$((n + 1))
+      if [ "$q" != "$p_have" ]; then
+        bad "$f: says '$q POCs'; the tree has $p_all under poc/ minus $p_wip marked in progress = $p_have"
+        broken=$((broken + 1))
+      fi
+    fi
+  done < "$f"
+done
+[ "$broken" -eq 0 ] && ok "quoted experiment and POC counts agree with the tree ($n checked; $x_have experiments, $p_have POCs)"
+
+# ---------------------------------------------------------------------------
 # 6. every vendored methodology file PROVENANCE.md names is on disk
 # ---------------------------------------------------------------------------
 n=0; broken=0
