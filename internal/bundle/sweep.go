@@ -86,6 +86,25 @@ type SweepOptions struct {
 	// bundle: no ELF is rewritten and no file is removed, so the same AppDir
 	// answers for every edge in turn and the measurement is repeatable.
 	CutEdges []string
+
+	// ⭐ Fixpoint IS T-066's B3 LEVER, AND IT IS A MEASURING DEVICE ONLY.
+	//
+	// The soname string scan takes mentions from EVERY object in the bundle,
+	// including objects that are themselves unreachable. So an unreachable
+	// `libicui18n` whose `.dynstr` names `libicuuc` keeps `libicuuc` alive —
+	// a library kept by a library nothing can reach. The lever is to count
+	// mentions only from REACHABLE objects, which is circular, so it is
+	// iterated to a fixpoint: the scan set starts as every object and can only
+	// shrink, so it terminates.
+	//
+	// ⛔ OFF BY DEFAULT, AND NOT WIRED INTO DEBLOAT. This makes the sweep
+	// delete MORE, and `experiments/89-` — "debloating, and the control that
+	// says nothing was lost" — is the control it would have to pass before
+	// anything acts on it. T-066 names it as *"a real lever AND a real safety
+	// question"*; this flag measures the lever and leaves the question open,
+	// the same way CutEdges measured route A's ceiling without modifying a
+	// bundle.
+	Fixpoint bool
 }
 
 // cutSet is the parsed form of SweepOptions.CutEdges: for each depending base
@@ -171,6 +190,16 @@ type SweepResult struct {
 	// requested" from "a cut was requested and matched nothing".
 	CutEdges   []string
 	Unresolved []string // DT_NEEDED names nothing in the bundle provides
+
+	// The fixpoint's own numbers. ⛔ FixpointRounds is reported because ONE
+	// round means the lever bought nothing on this bundle — the scan set never
+	// shrank — and a delta of zero would otherwise read as "the lever does not
+	// work" rather than "this bundle has no unreachable object that mentions a
+	// reachable one".
+	Fixpoint        bool
+	FixpointRounds  int
+	FixpointScanned int // objects the LAST round scanned for sonames
+	ObjectsScanned  int // objects the first round scanned: every ELF in the bundle
 }
 
 // discoverDirs finds the bundle's program and library roots by looking, so a
@@ -400,12 +429,11 @@ func Sweep(o SweepOptions) (*SweepResult, error) {
 	// also what a rebuild does: the dependency is gone, not renamed.
 	cuts = cuts.expandToFile(index)
 
-	for _, r := range sonamesMentionedInObjects(o.Dir, allObjects, index, cuts) {
-		roots = append(roots, r)
-	}
-	roots = uniq(roots)
-
-	// Everything in a plugin directory is a root of its own closure.
+	// Everything in a plugin directory is a root of its own closure. ⚠ These
+	// and the program roots are the SEED: they are roots by structure and do
+	// not depend on what any object mentions, so the fixpoint below never
+	// removes one.
+	seed := append([]string(nil), roots...)
 	for dir := range pluginDirs {
 		entries, err := os.ReadDir(dir)
 		if err != nil {
@@ -417,56 +445,95 @@ func Sweep(o SweepOptions) (*SweepResult, error) {
 			}
 			p := filepath.Join(dir, e.Name())
 			if IsSharedObject(e.Name()) || elfx.IsELF(p) {
-				roots = append(roots, p)
+				seed = append(seed, p)
 			}
 		}
 	}
-	roots = uniq(roots)
+	seed = uniq(seed)
 
-	// The closure.
+	// The soname-mention roots and the closure, iterated when Fixpoint is set.
+	//
+	// ⭐ WHY IT TERMINATES, rather than "it seems to settle". The scan set
+	// starts as every object and each round keeps only the objects the previous
+	// round found reachable, so it is monotonically decreasing over a finite
+	// set. Fewer objects scanned means fewer or equal mention-roots, which means
+	// a smaller or equal closure — so the sequence is monotone and reaches a
+	// fixpoint. The loop stops when the scan set stops changing.
+	scanSet := allObjects
+	var roots2 []string
+	var reachable map[string]bool
+	var unresolved map[string]bool
 	cutHits := 0
-	reachable := map[string]bool{}
-	unresolved := map[string]bool{}
-	queue := append([]string(nil), roots...)
-	for len(queue) > 0 {
-		p := queue[len(queue)-1]
-		queue = queue[:len(queue)-1]
-		real, err := filepath.EvalSymlinks(p)
-		if err != nil {
-			real = p
-		}
-		if reachable[real] {
-			continue
-		}
-		reachable[real] = true
-		reachable[p] = true
-		needed, err := elfx.Needed(real)
-		if err != nil {
-			continue
-		}
-		for _, n := range needed {
-			base := filepath.Base(n)
-			// ⭐ The edge is dropped from the WALK, never from the bundle.
-			if cuts.cut(filepath.Base(real), base) {
-				cutHits++
+	rounds := 0
+	for {
+		rounds++
+		cutHits = 0
+		roots2 = append([]string(nil), seed...)
+		roots2 = append(roots2, sonamesMentionedInObjects(o.Dir, scanSet, index, cuts)...)
+		roots2 = uniq(roots2)
+
+		reachable = map[string]bool{}
+		unresolved = map[string]bool{}
+		queue := append([]string(nil), roots2...)
+		for len(queue) > 0 {
+			p := queue[len(queue)-1]
+			queue = queue[:len(queue)-1]
+			real, err := filepath.EvalSymlinks(p)
+			if err != nil {
+				real = p
+			}
+			if reachable[real] {
 				continue
 			}
-			target, ok := index[base]
-			if !ok {
-				unresolved[base] = true
+			reachable[real] = true
+			reachable[p] = true
+			needed, err := elfx.Needed(real)
+			if err != nil {
 				continue
 			}
-			queue = append(queue, target)
+			for _, n := range needed {
+				base := filepath.Base(n)
+				// ⭐ The edge is dropped from the WALK, never from the bundle.
+				if cuts.cut(filepath.Base(real), base) {
+					cutHits++
+					continue
+				}
+				target, ok := index[base]
+				if !ok {
+					unresolved[base] = true
+					continue
+				}
+				queue = append(queue, target)
+			}
 		}
+
+		if !o.Fixpoint {
+			break
+		}
+		next := make([]string, 0, len(scanSet))
+		for _, p := range scanSet {
+			if reachable[p] {
+				next = append(next, p)
+			}
+		}
+		if len(next) == len(scanSet) {
+			break
+		}
+		scanSet = next
 	}
+	roots = roots2
 
 	res := &SweepResult{
-		Roots:       roots,
-		Reachable:   reachable,
-		TotalFiles:  totalFiles,
-		TotalBytes:  totalBytes,
-		CutEdgesHit: cutHits,
-		CutEdges:    o.CutEdges,
+		Roots:           roots,
+		Reachable:       reachable,
+		TotalFiles:      totalFiles,
+		TotalBytes:      totalBytes,
+		CutEdgesHit:     cutHits,
+		CutEdges:        o.CutEdges,
+		Fixpoint:        o.Fixpoint,
+		FixpointRounds:  rounds,
+		FixpointScanned: len(scanSet),
+		ObjectsScanned:  len(allObjects),
 	}
 	for d := range pluginDirs {
 		if rel, err := filepath.Rel(o.Dir, d); err == nil {
@@ -548,6 +615,16 @@ func (r *SweepResult) Report(w *strings.Builder, listAll bool) {
 		fmt.Fprintf(w, "cut requested    %d: %s\n", len(r.CutEdges), strings.Join(r.CutEdges, " "))
 		fmt.Fprintf(w, "cut edges hit    %d%s\n", r.CutEdgesHit,
 			map[bool]string{true: "   ⛔ NOTHING MATCHED -- this bundle has no such edge, so a zero delta below measures nothing", false: ""}[r.CutEdgesHit == 0])
+	}
+	// ⛔ Printed whenever the fixpoint was asked for, for the same reason the
+	// cut lines are: ONE round means the scan set never shrank, so a zero delta
+	// says "this bundle has no unreachable object mentioning a reachable one"
+	// rather than "the lever does not work".
+	if r.Fixpoint {
+		fmt.Fprintf(w, "fixpoint rounds  %d%s\n", r.FixpointRounds,
+			map[bool]string{true: "   ⚠ the scan set never shrank, so a zero delta measures nothing about this lever", false: ""}[r.FixpointRounds == 1])
+		fmt.Fprintf(w, "objects scanned  %d of %d for soname mentions\n",
+			r.FixpointScanned, r.ObjectsScanned)
 	}
 	if len(r.Unresolved) > 0 {
 		fmt.Fprintf(w, "unresolved       %d DT_NEEDED name(s) nothing in the bundle provides:\n",

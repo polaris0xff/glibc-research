@@ -360,10 +360,19 @@ is **costing route B**, which is where the size actually is.
     B1b ⛔ NEXT: cost route B in WALL CLOCK. One of the 161 is qtbase and Qt
         does not build in a minute. That needs a rebuild.
     B2  ⭐ THEN the allowlist, now bounded and worth building anyway.
-    B3  ⚠ The fixpoint lever, named and not taken: the soname string scan
-        counts mentions from EVERY object including unreachable ones, so an
-        unreachable libicui18n keeps libicuuc alive. It is a real lever AND a
-        real safety question -- 89- is the control it would have to pass.
+    B3  ⭐ TAKEN 2026-09-03c AS A MEASURING DEVICE: `pgb bundle sweep
+        --fixpoint`. Worth +7 files / +978,576 B on the jq AppDir (262 ->
+        269 unreachable, 45.8% -> 51.4%), 3 rounds, scan set 283 -> 14.
+        ⭐ The baseline row is BYTE-IDENTICAL to the one already recorded, so
+        the loop is a no-op when off. The seven are six glibc CJK gconv
+        HELPER libraries plus libresolv.so.2, held up by gconv modules the
+        baseline already drops.
+        ⛔ NOT WIRED INTO DEBLOAT and 89- has NOT been run against it. The
+        seven names sharpen the safety question: a bundle converting a CJK
+        encoding reaches those helpers through iconv_open, which leaves no
+        DT_NEEDED and no mention -- the libSDL3 shape.
+    B3b ⛔ NEXT: run experiments/89- against --fixpoint. That is the control,
+        and nothing may act on the lever until it passes.
     B4  ⚠ A kdenlive AppDir does not exist. B1 needs only the closure.
 
     ---- 2. then, by how foundational they are ----

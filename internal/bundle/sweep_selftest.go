@@ -142,6 +142,69 @@ func Selftest() *selftest.Report {
 	r.CheckBool("and the library only it needs becomes reachable",
 		unreachEnv["libquietdep.so.1"], false)
 	r.Check("unreachable count with the env file", strconv.Itoa(resEnv.UnreachFiles), "1")
+
+	// ---- ⭐ T-066 lever B3: the FIXPOINT --------------------------------
+	//
+	// ⛔ THE SHAPE, and it is the one measured on a real bundle. The soname
+	// string scan takes mentions from EVERY object, including objects that are
+	// themselves unreachable — so an unreachable library keeps another library
+	// alive purely by naming it. On the `jq` AppDir that is six glibc gconv
+	// helper libraries (`libCNS`, `libGB`, `libJIS`, …) held up by the CJK
+	// gconv modules that mention them, which are themselves unreachable.
+	//
+	// The fixture reproduces it in two files: `libghost` is unreachable and its
+	// `.rodata` names `libhaunted`, which nothing else references. Without the
+	// fixpoint `libhaunted` is a root; with it, `libghost` drops out of the
+	// scan set and `libhaunted` goes with it.
+	if !write("ghost.c", "const char *n = \"libhaunted.so.1\";\nint ghost(void){return 5;}\n") ||
+		!write("haunted.c", "int haunted(void){return 6;}\n") {
+		return r
+	}
+	if !cc("-shared", "-fPIC", "-o", filepath.Join(lib, "libhaunted.so.1"), filepath.Join(src, "haunted.c")) ||
+		!cc("-shared", "-fPIC", "-o", filepath.Join(lib, "libghost.so.1"), filepath.Join(src, "ghost.c")) {
+		r.Skip("the fixpoint fixture libraries did not build")
+		return r
+	}
+	base, err := Sweep(SweepOptions{Dir: app, EnvFiles: []string{envFile}})
+	if err != nil {
+		r.Fail("sweep for the fixpoint baseline", err.Error(), "no error")
+		return r
+	}
+	fix, err := Sweep(SweepOptions{Dir: app, EnvFiles: []string{envFile}, Fixpoint: true})
+	if err != nil {
+		r.Fail("sweep with the fixpoint", err.Error(), "no error")
+		return r
+	}
+	ub, uf := map[string]bool{}, map[string]bool{}
+	for _, u := range base.Unreachable {
+		ub[filepath.Base(u)] = true
+	}
+	for _, u := range fix.Unreachable {
+		uf[filepath.Base(u)] = true
+	}
+	r.CheckBool("an unreachable library that NAMES another is unreachable",
+		ub["libghost.so.1"], true)
+	// ⛔ THE DEFECT THE LEVER ADDRESSES: without the fixpoint, the named
+	// library is a ROOT, held up by an object nothing can reach.
+	r.CheckBool("...but without the fixpoint the library it names is KEPT",
+		ub["libhaunted.so.1"], false)
+	r.CheckBool("⭐ with the fixpoint, the library it names is unreachable too",
+		uf["libhaunted.so.1"], true)
+	r.CheckBool("...and the ghost itself still is", uf["libghost.so.1"], true)
+	// ⛔ NOTHING THAT WAS REACHABLE BECOMES UNREACHABLE THE OTHER WAY. The
+	// fixpoint may only shrink the reachable set through the mention rule; a
+	// library reached by a real DT_NEEDED must be untouched.
+	r.CheckBool("a library the program NEEDS is still reachable under the fixpoint",
+		uf["libfoo.so.1"], false)
+	r.CheckBool("a plugin's own dependency is too", uf["libplugdep.so.1"], false)
+	r.CheckBool("and the env-named library is too", uf["libquietdep.so.1"], false)
+	// The round count is reported so a zero delta cannot read as "the lever
+	// does not work" — here it must have iterated at least twice.
+	r.CheckBool("the fixpoint iterated more than once on this fixture",
+		fix.FixpointRounds > 1, true)
+	r.CheckBool("...and the baseline reports one round", base.FixpointRounds == 1, true)
+	r.CheckBool("...and scanned fewer objects at the end than at the start",
+		fix.FixpointScanned < fix.ObjectsScanned, true)
 	return r
 }
 

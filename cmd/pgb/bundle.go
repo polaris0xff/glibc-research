@@ -150,6 +150,13 @@ func bundleSweep(args []string) error {
 			if v, err = next(); err == nil {
 				o.CutEdges = append(o.CutEdges, v)
 			}
+		case "--fixpoint":
+			// ⭐ TODO T-066 route A, lever B3: count soname mentions only from
+			// objects that are themselves reachable, iterated to a fixpoint.
+			// ⛔ A MEASURING DEVICE, not a policy: nothing in the build path
+			// sets this, because it makes the sweep delete more and
+			// `experiments/89-` is the control that would have to pass first.
+			o.Fixpoint = true
 		case "--list":
 			listAll = true
 		default:

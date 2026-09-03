@@ -1810,6 +1810,66 @@ including objects that are themselves unreachable. So an unreachable
 fixpoint — only mentions from reachable objects count — is a real further lever
 and a real safety question, and it is named here rather than taken.
 
+### ⭐ 2026-09-03c: LEVER B3 IS TAKEN — AS A MEASURING DEVICE, AND IT IS WORTH 0.93 MiB ON `jq`
+
+⭐ **`pgb bundle sweep --fixpoint`.** Soname mentions are counted only from
+objects that are themselves reachable, iterated until the scan set stops
+shrinking. ⛔ **Off by default and NOT wired into debloat** — `Fixpoint` appears
+in `cmd/pgb/bundle.go` and nowhere else, and `internal/bundle/appimage.go` never
+sets it. This measures the lever; it does not act on it, exactly as `--cut`
+measured route A's ceiling without modifying a bundle.
+
+⭐ **WHY IT TERMINATES, rather than "it seems to settle".** The scan set starts
+as every object and each round keeps only what the previous round found
+reachable, so it is monotonically decreasing over a finite set; fewer objects
+scanned gives fewer or equal mention-roots, hence a smaller or equal closure.
+⚠ The **seed** — the program roots and everything in a plugin directory — is
+outside the loop, because those are roots by structure rather than by mention
+and the fixpoint must never remove one.
+
+**Measured on the `jq` AppDir at `--debloat none`, 284 library files, 16.7 MiB:**
+
+| arm | roots | unreachable | |
+|---|---|---|---|
+| baseline | 28 | 262 files, 8,012,232 B (45.8%) | |
+| ⭐ `--fixpoint` | 20 | **269 files, 8,990,808 B (51.4%)** | ⭐ **+7 files, +978,576 B** |
+
+    fixpoint rounds  3
+    objects scanned  14 of 283 for soname mentions
+
+⭐ **THE BASELINE ROW IS BYTE-IDENTICAL TO THE ONE THIS ENTRY ALREADY
+RECORDED** — 262 files, 8,012,232 B — which is the regression control saying
+the loop this change wraps around the walk is a no-op when the flag is off.
+
+⭐ **AND THE SEVEN FILES ARE NAMED, because that is what makes the safety
+question answerable instead of abstract:**
+
+    lib/libCNS.so  lib/libGB.so  lib/libISOIR165.so
+    lib/libJIS.so  lib/libJISX0213.so  lib/libKSC.so      lib/libresolv.so.2
+
+Six are glibc's **CJK gconv helper libraries**, and the objects mentioning them
+are `EUC-TW.so`, `ISO-2022-CN.so` and `ISO-2022-CN-EXT.so` — gconv modules the
+**baseline already classifies unreachable**. So the pattern this lever was
+named for is exactly what it found: an unreachable object holding up a library
+only it names. ⚠ Nothing goes the other way — the set of files the baseline
+drops and the fixpoint keeps is **empty**.
+
+⛔ **THE SAFETY QUESTION IS STILL OPEN AND `experiments/89-` IS STILL THE
+CONTROL.** It has **not** been run against the fixpoint, and until it is,
+nothing may act on this. ⚠ And the seven names sharpen the question rather
+than settling it: a bundle whose application converts a CJK encoding at run
+time reaches those helpers through `iconv_open`, which leaves no `DT_NEEDED`
+and no mention — the same shape as the `libSDL3` miss this sweep already paid
+for once. ⭐ The gconv tree is how a *bundle* solves the gconv problem
+(`docs/AGENTS.md` §14), so this lever aims straight at it.
+
+**Carried offline** in `bundle-sweep`: `libghost.so.1` is unreachable and its
+`.rodata` names `libhaunted.so.1`, which nothing else references. Without the
+fixpoint `libhaunted` is a root; with it, it is unreachable. ⛔ Plus the three
+negatives that stop the lever being "delete more": a library the program
+NEEDS, a plugin's own dependency, and the env-named library are all still
+reachable under it. 506 → **516 cases**.
+
 ### ⭐ 2026-09-03c: ROUTE B IS COSTED, AND IT IS FOUR TIMES CHEAPER THAN THIS ENTRY ASSUMED
 
 `experiments/95-`, `evidence/95-route-b-cost/RESULT.txt`. ⛔ **This entry's own
