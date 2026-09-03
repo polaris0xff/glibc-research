@@ -139,8 +139,15 @@ Measured 2026-09-03c: nixpkgs ships none.
 - ⛔ **`$?` after a pipeline is the PIPELINE's status.**
 - ⛔ **`chmod 000` is not a control when you are root.** Move the file away.
 - ⛔ **Never edit a shell script while it is running.**
-- ⚠ **An experiment writes its own `RESULT.txt`.** Redirect stdout elsewhere.
-  ⚠ **A POC does NOT** — redirect, or its RESULT.txt describes the previous run.
+- ⛔ **USE `sh scripts/common/run-experiment.sh <NN>` — NOT `sh experiments/NN-*.sh`.**
+  ⚠ **This note used to say "an experiment writes its own `RESULT.txt`, redirect
+  stdout elsewhere; a POC does NOT". BOTH HALVES WERE WRONG**, measured
+  2026-09-03c: **19** experiments write their own, **13** do not, and every POC
+  does via `poc/common.sh`. There is no way to tell which group one is in
+  without reading it. ⛔ It cost a measurement the same day — `experiments/30-`
+  was re-run, reported `pass=11 fail=0`, and refreshed **nothing**. The wrapper
+  tees the transcript to `run.log` always and writes `RESULT.txt` only when the
+  experiment did not, decided by mtime rather than by a list of names.
 - ⛔ **read the CI run; a local gate does not speak for it.**
 - ⚠ **`scratchpad/` is NOT a path in the repo.** It is the session's own
   directory outside the tree; a relative `scratchpad/x` silently reads nothing.

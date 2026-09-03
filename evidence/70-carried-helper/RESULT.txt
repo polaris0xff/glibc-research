@@ -1,6 +1,6 @@
 experiment 70 - can a helper written in a real language be carried in?
-date (UTC)   : 2026-09-02T04:17:53Z
-host kernel  : Linux 6.18.44-fc-v22
+date (UTC)   : 2026-09-03T09:32:20Z
+host kernel  : Linux 6.18.44-fc-v24
 rustc        : rustc 1.94.1 (e408947bf 2026-03-25)
 cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
 
@@ -16,4 +16,4 @@ rockylinux-8           glibc  ok                ok                ok
 opensuse-leap-15.6     glibc  ok                ok                ok               
 fedora-42              glibc  ok                ok                ok               
 archlinux-latest       glibc  ok                ok                ok               
-pgb-env-debian12       glibc  ok                ok                ok               
+pgb-env-debian13       glibc  ok                ok                ok               

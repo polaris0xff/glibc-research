@@ -144,8 +144,33 @@ exp_rootfs_libc() { # name -> musl | glibc | unknown
 
 # Run a command inside a rootfs and echo ONLY its exit status.
 # ⛔ Unpiped: the status has to be the command's own.
-exp_run_status() { # rootfs copyspec cmd...
+#
+# ⛔ THE FIRST ARGUMENT IS A PATH, NOT A ROOTFS NAME, and until deep review 5
+# on 2026-09-03c getting that wrong was INVISIBLE. Measured, three genuinely
+# different situations returning one indistinguishable answer:
+#
+#     a rootfs path that does not exist  -> "2"
+#     a rootfs NAME where a path is due  -> "2"
+#     a real rootfs, program exits 2     -> "2"
+#
+# ⚠ That is this project's own exit convention -- 0 ok, 1 ran-and-failed,
+# 2 COULD-NOT-RUN -- being collapsed by the helper that carries it. An
+# experiment comparing the result against a number would go green on a run
+# that never happened. `experiments/97-` walked into the name-versus-path half
+# of it and printed nothing on all eleven rows.
+#
+# ⭐ SO A ROOTFS THAT IS NOT A DIRECTORY NOW RETURNS A NON-NUMERIC TOKEN.
+# `exp_check "..." "$st" 0` then FAILS naming it, instead of matching some
+# number by coincidence. ⚠ It does not catch every could-not-run -- `pgb
+# rootfs run` can still fail for its own reasons and report 2 -- so a caller
+# whose expected status is 2 still owes itself a positive control, as
+# `experiments/80-` already has.
+exp_run_status() { # rootfs-PATH copyspec cmd...
   _r="$1"; _c="$2"; shift 2
+  if [ ! -d "$_r" ]; then
+    printf 'no-rootfs(%s)' "$_r"
+    return
+  fi
   "$REPO_DIR/pgb" rootfs run "$_r" --copy "$_c" -- "$@" >/dev/null 2>&1
   printf '%s' "$?"
 }

@@ -1,0 +1,47 @@
+===============================================================
+96 - LD_DEBUG when ld.so arrives as a library, not as the interpreter
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-03T09:38:21Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/96-ld-debug-as-library
+--------------------------------------------------------------
+
+  ok    the static arm has no PT_INTERP                = 0
+  ok    ...and no DT_NEEDED                            = 0
+  ok    the dynamic control DOES have a PT_INTERP      = 1
+  ok    the static arm dlopens the host object         = 0
+  ok    the dynamic control does too                   = 0
+  ok    the static process DOES map glibc's ld.so      = yes
+
+  LD_DEBUG setting                   DYNAMIC (ctrl)  STATIC (subj)
+  bindings, stderr lines                        143              0
+  all, stderr lines                             485              0
+  bindings, LD_DEBUG_OUTPUT files                 1              0
+  help, lines mentioning LD_DEBUG                 2              0
+  help, program still ran                         0              1
+
+  ok    the CONTROL prints bindings (else nothing below means anything) = yes
+  ok    ...and more of them at LD_DEBUG=all            = yes
+  ok    ...and writes an LD_DEBUG_OUTPUT file          = 1
+  ok    ...and LD_DEBUG=help stops it before the program runs = 0
+  ok    the SUBJECT prints nothing at LD_DEBUG=bindings = 0
+  ok    ...nothing at LD_DEBUG=all either              = 0
+  ok    ...and writes no LD_DEBUG_OUTPUT file at all   = 0
+  ok    ...and LD_DEBUG=help does not stop it: it runs = 1
+        
+        ANSWER: no. LD_DEBUG is processed during ld.so's own startup, which
+        never runs when ld.so is brought in through the static dlopen path.
+        The loader IS in the process and reads the variable's value never.
+
+wrote /home/user/glibc-research/evidence/96-ld-debug-as-library/RESULT.txt
+
+-- result ----------------------------------------------------
+pass=14 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

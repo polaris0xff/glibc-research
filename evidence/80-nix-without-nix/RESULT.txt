@@ -1,7 +1,7 @@
 experiment 80 - reaching nixpkgs with no nix
-date            : 2026-09-02T04:36:25Z
+date            : 2026-09-03T09:30:56Z
 channel         : nixpkgs-unstable
-revision        : 26.11pre1063758.e8be7818e19a
+revision        : 26.11pre1066425.9387b3fcc0c2
 subject         : /nix/store/9ipfvwnqp1q8ijnmi5sxvlx9r8w34lw3-bash-5.3p15
 closure         : 5 paths, fetched and hash-checked over HTTPS
 oracle          : nix (Determinate Nix 3.22.2) 2.35.2

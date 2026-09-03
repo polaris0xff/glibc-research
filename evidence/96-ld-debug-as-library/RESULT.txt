@@ -1,6 +1,6 @@
 96 - LD_DEBUG when ld.so arrives as a library, not as the interpreter
 
-date: 2026-09-03T04:23:47Z
+date: 2026-09-03T09:38:21Z
 kernel: Linux 6.18.44-fc-v24
 host libc: ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
 cc: cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0

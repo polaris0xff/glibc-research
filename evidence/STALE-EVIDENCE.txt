@@ -1,0 +1,42 @@
+# evidence/STALE-EVIDENCE.txt — evidence known to describe an older instrument
+#
+# ⛔ THIS FILE IS A DEBT LEDGER, NOT AN EXCUSE. Every line names an experiment
+# whose committed evidence was written BEFORE the last non-comment change to
+# the script that produces it. `scripts/common/check-docs.sh` gate 10 fails on
+# such a pair unless it is listed here, so what is in this file is visible,
+# counted, and owned by an entry.
+#
+# ⚠ AN ENTRY IS PINNED TO BOTH COMMITS AND STOPS MATCHING WHEN EITHER MOVES.
+# Re-run the experiment and the pair changes, the line goes inert and should be
+# deleted. Change the script again and the pair changes, the gate fires again.
+# A line cannot silently outlive its reason.
+#
+# Format:  <script basename> <script-commit> <evidence-commit> <reason>
+#
+# ---------------------------------------------------------------------------
+# ⛔ ALL FOUR BELOW ARE THE SAME DEBT, and it is T-070's residue.
+#
+# Found by deep review 6 on 2026-09-03c. Each of these scripts used to carry
+#
+#     ENV_ROOT="$ROOTFS_DIR/${PGB_ENV_NAME:-pgb-env-debian12}"
+#
+# and now takes the name from `internal/cfg/cfg.go`, which says
+# `pgb-env-debian13`. So the committed numbers were measured inside
+# **glibc 2.36** and the script now measures **glibc 2.41**. That is not a
+# cosmetic diff: it is the build environment the whole experiment runs in.
+#
+# ⚠ T-070 measured the pin move and found its four named costs at zero, so the
+# numbers may well be unchanged — but nobody has re-run these, and until
+# somebody does the record must not imply otherwise. **T-077 owns it.**
+#
+# ⛔ 60-, 61- and 62- are THE HEAD-TO-HEAD. `docs/comparison.md` and
+# `docs/REQUIREMENTS.md`'s table — artefact size, malloc throughput, the
+# eleven-row coverage against AppImage/Flatpak/snap/onelf/static-musl — all
+# come from them. They are pinned here rather than re-run because between them
+# they build five delivery formats and run two benchmark matrices; that is
+# hours, not minutes, and it needs the machine to itself for the clock rows.
+#
+60-versus-alternatives.sh 8ce829252d942b05a25a484b780148d427b1890e 9cb85154035f2a81824ca8428cb4419c44567d0d T-077: measured on pgb-env-debian12/glibc-2.36; builds five delivery formats, needs an idle machine
+61-libc-throughput.sh 8ce829252d942b05a25a484b780148d427b1890e 0e56e62962e7d461dca7b57ebc9534476b0a4941 T-077: measured on pgb-env-debian12/glibc-2.36; benchmark matrix, needs an idle machine for the clock
+62-anylinux-appimage.sh 8ce829252d942b05a25a484b780148d427b1890e 894bfaec26de04327d143a913f4a39bafbd567d8 T-077: measured on pgb-env-debian12/glibc-2.36; builds an anylinux AppImage on an Arch bed
+88-nonix-end-to-end.sh 8ce829252d942b05a25a484b780148d427b1890e 25a86348fced4718085f9ef5997e103f7de82299 T-077: measured on pgb-env-debian12/glibc-2.36; five arms, plans and builds jq inside a rootfs

@@ -457,6 +457,70 @@ else
   ok "no third-party agent instruction file under references/"
 fi
 
+# ---------------------------------------------------------------------------
+# 10. ⛔ AN EXPERIMENT'S COMMITTED EVIDENCE MUST NOT PREDATE THE EXPERIMENT.
+#
+# ⛔ THE DEFECT THIS EXISTS TO CATCH, found by deep review 6 on 2026-09-03c and
+# not by reading: `docs/AGENTS.md` §9 says "all 32 experiments | every one
+# measured". True -- and SEVEN of them had evidence written before the last
+# change to the script that produces it, so what is committed describes a
+# different instrument. The sharpest instance was
+# `evidence/70-carried-helper/RESULT.txt`, whose table named `pgb-env-debian12`
+# -- the environment T-070 RETIRED. The tree carried a glibc 2.36 measurement
+# as current while the pin was 2.41, and nothing said so.
+#
+# ⚠ `TODO/check.sh` gate 8 cannot see this: it forbids a hardcoded environment
+# name in CODE and explicitly exempts prose, and `evidence/` is neither.
+# `check-docs.sh` gate 3 cannot see it either: the cited file EXISTS. This is
+# corrections.md C5 and C23's class -- the file is current, the RUN is not.
+#
+# ⚠ COMMENT-ONLY EDITS DO NOT COUNT. A script whose only change since its
+# evidence is a comment still measures the same thing, and a gate that fired on
+# those would be turned off within a week.
+#
+# ⭐ THE EXEMPTION IS PINNED TO BOTH COMMITS. `evidence/STALE-EVIDENCE.txt`
+# names pairs that are known-stale and too expensive to re-run right now. An
+# entry stops matching the moment EITHER side moves, so it cannot silently
+# outlive its reason.
+n=0; stale=0; exempt=0
+EXEMPT_FILE=evidence/STALE-EVIDENCE.txt
+for s in experiments/[0-9]*.sh; do
+  [ -e "$s" ] || continue
+  num=$(basename "$s" | sed 's/-.*//')
+  d=$(ls -d evidence/"$num"-* 2>/dev/null | head -1)
+  [ -n "$d" ] || continue
+  n=$((n + 1))
+  sc=$(git log -1 --format=%H -- "$s" 2>/dev/null)
+  ec=$(git log -1 --format=%H -- "$d" 2>/dev/null)
+  [ -n "$sc" ] && [ -n "$ec" ] || continue
+  st=$(git log -1 --format=%ct -- "$s" 2>/dev/null)
+  et=$(git log -1 --format=%ct -- "$d" 2>/dev/null)
+  [ "${st:-0}" -gt "${et:-0}" ] || continue
+  # ⛔ EVIDENCE BEING RE-RUN RIGHT NOW IS NOT STALE, and the first version of
+  # this gate could not be satisfied before the commit it was demanding: you
+  # re-run the experiment, the working tree holds the fresh result, `git log`
+  # still points at the old commit, the gate fails, and the gate has to be
+  # green BEFORE you may commit. A check that can only pass after the commit it
+  # blocks is a check people delete. An uncommitted change under the evidence
+  # directory means the answer is being replaced in this very commit.
+  [ -z "$(git status --porcelain -- "$d" 2>/dev/null)" ] || continue
+  # Did the script change in a way that could change what it measures?
+  real=$(git diff "$ec".."$sc" -- "$s" 2>/dev/null \
+         | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' \
+         | sed 's/^[+-][[:space:]]*//' | grep -vE '^(#|$)' | grep -c . || true)
+  [ "${real:-0}" -gt 0 ] || continue
+  if [ -e "$EXEMPT_FILE" ] \
+     && grep -qE "^$(basename "$s")[[:space:]]+${sc}[[:space:]]+${ec}([[:space:]]|$)" "$EXEMPT_FILE"; then
+    exempt=$((exempt + 1))
+    continue
+  fi
+  bad "$(basename "$s") changed after its evidence was written ($real non-comment line(s)); re-run it, or pin it in $EXEMPT_FILE as: $(basename "$s") $sc $ec <reason>"
+  stale=$((stale + 1))
+done
+if [ "$stale" -eq 0 ]; then
+  ok "committed evidence is no older than its experiment ($n checked, $exempt pinned stale)"
+fi
+
 echo
 if [ "$fail" -eq 0 ]; then
   echo "VERDICT: the documentation agrees with the tree."
