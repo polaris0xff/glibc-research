@@ -13,11 +13,19 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
                    OPERATOR SAID THE OPPOSITE. `git ls-remote --heads origin`
                    returns `main` and nothing else. ⛔ `git branch -r` is not
                    evidence about the remote; `ls-remote` is.
-    CI             ⭐ green on every push this session EXCEPT one, which is
-                   the point: check-docs.sh listed only TRACKED files, so a
-                   NEW document was unchecked by the very commit the gate
-                   exists to block. CI caught it; the local gate did not.
-                   Fixed (--cached --others --exclude-standard).
+    CI             ⛔ TWO local-gate holes, SIX red runs, both found by CI
+                   and both now closed:
+                   (a) check-docs.sh listed only TRACKED files, so a NEW
+                       document was unchecked by the very commit the gate
+                       exists to block  -> --cached --others
+                       --exclude-standard;
+                   (b) its path check was bare `[ -e ]`, so a GITIGNORED
+                       build product that exists locally passed here and
+                       failed on a clean checkout -- five red runs from one
+                       cited path  -> an existing `evidence/` path that
+                       `git check-ignore` claims is now a failure.
+                   ⛔ RE-CHECK CI AFTER EVERY PUSH. Both holes made the
+                   local gate say green while CI said red.
     SELFTESTS      546 pass, 1 could not run (no zstd) — carried, re-verify
     ACCEPTANCE     ⚠ the ten POCs were NOT re-run this session. The toolchain
                    was not touched — only internal/bundle — so they are not
