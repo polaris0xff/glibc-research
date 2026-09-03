@@ -314,6 +314,19 @@ func FlagsSelftest() *selftest.Report {
 		cand("-L/a", "-L/b", "-licuuc"), "/a/libicuuc.a|/b/libicuuc.a")
 	r.Check("cxx-candidates: -l:NAME names the file exactly",
 		cand("-L/p", "-l:libicuuc.a"), "/p/libicuuc.a")
+	// ⛔ THE SEPARATED FORM OF -l, WHICH THIS SCAN MISSED UNTIL DEEP REVIEW 4
+	// ON 2026-09-03c. `-L` had a separated case and `-l` did not: it fell into
+	// the "this flag's value is not an input" branch, which is true of `-o`
+	// and `-L` and FALSE of `-l`, whose value is the library to resolve. GNU
+	// ld documents `-l namespec` with a space and gcc passes it through, so a
+	// build system that emits it got the pre-R3 behaviour -- the whole
+	// argument skipped -- from code written to fix exactly that.
+	r.Check("cxx-candidates: a separated -l NAME resolves too",
+		cand("-L/p/lib", "-l", "icuuc"), "/p/lib/libicuuc.a")
+	r.Check("cxx-candidates: ...and the separated -l: form",
+		cand("-L/p", "-l", ":libicuuc.a"), "/p/libicuuc.a")
+	r.Check("cxx-candidates: a separated -l with no -L still resolves to nothing",
+		cand("-l", "m"), "")
 	// ⛔ WITHOUT A -L THERE IS NOTHING TO RESOLVE AGAINST, and the system
 	// directories are deliberately not searched: it would put every link's
 	// scan on /usr/lib's archives for no gain, since a C link that needs the

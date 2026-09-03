@@ -199,6 +199,27 @@ func cxxCandidates(args []string) [][]string {
 		}
 		return out
 	}
+	// ⛔ ONE RESOLVER FOR BOTH SPELLINGS OF -l, AND THAT IS THE POINT.
+	//
+	// This scan already had a `-L dir` case beside its `-Ldir` case and did
+	// NOT have the same pair for `-l`: the separated form fell into the
+	// "this flag's value is not an input" branch, which is true of `-o` and
+	// `-L` and false of `-l`, whose value is the library to resolve. GNU ld
+	// documents `-l namespec` with a space and gcc passes it through, so a
+	// build system emitting it got the whole argument skipped -- the exact
+	// behaviour this function was written to fix. Deep review 4, 2026-09-03c.
+	//
+	// Keeping the two spellings on one code path is what stops them drifting
+	// apart again; `wrapper-flags` pins both.
+	namespec := func(ns string) []string {
+		if rest, ok := strings.CutPrefix(ns, ":"); ok {
+			// `-l:libfoo.a` names the file exactly.
+			return inDirs(rest)
+		}
+		// ⚠ Only `.a`. A shared library carries its own DT_NEEDED on
+		// libstdc++ and needs nothing from us.
+		return inDirs("lib" + ns + ".a")
+	}
 	var groups [][]string
 	skipNext := false
 	for i, a := range args {
@@ -208,16 +229,17 @@ func cxxCandidates(args []string) [][]string {
 		}
 		var g []string
 		switch {
-		case a == "-L" || a == "-l" || a == "-o":
+		case a == "-l":
+			// ⭐ The value IS an input, unlike -L's and -o's.
+			if i+1 < len(args) {
+				g = namespec(args[i+1])
+				skipNext = true
+			}
+		case a == "-L" || a == "-o":
 			// The value is the next argument and is not an input.
 			skipNext = i+1 < len(args)
-		case strings.HasPrefix(a, "-l:"):
-			// `-l:libfoo.a` names the file exactly.
-			g = inDirs(strings.TrimPrefix(a, "-l:"))
 		case strings.HasPrefix(a, "-l"):
-			// ⚠ Only `.a`. A shared library carries its own DT_NEEDED on
-			// libstdc++ and needs nothing from us.
-			g = inDirs("lib" + strings.TrimPrefix(a, "-l") + ".a")
+			g = namespec(strings.TrimPrefix(a, "-l"))
 		case strings.HasPrefix(a, "-"):
 			// Any other flag names no input.
 		case strings.HasSuffix(a, ".a"), strings.HasSuffix(a, ".o"):

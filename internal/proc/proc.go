@@ -113,6 +113,21 @@ func (c *Cmd) build() *exec.Cmd {
 
 // lookPathIn resolves name against the PATH in env, which is the environment
 // the child will actually run with.
+//
+// ⚠ ONE NAMED DIVERGENCE FROM exec.LookPath, RECORDED RATHER THAN FIXED —
+// deep review 4, 2026-09-03c. `exec.LookPath` asks the KERNEL whether the
+// caller may execute the file (`faccessat`/`X_OK`); this asks whether ANY
+// execute bit is set. For root — which is every context this runs in today —
+// the two agree, because root may execute anything carrying any x bit. They
+// diverge for an unprivileged caller facing, say, a 0700 file owned by
+// somebody else: LookPath would skip it and this would select it, and exec
+// would then fail EACCES instead of "not found".
+//
+// ⛔ IT IS NOT FIXED BECAUSE IT CANNOT BE SHOWN TO FAIL HERE. `RULES.md`
+// §"an assertion you have not seen fail is not an assertion" cuts both ways:
+// a fix whose selftest passes identically before and after is not a fix, it is
+// a change. If a non-root path ever reaches this, the case becomes writable
+// and the fix is one `syscall.Access(p, unix.X_OK)`.
 func lookPathIn(name string, env []string) (string, bool) {
 	if name == "" || strings.ContainsRune(name, os.PathSeparator) {
 		return "", false // an explicit path is not looked up
