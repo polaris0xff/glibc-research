@@ -1,6 +1,6 @@
 
 Building for: linux-g++ (x86_64, CPU features: )
-Compiler: gcc 12.2.0
+Compiler: gcc 14.2.0
 Build options:
   Mode ................................... release
   Optimize release build for size ........ no
@@ -13,7 +13,7 @@ Build options:
   Using Link Time Optimization (LTCG) .... no
   Using Intel Control-flow Enforcement Technology (CET)  yes
   Using Glibc function fortification ..... yes
-  Using -ftrivial-auto-var-init=pattern .. no
+  Using -ftrivial-auto-var-init=pattern .. yes
   Using -fstack-protector-strong ......... yes
   Using -fstack-clash-protection ......... yes
   Using libstdc++ assertions ............. yes

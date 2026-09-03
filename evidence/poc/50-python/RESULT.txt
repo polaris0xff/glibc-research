@@ -6,57 +6,47 @@ version       : 3.12.7
 sha256        : 73ac8fe780227bf371add8373c3079f42a0dc62deff8d612cd15a618082ab623
 normal build  : ./configure && make && make install
 stresses      : dlopen extension modules, a large data tree, NSS via socket/pwd, locale
-date (UTC)    : 2026-09-01T06:35:20Z
+date (UTC)    : 2026-09-03T00:05:05Z
 evidence      : /home/user/glibc-research/evidence/poc/50-python
+build env     : /var/lib/pgb-rootfs/pgb-env-debian13
+build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
+build gcc     : gcc (Debian 14.2.0-19) 14.2.0
+build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
 ---------------------------------------------------------------
+        static stdlib modules requested: 49
+du: invalid option -- '/'
+du: invalid option -- 'o'
+du: invalid option -- 'e'
+du: invalid option -- '/'
+du: invalid option -- 'u'
+du: invalid option -- 'e'
+du: invalid option -- 'r'
+du: invalid option -- '/'
+du: invalid option -- 'g'
+du: invalid option -- 'i'
+du: invalid option -- '-'
+du: invalid option -- 'r'
+du: invalid option -- 'e'
+du: invalid option -- 'e'
+du: invalid option -- 'r'
+du: invalid option -- '/'
+du: invalid option -- 'e'
+du: invalid option -- 'v'
+du: invalid option -- 'i'
+du: invalid maximum depth 'ence/poc/50-python/pystdlib'
+Try 'du --help' for more information.
+        stdlib tree: , 591 .py files
+        lib-dynload .so files remaining: 0
   ok    built                                        = yes
 
   the binary:
-    size                   46421864 bytes
+    size                   47114416 bytes
     file                   ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), statically linked, BuildID
     PT_INTERP              absent
     DT_NEEDED              0
     pgb runtime linked     yes
+    .comment gcc           14.2.0
+  ok    built by the environment's own gcc           = 14.2.0
 
   functional test across the pinned matrix:
     ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
-    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
-  ok    alpine-3.22: functional test                 = ok
-    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
-  ok    alpine-3.20: functional test                 = ok
-    alpine-3.10          musl   ok         none                         none
-  ok    alpine-3.10: functional test                 = ok
-    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
-  ok    voidlinux-musl: functional test              = ok
-    debian-11            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
-  ok    debian-11: functional test                   = ok
-    debian-12            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
-  ok    debian-12: functional test                   = ok
-    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
-  ok    ubuntu-20.04: functional test                = ok
-    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
-  ok    rockylinux-8: functional test                = ok
-    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
-  ok    opensuse-leap-15.6: functional test          = ok
-    fedora-42            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
-  ok    fedora-42: functional test                   = ok
-    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
-  ok    archlinux-latest: functional test            = ok
-
-  OBSERVATION -- how many C modules are inside the interpreter (measured, not asserted):
-    ENVIRONMENT          LIBC   OUTCOME    HOST OBJECTS PULLED IN
-    alpine-3.22          musl   builtin=87 localhost=resolves dynload-on-path=1 none
-    alpine-3.20          musl   builtin=87 localhost=resolves dynload-on-path=1 none
-    alpine-3.10          musl   builtin=87 localhost=resolves dynload-on-path=1 none
-    voidlinux-musl       musl   builtin=87 localhost=resolves dynload-on-path=1 none
-    debian-11            glibc  builtin=87 localhost=NO dynload-on-path=1 none
-    debian-12            glibc  builtin=87 localhost=NO dynload-on-path=1 none
-    ubuntu-20.04         glibc  builtin=87 localhost=NO dynload-on-path=1 none
-    rockylinux-8         glibc  builtin=87 localhost=resolves dynload-on-path=1 none
-    opensuse-leap-15.6   glibc  builtin=87 localhost=resolves dynload-on-path=1 none
-    fedora-42            glibc  builtin=87 localhost=resolves dynload-on-path=1 none
-    archlinux-latest     glibc  builtin=87 localhost=resolves dynload-on-path=1 none
-
----------------------------------------------------------------
-pass=12 fail=0 skip=0
-VERDICT: 50-python builds and works across the matrix.

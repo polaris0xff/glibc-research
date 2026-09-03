@@ -199,11 +199,11 @@
 /usr/lib/libreoffice/share/palette/styles.sod	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/styles.sod is not an x86-64 ELF shared object
 /usr/lib/libreoffice/share/palette/tonal.soc	not-an-object	pgb-elfload: /usr/lib/libreoffice/share/palette/tonal.soc is not an x86-64 ELF shared object
 /usr/lib/llvm-18/lib/LLVMPolly.so	undefined	pgb-elfload: LLVMPolly.so: undefined symbol: _ZN4llvm16CallGraphSCCPass17assignPassManagerERNS_7PMStackENS_15PassManagerTypeE
-/usr/lib/llvm-18/lib/LLVMgold.so	crash	
-/usr/lib/llvm-18/lib/libLLVM.so.1	crash	
-/usr/lib/llvm-18/lib/libLTO.so.18.1	crash	
-/usr/lib/llvm-18/lib/libclang-cpp.so.18.1	crash	
-/usr/lib/llvm-18/lib/liblldbIntelFeatures.so.18.1	crash	
+/usr/lib/llvm-18/lib/LLVMgold.so	ok	
+/usr/lib/llvm-18/lib/libLLVM.so.1	ok	
+/usr/lib/llvm-18/lib/libLTO.so.18.1	ok	
+/usr/lib/llvm-18/lib/libclang-cpp.so.18.1	ok	
+/usr/lib/llvm-18/lib/liblldbIntelFeatures.so.18.1	ok	
 /usr/lib/php/20240924/calendar.so	undefined	pgb-elfload: calendar.so: undefined symbol: add_assoc_zval_ex
 /usr/lib/php/20240924/ctype.so	undefined	pgb-elfload: ctype.so: undefined symbol: zend_zval_type_name
 /usr/lib/php/20240924/curl.so	undefined	pgb-elfload: curl.so: undefined symbol: zend_known_strings
@@ -843,8 +843,8 @@
 /usr/lib/x86_64-linux-gnu/libGLX_mesa.so.0.0.0	tlsdesc	pgb-elfload: libgallium-25.2.8-0ubuntu0.24.04.1.so: TLSDESC relocation for ? is not implemented
 /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libICE.so.6.3.0	ok	
-/usr/lib/x86_64-linux-gnu/libLLVM-17.so.1	crash	
-/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1	crash	
+/usr/lib/x86_64-linux-gnu/libLLVM-17.so.1	ok	
+/usr/lib/x86_64-linux-gnu/libLLVM.so.20.1	ok	
 /usr/lib/x86_64-linux-gnu/libLerc.so.4	ok	
 /usr/lib/x86_64-linux-gnu/libSM.so.6.0.1	ok	
 /usr/lib/x86_64-linux-gnu/libSvtAv1Enc.so.1.7.0	ok	
@@ -979,7 +979,7 @@
 /usr/lib/x86_64-linux-gnu/libcap-ng.so.0.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libcap.so.2.66	ok	
 /usr/lib/x86_64-linux-gnu/libcc1.so.0.0.0	ok	
-/usr/lib/x86_64-linux-gnu/libclang-18.so.18	crash	
+/usr/lib/x86_64-linux-gnu/libclang-18.so.18	ok	
 /usr/lib/x86_64-linux-gnu/libclucene-contribs-lib.so.2.3.3.4	ok	
 /usr/lib/x86_64-linux-gnu/libclucene-core.so.2.3.3.4	ok	
 /usr/lib/x86_64-linux-gnu/libclucene-shared.so.2.3.3.4	ok	
@@ -1120,7 +1120,7 @@
 /usr/lib/x86_64-linux-gnu/liblber.so.2.0.200	ok	
 /usr/lib/x86_64-linux-gnu/liblcms2.so.2.0.14	ok	
 /usr/lib/x86_64-linux-gnu/libldap.so.2.0.200	ok	
-/usr/lib/x86_64-linux-gnu/liblldb-18.so.1	crash	
+/usr/lib/x86_64-linux-gnu/liblldb-18.so.1	ok	
 /usr/lib/x86_64-linux-gnu/liblsan.so.0.0.0	refused-interposer	pgb-elfload: liblsan.so.0.0.0 is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libltdl.so.7.3.2	ok	
 /usr/lib/x86_64-linux-gnu/liblz4.so.1.9.4	ok	
@@ -1299,19 +1299,19 @@
 /usr/lib/x86_64-linux-gnu/packagekit-backend/libpk_backend_test_thread.so	undefined	pgb-elfload: libpk_backend_test_thread.so: undefined symbol: pk_backend_job_set_status
 /usr/lib/x86_64-linux-gnu/perl-base/auto/Cwd/Cwd.so	undefined	pgb-elfload: Cwd.so: undefined symbol: Perl_stack_grow
 /usr/lib/x86_64-linux-gnu/perl-base/auto/Fcntl/Fcntl.so	undefined	pgb-elfload: Fcntl.so: undefined symbol: Perl_croak_nocontext
-/usr/lib/x86_64-linux-gnu/perl-base/auto/File/Glob/Glob.so	undefined	pgb-elfload: Glob.so: undefined symbol: PL_charclass
+/usr/lib/x86_64-linux-gnu/perl-base/auto/File/Glob/Glob.so	other	pgb-elfload: Glob.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
 /usr/lib/x86_64-linux-gnu/perl-base/auto/Hash/Util/Util.so	undefined	pgb-elfload: Util.so: undefined symbol: PL_sv_placeholder
 /usr/lib/x86_64-linux-gnu/perl-base/auto/IO/IO.so	undefined	pgb-elfload: IO.so: undefined symbol: PL_ppaddr
 /usr/lib/x86_64-linux-gnu/perl-base/auto/List/Util/Util.so	undefined	pgb-elfload: Util.so: undefined symbol: PL_memory_wrap
-/usr/lib/x86_64-linux-gnu/perl-base/auto/POSIX/POSIX.so	undefined	pgb-elfload: POSIX.so: undefined symbol: PL_csighandler1p
+/usr/lib/x86_64-linux-gnu/perl-base/auto/POSIX/POSIX.so	other	pgb-elfload: POSIX.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
 /usr/lib/x86_64-linux-gnu/perl-base/auto/Socket/Socket.so	undefined	pgb-elfload: Socket.so: undefined symbol: Perl_sv_2iv_flags
 /usr/lib/x86_64-linux-gnu/perl-base/auto/attributes/attributes.so	undefined	pgb-elfload: attributes.so: undefined symbol: Perl_stack_grow
 /usr/lib/x86_64-linux-gnu/perl-base/auto/re/re.so	undefined	pgb-elfload: re.so: undefined symbol: Perl_regexec_flags
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/B/B.so	undefined	pgb-elfload: B.so: undefined symbol: PL_No
-/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Compress/Raw/Bzip2/Bzip2.so	undefined	pgb-elfload: Bzip2.so: undefined symbol: Perl_sv_setref_pv
-/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Compress/Raw/Zlib/Zlib.so	undefined	pgb-elfload: Zlib.so: undefined symbol: Perl_sv_setref_pv
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Compress/Raw/Bzip2/Bzip2.so	other	pgb-elfload: Bzip2.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Compress/Raw/Zlib/Zlib.so	other	pgb-elfload: Zlib.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Cwd/Cwd.so	undefined	pgb-elfload: Cwd.so: undefined symbol: Perl_stack_grow
-/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/DB_File/DB_File.so	undefined	pgb-elfload: DB_File.so: undefined symbol: Perl_mg_get
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/DB_File/DB_File.so	other	pgb-elfload: DB_File.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Data/Dumper/Dumper.so	undefined	pgb-elfload: Dumper.so: undefined symbol: PL_No
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Devel/Peek/Peek.so	undefined	pgb-elfload: Peek.so: undefined symbol: Perl_runops_debug
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Digest/MD5/MD5.so	undefined	pgb-elfload: MD5.so: undefined symbol: Perl_sv_2uv_flags
@@ -1327,21 +1327,21 @@
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Encode/Unicode/Unicode.so	undefined	pgb-elfload: Unicode.so: undefined symbol: PL_strict_utf8_dfa_tab
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Fcntl/Fcntl.so	undefined	pgb-elfload: Fcntl.so: undefined symbol: Perl_croak_nocontext
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/File/DosGlob/DosGlob.so	undefined	pgb-elfload: DosGlob.so: undefined symbol: Perl_newXS_deffile
-/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/File/Glob/Glob.so	undefined	pgb-elfload: Glob.so: undefined symbol: PL_charclass
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/File/Glob/Glob.so	other	pgb-elfload: Glob.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Filter/Util/Call/Call.so	undefined	pgb-elfload: Call.so: undefined symbol: Perl_save_sptr
-/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/GDBM_File/GDBM_File.so	undefined	pgb-elfload: GDBM_File.so: undefined symbol: Perl_save_sptr
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/GDBM_File/GDBM_File.so	other	pgb-elfload: GDBM_File.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Hash/Util/FieldHash/FieldHash.so	undefined	pgb-elfload: FieldHash.so: undefined symbol: Perl_sv_2iv_flags
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Hash/Util/Util.so	undefined	pgb-elfload: Util.so: undefined symbol: PL_sv_placeholder
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/I18N/Langinfo/Langinfo.so	undefined	pgb-elfload: Langinfo.so: undefined symbol: Perl_sv_2iv_flags
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/IO/IO.so	undefined	pgb-elfload: IO.so: undefined symbol: PL_ppaddr
-/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/IPC/SysV/SysV.so	undefined	pgb-elfload: SysV.so: undefined symbol: Perl_sv_2iv_flags
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/IPC/SysV/SysV.so	other	pgb-elfload: SysV.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/List/Util/Util.so	undefined	pgb-elfload: Util.so: undefined symbol: PL_memory_wrap
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/MIME/Base64/Base64.so	undefined	pgb-elfload: Base64.so: undefined symbol: PL_charclass
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Math/BigInt/FastCalc/FastCalc.so	undefined	pgb-elfload: FastCalc.so: undefined symbol: Perl_sv_2iv_flags
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/NDBM_File/NDBM_File.so	undefined	pgb-elfload: NDBM_File.so: undefined symbol: Perl_save_sptr
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/ODBM_File/ODBM_File.so	undefined	pgb-elfload: ODBM_File.so: undefined symbol: Perl_save_sptr
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Opcode/Opcode.so	undefined	pgb-elfload: Opcode.so: undefined symbol: PL_op_name
-/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/POSIX/POSIX.so	undefined	pgb-elfload: POSIX.so: undefined symbol: PL_csighandler1p
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/POSIX/POSIX.so	other	pgb-elfload: POSIX.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/PerlIO/encoding/encoding.so	undefined	pgb-elfload: encoding.so: undefined symbol: PerlIOBuf_open
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/PerlIO/mmap/mmap.so	undefined	pgb-elfload: mmap.so: undefined symbol: PerlIOBuf_pushed
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/PerlIO/scalar/scalar.so	undefined	pgb-elfload: scalar.so: undefined symbol: PerlIOBase_binmode
@@ -1350,8 +1350,8 @@
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Socket/Socket.so	undefined	pgb-elfload: Socket.so: undefined symbol: Perl_sv_2iv_flags
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Storable/Storable.so	undefined	pgb-elfload: Storable.so: undefined symbol: PL_No
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Sys/Hostname/Hostname.so	undefined	pgb-elfload: Hostname.so: undefined symbol: Perl_stack_grow
-/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Sys/Syslog/Syslog.so	undefined	pgb-elfload: Syslog.so: undefined symbol: Perl_sv_2iv_flags
-/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Time/HiRes/HiRes.so	undefined	pgb-elfload: HiRes.so: undefined symbol: PL_ppaddr
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Sys/Syslog/Syslog.so	other	pgb-elfload: Syslog.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
+/usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Time/HiRes/HiRes.so	other	pgb-elfload: HiRes.so: general-dynamic TLS symbol PL_current_context is defined nowhere in the loaded set
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Time/Piece/Piece.so	undefined	pgb-elfload: Piece.so: undefined symbol: Perl_sv_2iv_flags
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Unicode/Collate/Collate.so	undefined	pgb-elfload: Collate.so: undefined symbol: PL_hexdigit
 /usr/lib/x86_64-linux-gnu/perl/5.38.2/auto/Unicode/Normalize/Normalize.so	undefined	pgb-elfload: Normalize.so: undefined symbol: PL_strict_utf8_dfa_tab

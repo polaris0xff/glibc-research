@@ -1,15 +1,15 @@
 93 - host shared objects through pgb-elfload
-date        : 2026-09-02T23:50:20Z
+date        : 2026-09-03T00:05:18Z
 host        : Linux 6.18.44-fc-v24
 objects     : 1527
 
-ok=620 refused=119 failed=733 crash=55 hang=0
+ok=629 refused=119 failed=733 crash=46 hang=0
 
 by reason:
-  undefined              643
+  undefined              632
   not-an-object          96
-  other                  58
-  crash                  55
+  other                  69
+  crash                  46
   missing-dep            29
   served-by-image        10
   refused-interposer     9
@@ -17,16 +17,7 @@ by reason:
   tlsdesc                3
 
 crashed or hung:
-  /usr/lib/llvm-18/lib/LLVMgold.so	status=139	
-  /usr/lib/llvm-18/lib/libLLVM.so.1	status=139	
-  /usr/lib/llvm-18/lib/libLTO.so.18.1	status=139	
-  /usr/lib/llvm-18/lib/libclang-cpp.so.18.1	status=139	
-  /usr/lib/llvm-18/lib/liblldbIntelFeatures.so.18.1	status=139	
-  /usr/lib/x86_64-linux-gnu/libLLVM-17.so.1	status=139	
-  /usr/lib/x86_64-linux-gnu/libLLVM.so.20.1	status=139	
-  /usr/lib/x86_64-linux-gnu/libclang-18.so.18	status=139	
   /usr/lib/x86_64-linux-gnu/libgprofng.so.0.0.0	status=139	
-  /usr/lib/x86_64-linux-gnu/liblldb-18.so.1	status=139	
   /usr/lib/x86_64-linux-gnu/xtables/libarpt_mangle.so	status=139	
   /usr/lib/x86_64-linux-gnu/xtables/libebt_arpreply.so	status=139	
   /usr/lib/x86_64-linux-gnu/xtables/libebt_dnat.so	status=139	
