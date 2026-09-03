@@ -6,16 +6,22 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03d, at the START (RULES.md §RESUME), refreshed as
-                   work lands
+    LAST WRITTEN   2026-09-03d, at the START (RULES.md §RESUME) and refreshed
+                   as work landed. Session COMPLETE.
     TREE           main, began at 432e6413 (== origin/main at session start)
     BRANCH         ⛔ main. The harness names a `claude/*` branch and THE
                    OPERATOR SAID THE OPPOSITE. `git ls-remote --heads origin`
                    returns `main` and nothing else. ⛔ `git branch -r` is not
                    evidence about the remote; `ls-remote` is.
-    CI             ⚠ green at 432e6413 per the last session. Re-check per push.
+    CI             ⭐ green on every push this session EXCEPT one, which is
+                   the point: check-docs.sh listed only TRACKED files, so a
+                   NEW document was unchecked by the very commit the gate
+                   exists to block. CI caught it; the local gate did not.
+                   Fixed (--cached --others --exclude-standard).
     SELFTESTS      546 pass, 1 could not run (no zstd) — carried, re-verify
-    ACCEPTANCE     the ten POCs, four clean-rebuilt green runs last session
+    ACCEPTANCE     ⚠ the ten POCs were NOT re-run this session. The toolchain
+                   was not touched — only internal/bundle — so they are not
+                   expected to move, and that is an expectation, not a run.
 
 ---
 
@@ -64,34 +70,32 @@ is the failure. `corrections.md` C23 is why the old numbers cannot be quoted.
 
 ## In flight right now
 
-    ⚠ SESSION 2026-09-03d. Scoped by the operator to PROGRESS.md N0–N6.
-      ⭐ N0, N2 and N6 are DONE, and TWO LEVERS ARE SHIPPED.
+    ⭐ NOTHING. Everything is committed, pushed and gated.
+      Session 2026-09-03d is COMPLETE. Read PROGRESS.md — the operator
+      re-scoped it mid-session and the next task list is G1 and G2.
 
-    ⭐ THE HEADLINE: `jq` cold start went 2.07× → **1.00×** against the
-       field, eleven environments, and the closure did not change. Two
-       constants in internal/bundle/appimage.go did:
-         uruntime v0.5.6 full → v0.5.9 LITE   (77-)  2.07× → 1.28×
-         dwarfs block -S26 → -S18             (81-)  1.28× → 1.00×
-       ⚠ Size went the other way to buy it: 1.44× → 1.70×.
-
-    RUNNING   experiments/90- (kdenlive) with the CORRECTED cold protocol.
-              It rebuilds the bundle (~7 GB cache, tens of minutes).
-              ⛔ DO NOT EDIT ANY RUNNING SCRIPT. This session did, on 90-,
-              and had to kill and restart the run: `sh` re-reads from a
-              byte offset.
+    ⭐ WHAT THIS SESSION LEFT BEHIND, in one line each:
+      the bundler is LEVEL OR AHEAD ON SPEED (jq cold 1.00x, kdenlive
+      cold 0.74x, host objects 0/11 against 4/11), by two constants in
+      internal/bundle/appimage.go and nothing else;
+      experiments/clock.sh is the instrument every millisecond goes
+      through, and it asserts its own A/A control;
+      every reference the operator named is vendored, pinned and read.
 
     ⛔ WHAT IS NOT DONE, IN ORDER:
-       1. 86- has ONE run at the shipped configuration. The parity
-          headline is N=1 at the config level, which is C23's own lesson.
-          RE-RUN IT.
-       2. 78-, 85-, 89- build bundles and their evidence describes the OLD
-          runtime AND the old block size. NO GATE CAN SEE IT —
-          check-docs.sh compares a script against its evidence and none of
-          those scripts changed. C5's shape reached through the Go source.
-          ⭐ `pgb bundle appimage` now PRINTS the two runtime filenames, so
-          a run.log says which it describes. 78- and 89- are cheap.
-       3. 86-'s WARM column subtracts a cold run that is not in the series
-          it divides. Its cold column is sound. Carry clock.sh into it.
+       1. 86-'s WARM column subtracts a cold run that is not in the
+          series it divides. Its COLD column is sound. Carry clock.sh in.
+       2. kdenlive's warm row is 3.45x against us and UNEXPLAINED.
+          First candidate: at 565 MB it is over uruntime's 350 MB
+          MAX_EXTRACT_SELF_SIZE, so it EXTRACTS where jq MOUNTS.
+          docs/research/nix-bundle-patching.md §1.
+       3. kdenlive's render direction is unresolved — two runs disagree.
+       4. 78-, 85-, 89- carry evidence describing the OLD runtime. No
+          gate can see it; `pgb bundle appimage` now PRINTS the runtime
+          filenames so a run.log says which it describes.
+       5. defaultSharunURL is pinned to `latest`, in a constant block
+          whose own comment says that is the thing not to do. Not fixed:
+          choosing a tag needs the eleven-environment matrix re-run.
 
 ## ⛔ WHAT IS LEFT — READ PROGRESS.md, IT IS THE WORK ORDER
 

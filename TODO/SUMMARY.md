@@ -1,77 +1,103 @@
-# SUMMARY.md — the session of 2026-09-03c
+# SUMMARY.md — the session of 2026-09-03d
 
-⛔ **Overwritten every session.** The history is the git log, and the previous
-session's summary is
-[`../HISTORY/sessions/2026-09-03.md`](../HISTORY/sessions/2026-09-03.md).
+⛔ **Overwritten every session.** The narrative is
+[`../HISTORY/sessions/2026-09-03d.md`](../HISTORY/sessions/2026-09-03d.md);
+the work order is [`PROGRESS.md`](PROGRESS.md).
 
-⭐ **The headline: the list of nine glibc quirks was not complete, and the
-tenth was found and closed the same day.** `docs/REQUIREMENTS.md` said *"there
-is no unenumerated remainder"* — the sentence that made the operator's part 2
-countable. It was false. `grep -rn zoneinfo` over the whole tree returned
-**nothing**, and static glibc turns out to read the host's **timezone
-database**, which **four of eleven** environments do not have — including
-`ubuntu-20.04`, which is glibc. `--embed-tzdata` closes it on 11 of 11.
+    SCOPE     the operator: "focus the next session entirely on optimizing
+              the nix bundler as much as possible" (PROGRESS.md N0–N6),
+              then mid-session: defer the speed comparison, reprioritise
+              the glibc-static and nix-bundle quirks, and mine every named
+              reference with three passes each.
+    RESULT    ⭐ THE BUNDLER IS LEVEL OR AHEAD ON SPEED, on a CLI and on a
+              GUI, and the closure never changed.
 
-⭐ **And the bundler's acceptance bar changed shape**: the operator struck
-**size** and put **speed** and **one-command packaging** in its place. That is
-harder, not softer — the conditions are conjunctive, one-command packaging is a
-win `pgb` can already publish, and the clock is the column it is furthest
-behind on.
+## ⭐ What moved
 
-## Before and after
-
-| | at start | at end |
+| | before | after |
 |---|---|---|
-| **the bundler's bar** | size, shape, friction, honesty | ⭐ **speed + one command**; size struck. Every byte lever is **un-scored** until re-measured in milliseconds |
-| **the bundler's timing numbers** | published as fact | ⛔ **do not re-derive** — from a superseded evidence file, one sample per arm, ratios of 2.52×/3.48×/4.92×/5.02× across four runs, warm above cold in two. ⭐ Direction survives; magnitude does not. C23 |
-| **the glibc quirks** | "nine, no unenumerated remainder" | ⛔ **TEN**, and the claim of completeness is withdrawn. ⭐ Nine closed, one open |
-| **timezone** | not on the list, never measured | ⭐ **closed**: `--embed-tzdata`, 11 of 11, 193,208 B for 20 zones |
-| **`TODO/*.md` entry text** | 5,085 lines | ⭐ **545**. 34 closed entries + the long-form findings behind the open ones in `HISTORY/entries/` |
-| **that split** | a convention | ⭐ **gated** — `check.sh` 4b/4c/4d, each proved able to fail |
-| **`cxxCandidates`** | fixed for `-lNAME` | ⛔ still skipped the **separated** `-l NAME`. R3's fix went halfway; both spellings on one resolver now |
-| **`exp_run_status`** | "could not run" and "exited N" both `2` | ⭐ a non-numeric token, so a comparison fails loudly |
-| **the carried note on evidence** | "an experiment writes its own RESULT.txt" | ⛔ **inverted** — 19 of 32 do, 13 do not. `scripts/common/run-experiment.sh` makes one command right for all of them |
-| **stale evidence** | invisible | ⭐ **gate 10**: 7 of 32 experiments had evidence older than their own script. Three re-run, four pinned with reasons, T-077 owns them |
-| **the four new references** | mined, unread | ⭐ **read**, four passes + tracker, two write-up files. Two findings correct the record |
-| **selftests** | 540 | ⭐ **546**, 1 could not run (no zstd) |
-| **Entries** | 48 / 14 open / 34 done | **50 / 15 open / 35 done** |
+| `jq` cold start vs the field, 11 environments | 2.07× | ⭐ **1.00×**, ours faster on 6 of 11 rows |
+| kdenlive cold start vs the competitor | 4.92× against us | ⭐ **0.74× — ours is faster** |
+| kdenlive host shared objects | — | ⭐ **0 of 11**, against the competitor's 4 of 11 |
+| `jq` artefact size | 2.86× | 1.70× ⚠ (1.44×, then `-S18` cost +17.8%) |
+| kdenlive artefact size | 2.45× | ⛔ 2.95× |
 
-## ⛔ What was found, and not one came from reading code
+⛔ **Two constants in `internal/bundle/appimage.go` did all of it**: uruntime
+`full` → `lite` (`experiments/77-`, 0.69–0.76×) and the dwarfs block `-S26`
+(64 MiB) → `-S18` (256 KiB) (`experiments/81-`, 0.66× on a large artefact).
 
-1. ⛔ **The tenth glibc quirk**, found by taking *"are there still some?"* as a
-   question about **completeness**. And its failure is worse than "returns
-   UTC": glibc re-reads `TZ=Europe/Berlin` as a POSIX spec and prints
-   `Europe +0000` — **the zone name you asked for, at a UTC offset**, so the
-   field that looks like a confirmation is an echo of the input.
-2. ⛔ **The bundler's milliseconds do not re-derive**, found by opening the
-   file the entries cite, on the day those milliseconds became the whole bar.
-3. ⛔ **`-l NAME` with a space was still skipped** — found by reading the
-   session's own fix adversarially, proved red before being fixed.
-4. ⛔ **A helper collapsed this project's own exit convention**, found by
-   running it three ways and getting `2` from all of them.
-5. ⛔ **A carried machine note was backwards**, found because acting on it
-   re-ran an experiment that refreshed nothing and reported success.
-6. ⛔ **Seven experiments' evidence predates their own script**, found by
-   comparing two `git log` timestamps — including one whose committed table
-   names the environment T-070 retired.
-7. ⛔ **Four open entries lost the pointer to their own detail** within an hour
-   of the strip that created them. Now gated.
-8. ⭐ **A carried selftest caught a live defect while it was being written**:
-   `PGB_OPT_EMBED_TZDATA` was exported without being added to `cfg.OptVars`,
-   which is T-019's class, caught in seconds.
-9. ⛔ **Two of this project's written-down claims were corrected by somebody
-   else's repository** — "there is no static nix to fetch" (the nix flake
-   ships one) and T-051's `--store` route (it fails on Debian stable, with a
-   probe that passes first).
+## ⭐ The five findings behind it
 
-## What is left
+1. **The instrument was measuring the wrong thing.** `90-`'s cold column
+   obtained "cold" by copying the artefact; uruntime keys its mount on
+   **content** and holds it **5 s**, so the copy reused the live mount and the
+   column reported a warm start — 1.02× of warm, measured. `corrections.md`
+   **C24**, and it is C23's missing mechanism.
+2. **Size is not the time column.** `experiments/84-`: a 29.6× image and a
+   138× file count each move cold start ~1.05×; image size costs
+   **0.024–0.031 ms/MiB**, so the whole 196 MiB between the two kdenlive
+   bundles is ~5 ms of a gap never seen below 129 ms. ⛔ N1's premise is gone.
+3. **We were not running the runtime we were measured against.** `86-` stages
+   the competitor's own toolchain — uruntime **lite**; we shipped **full**.
+4. **The pin was decorative.** `download` returned early whenever the
+   destination existed, whatever URL was asked for, so moving a pin changed
+   nothing on any machine that had built a bundle. Now keyed on the URL.
+5. **The dwarfs block size is a lever, and the sweep had to run three times**
+   to find its minimum — 1 MiB, then 256 KiB, both monotonic to their own
+   floor. 64 KiB is the minimum and is **not** shipped: 0.02× more for another
+   19% of the artefact.
 
-⛔ **The next session is scoped by the operator: the bundler, on the clock.**
-`PROGRESS.md` N0–N6, and **N0 is not optional** — fix the instrument before
-measuring anything with it. ⭐ N2 names the hypothesis that decides whether any
-of the size work counts, and `pelf`'s 350 MB mount-versus-extract threshold is
-independent corroboration for it.
+## ⭐ The reference sweep, and what it corrected
 
-⚠ **Deferred, plainly**: nothing from the reference sweep was **run**;
-`60-`, `61-`, `62-` and `88-` were not re-run on the current pin (T-077);
-T-012's git/URL route, by the operator's own instruction.
+Every reference the operator named is vendored and pinned; three passes each.
+⭐ **It corrected five claims this session had already published** — the
+mount/extract selector is a **patchable constant**, not an environment
+variable; `lite` drops **`dwarfsck`/`mkdwarfs`**, not codecs; the field's icon
+rule is **at least 128×128**, the opposite of what was recorded; its desktop
+rule takes the **first** match, not the smallest; and gearlever's gate is
+**GIO's content type**, not the type-2 magic (`gio info` says
+`application/vnd.appimage` for ours and the competitor's alike).
+
+⭐ **And `experiments/99-`'s bisected 4–6 s reuse window turned out to be a
+source constant**: `REUSE_CHECK_DELAY = "5s"`.
+
+📚 [`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md),
+[`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md).
+
+## ⭐ What was built
+
+| | |
+|---|---|
+| `experiments/clock.sh` | the wall-clock instrument: median of N, arms interleaved with a rotating start, and an **A/A control** whose ratio is the floor below which no row may be believed |
+| `experiments/99-` | stands it up and **asserts** the control; found C24 |
+| `experiments/84-` | is size the time column — no |
+| `experiments/77-` | the runtime, five ways, one component at a time |
+| `experiments/81-` | the dwarfs block size, seven ways, two subjects |
+| `experiments/90-` | rebuilt on the corrected protocol; kdenlive re-measured |
+| `lib.sh` `exp_pack_blocksize` | reads the block size out of the Go source so no experiment can copy a stale one |
+
+## ⛔ Defects found in this session's own work
+
+⭐ **Every review found one.** `clk_run_twin` was dead code that also passed an
+empty argument. `90-`'s cache stamped on `[ -s ]`, so a truncated 99 MB
+artefact would have been reused as a whole one. `77-` borrowed
+`$CACHE/tools/mkdwarfs` and silently changed the meaning of three arms when the
+pin moved. `86-`'s **warm** column subtracts a cold run that is not in the
+series it divides. `92` was not a free number — `evidence/92-go-port` had it.
+`check-docs.sh` enumerated tracked files only, so a **new** document was
+unchecked by exactly the commit the gate exists to block; **CI caught that one,
+not the local gate.**
+
+⛔ **And a process failure**: `experiments/90-` was edited **while running**,
+which cost a run. `sh` re-reads from a byte offset.
+
+## ⛔ What is NOT done
+
+1. `86-`'s warm arithmetic is unverified — `clock.sh` is the shape to carry in.
+2. kdenlive's **warm** row is 3.45× against us and unexplained. First
+   candidate: at 565 MB it is over uruntime's 350 MB threshold, so it
+   **extracts** where `jq` **mounts**.
+3. kdenlive's **render** direction is unresolved — two runs disagree.
+4. `78-`, `85-`, `89-` carry evidence describing the old runtime.
+5. `defaultSharunURL` is pinned to `latest`, in a constant block whose own
+   comment says that is the thing not to do.
