@@ -549,7 +549,20 @@ is **costing route B**, which is where the size actually is.
             ⛔ SO RUNG 1 IS NOT BLOCKED ON A TOOL. It is blocked on BUILDING
             1,665 derivations static-glibc -- expect boost, the AWS CRT and
             libgit2 to be the ones that refuse.
-    T-054   rungs 3 (KF6) and 4 (kdenlive static)
+    T-054   rungs 3 (KF6) and 4 (kdenlive static).
+            ⭐ RUNG 4's DIRECT DEMAND MEASURED 2026-09-03c: kdenlive 26.08.0
+            has 13 buildInputs, and rung 3 is TWO of them, not a framework
+            set --
+              Qt    qtbase-6.11.1 ⭐ DONE at exactly this version (poc/90,91),
+                    plus qtsvg qtmultimedia qtnetworkauth qtimageformats
+              media ffmpeg-full-9.0, mlt-7.40.0, ffmpegthumbs -- ⭐ ffmpeg and
+                    MLT done at OLDER versions in poc/80 (7.1 / 7.30.0)
+              KDE   kio-extras, qqc2-desktop-style  ⛔ rung 3. The sprawl is
+                    TRANSITIVE: kio-extras pulls kio, which pulls much of KF6
+              other KDDockWidgets, v4l-utils, opentimelineio
+            ⛔ AND THE PLAN NEEDED NIX: the nix-free route reaches `kdenlive`
+            but not the dotted `kdePackages.` attribute, so it fell back to
+            evaluation. That is the gap T-060 exists to close.
     T-051   the no-compiler host
     T-012   pgb build <url-or-package>
     then    P2 by category

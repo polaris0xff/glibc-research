@@ -283,6 +283,37 @@ attempted, and kdenlive itself was not attempted** — that POC says so in its
 own "depth reached" section. So: the engine is proved, the application is not,
 and nobody has yet shown either that it can or that it cannot be done.
 
+### ⭐ 2026-09-03c — RUNG 4's DIRECT DEMAND, MEASURED, AND IT IS 13 INPUTS
+
+⭐ **`pgb nix plan kdePackages.kdenlive` — kdenlive 26.08.0, 13 buildInputs and
+8 nativeBuildInputs.** The entry's rungs are ordered KF6 then kdenlive; this
+says what rung 4 actually asks for, and it is narrower than "KDE Frameworks":
+
+| group | inputs | where this project stands |
+|---|---|---|
+| **Qt** | `qtbase-6.11.1`, `qtsvg`, `qtmultimedia`, `qtnetworkauth`, `qtimageformats` | ⭐ **qtbase 6.11.1 is DONE at exactly this version** — `poc/90-qt` and `poc/91-qt-xcb`. Four further modules, none attempted |
+| **media** | `ffmpeg-full-9.0`, `mlt-7.40.0`, `ffmpegthumbs` | ⭐ **ffmpeg and MLT are done at OLDER versions** — `poc/80-mlt` built ffmpeg 7.1 and MLT 7.30.0. ⚠ The version drift is real work, not a formality |
+| **KDE** | `kio-extras`, `qqc2-desktop-style` | ⛔ **rung 3, and it is TWO direct inputs rather than a framework set.** The sprawl is transitive: `kio-extras` pulls `kio`, which pulls much of KF6 |
+| **other** | `KDDockWidgets-2.4.1`, `v4l-utils`, `opentimelineio-0.18.1` | untouched |
+
+    nativeBuildInputs  cmake-4.3.4  ninja-1.13.2  wrap-qt6-apps-hook
+                       kf6-move-outputs-hook  qmllint-validate-hook
+                       pkg-config-wrapper  shared-mime-info  separate-debug-info.sh
+
+⭐ **So rung 3 is two direct inputs, not a wall**, and rung 4's Qt half already
+has its largest piece proved at the version kdenlive wants. ⚠ That is a
+narrowing of the work, not a claim it is easy: the transitive KF6 closure under
+`kio-extras` is where the count goes, and `poc/80-mlt`'s two recorded build-system
+failures below are exactly the shape to expect more of.
+
+⛔ **AND THIS PLAN NEEDED NIX.** `pgb nix plan kdePackages.kdenlive` reported
+`no nix-free route resolved … falling back to evaluation` and
+`channel pin agrees: no` — the nix-free index/hydra route reaches `kdenlive`
+(it did for `experiments/95-`) but not the dotted `kdePackages.` attribute with
+its buildInputs. ⚠ **So this measurement is not reproducible on a host with no
+nix**, which is precisely the gap T-060 exists to close, and it is recorded here
+rather than left to surprise someone.
+
 **Two failures worth carrying forward**, both from that POC and both about the
 build system rather than the code:
 - MLT hard-codes `add_library(mlt SHARED)` at `src/framework/CMakeLists.txt:36`,
