@@ -38,3 +38,65 @@ rewrite path testable with no GPU and no Alpine.
 the full rewrite, and the table shows what changed on each of 11.
 
 📚 [detail](../HISTORY/entries/runtime-open.md)
+
+## T-076 — ⛔ the TENTH quirk: static glibc reads the host's timezone database
+
+**Source** ⭐ **found 2026-09-03c** by taking the operator's *"fix all remaining
+GLIBC quirks if there still are some"* as a question about **completeness**
+rather than about the eight that are closed.
+**Category** runtime · **Priority** P1 · **Effort** M · **Status** open
+
+⛔ **`docs/REQUIREMENTS.md` said of its nine issues: *"there is no unenumerated
+remainder."* That was false, and it was the sentence that made part 2 of the
+operator's bar countable.** `grep -rn zoneinfo` over `docs/`, `TODO/`,
+`experiments/`, `poc/`, `internal/` and `tool/` returned **nothing**. Nobody
+had looked.
+
+**Measured** — `experiments/97-timezone.sh`, **pass=10 fail=0 skip=0**,
+`evidence/97-timezone/RESULT.txt`:
+
+| | |
+|---|---|
+| static `libc.a` | names `/usr/share/zoneinfo`, `/etc/localtime` and honours `TZDIR`, and carries **no data** |
+| resolve `Europe/Berlin` correctly | **7 of 11** — `CEST +0200`, hour 02 |
+| ⛔ cannot, and do not say so | **4 of 11** — alpine 3.10, 3.20, 3.22 and ⚠ **ubuntu-20.04, which is glibc** |
+
+⛔ **The failure mode is worse than "it returns UTC".** With no database glibc
+re-reads `TZ=Europe/Berlin` as a POSIX zone specification — a bare abbreviation
+with no offset — and prints:
+
+    Europe +0000 00
+
+⭐ **the zone name the caller ASKED FOR, with a UTC offset.** So `%Z`, the field
+that looks like a confirmation, is an echo of the input, and the only field
+carrying the defect is the offset. A log line reading `Europe` beside a
+timestamp two hours out is the production shape of this bug.
+
+⚠ **And it is not a musl story.** Three of the four are Alpine; the fourth is a
+Debian-family image that simply does not install `tzdata`.
+
+**What is left.**
+
+1. ⭐ **The fix has a precedent and it is the same one twice over.** `terminfo`
+   and the CA bundle are both host databases that some environments lack, and
+   both were closed by an **opt-in `--embed-*`**. `--embed-tzdata` is the
+   third of that family. ⚠ Unlike those two, glibc offers a documented hook —
+   `TZDIR` — which may make it cheaper; ⛔ that is a guess and the mechanism
+   has not been chosen.
+2. ⚠ **Decide what "correct" means when the zone is unknown.** Silently
+   answering with a UTC offset is the defect; refusing is a behaviour change
+   for programs that do not care about time zones. The `--embed-*` family's
+   answer — opt in, and be exact when you do — is the likely one.
+3. ⛔ **Size.** A full `tzdata` is ~1,800 files and a few hundred KB
+   compiled; embedding all of it is not obviously right for a program that
+   uses one zone.
+
+⭐ **AND THE METHOD MATTERS MORE THAN THE ROW.** One grep found a tenth issue
+in a list called complete. The next candidates, each worth one measurement:
+`/etc/services` and `/etc/protocols` for `getservbyname`; `libgcc_s.so.1` for
+`pthread_cancel` and `backtrace` — ⚠ **probed the same day: 0 mentions in the
+build host's `libc.a` at glibc 2.39**, so likely already dead upstream, but
+**not measured on the pinned 2.41**.
+
+**Prove.** All eleven resolve `Europe/Berlin` to `CEST +0200`, with the same
+binary, and `experiments/97-` asserts `MISSING = 0`.

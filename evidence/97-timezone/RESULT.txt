@@ -1,0 +1,63 @@
+===============================================================
+97 - the timezone database: a tenth way static glibc is not self-contained
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-03T09:22:07Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/97-timezone
+--------------------------------------------------------------
+
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-03T09:22:07Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/97-timezone
+--------------------------------------------------------------
+  ok    libc.a names /usr/share/zoneinfo               = yes
+  ok    libc.a names /etc/localtime                    = yes
+  ok    libc.a honours TZDIR                           = yes
+        so the database is HOST data: nothing about it is linked in.
+  ok    the subject has no PT_INTERP                   = 0
+  ok    ...and no DT_NEEDED                            = 0
+        build host: CEST +0200 02
+  ok    the CONTROL resolves Europe/Berlin on the build host = +0200
+  ok    ...and the hour is the summer offset, not UTC  = 02
+
+-- the eleven: does the host carry a zone database, and what does the
+   SAME static binary print when it asks for Europe/Berlin -----------
+  ENVIRONMENT          LIBC   ZONEFILES /etc/lt  PRINTED VERDICT
+  alpine-3.22          musl          0 no       Europe +0000 00 ⛔ NO DATABASE
+  alpine-3.20          musl          0 no       Europe +0000 00 ⛔ NO DATABASE
+  alpine-3.10          musl          0 no       Europe +0000 00 ⛔ NO DATABASE
+  voidlinux-musl       musl       1786 no       CEST +0200 02 ok
+  debian-11            glibc      1347 yes      CEST +0200 02 ok
+  debian-12            glibc       900 yes      CEST +0200 02 ok
+  ubuntu-20.04         glibc         0 no       Europe +0000 00 ⛔ NO DATABASE
+  rockylinux-8         glibc      1795 yes      CEST +0200 02 ok
+  opensuse-leap-15.6   glibc      1805 yes      CEST +0200 02 ok
+  fedora-42            glibc      1801 yes      CEST +0200 02 ok
+  archlinux-latest     glibc      1803 no       CEST +0200 02 ok
+
+  ok    every fetched environment answered             = 11
+  ok    environments that CANNOT resolve the zone      = 4
+  ok    environments with a database that answer correctly = 0
+        ⛔ the 4 that cannot do not SAY so: they print `Europe +0000`,
+           the zone name ASKED FOR with a UTC offset. The %Z field echoes
+           the input, so only the offset carries the defect.
+        ⚠ AND IT IS NOT A MUSL STORY: ubuntu-20.04 is glibc and is one of the
+           four. Three of the four are Alpine; the fourth is a Debian family
+           image that simply does not install tzdata.
+
+-- result ----------------------------------------------------
+pass=10 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

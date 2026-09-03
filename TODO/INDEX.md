@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 48  OPEN 14  DONE 34
+    TOTAL 49  OPEN 15  DONE 34
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 7 | 1 | 6 |
-| P1 | a documented capability does not work, or a flag does nothing | 32 | 8 | 24 |
+| P1 | a documented capability does not work, or a flag does nothing | 33 | 9 | 24 |
 | P2 | worth doing; nothing is wrong without it | 9 | 5 | 4 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -65,6 +65,7 @@ pretending to be one.
 | T-073 | P1 | S | done | runtime | ⭐ The own-symbol table answered where one of its two names had to defer |
 | T-074 | P1 | S | done | research | ⭐ The host-policy selftest could not fail on the state it was written to catch |
 | T-075 | P2 | S | done | research | ⭐ LD_DEBUG=bindings on the control, because the subject cannot be asked |
+| T-076 | P1 | M | open | runtime | ⛔ The TENTH quirk: static glibc reads the host's timezone database, and 4 of 11 have none |
 
 ## The argument behind the ordering
 

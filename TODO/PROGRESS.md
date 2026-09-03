@@ -5,7 +5,7 @@ the entries, and [`../HISTORY/`](../HISTORY/).
 
     STATE     2026-09-03c  ⚠ IN PROGRESS — refreshed as work lands, not only
               at the end
-    COUNTS    48 entries, 14 open, 34 done
+    COUNTS    49 entries, 15 open, 34 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN on every push this session
               selftests 540 pass, 1 could not run (no zstd)
@@ -16,9 +16,14 @@ the entries, and [`../HISTORY/`](../HISTORY/).
               UN-SCORED until it is re-measured on the clock, and the clock is
               the column we are furthest behind on.
               ⭐ TODO/ was stripped: 5,085 lines of entry text -> 545. The 34
-              closed entries and the long-form findings behind the 14 open
-              ones are in HISTORY/entries/, and the gate now enforces the
-              split rather than trusting it.
+              closed entries and the long-form findings behind the open ones
+              are in HISTORY/entries/, and the gate now enforces the split
+              rather than trusting it.
+              ⛔ AND THE LIST OF NINE GLIBC QUIRKS WAS NOT COMPLETE. A TENTH
+              was found by taking "are there still some?" as a question about
+              completeness: static glibc reads the HOST's timezone database,
+              4 of 11 environments have none -- including ubuntu-20.04, which
+              is glibc -- and they do not say so. T-076, experiments/97-.
 
 ## ⛔ READ THIS FIRST
 
@@ -82,16 +87,26 @@ the two disagree, say which one you are measuring against.
         re-score amended in place.
     B   ✅ TODO/ stripped; HISTORY/entries/ created; the gate taught the
         invariant and PROVED able to fail on it.
-    C   ⚠ the four deep reviews — the tree's four lenses:
-          1 does every claim hold when the command is run
-          2 what did the change stop measuring
-          3 what was deferred
-          4 is the code right
-    D   ⚠ the remaining glibc quirks: REQUIREMENTS.md enumerates NINE, eight
-        closed on 11/11 and ONE open — host plugins, served by --host-dlopen
-        and still host-dependent by the row's own words. ⛔ The question to
-        answer is whether the list of nine is still COMPLETE, not whether the
-        eight are still green.
+    C   ⚠ SIX deep reviews — the operator raised it from four on 2026-09-03c
+        ("add 2 more deep reviews (thorough ones) before the kickoff prompt"):
+          1 ✅ does every claim hold when the command is run
+              -> C23: the bundler's MILLISECONDS do not re-derive, and the
+                 ruling had just made them the bar
+          2 ✅ what did the change stop measuring
+              -> four open entries lost the pointer to their own detail;
+                 fixed, and check.sh 4d now enforces it
+          3 ⚠ what was deferred
+          4 ⚠ is the code right
+          5 ⚠ (added) the instruments: does each one still measure what its
+                own comment says
+          6 ⚠ (added) the claims nobody has attacked, the way the timezone
+                row was found
+    D   ✅ THE REMAINING GLIBC QUIRKS — ANSWERED, AND THE ANSWER IS "YES,
+        THERE WAS ONE". REQUIREMENTS.md said of its nine: "there is no
+        unenumerated remainder". FALSE. `grep -rn zoneinfo` over the whole
+        tree returned NOTHING, and the row that came out of looking fails on
+        FOUR environments, one of them glibc. T-076 is open; the list is TEN
+        and is no longer described as closed.
 
     ---- 1. NEXT SESSION, and the operator scoped it: THE BUNDLER ----
 
