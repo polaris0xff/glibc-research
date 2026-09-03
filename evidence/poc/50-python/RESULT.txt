@@ -50,3 +50,43 @@ Try 'du --help' for more information.
 
   functional test across the pinned matrix:
     ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
+    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.22: functional test                 = ok
+    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
+  ok    alpine-3.20: functional test                 = ok
+    alpine-3.10          musl   ok         none                         none
+  ok    alpine-3.10: functional test                 = ok
+    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
+  ok    voidlinux-musl: functional test              = ok
+    debian-11            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
+  ok    debian-11: functional test                   = ok
+    debian-12            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
+  ok    debian-12: functional test                   = ok
+    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
+  ok    ubuntu-20.04: functional test                = ok
+    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
+  ok    rockylinux-8: functional test                = ok
+    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
+  ok    opensuse-leap-15.6: functional test          = ok
+    fedora-42            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
+  ok    fedora-42: functional test                   = ok
+    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
+  ok    archlinux-latest: functional test            = ok
+
+  OBSERVATION -- how many C modules are inside the interpreter (measured, not asserted):
+    ENVIRONMENT          LIBC   OUTCOME    HOST OBJECTS PULLED IN
+    alpine-3.22          musl   builtin=87 localhost=resolves dynload-on-path=1 none
+    alpine-3.20          musl   builtin=87 localhost=resolves dynload-on-path=1 none
+    alpine-3.10          musl   builtin=87 localhost=resolves dynload-on-path=1 none
+    voidlinux-musl       musl   builtin=87 localhost=resolves dynload-on-path=1 none
+    debian-11            glibc  builtin=87 localhost=NO dynload-on-path=1 none
+    debian-12            glibc  builtin=87 localhost=NO dynload-on-path=1 none
+    ubuntu-20.04         glibc  builtin=87 localhost=NO dynload-on-path=1 none
+    rockylinux-8         glibc  builtin=87 localhost=resolves dynload-on-path=1 none
+    opensuse-leap-15.6   glibc  builtin=87 localhost=resolves dynload-on-path=1 none
+    fedora-42            glibc  builtin=87 localhost=resolves dynload-on-path=1 none
+    archlinux-latest     glibc  builtin=87 localhost=resolves dynload-on-path=1 none
+
+---------------------------------------------------------------
+pass=13 fail=0 skip=0
+VERDICT: 50-python builds and works across the matrix.

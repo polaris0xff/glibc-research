@@ -815,7 +815,7 @@
 /usr/lib/x86_64-linux-gnu/gio/modules/libdconfsettings.so	ok	
 /usr/lib/x86_64-linux-gnu/gprofng/libgp-collector.so	refused-interposer	pgb-elfload: libgp-collector.so is an allocator, sanitizer or profiler interposer; it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/gprofng/libgp-collectorAPI.so	ok	
-/usr/lib/x86_64-linux-gnu/gprofng/libgp-heap.so	ok	
+/usr/lib/x86_64-linux-gnu/gprofng/libgp-heap.so	refused-interposer	pgb-elfload: libgp-heap.so is an interposer by shape -- it defines an allocator or mmap entry point and imports dlsym, so it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/gprofng/libgp-iotrace.so	ok	
 /usr/lib/x86_64-linux-gnu/gprofng/libgp-sync.so	ok	
 /usr/lib/x86_64-linux-gnu/gstreamer-1.0/libgstcoreelements.so	ok	
@@ -972,7 +972,7 @@
 /usr/lib/x86_64-linux-gnu/libbz2.so.1.0.4	ok	
 /usr/lib/x86_64-linux-gnu/libc.so	not-an-object	pgb-elfload: /usr/lib/x86_64-linux-gnu/libc.so is not an x86-64 ELF shared object
 /usr/lib/x86_64-linux-gnu/libc.so.6	served-by-image	pgb-elfload: libc.so.6 is already served by this image's own static glibc; loading it would put a second libc in the process
-/usr/lib/x86_64-linux-gnu/libc_malloc_debug.so.0	undefined	pgb-elfload: libc_malloc_debug.so.0: undefined symbol: __malloc_initialize_hook@GLIBC_2.2.5
+/usr/lib/x86_64-linux-gnu/libc_malloc_debug.so.0	refused-interposer	pgb-elfload: libc_malloc_debug.so.0 is an interposer by shape -- it defines an allocator or mmap entry point and imports dlsym, so it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libcairo-gobject.so.2.11800.0	ok	
 /usr/lib/x86_64-linux-gnu/libcairo-script-interpreter.so.2.11800.0	ok	
 /usr/lib/x86_64-linux-gnu/libcairo.so.2.11800.0	ok	
@@ -1059,7 +1059,7 @@
 /usr/lib/x86_64-linux-gnu/libgpgme.so.11.27.0	ok	
 /usr/lib/x86_64-linux-gnu/libgpgmepp.so.6.15.0	ok	
 /usr/lib/x86_64-linux-gnu/libgpm.so.2	ok	
-/usr/lib/x86_64-linux-gnu/libgprofng.so.0.0.0	crash	
+/usr/lib/x86_64-linux-gnu/libgprofng.so.0.0.0	refused-interposer	pgb-elfload: libgprofng.so.0 is an interposer by shape -- it defines an allocator or mmap entry point and imports dlsym, so it chains through RTLD_NEXT, which a static image does not have
 /usr/lib/x86_64-linux-gnu/libgraphite2.so.3.2.1	ok	
 /usr/lib/x86_64-linux-gnu/libgssapi_krb5.so.2.2	ok	
 /usr/lib/x86_64-linux-gnu/libgstallocators-1.0.so.0.2402.0	ok	

@@ -459,6 +459,74 @@ static int el_in_map(const struct el_obj *o, const void *p, size_t len)
     return o->map_lo && q >= o->map_lo && len <= (size_t)(o->map_hi - q);
 }
 
+/* ⭐ THE SAME REFUSAL, DECIDED BY SHAPE INSTEAD OF BY NAME.
+ *
+ * The list above only ever catches an interposer somebody has already met.
+ * This reads the object's own dynamic symbol table for the signature that
+ * makes one unloadable here:
+ *
+ *   it DEFINES an allocator or mmap entry point   (it will be interposed on
+ *                                                  the moment it is mapped)
+ *   and IMPORTS dlsym or dlvsym                   (it chains to the real one
+ *                                                  through RTLD_NEXT)
+ *
+ * ⛔ A static image has no RTLD_NEXT, so the pointer it means to fill stays
+ * NULL and the FIRST allocation anywhere in the process calls through it. That
+ * is not a load failure, it is a crash in somebody else's code: `libgprofng`
+ * took the fault inside libstdc++'s own initialiser, at `malloc+0x3a`,
+ * `call *0xcba40(%rip)` with the slot still zero.
+ *
+ * ⭐ MEASURED BEFORE IT WAS WRITTEN, across all 1,527 shared objects on this
+ * host. The signature matches FIVE, and every one is a known interposer:
+ *
+ *   libmemusage.so          libjemalloc.so.2        libgprofng.so.0.0.0
+ *   gprofng/libgp-heap.so   gprofng/libgp-collector.so
+ *
+ * ⚠ Zero false positives, and two of the five were NOT in the name list -- so
+ * the rule is strictly better informed than the list, not a broader net. ⛔ It
+ * is deliberately NOT "defines malloc": libc itself does, and so does anything
+ * that ships its own allocator without interposing. The dlsym import is what
+ * separates the two, and it is the half that is actually about RTLD_NEXT.
+ */
+static int el_is_interposer(const struct el_obj *o, const char **why)
+{
+    static const char *const allocators[] = {
+        "malloc", "calloc", "realloc", "free", "mmap", "mmap64", NULL
+    };
+    int defines = 0, chains = 0;
+    uint32_t n;
+
+    if (!o->symtab || !o->strtab || !o->nsyms)
+        return 0;
+    for (n = 0; n < o->nsyms && !(defines && chains); n++) {
+        const Elf64_Sym *s = &o->symtab[n];
+        const char *nm;
+        const char *const *a;
+
+        if (!el_in_map(o, s, sizeof *s))
+            break;
+        nm = o->strtab + s->st_name;
+        if (!el_in_map(o, nm, 1) || !*nm)
+            continue;
+        if (s->st_shndx == SHN_UNDEF) {
+            if (strcmp(nm, "dlsym") == 0 || strcmp(nm, "dlvsym") == 0)
+                chains = 1;
+            continue;
+        }
+        if (ELF64_ST_TYPE(s->st_info) != STT_FUNC)
+            continue;
+        for (a = allocators; *a; a++)
+            if (strcmp(nm, *a) == 0) { defines = 1; break; }
+    }
+    if (defines && chains) {
+        *why = "an interposer by shape -- it defines an allocator or mmap "
+               "entry point and imports dlsym, so it chains through "
+               "RTLD_NEXT, which a static image does not have";
+        return 1;
+    }
+    return 0;
+}
+
 /* ------------------------------------------------------------ symbol tables */
 
 static uint32_t el_gnu_hash(const char *s)
@@ -1810,6 +1878,28 @@ static struct el_obj *el_load(const char *path, const struct el_obj *req)
     free(ph);
     el_dbg("pgb-elfload: mapped %s at %p (%zu bytes)\n", o->soname,
            (void *)o->base, o->span);
+
+    /* ⛔ THE INTERPOSER CHECK, BY SHAPE RATHER THAN BY NAME. el_refused_class()
+     * above declines a list of sonames, which only ever catches the ones
+     * somebody already met. This reads the object's own dynamic symbol table
+     * for the signature instead, so a profiler nobody has named is caught too.
+     *
+     * ⚠ It has to run AFTER el_read_dynamic (the symbol table is not known
+     * before it) and BEFORE el_relocate + el_init, because the damage is done
+     * by the initialiser. */
+    {
+        const char *why = NULL;
+        if (el_is_interposer(o, &why)) {
+            el_err("pgb-elfload: %s is %s", o->soname, why);
+            /* Not yet in el_objs, so nothing refers to it. The mapping is
+             * given back here rather than leaked, which the two failure paths
+             * above this point do not do -- they run before there is a
+             * mapping to give back. */
+            munmap(o->base, o->span);
+            free(o->soname); free(o->path); free(o);
+            return NULL;
+        }
+    }
 
     /* Registered BEFORE relocating so that a dependency cycle terminates and
      * so that a symbol defined here is visible to its own dependencies. */

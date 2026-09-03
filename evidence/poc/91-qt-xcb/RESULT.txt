@@ -6,86 +6,14 @@ version       : Qt 6.11.1 (qtbase) + libxcb 1.17 + xkbcommon 1.13 + OpenSSL 3
 sha256        : d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac
 normal build  : apt install qt6-base-dev && cmake && make
 stresses      : xcb QPA on a real X server, a mapped window, static OpenSSL linked into QtNetwork, QtSql/SQLite
-date (UTC)    : 2026-09-02T06:54:48Z
+date (UTC)    : 2026-09-03T00:08:15Z
 evidence      : /home/user/glibc-research/evidence/poc/91-qt-xcb
+build env     : /var/lib/pgb-rootfs/pgb-env-debian13
+build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
+build gcc     : gcc (Debian 14.2.0-19) 14.2.0
+build glibc   : ldd (Debian GLIBC 2.41-12+deb13u3) 2.41
 ---------------------------------------------------------------
 -- rung 1: the X stack, static, planned by nixpkgs -------------
   ok    a plan for qtbase was produced               = ok
         keeping: libxcb libxcb-util libxcb-image libxcb-keysyms libxcb-render-util libxcb-wm libxcb-cursor libxdmcp libxau libx11 libxext libxrender libxi libxfixes libxkbcommon libxml2 openssl xorgproto xcb-proto
         skipping 46 of qtbase's build inputs
-        built into the static prefix: libpthread-stubs libx11 libxau libxcb libxcb-cursor libxcb-image libxcb-keysyms libxcb-render-util libxcb-util libxcb-wm libxdmcp libxext libxfixes libxi libxkbcommon libxml2 libxrender openssl xcb-proto xkeyboard-config xorgproto xtrans 
-  ok    static libxcb in the prefix                  = ok
-  ok    static libxkbcommon in the prefix            = ok
-  ok    static openssl in the prefix                 = ok
-
--- rung 2: the qtbase source ------------------------------------
-  ok    qtbase source present                        = ok
-
--- rung 3: qtbase -static -xcb ---------------------------------
-
--- rung 2b: proving the static xcb link before overriding Qt ----
-  ok    a static xcb + xkbcommon-x11 program links   = ok
-  ok    and it is static (no PT_INTERP)              = 0
-        so Qt is told TEST_xcb_syslibs=ON, with the link above as the evidence
-  ok    qtbase configures with xcb                   = ok
-  ok    qtbase installed                             = ok
-  ok    the xcb platform plugin was built (as an archive) = ok
-        17004 bytes  /var/tmp/pgb-poc/91-qt-xcb/inst/plugins/platforms/libqxcb.a
-  ok    and NOT ONE shared object under the prefix   = 0
-
--- rung 4: an application that opens a window -------------------
-  ok    the probe builds against static Qt           = ok
-        47188304 bytes
-  ok    no PT_INTERP                                 = 0
-  ok    no DT_NEEDED                                 = 0
-
--- rung 5: the eleven, against a real X server ------------------
-  ok    Xvfb is answering on 127.0.0.1:91            = ok
-  ok    the probe passes on the build host           = 0
-        Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
-        Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
-        If this causes problems, reconfigure your locale. See the locale(1) manual
-        for more information.
-        QFontDatabase: Cannot find font directory /var/tmp/pgb-poc/91-qt-xcb/inst/lib/fonts.
-        Note that Qt no longer ships fonts. Deploy some (from https://dejavu-fonts.github.io/ for example) or switch to fontconfig.
-          QPA platform plugin                            ok     xcb
-          primary screen from the X server               ok     1024x768
-          QWidget::show() produced a QWindow             ok     winId=2097159
-          the window handle has a native id              ok     2097159
-          the X server exposed the window                ok     exposed
-          QWidget::grab() of the mapped window           ok     320x240
-          QSslSocket::supportsSsl()                      ok     OpenSSL 3.6.3 9 Jun 2026
-          the linked TLS backend names OpenSSL           ok     OpenSSL 3.6.3 9 Jun 2026
-          QSQLITE driver is registered                   ok     QSQLITE
-          a real SQLite query round trip                 ok     日本
-          QApplication::exec() returned 0                ok     0
-        failures: 0
-
-  functional test across the pinned matrix:
-    ENVIRONMENT          LIBC   RESULT     HOST .so LOADED              HOST DATA READ
-    alpine-3.22          musl   ok         none                         /etc/nsswitch.conf 
-  ok    alpine-3.22: functional test                 = ok
-    alpine-3.20          musl   ok         none                         /etc/nsswitch.conf 
-  ok    alpine-3.20: functional test                 = ok
-    alpine-3.10          musl   ok         none                         none
-  ok    alpine-3.10: functional test                 = ok
-    voidlinux-musl       musl   ok         none                         /etc/nsswitch.conf 
-  ok    voidlinux-musl: functional test              = ok
-    debian-11            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
-  ok    debian-11: functional test                   = ok
-    debian-12            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
-  ok    debian-12: functional test                   = ok
-    ubuntu-20.04         glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* gconv-cfg 
-  ok    ubuntu-20.04: functional test                = ok
-    rockylinux-8         glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
-  ok    rockylinux-8: functional test                = ok
-    opensuse-leap-15.6   glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
-  ok    opensuse-leap-15.6: functional test          = ok
-    fedora-42            glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
-  ok    fedora-42: functional test                   = ok
-    archlinux-latest     glibc  ok         none                         /etc/nsswitch.conf /usr/lib/locale/* 
-  ok    archlinux-latest: functional test            = ok
-
----------------------------------------------------------------
-pass=27 fail=0 skip=0
-VERDICT: 91-qt-xcb builds and works across the matrix.
