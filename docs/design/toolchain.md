@@ -111,11 +111,19 @@ than the field*, and that is the column `pgb` is furthest behind on:
 
 | what the ruling now decides | ours | the field | |
 |---|---|---|---|
-| kdenlive cold start (`TODO/toolchain.md` T-066) | 300 ms | 61 ms | ⛔ **4.92× — the binding failure** |
-| kdenlive render | 4,947 ms | 2,033 ms | ⛔ **2.43×** |
-| `jq` cold start (`experiments/86-`) | 162–198 ms | 79–107 ms | ⛔ ~1.9× |
-| `jq` warm start | 11–22 ms | 9–16 ms | ⚠ ~1.4× |
+| `jq` cold start — ⭐ **11 environments, mean of 5** (`experiments/86-`) | 139 ms | 67 ms | ⛔ **2.07×** |
+| `jq` warm start, same method | 14.9 ms | 10.8 ms | ⛔ **1.38×** |
+| kdenlive cold start (`TODO/toolchain.md` T-066) | 300 ms | 61 ms | ⛔ 4.92× ⚠ **one sample** |
+| kdenlive render | 4,947 ms | 2,033 ms | ⛔ 2.43× ⚠ **one sample** |
 | ~~artefact size~~ | ~~2.86×–3.05×~~ | | ⭐ **no longer counted** |
+
+⛔ **Trust the first two rows and treat the kdenlive pair as a direction, not a
+number** — deep review 1, 2026-09-03c. `86-` takes eleven environments and a
+mean of five per arm; `90-` takes **one sample**, its numbers come from a
+superseded version of the cited evidence file, and four runs of it give
+cold-start ratios of 2.52×, 3.48×, 4.92× and 5.02× with warm above cold in two
+of them. ⭐ **Every run agrees on the direction**: we are slower.
+[`../history/corrections.md`](../history/corrections.md) C23.
 
 ⭐ **And the second condition is already met, decisively.** `pgb bundle
 appimage kdenlive` is one command from a package name. The competitor's route

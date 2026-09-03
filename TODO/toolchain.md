@@ -182,11 +182,26 @@ script"*. `../docs/design/toolchain.md` carries the amendment.
 |---|---|---|---|---|
 | `jq` size (`experiments/86-`) | 11,471,610 B | 4,006,916 B | 2.86× | ⭐ acceptable |
 | kdenlive size (`experiments/90-`) | 471,033,944 B | 191,900,604 B | 2.45× | ⭐ acceptable |
-| kdenlive render | **4,947 ms** | 2,033 ms | ⛔ **2.43×** | ⛔ **binding** |
-| kdenlive cold start | **300 ms** | 61 ms | ⛔ **4.92×** | ⛔ **binding, worst column** |
+| kdenlive render | 4,947 ms | 2,033 ms | ⛔ 2.43× | ⛔ **binding** |
+| kdenlive cold start | 300 ms | 61 ms | ⛔ 4.92× | ⛔ **binding, worst column** |
+
+⛔ **THE TWO MILLISECOND ROWS ARE NOT RE-DERIVABLE FROM THE TREE — deep review
+1, 2026-09-03c.** They are from `git show
+68be1bcd:evidence/90-kdenlive-vs-enhanced/RESULT.txt`; the file at that path
+today is run 6, which says 24,074 / 13,680 and 5,941 / 1,183, and whose
+milliseconds this entry itself disclaims as contaminated. ⚠ **Four runs of the
+same comparison give cold-start ratios of 2.52×, 3.48×, 4.92× and 5.02×, and
+in two of them WARM IS SLOWER THAN COLD.** The direction survives — ours is
+slower on every run — the magnitude does not.
+`../docs/history/corrections.md` C23.
 
 **What is left, in the order the ruling puts it.**
 
+0. ⛔ **FIX THE INSTRUMENT BEFORE MEASURING ANYTHING WITH IT.** `90-` takes
+   **one sample per arm**; `86-` takes eleven environments × a mean of five,
+   with cold obtained by a fresh copy. Carry `86-`'s method into `90-`.
+   ⚠ Under the new bar an unpinned millisecond is worth less than none,
+   because it reads as measurement.
 1. ⛔ **RE-MEASURE THE LEVERS ON THE CLOCK.** `--cut`, `--fixpoint`, the
    debloat rules, route A and route B were all costed in **bytes**. None was
    measured in **milliseconds**, which is now the only thing that scores.

@@ -61,10 +61,11 @@ bundle last".
 ⭐ **Two conditions, conjunctive: perform better, and package in one command.**
 Size is struck. ⛔ **`pgb`'s bundler meets the second and fails the first** —
 one command from a package name against five separately versioned binaries
-plus a 121 KB driver script, but 4.92× the cold start on kdenlive and about
-1.9× on `jq`. ⚠ The size ratios this page quotes in the head-to-head below
-(**2.1 MB vs 3.7 MB**) are about the **static binary**, not the bundle, and
-are untouched by the ruling.
+plus a 121 KB driver script, but **2.07× the cold start on `jq`** measured over
+eleven environments at a mean of five samples each, and slower on kdenlive on
+every one of four runs. ⚠ The size ratios this page quotes in the head-to-head
+below (**2.1 MB vs 3.7 MB**) are about the **static binary**, not the bundle,
+and are untouched by the ruling.
 
 This is the project's acceptance bar. It is **not** met today: the current
 class is "programs that do not need to load host plugins"

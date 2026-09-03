@@ -747,6 +747,72 @@ fails on a copy.
 
 ---
 
+## C23 — the bundler's MILLISECONDS, quoted from evidence files that were later overwritten
+
+⛔ **Found by deep review 1 on 2026-09-03c, hours after the operator made those
+milliseconds the entire acceptance bar** — *"acceptable as long as ours
+performs better"*. Every size figure in the record re-derives; the timing
+figures do not.
+
+**Claimed**, by `TODO/toolchain.md` T-066 and `TODO/poc.md` T-055, each citing
+`experiments/90-`:
+
+| entry | render | cold start | artefact |
+|---|---|---|---|
+| T-066 | 4,947 vs 2,033 ms | 300 vs 61 ms | 471,033,944 B |
+| T-055 | 3,625 vs 2,001 ms | 3,344 vs 1,325 ms | 397,903,295 B |
+
+**Disproved by** reading the cited file. `evidence/90-kdenlive-vs-enhanced/RESULT.txt`
+in the tree today says **24,074 vs 13,680 ms render and 5,941 vs 1,183 ms
+cold** — neither entry's numbers, and it is the run T-066's own prose
+disclaims as contaminated. The quoted numbers are real; they are in
+**superseded versions of that same file**:
+
+    git show 68be1bcd:evidence/90-kdenlive-vs-enhanced/RESULT.txt   -> T-066's
+    git show 0d4a2a94:evidence/90-kdenlive-vs-enhanced/RESULT.txt   -> T-055's
+    git show 572e9b77:evidence/90-kdenlive-vs-enhanced/RESULT.txt   -> the tree's
+
+⛔ **The gate could not catch it.** `check-docs.sh` asserts that cited evidence
+*is in the repository*; all three runs write the same path, so an overwrite is
+invisible to it. This is C5's shape — *"a committed evidence file described a
+build configuration that no longer exists"* — one level down: the file is
+current, the **run** is not.
+
+⭐ **AND THE SPREAD IS THE REAL FINDING.** Four runs of the same comparison, the
+same two artefacts, the same machine:
+
+| run | ours cold | theirs cold | ratio | ours warm | theirs warm |
+|---|---|---|---|---|---|
+| `0d4a2a94` | 3,344 | 1,325 | 2.52× | 139 | 34 |
+| `68be1bcd` | **300** | **61** | 4.92× | 239 | ⚠ **82 — above its own cold** |
+| `572e9b77` | 5,941 | 1,183 | 5.02× | 337 | 129 |
+| `run.log` | 181 | 52 | 3.48× | ⚠ **221 — above its own cold** | 48 |
+
+⛔ **A 20× spread in the absolute cold figure and warm above cold in two of the
+four runs.** The direction is consistent and survives — **ours is slower on
+every run** — but the magnitude is not pinned, and "warm is slower than cold"
+is not a load artefact, it is the instrument's cold/warm distinction
+collapsing on this subject.
+
+⚠ **The same overwrite hit `experiments/86-`, and there the committed evidence
+is BETTER than the entry.** T-057 quotes *"cold 162–198 ms vs 79–107 ms, about
+1.9×"*; `evidence/86-bundler-vs-anylinux/per-environment.jq.txt` carries eleven
+environments × two arms, each a mean of five, and re-derives as **P 128–149
+(mean 139), A 62–74 (mean 67) — 2.07×**, with warm **14.9 vs 10.8 — 1.38×**,
+which is the one figure the entry got right. The entry's cold range appears in
+no version of that file; 162 ms is the **build-host** figure from the same
+entry's own prose, compared against an eleven-environment competitor number.
+
+**Now:** T-066, T-055 and T-057 cite the commit their numbers came from, not
+just the path. ⭐ And `PROGRESS.md` N1 — *re-measure every lever on the clock* —
+is ordered **after** fixing the instrument, because under the new bar an
+unpinned millisecond is worth less than no millisecond: it reads as
+measurement. ⚠ `experiments/86-`'s per-environment method (eleven rows, mean
+of five, cold by a fresh copy) is the shape to carry into `90-`, which takes
+one sample per arm.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

@@ -98,13 +98,21 @@ the two disagree, say which one you are measuring against.
     ⛔ "focus the next session entirely on optimizing the nix bundler as much
        as possible". The bar is now SPEED and ONE COMMAND. Size is struck.
 
-    N1  ⛔ FIRST, AND IT IS NOT OPTIONAL: re-measure the levers ON THE CLOCK.
-        --cut, --fixpoint, the debloat rules, route A and route B were all
-        costed in BYTES. Nothing was measured in milliseconds, so nothing is
-        scored against the bar. ⚠ Not invalidated — un-scored.
-        ⭐ The cheapest instrument exists: experiments/86- already measures
-        cold and warm start for ours against a hand-built Anylinux AppImage,
-        on jq, with the mount-reaping trap already found and fixed.
+    N0  ⛔ FIX THE INSTRUMENT FIRST — deep review 1 found the timing half of
+        the record does not re-derive. experiments/90- takes ONE SAMPLE per
+        arm; its quoted numbers are from a SUPERSEDED version of the evidence
+        file it cites; four runs give cold-start ratios of 2.52×, 3.48×, 4.92×
+        and 5.02×; and warm exceeds cold in two of them. ⭐ Every run agrees
+        on the DIRECTION — we are slower — and none pins the magnitude.
+        ⭐ experiments/86- is the shape to carry across: eleven environments,
+        a mean of five per arm, cold obtained by a fresh copy. Its jq figures
+        DO re-derive: 139 vs 67 ms cold (2.07×), 14.9 vs 10.8 warm (1.38×).
+        ⚠ Under the new bar an unpinned millisecond is worth LESS than none,
+        because it reads as measurement. docs/history/corrections.md C23.
+    N1  ⛔ THEN re-measure the levers ON THE CLOCK. --cut, --fixpoint, the
+        debloat rules, route A and route B were all costed in BYTES. Nothing
+        was measured in milliseconds, so nothing is scored against the bar.
+        ⚠ Not invalidated — un-scored.
     N2  ⭐ THE HYPOTHESIS TO TEST FIRST, because it is the one that makes the
         struck size work still count: on kdenlive, "start and render are
         dominated by mounting a 398 MB dwarfs image against a 192 MB one" —

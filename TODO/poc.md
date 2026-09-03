@@ -73,6 +73,16 @@ pkgforge-dev/kdenlive-AppImage-Enhanced"*.
 | runs on the eleven | 11 of 11 | 11 of 11 | equal | |
 | the MP4 | 4,149 B, 48 frames, libx264 | 4,162 B | equal | |
 
+⛔ **THE MILLISECOND ROWS ARE FROM A SUPERSEDED EVIDENCE FILE — deep review 1,
+2026-09-03c.** They are `git show
+0d4a2a94:evidence/90-kdenlive-vs-enhanced/RESULT.txt`; the file at that path
+today is a later run saying 24,074 / 13,680 render and 5,941 / 1,183 cold.
+⚠ That run also shows **ours 4/11 clean on host objects**, which the
+multi-program-shell fix later took to 11/11 — so these are different
+configurations, not clock noise. ⛔ Four runs give cold-start ratios of 2.52×,
+3.48×, 4.92× and 5.02×, and warm exceeds cold in two of them.
+`../docs/history/corrections.md` C23.
+
 ⭐ **What IS established, and it is the half T-054 could not reach**: a
 kdenlive that renders, produced by **one command from a package name**, on
 eleven distributions including four musl ones — engine, Qt stack, KF6, MLT and

@@ -36,8 +36,24 @@ and also solving the opengl problem"*.
 dwarfs + sharun instead of appimage-type2-runtime + mksquashfs + a bwrap
 AppRun, with the nixpkgs **closure** replacing sharun's ldd-and-strace library
 discovery. `experiments/86-` measured it against a hand-built Anylinux
-AppImage on `jq 1.8.2`: **11 of 11 both sides, 0 host objects both sides**,
-3.05× the size, ~1.9× cold start, ~1.4× warm.
+AppImage on `jq 1.8.2`: **11 of 11 both sides, 0 host objects both sides**.
+
+⭐ **RE-DERIVED FROM THE COMMITTED EVIDENCE, deep review 1, 2026-09-03c** —
+eleven environments × two arms, each a mean of five
+(`evidence/86-bundler-vs-anylinux/per-environment.jq.txt`):
+
+| | ours | the field | ratio |
+|---|---|---|---|
+| size | 11,471,610 B | 4,006,916 B | 2.86× ⭐ struck from the bar |
+| cold start | **128–149 ms**, mean 139 | **62–74 ms**, mean 67 | ⛔ **2.07×** |
+| warm start | 12–19 ms, mean 14.9 | 8–14 ms, mean 10.8 | ⛔ 1.38× |
+
+⛔ **This entry said "162–198 ms vs 79–107 ms, about 1.9×" and no version of
+that evidence file ever carried those numbers** — 162 ms is this entry's own
+**build-host** figure, compared against an eleven-environment competitor one.
+The warm claim (~1.4×) was right. `../docs/history/corrections.md` C23.
+⭐ **`86-`'s method is the one to carry into `90-`**, which takes one sample
+per arm and whose ratios swing between 2.52× and 5.02× across four runs.
 
 ⛔ **The claim, stated so it cannot drift**, and its two halves now score
 differently under the operator's ruling of 2026-09-03c:
