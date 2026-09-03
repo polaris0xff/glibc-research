@@ -46,24 +46,29 @@ the branch you are on AND `git status` after `git checkout main`.
 
 ## In flight right now
 
-    ⏳ R3 — T-063 arm S with `--without-icu` REMOVED. RUNNING on the bed.
+    ⭐ R3 ANSWERED, AND IT FOUND A LIVE DEFECT IN THE PRODUCT (66528e59).
+       `cxxRuntimeDemand` skipped every argument beginning with `-`, so the
+       C++-archive fix only ever saw archives named as LITERAL PATHS. postgres
+       names ICU as `-L… -licui18n -licuuc -licudata`, so libicuuc.a was never
+       opened and the link died on `operator delete`. Fixed: `-l`/`-l:` resolve
+       against `-L`. BEFORE rc=1, AFTER rc=0 and the binary runs.
+
+    ⏳ R3 RE-RUN with the fixed wrapper — RUNNING on the bed.
          cmd   cd /var/tmp/pgb-r3 && NIX_MAX_ROUNDS=24 \
                /home/user/glibc-research/pgb nix build --plan /var/tmp/pgb-r3/pg.plan
-         log   scratchpad/r3-postgres.log   (plan already produced: pg.plan)
+         log   scratchpad/r3-postgres-2.log   (first run: r3-postgres.log)
          ⛔ NOTHING ELSE MAY TOUCH pgb-env-debian13 WHILE IT RUNS.
-         ⭐ WHAT TO READ OFF IT: the plan carries `--with-icu`. The question is
-            whether the adaptation loop KEEPS it. If postgres builds with
-            `--with-icu` still on the final configure line, the C++-archive fix
-            (elfx.NeedsCXXRuntime) is proved on the real subject. If the loop
-            drops it, the fix did not reach this case and that is the finding.
+         ⭐ READ OFF IT: does postgres now build with `--with-icu` still on?
 
-    ⛔ OWED AS SOON AS THE BED IS FREE, and it is small:
-       re-run poc/70-sqlite-extensions, poc/80-mlt and poc/91-qt-xcb. Their
-       committed RESULT.txt files describe runs WITHOUT the new
-       `poc_check_built_by_env` assertion. Build trees for 80 and 91 are still
-       on disk, so the re-runs are minutes, not the full build.
-       ⚠ 90-qt's build tree was DELETED to make room for R3 (3.6 GB). Its
-       evidence is committed; a re-run costs ~14 minutes.
+    ⛔ OWED, IN THIS ORDER, ONCE THE BED IS FREE:
+       1. ⛔ RE-RUN THE TEN POCs. The link hot path changed AGAIN with the
+          `-l`/`-L` fix, and R1's ten-of-ten describes the pre-fix binary.
+            sh scratchpad/run-pocs.sh <stagedir>     (PGB_ENGINE=chroot)
+          ⚠ 90-qt's build tree was DELETED to make room for R3, so that one
+          rebuilds Qt (~14 min). 80 and 91 still have theirs.
+       2. The same run picks up the new `poc_check_built_by_env` assertion in
+          poc/70, poc/80 and poc/91, whose committed RESULT.txt files still
+          describe runs without it.
 
 ## ✅ DONE AND PUSHED THIS SESSION (all CI-green where CI has reported)
 
