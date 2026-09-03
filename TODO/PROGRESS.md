@@ -4,7 +4,7 @@
 and the entries.
 
     STATE     2026-09-02f / 2026-09-03
-    COUNTS    45 entries, 18 open, 27 done
+    COUNTS    45 entries, 17 open, 28 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN before this session; selftests 239 pass, 1 could not
               run (no zstd)
@@ -186,10 +186,8 @@ rests on the synthetic subject alone, and that is recorded.
 
     ---- glibc's remaining quirks, and future-proofing ----
 
-    T-070   ⚠ P0. Steps 1, 2 and 3 LANDED. 73- and 21- re-run at 2.41, NINE
-            of ten POCs re-run through the normal POC path, and ⭐ CI green at
-            debian:13, 16 of 16, on all eleven. ⛔ 80-mlt is the tenth and is
-            queued behind experiments/85-. Close the entry when it lands.
+    T-070   ✅ CLOSED. TEN of ten POCs pass at 2.41 through the normal POC
+            path, 73- and 21- re-run, CI green at debian:13 16 of 16.
     T-068   ✅ CLOSED. 93- green at pass=6 fail=0, and the control it passes
             read 10, then 1, then 0 as each defect was fixed.
     T-072   P1. --tls-reserve is implemented, and ⛔ its motivating object

@@ -38,33 +38,28 @@ the record used to claim.
 
 ## In flight right now
 
-    ⛔ THE BED IS BUSY, driven by scratchpad/bedqueue.sh (log:
-    scratchpad/bedqueue.log). ONE AT A TIME:
+    ⭐ NOTHING. The bed is idle and everything is committed and pushed.
 
-      1  experiments/85-opengl.sh   T-071's Prove. STARTED 00:36, building two
-                                    ~400 MB bundles. Log: scratchpad/exp85.log
-      2  poc/80-mlt/run.sh          the tenth POC at glibc 2.41. Hours.
-
-    ⛔ IF THE CONTAINER DIED, BOTH ARE LOST AND NEITHER IS COMMITTED. Re-run:
-      sh experiments/85-opengl.sh
-      sh poc/80-mlt/run.sh > evidence/poc/80-mlt/RESULT.txt 2>&1
-
-    ⚠ Everything else this session did IS committed and pushed.
+    The queue that was running at the previous refresh completed:
+      experiments/85-opengl.sh   pass=10 fail=0   -> T-071 CLOSED
+      poc/80-mlt/run.sh          pass=21 fail=0   -> T-070 CLOSED (10 of 10)
 
 ## ⛔ WHAT IS LEFT, IN ORDER
 
-    1  T-070 P0  steps 1-3 landed and CI is green at debian:13. ⛔ ONLY
-                 80-mlt is left; close the entry when it passes.
-    2  T-071 P0  read scratchpad/exp85.log. That is the entry's Prove and it
-                 has been "written and not run" for three sessions.
-    3  T-072 P1  experiments/76- with a non-zero --tls-reserve on the eleven.
+    1  T-066 P0  ⛔ THE LAST P0. The corpus is mined; measure the allowlist's
+                 ceiling first (route A in the entry). Needs an AppDir, and a
+                 7 GB one did not survive a container.
+    2  T-072 P1  experiments/76- with a non-zero --tls-reserve on the eleven.
                  ⚠ Read the entry first: the object that motivated it is
                  refused for a DIFFERENT reason and the benefit measured on
                  real host objects is currently ZERO objects.
-    4  T-066 P0  the corpus is mined; measure the allowlist's ceiling first.
-                 Needs an AppDir, and a 7 GB one did not survive a container.
-    5  T-062 P1  five packages still carry no selftest. verifyx and buildx
+    3  T-062 P1  five packages still carry no selftest. verifyx and buildx
                  shell out to a bed — carry their parsing, not their run.
+    4  T-063 P1  the miniflux proof: arm S has a static postgres on Alpine;
+                 src/interfaces does not build. Two NAMED fixes in
+                 PROGRESS.md's work order.
+    5  T-054/T-055  kdenlive. ⛔ The operator's bar is NOT met: 2.22x the size,
+                 and a same-day safe vs aggressive timing comparison is owed.
 
 ## ⭐ WHAT THIS SESSION CHANGED THAT YOU WILL TRIP OVER
 

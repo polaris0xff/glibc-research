@@ -22,13 +22,13 @@ zero *because of* a third.
 | **a POC's `RESULT.txt`** | said nothing about what built it | ⭐ environment, image, digest, gcc, glibc — and the binary's `.comment` **asserted** against it |
 | **`pgb selftest`** | 200 cases | ⭐ **307**, `wrapper` and `cfg` new |
 | **CI** | green | ⛔ **red for seven pushes**, then green — on a gate that passed here and failed there |
-| **Entries** | 45 / 20 open / 25 done | ⭐ **45 / 18 open / 27 done** — T-068 and T-071 closed |
+| **Entries** | 45 / 20 open / 25 done | ⭐ **45 / 17 open / 28 done** — T-068, T-070 and T-071 closed. P0: 3 open → **1** |
 
 ## What was actually settled
 
 | | | |
 |---|---|---|
-| **T-070** | ⚠ **advanced, one row left** | the pin is `debian:13`/2.41. `73-` re-run independently reproduced the prediction, `21-` re-run with a pin-following arm, **nine of ten POCs** re-run through the normal path, CI green. ⛔ 80-mlt is the tenth and was still running at session end |
+| **T-070** | ✅ **CLOSED** | the pin is `debian:13`/2.41. `73-` re-run independently reproduced the prediction, `21-` re-run with a pin-following arm, ⭐ **all TEN POCs** re-run through the normal path, CI green 16 of 16 |
 | **T-068** | ✅ **CLOSED** | 93- green at `pass=6 fail=0`, with the arc that earned the zero |
 | **T-071** | ✅ **CLOSED** | 85- run at last — the data-coherence arm's negative control fired on a real bundle |
 | **T-072** | ⚠ **advanced, and its premise is dented** | the object it was opened on, `liblsan.so`, is refused as a **sanitizer interposer** before TLS is considered. Zero of 71 `PT_TLS` objects want more than the surplus |
@@ -106,8 +106,6 @@ be **derived**: diff the environment across `Export()`.
 
 ## ⛔ What the next session must not read as settled
 
-- ⛔ **`poc/80-mlt` at glibc 2.41 was still running at session end** and is not
-  committed. It is the tenth POC and the last row of T-070.
 - ⛔ **The version-matching fix is under-measured** — see review 2.
 - ⛔ **`--tls-reserve`'s measured benefit on real host objects is zero
   objects.** The mechanism is sound; its justification is not.

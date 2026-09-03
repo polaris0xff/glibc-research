@@ -1732,7 +1732,7 @@ for the same job in C++.
 quirks, ensure future version won't break our tooling or binary built by your
 tooling"*, and the question *"why do we compile on an older distro, isn't glibc
 backwards compatible?"*
-**Category** toolchain · **Priority** P0 · **Effort** M · **Status** open
+**Category** toolchain · **Priority** P0 · **Effort** M · **Status** ✅ done
 
 ⭐ **The question is answered in
 [`../docs/design/glibc-versions.md`](../docs/design/glibc-versions.md) and the
@@ -1936,7 +1936,7 @@ Re-run against the link fix, same environment and same digest:
 
 ⚠ Both report `unmeasured` in the gcc column because neither keeps a binary in
 its evidence directory. The compiler was then read from the binaries they
-actually produced (`evidence/91-*/run2-comment-readings.txt`):
+actually produced (`evidence/91-glibc-pin-candidates/run2-comment-readings.txt`):
 
     70-sqlite/sqlite3-wrapped   gcc 14.2.0     80-kdenlive/melt-static      gcc 14.2.0
     70-sqlite/sqlite3-control   gcc 14.2.0     80-kdenlive/inst/bin/ffmpeg  gcc 14.2.0
@@ -2060,8 +2060,26 @@ file and line, and removing it makes it pass.
 |---|---|
 | `experiments/73-` | ⭐ **independently reproduced arm 4's prediction** — class B 20 → 5, class C and E empty on all eleven, `debian-12` the one cost at 851 → 849 |
 | `experiments/21-`, with a **new third arm that follows the pin** | `none` at 2.41, with the 2.31 arm firing as the control. pass=3 fail=0 |
-| POCs 10, 20, 30, 40, 50, 60, 70, 90 | ⭐ **all pass**, and each `RESULT.txt` now opens with the environment, image, digest, gcc and glibc that built it |
+| ⭐ **ALL TEN POCs**, through the normal POC path | ⭐ **all pass** — 10-gawk 13, 20-nano 13, 30-curl 13, 40-jq 13, 50-python 13, 60-leveldb 13, 70-sqlite 20, 80-mlt 21, 90-qt 21, 91-qt-xcb 27. Each `RESULT.txt` now opens with the environment, image, digest, gcc and glibc that built it, and `poc_inspect` ASSERTS the binary's own `.comment` against it |
 | ⭐ **CI, run `33699204833`** | ⭐ **16 of 16 jobs green** — the `build` job ran inside the derived `debian:13` container and the probe it produced ran correctly on **all eleven** target environments |
+
+## ✅ CLOSED 2026-09-03 — the ruling is made, the pin has moved, the matrices agree
+
+**The Prove asked for** *"a row per candidate pin — glibc version, kernel floor,
+class B residue, class C residue, POCs building, `21-` verdict — and a ruling"*.
+Every row is above. The ruling is **MOVE THE PIN**, it is made, and it has
+landed in `cfg.go` with the three-step order the entry itself set out.
+
+    the ten POCs at 2.41, normal POC path   10 of 10 pass
+    experiments/21- at 2.41                 none, with the 2.31 arm firing
+    experiments/73- at 2.41                 class B 20 -> 5, C and E empty
+    CI run 33699204833                      16 of 16, all eleven targets
+
+⚠ **What this entry does NOT close: the ceiling regrows.** Five class B symbols
+remain, at `GLIBC_2.42`/`2.43`, on `archlinux-latest` alone — a rolling
+distribution is always ahead of any pin. `docs/design/glibc-versions.md` rule 6
+says to re-cost the move periodically rather than wait for a failure, and
+`experiments/91-` runs the whole veto before anything expensive.
 
 ⭐ **CI is the independent confirmation this move needed.** It builds on a
 GitHub runner, in a container resolved from `cfg.go` by the `matrix` job, and
