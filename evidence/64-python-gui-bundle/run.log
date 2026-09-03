@@ -2,7 +2,7 @@
 64 - GTK and Python out of a nixpkgs closure, with the compiled-in store path resolved
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-03T23:32:12Z
+date (UTC)   : 2026-09-03T23:50:58Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -16,15 +16,11 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
 
 -- arm G: galculator (UI loaded from a file at a compiled-in path) --
         building gal — several minutes
-        artefact: /var/tmp/t080/galculator.AppImage, 177518855 bytes
+        artefact: /var/tmp/t080/galculator.AppImage, 177519292 bytes
         store map: 130 store paths resolve inside the bundle
 
   ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
-  alpine-3.22          musl   yes   1        2        yes      3436
+  alpine-3.22          musl   yes   1        0        yes      3409
       out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
-  alpine-3.20          musl   yes   1        1        yes      3429
-      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
-  alpine-3.10          musl   yes   1        1        yes      3432
-      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
-  voidlinux-musl       musl   yes   1        0        yes      3431
+  alpine-3.20          musl   yes   1        0        yes      3409
       out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]

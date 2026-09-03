@@ -21,7 +21,8 @@ A nixpkgs program compiles its own store path into `.rodata`:
 at `AppDir/share/galculator/ui/main_frame.ui` — and dies, because the path it
 names does not exist on the target.
 
-`experiments/64-` measures exactly this, with a positive control:
+`experiments/64-` measured exactly this on 2026-09-03e, with a positive
+control:
 
 | arm | subject | window on a real X server |
 |---|---|---|
@@ -29,10 +30,15 @@ names does not exist on the target.
 | X | `mousepad` — UI is a GResource compiled into the binary | ✅ 11 of 11 |
 | C | `galculator` again, with that store path made to resolve | ✅ 11 of 11 |
 
-⭐ Arm C is why *"a hardcoded store path is what stops it"* is a measurement
+⭐ Arm C is why *"a hardcoded store path is what stops it"* was a measurement
 rather than a reading of an error message. ⚠ Arm C's mechanism — binding the
-bundle's own `AppDir` at the store path with a mount namespace — **is not a
+bundle's own `AppDir` at the store path with a mount namespace — **was never a
 fix**: it needs root, which a user double-clicking an AppImage does not have.
+
+⚠ **Arm C is RETIRED**, and the experiment now runs arm **N** in its place:
+the same bundle built with `--no-storefix`, the one mechanism absent. Arm C
+answered *"is the store path the cause"*; arm N answers *"is the mechanism
+what fixed it"*, which is the question once there is a mechanism.
 
 ---
 
@@ -85,9 +91,25 @@ an **exact match against that set**; a store path that is not in it is
 **reported as a finding**, never silently substituted.
 
     tool/runtime/pgb-storefix.c   the interposer
+    internal/bundle/storefix.go   the map, the farm, the ABI check, the report
     AppDir/lib/libpgb-storefix.so where it ships
     AppDir/.storemap              the table, generated from the closure
     AppDir/.preload               sharun's own preload mechanism
+    AppDir/store/<name>-<ver>     one directory per store path in the closure
+
+⭐ **The directories are SYMLINKS, not copies.** The bundle already holds every
+file once, flattened — libraries in `lib/`, programs in `shared/bin/`, every
+`share/`, `etc/` and `libexec/` tree merged — so `store/.root` carries one
+symlink per top-level name and every store path points at it. A closure of 130
+store paths costs 130 symlinks, not 130 copies of the tree.
+
+⛔ **The ABI is checked, not hoped.** The interposer is compiled by the build
+host's compiler against the build host's glibc; if that glibc is NEWER than the
+closure's, the target's loader refuses the object and the bundle simply does
+not run. `checkStorefixABI` reads every versioned symbol the object imports out
+of its `.dynsym` and asserts the bundle's own `libc.so.6` defines it, at that
+version. ⚠ A musl closure is refused outright and said so, rather than failing
+at run time with a message about a symbol.
 
 **How it works.** `Anylinux-sharun` reads `.preload` from the bundle root and
 passes it to the loader as `--preload` (`src/main.rs`, `read_preload` in
@@ -107,16 +129,25 @@ untouched.
 | handles a store path inside a **script** or a data file | yes — and those are rewritten at build time as well | no |
 | works for a **static** binary, or one issuing raw syscalls | ⛔ **no** | yes |
 
-⚠ **The last row is the boundary and it is measured, not asserted** —
-`experiments/64-` arm S runs a static subject through the same instrument.
+⛔ **The last row is the boundary and it is NOT MEASURED.** No subject in
+`experiments/64-` or `65-` is statically linked or issues raw syscalls, so this
+row is reasoning about a mechanism rather than a result. ⚠ What WOULD measure
+it: a Go program out of the closure, bundled and run with a store path
+compiled in — `pgb`'s own binary is exactly that shape. Until somebody runs
+it, the honest statement is that the interposer has no PLT to win there and
+that nothing has confirmed the consequence.
 
 ## 4. ⛔ What the interposer does NOT cover
 
 **An absence is not a zero. Where this was looked for, and where it was not:**
 
 - **Interposed:** the path-taking entry points the application and its shared
-  libraries reach through the PLT. The list is in the source, and
-  `pgb bundle storefix --list` prints it.
+  libraries reach through the PLT — `open`/`openat` and their `64` forms,
+  `fopen`/`fopen64`/`freopen`, `stat`/`lstat`/`fstatat` and the pre-2.33
+  `__xstat` family, `statx`, `access`/`faccessat`, `opendir`, `readlink`,
+  `realpath`, `execve`/`execv`, and `dlopen`. The list is the definitions in
+  [`../../tool/runtime/pgb-storefix.c`](../../tool/runtime/pgb-storefix.c) and
+  nowhere else.
 - ⛔ **Not interposed: glibc's own internal calls.** `fopen` reaches
   `__open64_nocancel` inside libc without going through the PLT, so
   interposing `open` alone does not catch it — which is why `fopen`, `opendir`,
@@ -134,12 +165,21 @@ untouched.
 
 Three rewrites happen at build time, all against the same closure set:
 
-1. **Scripts** — a shebang or a body naming a store path in the set is
-   rewritten to the in-bundle location. A script is a text file, so this
-   rewrite may lengthen and no interposer is needed for it.
-2. **`.desktop` entries** — `Exec=`, `TryExec=`, `Icon=`, and
-   `DBusActivatable` (which must go: a bundle cannot be D-Bus activated).
-3. **Manifests** — the ICD and vendor JSON already handled by
+1. **A script entry point becomes interpreter + script.** The shebang is
+   resolved against the closure at build time, so the script's own text needs
+   no rewriting at all — a store path inside it reaches libc through the
+   interpreter and the interposer answers it. ⛔ A shebang naming a HOST
+   interpreter (`#!/bin/sh`) is refused rather than adopted: running the
+   host's shell puts the host's libc in the process.
+2. **`.env`** — `${SHARUN_DIR}` is what sharun expands, so a store path in a
+   lifted wrapper variable becomes one.
+3. **`.desktop` entries** — `Exec=` and `TryExec=` are rewritten to the
+   bundled program, `Icon=` to the icon the bundle actually carries at its top
+   level, and `DBusActivatable` is **removed**: a bundle cannot be D-Bus
+   activated, so a launcher that believes it waits for a service that never
+   appears. ⚠ Nothing here writes `${SHARUN_DIR}` into a desktop entry — a
+   file manager expands nothing — so a store path that survives is reported.
+4. **Manifests** — the ICD and vendor JSON already handled by
    `rewriteManifestPaths`, kept on the same list so the two rules cannot
    disagree about which files matter.
 

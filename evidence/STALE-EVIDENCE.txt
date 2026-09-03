@@ -36,7 +36,15 @@
 # they build five delivery formats and run two benchmark matrices; that is
 # hours, not minutes, and it needs the machine to itself for the clock rows.
 #
-60-versus-alternatives.sh 8ce829252d942b05a25a484b780148d427b1890e 9cb85154035f2a81824ca8428cb4419c44567d0d T-077: measured on pgb-env-debian12/glibc-2.36; builds five delivery formats, needs an idle machine
+# ⚠ AND THE PAIRS FOR 60- AND 62- MOVED ON 2026-09-03f, for a second reason
+# that does not replace the first. Both gained a COMMENT naming T-084: their
+# hand copy of the trace classifier counts a FAILED `openat` as a load when
+# strace splits the call across two lines. ⛔ The error only ever runs one way,
+# so their committed ZEROS stand and only a non-zero could be inflated —
+# `docs/history/corrections.md` C25. The re-run T-077 already owed is now owed
+# for two reasons and is still one re-run.
+#
+60-versus-alternatives.sh 2e66b0ce248e9fc8dcc16fcbc2ec37d7ecce15ab 9cb85154035f2a81824ca8428cb4419c44567d0d T-077 and T-084: measured on pgb-env-debian12/glibc-2.36; builds five delivery formats, needs an idle machine
 61-libc-throughput.sh 8ce829252d942b05a25a484b780148d427b1890e 0e56e62962e7d461dca7b57ebc9534476b0a4941 T-077: measured on pgb-env-debian12/glibc-2.36; benchmark matrix, needs an idle machine for the clock
-62-anylinux-appimage.sh 8ce829252d942b05a25a484b780148d427b1890e 894bfaec26de04327d143a913f4a39bafbd567d8 T-077: measured on pgb-env-debian12/glibc-2.36; builds an anylinux AppImage on an Arch bed
+62-anylinux-appimage.sh 2e66b0ce248e9fc8dcc16fcbc2ec37d7ecce15ab 894bfaec26de04327d143a913f4a39bafbd567d8 T-077 and T-084: measured on pgb-env-debian12/glibc-2.36; builds an anylinux AppImage on an Arch bed
 88-nonix-end-to-end.sh 8ce829252d942b05a25a484b780148d427b1890e 25a86348fced4718085f9ef5997e103f7de82299 T-077: measured on pgb-env-debian12/glibc-2.36; five arms, plans and builds jq inside a rootfs
