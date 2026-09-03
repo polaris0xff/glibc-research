@@ -61,6 +61,92 @@ type SweepOptions struct {
 
 	// ExtraRoots are additional programs to start from, by path or base name.
 	ExtraRoots []string
+
+	// ⭐ CutEdges MAKES THE ALLOWLIST'S CEILING MEASURABLE. TODO T-066 route A.
+	//
+	// Each entry is `FROM=>TO`: a DT_NEEDED edge to treat as absent, where
+	// FROM is the base name of the depending file (or `*` for any) and TO is
+	// the soname it names. The sweep then reports what becomes unreachable
+	// without that edge, and the delta against the same sweep with no cut is
+	// the size of the subtree reachable ONLY through it.
+	//
+	// ⛔ WHY THIS IS THE QUESTION AND NOT AN OPTIMISATION. An allowlist chooses
+	// which PATHS to carry; it cannot remove a dependency a library DECLARES.
+	// A perfect allowlist naming only kdenlive's true dependencies still
+	// carries libicudata.so, because the libQt6Core.so in the closure has a
+	// DT_NEEDED on it — which is exactly what b.integrity() asserts must hold.
+	// Only a REBUILD removes the edge, and `qt6-base-mini.sh`'s
+	// `-DFEATURE_icu=OFF` is that rebuild. So the bytes reachable only through
+	// the edges those recipes delete are the bytes no allowlist can reach, and
+	// that is the ceiling this entry asked to be measured before the allowlist
+	// is built.
+	//
+	// ⚠ NOTHING IS MODIFIED. The cut is applied to the graph walk, not to the
+	// bundle: no ELF is rewritten and no file is removed, so the same AppDir
+	// answers for every edge in turn and the measurement is repeatable.
+	CutEdges []string
+}
+
+// cutSet is the parsed form of SweepOptions.CutEdges: for each depending base
+// name (or "*"), the set of sonames whose edge is treated as absent.
+type cutSet map[string]map[string]bool
+
+func parseCutEdges(in []string) (cutSet, error) {
+	if len(in) == 0 {
+		return nil, nil
+	}
+	cs := cutSet{}
+	for _, e := range in {
+		from, to, ok := strings.Cut(e, "=>")
+		if !ok {
+			return nil, fail.Cannot("bundle sweep: --cut wants FROM=>TO, got %q", e)
+		}
+		from = strings.TrimSpace(from)
+		to = strings.TrimSpace(to)
+		if from == "" || to == "" {
+			return nil, fail.Cannot("bundle sweep: --cut wants FROM=>TO, got %q", e)
+		}
+		if cs[from] == nil {
+			cs[from] = map[string]bool{}
+		}
+		cs[from][to] = true
+	}
+	return cs, nil
+}
+
+// expandToFile widens every cut target to all index names for the same real
+// file, so a cut names a DEPENDENCY rather than one spelling of it.
+func (cs cutSet) expandToFile(index map[string]string) cutSet {
+	if cs == nil {
+		return nil
+	}
+	groups := selfKeys(index)
+	byName := map[string]map[string]bool{}
+	for _, keys := range groups {
+		for k := range keys {
+			byName[k] = keys
+		}
+	}
+	out := cutSet{}
+	for from, tos := range cs {
+		out[from] = map[string]bool{}
+		for to := range tos {
+			out[from][to] = true
+			for k := range byName[to] {
+				out[from][k] = true
+			}
+		}
+	}
+	return out
+}
+
+// cut reports whether the edge from `fromBase` to soname `to` is treated as
+// absent. A `*` entry matches any depending object.
+func (cs cutSet) cut(fromBase, to string) bool {
+	if cs == nil {
+		return false
+	}
+	return cs[fromBase][to] || cs["*"][to]
 }
 
 // SweepResult is what the sweep found.
@@ -73,7 +159,17 @@ type SweepResult struct {
 	TotalBytes   int64
 	UnreachFiles int
 	UnreachBytes int64
-	Unresolved   []string // DT_NEEDED names nothing in the bundle provides
+
+	// ⛔ HOW MANY EDGES THE CUT ACTUALLY MATCHED, and it has to be reported.
+	// A `--cut` naming an edge this bundle does not have removes nothing, so
+	// the unreachable delta is zero — which reads exactly like "that edge
+	// costs nothing to carry" and means the opposite. Zero here says the
+	// measurement did not happen. docs/AGENTS.md §0b: an absence is not a zero.
+	CutEdgesHit int
+	// CutEdges echoes what was asked for, so Report can tell "no cut was
+	// requested" from "a cut was requested and matched nothing".
+	CutEdges   []string
+	Unresolved []string // DT_NEEDED names nothing in the bundle provides
 }
 
 // discoverDirs finds the bundle's program and library roots by looking, so a
@@ -122,6 +218,14 @@ func Sweep(o SweepOptions) (*SweepResult, error) {
 	}
 	log.Debugf("program dirs: %v", progDirs)
 	log.Debugf("library dirs: %v", libDirs)
+
+	// ⛔ Parsed BEFORE the index walk, because the cut reaches the soname
+	// string scan as well as the DT_NEEDED walk -- see
+	// sonamesMentionedInObjects.
+	cuts, err := parseCutEdges(o.CutEdges)
+	if err != nil {
+		return nil, err
+	}
 
 	// The index: every shared object in the bundle, by base name. A symlink is
 	// followed to whatever it names inside the bundle; a name that resolves to
@@ -280,7 +384,22 @@ func Sweep(o SweepOptions) (*SweepResult, error) {
 	// version banner also counts, and keeping a library nothing loads costs
 	// space where deleting one something loads costs the application. The
 	// sweep's own contract says which way to err.
-	for _, r := range sonamesMentionedInObjects(o.Dir, allObjects, index) {
+	// ⛔ THE CUT IS BY TARGET FILE, NOT BY NAME, and it has to be resolved
+	// against the index before it is used.
+	//
+	// ⚠ MEASURED, and the first version got it wrong. One library is in the
+	// index under several names: `libunistring.so`, `libunistring.so.5` and
+	// `libunistring.so.5.2.1` all resolve to one file. Cutting
+	// `libidn2=>libunistring.so.5` suppressed that one needle and left
+	// `libunistring.so` -- which is a SUBSTRING of the same string in libidn2's
+	// .dynstr -- to make the library a root anyway. The roots count fell by one
+	// and not a byte moved.
+	//
+	// ⭐ So a cut naming any one of a file's names cuts all of them. That is
+	// also what a rebuild does: the dependency is gone, not renamed.
+	cuts = cuts.expandToFile(index)
+
+	for _, r := range sonamesMentionedInObjects(o.Dir, allObjects, index, cuts) {
 		roots = append(roots, r)
 	}
 	roots = uniq(roots)
@@ -304,6 +423,7 @@ func Sweep(o SweepOptions) (*SweepResult, error) {
 	roots = uniq(roots)
 
 	// The closure.
+	cutHits := 0
 	reachable := map[string]bool{}
 	unresolved := map[string]bool{}
 	queue := append([]string(nil), roots...)
@@ -324,9 +444,15 @@ func Sweep(o SweepOptions) (*SweepResult, error) {
 			continue
 		}
 		for _, n := range needed {
-			target, ok := index[filepath.Base(n)]
+			base := filepath.Base(n)
+			// ⭐ The edge is dropped from the WALK, never from the bundle.
+			if cuts.cut(filepath.Base(real), base) {
+				cutHits++
+				continue
+			}
+			target, ok := index[base]
 			if !ok {
-				unresolved[filepath.Base(n)] = true
+				unresolved[base] = true
 				continue
 			}
 			queue = append(queue, target)
@@ -334,10 +460,12 @@ func Sweep(o SweepOptions) (*SweepResult, error) {
 	}
 
 	res := &SweepResult{
-		Roots:      roots,
-		Reachable:  reachable,
-		TotalFiles: totalFiles,
-		TotalBytes: totalBytes,
+		Roots:       roots,
+		Reachable:   reachable,
+		TotalFiles:  totalFiles,
+		TotalBytes:  totalBytes,
+		CutEdgesHit: cutHits,
+		CutEdges:    o.CutEdges,
 	}
 	for d := range pluginDirs {
 		if rel, err := filepath.Rel(o.Dir, d); err == nil {
@@ -412,6 +540,14 @@ func (r *SweepResult) Report(w *strings.Builder, listAll bool) {
 	fmt.Fprintf(w, "unreachable      %d files, %d bytes (%s, %.1f%%)\n",
 		r.UnreachFiles, r.UnreachBytes, humanBytes(r.UnreachBytes),
 		percent(r.UnreachBytes, r.TotalBytes))
+	// ⛔ Printed whenever a cut was asked for, INCLUDING when it matched
+	// nothing -- that is the reading the caller most needs and the one a
+	// silent zero would hide.
+	if len(r.CutEdges) > 0 {
+		fmt.Fprintf(w, "cut requested    %d: %s\n", len(r.CutEdges), strings.Join(r.CutEdges, " "))
+		fmt.Fprintf(w, "cut edges hit    %d%s\n", r.CutEdgesHit,
+			map[bool]string{true: "   ⛔ NOTHING MATCHED -- this bundle has no such edge, so a zero delta below measures nothing", false: ""}[r.CutEdgesHit == 0])
+	}
 	if len(r.Unresolved) > 0 {
 		fmt.Fprintf(w, "unresolved       %d DT_NEEDED name(s) nothing in the bundle provides:\n",
 			len(r.Unresolved))
@@ -550,7 +686,70 @@ var dotSo = []byte(".so")
 // `sonamesMentionedNaive` below is the original, kept as the CONTROL its
 // selftest compares against — this is a change to the function that decides
 // what gets DELETED, and "it looks equivalent" is not the standard.
-func sonamesMentionedInObjects(root string, objects []string, index map[string]string) []string {
+// selfKeys groups the index's keys by the real file they resolve to, so a scan
+// can ask "which of these names name THIS object" instead of comparing one
+// string.
+//
+// ⛔ THE DEFECT IT REPLACES, AND IT DISABLED THE SWEEP'S LARGEST LEVER.
+// Both scans below excluded the scanned object's own base name — `n != self`
+// with `self = filepath.Base(o)` — so that a library mentioning its own name
+// did not become a root of itself. ⚠ **For a versioned library that check can
+// never fire.** `libunistring.so.5.2.1` carries `DT_SONAME libunistring.so.5`;
+// the index holds `libunistring.so.5`, because the symlink beside it is an
+// index key; and `"libunistring.so.5" != "libunistring.so.5.2.1"`. So the
+// needle matched the SONAME string sitting in the object's own `.dynstr`, the
+// self-check compared it against the FILENAME, and the library became a root
+// of itself.
+//
+// ⭐ MEASURED ON A REAL BUNDLE, not reasoned from the shape of the check: in
+// the `jq` AppDir, `libunistring.so.5` is reachable with its only DT_NEEDED
+// edge cut, and the only two files containing that string are `libidn2` and
+// `libunistring.so.5.2.1` itself. Nearly every ordinary shared library on a
+// Linux system has a SONAME that differs from its filename, so this held for
+// nearly all of them — `DropUnreachable` could not drop a versioned library
+// whatever the graph said. TODO T-066.
+//
+// ⚠ It is deliberately by REAL FILE rather than by name: the group for
+// `libunistring.so.5.2.1` is `{libunistring.so, libunistring.so.5,
+// libunistring.so.5.2.1}`, which is the filename, the SONAME symlink and the
+// development symlink at once, without a rule about version suffixes.
+func selfKeys(index map[string]string) map[string]map[string]bool {
+	byReal := map[string]map[string]bool{}
+	for k, p := range index {
+		real, err := filepath.EvalSymlinks(p)
+		if err != nil {
+			real = p
+		}
+		if byReal[real] == nil {
+			byReal[real] = map[string]bool{}
+		}
+		byReal[real][k] = true
+	}
+	return byReal
+}
+
+// selfSetFor returns the index keys naming the same file as o.
+func selfSetFor(groups map[string]map[string]bool, o string) map[string]bool {
+	real, err := filepath.EvalSymlinks(o)
+	if err != nil {
+		real = o
+	}
+	if s := groups[real]; s != nil {
+		return s
+	}
+	return map[string]bool{filepath.Base(o): true}
+}
+
+// ⭐ THE CUT REACHES THE STRING SCAN TOO, AND IT HAS TO.
+//
+// A `-mini` rebuild does not merely stop linking against a library: it removes
+// the `DT_NEEDED` entry, and a DT_NEEDED entry IS a string in the object's own
+// `.dynstr`. So the rebuilt `libQt6Core.so.6` does not mention `libicuuc` at
+// all. A cut that suppressed the graph edge but left the string behind would
+// keep the library reachable through this rule and report a ceiling of zero
+// for every edge — which is exactly what the first version of this measured on
+// the `jq` bundle. TODO T-066 route A.
+func sonamesMentionedInObjects(root string, objects []string, index map[string]string, cuts cutSet) []string {
 	// Only names the bundle actually has can be roots, so the needle set is
 	// the index rather than every plausible soname.
 	var needles []string
@@ -574,12 +773,13 @@ func sonamesMentionedInObjects(root string, objects []string, index map[string]s
 
 	runHits := map[string][]string{} // a distinct run -> the needles inside it
 	found := map[string]bool{}
+	groups := selfKeys(index)
 	for _, o := range objects {
 		data, err := os.ReadFile(o)
 		if err != nil {
 			continue
 		}
-		self := filepath.Base(o)
+		self := selfSetFor(groups, o)
 		runs := map[string]bool{}
 		start := -1
 		for i := 0; i <= len(data); i++ {
@@ -610,7 +810,7 @@ func sonamesMentionedInObjects(root string, objects []string, index map[string]s
 				runHits[r] = hits
 			}
 			for _, n := range hits {
-				if n != self {
+				if !self[n] && !cuts.cut(filepath.Base(o), n) {
 					found[n] = true
 				}
 			}
@@ -637,7 +837,7 @@ func sonamesMentionedInObjects(root string, objects []string, index map[string]s
 // every DT_NEEDED still resolving and every gate in this tree green — which is
 // exactly how the libSDL3 miss reached a run. The two implementations are
 // compared on a fixture instead.
-func sonamesMentionedNaive(root string, objects []string, index map[string]string) []string {
+func sonamesMentionedNaive(root string, objects []string, index map[string]string, cuts cutSet) []string {
 	needles := make([][]byte, 0, len(index))
 	names := make([]string, 0, len(index))
 	for n := range index {
@@ -648,14 +848,15 @@ func sonamesMentionedNaive(root string, objects []string, index map[string]strin
 		names = append(names, n)
 	}
 	found := map[string]bool{}
+	groups := selfKeys(index)
 	for _, o := range objects {
 		data, err := os.ReadFile(o)
 		if err != nil {
 			continue
 		}
-		self := filepath.Base(o)
+		self := selfSetFor(groups, o)
 		for i, nd := range needles {
-			if names[i] == self || found[names[i]] {
+			if self[names[i]] || found[names[i]] || cuts.cut(filepath.Base(o), names[i]) {
 				continue
 			}
 			if bytes.Contains(data, nd) {

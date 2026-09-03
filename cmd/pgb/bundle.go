@@ -141,6 +141,15 @@ func bundleSweep(args []string) error {
 			if v, err = next(); err == nil {
 				o.ProgramDirs = append(o.ProgramDirs, v)
 			}
+		case "--cut":
+			// ⭐ TODO T-066 route A: treat a DT_NEEDED edge as absent and
+			// report what becomes unreachable without it. The delta against
+			// the uncut sweep is the size of the subtree reachable ONLY
+			// through that edge -- the bytes an allowlist cannot reach,
+			// because only a rebuild removes a declared dependency.
+			if v, err = next(); err == nil {
+				o.CutEdges = append(o.CutEdges, v)
+			}
 		case "--list":
 			listAll = true
 		default:

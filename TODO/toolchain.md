@@ -1559,6 +1559,127 @@ for kdenlive. ⭐ **The bar is the field**: `experiments/86-`'s hand-built
 Anylinux arm for the CLI, and `kdenlive-AppImage-Enhanced` for the big one.
 `docs/AGENTS.md` §14 forbids "better" without the measurement.
 
+### ⛔ 2026-09-03: ROUTE A HAS AN INSTRUMENT NOW, AND MEASURING IT FOUND A DEFECT IN THE SWEEP
+
+⭐ **`pgb bundle sweep --cut FROM=>TO` is route A's measuring device.** It
+treats one `DT_NEEDED` edge as absent and reports what becomes unreachable
+without it; the delta against the uncut sweep is the size of the subtree
+reachable ONLY through that edge — the bytes an allowlist cannot reach, because
+only a rebuild removes a declared dependency. ⚠ **Nothing is modified**: the cut
+is applied to the graph walk, so one AppDir answers for every edge in turn.
+
+⛔ **THE ENTRY SAID THIS MEASUREMENT WAS CHEAP — "it needs the AppDir and `pgb
+bundle sweep`, no rebuild". THAT WAS WRONG, and finding out why is the result.**
+Three things had to be fixed before a cut could move a single byte, and each was
+found by the number refusing to move:
+
+**1. ⛔ A versioned library was a ROOT OF ITSELF, and that disabled the largest
+lever in this entry.** Both soname scans excluded the scanned object's own base
+name — `n != self` with `self = filepath.Base(o)` — so a library mentioning its
+own name did not become a root. ⚠ **For a versioned library that check can never
+fire.** `libunistring.so.5.2.1` carries `DT_SONAME libunistring.so.5`; the index
+holds `libunistring.so.5`, because the symlink beside it is an index key; and
+the two strings are not equal. So the needle matched the SONAME in the object's
+own `.dynstr`, the self-check compared it against the FILENAME, and the library
+became its own root. ⭐ **Nearly every ordinary shared library has a SONAME that
+differs from its filename**, so `DropUnreachable` could not drop a versioned
+library whatever the graph said.
+
+⭐ **Measured on the `jq` AppDir**: roots **40 → 28**, unreachable **252 files /
+7,698,280 B → 262 files / 8,012,232 B**. The self-check is by REAL FILE now, so
+the group for `libunistring.so.5.2.1` is `{libunistring.so, libunistring.so.5,
+libunistring.so.5.2.1}` — filename, SONAME symlink and development symlink at
+once, with no rule about version suffixes.
+
+⚠ **The selftest had a self-naming case and it passed throughout**, because its
+fixture used `libself.so.3`, a file whose name equals its SONAME. A versioned
+fixture with a SONAME symlink is added; it FAILS against the old one-name check
+and passes against the new one.
+
+**2. The cut has to reach the soname STRING scan, not just the DT_NEEDED walk.**
+A `-mini` rebuild does not merely stop linking: it removes the `DT_NEEDED`
+entry, and that entry IS a string in the object's `.dynstr`. A cut that
+suppressed the edge and left the string made every edge measure zero.
+
+**3. The cut is by target FILE, not by name.** Cutting
+`libidn2=>libunistring.so.5` suppressed that needle and left `libunistring.so`
+— a substring of the same string — to make the library a root anyway. The roots
+count fell by one and not a byte moved.
+
+⭐ **VALIDATED AGAINST A KNOWN ANSWER.** With all three fixed, cutting `jq`'s
+only interesting edge gives a delta of **2,076,792 bytes, which is exactly the
+size of `libunistring.so.5.2.1`** — the one library that edge uniquely reaches.
+
+    unreachable  baseline  262 files,  8,012,232 B
+    unreachable  --cut     263 files, 10,089,024 B     delta 2,076,792 B
+
+⚠ **And the instrument says when it measured nothing.** A `--cut` naming an edge
+the bundle does not have prints `cut edges hit 0  ⛔ NOTHING MATCHED`, because a
+zero delta otherwise reads exactly like "that edge costs nothing to carry" and
+means the opposite.
+
+### ⛔ AND THE `jq` RATIO IN THIS ENTRY IS STALE — 1.22× DESCRIBES A BUILD THAT NO LONGER EXISTS
+
+⚠ **`evidence/78-bundle-cli-bench/RESULT.txt` predated the commit that gated
+`DropUnreachable` to `aggressive`** (`5fbf7ad0`, "The sweep ran before .env
+existed and deleted kdenlive's MLT modules"), checked with
+`git merge-base --is-ancestor`. In that file `safe` and `aggressive` are the
+SAME number, 4,890,913 — the sweep was feeding both. After the gating, `safe`
+correctly stops dropping unreachable objects and grows back.
+
+⭐ **Re-run 2026-09-03, same subject, against `experiments/86-`'s hand-built
+Anylinux arm at 4,006,916 B:**
+
+| arm | bytes | vs the field |
+|---|---|---|
+| `none` | 12,261,839 | 3.06× |
+| `safe` | 7,332,001 | 1.83× |
+| ⭐ `aggressive` | **6,326,245** | ⭐ **1.58×** |
+| ⚠ the 1.22× this entry quoted | 4,890,913 | ⚠ a pre-gating build where `safe` also swept |
+
+⛔ **So the honest current figure is 1.58× at `aggressive`, not 1.22×**, and the
+improvement this entry claimed was partly the gating being absent rather than
+the bundler being better. `experiments/78-` re-run: `pass=1 fail=0`, all three
+arms build and answer the workload identically.
+
+⚠ **What the self-exclusion fix bought on the artefact, measured both ways on
+today's tree** — the same subject built with the pre-fix check planted:
+
+    pre-fix   aggressive   252 objects, 7.3 MiB dropped   artefact 6,389,462 B
+    post-fix  aggressive   262 objects, 7.6 MiB dropped   artefact 6,326,245 B
+                                                          delta       63,217 B
+
+⭐ **~62 KiB, about 1%**, and consistent with this entry's own ~7.5:1
+AppDir-to-artefact ratio. ⛔ **It must not be written up as a size win.** `jq`'s
+bundle has few versioned libraries with subtrees of their own; the fix is
+structural — it restores a lever that was silently disabled — and what it is
+worth on a Qt/mesa bundle, where versioned libraries dominate, is **unmeasured**.
+
+### ⚠ WHAT ROUTE A STILL OWES, and it is one build
+
+⛔ **The ceiling number itself is NOT measured**, and must not be reported as
+though it were. The instrument is validated and the defects in its way are
+fixed, but the edges that matter — `libQt6Core→libicuuc`, `libgallium→libLLVM`,
+`libavcodec→libx265` — do not exist in a `jq` bundle: `--cut
+'libQt6Core.so.6=>libicuuc.so.76'` there prints `cut edges hit 0`. What is owed
+is one Qt/mesa AppDir and one sweep per edge. ⚠ The previous attempt's AppDir
+(`/var/tmp/pgb-appimage-kden`, 7 GB) did not survive a container.
+
+⭐ **And one more thing the sweep does that bounds any ceiling measured with
+it**: the soname string scan takes mentions from EVERY object in the bundle,
+including objects that are themselves unreachable. So an unreachable
+`libicui18n` mentioning `libicuuc` keeps `libicuuc` reachable. Making that a
+fixpoint — only mentions from reachable objects count — is a real further lever
+and a real safety question, and it is named here rather than taken.
+
+### ⚠ A preflight, found by walking into it
+
+`pgb bundle appimage --out DIR/x.AppImage` with no `DIR` fetched the whole
+closure, assembled the AppDir, debloated and swept it, and only then handed
+mkdwarfs a path it could not open — reporting `mkdwarfs failed` over a log
+saying it wrote **0 files**, which reads like the AppDir was empty. The output
+directory is created before the closure is fetched now.
+
 ## ⚠ Significantly advanced, and STILL OPEN — `experiments/78-`
 
 ⭐ **2.86× the field → 1.22×, on `jq`.** ⛔ Not parity, so this entry stays

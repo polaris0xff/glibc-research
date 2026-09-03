@@ -127,6 +127,24 @@ func (b *Builder) Build() error {
 	if b.O.Target == "" {
 		return fail.Cannot("give a nixpkgs attribute or a store path")
 	}
+	// ⛔ THE OUTPUT DIRECTORY IS CHECKED FIRST, BECAUSE THE FAILURE ARRIVES
+	// LAST. `--out /var/tmp/t066/jq.AppImage` with no `/var/tmp/t066` fetched
+	// the whole closure, assembled the AppDir, debloated it and swept it, and
+	// only then handed mkdwarfs a path it could not open:
+	//
+	//     E cannot open output file '"/var/tmp/t066/jq.AppImage"': No such file
+	//     0 dirs, 0/0 soft/hard links, 0/0 files, 0 other
+	//
+	// ⚠ And the message a reader sees is `mkdwarfs failed` over a log saying
+	// it wrote 0 files, which reads like the AppDir was empty. Minutes of work
+	// thrown away for a missing directory nothing had looked at.
+	if b.O.Out != "" {
+		if dir := filepath.Dir(b.O.Out); dir != "" && dir != "." {
+			if err := os.MkdirAll(dir, 0o755); err != nil {
+				return fail.Cannot("cannot create the output directory %s: %v", dir, err)
+			}
+		}
+	}
 	outPath, err := b.resolveTarget()
 	if err != nil {
 		return err

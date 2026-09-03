@@ -5,7 +5,7 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03b, at session START
+    LAST WRITTEN   2026-09-03b, refreshed after the operator review landed
     TREE           main, clean, at 7c79dac5 + this
     BRANCH         ⛔ main. The harness named
                    `claude/cross-libc-dlopen-review-ukfukq`; RULES.md §Git
@@ -34,44 +34,48 @@ HEAD..origin/main` said **214**. Do this, in this order:
 
 ## In flight right now
 
-    ⭐ Session start. Bootstrap running detached; nothing else in flight.
+    ⭐ NOTHING RUNNING. Everything below is committed and pushed to main.
+    CI: green on 6831bd56 (the loader change). Two later runs in flight.
+
+## ✅ THE OPERATOR REVIEW (cross-libc-dlopen #28 / PR 30) IS DONE, ALL FOUR
+
+    1  T-073  el_own_syms[] was ONE table with TWO opposite requirements.
+              __tls_get_addr must WIN; _dl_mcount_wrapper_check must YIELD.
+              Split into el_own_syms_first / el_own_syms_last.
+              experiments/94-, pass=16 fail=0, 11 of 11 on the bed.
+              ⛔ THE VALUE HIDES IT: tls=0x5eeded is correct under the defect
+              too, because the decoy is self-consistent. Only the call count
+              separates them -- decoy_calls 0 fixed, 2 reversed.
+    2  T-031  reference re-mined 1cecf50e -> 793f3f3f (PR 30's merge commit).
+              mine-repo.sh now strips a third party's agent instruction file
+              at fetch time and RECORDS the trim; the re-mine had silently
+              put back the one docs/AGENTS.md §12 calls deliberately deleted.
+              Two MORE were found across the 34 and removed.
+              check-docs.sh gate 7 asserts none is vendored.
+    3  T-074  the host-policy selftest's "is unset" assertions read the VALUE,
+              and "" means BOTH absent and set-and-empty. Five of them could
+              not fail on the dangerous state. present() now asks presence,
+              and the instrument itself is asserted. Product unchanged.
+    4  T-075  LD_DEBUG=bindings on 93-'s dynamic control, for the rows where
+              the two loaders disagree. ⚠ It cannot see our own loader -- no
+              PT_INTERP, no ld.so to read the variable -- and the comment
+              says so. Two further placements stay open, each needing one
+              measurement first.
 
 ## ⛔ WHAT IS LEFT, IN ORDER
 
-    ---- operator-supplied, 2026-09-03b: cross-libc-dlopen #28 / PR #30 ----
-
-    ⛔ WE ARE NOT AFFECTED BY THE BUG and must not write that we are. It is in
-    an LD_PRELOAD forwarding shim; we ship no preload shim and our output has
-    no PT_INTERP. The DEFECT CLASS is ours: a lookup that ANSWERS when it
-    should DEFER.
-
-    A  el_provider()'s el_own_syms[] is checked FIRST and UNCONDITIONALLY.
-       The two entries have OPPOSITE requirements and nothing distinguishes
-       them or asserts the ordering:
-         __tls_get_addr            MUST win over everything
-         _dl_mcount_wrapper_check  MUST yield to any real definition
-       Assert BOTH directions, plant the reversal, read the exit code unpiped.
-    B  references/pkgforge-dev__cross-libc-dlopen is pinned PRE-PR-30
-       (1cecf50e, 2026-09-01). T-031 proposes porting from it -> a port would
-       inherit the bug. Re-mine at the post-PR-30 commit, or write the
-       staleness into T-031.
-    C  __EGL_VENDOR_LIBRARY_FILENAMES REPLACES _DIRS and empty is worse than
-       unset — the same shape. Check experiments/85- ASSERTS the
-       PGB_HOST_MESA release path rather than merely implementing it.
-    D  LD_DEBUG=bindings settles which object won a symbol, in one command.
-       Put it in the harness where a CONTROL is dynamic (93-'s hostprobe,
-       poc/10-gawk, 62-'s bundle arms). ⚠ It cannot see our own compiled-in
-       loader — say so in the comment.
-
-    ---- then PROGRESS.md's work order ----
-
-    1  T-066 P0  ⛔ THE LAST P0. Measure the allowlist's ceiling first
-                 (route A in the entry). Needs an AppDir.
+    1  T-066 P0  ⛔ THE LAST P0. Measure the allowlist's ceiling FIRST
+                 (route A in the entry). Needs an AppDir, and a 7 GB one did
+                 not survive a container.
     2  T-072 P1  experiments/76- with a non-zero --tls-reserve on the eleven.
-                 ⚠ Its premise is dented — read the entry first.
+                 ⚠ Read the entry first: its premise is dented -- the object
+                 that motivated it is refused for a DIFFERENT reason and the
+                 benefit on real host objects is currently ZERO objects.
     3  T-062 P1  five packages still carry no selftest.
-    4  T-063 P1  the miniflux proof.
-    5  T-054/T-055  kdenlive.
+    4  T-063 P1  the miniflux proof: arm S has a static postgres on Alpine;
+                 src/interfaces does not build.
+    5  T-054/T-055  kdenlive. ⛔ The bar is NOT met: 2.22x the size, and a
+                 same-day safe vs aggressive timing comparison is owed.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 

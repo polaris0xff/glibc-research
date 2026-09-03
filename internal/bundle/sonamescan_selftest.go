@@ -86,6 +86,19 @@ func SonameScanSelftest() *selftest.Report {
 		// ⚠ Mentions its own name only: the rule is that an object naming
 		// itself is not evidence anything loads it.
 		"libself.so.3": "\x00libself.so.3\x00",
+		// ⛔ THE CASE THIS FIXTURE DID NOT HAVE, AND IT IS THE ORDINARY ONE.
+		// `libself.so.3` is a file whose NAME equals its SONAME, which is not
+		// what a real library looks like: `libunistring.so.5.2.1` carries
+		// `DT_SONAME libunistring.so.5` and has that name beside it as a
+		// symlink. The self-check compared the needle against
+		// `filepath.Base(o)`, so for every versioned library it compared
+		// "libversioned.so.7" against "libversioned.so.7.1.2", never matched,
+		// and the library became a ROOT OF ITSELF through the SONAME in its
+		// own .dynstr.
+		//
+		// ⭐ Measured on the real `jq` AppDir before the fix: roots 40, and 12
+		// of them were this. TODO T-066.
+		"libversioned.so.7.1.2": "\x00libversioned.so.7\x00",
 	}
 	var paths []string
 	for n, body := range objects {
@@ -100,8 +113,18 @@ func SonameScanSelftest() *selftest.Report {
 		paths = append(paths, p)
 	}
 
-	fast := sonamesMentionedInObjects(dir, paths, index)
-	slow := sonamesMentionedNaive(dir, paths, index)
+	// ⭐ THE SONAME SYMLINK, which is what makes the case above realistic: the
+	// index holds `libversioned.so.7` and it resolves to the versioned file.
+	// Without this the two names are unrelated and the case tests nothing.
+	if err := os.Symlink(filepath.Join(lib, "libversioned.so.7.1.2"),
+		filepath.Join(lib, "libversioned.so.7")); err != nil {
+		r.Fail("symlink libversioned.so.7", err.Error(), "created")
+		return r
+	}
+	index["libversioned.so.7"] = filepath.Join(lib, "libversioned.so.7")
+
+	fast := sonamesMentionedInObjects(dir, paths, index, nil)
+	slow := sonamesMentionedNaive(dir, paths, index, nil)
 
 	base := func(in []string) string {
 		var out []string
@@ -127,6 +150,13 @@ func SonameScanSelftest() *selftest.Report {
 	r.CheckBool("a soname inside a space-separated list is found", got["libinlist.so.1"], true)
 	// ⛔ The two negatives.
 	r.CheckBool("an object naming only ITSELF is not a root", got["libself.so.3"], false)
+	// ⛔ THE SAME RULE FOR THE ORDINARY SHAPE, and this is the one that was
+	// broken: the needle is the SONAME, the file is the versioned name, and
+	// the two are never equal. Both names must be excluded, because both name
+	// the same file. Fails before the selfKeys() fix, passes after.
+	r.CheckBool("a VERSIONED object naming only its own SONAME is not a root",
+		got["libversioned.so.7"], false)
+	r.CheckBool("...nor under its own file name", got["libversioned.so.7.1.2"], false)
 	r.CheckBool("a library nothing mentions is not a root", got["libunmentioned.so.4"], false)
 	return r
 }
