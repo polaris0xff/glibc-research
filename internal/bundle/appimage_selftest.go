@@ -97,6 +97,47 @@ func AppImageSelftest(c *cfg.Config) *selftest.Report {
 	r.Check("a repeated path component is dropped, first position kept",
 		firstLineFor(string(folded), "QT_PLUGIN_PATH"),
 		"QT_PLUGIN_PATH=/a:/b:${QT_PLUGIN_PATH}")
+
+	// ---- elfClass: the decision that keeps lib32 apart from lib ----------
+	//
+	// ⛔ WHY THIS IS ASSERTED. `copyLibraries` routes an object to `lib32` or
+	// `lib` on this one value, and its own comment says what getting it wrong
+	// costs: *"a flat directory holding an i386 and an x86_64 libfoo.so.1 gives
+	// the loader whichever landed first"*. That is a silent wrong-architecture
+	// load, not a build failure. ⚠ Nothing covered it — T-057's 32-bit item.
+	//
+	// ⭐ Hermetic: `elfClass` reads five bytes, so the fixtures are five bytes.
+	// No compiler, no multilib, and it runs on a machine that has neither.
+	ec := filepath.Join(dir, "elfclass")
+	if err := os.MkdirAll(ec, 0o755); err != nil {
+		r.Fail("mkdir elfclass", err.Error(), "created")
+		return r
+	}
+	classOf := func(name string, body []byte) int {
+		p := filepath.Join(ec, name)
+		if err := os.WriteFile(p, body, 0o644); err != nil {
+			return -1
+		}
+		return elfClass(p)
+	}
+	elf32 := []byte{0x7f, 'E', 'L', 'F', 1, 1, 1, 0}
+	elf64 := []byte{0x7f, 'E', 'L', 'F', 2, 1, 1, 0}
+	r.CheckInt("an ELFCLASS32 object is 32", classOf("m32.so", elf32), 32)
+	r.CheckInt("an ELFCLASS64 object is 64", classOf("m64.so", elf64), 64)
+	// ⛔ THE THREE ZEROS, and each is a different way of not being an object.
+	// Zero means "not sorted into lib32", which is the safe direction only
+	// because `copyLibraries` treats everything that is not 32 as `lib`.
+	r.CheckInt("a file with no ELF magic is 0",
+		classOf("text.so", []byte("#!/bin/sh\necho hi\n")), 0)
+	r.CheckInt("an unknown EI_CLASS is 0, not guessed",
+		classOf("weird.so", []byte{0x7f, 'E', 'L', 'F', 9, 1, 1, 0}), 0)
+	// ⚠ A file SHORTER than the header cannot be classified, and the read has
+	// to fail rather than index past the end.
+	r.CheckInt("a file shorter than the header is 0",
+		classOf("short.so", []byte{0x7f, 'E', 'L'}), 0)
+	r.CheckInt("an empty file is 0", classOf("empty.so", nil), 0)
+	r.CheckInt("a file that does not exist is 0",
+		elfClass(filepath.Join(ec, "absent.so")), 0)
 	return r
 }
 

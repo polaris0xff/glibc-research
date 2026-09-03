@@ -445,7 +445,15 @@ is **costing route B**, which is where the size actually is.
             produce an EMPTY CAPTURE that reads as "no bindings". And it
             settles 62- too -- the instrument can describe every competitor
             arm (they run a bundled ld-linux) and not ours.
-    T-057   item 2: a 32-bit application through the lib32 path
+    T-057   a 32-bit application through the lib32 path.
+            ⚠ CORRECTED 2026-09-03c: the entry said "No 32-bit path. lib32
+            exists in the Anylinux layout and not here". ⭐ THAT IS STALE --
+            assemble.go reads EI_CLASS, routes 32-bit objects to lib32, copies
+            a 32-bit loader, warns by name when there is none, and makes the
+            shared/lib32 symlink. ⛔ What is missing is the MEASUREMENT: no
+            32-bit application has been put through it. ⭐ And elfClass -- the
+            decision that keeps an i386 libfoo.so.1 from shadowing the x86_64
+            one -- had NO carried coverage; seven hermetic cases now pin it.
     T-060   rungs 2 and 3, the static nix
     T-054   rungs 3 (KF6) and 4 (kdenlive static)
     T-051   the no-compiler host

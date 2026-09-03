@@ -302,7 +302,24 @@ voidlinux (both musl), debian 11 and arch.
 3. **Wrapper scripts.** A nixpkgs `bin/x` that is a shell wrapper is followed
    to its ELF and the wrapper's ENVIRONMENT is dropped. T-053; `patsh` is
    aimed at exactly this.
-4. **No 32-bit path.** `lib32` exists in the Anylinux layout and not here.
+4. ⚠ **"No 32-bit path" — STALE, CORRECTED 2026-09-03c BY READING THE CODE
+   RATHER THAN THE ENTRY.** `lib32` is implemented and has been for some time;
+   this row was never updated. `internal/bundle/assemble.go` reads each
+   object's `EI_CLASS`, routes the 32-bit half to `lib32` instead of `lib`,
+   finds and copies a **32-bit loader** (`ld-linux.so.2` /
+   `ld-linux-armhf.so.3`), ⭐ **warns by name when the closure has 32-bit
+   objects and no 32-bit loader** rather than producing a bundle that cannot
+   run them, and creates the `shared/lib32` symlink sharun expects.
+   ⛔ **What is actually missing is the MEASUREMENT**: no 32-bit application
+   has been put through it, so nothing says the layout works — only that it is
+   produced. ⚠ And the whole path had **no carried coverage at all** until
+   2026-09-03c: `elfClass` decides `lib32` versus `lib`, and its own comment
+   names the cost of getting it wrong — *"a flat directory holding an i386 and
+   an x86_64 `libfoo.so.1` gives the loader whichever landed first"*, which is
+   a silent wrong-architecture load rather than a build failure. Seven
+   hermetic cases now pin it in `bundle-appimage` (ELFCLASS32 → 32,
+   ELFCLASS64 → 64, and five ways of being neither → 0); they need no compiler
+   and no multilib because `elfClass` reads five bytes.
 5. **Nothing is measured against a hand-built Anylinux AppImage.**
    `experiments/62-` compares `pgb` against one; nothing compares OUR bundle
    against one.
