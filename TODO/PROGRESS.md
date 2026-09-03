@@ -503,7 +503,20 @@ is **costing route B**, which is where the size actually is.
             32-bit application has been put through it. ⭐ And elfClass -- the
             decision that keeps an i386 libfoo.so.1 from shadowing the x86_64
             one -- had NO carried coverage; seven hermetic cases now pin it.
-    T-060   rungs 2 and 3, the static nix
+    T-060   rungs 2 and 3, the static nix.
+            ⭐ RUNG 1's PREMISE MEASURED 2026-09-03c, and it narrows the work:
+              - the components are NOT index attributes. 149,813 attributes,
+                6 `nixVersions.*` (all the AGGREGATOR), 0 nix-cli/nix-store/…
+              - `pgb nix plan nix` gives 7 buildInputs -- five test-runs, the
+                functional tests, nix-perl -- so planning the top-level attr
+                and building it would build NO NIX AT ALL.
+              - ⭐ BUT they ARE reachable through the .drv graph, which the
+                tool already walks one level of: 24 nix component derivations
+                are on disk after one plan, and `pgb nix drv` reads them.
+            ⛔ So rung 1's missing piece is a TRANSITIVE .drv walk. Of the
+            named risks only sqlite and brotli are in the one level fetched;
+            boost, libgit2, libarchive, lowdown, editline, libsodium, toml11
+            and the AWS CRT are further down and nothing has walked there.
     T-054   rungs 3 (KF6) and 4 (kdenlive static)
     T-051   the no-compiler host
     T-012   pgb build <url-or-package>

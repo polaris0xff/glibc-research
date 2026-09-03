@@ -948,6 +948,44 @@ sqlite, curl+openssl, libsodium, brotli, toml11 and the AWS CRT**, and the AWS
 half is optional while boost is not. Any one of those can refuse `-static` the
 way MLT's `add_library(mlt SHARED)` did.
 
+### ⭐ 2026-09-03c — RUNG 1's PREMISE, MEASURED BEFORE THE ARM IS ATTEMPTED
+
+⛔ **THE COMPONENTS ARE NOT INDEX ATTRIBUTES, and that is the first thing rung
+1 walks into.** The nixpkgs index this tool resolves through holds **149,813**
+attributes and none of them is a nix component:
+
+    pgb nix cache attr nix-cli
+      -> no attribute, pname or name "nix-cli" for x86_64-linux
+    attributes matching ^nixVersions   -> 6, every one the AGGREGATOR
+    attributes named nix-{cli,store,expr,util,main,cmd,fetchers,flake}-N
+      -> 0   (the only `nix-store*` hits are unrelated packages)
+
+⚠ **And `nix` itself is an aggregator, which the plan says plainly:**
+`pgb nix plan nix` gives `nix 2.34.8` with **7 buildInputs — five test-runs,
+the functional tests and `nix-perl` — and one nativeBuildInput, `lndir`.**
+Planning the top-level attribute and building it would build no nix at all.
+
+⭐ **BUT THEY ARE REACHABLE, BY A ROUTE THE TOOL ALREADY HAS.** `pgb nix plan
+nix` reports `derivations 27 fetched and verified over HTTPS`, and
+`/root/.local/state/pgb/drv/` then holds **24 nix component derivations** —
+the eight the paragraph above names, plus their `-c` (C API) variants, the
+`-tests-run` ones, `nix-manual`, `nix-nswrapper` and `nix-perl`.
+`pgb nix drv <file>` reads any of them:
+
+    nix-2.34.8.drv        inputDrvs 26, inputSrcs 2, env 36, outputs 4
+    nix-store-2.34.8.drv  inputDrvs 15, inputSrcs 3, env 39, outputs 3
+
+⛔ **SO RUNG 1'S MISSING PIECE IS A TRANSITIVE `.drv` WALK, and that is a
+smaller thing than the entry implies.** What is fetched today is **one level**:
+the top derivation's inputs. Of the dependencies named as risks above, only
+`sqlite` (3 derivations) and `brotli` (1) are in that level; **boost, libgit2,
+libarchive, lowdown, editline, libsodium, toml11 and the AWS CRT are not** —
+not because they are absent, but because nothing has walked down to them.
+⭐ `pgb nix drv` is the primitive and `internal/nixx`'s dependency walk is the
+place; ⚠ nothing drives it end to end, and **this measurement did not walk the
+graph** — it observed what one `plan` left on disk, which is a weaker claim and
+is the one being made.
+
 ⭐ **A cheaper second reading of the same goal, which the operator allowed:**
 *"or carries enough of one"*. `internal/nixx/fetch.go` already fetches
 nix's own closure from `cache.nixos.org` with no nix and no root — 57 store
