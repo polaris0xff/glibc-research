@@ -1,0 +1,30 @@
+96 - LD_DEBUG when ld.so arrives as a library, not as the interpreter
+
+date: 2026-09-03T04:23:47Z
+kernel: Linux 6.18.44-fc-v24
+host libc: ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc: cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+
+THE QUESTION (T-075, first open row): poc/10-gawk observes a STATIC
+binary dlopening a host extension. There the host ld.so enters as a
+LIBRARY rather than as the program interpreter. Does LD_DEBUG print
+anything in that configuration?
+
+LD_DEBUG setting                   DYNAMIC (ctrl)  STATIC (subj)
+bindings, stderr lines                        143              0
+all, stderr lines                             485              0
+bindings, output files                          1              0
+help, program still ran                         0              1
+
+ANSWER: NO. And ld.so IS mapped into the static process -- strace
+shows it opening ld-linux-x86-64.so.2 -- so this is not "no loader
+was present". LD_DEBUG is parsed during the loader own startup,
+which the static dlopen path never runs.
+
+CONSEQUENCE for T-075: LD_DEBUG must NOT be written into
+poc/10-gawk observation. It would not fail there -- it would produce
+an EMPTY CAPTURE, which in an observation table reads as "no
+bindings" rather than "the instrument does not work here".
+
+reproduce:
+  sh experiments/96-ld-debug-as-library.sh

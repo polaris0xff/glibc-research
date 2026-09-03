@@ -381,10 +381,20 @@ is **costing route B**, which is where the size actually is.
             asserted without a bed. ⛔ REAL-BUILD VALIDATION STILL OWED: the
             POC suite was running against the pre-refactor pgb when this
             landed, so re-run one POC after rebuilding ./pgb.
-    T-075   the two LD_DEBUG placements left, each needing ONE measurement
-            first: does LD_DEBUG print anything when ld.so arrives as a
-            LIBRARY (poc/10-gawk), and is the question worth asking in 62-
-            where classify_trace already answers the load question.
+    T-075   ✅ DONE 2026-09-03c. `experiments/96-`, pass=14 fail=0. BOTH rows
+            measured by one experiment, and the answer to both is NO.
+            ⭐ Same source, same compiler, one -static and one not, both
+            dlopening the same host object:
+              LD_DEBUG=bindings   dynamic 143 lines   static 0
+              LD_DEBUG=all        dynamic 485 lines   static 0
+              LD_DEBUG=help       dynamic exits       static RUNS TO COMPLETION
+            ⛔ And ld.so IS in the static process -- strace shows it opening
+            ld-linux-x86-64.so.2. The loader is present and reads the variable
+            never, because LD_DEBUG is parsed during ld.so's OWN startup.
+            ⛔ So it must not go into poc/10-gawk: it would not fail, it would
+            produce an EMPTY CAPTURE that reads as "no bindings". And it
+            settles 62- too -- the instrument can describe every competitor
+            arm (they run a bundled ld-linux) and not ours.
     T-057   item 2: a 32-bit application through the lib32 path
     T-060   rungs 2 and 3, the static nix
     T-054   rungs 3 (KF6) and 4 (kdenlive static)

@@ -1063,3 +1063,55 @@ and no `bindings/` directory left behind.
 ⛔ Both remaining rows are **open work, not a verdict**: each needs one
 measurement — does `LD_DEBUG` print anything in that configuration — before
 anything is written into those harnesses.
+
+### ✅ 2026-09-03c — BOTH REMAINING ROWS ARE MEASURED, AND THE ANSWER IS NO
+
+`experiments/96-`, `evidence/96-ld-debug-as-library/RESULT.txt`, **pass=14
+fail=0**. The measurement the two rows were waiting on has been taken, and one
+experiment settles both.
+
+⭐ **The subject and the control differ in ONE property**: the same source, the
+same compiler, one linked `-static` and one not, both `dlopen`ing the same host
+object and calling a symbol out of it. Both succeed.
+
+| `LD_DEBUG` | dynamic (control) | ⭐ static (subject) |
+|---|---|---|
+| `bindings`, stderr lines | **143** | ⛔ **0** |
+| `all`, stderr lines | **485** | ⛔ **0** |
+| `bindings`, `LD_DEBUG_OUTPUT` files | **1** | ⛔ **0** |
+| `help`, program still ran | 0 — the loader printed and exited | ⛔ **1 — it ran to completion** |
+
+⛔ **AND `ld.so` IS IN THE STATIC PROCESS.** `strace` shows the static binary
+opening `/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2` on its way through the
+`dlopen`. So this is **not** *"there was no loader to read the variable"* — the
+loader is present, mapped, and does the work, and reads `LD_DEBUG` never.
+⭐ The `help` row is the cleanest single proof: `LD_DEBUG=help` makes `ld.so`
+print and **exit before the program runs**, and the static arm ran to
+completion.
+
+⭐ **The cause: `LD_DEBUG` is parsed during `ld.so`'s OWN startup**, which the
+static-`dlopen` path never executes. Arriving as a library is arriving after
+the point at which the variable would have been read.
+
+⛔ **So the diagnostic must NOT go into `poc/10-gawk`.** It would not *fail*
+there — it would produce an **empty capture**, and an empty capture in an
+observation table reads as *"no bindings"* rather than *"the instrument does
+not work here"*. `docs/AGENTS.md` §0b: an absence is not a zero. Writing it in
+would have manufactured one on every row.
+
+⭐ **AND THE SAME MEASUREMENT CLOSES THE `experiments/62-` ROW, which is more
+than that row asked for.** T-075's premise said `LD_DEBUG` cannot be asked of
+our output because there is no `PT_INTERP`. 96- says something stronger: it
+cannot be asked **even when glibc's loader is in the process**. 62-'s arms
+divide exactly on that line — the anylinux/sharun arm runs a **bundled
+`ld-linux`** explicitly and would answer, and **our own arm is static and
+cannot**. ⛔ An instrument that can describe every competitor and not the
+subject is the wrong instrument for a comparison about the subject, and
+`classify_trace` — which reads the opens and attributes them to a pid — already
+answers the question 62- is actually asking.
+
+⚠ **Measured on the build host** (Ubuntu 24.04, glibc 2.39), not across the
+eleven. The mechanism is a property of where glibc parses the variable rather
+than of a distribution, and the experiment carries its own control so a host
+where the instrument were simply broken would fail the control first — but the
+eleven-row version has not been run and is not claimed.
