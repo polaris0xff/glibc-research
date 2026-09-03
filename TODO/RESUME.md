@@ -44,31 +44,45 @@ the branch you are on AND `git status` after `git checkout main`.
     ./pgb bootstrap --check                  is it ready
     sh scripts/common/install-codegraph.sh   v1.6.0, 98 files / 1,864 nodes
 
+## ⛔ THE ONE THING A FRESH SESSION MUST DO FIRST
+
+    Re-run the acceptance suite with BOTH toolchain fixes in the binary:
+
+        make && sh poc/run-all.sh --rebuild
+
+    ⛔ `--rebuild` IS NOT OPTIONAL after a wrapper change: every POC skips its
+    build when the artefact exists, and only five of the ten honour
+    POC_REBUILD, so a plain re-run reuses binaries the OLD toolchain produced
+    and reports ten green rows that say nothing. `poc/run-all.sh` is new this
+    session and exists because that trap had caught every previous "re-run the
+    POCs" instruction.
+
+    TWO hot-path fixes landed this session and the suite must cover both:
+      1. `cxxRuntimeDemand` now resolves `-lNAME` against `-L` (66528e59)
+      2. `proc.Cmd` now resolves argv[0] against the CHILD's PATH (6a04721d)
+    The run that was in flight when (2) landed covers only (1).
+
 ## In flight right now
 
-    ⭐ R3 ANSWERED, AND IT FOUND A LIVE DEFECT IN THE PRODUCT (66528e59).
-       `cxxRuntimeDemand` skipped every argument beginning with `-`, so the
-       C++-archive fix only ever saw archives named as LITERAL PATHS. postgres
-       names ICU as `-L… -licui18n -licuuc -licudata`, so libicuuc.a was never
-       opened and the link died on `operator delete`. Fixed: `-l`/`-l:` resolve
-       against `-L`. BEFORE rc=1, AFTER rc=0 and the binary runs.
+    ⏳ `sh poc/run-all.sh --rebuild` — RUNNING on the bed, covering fix (1)
+       only. log: scratchpad/runall.log
+       ⛔ NOTHING ELSE MAY TOUCH pgb-env-debian13 WHILE IT RUNS, and ⛔ DO NOT
+       REBUILD ./pgb — a mid-run swap makes the result describe two binaries.
+       ⭐ It is also the first run to carry `poc_check_built_by_env`: 70-sqlite
+       came back pass=21 where it was 20.
+       ⚠ When it finishes: `make && sh poc/run-all.sh --rebuild` once more, so
+       one run covers BOTH fixes. That is the top of this file.
 
-    ⏳ R3 RE-RUN with the fixed wrapper — RUNNING on the bed.
-         cmd   cd /var/tmp/pgb-r3 && NIX_MAX_ROUNDS=24 \
-               /home/user/glibc-research/pgb nix build --plan /var/tmp/pgb-r3/pg.plan
-         log   scratchpad/r3-postgres-2.log   (first run: r3-postgres.log)
-         ⛔ NOTHING ELSE MAY TOUCH pgb-env-debian13 WHILE IT RUNS.
-         ⭐ READ OFF IT: does postgres now build with `--with-icu` still on?
-
-    ⛔ OWED, IN THIS ORDER, ONCE THE BED IS FREE:
-       1. ⛔ RE-RUN THE TEN POCs. The link hot path changed AGAIN with the
-          `-l`/`-L` fix, and R1's ten-of-ten describes the pre-fix binary.
-            sh scratchpad/run-pocs.sh <stagedir>     (PGB_ENGINE=chroot)
-          ⚠ 90-qt's build tree was DELETED to make room for R3, so that one
-          rebuilds Qt (~14 min). 80 and 91 still have theirs.
-       2. The same run picks up the new `poc_check_built_by_env` assertion in
-          poc/70, poc/80 and poc/91, whose committed RESULT.txt files still
-          describe runs without it.
+    ✅ R3 IS ANSWERED, BOTH HALVES.
+       ⛔ First run: the C++-archive fix did NOT reach postgres. `-with-icu`
+       survived all 14 rounds, then the link died on `operator delete` out of
+       libicuuc.a. Cause: `cxxRuntimeDemand` skipped every argument beginning
+       with `-`, and postgres names ICU as `-L… -licuuc`. (66528e59)
+       ⭐ Re-run with the fix: ICU errors 0, `src/backend/postgres` built,
+       101,647,216 B, PT_INTERP 0, DT_NEEDED 0, 3,911 icu_78 symbols,
+       PostgreSQL 18.6 answering ON ALPINE. It now stops in
+       `src/interfaces/libpq` on postgres's OWN policy check against the
+       SHARED libpq — a different rung, named in T-063. (b89138c3)
 
 ## ✅ DONE AND PUSHED THIS SESSION (all CI-green where CI has reported)
 
