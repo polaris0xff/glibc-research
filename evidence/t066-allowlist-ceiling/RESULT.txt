@@ -1,0 +1,43 @@
+T-066 route A -- the allowlist ceiling, measured
+date        : 2026-09-03T02:06:51Z
+host        : Linux 6.18.44-fc-v24
+subject     : mesa-demos, nixpkgs closure, --debloat none
+AppDir      : /var/tmp/pgb-appimage-mesa/mesa-demos/AppDir
+library tree: 806 files, 938.8 MiB
+
+THE QUESTION (T-066 route A): an allowlist chooses which PATHS to carry.
+It cannot remove a dependency a library DECLARES -- b.integrity() asserts
+every DT_NEEDED resolves inside the bundle. So the bytes reachable ONLY
+through an edge a `-mini` REBUILD deletes are the bytes no allowlist can
+reach. That is the ceiling.
+
+THE INSTRUMENT: `pgb bundle sweep --cut FROM=>TO` drops the edge from the
+graph walk and from the soname string scan, and resolves the target to a
+FILE so every name for it is cut. Nothing on disk is modified.
+
+  arm                                    unreachable         delta
+  baseline                          61,882,072 B (59.0 MiB)        --
+  + cut *=>libLLVM.so.21.1         250,081,656 B (238.5 MiB)  188,199,584 B
+  + cut *=>libicu{uc,data,i18n}    291,032,720 B (277.6 MiB)   40,951,064 B
+
+  CEILING for these two recipes    229,150,648 B = 218.5 MiB
+  share of the 938.8 MiB lib tree  23.3%
+  at the ~7.5:1 AppDir:artefact ratio    about 29 MiB of artefact
+
+edges hit: 8 for libLLVM, 13 with icu -- reported, because a --cut that
+matches nothing gives a zero delta that reads like "this edge is free".
+
+CORROBORATION for the entry's "subtractive cannot win": the sweep can
+prove only 6.3% of this bundle dead. The two rebuild edges above are
+worth 23.3% -- nearly four times what deletion can reach here.
+
+WHAT THIS DOES NOT SAY. It is mesa-demos, not kdenlive: a different
+closure with a different ceiling. ffmpeg->x265 and the Qt edges are not
+in this bundle and are not counted. The ~7.5:1 ratio is carried from
+experiments/90- run 6 and was not re-measured here.
+
+reproduce:
+  ./pgb bundle appimage mesa-demos --out DIR/mesa.AppImage \
+      --cache /var/tmp/pgb-appimage-mesa --debloat none
+  ./pgb bundle sweep <cache>/mesa-demos/AppDir
+  ./pgb bundle sweep <cache>/mesa-demos/AppDir --cut "*=>libLLVM.so.21.1"

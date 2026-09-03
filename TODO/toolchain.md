@@ -1655,15 +1655,40 @@ bundle has few versioned libraries with subtrees of their own; the fix is
 structural — it restores a lever that was silently disabled — and what it is
 worth on a Qt/mesa bundle, where versioned libraries dominate, is **unmeasured**.
 
-### ⚠ WHAT ROUTE A STILL OWES, and it is one build
+### ⭐ AND THE CEILING IS MEASURED — 218.5 MiB of 938.8, on a mesa bundle
 
-⛔ **The ceiling number itself is NOT measured**, and must not be reported as
-though it were. The instrument is validated and the defects in its way are
-fixed, but the edges that matter — `libQt6Core→libicuuc`, `libgallium→libLLVM`,
-`libavcodec→libx265` — do not exist in a `jq` bundle: `--cut
-'libQt6Core.so.6=>libicuuc.so.76'` there prints `cut edges hit 0`. What is owed
-is one Qt/mesa AppDir and one sweep per edge. ⚠ The previous attempt's AppDir
-(`/var/tmp/pgb-appimage-kden`, 7 GB) did not survive a container.
+`evidence/t066-allowlist-ceiling/RESULT.txt`. ⚠ **Not on kdenlive**: the
+subject is `mesa-demos` at `--debloat none`, whose 1.2 GB AppDir carries the
+single biggest `-mini` edge (`mesa-mini.sh` deletes `llvm-libs` from `depends`)
+and the icu one, and builds in minutes rather than twenty. **806 library files,
+938.8 MiB.**
+
+| arm | unreachable | delta |
+|---|---|---|
+| baseline | 61,882,072 B (59.0 MiB) | — |
+| `--cut '*=>libLLVM.so.21.1'` | 250,081,656 B (238.5 MiB) | ⭐ **188,199,584 B** |
+| ⭐ **+ `--cut` the three icu names** | **291,032,720 B (277.6 MiB)** | **40,951,064 B** |
+
+⭐ **THE CEILING FOR THESE TWO RECIPES IS 229,150,648 B = 218.5 MiB — 23.3% of
+the library tree**, and at this entry's own ~7.5:1 AppDir-to-artefact ratio
+that is **about 29 MiB of artefact** an allowlist can never reach.
+⚠ 8 edges were hit for `libLLVM` and 13 with icu; the counts are printed
+because a `--cut` that matches nothing gives a zero delta that reads exactly
+like "this edge is free to carry".
+
+⛔ **AND IT CORROBORATES "SUBTRACTIVE CANNOT WIN" WITH A FRESH NUMBER.** On this
+bundle the sweep can prove only **6.3%** dead. The two rebuild edges above are
+worth **23.3%** — nearly four times what deletion can reach here, from two
+recipes out of the corpus's 24. ⭐ That is the entry's structural argument
+measured on our own bundle rather than read out of somebody's build script,
+which is what the previous revision said was missing.
+
+⚠ **What it does not say.** It is `mesa-demos`, not kdenlive — a different
+closure with a different ceiling, and the Qt and `ffmpeg→x265` edges are not in
+it and are not counted. The 7.5:1 ratio is carried from `experiments/90-` run 6
+and was **not** re-measured here, so the ~29 MiB is an estimate and the
+218.5 MiB is the measurement. ⚠ The kdenlive AppDir the entry wanted
+(`/var/tmp/pgb-appimage-kden`, 7 GB) still does not exist.
 
 ⭐ **And one more thing the sweep does that bounds any ceiling measured with
 it**: the soname string scan takes mentions from EVERY object in the bundle,
