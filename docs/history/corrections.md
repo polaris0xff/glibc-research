@@ -864,6 +864,47 @@ the ones C23 disclaims — `TODO/toolchain.md` T-066 owns it.
 
 ---
 
+## C25 — "a trace line containing ENOENT is the whole of a failed open"
+
+⛔ **The classifier that decides "zero host shared objects" counted FAILED
+opens as loads**, and the shape is `strace`'s, not the bundle's. A long call is
+split across two lines:
+
+```
+openat(AT_FDCWD, "/usr/lib/x86_64-linux-gnu/libGLX.so.1", O_RDONLY <unfinished ...>
+<... openat resumed>)                   = -1 ENOENT (No such file or directory)
+```
+
+The **path** is on the first line and the **result** on the second. Every copy
+of the classifier filtered with `!/ENOENT|= -1/`, which the first line
+satisfies — so the probe was recorded as an object the program had loaded.
+
+⭐ **Found by a disagreement, not by reading**, which is this tree's usual
+route: `experiments/64-` reported **2 host shared objects** for a galculator
+bundle on `alpine-3.22` — a musl image with no `/usr/lib/x86_64-linux-gnu` at
+all. Both entries were `libGLX.so.1` probes that returned ENOENT.
+
+⚠ **It surfaced only after T-081 lengthened the library path.** `copyLibraries`
+had carried nine named subdirectories of `lib/` and now carries every one, so
+`sharun --gen-lib-path` writes more entries, glibc tries each under
+`glibc-hwcaps/x86-64-v{4,3,2}`, and a run that made a few hundred failed opens
+now makes a few thousand — which is what made a split line likely.
+
+⭐ **THE ERROR ONLY EVER RUNS ONE WAY.** It can turn a clean row dirty; it can
+never turn a dirty row clean. So every committed **zero** stands, and this
+correction retracts no published verdict. ⛔ A committed **non-zero** may be
+inflated, and the claim at risk is named: `comparison.md` and `docs/AGENTS.md`
+§9 quote *"host objects 0 of 11 against 4 of 11"* for kdenlive, and that 4 is
+the competitor's count from `experiments/90-`.
+
+**The fix** is one implementation instead of nine: `experiments/lib.sh`'s
+`exp_classify_trace` pairs a split `openat` with its own `<... openat resumed>`
+line by pid and records the path only when the result is not an error.
+`experiments/64-` and `65-` use it. ⚠ The other seven copies carry a comment
+naming this correction and are converted and re-run by **T-084**.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

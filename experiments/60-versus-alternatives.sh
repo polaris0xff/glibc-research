@@ -380,6 +380,17 @@ printf '\n'
 #           two-libc hazard actually lives in;
 # tree    = every pid descended from the artefact, which is everything the
 #           machine was made to load in order to deliver it.
+#
+# ⚠ THE CLASSIFIER BELOW IS A HAND COPY AND IT CARRIES A KNOWN DEFECT.
+# 2026-09-03f: strace splits a long call across `openat(..., "path"
+# <unfinished ...>` and `<... openat resumed>) = -1 ENOENT`. The PATH is on
+# the first line and the RESULT on the second, so a filter that drops lines
+# containing ENOENT keeps the first half of a FAILED open and counts it as a
+# load. ⛔ THE ERROR ONLY RUNS ONE WAY -- it can turn a clean row dirty and
+# can never turn a dirty row clean -- so this experiment's committed ZEROS
+# stand; a committed NON-zero may be inflated. The corrected implementation is
+# `experiments/lib.sh`'s `exp_classify_trace`; converting this one and re-running
+# it is TODO T-084. docs/history/corrections.md.
 classify_trace() {
   awk -v want="$2" -v mode="$3" '
     { pid = $1 }

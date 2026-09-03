@@ -103,6 +103,30 @@ func AppImageSelftest(c *cfg.Config) *selftest.Report {
 	_, err = b.resolveEntry(pkgDir, "hostprog", true)
 	r.CheckBool("a HOST-interpreter shebang is refused, not adopted", err != nil, true)
 
+	// ⛔ A SCRIPT IS NOT A SHELL WRAPPER, and this is the defect that put
+	// PYTHON SOURCE in a bundle's .env. readShellWrapper scans for
+	// `key=value` lines and a Python script is full of them; `meld`'s
+	// `message_type=Gtk.MessageType.ERROR,` became an environment variable.
+	// The distinguishing property is the shebang naming a SHELL.
+	py := filepath.Join(dir, "pyscript")
+	_ = os.WriteFile(py, []byte("#!/nix/store/dddddddddddddddddddddddddddddddd-python3-3.14.7/bin/python3\n"+
+		"dialog = Gtk.MessageDialog(\n    message_type=Gtk.MessageType.ERROR,\n    buttons=Gtk.ButtonsType.CLOSE,\n)\n"), 0o755)
+	r.CheckInt("a PYTHON script yields no wrapper records", len(ReadWrapper(py)), 0)
+	sh2 := filepath.Join(dir, "envshell")
+	_ = os.WriteFile(sh2, []byte("#!/usr/bin/env bash\nexport FOO=/nix/store/cccccccccccccccccccccccccccccccc-qt/x\n"+
+		"exec /nix/store/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-real/bin/prog\n"), 0o755)
+	r.CheckBool("...but `env bash` still reads as one", len(ReadWrapper(sh2)) > 0, true)
+
+	// ⛔ ${SHARUN_DIR} MUST SURVIVE THE STORE-PATH REWRITE AS A LITERAL.
+	// See StoreRefToBundle: Go read it as a capture-group reference and
+	// deleted it, so a bundle's own .env named /store/... on every row.
+	r.Check("a lifted store path keeps ${SHARUN_DIR} as a literal",
+		StoreRefToBundle("/nix/store/cccccccccccccccccccccccccccccccc-qt-6.11.1/plugins"),
+		"${SHARUN_DIR}/store/qt-6.11.1/plugins")
+	r.Check("...on every element of a path list, and only on store paths",
+		StoreRefToBundle("/nix/store/cccccccccccccccccccccccccccccccc-a-1/x:/usr/share:/nix/store/dddddddddddddddddddddddddddddddd-b-2/y"),
+		"${SHARUN_DIR}/store/a-1/x:/usr/share:${SHARUN_DIR}/store/b-2/y")
+
 	// The wrapper reader, on both shapes.
 	shell := filepath.Join(dir, "shellwrap")
 	_ = os.WriteFile(shell, []byte("#!/bin/sh\nexport QT_PLUGIN_PATH='/nix/store/cccccccccccccccccccccccccccccccc-qt/plugins':$QT_PLUGIN_PATH\n"+

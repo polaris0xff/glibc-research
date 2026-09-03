@@ -73,3 +73,46 @@ reason.
 
 **Prove.** `evidence/STALE-EVIDENCE.txt` is empty of entries, and gate 10
 reports `0 pinned stale`.
+
+## T-084 — ⛔ the trace classifier is nine hand copies, and one of them was wrong
+
+**Source** ⭐ **found by a disagreement, 2026-09-03f**: `experiments/64-`
+reported **2 host shared objects** for a bundle running on `alpine-3.22` — a
+musl image with no `/usr/lib/x86_64-linux-gnu` at all.
+**Category** ci · **Priority** P1 · **Effort** M · **Status** open
+
+**Problem.** `strace` splits a long call across two lines:
+
+    openat(AT_FDCWD, "/usr/lib/…/libGLX.so.1", O_RDONLY <unfinished ...>
+    <... openat resumed>)                     = -1 ENOENT
+
+The **path** is on the first line and the **result** on the second. Every copy
+of the classifier filters with `!/ENOENT|= -1/`, which the first line
+satisfies — so a FAILED open is recorded as a loaded object.
+[`../docs/history/corrections.md`](../docs/history/corrections.md) C25 has the
+mechanism and the measurement.
+
+⭐ **THE ERROR ONLY RUNS ONE WAY.** It can turn a clean row dirty and can never
+turn a dirty row clean, so every committed **zero** stands. ⛔ A committed
+**non-zero** may be inflated, and the one that matters is named: the
+competitor's *"4 of 11"* in `docs/comparison.md` and `docs/AGENTS.md` §9, from
+`experiments/90-`.
+
+**What is left.** ⭐ **The corrected implementation already exists and is
+shared**: `experiments/lib.sh`'s `exp_classify_trace`, used by `64-` and `65-`.
+Seven experiments still carry a hand copy and each has a comment naming this
+entry: `60-`, `62-`, `77-`, `85-`, `86-`, `89-`, `90-`.
+
+1. convert each to `exp_classify_trace` — a deletion, not a rewrite;
+2. re-run them, and compare the host counts before and after. ⚠ `90-` and
+   `86-` build kdenlive-scale bundles, so this is the expensive half and it is
+   why the entry is M rather than S;
+3. if the competitor's count moves, `docs/comparison.md` and `docs/AGENTS.md`
+   §9 change with it.
+
+**Prove.** Every one of the seven re-run against the shared classifier, with
+the before/after host count for each printed side by side.
+
+⚠ **Do not "fix" this by widening the ENOENT filter.** The result is genuinely
+not on the line the path is on; pairing by pid is the only correct read, and a
+cleverer regular expression would be the same guess in a new place.

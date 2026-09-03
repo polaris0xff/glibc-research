@@ -180,26 +180,14 @@ reap_in_root() { # rootfs-path
   done
 }
 
-# ⭐ THE CLASSIFIER IS `experiments/62-`'s, DELIBERATELY. A bundle's trace must
-# NOT be attributed to one pid — uruntime forks, mounts and re-execs, so the
-# payload runs in a descendant — and a path is only a shared object if it ENDS
-# in .so or .so.N, because /etc/ld.so.cache is an index. Both rules are
-# docs/AGENTS.md §14 and both were defects here once.
-classify_trace() {  # tracefile /artefact
-  awk -v want="$2" '
-    { pid = $1 }
-    $0 ~ ("execve\\(\"" want "\"") { inset[pid] = 1; next }
-    ($0 ~ /(clone|clone3|vfork|fork)\(/ || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) \
-      && /= [0-9]+$/ { if (inset[pid]) inset[$NF] = 1; next }
-    inset[pid] && /open(at)?\(/ && !/ENOENT|= -1/ {
-      if (match($0, /"[^"]*"/) == 0) next
-      p = substr($0, RSTART + 1, RLENGTH - 2)
-      if (p !~ /\.so(\.[0-9]+)*$/) next
-      if (p ~ /^\/(usr\/)?(local\/)?lib(32|64)?\//) print "host " p
-      else print "bundled " p
-    }
-  ' "$1" | sort -u
-}
+# ⭐ THE CLASSIFIER IS experiments/lib.sh's `exp_classify_trace`, NOT A COPY.
+# ⛔ Nine experiments carried the same awk by hand and they could not be
+# corrected together: 2026-09-03f found that a split `openat( ... <unfinished
+# ...>` carries the PATH and no result, so a filter dropping lines that contain
+# ENOENT keeps the first half of a FAILED open and counts it as a load. A
+# galculator bundle read 2 host shared objects on alpine-3.22 and both were
+# ENOENT probes. One implementation is what stops that from having to be found
+# nine times. docs/history/corrections.md.
 
 ENVS=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt")
 
@@ -258,7 +246,7 @@ for name in $ENVS; do
   reap_in_root "$root"
   rm -f "$root/subj64"
 
-  cls=$(classify_trace "$tr" /subj64)
+  cls=$(exp_classify_trace "$tr" /subj64)
   nhost=$(printf '%s\n' "$cls" | grep -c '^host ' || true)
   nbund=$(printf '%s\n' "$cls" | grep -c '^bundled ' || true)
   hasgtk=$(printf '%s\n' "$cls" | grep -c '^bundled .*libgtk-3' || true)

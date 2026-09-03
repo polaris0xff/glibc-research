@@ -86,6 +86,7 @@ func FlagsSelftest() *selftest.Report {
 		// PGB_OPT_* would otherwise make this selftest measure that session.
 		c.UseIconv, c.EmbedLocale, c.EmbedCacert, c.EmbedTerminfo = true, false, false, false
 		c.EmbedTzdata = false
+		c.EmbedNetdb = false
 		c.HostDlopen, c.WrapDlopen, c.TLSReserve = false, nil, 0
 		return c
 	}
@@ -161,6 +162,7 @@ func FlagsSelftest() *selftest.Report {
 	for _, a := range []axis{
 		{"--embed-terminfo", func(c *cfg.Config) { c.EmbedTerminfo = true }, "pgb-terminfo.o"},
 		{"--embed-tzdata", func(c *cfg.Config) { c.EmbedTzdata = true }, "pgb-tzdata.o"},
+		{"--embed-netdb", func(c *cfg.Config) { c.EmbedNetdb = true }, "pgb-netdb.o"},
 		{"--embed-cacert", func(c *cfg.Config) { c.EmbedCacert = true }, "pgb-cacert.o"},
 		{"--embed-locale", func(c *cfg.Config) { c.EmbedLocale = true }, "pgb-locale.o"},
 		{"--wrap-dlopen", func(c *cfg.Config) { c.WrapDlopen = []string{"p=x.o"} }, "--wrap=dlsym"},
@@ -346,6 +348,7 @@ func FlagsSelftest() *selftest.Report {
 	r.Check("cxx-candidates: a source file is not an input to this scan",
 		cand("main.c", "other.cpp"), "")
 
+	NetdbParseSelftest(r)
 	return r
 }
 
@@ -359,3 +362,57 @@ func quote(s string) string {
 
 // firstOf turns the detector's (input, symbol) pair into one comparable value.
 func firstOf(a, _ string) string { return a }
+
+// NetdbParseSelftest exercises the two file parsers offline.
+//
+// ⛔ WHY THEY ARE ASSERTED RATHER THAN READ. `/etc/services` is a text format
+// with three shapes that all look alike — a comment on its own line, a comment
+// at the end of a real line, and an entry with aliases — and the third is the
+// one that decides whether `getservbyname("www","tcp")` answers. A parser that
+// dropped aliases would produce a table that is right about `http` and wrong
+// about `www`, which no build-time check would notice.
+func NetdbParseSelftest(r *selftest.Report) {
+	const services = `# a comment line
+http		80/tcp		www www-http	# WorldWideWeb HTTP
+https		443/tcp
+domain		53/udp
+notaport	xx/tcp
+short
+`
+	svc := ParseServices(services)
+	find := func(name, proto string) int {
+		for _, e := range svc {
+			if e.name == name && e.proto == proto {
+				return e.port
+			}
+		}
+		return -1
+	}
+	r.CheckInt("a plain entry parses", find("http", "tcp"), 80)
+	r.CheckInt("⭐ an ALIAS becomes an entry of its own", find("www", "tcp"), 80)
+	r.CheckInt("...and so does the second alias", find("www-http", "tcp"), 80)
+	r.CheckInt("the protocol is part of the key", find("domain", "udp"), 53)
+	r.CheckInt("...so the same name under another protocol is absent",
+		find("domain", "tcp"), -1)
+	r.CheckInt("a non-numeric port is skipped, not zero", find("notaport", "tcp"), -1)
+	r.CheckInt("a line with one field is skipped", len(ParseServices("short\n")), 0)
+	r.CheckInt("a comment-only file yields nothing", len(ParseServices("# x\n#y\n")), 0)
+
+	const protocols = `# comment
+ip	0	IP		# internet protocol
+tcp	6	TCP
+notanumber	zz
+`
+	pro := ParseProtocols(protocols)
+	num := func(name string) int {
+		for _, e := range pro {
+			if e.name == name {
+				return e.number
+			}
+		}
+		return -1
+	}
+	r.CheckInt("a protocol parses", num("tcp"), 6)
+	r.CheckInt("⭐ its ALIAS parses too", num("IP"), 0)
+	r.CheckInt("a non-numeric protocol number is skipped", num("notanumber"), -1)
+}

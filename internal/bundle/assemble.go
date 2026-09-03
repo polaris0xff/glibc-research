@@ -69,7 +69,12 @@ func (b *Builder) assemble() error {
 	extra := 0
 	if entries, err := os.ReadDir(filepath.Join(entryDir, "bin")); err == nil {
 		for _, e := range entries {
-			if e.IsDir() || e.Name() == b.Prog {
+			// ⚠ A DOT-NAMED FILE IN bin/ IS NOT A PROGRAM. `.meld-wrapped` is
+			// the target a makeBinaryWrapper execs, and installing it as a
+			// second program gave the bundle two entry points for one
+			// application — and, once a script could resolve, a second static
+			// trampoline and a second copy of the script.
+			if e.IsDir() || e.Name() == b.Prog || strings.HasPrefix(e.Name(), ".") {
 				continue
 			}
 			r, err := b.resolveEntry(entryDir, e.Name(), false)

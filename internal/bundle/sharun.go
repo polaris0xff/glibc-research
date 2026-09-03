@@ -170,6 +170,29 @@ func bakedOverride(storeName, sub string) []string {
 
 var storeRefWithSub = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[A-Za-z0-9._+-]+/[A-Za-z0-9._+/-]*`)
 
+// storeRefName matches a store path down to its name, which is the directory
+// the bundle's own store farm answers under.
+var storeRefName = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-([^/:; ]*)`)
+
+// StoreRefToBundle turns every store path in a value into the bundle-relative
+// one, keeping ${SHARUN_DIR} as a LITERAL.
+//
+// ⛔ THIS WAS ONE CALL TO ReplaceAllString AND IT WAS SILENTLY WRONG.
+// Go's Expand reads `${SHARUN_DIR}` in a replacement template as a reference
+// to a capture group named SHARUN_DIR; this pattern has no such group, so it
+// expanded to NOTHING and every lifted variable named an absolute `/store/...`
+// that exists on no machine. Measured on the meld bundle: XDG_DATA_DIRS,
+// GI_TYPELIB_PATH, GIO_EXTRA_MODULES, PATH and GDK_PIXBUF_MODULE_FILE all
+// pointed there. ⚠ Nothing caught it because no check reads a variable's
+// VALUE against the bundle — `integrity()` walks DT_NEEDED and
+// `manifestIntegrity()` reads the ICD manifests.
+func StoreRefToBundle(v string) string {
+	return storeRefName.ReplaceAllStringFunc(v, func(m string) string {
+		g := storeRefName.FindStringSubmatch(m)
+		return "${SHARUN_DIR}/store/" + g[1]
+	})
+}
+
 // writeEnv writes .env: the paths sharun needs, the environment lifted out of
 // a nixpkgs wrapper, and the overrides for directories a program had compiled
 // in. Every path is set only if the bundle actually has it.
@@ -232,15 +255,10 @@ func (b *Builder) writeEnv() error {
 // lines with the same semantics, copying the directory each value names.
 //
 // The SUBDIRECTORY the variable names is copied, not the whole package: a
-// value like QT_PLUGIN_PATH names one directory, and copying the entire store
-// path for it duplicates shared objects the bundle has already flattened into
-// its own lib/.
+// value like QT_PLUGIN_PATH names one directory, and the bundle already holds
+// what it names — flattened into lib/ and merged into share/.
 func (b *Builder) liftWrapperEnv() []string {
 	if len(b.wrapEnv) == 0 {
-		return nil
-	}
-	storeDir := filepath.Join(b.AppDir, "store")
-	if err := os.MkdirAll(storeDir, 0o755); err != nil {
 		return nil
 	}
 	refs := map[string]bool{}
@@ -257,43 +275,43 @@ func (b *Builder) liftWrapperEnv() []string {
 		sorted = append(sorted, r)
 	}
 	sortStrings(sorted)
+	// ⛔ THE SUBTREE IS NO LONGER COPIED HERE, AND THAT IS A FIX RATHER THAN A
+	// SAVING. This used to materialise `store/<name>/<sub>` per variable. Once
+	// storefix.go's farm gave every store path in the closure a directory,
+	// the two collided: `liftWrapperEnv` created `store/glib-2.88.3/lib`
+	// holding ONLY `girepository-1.0`, so the farm could not put a symlink
+	// there, and `store/glib-2.88.3/lib/libgobject-2.0.so.0` — which the
+	// typelib names — did not exist. Measured on the meld bundle: every
+	// gi.repository import failed with `cannot open shared object file`.
+	// ⭐ The farm answers the whole store path now, so what is left here is
+	// the FETCH: a wrapper can name a store path the closure does not carry.
 	for _, ref := range sorted {
-		rest := strings.TrimPrefix(ref, "/nix/store/")
-		base, sub, _ := strings.Cut(rest, "/")
-		short := base
-		if len(short) > 33 {
-			short = short[33:]
-		}
+		base, _, _ := strings.Cut(strings.TrimPrefix(ref, "/nix/store/"), "/")
 		if _, err := os.Stat(filepath.Join(b.Root, base)); err != nil {
 			if _, ferr := b.Nix.Fetch("/nix/store/"+base, nixx.FetchOptions{Out: b.Root, WithClosure: true}); ferr != nil {
 				logx.Warnf("wrapper env names %s, which is not in the closure and could not be fetched", base)
-				continue
 			}
-		}
-		if sub != "" {
-			src := filepath.Join(b.Root, base, sub)
-			if _, err := os.Stat(src); err == nil {
-				dst := filepath.Join(storeDir, short, sub)
-				if _, err := os.Stat(dst); err != nil {
-					_ = os.MkdirAll(filepath.Dir(dst), 0o755)
-					_ = copyTreeNoClobber(src, dst)
-				}
-				continue
-			}
-		}
-		dst := filepath.Join(storeDir, short)
-		if _, err := os.Stat(dst); err != nil {
-			_ = copyTreeNoClobber(filepath.Join(b.Root, base), dst)
 		}
 	}
 
-	rewrite := regexp.MustCompile(`/nix/store/[a-z0-9]{32}-([^/:; ]*)`)
+	// ⛔ `${SHARUN_DIR}` IN A GO REPLACEMENT TEMPLATE IS A CAPTURE-GROUP
+	// REFERENCE, NOT A LITERAL, and this line read
+	// `ReplaceAllString(v, "${SHARUN_DIR}/store/$1")`. Go's Expand treats
+	// `${name}` as the group called `name`; this regexp has no group called
+	// SHARUN_DIR, so it expanded to NOTHING and every lifted variable named an
+	// absolute `/store/...` path that exists on no machine. Measured on the
+	// meld bundle: XDG_DATA_DIRS, GI_TYPELIB_PATH, GIO_EXTRA_MODULES, PATH and
+	// GDK_PIXBUF_MODULE_FILE all pointed at `/store/...`. ⚠ It was silent
+	// because nothing checks a variable's value against the bundle — the
+	// checks read DT_NEEDED and the ICD manifests.
+	// ⭐ ReplaceAllStringFunc does no template expansion at all, which is why
+	// it is used instead of escaping the `$`.
 	var out []string
 	for _, r := range b.wrapEnv {
 		if r.Var == "" {
 			continue
 		}
-		v := rewrite.ReplaceAllString(r.Value, "${SHARUN_DIR}/store/$1")
+		v := StoreRefToBundle(r.Value)
 		sep := r.Sep
 		if sep == "" {
 			sep = ":"
@@ -377,15 +395,12 @@ func (b *Builder) carryBakedPaths() []string {
 		if len(lines) == 0 {
 			continue
 		}
-		dst := filepath.Join(b.AppDir, "store", short, sub)
-		if _, err := os.Stat(dst); err != nil {
-			if err := os.MkdirAll(filepath.Dir(dst), 0o755); err != nil {
-				continue
-			}
-			if err := copyTreeNoClobber(src, dst); err != nil {
-				continue
-			}
-		}
+		// ⛔ NOT COPIED HERE EITHER, same reason: `copyLibraries` now carries
+		// every directory under a store path's lib/ and `copyClosureTrees`
+		// merges every share/, so the tree this variable names is already in
+		// the bundle and storefix.go's farm is what makes the path reach it.
+		// A second copy under store/<name>/ both duplicated the data and
+		// blocked the farm's symlink.
 		out = append(out, lines...)
 		for _, l := range lines {
 			name, _, _ := strings.Cut(l, "=")

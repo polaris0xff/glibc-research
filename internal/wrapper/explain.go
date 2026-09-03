@@ -112,6 +112,15 @@ LINK FLAGS
                                  name asked for, at a UTC offset. T-076
 `)
 	}
+	if c.EmbedNetdb {
+		w.WriteString(`  -Wl,--wrap=getservbyname...    /etc/services and /etc/protocols, carried
+  <pgb-netdb.o>                  from the build environment and consulted ONLY
+  <pgb-netdb-data.o>             when the host's own file did not answer.
+                                 getservbyname("http","tcp") returns NULL on
+                                 3 of the 11 targets -- debian-11, debian-12
+                                 and ubuntu-20.04, ALL GLIBC. T-079
+`)
+	}
 	if c.EmbedLocale {
 		w.WriteString(`  -Wl,--wrap=setlocale           embedded C.UTF-8, materialised ONLY when the
   <pgb-locale-data.o>            host cannot answer a UTF-8 setlocale. A

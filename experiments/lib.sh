@@ -245,6 +245,60 @@ exp_trace_libs() {   # rootfs in-root-path tracefile [extra args...]
     | tr -d '"' | sort -u
 }
 
+# exp_classify_trace reads a `strace -f` transcript and says which shared
+# objects the ARTEFACT loaded, split into host and bundled.
+#
+# ⛔ THREE RULES, AND EVERY ONE OF THEM WAS A DEFECT HERE FIRST.
+#
+#  1. ⛔ NOT ONE PID. uruntime forks, mounts and re-execs, so the payload runs
+#     in a descendant. The fork family has to be followed through BOTH halves
+#     of a split call: strace writes `clone( <unfinished ...>` and
+#     `<... clone resumed>) = 1234`, and the pid is only on the second.
+#     experiments/62- carries what missing that cost.
+#  2. ⛔ A SHARED OBJECT ENDS IN `.so` OR `.so.N`. `/etc/ld.so.cache` is an
+#     index, not an object, and matching `.so` as a substring counts it.
+#  3. ⭐ AN `openat` CAN BE SPLIT TOO, AND THIS ONE IS NEW — 2026-09-03f.
+#     `openat(..., "path" <unfinished ...>` carries the PATH and no result;
+#     `<... openat resumed>) = -1 ENOENT` carries the result and no path. A
+#     filter that drops lines containing `ENOENT` therefore keeps the first
+#     half of a FAILED open and counts it as a load. ⚠ Measured: a galculator
+#     bundle on alpine-3.22 reported 2 host shared objects, and both were
+#     `libGLX.so.1` probes that returned ENOENT on the resumed line.
+#     ⛔ The error only ever runs one way — it can turn a clean row dirty and
+#     can never turn a dirty row clean — so a committed ZERO is unaffected by
+#     it. A committed NON-zero may be inflated. docs/history/corrections.md.
+#
+# Usage: exp_classify_trace <tracefile> <in-root artefact path>
+exp_classify_trace() {
+  awk -v want="$2" '
+    function record(p) {
+      if (p !~ /\.so(\.[0-9]+)*$/) return
+      if (p ~ /^\/(usr\/)?(local\/)?lib(32|64)?\//) out["host " p] = 1
+      else out["bundled " p] = 1
+    }
+    { pid = $1 }
+    $0 ~ ("execve\\(\"" want "\"") { inset[pid] = 1; next }
+    ($0 ~ /(clone|clone3|vfork|fork)\(/ || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) \
+      && /= [0-9]+$/ { if (inset[pid]) inset[$NF] = 1; next }
+    /open(at)?\(/ && /<unfinished \.\.\.>/ {
+      if (!inset[pid]) next
+      if (match($0, /"[^"]*"/) == 0) next
+      pending[pid] = substr($0, RSTART + 1, RLENGTH - 2)
+      next
+    }
+    /<\.\.\. open(at)? resumed>/ {
+      if (inset[pid] && pending[pid] != "" && $0 !~ /= -1/) record(pending[pid])
+      delete pending[pid]
+      next
+    }
+    inset[pid] && /open(at)?\(/ && !/ENOENT|= -1/ {
+      if (match($0, /"[^"]*"/) == 0) next
+      record(substr($0, RSTART + 1, RLENGTH - 2))
+    }
+    END { for (k in out) print k }
+  ' "$1" | sort -u
+}
+
 exp_finish() {
   printf '\n'
   printf -- '-- result ----------------------------------------------------\n'

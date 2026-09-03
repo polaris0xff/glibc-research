@@ -165,6 +165,20 @@ func readShellWrapper(path string) []WrapRecord {
 	if !bytes.HasPrefix(b, []byte("#!")) {
 		return nil
 	}
+	// ⛔ A SHEBANG IS NOT A SHELL WRAPPER, AND TREATING IT AS ONE PUT PYTHON
+	// SOURCE IN A BUNDLE'S .env. This function scans for `key=value` lines,
+	// and a Python script is full of them — `meld`'s
+	//
+	//     message_type=Gtk.MessageType.ERROR,
+	//     buttons=Gtk.ButtonsType.CLOSE,
+	//
+	// were lifted into the bundle's environment as variables. ⚠ It surfaced
+	// the moment a script could be an entry point at all (T-081), and the fix
+	// is to check the property that actually distinguishes the two: a shell
+	// wrapper's shebang names a SHELL.
+	if !shebangIsShell(b) {
+		return nil
+	}
 	var recs []WrapRecord
 	target := ""
 	for line := range strings.SplitSeq(string(b), "\n") {
@@ -279,4 +293,33 @@ func WrapperTarget(recs []WrapRecord) string {
 		}
 	}
 	return ""
+}
+
+// shells are the interpreters a nixpkgs `makeWrapper` script can name. A
+// wrapper is a shell script by construction: makeWrapper writes `#!` plus the
+// store path of bash (or sh), and nothing else it emits is a wrapper.
+var shells = map[string]bool{
+	"sh": true, "bash": true, "dash": true, "ash": true,
+	"ksh": true, "zsh": true, "busybox": true,
+}
+
+// shebangIsShell reports whether a file's first line names one of them,
+// including the `env <shell>` form.
+func shebangIsShell(b []byte) bool {
+	line, _, _ := bytes.Cut(b, []byte("\n"))
+	words := strings.Fields(strings.TrimPrefix(string(line), "#!"))
+	if len(words) == 0 {
+		return false
+	}
+	name := words[0]
+	if i := strings.LastIndexByte(name, '/'); i >= 0 {
+		name = name[i+1:]
+	}
+	if name == "env" && len(words) > 1 {
+		name = words[1]
+		if i := strings.LastIndexByte(name, '/'); i >= 0 {
+			name = name[i+1:]
+		}
+	}
+	return shells[name]
 }

@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 56  OPEN 18  DONE 38
+    TOTAL 57  OPEN 19  DONE 38
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 7 | 1 | 6 |
-| P1 | a documented capability does not work, or a flag does nothing | 38 | 10 | 28 |
+| P1 | a documented capability does not work, or a flag does nothing | 39 | 11 | 28 |
 | P2 | worth doing; nothing is wrong without it | 11 | 7 | 4 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -73,6 +73,7 @@ pretending to be one.
 | T-081 | P1 | L | open | toolchain | ⛔ The debloater/patcher — MEASURED as what stops a bundled GUI from drawing |
 | T-082 | P2 | XL | open | toolchain | Vendor and patch the third-party runtime and tooling, with drift detection |
 | T-083 | P2 | M | open | toolchain | Native desktop integration: our bundles as ordinary AppImages |
+| T-084 | P1 | M | open | ci | ⛔ The trace classifier is nine hand copies, and one of them counted FAILED opens as loads |
 
 ## The argument behind the ordering
 

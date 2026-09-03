@@ -33,7 +33,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/polaris0xff/glibc-research/internal/elfx"
 	"github.com/polaris0xff/glibc-research/internal/logx"
 	"github.com/polaris0xff/glibc-research/internal/proc"
 )
@@ -324,29 +323,32 @@ func (b *Builder) checkStorefixABI(so string) error {
 	if err != nil {
 		return err
 	}
-	libs := map[string][]byte{}
+	defined := map[string]map[string]bool{}
+	versions := map[string]map[string]bool{}
 	var missing, tooNew []string
 	for _, sym := range imports {
 		lib := sym.Library
 		if lib == "" {
 			continue
 		}
-		data, ok := libs[lib]
-		if !ok {
+		if _, ok := defined[lib]; !ok {
 			p := filepath.Join(b.AppDir, "lib", lib)
-			names, derr := elfx.DefinedExternalSymbols(p)
+			// ⛔ .dynsym, NOT .symtab. `elfx.DefinedExternalSymbols` reads
+			// `.symtab`, which is what an ARCHIVE has; a shipped libc.so.6 is
+			// stripped and exports through `.dynsym` alone, so that reader
+			// reported glibc as defining neither `dlsym` nor `fclose` and this
+			// check refused every bundle it was asked about.
+			d, v, derr := definedDynamic(p)
 			if derr != nil {
 				return fmt.Errorf("the bundle has no readable %s: %v", lib, derr)
 			}
-			data = []byte(strings.Join(names, "\n") + "\n")
-			libs[lib] = data
-			libs[lib+"\x00versions"] = versionStrings(p)
+			defined[lib], versions[lib] = d, v
 		}
-		if !containsLine(libs[lib], sym.Name) {
+		if !defined[lib][sym.Name] {
 			missing = append(missing, sym.Name+" ("+lib+")")
 			continue
 		}
-		if sym.Version != "" && !containsLine(libs[lib+"\x00versions"], sym.Version) {
+		if sym.Version != "" && !versions[lib][sym.Version] {
 			tooNew = append(tooNew, sym.Name+"@"+sym.Version+" ("+lib+")")
 		}
 	}
@@ -364,40 +366,41 @@ func (b *Builder) checkStorefixABI(so string) error {
 		strings.Join(tooNew, ", "))
 }
 
-// versionStrings returns the symbol-version names a library defines, one per
-// line. glibc writes them into .dynstr, which is where a `GLIBC_2.41` a
-// caller asks for has to be found.
-func versionStrings(path string) []byte {
+// definedDynamic reads what a SHARED OBJECT exports: the names in .dynsym that
+// are defined here, and the symbol-version names it declares.
+//
+// ⚠ The version names live in .dynstr. A caller asking for `dlsym@GLIBC_2.34`
+// is satisfied only if the library declares that version, which is exactly the
+// check that catches a build host whose glibc is newer than the closure's.
+func definedDynamic(path string) (names, vers map[string]bool, err error) {
 	f, err := elf.Open(path)
 	if err != nil {
-		return nil
+		return nil, nil, err
 	}
 	defer f.Close()
-	sec := f.Section(".dynstr")
-	if sec == nil {
-		return nil
-	}
-	data, err := sec.Data()
+	syms, err := f.DynamicSymbols()
 	if err != nil {
-		return nil
+		return nil, nil, err
 	}
-	var out strings.Builder
-	for _, s := range strings.Split(string(data), "\x00") {
-		if strings.HasPrefix(s, "GLIBC_") || strings.HasPrefix(s, "GCC_") {
-			out.WriteString(s)
-			out.WriteByte('\n')
+	names = map[string]bool{}
+	for _, s := range syms {
+		if s.Section == elf.SHN_UNDEF || s.Name == "" {
+			continue
+		}
+		names[s.Name] = true
+	}
+	vers = map[string]bool{}
+	if sec := f.Section(".dynstr"); sec != nil {
+		if data, derr := sec.Data(); derr == nil {
+			for _, s := range strings.Split(string(data), "\x00") {
+				if strings.HasPrefix(s, "GLIBC_") || strings.HasPrefix(s, "GCC_") ||
+					strings.HasPrefix(s, "GLIBCXX_") || strings.HasPrefix(s, "CXXABI_") {
+					vers[s] = true
+				}
+			}
 		}
 	}
-	return []byte(out.String())
-}
-
-func containsLine(hay []byte, want string) bool {
-	for _, l := range strings.Split(string(hay), "\n") {
-		if l == want {
-			return true
-		}
-	}
-	return false
+	return names, vers, nil
 }
 
 // preloadNames reads .preload, which is sharun's own mechanism: the objects it

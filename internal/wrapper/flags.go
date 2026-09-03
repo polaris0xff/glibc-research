@@ -95,6 +95,17 @@ func LinkFlags(c *cfg.Config, rd string, cxx bool) []string {
 		out = append(out, "-Wl,-u,pgb_tzdata_anchor",
 			filepath.Join(rd, "pgb-tzdata.o"), filepath.Join(rd, "pgb-tzdata-data.o"))
 	}
+	// ⚠ --wrap, NOT AN ANCHOR, and the difference is which question the
+	// mechanism answers. tzdata and terminfo POINT a search variable at
+	// carried data before main() runs; there is no TZDIR for /etc/services, so
+	// this one has to intercept the CALL. Same shape as --embed-locale.
+	if c.EmbedNetdb {
+		out = append(out, "-Wl,--wrap=getservbyname,--wrap=getservbyport,"+
+			"--wrap=getprotobyname,--wrap=getprotobynumber,"+
+			"--wrap=getservbyname_r,--wrap=getservbyport_r,"+
+			"--wrap=getprotobyname_r,--wrap=getprotobynumber_r",
+			filepath.Join(rd, "pgb-netdb.o"), filepath.Join(rd, "pgb-netdb-data.o"))
+	}
 	if len(c.WrapDlopen) > 0 {
 		if _, err := os.Stat(filepath.Join(rd, "pgb-dlopen-table.o")); err == nil {
 			out = append(out, "-Wl,--wrap=dlopen,--wrap=dlsym,--wrap=dlclose,--wrap=dlerror",

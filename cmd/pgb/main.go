@@ -64,6 +64,10 @@ OPTIONS (build)
                              and carry a copy for hosts that have none
   --embed-terminfo           carry a handful of terminal descriptions, used
                              only when the host cannot describe $TERM
+  --embed-netdb              carry /etc/services and /etc/protocols, used only
+                             where the host has neither. getservbyname("http",
+                             "tcp") answers NULL on 3 of the 11 targets, all
+                             glibc
   --embed-tzdata             carry a handful of timezone descriptions, used
                              only when the host has no zone database. Without
                              it, four of the eleven answer TZ=Europe/Berlin
@@ -186,6 +190,8 @@ func (p *parser) option(a string) (bool, error) {
 		p.c.EmbedCacert = true
 	case "--embed-terminfo":
 		p.c.EmbedTerminfo = true
+	case "--embed-netdb":
+		p.c.EmbedNetdb = true
 	case "--embed-tzdata":
 		p.c.EmbedTzdata = true
 	case "--no-iconv":

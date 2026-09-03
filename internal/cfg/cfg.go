@@ -116,6 +116,7 @@ type Config struct {
 	EmbedCacert   bool
 	EmbedTerminfo bool
 	EmbedTzdata   bool
+	EmbedNetdb    bool
 	UseIconv      bool
 	ArchBaseline  string
 	ExtraBinds    []string
@@ -156,6 +157,7 @@ func Load(self string) *Config {
 		EmbedCacert:   logx.EnvBool("PGB_OPT_EMBED_CACERT", false),
 		EmbedTerminfo: logx.EnvBool("PGB_OPT_EMBED_TERMINFO", false),
 		EmbedTzdata:   logx.EnvBool("PGB_OPT_EMBED_TZDATA", false),
+		EmbedNetdb:    logx.EnvBool("PGB_OPT_EMBED_NETDB", false),
 		UseIconv:      logx.EnvBool("PGB_OPT_USE_ICONV", true),
 		ArchBaseline:  os.Getenv("PGB_OPT_BASELINE"),
 		ExtraBinds:    strings.Fields(os.Getenv("PGB_OPT_BINDS")),
@@ -185,7 +187,7 @@ func Load(self string) *Config {
 // list, so the exporter and the container argument builder cannot drift.
 var OptVars = []string{
 	"PGB_OPT_VERBOSE", "PGB_OPT_EMBED_LOCALE", "PGB_OPT_EMBED_CACERT",
-	"PGB_OPT_EMBED_TERMINFO", "PGB_OPT_EMBED_TZDATA",
+	"PGB_OPT_EMBED_TERMINFO", "PGB_OPT_EMBED_TZDATA", "PGB_OPT_EMBED_NETDB",
 	"PGB_OPT_USE_ICONV", "PGB_OPT_BASELINE",
 	"PGB_OPT_BINDS", "PGB_OPT_WRAP_DLOPEN", "PGB_OPT_HOST_DLOPEN",
 	"PGB_OPT_TLS_RESERVE",
@@ -202,6 +204,7 @@ func (c *Config) Export() {
 	set("PGB_OPT_EMBED_CACERT", bit(c.EmbedCacert))
 	set("PGB_OPT_EMBED_TERMINFO", bit(c.EmbedTerminfo))
 	set("PGB_OPT_EMBED_TZDATA", bit(c.EmbedTzdata))
+	set("PGB_OPT_EMBED_NETDB", bit(c.EmbedNetdb))
 	set("PGB_OPT_USE_ICONV", bit(c.UseIconv))
 	set("PGB_OPT_BASELINE", c.ArchBaseline)
 	set("PGB_OPT_BINDS", strings.Join(c.ExtraBinds, " "))
