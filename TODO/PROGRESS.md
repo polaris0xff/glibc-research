@@ -55,17 +55,19 @@ Quoted, because the framing is load-bearing:
 > impossible, pivot to kdenlive.nixappimage, but it must be smaller, load
 > faster, run faster than pkgforge-dev/kdenlive-AppImage-Enhanced."*
 
-| goal | entries | where it stands |
+| goal | entries | where it stands after 2026-09-03c |
 |---|---|---|
-| 1. the builder | T-050 ✅, T-051, T-060, T-012 | unchanged this session |
-| 2. the bundler | T-057 ⚠, T-052 ✅, T-053 ✅, T-066, T-071 | unchanged this session; ⛔ **the size gap is structural** |
-| 3. kdenlive | T-054, T-055 | unchanged this session. ⛔ **The bar is NOT met**: 2.22× the size |
+| 1. the builder | T-050 ✅, T-051, T-060, T-012 | ⭐ **T-060 rung 1's premise measured**: the components are not index attributes, `nix` itself is an aggregator, and the transitive `.drv` walk **already exists** (`pgb nix cache closure`, 2,000 paths / 1,665 derivations). It is blocked on **building** them, not on a tool |
+| 2. the bundler | T-057 ⚠, T-052 ✅, T-053 ✅, T-066, T-071 | ⭐ **T-066 moved on both routes**: route B costed (161 of 676 on kdenlive, 8 of 111 on mesa-demos) and route A **measured dead at path granularity** (0 of jq's 7 store paths). The fixpoint lever landed as a measuring device and is **additive** with the cut lever. ⚠ T-057's "no 32-bit path" was **stale** — `lib32` is implemented; the measurement is what is missing |
+| 3. kdenlive | T-054, T-055 | ⭐ **rung 4's direct demand measured**: 13 buildInputs, and rung 3 is **two** of them, not a framework set. qtbase 6.11.1 is already proved at exactly the version kdenlive wants. ⛔ **The bar is still NOT met**: 2.22× the size |
 
-⚠ **This session worked the top of the work order, which is glibc's remaining
-quirks and future-proofing — not the three goals.** That is the ordering
-`INDEX.md` argues for and it is deliberate.
+⚠ **The session of 2026-09-03b worked the top of the work order — glibc's
+remaining quirks and future-proofing — not the three goals.** ⭐ **2026-09-03c
+cleared that session's debt and then reached all three**, because the debt items
+led straight into them: R3 found the toolchain defect, and T-066's route
+costing was the next thing on the order.
 
-## What this session did
+## What the session of 2026-09-03b did — ⚠ THE PREVIOUS SESSION, kept because its findings stand
 
 ⭐ **The operator supplied a review of `pkgforge-dev/cross-libc-dlopen#28` /
 PR 30 with four items, in order. All four are done, and three of them turned up
