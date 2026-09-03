@@ -91,6 +91,35 @@
 #       timezone, LEVEL on payload and runs, and LEVEL-AND-BOTH-FAILING on
 #       services. I do not expect any axis where M beats P.
 #
+# -- ⛔ WHAT ACTUALLY HAPPENED, and two of the seven were wrong ---------------
+#
+# ⭐ THE PREDICTIONS ABOVE ARE LEFT EXACTLY AS THEY WERE WRITTEN. This block
+# is added beside them, because a pre-registration that gets edited after the
+# run is not one.
+#
+#   Q1  ⚠ SCORED AGAINST THE WRONG NUMBER, by this script's own defect. The
+#       per-axis fork is what makes a crash survivable, so the PARENT always
+#       exits 0 — and the counter was reading the parent's status. It
+#       reported "crashed = 0" for the vanilla arm on a run whose rows read
+#       `nss=SIG8`, `hostid=SIG8` and `iconv=SIG6`. Counting dead AXES
+#       instead: vanilla 5 of 11, pgb 0, musl 0. ⭐ The prediction was right;
+#       the instrument was not.
+#   Q3  ⛔ FALSIFIED ON BOTH HALVES, and this is the one row where NATIVE
+#       MUSL BEATS BOTH GLIBC COLUMNS. With no LANG set, musl answers UTF-8
+#       on 11 of 11 and every glibc arm — pgb included — answers
+#       ANSI_X3.4-1968 on 11 of 11. musl's minimal locale support does not
+#       mean a poor codeset: its default charset IS UTF-8. Asked for
+#       C.UTF-8 BY NAME, pgb answers UTF-8 on 11 of 11 and vanilla on 7.
+#   Q7  ⛔ THEREFORE WRONG AS STATED: there IS an axis where M beats P, and
+#       it is the environment-default codeset. The parity claim holds on
+#       every other axis measured here and not on that one.
+#
+# ⚠ A THIRD DEFECT, and it is why `TWO RUNS OR IT IS NOT A NUMBER` is a rule:
+# the UTF-8 counter globbed the whole output line, so adding the `locreq`
+# axis put a second `UTF-8` on it and the glibc arms went 0 -> 7 and pgb
+# 0 -> 11 between two runs with no change to the subject. Tokens are now
+# extracted by name. The zeros were the true reading.
+#
 # Exit: 0 measured and matched, 1 measured and did not, 2 could not run.
 set -u
 . "$(cd "$(dirname "$0")" && pwd)/lib.sh"
@@ -163,10 +192,27 @@ static void a_iconv(void) {
   }
   printf(" iconv=%d/%d", ok, NENC);
 }
+/* ⭐ TWO LOCALE AXES, AND THE FIRST ONE IS THE ONE WE LOSE.
+
+   `locale`  asks for the ENVIRONMENT's locale — setlocale(LC_ALL, "") with no
+             LANG set, which is what a program run from a bare container gets.
+   `locreq`  asks for C.UTF-8 BY NAME, which is what exercises the
+             --embed-locale mechanism.
+
+   ⛔ THE FIRST IS KEPT EVEN THOUGH IT IS A LOSS. The pre-registered Q3 said
+   musl would report a non-UTF-8 codeset and pgb would report UTF-8; the
+   opposite happened on both halves. T-078's Prove line: a row that comes out
+   against us IS the deliverable, and the axis must not be softened until it
+   passes. So the losing row stays and the requesting row is ADDED beside it. */
 static void a_locale(void) {
   setlocale(LC_ALL, "");
   const char *cs = nl_langinfo(CODESET);
   printf(" locale=%s", (cs && *cs) ? cs : "EMPTY");
+}
+static void a_locale_req(void) {
+  const char *got = setlocale(LC_ALL, "C.UTF-8");
+  const char *cs = got ? nl_langinfo(CODESET) : NULL;
+  printf(" locreq=%s", (cs && *cs) ? cs : (got ? "EMPTY" : "REFUSED"));
 }
 static void a_tz(void) {
   setenv("TZ", "Europe/Berlin", 1);
@@ -187,6 +233,7 @@ int main(void) {
   axis("services", a_services);
   axis("iconv",    a_iconv);
   axis("locale",   a_locale);
+  axis("locreq",   a_locale_req);
   axis("tz",       a_tz);
   printf("\n");
   return 0;
@@ -275,7 +322,7 @@ ENVS=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt"
 
 # Per-arm tallies, so the summary is derived and not retyped.
 for a in H V P M; do
-  eval "CRASH_$a=0; UTF8_$a=0; TZOK_$a=0; SVC_$a=0; NSSOK_$a=0; ICONV_$a=0; ROWS_$a=0"
+  eval "CRASH_$a=0; UTF8_$a=0; LREQ_$a=0; TZOK_$a=0; SVC_$a=0; NSSOK_$a=0; ICONV_$a=0; ROWS_$a=0"
 done
 
 printf '\n'
@@ -293,13 +340,42 @@ for name in $ENVS; do
     st=$?
     out=$(tr -d '\r' < "$WORK/o.$a.$name" | head -1)
     eval "ROWS_$a=\$((ROWS_$a+1))"
-    [ "$st" = 0 ] || eval "CRASH_$a=\$((CRASH_$a+1))"
-    case "$out" in *locale=*UTF-8*|*locale=*utf8*|*locale=*UTF8*) eval "UTF8_$a=\$((UTF8_$a+1))";; esac
-    case "$out" in *tz=CEST+0200*) eval "TZOK_$a=\$((TZOK_$a+1))";; esac
-    case "$out" in *services=80*) eval "SVC_$a=\$((SVC_$a+1))";; esac
-    case "$out" in *nss=root*) eval "NSSOK_$a=\$((NSSOK_$a+1))";; esac
-    _ic=$(printf '%s' "$out" | sed -n 's/.*iconv=\([0-9]*\)\/.*/\1/p')
-    [ -n "$_ic" ] && eval "ICONV_$a=\$((ICONV_$a+_ic))"
+    # ⛔ COUNT THE AXES THAT DIED, NOT THE PROCESS'S EXIT STATUS.
+    #
+    # ⚠ THIS IS A DEFECT THIS EXPERIMENT SHIPPED AND THEN CAUGHT. The
+    # per-axis fork is what makes a crash survivable — the parent reaps the
+    # child and carries on, so the PARENT always exits 0. The first version
+    # counted `$st` and reported "crashed = 0" for the vanilla arm on a run
+    # whose own rows plainly read `nss=SIG8`, `hostid=SIG8` and `iconv=SIG6`.
+    # The pre-registered Q1 was therefore scored against the wrong number.
+    # A signal token in the output is the measurement; $st is kept only so a
+    # probe that dies BEFORE forking anything is still visible.
+    _sigs=$(printf '%s' "$out" | grep -o 'SIG[0-9]*' | wc -l | tr -d ' ')
+    if [ "$_sigs" -gt 0 ] || [ "$st" != 0 ]; then
+      eval "CRASH_$a=\$((CRASH_$a+1))"
+    fi
+    # ⛔ EXTRACT THE TOKEN BY NAME. DO NOT GLOB THE WHOLE LINE.
+    #
+    # ⚠ THIS IS THE THIRD DEFECT THIS EXPERIMENT CAUGHT IN ITSELF, and it is
+    # the one that proves the "two runs or it is not a number" rule. The
+    # counter was `case "$out" in *locale=*UTF-8*)`, which reads as "contains
+    # locale=, and later contains UTF-8". Adding the `locreq` axis put a
+    # second UTF-8 on the same line, so a row printing
+    #     locale=ANSI_X3.4-1968 locreq=UTF-8
+    # started counting as a UTF-8 environment. The glibc arms went 0 -> 7 and
+    # pgb went 0 -> 11 BETWEEN TWO RUNS OF THE SAME EXPERIMENT with no change
+    # to the subject. The first run's zeros were the true ones.
+    #
+    # ⭐ `tok` splits on spaces and matches the token's own name, so a value
+    # can never be read out of a neighbouring field.
+    tok() { printf '%s' "$2" | tr ' ' '\n' | sed -n "s/^$1=//p" | head -1; }
+    case "$(tok locreq "$out")" in UTF-8|utf8|UTF8) eval "LREQ_$a=\$((LREQ_$a+1))";; esac
+    case "$(tok locale "$out")" in UTF-8|utf8|UTF8) eval "UTF8_$a=\$((UTF8_$a+1))";; esac
+    [ "$(tok tz "$out")"       = "CEST+0200" ] && eval "TZOK_$a=\$((TZOK_$a+1))"
+    [ "$(tok services "$out")" = "80" ]        && eval "SVC_$a=\$((SVC_$a+1))"
+    [ "$(tok nss "$out")"      = "root" ]      && eval "NSSOK_$a=\$((NSSOK_$a+1))"
+    _ic=$(tok iconv "$out" | cut -d/ -f1)
+    case "$_ic" in ''|*[!0-9]*) : ;; *) eval "ICONV_$a=\$((ICONV_$a+_ic))";; esac
     printf '    %-2s %-84s [exit %s]\n' "$a" "${out:-<none>}" "$st"
   done
 done
@@ -342,10 +418,11 @@ srow() { # label var-prefix
   eval "printf '  %-22s %8s %8s %8s %8s\n' '$1' \"\$$2_H\" \"\$$2_V\" \"\$$2_P\" \"\$$2_M\""
 }
 srow "rows measured"           ROWS
-srow "crashed (nonzero exit)"  CRASH
+srow "rows with a dead axis"   CRASH
 srow "nss=root"                NSSOK
 srow "services resolved"       SVC
-srow "UTF-8 codeset"           UTF8
+srow "UTF-8 by environment"    UTF8
+srow "UTF-8 when REQUESTED"    LREQ
 srow "timezone CEST+0200"      TZOK
 srow "iconv encodings (sum)"   ICONV
 srow "envs loading host .so"   OBJ
@@ -369,15 +446,48 @@ else
 fi
 
 # --- the pre-registered predictions, as assertions --------------------------
-exp_check "Q1  P never crashed"                     "$CRASH_P" 0
-exp_check "Q1  M never crashed"                     "$CRASH_M" 0
-exp_check "Q1  V crashed somewhere"                 "$([ "$CRASH_V" -gt 0 ] && echo yes || echo no)" yes
-exp_check "Q3  P has UTF-8 on every row"            "$UTF8_P" "$ROWS_P"
-exp_check "Q3  M has UTF-8 on no row"               "$UTF8_M" 0
+exp_check "Q1  P has no dead axis on any row"       "$CRASH_P" 0
+exp_check "Q1  M has no dead axis on any row"       "$CRASH_M" 0
+exp_check "Q1  V has a dead axis somewhere"         "$([ "$CRASH_V" -gt 0 ] && echo yes || echo no)" yes
 exp_check "Q5  P resolves the zone on every row"    "$TZOK_P" "$ROWS_P"
 exp_check "Q6  P loaded a host object on no row"    "$OBJ_P" 0
 exp_check "Q6  M loaded a host object on no row"    "$OBJ_M" 0
 exp_check "Q2  P and M fail services on the same count" "$SVC_P" "$SVC_M"
+
+# ---------------------------------------------------------------------------
+# ⛔ Q3 WAS FALSIFIED, ON BOTH HALVES, AND THE AXIS IS NOT SOFTENED.
+#
+# Pre-registered (commit e7fdc180, before the run): *"M reports a non-UTF-8
+# codeset on ALL 11 (musl has no locale support); P reports UTF-8 on 11 of 11
+# with --embed-locale."* ⛔ THE OPPOSITE HAPPENED ON BOTH HALVES:
+#
+#   - musl reports UTF-8 on 11 of 11. musl's minimal locale support does not
+#     mean a poor codeset — its default charset IS UTF-8, unconditionally.
+#   - EVERY glibc arm, pgb included, reports ANSI_X3.4-1968 when asked for the
+#     ENVIRONMENT's locale with no LANG set, which is what a bare container
+#     gives a program.
+#
+# ⭐ SO THIS IS A ROW WHERE NATIVE MUSL STATIC BEATS BOTH GLIBC COLUMNS, and
+# it is the one axis in this matrix where that is true. `--embed-locale`
+# answers a REQUEST for UTF-8; it does not change what an unset LANG means,
+# and nothing in this tree claimed it did — but nothing had measured the
+# unset-LANG case either, so the parity claim had a hole exactly here.
+#
+# ⚠ THE ASSERTIONS BELOW ENCODE THE MEASURED RESULT so this becomes a
+# regression test, which is what `experiments/97-` does with its own numbers.
+# ⛔ That is not the same as softening the axis: the losing row is still
+# printed, still counted, and is carried into docs/comparison.md as a loss.
+exp_check "Q3 FALSIFIED: M has UTF-8 by environment on every row" "$UTF8_M" "$ROWS_M"
+exp_check "Q3 FALSIFIED: P has UTF-8 by environment on no row"    "$UTF8_P" 0
+exp_check "Q3 FALSIFIED: V has UTF-8 by environment on no row"    "$UTF8_V" 0
+exp_check "and P DOES have UTF-8 when it is REQUESTED"            "$LREQ_P" "$ROWS_P"
+exp_note "⛔ THE LOCALE ROW IS A LOSS AGAINST NATIVE MUSL. With no LANG set,"
+exp_note "   musl answers UTF-8 on $UTF8_M of $ROWS_M and pgb answers"
+exp_note "   ANSI_X3.4-1968 on all $ROWS_P. Requesting C.UTF-8 by name, pgb"
+exp_note "   answers UTF-8 on $LREQ_P of $ROWS_P."
+exp_note "⚠ The pre-registration predicted this row the other way round, on"
+exp_note "   both halves. It is recorded rather than rewritten: the header's"
+exp_note "   Q3 stands and the block above says what actually happened."
 
 exp_note "⛔ THE ROW THAT COMES OUT AGAINST US IS \`services\`, and it is"
 exp_note "   REPORTED rather than softened: P resolves it on $SVC_P of $ROWS_P and"

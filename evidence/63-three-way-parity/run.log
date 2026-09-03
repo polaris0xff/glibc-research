@@ -1,0 +1,152 @@
+===============================================================
+63 - the three-way parity matrix: vanilla gcc -static, pgb, native musl static
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-03T17:48:10Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/63-three-way-parity
+--------------------------------------------------------------
+
+  ok    arm H built (control)                          = yes
+  ok    arm V built (vanilla, pinned)                  = yes
+  ok    arm P built (pgb)                              = yes
+  ok    arm M built (native musl)                      = yes
+
+-- the artefacts themselves ----------------------------------------
+  ARM                              SIZE (B)  PT_INTERP  DT_NEEDED
+  H vanilla (host cc)               1183400  none       none
+  V vanilla (pinned env)            1148360  none       none
+  P pgb                             2722968  none       none
+  M native musl static               237440  none       none
+
+-- the matrix ------------------------------------------------------
+
+  alpine-3.22  (musl)
+    H  probe nss=root hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=REFUSED tz=Europe+0000 [exit 0]
+    V  probe nss=root hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=REFUSED tz=Europe+0000 [exit 0]
+    P  probe nss=root hostid=0 services=80 iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=80 iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=UTC+0000 [exit 0]
+
+  alpine-3.20  (musl)
+    H  probe nss=root hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=REFUSED tz=Europe+0000 [exit 0]
+    V  probe nss=root hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=REFUSED tz=Europe+0000 [exit 0]
+    P  probe nss=root hostid=0 services=80 iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=80 iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=UTC+0000 [exit 0]
+
+  alpine-3.10  (musl)
+    H  probe nss=root hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=REFUSED tz=Europe+0000 [exit 0]
+    V  probe nss=root hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=REFUSED tz=Europe+0000 [exit 0]
+    P  probe nss=root hostid=0 services=80 iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=80 iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=UTC+0000 [exit 0]
+
+  voidlinux-musl  (musl)
+    H  probe nss=root hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=REFUSED tz=CEST+0200 [exit 0]
+    V  probe nss=root hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=REFUSED tz=CEST+0200 [exit 0]
+    P  probe nss=root hostid=0 services=80 iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=80 iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=CEST+0200 [exit 0]
+
+  debian-11  (glibc)
+    H  probe nss=root hostid=0 services=NULL iconv=SIG6 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    V  probe nss=root hostid=0 services=NULL iconv=SIG6 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    P  probe nss=root hostid=0 services=NULL iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=NULL iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=CEST+0200 [exit 0]
+
+  debian-12  (glibc)
+    H  probe nss=root hostid=0 services=NULL iconv=SIG8 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    V  probe nss=root hostid=0 services=NULL iconv=SIG8 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    P  probe nss=root hostid=0 services=NULL iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=NULL iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=CEST+0200 [exit 0]
+
+  ubuntu-20.04  (glibc)
+    H  probe nss=root hostid=0 services=NULL iconv=SIG6 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=Europe+0000 [exit 0]
+    V  probe nss=root hostid=0 services=NULL iconv=SIG6 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=Europe+0000 [exit 0]
+    P  probe nss=root hostid=0 services=NULL iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=NULL iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=UTC+0000 [exit 0]
+
+  rockylinux-8  (glibc)
+    H  probe nss=root hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    V  probe nss=root hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    P  probe nss=root hostid=0 services=80 iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=80 iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=CEST+0200 [exit 0]
+
+  opensuse-leap-15.6  (glibc)
+    H  probe nss=SIG8 hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    V  probe nss=SIG8 hostid=0 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    P  probe nss=root hostid=0 services=80 iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=80 iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=CEST+0200 [exit 0]
+
+  fedora-42  (glibc)
+    H  probe nss=root hostid=12583426 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    V  probe nss=root hostid=12583426 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    P  probe nss=root hostid=0 services=80 iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=80 iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=CEST+0200 [exit 0]
+
+  archlinux-latest  (glibc)
+    H  probe nss=root hostid=SIG8 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    V  probe nss=root hostid=SIG8 services=80 iconv=1/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    P  probe nss=root hostid=0 services=80 iconv=12/12 locale=ANSI_X3.4-1968 locreq=UTF-8 tz=CEST+0200 [exit 0]
+    M  probe nss=root hostid=0 services=80 iconv=10/12 locale=UTF-8 locreq=UTF-8 tz=CEST+0200 [exit 0]
+
+-- payload: host shared objects opened, by pid-attributed trace ------
+  alpine-3.22  H=0  V=0  P=0  M=0
+  alpine-3.20  H=0  V=0  P=0  M=0
+  alpine-3.10  H=0  V=0  P=0  M=0
+  voidlinux-musl  H=0  V=0  P=0  M=0
+  debian-11  H=0  V=0  P=0  M=0
+  debian-12  H=0  V=0  P=0  M=0
+  ubuntu-20.04  H=0  V=0  P=0  M=0
+  rockylinux-8  H=0  V=0  P=0  M=0
+  opensuse-leap-15.6  H=0  V=0  P=0  M=0
+  fedora-42  H=0  V=0  P=0  M=0
+  archlinux-latest  H=0  V=0  P=0  M=0
+
+-- summary ---------------------------------------------------------
+  AXIS                     H host V pinned    P pgb   M musl
+  rows measured                11       11       11       11
+  rows with a dead axis         5        5        0        0
+  nss=root                     10       10       11       11
+  services resolved             8        8        8        8
+  UTF-8 by environment          0        0        0       11
+  UTF-8 when REQUESTED          7        7       11       11
+  timezone CEST+0200            7        7       11        7
+  iconv encodings (sum)         8        8      132      110
+  envs loading host .so         0        0        0        0
+
+  ok    control: host-built and pinned-built vanilla agree = yes
+        ⚠ if this ever reads no, the 'vanilla' column is two different
+           things and docs/comparison.md must name the compiler.
+  ok    Q1  P has no dead axis on any row              = 0
+  ok    Q1  M has no dead axis on any row              = 0
+  ok    Q1  V has a dead axis somewhere                = yes
+  ok    Q5  P resolves the zone on every row           = 11
+  ok    Q6  P loaded a host object on no row           = 0
+  ok    Q6  M loaded a host object on no row           = 0
+  ok    Q2  P and M fail services on the same count    = 8
+  ok    Q3 FALSIFIED: M has UTF-8 by environment on every row = 11
+  ok    Q3 FALSIFIED: P has UTF-8 by environment on no row = 0
+  ok    Q3 FALSIFIED: V has UTF-8 by environment on no row = 0
+  ok    and P DOES have UTF-8 when it is REQUESTED     = 11
+        ⛔ THE LOCALE ROW IS A LOSS AGAINST NATIVE MUSL. With no LANG set,
+           musl answers UTF-8 on 11 of 11 and pgb answers
+           ANSI_X3.4-1968 on all 11. Requesting C.UTF-8 by name, pgb
+           answers UTF-8 on 11 of 11.
+        ⚠ The pre-registration predicted this row the other way round, on
+           both halves. It is recorded rather than rewritten: the header's
+           Q3 stands and the block above says what actually happened.
+        ⛔ THE ROW THAT COMES OUT AGAINST US IS `services`, and it is
+           REPORTED rather than softened: P resolves it on 8 of 11 and
+           M on 8 of 11. pgb has no mechanism for /etc/services;
+           experiments/82- is where that row was found. T-079.
+        ⚠ SKIPS: an arm that did not build is a SKIP above, never a dash in
+           the table and never a pass. skip=$SKIP at the end is the number
+           to read before believing any column.
+
+-- result ----------------------------------------------------
+pass=16 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------
