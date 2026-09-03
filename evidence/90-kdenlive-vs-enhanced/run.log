@@ -14,3 +14,28 @@ evidence     : /home/user/glibc-research/evidence/90-kdenlive-vs-enhanced
 
 -- the two artefacts ---------------------------------------------
         building ours (debloat=safe): ./pgb bundle appimage kdenlive --with-program melt
+        artefact built with: debloat=safe
+  ok    ours exists                                    = yes
+  ok    the competitor exists                          = yes
+
+  ARTEFACT                                    BYTES
+  P  ours (one command, nixpkgs)          565332219
+  E  kdenlive-AppImage-Enhanced           191900604
+     ratio P/E                                2.95x
+        operator's bar: smaller, loads faster, runs faster than E
+
+-- the render (melt, the engine kdenlive drives) ------------------
+  P  ours                                  1434 ms         4149 bytes of MP4
+  E  enhanced                              1973 ms         4162 bytes of MP4
+  ok    ours rendered a real MP4                       = yes
+  ok    the competitor rendered a real MP4             = yes
+
+-- startup (the instrument experiments/86- ended up with) ---------
+
+-- arm O: the same payload, packed by onelf ----------------------
+        adding the rust target onelf needs: x86_64-unknown-linux-musl
+  SKIP  arm O (onelf)                                  (onelf did not build: see /home/user/glibc-research/evidence/90-kdenlive-vs-enhanced/build/onelf-build.log (musl-gcc is also absent))
+
+-- melt on the eleven, both artefacts -----------------------------
+  ENVIRONMENT         LIBC   | P:res    P:host | E:res    E:host
+  alpine-3.22         musl   | ok       0      | ok       0     
