@@ -301,12 +301,12 @@ one clear fix inside T-063 arm S:
 
 ⭐ **None blocking.**
 
-1. ⚠ **Two branches exist on the remote that no session created deliberately**
-   — `claude/glibc-kdenlive-validation-2x7c3c` and
-   `claude/glibc-research-foundations-7pjoqe`, both named by the harness.
-   `RULES.md` §Git outranks the harness and every commit is on `main`. The git
-   proxy refuses remote deletes, so they are left for a human to remove in the
-   web UI.
+1. ✅ **RESOLVED 2026-09-03.** The two harness-named branches this asked about
+   are gone: `git ls-remote --heads origin` returns **`main` and nothing else**.
+   ⚠ The harness named `claude/cross-libc-dlopen-review-ukfukq` this session
+   and it was never pushed; the local copy is deleted with `git branch -d`,
+   which confirmed it was fully merged. `RULES.md` §Git outranks the harness
+   and the operator said the same.
 2. ⚠ **A GPU** — **T-059**, not a question. Every GL row is `swrast`, and
    T-071 item 4's second half cannot be settled without one.
 3. ⚠ **Docker Hub rate-limits anonymous pulls in this environment.**
