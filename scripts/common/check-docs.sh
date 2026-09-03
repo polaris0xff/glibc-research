@@ -230,7 +230,28 @@ while IFS="$(printf '\t')" read -r f sev p; do
   case "$p" in experiments/[0-9]*|poc/[0-9]*) continue ;; esac   # check (4)
   printf '%s' "$p" | grep -qE "^($tops)/" || continue
   n=$((n + 1))
-  [ -e "$p" ] && continue
+  # ⛔ EXISTING IS NOT ENOUGH WHEN THE PATH IS GITIGNORED, and this cost five
+  # red CI runs on 2026-09-03d. A document cited
+  # `evidence/77-uruntime-header/build/field.AppImage`; `.gitignore` excludes
+  # `evidence/*/build/`, so the file was right there on the machine that wrote
+  # the sentence and absent in every fresh clone. ⚠ The local gate said the
+  # documentation agreed with the tree, five times, and CI disagreed five
+  # times -- `docs/AGENTS.md` §0b's "read the CI run; a local gate does not
+  # speak for it", earned again.
+  # ⭐ Scoped to `evidence/` on purpose: `../pgb` is a build product too and
+  # documents name it deliberately. Evidence is the thing that must be
+  # committed to be evidence.
+  if [ -e "$p" ]; then
+    case "$p" in
+      evidence/*)
+        if git check-ignore -q "$p" 2>/dev/null; then
+          bad "$f: names a gitignored build product as evidence -> $p (it exists here and in no fresh clone)"
+          broken=$((broken + 1))
+        fi
+        ;;
+    esac
+    continue
+  fi
   if [ "$sev" = strict ]; then
     bad "$f: names a path that does not exist -> $p"
     broken=$((broken + 1))

@@ -138,10 +138,12 @@ immediately after the header, and it is a dwarfs image because our own packer
 wrote it with `mkdwarfs`. **A third-party reader has still not been pointed at
 it.**
 
-Every other row was run against
-`evidence/77-uruntime-header/build/field.AppImage` — a `pgb bundle appimage jq`
-at the shipped configuration — and, where it matters, against the competitor's
-`kdenlive-AppImage-Enhanced` for comparison.
+Every other row was run against the artefact `experiments/77-` builds as its
+`field` arm — a `pgb bundle appimage jq` at the shipped runtime and block size,
+6,806,407 B, `evidence/77-uruntime-header/RESULT.txt` — and, where it matters,
+against the competitor's `kdenlive-AppImage-Enhanced` for comparison.
+⚠ The artefact itself is a build product under a gitignored directory, so it is
+named by the experiment that produces it rather than by path.
 
 | what a manager needs | who needs it | ours | the competitor |
 |---|---|---|---|
