@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.github.AppManager</id>
+  <name>AppManager</name>
+  <developer id="com.github.AppManager">
+    <name>Arnis Kemlers</name>
+  </developer>
+  <developer_name>Arnis Kemlers</developer_name>
+  <summary>Drag-and-drop AppImage installer and management application</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <!-- Copyright notice -->
+  <custom>
+    <value key="Copyright">© 2026 Arnis Kemlers</value>
+  </custom>
+
+  <!-- Bundled third-party components -->
+  <bundle type="legal">
+    <name>squashfs-tools (unsquashfs)</name>
+    <copyright>© Phillip Lougher</copyright>
+    <license>GPL-2.0-or-later</license>
+  </bundle>
+  <bundle type="legal">
+    <name>DwarFS</name>
+    <copyright>© Marcus Holland-Moritz</copyright>
+    <license>GPL-3.0</license>
+  </bundle>
+  <bundle type="legal">
+    <name>zsync2</name>
+    <copyright>© AppImageCommunity, © Colin Phipps</copyright>
+    <license>Artistic-2.0</license>
+  </bundle>
+  <description>
+    <p>AppManager lets you install or uninstall AppImages with a familiar drag-and-drop workflow inspired by macOS. It handles desktop integration, icon extraction, executable bits, and app updates.</p>
+  </description>
+  <launchable type="desktop-id">com.github.AppManager.desktop</launchable>
+  <url type="homepage">https://github.com/kem-a/AppManager</url>
+  <url type="bugtracker">https://github.com/kem-a/AppManager/issues</url>
+  <url type="contribute">https://github.com/kem-a/AppManager/graphs/contributors</url>
+  <provides>
+    <binary>app-manager</binary>
+  </provides>
+  <releases>
+    <release version="3.3.0" date="2026-02-21">
+    </release>
+    <release version="3.2.1" date="2025-12-24">
+    </release>
+  </releases>
+</component>

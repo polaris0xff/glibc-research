@@ -1,0 +1,419 @@
+[
+ {
+  "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778194800",
+  "pull_request_review_id": 3768324615,
+  "id": 2778194800,
+  "node_id": "PRRC_kwDOQZbMes6ll-Nw",
+  "diff_hunk": "@@ -7,276 +7,55 @@\n   workflow_dispatch:\n \n jobs:\n-  build-x86_64:\n-    runs-on: ubuntu-latest\n-    container:\n-      image: fedora:41\n-    permissions:\n-      contents: write\n+  build:\n+    name: \"Build AppImage (${{ matrix.arch }})\"\n+    runs-on: ${{ matrix.runs-on }}\n+    strategy:\n+      matrix:\n+        include:\n+          - runs-on: ubuntu-latest\n+            arch: x86_64\n+          - runs-on: ubuntu-24.04-arm\n+            arch: aarch64\n+    container: ghcr.io/pkgforge-dev/archlinux:latest\n     steps:\n       - name: Checkout\n         uses: actions/checkout@v4\n \n-      - name: Install build dependencies\n-        run: |\n-          dnf install -y \\\n-            meson \\\n-            ninja-build \\\n-            gcc \\\n-            vala \\\n-            glib2-devel \\\n-            gtk4-devel \\\n-            libadwaita-devel \\\n-            json-glib-devel \\\n-            libgee-devel \\\n-            libsoup3-devel \\\n-            libportal-devel \\\n-            libportal-gtk4-devel \\\n-            desktop-file-utils \\\n-            chrpath \\\n-            jq \\\n-            p7zip \\\n-            curl \\\n-            file \\\n-            fuse \\\n-            fuse-libs \\\n-            zsync\n-\n-      - name: Install appimagetool\n-        run: |\n-          curl -Lo /usr/local/bin/appimagetool \"https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage\"\n-          chmod +x /usr/local/bin/appimagetool\n-          # Extract appimagetool since FUSE may not work in container\n-          cd /tmp\n-          /usr/local/bin/appimagetool --appimage-extract\n-          mv squashfs-root appimagetool-extracted\n-          ln -sf /tmp/appimagetool-extracted/AppRun /usr/local/bin/appimagetool\n-\n-      - name: Configure\n-        run: meson setup build --prefix=/usr -Dbundle_dwarfs=true -Dbundle_zsync=true -Dbundle_7z=true\n-\n-      - name: Build\n-        run: ninja -C build\n-\n-      - name: Stage install tree\n-        run: |\n-          DESTDIR=\"${GITHUB_WORKSPACE}/dist-root\"\n-          rm -rf \"$DESTDIR\"\n-          mkdir -p \"$DESTDIR\"\n-          meson install -C build --destdir \"$DESTDIR\"\n-\n-      - name: Capture project version\n-        id: meta\n-        run: |\n-          VERSION=$(meson introspect build --projectinfo | jq -r '.version')\n-          echo \"version=$VERSION\" >> \"$GITHUB_OUTPUT\"\n-\n-      - name: Build AppImage\n-        env:\n-          VERSION: ${{ steps.meta.outputs.version }}\n-        run: |\n-          set -euo pipefail\n-          DESTDIR=\"${GITHUB_WORKSPACE}/dist-root\"\n-          PACKAGE_DIR=\"${GITHUB_WORKSPACE}/packages\"\n-          APPDIR=\"${GITHUB_WORKSPACE}/AppDir\"\n-\n-          rm -rf \"$APPDIR\"\n-          mkdir -p \"$APPDIR\"\n-          mkdir -p \"$PACKAGE_DIR\"\n-\n-          # Copy installed files\n-          cp -a \"$DESTDIR/usr\" \"$APPDIR/\"\n+      - name: Preparing Container\n+        uses: pkgforge-dev/anylinux-setup-action@v1\n \n-          # Bundle shared libraries that may not be present on non-GNOME systems\n-          # (e.g. KDE-based distros like CachyOS KDE)\n-          mkdir -p \"$APPDIR/usr/lib\"\n-          for lib in libgee-0.8.so libsoup-3.0.so; do\n-            lib_path=$(ldd \"$DESTDIR/usr/bin/app-manager\" 2>/dev/null | grep \"$lib\" | awk '{print $3}' | head -1)\n-            if [ -n \"$lib_path\" ] && [ -f \"$lib_path\" ]; then\n-              cp -L \"$lib_path\" \"$APPDIR/usr/lib/\"\n-              echo \"Bundled: $lib \u2192 $(basename \"$lib_path\") ($lib_path)\"\n-            else\n-              echo \"Warning: $lib not found via ldd, skipping\"\n-            fi\n-          done\n+      - name: Build AnyLinux AppImage\n+        run: sh scripts/make-anyimage.sh\n \n-          # Create AppRun script\n-          printf '%s\\n' '#!/bin/bash' \\\n-            'HERE=\"$(dirname \"$(readlink -f \"$0\")\")\"' \\\n-            'export APPDIR=\"$HERE\"' \\\n-            'export LD_LIBRARY_PATH=\"$HERE/usr/lib:${LD_LIBRARY_PATH:-}\"' \\\n-            'export GSETTINGS_SCHEMA_DIR=\"$HERE/usr/share/glib-2.0/schemas:${GSETTINGS_SCHEMA_DIR:-}\"' \\\n-            'export XDG_DATA_DIRS=\"$HERE/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}\"' \\\n-            'export PATH=\"$HERE/usr/bin:$PATH\"' \\\n-            'exec \"$HERE/usr/bin/app-manager\" \"$@\"' > \"$APPDIR/AppRun\"\n-          chmod +x \"$APPDIR/AppRun\"\n-\n-          # Desktop and icon at AppDir root\n-          install -Dm644 \"$DESTDIR/usr/share/applications/com.github.AppManager.desktop\" \"$APPDIR/com.github.AppManager.desktop\"\n-          install -Dm644 \"$DESTDIR/usr/share/icons/hicolor/scalable/apps/com.github.AppManager.svg\" \"$APPDIR/com.github.AppManager.svg\"\n-\n-          # Validate desktop file\n-          desktop-file-validate \"$APPDIR/com.github.AppManager.desktop\" || true\n-\n-          # Remove rpath if present\n-          chrpath -d \"$APPDIR/usr/bin/app-manager\" 2>/dev/null || true\n-\n-          # Build AppImage with embedded update information for zsync delta updates\n-          UPDATE_INFO=\"gh-releases-zsync|kem-a|AppManager|latest|AppManager-*-x86_64.AppImage.zsync\"\n-          ARCH=x86_64 appimagetool --updateinformation \"$UPDATE_INFO\" \"$APPDIR\" \"$PACKAGE_DIR/AppManager-${VERSION}-x86_64.AppImage\"\n-\n-          # Generate zsync file for delta updates\n-          cd \"$PACKAGE_DIR\"\n-          zsyncmake -u \"AppManager-${VERSION}-x86_64.AppImage\" \"AppManager-${VERSION}-x86_64.AppImage\"\n-\n-      - name: Upload release packages\n-        if: startsWith(github.ref, 'refs/tags/')\n-        uses: softprops/action-gh-release@v2\n+      - name: Upload AppImage artifact\n+        uses: actions/upload-artifact@v4\n         with:\n-          files: |\n-            packages/AppManager-${{ steps.meta.outputs.version }}-x86_64.AppImage\n-            packages/AppManager-${{ steps.meta.outputs.version }}-x86_64.AppImage.zsync\n+          name: AppManager-anylinux-${{ matrix.arch }}.AppImage\n+          path: build-anyimage/dist/*.AppImage\n \n-      - name: Upload artifacts (for non-release builds)\n-        if: \"!startsWith(github.ref, 'refs/tags/')\"\n+      - name: Upload zsync artifact\n         uses: actions/upload-artifact@v4\n         with:\n-          name: packages-x86_64\n-          path: packages/*\n+          name: AppManager-anylinux-${{ matrix.arch }}.AppImage.zsync\n+          path: build-anyimage/dist/*.AppImage.zsync\n \n-  build-aarch64:\n-    runs-on: ubuntu-24.04-arm\n-    container:\n-      image: fedora:41\n+  release:",
+  "path": ".github/workflows/package.yml",
+  "commit_id": "07db3b04e6f2b171f85c1afdbf007ccb6bfee4b7",
+  "original_commit_id": "07db3b04e6f2b171f85c1afdbf007ccb6bfee4b7",
+  "user": {
+   "login": "github-advanced-security[bot]",
+   "id": 62310815,
+   "node_id": "MDM6Qm90NjIzMTA4MTU=",
+   "avatar_url": "https://avatars.githubusercontent.com/in/57789?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/github-advanced-security%5Bbot%5D",
+   "html_url": "https://github.com/apps/github-advanced-security",
+   "followers_url": "https://api.github.com/users/github-advanced-security%5Bbot%5D/followers",
+   "following_url": "https://api.github.com/users/github-advanced-security%5Bbot%5D/following{/other_user}",
+   "gists_url": "https://api.github.com/users/github-advanced-security%5Bbot%5D/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/github-advanced-security%5Bbot%5D/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/github-advanced-security%5Bbot%5D/subscriptions",
+   "organizations_url": "https://api.github.com/users/github-advanced-security%5Bbot%5D/orgs",
+   "repos_url": "https://api.github.com/users/github-advanced-security%5Bbot%5D/repos",
+   "events_url": "https://api.github.com/users/github-advanced-security%5Bbot%5D/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/github-advanced-security%5Bbot%5D/received_events",
+   "type": "Bot",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "## Workflow does not contain permissions\n\nActions job or workflow does not limit the permissions of the GITHUB_TOKEN. Consider setting an explicit permissions block, using the following as a minimal starting point: {{contents: read}}\n\n[Show more details](https://github.com/kem-a/AppManager/security/code-scanning/1)",
+  "created_at": "2026-02-07T22:51:57Z",
+  "updated_at": "2026-02-07T22:51:57Z",
+  "html_url": "https://github.com/kem-a/AppManager/pull/16#discussion_r2778194800",
+  "pull_request_url": "https://api.github.com/repos/kem-a/AppManager/pulls/16",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778194800"
+   },
+   "html": {
+    "href": "https://github.com/kem-a/AppManager/pull/16#discussion_r2778194800"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/16"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778194800/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": 11,
+  "original_start_line": 11,
+  "start_side": "RIGHT",
+  "line": 45,
+  "original_line": 43,
+  "side": "RIGHT",
+  "author_association": "CONTRIBUTOR",
+  "original_position": 167,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778226132",
+  "pull_request_review_id": 3768430551,
+  "id": 2778226132,
+  "node_id": "PRRC_kwDOQZbMes6lmF3U",
+  "diff_hunk": "@@ -0,0 +1,156 @@\n+#!/bin/sh\n+#\n+# Build AnyLinux AppImage for AppManager using quick-sharun + sharun\n+#\n+# Produces a truly portable AppImage that works on any Linux distro,\n+# including old glibc, musl-based, and non-FHS systems.\n+#\n+# The script auto-detects whether it's running inside Arch Linux.\n+# If not, it will use podman to run itself inside a container.\n+#\n+# Usage:  ./scripts/make-anyimage.sh\n+# Output: ./build-anyimage/dist/AppManager-<version>-anylinux-<arch>.AppImage\n+#\n+\n+set -eu\n+\n+CONTAINER_IMAGE=\"ghcr.io/pkgforge-dev/archlinux:latest\"\n+CONTAINER_NAME=\"appmanager-anylinux-build\"\n+\n+# \u2500\u2500 Container bootstrap \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+# If not running inside the Arch container, re-exec inside one.\n+_inside_arch() {\n+    [ -f /etc/arch-release ] 2>/dev/null\n+}\n+\n+if ! _inside_arch; then\n+    if ! command -v podman >/dev/null 2>&1; then\n+        echo \"Error: podman is required to build outside of Arch Linux.\"\n+        echo \"Install it with your package manager, e.g.:\"\n+        echo \"  sudo dnf install podman   # Fedora\"\n+        echo \"  sudo apt install podman   # Debian/Ubuntu\"\n+        exit 1\n+    fi\n+\n+    # Check if image is available locally\n+    if ! podman image exists \"$CONTAINER_IMAGE\" 2>/dev/null; then\n+        printf \"Arch container image not found locally.\\n\"\n+        printf \"Pull %s? [Y/n] \" \"$CONTAINER_IMAGE\"\n+        read -r answer </dev/tty || answer=\"\"\n+        case \"$answer\" in\n+            [nN]*) echo \"Aborted.\"; exit 1 ;;\n+        esac\n+        podman pull \"$CONTAINER_IMAGE\"\n+    fi\n+\n+    # Reuse an existing container if available, otherwise create one.\n+    # This avoids re-downloading packages on every build.\n+    if podman container exists \"$CONTAINER_NAME\" 2>/dev/null; then\n+        echo \"=== Reusing existing Arch container ($CONTAINER_NAME) ===\"\n+        exec podman start -ai \"$CONTAINER_NAME\"\n+    else\n+        echo \"=== Creating Arch Linux container ($CONTAINER_NAME) ===\"\n+        exec podman run \\\n+            -v \"$PWD\":/src:Z \\\n+            -w /src \\\n+            --name \"$CONTAINER_NAME\" \\\n+            \"$CONTAINER_IMAGE\" \\\n+            sh scripts/make-anyimage.sh\n+    fi\n+fi\n+\n+# \u2500\u2500 From here on we are inside Arch Linux \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+\n+ARCH=$(uname -m)\n+SHARUN_URL=\"https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh\"\n+DEBLOATED_URL=\"https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh\"\n+\n+# \u2500\u2500 Install build dependencies \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Installing build dependencies...\"\n+echo \"---------------------------------------------------------------\"\n+pacman -Syu --noconfirm \\\n+    base-devel \\\n+    meson \\\n+    vala \\\n+    glib2 \\\n+    gtk4 \\\n+    libadwaita \\\n+    json-glib \\\n+    libgee \\\n+    libsoup3 \\\n+    desktop-file-utils \\\n+    wget \\\n+    xorg-server-xvfb \\\n+    zsync\n+\n+# \u2500\u2500 Install debloated packages \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Installing debloated packages...\"\n+echo \"---------------------------------------------------------------\"\n+if command -v get-debloated-pkgs >/dev/null 2>&1; then\n+    get-debloated-pkgs --add-common --prefer-nano\n+else\n+    wget --retry-connrefused --tries=30 \"$DEBLOATED_URL\" -O /tmp/get-debloated-pkgs.sh\n+    chmod +x /tmp/get-debloated-pkgs.sh\n+    /tmp/get-debloated-pkgs.sh --add-common --prefer-nano\n+fi\n+\n+# \u2500\u2500 Build and install app-manager \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Building app-manager...\"\n+echo \"---------------------------------------------------------------\"\n+# Use a separate build dir to avoid conflicts with the host build/\n+rm -rf build-anyimage\n+meson setup build-anyimage --prefix=/usr \\\n+    -Dbundle_dwarfs=true \\\n+    -Dbundle_zsync=true \\\n+    -Dbundle_7z=true\n+meson compile -C build-anyimage\n+meson install -C build-anyimage\n+\n+# \u2500\u2500 Get version \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+VERSION=$(meson introspect build-anyimage --projectinfo 2>/dev/null \\\n+    | awk -F'\"' '/\"version\"/{print $4}')\n+\n+# \u2500\u2500 Configure AppImage \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+export ARCH VERSION\n+export APPDIR=./build-anyimage/AppDir\n+export OUTPATH=./build-anyimage/dist\n+export OUTNAME=\"AppManager-${VERSION}-anylinux-${ARCH}.AppImage\"\n+export UPINFO=\"gh-releases-zsync|kem-a|AppManager|latest|*anylinux*${ARCH}.AppImage.zsync\"\n+export ICON=/usr/share/icons/hicolor/scalable/apps/com.github.AppManager.svg\n+export DESKTOP=/usr/share/applications/com.github.AppManager.desktop\n+\n+# \u2500\u2500 Download quick-sharun if not already available \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+if command -v quick-sharun >/dev/null 2>&1; then\n+    QS=quick-sharun\n+else\n+    wget --retry-connrefused --tries=30 \"$SHARUN_URL\" -O /tmp/quick-sharun\n+    chmod +x /tmp/quick-sharun\n+    QS=/tmp/quick-sharun\n+fi\n+\n+# \u2500\u2500 Bundle with quick-sharun \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Bundling AppImage...\"\n+echo \"---------------------------------------------------------------\"\n+\n+# Bundle main binary + helper tools invoked as subprocesses.\n+# quick-sharun will auto-detect GTK4, libadwaita, and all their deps.\n+# The helper tools (dwarfs, zsync2, 7z) are static binaries installed\n+# by meson to /usr/bin \u2014 they need to be passed explicitly since the\n+# app invokes them as child processes, not via dynamic linking.\n+\"$QS\" \\\n+    /usr/bin/app-manager \\\n+    /usr/bin/dwarfsextract \\\n+    /usr/bin/dwarfsck \\\n+    /usr/bin/zsync2 \\\n+    /usr/bin/7z",
+  "path": "scripts/make-anyimage.sh",
+  "commit_id": "09e2b91faf4e66f7e98b72e98b881ba6f9a30811",
+  "original_commit_id": "09e2b91faf4e66f7e98b72e98b881ba6f9a30811",
+  "user": {
+   "login": "Samueru-sama",
+   "id": 36420837,
+   "node_id": "MDQ6VXNlcjM2NDIwODM3",
+   "avatar_url": "https://avatars.githubusercontent.com/u/36420837?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Samueru-sama",
+   "html_url": "https://github.com/Samueru-sama",
+   "followers_url": "https://api.github.com/users/Samueru-sama/followers",
+   "following_url": "https://api.github.com/users/Samueru-sama/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Samueru-sama/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Samueru-sama/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Samueru-sama/subscriptions",
+   "organizations_url": "https://api.github.com/users/Samueru-sama/orgs",
+   "repos_url": "https://api.github.com/users/Samueru-sama/repos",
+   "events_url": "https://api.github.com/users/Samueru-sama/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Samueru-sama/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "On archlinux `/usr/bin/7z` is a shell script that is coded to run `exec /usr/lib/7zip/7z \"$@\"`, so you most likely need to add that file instead.\n\nWith vala apps you may need to pass `/usr/share/vala` to `quick-sharun` btw\n\nAlso if this app uses glib networking, you need to pass a few libs manully, [see this](https://github.com/pkgforge-dev/ProtonPlus-AppImage/blob/4b95c7793e7bfb933ccbf567cb9141d693415c34/make-appimage.sh#L20-L23)",
+  "created_at": "2026-02-07T23:26:57Z",
+  "updated_at": "2026-02-07T23:26:57Z",
+  "html_url": "https://github.com/kem-a/AppManager/pull/16#discussion_r2778226132",
+  "pull_request_url": "https://api.github.com/repos/kem-a/AppManager/pulls/16",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778226132"
+   },
+   "html": {
+    "href": "https://github.com/kem-a/AppManager/pull/16#discussion_r2778226132"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/16"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778226132/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": 140,
+  "original_start_line": 140,
+  "start_side": "RIGHT",
+  "line": 145,
+  "original_line": 145,
+  "side": "RIGHT",
+  "author_association": "NONE",
+  "original_position": 145,
+  "position": 145,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778878310",
+  "pull_request_review_id": 3769197338,
+  "id": 2778878310,
+  "node_id": "PRRC_kwDOQZbMes6lolFm",
+  "diff_hunk": "@@ -0,0 +1,156 @@\n+#!/bin/sh\n+#\n+# Build AnyLinux AppImage for AppManager using quick-sharun + sharun\n+#\n+# Produces a truly portable AppImage that works on any Linux distro,\n+# including old glibc, musl-based, and non-FHS systems.\n+#\n+# The script auto-detects whether it's running inside Arch Linux.\n+# If not, it will use podman to run itself inside a container.\n+#\n+# Usage:  ./scripts/make-anyimage.sh\n+# Output: ./build-anyimage/dist/AppManager-<version>-anylinux-<arch>.AppImage\n+#\n+\n+set -eu\n+\n+CONTAINER_IMAGE=\"ghcr.io/pkgforge-dev/archlinux:latest\"\n+CONTAINER_NAME=\"appmanager-anylinux-build\"\n+\n+# \u2500\u2500 Container bootstrap \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+# If not running inside the Arch container, re-exec inside one.\n+_inside_arch() {\n+    [ -f /etc/arch-release ] 2>/dev/null\n+}\n+\n+if ! _inside_arch; then\n+    if ! command -v podman >/dev/null 2>&1; then\n+        echo \"Error: podman is required to build outside of Arch Linux.\"\n+        echo \"Install it with your package manager, e.g.:\"\n+        echo \"  sudo dnf install podman   # Fedora\"\n+        echo \"  sudo apt install podman   # Debian/Ubuntu\"\n+        exit 1\n+    fi\n+\n+    # Check if image is available locally\n+    if ! podman image exists \"$CONTAINER_IMAGE\" 2>/dev/null; then\n+        printf \"Arch container image not found locally.\\n\"\n+        printf \"Pull %s? [Y/n] \" \"$CONTAINER_IMAGE\"\n+        read -r answer </dev/tty || answer=\"\"\n+        case \"$answer\" in\n+            [nN]*) echo \"Aborted.\"; exit 1 ;;\n+        esac\n+        podman pull \"$CONTAINER_IMAGE\"\n+    fi\n+\n+    # Reuse an existing container if available, otherwise create one.\n+    # This avoids re-downloading packages on every build.\n+    if podman container exists \"$CONTAINER_NAME\" 2>/dev/null; then\n+        echo \"=== Reusing existing Arch container ($CONTAINER_NAME) ===\"\n+        exec podman start -ai \"$CONTAINER_NAME\"\n+    else\n+        echo \"=== Creating Arch Linux container ($CONTAINER_NAME) ===\"\n+        exec podman run \\\n+            -v \"$PWD\":/src:Z \\\n+            -w /src \\\n+            --name \"$CONTAINER_NAME\" \\\n+            \"$CONTAINER_IMAGE\" \\\n+            sh scripts/make-anyimage.sh\n+    fi\n+fi\n+\n+# \u2500\u2500 From here on we are inside Arch Linux \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+\n+ARCH=$(uname -m)\n+SHARUN_URL=\"https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh\"\n+DEBLOATED_URL=\"https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh\"\n+\n+# \u2500\u2500 Install build dependencies \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Installing build dependencies...\"\n+echo \"---------------------------------------------------------------\"\n+pacman -Syu --noconfirm \\\n+    base-devel \\\n+    meson \\\n+    vala \\\n+    glib2 \\\n+    gtk4 \\\n+    libadwaita \\\n+    json-glib \\\n+    libgee \\\n+    libsoup3 \\\n+    desktop-file-utils \\\n+    wget \\\n+    xorg-server-xvfb \\\n+    zsync\n+\n+# \u2500\u2500 Install debloated packages \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Installing debloated packages...\"\n+echo \"---------------------------------------------------------------\"\n+if command -v get-debloated-pkgs >/dev/null 2>&1; then\n+    get-debloated-pkgs --add-common --prefer-nano\n+else\n+    wget --retry-connrefused --tries=30 \"$DEBLOATED_URL\" -O /tmp/get-debloated-pkgs.sh\n+    chmod +x /tmp/get-debloated-pkgs.sh\n+    /tmp/get-debloated-pkgs.sh --add-common --prefer-nano\n+fi\n+\n+# \u2500\u2500 Build and install app-manager \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Building app-manager...\"\n+echo \"---------------------------------------------------------------\"\n+# Use a separate build dir to avoid conflicts with the host build/\n+rm -rf build-anyimage\n+meson setup build-anyimage --prefix=/usr \\\n+    -Dbundle_dwarfs=true \\\n+    -Dbundle_zsync=true \\\n+    -Dbundle_7z=true\n+meson compile -C build-anyimage\n+meson install -C build-anyimage\n+\n+# \u2500\u2500 Get version \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+VERSION=$(meson introspect build-anyimage --projectinfo 2>/dev/null \\\n+    | awk -F'\"' '/\"version\"/{print $4}')\n+\n+# \u2500\u2500 Configure AppImage \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+export ARCH VERSION\n+export APPDIR=./build-anyimage/AppDir\n+export OUTPATH=./build-anyimage/dist\n+export OUTNAME=\"AppManager-${VERSION}-anylinux-${ARCH}.AppImage\"\n+export UPINFO=\"gh-releases-zsync|kem-a|AppManager|latest|*anylinux*${ARCH}.AppImage.zsync\"\n+export ICON=/usr/share/icons/hicolor/scalable/apps/com.github.AppManager.svg\n+export DESKTOP=/usr/share/applications/com.github.AppManager.desktop\n+\n+# \u2500\u2500 Download quick-sharun if not already available \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+if command -v quick-sharun >/dev/null 2>&1; then\n+    QS=quick-sharun\n+else\n+    wget --retry-connrefused --tries=30 \"$SHARUN_URL\" -O /tmp/quick-sharun\n+    chmod +x /tmp/quick-sharun\n+    QS=/tmp/quick-sharun\n+fi\n+\n+# \u2500\u2500 Bundle with quick-sharun \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Bundling AppImage...\"\n+echo \"---------------------------------------------------------------\"\n+\n+# Bundle main binary + helper tools invoked as subprocesses.\n+# quick-sharun will auto-detect GTK4, libadwaita, and all their deps.\n+# The helper tools (dwarfs, zsync2, 7z) are static binaries installed\n+# by meson to /usr/bin \u2014 they need to be passed explicitly since the\n+# app invokes them as child processes, not via dynamic linking.\n+\"$QS\" \\\n+    /usr/bin/app-manager \\\n+    /usr/bin/dwarfsextract \\\n+    /usr/bin/dwarfsck \\\n+    /usr/bin/zsync2 \\\n+    /usr/bin/7z",
+  "path": "scripts/make-anyimage.sh",
+  "commit_id": "09e2b91faf4e66f7e98b72e98b881ba6f9a30811",
+  "original_commit_id": "09e2b91faf4e66f7e98b72e98b881ba6f9a30811",
+  "user": {
+   "login": "kem-a",
+   "id": 33252703,
+   "node_id": "MDQ6VXNlcjMzMjUyNzAz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/33252703?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/kem-a",
+   "html_url": "https://github.com/kem-a",
+   "followers_url": "https://api.github.com/users/kem-a/followers",
+   "following_url": "https://api.github.com/users/kem-a/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kem-a/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/kem-a/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kem-a/subscriptions",
+   "organizations_url": "https://api.github.com/users/kem-a/orgs",
+   "repos_url": "https://api.github.com/users/kem-a/repos",
+   "events_url": "https://api.github.com/users/kem-a/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/kem-a/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "@Samueru-sama, thanks for the tips. Missing network handling libs is actually critical issue. \n\nAlmost all GUI apps have at least about dialog with links to issue reporting etc. Will those work without these libs? In my opinion networking libs should be bundled by default if it's not a terminal app.",
+  "created_at": "2026-02-08T08:11:53Z",
+  "updated_at": "2026-02-08T08:11:53Z",
+  "html_url": "https://github.com/kem-a/AppManager/pull/16#discussion_r2778878310",
+  "pull_request_url": "https://api.github.com/repos/kem-a/AppManager/pulls/16",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778878310"
+   },
+   "html": {
+    "href": "https://github.com/kem-a/AppManager/pull/16#discussion_r2778878310"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/16"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778878310/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": 140,
+  "original_start_line": 140,
+  "start_side": "RIGHT",
+  "line": 145,
+  "original_line": 145,
+  "side": "RIGHT",
+  "in_reply_to_id": 2778226132,
+  "author_association": "OWNER",
+  "original_position": 145,
+  "position": 145,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778923713",
+  "pull_request_review_id": 3769250979,
+  "id": 2778923713,
+  "node_id": "PRRC_kwDOQZbMes6lowLB",
+  "diff_hunk": "@@ -0,0 +1,156 @@\n+#!/bin/sh\n+#\n+# Build AnyLinux AppImage for AppManager using quick-sharun + sharun\n+#\n+# Produces a truly portable AppImage that works on any Linux distro,\n+# including old glibc, musl-based, and non-FHS systems.\n+#\n+# The script auto-detects whether it's running inside Arch Linux.\n+# If not, it will use podman to run itself inside a container.\n+#\n+# Usage:  ./scripts/make-anyimage.sh\n+# Output: ./build-anyimage/dist/AppManager-<version>-anylinux-<arch>.AppImage\n+#\n+\n+set -eu\n+\n+CONTAINER_IMAGE=\"ghcr.io/pkgforge-dev/archlinux:latest\"\n+CONTAINER_NAME=\"appmanager-anylinux-build\"\n+\n+# \u2500\u2500 Container bootstrap \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+# If not running inside the Arch container, re-exec inside one.\n+_inside_arch() {\n+    [ -f /etc/arch-release ] 2>/dev/null\n+}\n+\n+if ! _inside_arch; then\n+    if ! command -v podman >/dev/null 2>&1; then\n+        echo \"Error: podman is required to build outside of Arch Linux.\"\n+        echo \"Install it with your package manager, e.g.:\"\n+        echo \"  sudo dnf install podman   # Fedora\"\n+        echo \"  sudo apt install podman   # Debian/Ubuntu\"\n+        exit 1\n+    fi\n+\n+    # Check if image is available locally\n+    if ! podman image exists \"$CONTAINER_IMAGE\" 2>/dev/null; then\n+        printf \"Arch container image not found locally.\\n\"\n+        printf \"Pull %s? [Y/n] \" \"$CONTAINER_IMAGE\"\n+        read -r answer </dev/tty || answer=\"\"\n+        case \"$answer\" in\n+            [nN]*) echo \"Aborted.\"; exit 1 ;;\n+        esac\n+        podman pull \"$CONTAINER_IMAGE\"\n+    fi\n+\n+    # Reuse an existing container if available, otherwise create one.\n+    # This avoids re-downloading packages on every build.\n+    if podman container exists \"$CONTAINER_NAME\" 2>/dev/null; then\n+        echo \"=== Reusing existing Arch container ($CONTAINER_NAME) ===\"\n+        exec podman start -ai \"$CONTAINER_NAME\"\n+    else\n+        echo \"=== Creating Arch Linux container ($CONTAINER_NAME) ===\"\n+        exec podman run \\\n+            -v \"$PWD\":/src:Z \\\n+            -w /src \\\n+            --name \"$CONTAINER_NAME\" \\\n+            \"$CONTAINER_IMAGE\" \\\n+            sh scripts/make-anyimage.sh\n+    fi\n+fi\n+\n+# \u2500\u2500 From here on we are inside Arch Linux \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+\n+ARCH=$(uname -m)\n+SHARUN_URL=\"https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/quick-sharun.sh\"\n+DEBLOATED_URL=\"https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/main/useful-tools/get-debloated-pkgs.sh\"\n+\n+# \u2500\u2500 Install build dependencies \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Installing build dependencies...\"\n+echo \"---------------------------------------------------------------\"\n+pacman -Syu --noconfirm \\\n+    base-devel \\\n+    meson \\\n+    vala \\\n+    glib2 \\\n+    gtk4 \\\n+    libadwaita \\\n+    json-glib \\\n+    libgee \\\n+    libsoup3 \\\n+    desktop-file-utils \\\n+    wget \\\n+    xorg-server-xvfb \\\n+    zsync\n+\n+# \u2500\u2500 Install debloated packages \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Installing debloated packages...\"\n+echo \"---------------------------------------------------------------\"\n+if command -v get-debloated-pkgs >/dev/null 2>&1; then\n+    get-debloated-pkgs --add-common --prefer-nano\n+else\n+    wget --retry-connrefused --tries=30 \"$DEBLOATED_URL\" -O /tmp/get-debloated-pkgs.sh\n+    chmod +x /tmp/get-debloated-pkgs.sh\n+    /tmp/get-debloated-pkgs.sh --add-common --prefer-nano\n+fi\n+\n+# \u2500\u2500 Build and install app-manager \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Building app-manager...\"\n+echo \"---------------------------------------------------------------\"\n+# Use a separate build dir to avoid conflicts with the host build/\n+rm -rf build-anyimage\n+meson setup build-anyimage --prefix=/usr \\\n+    -Dbundle_dwarfs=true \\\n+    -Dbundle_zsync=true \\\n+    -Dbundle_7z=true\n+meson compile -C build-anyimage\n+meson install -C build-anyimage\n+\n+# \u2500\u2500 Get version \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+VERSION=$(meson introspect build-anyimage --projectinfo 2>/dev/null \\\n+    | awk -F'\"' '/\"version\"/{print $4}')\n+\n+# \u2500\u2500 Configure AppImage \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+export ARCH VERSION\n+export APPDIR=./build-anyimage/AppDir\n+export OUTPATH=./build-anyimage/dist\n+export OUTNAME=\"AppManager-${VERSION}-anylinux-${ARCH}.AppImage\"\n+export UPINFO=\"gh-releases-zsync|kem-a|AppManager|latest|*anylinux*${ARCH}.AppImage.zsync\"\n+export ICON=/usr/share/icons/hicolor/scalable/apps/com.github.AppManager.svg\n+export DESKTOP=/usr/share/applications/com.github.AppManager.desktop\n+\n+# \u2500\u2500 Download quick-sharun if not already available \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+if command -v quick-sharun >/dev/null 2>&1; then\n+    QS=quick-sharun\n+else\n+    wget --retry-connrefused --tries=30 \"$SHARUN_URL\" -O /tmp/quick-sharun\n+    chmod +x /tmp/quick-sharun\n+    QS=/tmp/quick-sharun\n+fi\n+\n+# \u2500\u2500 Bundle with quick-sharun \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n+echo \"Bundling AppImage...\"\n+echo \"---------------------------------------------------------------\"\n+\n+# Bundle main binary + helper tools invoked as subprocesses.\n+# quick-sharun will auto-detect GTK4, libadwaita, and all their deps.\n+# The helper tools (dwarfs, zsync2, 7z) are static binaries installed\n+# by meson to /usr/bin \u2014 they need to be passed explicitly since the\n+# app invokes them as child processes, not via dynamic linking.\n+\"$QS\" \\\n+    /usr/bin/app-manager \\\n+    /usr/bin/dwarfsextract \\\n+    /usr/bin/dwarfsck \\\n+    /usr/bin/zsync2 \\\n+    /usr/bin/7z",
+  "path": "scripts/make-anyimage.sh",
+  "commit_id": "09e2b91faf4e66f7e98b72e98b881ba6f9a30811",
+  "original_commit_id": "09e2b91faf4e66f7e98b72e98b881ba6f9a30811",
+  "user": {
+   "login": "Samueru-sama",
+   "id": 36420837,
+   "node_id": "MDQ6VXNlcjM2NDIwODM3",
+   "avatar_url": "https://avatars.githubusercontent.com/u/36420837?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/Samueru-sama",
+   "html_url": "https://github.com/Samueru-sama",
+   "followers_url": "https://api.github.com/users/Samueru-sama/followers",
+   "following_url": "https://api.github.com/users/Samueru-sama/following{/other_user}",
+   "gists_url": "https://api.github.com/users/Samueru-sama/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/Samueru-sama/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/Samueru-sama/subscriptions",
+   "organizations_url": "https://api.github.com/users/Samueru-sama/orgs",
+   "repos_url": "https://api.github.com/users/Samueru-sama/repos",
+   "events_url": "https://api.github.com/users/Samueru-sama/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/Samueru-sama/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "> Almost all GUI apps have at least about dialog with links to issue reporting etc. Will those work without these libs? In my opinion networking libs should be bundled by default if it's not a terminal app.\r\n\r\nWe do that already by default, the exception is glib network **because we don't know how to detect it**\r\n\r\nSee https://github.com/pkgforge-dev/Anylinux-AppImages/issues/116\r\n\r\nAll GTK apps link to glib, **but not all GTK use glib network**, I believe some even bypass it all together using p11kit, and adding this brings a heavy dependency from OpenSSL so it is a bad idea to just add it for all GTK apps.\r\n\r\nThis is the end result of glib being a humongous monolith lol, we don't have this problem with Qt becasue applications that need Qt networking just link directly to libQt*Network",
+  "created_at": "2026-02-08T08:55:12Z",
+  "updated_at": "2026-02-08T08:55:42Z",
+  "html_url": "https://github.com/kem-a/AppManager/pull/16#discussion_r2778923713",
+  "pull_request_url": "https://api.github.com/repos/kem-a/AppManager/pulls/16",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778923713"
+   },
+   "html": {
+    "href": "https://github.com/kem-a/AppManager/pull/16#discussion_r2778923713"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/16"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/2778923713/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": 140,
+  "original_start_line": 140,
+  "start_side": "RIGHT",
+  "line": 145,
+  "original_line": 145,
+  "side": "RIGHT",
+  "in_reply_to_id": 2778226132,
+  "author_association": "NONE",
+  "original_position": 145,
+  "position": 145,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/3123425805",
+  "pull_request_review_id": 4154079256,
+  "id": 3123425805,
+  "node_id": "PRRC_kwDOQZbMes66K7IN",
+  "diff_hunk": "@@ -0,0 +1,80 @@\n+{ lib\n+, stdenv\n+, meson\n+, ninja\n+, pkg-config\n+, vala\n+, desktop-file-utils\n+, wrapGAppsHook4\n+, gobject-introspection\n+, makeWrapper\n+, gtk4\n+, libadwaita\n+, glib\n+, json-glib\n+, libgee\n+, libsoup_3\n+, zstd\n+, squashfsTools\n+, squashfuse\n+, dwarfs\n+, zsync\n+}:\n+\n+stdenv.mkDerivation(finalAttrs: {\n+  pname = \"app-manager\";\n+  version = \"3.5.3\";",
+  "path": "package.nix",
+  "commit_id": "e23d5736b3545a43985c9d1a96c7889bf27c1f44",
+  "original_commit_id": "e23d5736b3545a43985c9d1a96c7889bf27c1f44",
+  "user": {
+   "login": "kem-a",
+   "id": 33252703,
+   "node_id": "MDQ6VXNlcjMzMjUyNzAz",
+   "avatar_url": "https://avatars.githubusercontent.com/u/33252703?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/kem-a",
+   "html_url": "https://github.com/kem-a",
+   "followers_url": "https://api.github.com/users/kem-a/followers",
+   "following_url": "https://api.github.com/users/kem-a/following{/other_user}",
+   "gists_url": "https://api.github.com/users/kem-a/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/kem-a/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/kem-a/subscriptions",
+   "organizations_url": "https://api.github.com/users/kem-a/orgs",
+   "repos_url": "https://api.github.com/users/kem-a/repos",
+   "events_url": "https://api.github.com/users/kem-a/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/kem-a/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "On minor issue. Is it possible to pull version number from meson.build file? I really don't want to update app version in two places.\n\n```meson.build\nproject('app-manager', ['vala', 'c'],\n  version: '3.6.0',\n  meson_version: '>=0.64.0'\n)\n```",
+  "created_at": "2026-04-22T10:58:35Z",
+  "updated_at": "2026-04-22T10:58:35Z",
+  "html_url": "https://github.com/kem-a/AppManager/pull/97#discussion_r3123425805",
+  "pull_request_url": "https://api.github.com/repos/kem-a/AppManager/pulls/97",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/3123425805"
+   },
+   "html": {
+    "href": "https://github.com/kem-a/AppManager/pull/97#discussion_r3123425805"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/97"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/3123425805/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 26,
+  "side": "RIGHT",
+  "author_association": "OWNER",
+  "original_position": 26,
+  "position": 1,
+  "subject_type": "line"
+ },
+ {
+  "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/3123523129",
+  "pull_request_review_id": 4154178687,
+  "id": 3123523129,
+  "node_id": "PRRC_kwDOQZbMes66LS45",
+  "diff_hunk": "@@ -0,0 +1,80 @@\n+{ lib\n+, stdenv\n+, meson\n+, ninja\n+, pkg-config\n+, vala\n+, desktop-file-utils\n+, wrapGAppsHook4\n+, gobject-introspection\n+, makeWrapper\n+, gtk4\n+, libadwaita\n+, glib\n+, json-glib\n+, libgee\n+, libsoup_3\n+, zstd\n+, squashfsTools\n+, squashfuse\n+, dwarfs\n+, zsync\n+}:\n+\n+stdenv.mkDerivation(finalAttrs: {\n+  pname = \"app-manager\";\n+  version = \"3.5.3\";",
+  "path": "package.nix",
+  "commit_id": "e23d5736b3545a43985c9d1a96c7889bf27c1f44",
+  "original_commit_id": "e23d5736b3545a43985c9d1a96c7889bf27c1f44",
+  "user": {
+   "login": "finettt",
+   "id": 126771125,
+   "node_id": "U_kgDOB45ftQ",
+   "avatar_url": "https://avatars.githubusercontent.com/u/126771125?v=4",
+   "gravatar_id": "",
+   "url": "https://api.github.com/users/finettt",
+   "html_url": "https://github.com/finettt",
+   "followers_url": "https://api.github.com/users/finettt/followers",
+   "following_url": "https://api.github.com/users/finettt/following{/other_user}",
+   "gists_url": "https://api.github.com/users/finettt/gists{/gist_id}",
+   "starred_url": "https://api.github.com/users/finettt/starred{/owner}{/repo}",
+   "subscriptions_url": "https://api.github.com/users/finettt/subscriptions",
+   "organizations_url": "https://api.github.com/users/finettt/orgs",
+   "repos_url": "https://api.github.com/users/finettt/repos",
+   "events_url": "https://api.github.com/users/finettt/events{/privacy}",
+   "received_events_url": "https://api.github.com/users/finettt/received_events",
+   "type": "User",
+   "user_view_type": "public",
+   "site_admin": false
+  },
+  "body": "Done",
+  "created_at": "2026-04-22T11:17:31Z",
+  "updated_at": "2026-04-22T11:17:31Z",
+  "html_url": "https://github.com/kem-a/AppManager/pull/97#discussion_r3123523129",
+  "pull_request_url": "https://api.github.com/repos/kem-a/AppManager/pulls/97",
+  "_links": {
+   "self": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/3123523129"
+   },
+   "html": {
+    "href": "https://github.com/kem-a/AppManager/pull/97#discussion_r3123523129"
+   },
+   "pull_request": {
+    "href": "https://api.github.com/repos/kem-a/AppManager/pulls/97"
+   }
+  },
+  "reactions": {
+   "url": "https://api.github.com/repos/kem-a/AppManager/pulls/comments/3123523129/reactions",
+   "total_count": 0,
+   "+1": 0,
+   "-1": 0,
+   "laugh": 0,
+   "hooray": 0,
+   "confused": 0,
+   "heart": 0,
+   "rocket": 0,
+   "eyes": 0
+  },
+  "start_line": null,
+  "original_start_line": null,
+  "start_side": null,
+  "line": null,
+  "original_line": 26,
+  "side": "RIGHT",
+  "in_reply_to_id": 3123425805,
+  "author_association": "CONTRIBUTOR",
+  "original_position": 26,
+  "position": 1,
+  "subject_type": "line"
+ }
+]

@@ -1,0 +1,382 @@
+[
+ {
+  "name": "v3.8.0",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.8.0",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.8.0",
+  "commit": {
+   "sha": "7d9d53ef8995b39d6c919462712a88d6076af49a",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/7d9d53ef8995b39d6c919462712a88d6076af49a"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuOC4w"
+ },
+ {
+  "name": "v3.7.3",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.7.3",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.7.3",
+  "commit": {
+   "sha": "4b62961301d17a5a66ac26fe63a13ab1125f806f",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/4b62961301d17a5a66ac26fe63a13ab1125f806f"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNy4z"
+ },
+ {
+  "name": "v3.7.2",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.7.2",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.7.2",
+  "commit": {
+   "sha": "28dbbcf7763ec2a7089c654551e9199907212975",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/28dbbcf7763ec2a7089c654551e9199907212975"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNy4y"
+ },
+ {
+  "name": "v3.7.1",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.7.1",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.7.1",
+  "commit": {
+   "sha": "3f8b03817fd376bcaad687fa4e3a3ae1e7554b46",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/3f8b03817fd376bcaad687fa4e3a3ae1e7554b46"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNy4x"
+ },
+ {
+  "name": "v3.7.0",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.7.0",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.7.0",
+  "commit": {
+   "sha": "bb14aac3e5189ff233f58b01370b09598afab270",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/bb14aac3e5189ff233f58b01370b09598afab270"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNy4w"
+ },
+ {
+  "name": "v3.6.5",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.6.5",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.6.5",
+  "commit": {
+   "sha": "26691624187f377647ac9ead805afa8bad2541b6",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/26691624187f377647ac9ead805afa8bad2541b6"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNi41"
+ },
+ {
+  "name": "v3.6.4",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.6.4",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.6.4",
+  "commit": {
+   "sha": "a82befce9445f6c133a043778fd7541a7a504595",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/a82befce9445f6c133a043778fd7541a7a504595"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNi40"
+ },
+ {
+  "name": "v3.6.3",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.6.3",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.6.3",
+  "commit": {
+   "sha": "bc6719020be28eb2fd45d1a8aa6bd5c415065b66",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/bc6719020be28eb2fd45d1a8aa6bd5c415065b66"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNi4z"
+ },
+ {
+  "name": "v3.6.2",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.6.2",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.6.2",
+  "commit": {
+   "sha": "0f0a065074f103b1265dc19b5a899e2010809d6f",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/0f0a065074f103b1265dc19b5a899e2010809d6f"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNi4y"
+ },
+ {
+  "name": "v3.6.1",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.6.1",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.6.1",
+  "commit": {
+   "sha": "35395faf35b561e2ded057ebccae57a03530377b",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/35395faf35b561e2ded057ebccae57a03530377b"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNi4x"
+ },
+ {
+  "name": "v3.6.0",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.6.0",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.6.0",
+  "commit": {
+   "sha": "2ae9f3259b8694abb265cb5499fac81b3f476c47",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/2ae9f3259b8694abb265cb5499fac81b3f476c47"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNi4w"
+ },
+ {
+  "name": "v3.5.2",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.5.2",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.5.2",
+  "commit": {
+   "sha": "410888a592bc0fc91eaa3c15b47eb5c0cbfd6321",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/410888a592bc0fc91eaa3c15b47eb5c0cbfd6321"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNS4y"
+ },
+ {
+  "name": "v3.5.1",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.5.1",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.5.1",
+  "commit": {
+   "sha": "9f558fb6220112bc9d08f60b6f67749d041f6dde",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/9f558fb6220112bc9d08f60b6f67749d041f6dde"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNS4x"
+ },
+ {
+  "name": "v3.5.0",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.5.0",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.5.0",
+  "commit": {
+   "sha": "707b5fdad33dc5f4682c6e7980b4aeb2271b31f5",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/707b5fdad33dc5f4682c6e7980b4aeb2271b31f5"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNS4w"
+ },
+ {
+  "name": "v3.4.4",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.4.4",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.4.4",
+  "commit": {
+   "sha": "4aba1cb6fcc5dc48abc0353834f890640be28706",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/4aba1cb6fcc5dc48abc0353834f890640be28706"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNC40"
+ },
+ {
+  "name": "v3.4.3",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.4.3",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.4.3",
+  "commit": {
+   "sha": "6260aedb1244b8c70952b2ccbc2ecbbe68e7490a",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/6260aedb1244b8c70952b2ccbc2ecbbe68e7490a"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNC4z"
+ },
+ {
+  "name": "v3.4.2",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.4.2",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.4.2",
+  "commit": {
+   "sha": "c914de30ea051142fbef85651e0204d9523cd985",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/c914de30ea051142fbef85651e0204d9523cd985"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNC4y"
+ },
+ {
+  "name": "v3.4.1",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.4.1",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.4.1",
+  "commit": {
+   "sha": "a8740df1478fa23170df8b190f136b095e61cf14",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/a8740df1478fa23170df8b190f136b095e61cf14"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNC4x"
+ },
+ {
+  "name": "v3.4.0",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.4.0",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.4.0",
+  "commit": {
+   "sha": "e25526da883544a92720f73cdaebb6bae444a42a",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/e25526da883544a92720f73cdaebb6bae444a42a"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuNC4w"
+ },
+ {
+  "name": "v3.3.0",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.3.0",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.3.0",
+  "commit": {
+   "sha": "f1f2c9ee3f1632b404eb4466ce4e170ffce45bf0",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/f1f2c9ee3f1632b404eb4466ce4e170ffce45bf0"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuMy4w"
+ },
+ {
+  "name": "v3.2.1",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.2.1",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.2.1",
+  "commit": {
+   "sha": "b7bf550c165a8c21de89c010b234e57f6012a620",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/b7bf550c165a8c21de89c010b234e57f6012a620"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuMi4x"
+ },
+ {
+  "name": "v3.2.0",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.2.0",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.2.0",
+  "commit": {
+   "sha": "c15206b247ee8d849f280cc81db39595ea23b87b",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/c15206b247ee8d849f280cc81db39595ea23b87b"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuMi4w"
+ },
+ {
+  "name": "v3.1.1",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.1.1",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.1.1",
+  "commit": {
+   "sha": "a21c9b828c7d73cb0c8b7b8af8240f69311c3c63",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/a21c9b828c7d73cb0c8b7b8af8240f69311c3c63"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuMS4x"
+ },
+ {
+  "name": "v3.0.1",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.0.1",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.0.1",
+  "commit": {
+   "sha": "f09dcf14096d95676ee39ab5c439d6d1d500eba8",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/f09dcf14096d95676ee39ab5c439d6d1d500eba8"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuMC4x"
+ },
+ {
+  "name": "v3.0.0",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v3.0.0",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v3.0.0",
+  "commit": {
+   "sha": "ce8e016a990efd4572cb3ad3030344e8d1780d31",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/ce8e016a990efd4572cb3ad3030344e8d1780d31"
+  },
+  "node_id": "REF_kwDOQZbMerByZWZzL3RhZ3MvdjMuMC4w"
+ },
+ {
+  "name": "v2.4.1-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.4.1-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.4.1-beta",
+  "commit": {
+   "sha": "8e8b0a04a3899a6a937a52146abb6118e261da4f",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/8e8b0a04a3899a6a937a52146abb6118e261da4f"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuNC4xLWJldGE"
+ },
+ {
+  "name": "v2.4.0-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.4.0-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.4.0-beta",
+  "commit": {
+   "sha": "e314547ee69abf458f240ba82ad8ed1f488a4b39",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/e314547ee69abf458f240ba82ad8ed1f488a4b39"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuNC4wLWJldGE"
+ },
+ {
+  "name": "v2.3.2-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.3.2-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.3.2-beta",
+  "commit": {
+   "sha": "360243a51a873c7a0232460c28ac3f70a24e037a",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/360243a51a873c7a0232460c28ac3f70a24e037a"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuMy4yLWJldGE"
+ },
+ {
+  "name": "v2.2.4-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.2.4-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.2.4-beta",
+  "commit": {
+   "sha": "5121ea5d2bac5b3fea4d15d4858c47a14c28fba5",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/5121ea5d2bac5b3fea4d15d4858c47a14c28fba5"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuMi40LWJldGE"
+ },
+ {
+  "name": "v2.2.3-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.2.3-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.2.3-beta",
+  "commit": {
+   "sha": "54d54372692a6c0dc5f3679c9eb362348a53eaa2",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/54d54372692a6c0dc5f3679c9eb362348a53eaa2"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuMi4zLWJldGE"
+ },
+ {
+  "name": "v2.2.2-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.2.2-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.2.2-beta",
+  "commit": {
+   "sha": "f4b4c945fcdb71bd835afedf99fe4132f4dfee38",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/f4b4c945fcdb71bd835afedf99fe4132f4dfee38"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuMi4yLWJldGE"
+ },
+ {
+  "name": "v2.2.1-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.2.1-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.2.1-beta",
+  "commit": {
+   "sha": "503890897bf7456134404f73145f01f1afeb4491",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/503890897bf7456134404f73145f01f1afeb4491"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuMi4xLWJldGE"
+ },
+ {
+  "name": "v2.2.0-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.2.0-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.2.0-beta",
+  "commit": {
+   "sha": "7bd2833f537b404f1df2e8cf8eb9ca04d43a1561",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/7bd2833f537b404f1df2e8cf8eb9ca04d43a1561"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuMi4wLWJldGE"
+ },
+ {
+  "name": "v2.1.2-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.1.2-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.1.2-beta",
+  "commit": {
+   "sha": "f5e6e94cd6aee904c39c4dccb8d3960f57941f67",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/f5e6e94cd6aee904c39c4dccb8d3960f57941f67"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuMS4yLWJldGE"
+ },
+ {
+  "name": "v2.1.1-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.1.1-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.1.1-beta",
+  "commit": {
+   "sha": "793970acfb78b24ff738782d90d5c4be0a1c1966",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/793970acfb78b24ff738782d90d5c4be0a1c1966"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuMS4xLWJldGE"
+ },
+ {
+  "name": "v2.1.0-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.1.0-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.1.0-beta",
+  "commit": {
+   "sha": "6d178137a9e8807b5a7c66a6881e8c3a7b724083",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/6d178137a9e8807b5a7c66a6881e8c3a7b724083"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuMS4wLWJldGE"
+ },
+ {
+  "name": "v2.0.0-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v2.0.0-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v2.0.0-beta",
+  "commit": {
+   "sha": "0c4cb98a3dfa176655662e5026275c7b96787782",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/0c4cb98a3dfa176655662e5026275c7b96787782"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjIuMC4wLWJldGE"
+ },
+ {
+  "name": "v1.0.0-beta",
+  "zipball_url": "https://api.github.com/repos/kem-a/AppManager/zipball/refs/tags/v1.0.0-beta",
+  "tarball_url": "https://api.github.com/repos/kem-a/AppManager/tarball/refs/tags/v1.0.0-beta",
+  "commit": {
+   "sha": "afa2205210e953a7f26655121faeb15f7a4f378f",
+   "url": "https://api.github.com/repos/kem-a/AppManager/commits/afa2205210e953a7f26655121faeb15f7a4f378f"
+  },
+  "node_id": "REF_kwDOQZbMerVyZWZzL3RhZ3MvdjEuMC4wLWJldGE"
+ }
+]

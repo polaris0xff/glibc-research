@@ -1,0 +1,913 @@
+use std::{
+    collections::{HashMap, HashSet},
+    fs,
+    path::{Path, PathBuf},
+    sync::{LazyLock, RwLock},
+};
+
+use documented::{Documented, DocumentedFields};
+use serde::{Deserialize, Serialize};
+use soar_utils::{
+    path::{is_safe_component, resolve_path, xdg_config_home, xdg_data_home},
+    system::platform,
+};
+use toml_edit::DocumentMut;
+use tracing::{debug, info, trace, warn};
+
+use crate::{
+    annotations::{annotate_toml_array_of_tables, annotate_toml_table},
+    display::DisplaySettings,
+    error::{ConfigError, Result},
+    profile::Profile,
+    repository::{get_platform_repositories, Repository, SOARPKGS_PUBKEY},
+    utils::default_install_patterns,
+};
+
+/// Application's configuration
+#[derive(Clone, Deserialize, Serialize, Documented, DocumentedFields)]
+pub struct Config {
+    /// The name of the default profile to use.
+    pub default_profile: String,
+
+    /// A map of profile names to their configurations.
+    pub profile: HashMap<String, Profile>,
+
+    /// List of configured repositories.
+    pub repositories: Vec<Repository>,
+
+    /// Path to the local cache directory.
+    /// Default: $SOAR_ROOT/cache
+    pub cache_path: Option<String>,
+
+    /// Path where the Soar package database is stored.
+    /// Default: $SOAR_ROOT/db
+    pub db_path: Option<String>,
+
+    /// Directory where binary symlinks are placed.
+    /// Default: $SOAR_ROOT/bin
+    pub bin_path: Option<String>,
+
+    /// Directory where desktop files are stored.
+    /// Default: $XDG_DATA_HOME/applications (user) or /usr/local/share/applications (system)
+    pub desktop_path: Option<String>,
+
+    /// Path to the local clone of all repositories.
+    /// Default: $SOAR_ROOT/repos
+    pub repositories_path: Option<String>,
+
+    /// Portable dirs path
+    /// Default: $SOAR_ROOT/portable-dirs
+    pub portable_dirs: Option<String>,
+
+    /// If true, enables parallel downloading of packages.
+    /// Default: true
+    pub parallel: Option<bool>,
+
+    /// Maximum number of parallel downloads.
+    /// Default: 4
+    pub parallel_limit: Option<u32>,
+
+    /// Maximum number of concurrent requests for GHCR (GitHub Container Registry).
+    /// Default: 8
+    pub ghcr_concurrency: Option<usize>,
+
+    /// Limits the number of results returned by a search.
+    /// Default: 20
+    pub search_limit: Option<usize>,
+
+    /// Allows packages to be updated across different repositories.
+    /// NOTE: This is not yet implemented
+    pub cross_repo_updates: Option<bool>,
+
+    /// Shells to link package completions for. Defaults to those whose
+    /// completion directory already exists, so soar does not create one for a
+    /// shell nobody uses.
+    pub completions: Option<Vec<String>>,
+
+    /// Glob patterns filtering which files an install keeps.
+    ///
+    /// Default: ["!*.log", "!SBUILD", "!*.json", "!*.version"]
+    #[deprecated(
+        since = "0.13.0",
+        note = "only the OCI download path applies these; the declarative format does not use it"
+    )]
+    pub install_patterns: Option<Vec<String>>,
+
+    /// Global override for signature verification
+    pub signature_verification: Option<bool>,
+
+    /// Global override for desktop integration
+    pub desktop_integration: Option<bool>,
+
+    /// Global override for sync interval
+    pub sync_interval: Option<String>,
+
+    /// Display settings for output formatting
+    pub display: Option<DisplaySettings>,
+
+    /// Whether this config is for system mode.
+    /// Not serialized - set programmatically.
+    #[serde(skip)]
+    #[documented(skip)]
+    pub system_mode: bool,
+}
+
+pub static CONFIG: LazyLock<RwLock<Option<Config>>> = LazyLock::new(|| RwLock::new(None));
+pub static CURRENT_PROFILE: LazyLock<RwLock<Option<String>>> = LazyLock::new(|| RwLock::new(None));
+pub static SYSTEM_MODE: LazyLock<RwLock<bool>> = LazyLock::new(|| RwLock::new(false));
+
+pub static CONFIG_PATH: LazyLock<RwLock<PathBuf>> = LazyLock::new(|| {
+    RwLock::new(match std::env::var("SOAR_CONFIG") {
+        Ok(path_str) => PathBuf::from(path_str),
+        Err(_) => xdg_config_home().join("soar").join("config.toml"),
+    })
+});
+
+/// Check if running in system mode
+pub fn is_system_mode() -> bool {
+    *SYSTEM_MODE.read().unwrap()
+}
+
+/// Enable system mode and set appropriate paths
+pub fn enable_system_mode() {
+    let mut system_mode = SYSTEM_MODE.write().unwrap();
+    *system_mode = true;
+    drop(system_mode);
+
+    let mut config_path = CONFIG_PATH.write().unwrap();
+    *config_path = PathBuf::from("/etc/soar/config.toml");
+}
+
+/// Get the system root path
+pub fn system_root() -> PathBuf {
+    PathBuf::from("/opt/soar")
+}
+
+pub fn init() -> Result<()> {
+    let config = Config::new()?;
+    let mut global_config = CONFIG.write().unwrap();
+    *global_config = Some(config);
+    Ok(())
+}
+
+fn ensure_config_initialized() {
+    let mut config_guard = CONFIG.write().unwrap();
+    if config_guard.is_none() {
+        *config_guard = Some(Config::default_config::<&str>(&[]));
+    }
+}
+
+pub fn get_config() -> Config {
+    {
+        let config_guard = CONFIG.read().unwrap();
+        if config_guard.is_some() {
+            drop(config_guard);
+            return CONFIG.read().unwrap().as_ref().unwrap().clone();
+        }
+    }
+
+    ensure_config_initialized();
+
+    CONFIG.read().unwrap().as_ref().unwrap().clone()
+}
+
+pub fn get_current_profile() -> String {
+    let current_profile = CURRENT_PROFILE.read().unwrap();
+    current_profile
+        .clone()
+        .unwrap_or_else(|| get_config().default_profile.clone())
+}
+
+pub fn set_current_profile(name: &str) -> Result<()> {
+    let config = get_config();
+    if !config.profile.contains_key(name) {
+        return Err(ConfigError::InvalidProfile(name.to_string()));
+    }
+    let mut profile = CURRENT_PROFILE.write().unwrap();
+    *profile = Some(name.to_string());
+    Ok(())
+}
+
+impl Config {
+    /// Returns whether this config is for system mode.
+    pub fn is_system(&self) -> bool {
+        self.system_mode
+    }
+
+    /// Returns the icons directory path based on system mode.
+    pub fn get_icons_path(&self) -> std::path::PathBuf {
+        soar_utils::path::icons_dir(self.system_mode)
+    }
+
+    // Still populated while the OCI path exists; see the field's deprecation.
+    #[allow(deprecated)]
+    pub fn default_config<T: AsRef<str>>(selected_repos: &[T]) -> Self {
+        trace!("creating default configuration");
+        let soar_root = if is_system_mode() {
+            std::env::var("SOAR_ROOT").unwrap_or_else(|_| system_root().display().to_string())
+        } else {
+            std::env::var("SOAR_ROOT")
+                .unwrap_or_else(|_| format!("{}/soar", xdg_data_home().display()))
+        };
+        trace!(soar_root = soar_root, "resolved SOAR_ROOT");
+
+        let default_profile = Profile {
+            root_path: soar_root.clone(),
+            packages_path: Some(format!("{soar_root}/packages")),
+        };
+        let default_profile_name = "default".to_string();
+
+        let current_platform = platform();
+        let mut repositories = Vec::new();
+        let selected_set: HashSet<&str> = selected_repos.iter().map(|s| s.as_ref()).collect();
+
+        for repo_info in get_platform_repositories().into_iter() {
+            // Check if repository supports the current platform
+            if !repo_info.platforms.contains(&current_platform.as_str()) {
+                continue;
+            }
+
+            if !selected_repos.is_empty() && !selected_set.contains(repo_info.name) {
+                continue;
+            }
+
+            repositories.push(Repository {
+                name: repo_info.name.to_string(),
+                url: repo_info.url_template.replace("{}", &current_platform),
+                pubkey: repo_info.pubkey.map(String::from),
+                desktop_integration: repo_info.desktop_integration,
+                enabled: repo_info.enabled,
+                signature_verification: repo_info.signature_verification,
+                sync_interval: repo_info.sync_interval.map(String::from),
+            });
+        }
+
+        // Filter by selected repositories if specified
+        let repositories = if selected_repos.is_empty() {
+            repositories
+        } else {
+            repositories
+                .into_iter()
+                .filter(|repo| selected_set.contains(repo.name.as_str()))
+                .collect()
+        };
+
+        // Show warning if no repositories are available for this platform
+        if repositories.is_empty() {
+            if selected_repos.is_empty() {
+                warn!(
+                    "No official repositories available for {}. You can add custom repositories in your config file.",
+                    current_platform
+                );
+            } else {
+                warn!("No repositories enabled.");
+            }
+        }
+
+        Self {
+            profile: HashMap::from([(default_profile_name.clone(), default_profile)]),
+            default_profile: default_profile_name,
+
+            bin_path: Some(format!("{soar_root}/bin")),
+            desktop_path: None,
+            cache_path: Some(format!("{soar_root}/cache")),
+            db_path: Some(format!("{soar_root}/db")),
+            repositories_path: Some(format!("{soar_root}/repos")),
+            portable_dirs: Some(format!("{soar_root}/portable-dirs")),
+
+            repositories,
+            parallel: Some(true),
+            parallel_limit: Some(4),
+            search_limit: Some(20),
+            ghcr_concurrency: Some(8),
+            cross_repo_updates: Some(false),
+            install_patterns: Some(default_install_patterns()),
+            completions: None,
+
+            signature_verification: None,
+            desktop_integration: None,
+            sync_interval: None,
+            display: None,
+            system_mode: is_system_mode(),
+        }
+    }
+
+    /// Creates a default configuration for the given system mode.
+    // Still populated while the OCI path exists; see the field's deprecation.
+    #[allow(deprecated)]
+    pub fn default_config_for_mode<T: AsRef<str>>(selected_repos: &[T], system_mode: bool) -> Self {
+        trace!(
+            "creating default configuration for system_mode={}",
+            system_mode
+        );
+        let soar_root = if system_mode {
+            std::env::var("SOAR_ROOT").unwrap_or_else(|_| system_root().display().to_string())
+        } else {
+            std::env::var("SOAR_ROOT")
+                .unwrap_or_else(|_| format!("{}/soar", xdg_data_home().display()))
+        };
+        trace!(soar_root = soar_root, "resolved SOAR_ROOT");
+
+        let default_profile = Profile {
+            root_path: soar_root.clone(),
+            packages_path: Some(format!("{soar_root}/packages")),
+        };
+        let default_profile_name = "default".to_string();
+
+        let current_platform = platform();
+        let mut repositories = Vec::new();
+        let selected_set: HashSet<&str> = selected_repos.iter().map(|s| s.as_ref()).collect();
+
+        for repo_info in get_platform_repositories().into_iter() {
+            if !repo_info.platforms.contains(&current_platform.as_str()) {
+                continue;
+            }
+
+            if !selected_repos.is_empty() && !selected_set.contains(repo_info.name) {
+                continue;
+            }
+
+            repositories.push(Repository {
+                name: repo_info.name.to_string(),
+                url: repo_info.url_template.replace("{}", &current_platform),
+                pubkey: repo_info.pubkey.map(String::from),
+                desktop_integration: repo_info.desktop_integration,
+                enabled: repo_info.enabled,
+                signature_verification: repo_info.signature_verification,
+                sync_interval: repo_info.sync_interval.map(String::from),
+            });
+        }
+
+        let repositories = if selected_repos.is_empty() {
+            repositories
+        } else {
+            repositories
+                .into_iter()
+                .filter(|repo| selected_set.contains(repo.name.as_str()))
+                .collect()
+        };
+
+        if repositories.is_empty() {
+            if selected_repos.is_empty() {
+                warn!(
+                    "No official repositories available for {}. You can add custom repositories in your config file.",
+                    current_platform
+                );
+            } else {
+                warn!("No repositories enabled.");
+            }
+        }
+
+        Self {
+            profile: HashMap::from([(default_profile_name.clone(), default_profile)]),
+            default_profile: default_profile_name,
+
+            bin_path: Some(format!("{soar_root}/bin")),
+            desktop_path: None,
+            cache_path: Some(format!("{soar_root}/cache")),
+            db_path: Some(format!("{soar_root}/db")),
+            repositories_path: Some(format!("{soar_root}/repos")),
+            portable_dirs: Some(format!("{soar_root}/portable-dirs")),
+
+            repositories,
+            parallel: Some(true),
+            parallel_limit: Some(4),
+            search_limit: Some(20),
+            ghcr_concurrency: Some(8),
+            cross_repo_updates: Some(false),
+            install_patterns: Some(default_install_patterns()),
+            completions: None,
+
+            signature_verification: None,
+            desktop_integration: None,
+            sync_interval: None,
+            display: None,
+            system_mode,
+        }
+    }
+
+    /// Creates a new configuration by loading it from the configuration file.
+    /// If the configuration file is not found, it uses the default configuration.
+    pub fn new() -> Result<Self> {
+        if std::env::var("SOAR_STEALTH").is_ok() {
+            trace!("SOAR_STEALTH set, using default config");
+            return Ok(Self::default_config::<&str>(&[]));
+        }
+
+        let config_path = CONFIG_PATH.read().unwrap().to_path_buf();
+        debug!(path = %config_path.display(), "loading configuration");
+
+        let mut config = match fs::read_to_string(&config_path) {
+            Ok(content) => {
+                trace!("parsing configuration file");
+                toml::from_str(&content)?
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                debug!("config file not found, using defaults");
+                Self::default_config::<&str>(&[])
+            }
+            Err(err) => return Err(ConfigError::IoError(err)),
+        };
+
+        // Inherit system_mode from the global flag for backward compat
+        config.system_mode = is_system_mode();
+        config.resolve()?;
+        debug!(
+            profile = config.default_profile,
+            repos = config.repositories.len(),
+            "configuration loaded"
+        );
+
+        Ok(config)
+    }
+
+    // Still populated while the OCI path exists; see the field's deprecation.
+    #[allow(deprecated)]
+    pub fn resolve(&mut self) -> Result<()> {
+        trace!("resolving configuration");
+        if !self.profile.contains_key(&self.default_profile) {
+            return Err(ConfigError::MissingDefaultProfile(
+                self.default_profile.clone(),
+            ));
+        }
+
+        if self.parallel.unwrap_or(true) {
+            self.parallel_limit.get_or_insert(4);
+        }
+
+        if self.install_patterns.is_none() {
+            self.install_patterns = Some(default_install_patterns());
+        }
+
+        self.ghcr_concurrency.get_or_insert(8);
+        self.search_limit.get_or_insert(20);
+        self.cross_repo_updates.get_or_insert(false);
+
+        let mut seen_repos = HashSet::new();
+
+        for repo in &mut self.repositories {
+            // The name becomes a directory under the repositories path, so it
+            // must not be able to escape it.
+            if !is_safe_component(&repo.name) {
+                return Err(ConfigError::InvalidRepositoryName(repo.name.clone()));
+            }
+            if repo.name == "local" {
+                return Err(ConfigError::ReservedRepositoryName);
+            }
+            if !seen_repos.insert(&repo.name) {
+                return Err(ConfigError::DuplicateRepositoryName(repo.name.clone()));
+            }
+
+            repo.enabled.get_or_insert(true);
+
+            if repo.pubkey.is_none() && repo.name.as_str() == "soarpkgs" {
+                repo.pubkey = Some(SOARPKGS_PUBKEY.to_string())
+            }
+
+            let explicitly_enabled = self.signature_verification == Some(true)
+                || repo.signature_verification == Some(true);
+            if explicitly_enabled && repo.pubkey.is_none() {
+                return Err(ConfigError::MissingPubkey(repo.name.clone()));
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn default_profile(&self) -> Result<&Profile> {
+        self.profile
+            .get(&self.default_profile)
+            .ok_or_else(|| ConfigError::MissingDefaultProfile(self.default_profile.clone()))
+    }
+
+    pub fn get_profile(&self, name: &str) -> Result<&Profile> {
+        self.profile
+            .get(name)
+            .ok_or(ConfigError::MissingProfile(name.to_string()))
+    }
+
+    pub fn get_bin_path(&self) -> Result<PathBuf> {
+        if let Ok(env_path) = std::env::var("SOAR_BIN") {
+            return Ok(resolve_path(&env_path)?);
+        }
+        if let Some(bin_path) = &self.bin_path {
+            return Ok(resolve_path(bin_path)?);
+        }
+        self.default_profile()?.get_bin_path()
+    }
+
+    /// Shells whose completions should be linked.
+    pub fn completion_shells(&self) -> Vec<String> {
+        if let Some(shells) = &self.completions {
+            return shells.clone();
+        }
+        let data = soar_utils::path::xdg_data_home();
+        let config = soar_utils::path::xdg_config_home();
+        [
+            ("bash", data.join("bash-completion/completions")),
+            ("zsh", data.join("zsh/site-functions")),
+            ("fish", config.join("fish/completions")),
+        ]
+        .into_iter()
+        .filter(|(_, dir)| dir.is_dir())
+        .map(|(name, _)| name.to_string())
+        .collect()
+    }
+
+    pub fn get_desktop_path(&self) -> Result<PathBuf> {
+        if let Ok(env_path) = std::env::var("SOAR_DESKTOP") {
+            return Ok(resolve_path(&env_path)?);
+        }
+        if let Some(desktop_path) = &self.desktop_path {
+            return Ok(resolve_path(desktop_path)?);
+        }
+        Ok(soar_utils::path::desktop_dir(self.system_mode))
+    }
+
+    /// Creates a new configuration from a specific config file path with the given system mode.
+    pub fn new_for_mode(config_path: &Path, system_mode: bool) -> Result<Self> {
+        debug!(path = %config_path.display(), system_mode, "loading configuration for mode");
+
+        let mut config = match fs::read_to_string(config_path) {
+            Ok(content) => {
+                trace!("parsing configuration file");
+                toml::from_str(&content)?
+            }
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+                debug!("config file not found, using defaults");
+                Self::default_config_for_mode::<&str>(&[], system_mode)
+            }
+            Err(err) => return Err(ConfigError::IoError(err)),
+        };
+
+        config.system_mode = system_mode;
+        config.resolve()?;
+        debug!(
+            profile = config.default_profile,
+            repos = config.repositories.len(),
+            "configuration loaded for system_mode={}",
+            system_mode
+        );
+
+        Ok(config)
+    }
+
+    pub fn get_db_path(&self) -> Result<PathBuf> {
+        if let Ok(env_path) = std::env::var("SOAR_DB") {
+            return Ok(resolve_path(&env_path)?);
+        }
+        if let Some(soar_db) = &self.db_path {
+            return Ok(resolve_path(soar_db)?);
+        }
+        self.default_profile()?.get_db_path()
+    }
+
+    pub fn get_packages_path(&self, profile_name: Option<String>) -> Result<PathBuf> {
+        if let Ok(env_path) = std::env::var("SOAR_PACKAGES") {
+            return Ok(resolve_path(&env_path)?);
+        }
+        let profile_name = profile_name.unwrap_or_else(get_current_profile);
+        self.get_profile(&profile_name)?.get_packages_path()
+    }
+
+    pub fn get_cache_path(&self) -> Result<PathBuf> {
+        if let Ok(env_path) = std::env::var("SOAR_CACHE") {
+            return Ok(resolve_path(&env_path)?);
+        }
+        if let Some(soar_cache) = &self.cache_path {
+            return Ok(resolve_path(soar_cache)?);
+        }
+        self.get_profile(&get_current_profile())?.get_cache_path()
+    }
+
+    pub fn get_repositories_path(&self) -> Result<PathBuf> {
+        if let Ok(env_path) = std::env::var("SOAR_REPOSITORIES") {
+            return Ok(resolve_path(&env_path)?);
+        }
+        if let Some(repositories_path) = &self.repositories_path {
+            return Ok(resolve_path(repositories_path)?);
+        }
+        self.default_profile()?.get_repositories_path()
+    }
+
+    pub fn get_portable_dirs(&self) -> Result<PathBuf> {
+        if let Ok(env_path) = std::env::var("SOAR_PORTABLE_DIRS") {
+            return Ok(resolve_path(&env_path)?);
+        }
+
+        if let Some(portable_dirs) = &self.portable_dirs {
+            return Ok(resolve_path(portable_dirs)?);
+        }
+        self.default_profile()?.get_portable_dirs()
+    }
+
+    pub fn get_repository(&self, repo_name: &str) -> Option<&Repository> {
+        self.repositories
+            .iter()
+            .find(|repo| repo.name == repo_name && repo.is_enabled())
+    }
+
+    pub fn has_desktop_integration(&self, repo_name: &str) -> bool {
+        if let Some(global_override) = self.desktop_integration {
+            return global_override;
+        }
+        self.get_repository(repo_name)
+            .is_some_and(|repo| repo.desktop_integration.unwrap_or(true))
+    }
+
+    pub fn display(&self) -> DisplaySettings {
+        self.display.clone().unwrap_or_default()
+    }
+
+    pub fn save(&self) -> Result<()> {
+        let config_path = CONFIG_PATH.read().unwrap().to_path_buf();
+        let annotated_doc = self.to_annotated_document()?;
+        if let Some(parent) = config_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        fs::write(&config_path, annotated_doc.to_string())?;
+        info!("Configuration saved to {}", config_path.display());
+        Ok(())
+    }
+
+    pub fn to_annotated_document(&self) -> Result<DocumentMut> {
+        use toml_edit::Item;
+
+        let toml_string = toml::to_string_pretty(self)?;
+        let mut doc = toml_string.parse::<DocumentMut>()?;
+
+        annotate_toml_table::<Config>(doc.as_table_mut(), true)?;
+
+        if let Some(profiles_map_table_item) = doc.get_mut("profile") {
+            if let Some(profiles_map_table) = profiles_map_table_item.as_table_mut() {
+                for (_profile_name, profile_item) in profiles_map_table.iter_mut() {
+                    if let Item::Table(profile_table) = profile_item {
+                        annotate_toml_table::<Profile>(profile_table, false)?;
+                    }
+                }
+            }
+        }
+
+        if let Some(repositories_item) = doc.get_mut("repositories") {
+            if let Some(repositories_array) = repositories_item.as_array_of_tables_mut() {
+                annotate_toml_array_of_tables::<Repository>(repositories_array)?;
+            }
+        }
+
+        Ok(doc)
+    }
+}
+
+pub fn generate_default_config<T: AsRef<str>>(repos: &[T]) -> Result<()> {
+    let config_path = CONFIG_PATH.read().unwrap().to_path_buf();
+
+    if config_path.exists() {
+        return Err(ConfigError::ConfigAlreadyExists);
+    }
+
+    let def_config = Config::default_config(repos);
+    let annotated_doc = def_config.to_annotated_document()?;
+
+    if let Some(parent) = config_path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+
+    fs::write(&config_path, annotated_doc.to_string())?;
+    info!(
+        "Default configuration file generated with documentation at: {}",
+        config_path.display()
+    );
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{error::ConfigError, test_utils::with_env};
+
+    #[test]
+    fn test_default_config_creation() {
+        let config = Config::default_config::<&str>(&[]);
+
+        assert_eq!(config.default_profile, "default");
+        assert!(config.profile.contains_key("default"));
+        assert!(config.parallel.unwrap_or(false));
+        assert_eq!(config.parallel_limit, Some(4));
+        assert_eq!(config.search_limit, Some(20));
+        assert_eq!(config.ghcr_concurrency, Some(8));
+        assert_eq!(config.cross_repo_updates, Some(false));
+    }
+
+    #[test]
+    fn test_default_config_with_selected_repos() {
+        let config = Config::default_config(&["soarpkgs"]);
+
+        assert!(!config.repositories.is_empty());
+        assert!(config.repositories.iter().any(|r| r.name == "soarpkgs"));
+    }
+
+    #[test]
+    fn test_config_resolve_missing_default_profile() {
+        let mut config = Config::default_config::<&str>(&[]);
+        config.default_profile = "nonexistent".to_string();
+
+        let result = config.resolve();
+        assert!(matches!(result, Err(ConfigError::MissingDefaultProfile(_))));
+    }
+
+    fn repo_named(name: &str) -> Repository {
+        Repository {
+            name: name.to_string(),
+            url: "https://example.com".to_string(),
+            desktop_integration: None,
+            pubkey: None,
+            enabled: Some(true),
+            signature_verification: None,
+            sync_interval: None,
+        }
+    }
+
+    #[test]
+    fn test_config_resolve_rejects_traversal_repo_name() {
+        for name in ["..", "a/b", "/home/user/Documents", "", "."] {
+            let mut config = Config::default_config::<&str>(&[]);
+            config.repositories.push(repo_named(name));
+
+            let result = config.resolve();
+            assert!(
+                matches!(result, Err(ConfigError::InvalidRepositoryName(_))),
+                "name {name:?} should be rejected"
+            );
+        }
+    }
+
+    #[test]
+    fn test_config_resolve_accepts_normal_repo_name() {
+        let mut config = Config::default_config::<&str>(&[]);
+        config.repositories.push(repo_named("my-repo"));
+
+        assert!(config.resolve().is_ok());
+    }
+
+    #[test]
+    fn test_config_resolve_reserved_repo_name() {
+        let mut config = Config::default_config::<&str>(&[]);
+        config.repositories.push(Repository {
+            name: "local".to_string(),
+            url: "https://example.com".to_string(),
+            desktop_integration: None,
+            pubkey: None,
+            enabled: Some(true),
+            signature_verification: None,
+            sync_interval: None,
+        });
+
+        let result = config.resolve();
+        assert!(matches!(result, Err(ConfigError::ReservedRepositoryName)));
+    }
+
+    #[test]
+    fn test_config_resolve_signature_verification_without_pubkey() {
+        let mut config = Config::default_config::<&str>(&[]);
+        config.repositories.push(Repository {
+            name: "needs-key".to_string(),
+            url: "https://example.com".to_string(),
+            desktop_integration: None,
+            pubkey: None,
+            enabled: Some(true),
+            signature_verification: Some(true),
+            sync_interval: None,
+        });
+
+        let result = config.resolve();
+        assert!(matches!(result, Err(ConfigError::MissingPubkey(_))));
+    }
+
+    #[test]
+    fn test_config_resolve_duplicate_repo() {
+        let mut config = Config::default_config::<&str>(&[]);
+        config.repositories.push(Repository {
+            name: "duplicate".to_string(),
+            url: "https://example.com".to_string(),
+            desktop_integration: None,
+            pubkey: None,
+            enabled: Some(true),
+            signature_verification: None,
+            sync_interval: None,
+        });
+        config.repositories.push(Repository {
+            name: "duplicate".to_string(),
+            url: "https://example2.com".to_string(),
+            desktop_integration: None,
+            pubkey: None,
+            enabled: Some(true),
+            signature_verification: None,
+            sync_interval: None,
+        });
+
+        let result = config.resolve();
+        assert!(matches!(
+            result,
+            Err(ConfigError::DuplicateRepositoryName(_))
+        ));
+    }
+
+    #[test]
+    // Still populated while the OCI path exists; see the field's deprecation.
+    #[allow(deprecated)]
+    fn test_config_resolve_sets_defaults() {
+        let mut config = Config::default_config::<&str>(&[]);
+        config.ghcr_concurrency = None;
+        config.search_limit = None;
+        config.cross_repo_updates = None;
+        config.install_patterns = None;
+
+        config.resolve().unwrap();
+
+        assert_eq!(config.ghcr_concurrency, Some(8));
+        assert_eq!(config.search_limit, Some(20));
+        assert_eq!(config.cross_repo_updates, Some(false));
+        assert!(config.install_patterns.is_some());
+    }
+
+    #[test]
+    fn test_get_profile() {
+        let config = Config::default_config::<&str>(&[]);
+
+        let profile = config.get_profile("default");
+        assert!(profile.is_ok());
+
+        let missing = config.get_profile("nonexistent");
+        assert!(matches!(missing, Err(ConfigError::MissingProfile(_))));
+    }
+
+    #[test]
+    fn test_get_repository() {
+        let config = Config::default_config::<&str>(&[]);
+
+        if let Some(repo) = config.repositories.first() {
+            let found = config.get_repository(&repo.name);
+            assert!(found.is_some());
+        }
+
+        let missing = config.get_repository("nonexistent");
+        assert!(missing.is_none());
+    }
+
+    #[test]
+    fn test_has_desktop_integration() {
+        let mut config = Config::default_config::<&str>(&[]);
+
+        config.desktop_integration = Some(true);
+        assert!(config.has_desktop_integration("any_repo"));
+
+        config.desktop_integration = Some(false);
+        assert!(!config.has_desktop_integration("any_repo"));
+
+        config.desktop_integration = None;
+        config.repositories.push(Repository {
+            name: "test_repo".to_string(),
+            url: "https://example.com".to_string(),
+            desktop_integration: Some(true),
+            pubkey: None,
+            enabled: Some(true),
+            signature_verification: None,
+            sync_interval: None,
+        });
+        assert!(config.has_desktop_integration("test_repo"));
+    }
+
+    #[test]
+    fn test_get_desktop_path() {
+        let config = Config::default_config::<&str>(&[]);
+
+        // Default path based on system mode
+        let desktop = config.get_desktop_path().unwrap();
+        assert!(desktop.ends_with("applications"));
+
+        // Custom path override
+        let mut config = Config::default_config::<&str>(&[]);
+        config.desktop_path = Some("/custom/desktop/path".to_string());
+        let desktop = config.get_desktop_path().unwrap();
+        assert_eq!(desktop, PathBuf::from("/custom/desktop/path"));
+    }
+
+    #[test]
+    fn test_config_serialization() {
+        let config = Config::default_config::<&str>(&[]);
+        let serialized = toml::to_string(&config);
+        assert!(serialized.is_ok());
+
+        let deserialized: std::result::Result<Config, _> = toml::from_str(&serialized.unwrap());
+        assert!(deserialized.is_ok());
+    }
+
+    #[test]
+    fn test_config_path_env_override() {
+        with_env(vec![("SOAR_BIN", "/custom/bin")], || {
+            let config = Config::default_config::<&str>(&[]);
+            let bin_path = config.get_bin_path().unwrap();
+            assert_eq!(bin_path, PathBuf::from("/custom/bin"));
+        });
+    }
+}

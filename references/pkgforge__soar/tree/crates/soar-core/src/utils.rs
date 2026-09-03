@@ -1,0 +1,156 @@
+//! Utility functions for soar-core.
+
+use std::{
+    collections::HashMap,
+    fs,
+    path::{Path, PathBuf},
+};
+
+use soar_config::config::get_config;
+use soar_utils::{
+    error::FileSystemResult,
+    fs::{safe_remove, walk_dir},
+};
+use tracing::info;
+
+use crate::error::{ErrorContext, SoarError};
+
+type Result<T> = std::result::Result<T, SoarError>;
+
+/// Sets up required directories for soar operation.
+pub fn setup_required_paths() -> Result<()> {
+    let config = get_config();
+    let bin_path = config.get_bin_path()?;
+    if !bin_path.exists() {
+        fs::create_dir_all(&bin_path)
+            .with_context(|| format!("creating bin directory {}", bin_path.display()))?;
+    }
+
+    let db_path = config.get_db_path()?;
+    if !db_path.exists() {
+        fs::create_dir_all(&db_path)
+            .with_context(|| format!("creating database directory {}", db_path.display()))?;
+    }
+
+    for profile in config.profile.values() {
+        let packages_path = profile.get_packages_path()?;
+        if !packages_path.exists() {
+            fs::create_dir_all(&packages_path).with_context(|| {
+                format!("creating packages directory {}", packages_path.display())
+            })?;
+        }
+    }
+
+    Ok(())
+}
+
+/// Cleans up the cache directory.
+pub fn cleanup_cache() -> Result<()> {
+    let cache_path = get_config().get_cache_path()?;
+    if cache_path.exists() {
+        fs::remove_dir_all(&cache_path)
+            .with_context(|| format!("removing directory {}", cache_path.display()))?;
+        info!("Nuked cache directory: {}", cache_path.display());
+    } else {
+        info!("Cache directory is clean.");
+    }
+
+    Ok(())
+}
+
+fn remove_action(path: &Path) -> FileSystemResult<()> {
+    if path.is_symlink() && !path.exists() {
+        safe_remove(path)?;
+        info!("Removed broken symlink: {}", path.display());
+    }
+    Ok(())
+}
+
+/// Removes broken symlinks from bin, desktop, and icons directories.
+pub fn remove_broken_symlinks() -> Result<()> {
+    let mut soar_files_action = |path: &Path| -> FileSystemResult<()> {
+        if let Some(filename) = path.file_stem().and_then(|s| s.to_str()) {
+            if filename.ends_with("-soar") {
+                return remove_action(path);
+            }
+        }
+        Ok(())
+    };
+
+    let config = get_config();
+    walk_dir(&config.get_bin_path()?, &mut remove_action)?;
+    walk_dir(&config.get_desktop_path()?, &mut soar_files_action)?;
+    walk_dir(config.get_icons_path(), &mut soar_files_action)?;
+
+    Ok(())
+}
+
+/// Gets the extract directory path for a given base directory.
+pub fn get_extract_dir<P: AsRef<Path>>(base_dir: P) -> PathBuf {
+    let base_dir = base_dir.as_ref();
+    base_dir.join("SOAR_AUTOEXTRACT")
+}
+
+/// Substitute placeholders in a string with system/package metadata.
+///
+/// Supported placeholders:
+/// - `{arch}` - System architecture (e.g., "x86_64", "aarch64"), can be overridden via `arch_map`
+/// - `{os}` - Operating system (e.g., "linux", "macos")
+/// - `{version}` - Package version (if provided)
+pub fn substitute_placeholders(
+    template: &str,
+    version: Option<&str>,
+    arch_map: Option<&HashMap<String, String>>,
+) -> String {
+    let arch = arch_map
+        .and_then(|m| m.get(std::env::consts::ARCH))
+        .map(|s| s.as_str())
+        .unwrap_or(std::env::consts::ARCH);
+
+    let result = template
+        .replace("{arch}", arch)
+        .replace("{os}", std::env::consts::OS);
+
+    match version {
+        Some(v) => {
+            let normalized_version = v.strip_prefix('v').unwrap_or(v);
+            result.replace("{version}", normalized_version)
+        }
+        None => result,
+    }
+}
+
+/// Where a package's shared files are exposed on the system.
+///
+/// Each entry is the directory inside the package, the destination on the
+/// system, and whether the user asked for it. Man pages go beside the bin
+/// directory, because man-db derives its search path from PATH: for every
+/// `.../bin` it also looks at `.../share/man`. That makes them findable with
+/// no MANPATH set.
+pub fn shared_link_targets(
+    bin_dir: &Path,
+    shells: &[String],
+) -> Vec<(&'static str, PathBuf, bool)> {
+    let prefix = bin_dir.parent().unwrap_or(bin_dir);
+    let data = soar_utils::path::xdg_data_home();
+    let config = soar_utils::path::xdg_config_home();
+    let wants = |name: &str| shells.iter().any(|s| s == name);
+    vec![
+        ("share/man", prefix.join("share/man"), true),
+        (
+            "share/bash-completion/completions",
+            data.join("bash-completion/completions"),
+            wants("bash"),
+        ),
+        (
+            "share/zsh/site-functions",
+            data.join("zsh/site-functions"),
+            wants("zsh"),
+        ),
+        (
+            "share/fish/vendor_completions.d",
+            config.join("fish/completions"),
+            wants("fish"),
+        ),
+    ]
+}

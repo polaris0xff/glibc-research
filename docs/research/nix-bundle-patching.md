@@ -245,6 +245,58 @@ the recipe above achieved and less than "the GPU problem is solved".
 so the format works for large GUI applications. That is the baseline any claim
 about nix bundling has to beat, and it is higher than "nix cannot do GUI".
 
+## ⭐ 9. The vendoring model to copy, and it is a working one
+
+⛔ **The operator's future task F1 asks for "a script/tool/bot auto wired into
+our dev cycle where upstream's new commits/changes auto detected and
+auto-diffed".** `Azathothas/bit-cli` at `cce8131231abe8b232054f3f27b3feeac19dd411`
+already runs it over three upstream repositories and thirteen crates, and its
+`patches/README.md` states the model in one line:
+
+> **The model: the tree is the truth.** The vendored tree is edited in place,
+> like any other source in this repository. `patches/<upstream>/*.patch` is
+> **derived** from it and is never applied to anything.
+
+⭐ **And the alternative is refused with reasons, which is the part worth
+copying**: a pristine tree plus patches applied by a setup step *"was
+considered and rejected: every edit then needs a refresh, a dirty tree is easy
+to lose, and `rust-analyzer` reads the applied tree while the truth lives
+somewhere else."*
+
+⚠ **What the derived series buys, given the tree is already the truth**, is two
+things a working tree cannot say: **review** (somebody else's code on its own,
+without the 389 files around it) and **attribution** (Apache-2.0 asks a
+distributor to mark changed files as changed).
+
+**Three files and four scripts, and nothing else binds:**
+
+| | |
+|---|---|
+| `vendor/upstream.json` | what is vendored, from where, at which commit |
+| `patches/UPSTREAM.md` | every change made, and why — *"the part a script cannot write"* |
+| `patches/TASKS.md` | the work the fork exists to do, in order |
+| its `vendor-sync` script | put a tree in, or **three-way merge a new release onto ours** |
+| its `vendor-diff` script | regenerate the series; ⭐ **`-Check` fails when the series and the tree disagree** |
+| ⭐ its `upstream-scan` script | **everything upstream has, ranked against our open entries** |
+| its `vendor-status` script | one screen: is the fork healthy, is a merge due |
+
+⭐ **`upstream-scan` is F1's drift detector, already specified.** And
+`upstream.json` carries the field that makes reconciliation possible:
+
+> `base` is the commit our tree was last reconciled against. **It is not
+> necessarily what the tree contains**: the tree is ours and may carry patches.
+> That is the whole point of recording it.
+
+⚠ **One convention transfers directly and this project already has the rule.**
+`UPSTREAM.md`'s `Upstream:` field does **not** track a submission — nothing is
+sent upstream — it answers *"could a release retire this patch on its own?"*
+`TODO/RULES.md` §6 says the same thing here.
+
+⛔ **The methodology this is an instance of is already vendored in this tree**:
+[`../methodology/vendoring.md`](../methodology/vendoring.md), from
+`Azathothas/TEMPLATE`. It is binding, and F1 is an application of it rather
+than a new invention.
+
 ---
 
 ## ⛔ What this sweep did NOT establish

@@ -1,0 +1,100 @@
+
+## [0.5.2](https://github.com/pkgforge/soar/compare/soar-utils-v0.5.1...soar-utils-v0.5.2) - 2026-08-31
+
+### 🐛 Bug Fixes
+
+- *(system)* Only escalate for commands that write - ([1d7f1ef](https://github.com/pkgforge/soar/commit/1d7f1ef39e4cb6860423e365b8a7fbb8c8f15324))
+
+## [0.5.1](https://github.com/pkgforge/soar/compare/soar-utils-v0.5.0...soar-utils-v0.5.1) - 2026-08-15
+
+### ⛰️  Features
+
+- Serve soarpkgs on riscv64 and refresh the readme ([#198](https://github.com/pkgforge/soar/pull/198)) - ([2224691](https://github.com/pkgforge/soar/commit/22246912045678b45969e69b1ee23da6af43fd26))
+
+### 🐛 Bug Fixes
+
+- *(update)* Let the artifact decide where the version cannot - ([c656564](https://github.com/pkgforge/soar/commit/c656564f1d39548f3343acc0d049b1b01b370b00))
+
+### 📚 Documentation
+
+- Refresh README and CONTRIBUTING ([#199](https://github.com/pkgforge/soar/pull/199)) - ([6479cec](https://github.com/pkgforge/soar/commit/6479ceca42d8e1c452aaa11512457f10d98b6f5c))
+
+## [0.5.0](https://github.com/pkgforge/soar/compare/soar-utils-v0.4.3...soar-utils-v0.5.0) - 2026-08-02
+
+### ⛰️  Features
+
+- *(install)* Record where a URL install came from - ([d6c83ad](https://github.com/pkgforge/soar/commit/d6c83adf7ee42783d1f415b3c1c2a601f6b6d9c1))
+- [**breaking**] Consume the declarative index, drop the pkg_id requirement ([#186](https://github.com/pkgforge/soar/pull/186)) - ([3a35ad7](https://github.com/pkgforge/soar/commit/3a35ad7774e7ac3d8c055e4257cb3e9dff5be2fe))
+
+### 📚 Documentation
+
+- Cover forge tokens and rate limits - ([ccdd34a](https://github.com/pkgforge/soar/commit/ccdd34ad3f09a90994b85e917a45885fd1c3e413))
+- Refresh the readme and contributing guidelines - ([5ecd397](https://github.com/pkgforge/soar/commit/5ecd397e853d7d601677766ccf73dc68c063f015))
+
+## [0.4.3](https://github.com/pkgforge/soar/compare/soar-utils-v0.4.2...soar-utils-v0.4.3) - 2026-07-16
+
+### 🐛 Bug Fixes
+
+- *(security)* Validate repository names to block path traversal ([#183](https://github.com/pkgforge/soar/pull/183)) - ([c4b34f9](https://github.com/pkgforge/soar/commit/c4b34f9e0755ee43f2598dc4da783866394ea5fd))
+
+## [0.4.2](https://github.com/pkgforge/soar/compare/soar-utils-v0.4.1...soar-utils-v0.4.2) - 2026-06-25
+
+### ⚙️ Miscellaneous Tasks
+
+- Update Cargo.toml dependencies - ([0000000](https://github.com/pkgforge/soar/commit/0000000))
+
+## [0.4.1](https://github.com/pkgforge/soar/compare/soar-utils-v0.4.0...soar-utils-v0.4.1) - 2026-06-04
+
+### 🐛 Bug Fixes
+
+- *(dl)* Verify download integrity ([#168](https://github.com/pkgforge/soar/pull/168)) - ([336f2dd](https://github.com/pkgforge/soar/commit/336f2dde6cb8d1c112f4f558129ed53bf0888d03))
+
+## [0.4.0](https://github.com/pkgforge/soar/compare/soar-utils-v0.3.0...soar-utils-v0.4.0) - 2026-02-24
+
+### ⛰️  Features
+
+- *(lock)* Add locking for concurrent process safety ([#154](https://github.com/pkgforge/soar/pull/154)) - ([e3bef6a](https://github.com/pkgforge/soar/commit/e3bef6a09435e83a524b719f7b9f3e0d133c6b64))
+
+### 🐛 Bug Fixes
+
+- *(clippy)* Apply clippy suggestions - ([7b85532](https://github.com/pkgforge/soar/commit/7b85532d78baa32ee9541a2d764242656a8c07ba))
+
+### 🚜 Refactor
+
+- *(repositories)* Add soarpkgs, drop bincache and pkgcache - ([d07d602](https://github.com/pkgforge/soar/commit/d07d602dc9e972944b7516ac798036e5ddcc689f))
+
+### 📚 Documentation
+
+- *(readme)* Update readme - ([4fc58a7](https://github.com/pkgforge/soar/commit/4fc58a774b4c968db8f4d69f7f809378573b4145))
+
+### ⚙️ Miscellaneous Tasks
+
+- *(manifest)* Remove deprecated authors field - ([0bf1231](https://github.com/pkgforge/soar/commit/0bf123139798f2efb1674c8a14eaaf4f4640dc2a))
+
+## [0.3.0](https://github.com/pkgforge/soar/compare/soar-utils-v0.2.0...soar-utils-v0.3.0) - 2026-02-04
+
+### ⛰️  Features
+
+- *(nest)* [**breaking**] Remove nest functionality - ([dc21853](https://github.com/pkgforge/soar/commit/dc21853a2506d93d5ade9e2c4015c3a12b24c199))
+
+## [0.2.0](https://github.com/pkgforge/soar/compare/soar-utils-v0.1.1...soar-utils-v0.2.0) - 2026-01-17
+
+### ⛰️  Features
+
+- *(cli)* Add system-wide package management ([#141](https://github.com/pkgforge/soar/pull/141)) - ([f8d4f1c](https://github.com/pkgforge/soar/commit/f8d4f1c4e0e230427cd037355ba4a23da5b28a6b))
+
+### 🐛 Bug Fixes
+
+- *(clippy)* Apply clippy suggestions - ([1b45180](https://github.com/pkgforge/soar/commit/1b45180380790576d50f5c2430038efb0ca6d3a5))
+
+## [0.1.1](https://github.com/pkgforge/soar/compare/soar-utils-v0.1.0...soar-utils-v0.1.1) - 2025-12-28
+
+### 🐛 Bug Fixes
+
+- *(install)* Use deterministic hash for package without checksum - ([7a7a060](https://github.com/pkgforge/soar/commit/7a7a06049c61ba38a52921c51cb90b57aee4b809))
+
+## [0.1.0] - 2025-12-26
+
+### ⛰️  Features
+
+- *(crate)* Init soar-utils crate ([#92](https://github.com/pkgforge/soar/pull/92)) - ([26a9d92](https://github.com/pkgforge/soar/commit/26a9d92237d419946186bf084f8b45fad21cc4a1))

@@ -1,0 +1,139 @@
+using AppManager.Core;
+using AppManager.Utils;
+
+namespace AppManager {
+    public class DialogWindow : Adw.Window {
+        public signal void option_selected(string response_id);
+
+        private Gtk.Box body_box;
+        private Gtk.Box action_box;
+        private Gtk.Label title_label;
+        private bool actions_initialized = false;
+
+        public DialogWindow(Application app, Gtk.Window? parent, string title, Gtk.Image? icon = null) {
+            Object(application: app,
+                modal: (parent != null),
+                resizable: false,
+                destroy_with_parent: (parent != null),
+                width_request: 220,
+                default_width: 280);
+
+            if (parent != null) {
+                set_transient_for(parent);
+            }
+
+            var toolbar_view = new Adw.ToolbarView();
+            content = toolbar_view;
+
+            var header = new Adw.HeaderBar();
+            header.set_show_end_title_buttons(false);
+            header.set_show_start_title_buttons(false);
+            header.margin_top = 20;
+            title_label = new Gtk.Label(title);
+            title_label.add_css_class("title-4");
+            header.set_title_widget(title_label);
+            toolbar_view.add_top_bar(header);
+
+            var clamp = new Adw.Clamp();
+            clamp.margin_top = 20;
+            clamp.margin_bottom = 20;
+            clamp.margin_start = 20;
+            clamp.margin_end = 20;
+            clamp.maximum_size = 280;
+            clamp.tightening_threshold = 220;
+            toolbar_view.content = clamp;
+
+            body_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 18);
+            body_box.halign = Gtk.Align.FILL;
+            body_box.hexpand = true;
+            clamp.child = body_box;
+
+            if (icon != null) {
+                body_box.append(icon);
+            }
+
+            action_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 12);
+            action_box.halign = Gtk.Align.FILL;
+            action_box.hexpand = true;
+        }
+
+        public void append_body(Gtk.Widget widget) {
+            body_box.append(widget);
+        }
+
+        /**
+         * Re-uses this dialog for the next step of a flow: swaps the title and
+         * clears the body and buttons so the caller can rebuild them in place.
+         */
+        public void reset(string title, Gtk.Image? icon = null) {
+            title_label.set_text(title);
+
+            var child = body_box.get_first_child();
+            while (child != null) {
+                var next = child.get_next_sibling();
+                body_box.remove(child);
+                child = next;
+            }
+
+            action_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 12);
+            action_box.halign = Gtk.Align.FILL;
+            action_box.hexpand = true;
+            actions_initialized = false;
+
+            if (icon != null) {
+                body_box.append(icon);
+            }
+        }
+
+        public Gtk.Button add_option(string response_id, string label, bool is_default = false) {
+            if (!actions_initialized) {
+                body_box.append(action_box);
+                actions_initialized = true;
+            }
+
+            var button = new Gtk.Button.with_label(label);
+            button.halign = Gtk.Align.FILL;
+            button.hexpand = true;
+            button.set_size_request(-1, 40);
+            if (is_default) {
+                button.add_css_class("suggested-action");
+            }
+            action_box.append(button);
+            button.clicked.connect(() => {
+                option_selected(response_id);
+                this.close();
+            });
+            return button;
+        }
+    }
+
+    public class UninstallNotification : Object {
+        public static DialogWindow present(Application app, Gtk.Window? parent, InstallationRecord record) {
+            var dialog = new DialogWindow(app, parent, _("App removed"), build_image(record));
+
+            var app_name = record.name ?? record.installed_path;
+            if (app_name != null && app_name.strip() != "") {
+                var markup = "<b>%s</b>".printf(GLib.Markup.escape_text(app_name, -1));
+                dialog.append_body(UiUtils.create_wrapped_label(markup, true));
+            }
+
+            dialog.append_body(UiUtils.create_wrapped_label(_("The application was uninstalled successfully.")));
+            dialog.add_option("close", _("Close"), true);
+            dialog.present();
+            return dialog;
+        }
+
+        private static Gtk.Image build_image(InstallationRecord record) {
+            var image = new Gtk.Image();
+            image.set_pixel_size(64);
+            image.halign = Gtk.Align.CENTER;
+            var paintable = UiUtils.load_record_icon(record);
+            if (paintable != null) {
+                image.set_from_paintable(paintable);
+            } else {
+                image.set_from_icon_name("application-x-executable");
+            }
+            return image;
+        }
+    }
+}

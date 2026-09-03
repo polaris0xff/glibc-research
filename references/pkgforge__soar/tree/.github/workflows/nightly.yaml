@@ -1,0 +1,185 @@
+name: soar nightly
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+on:
+  schedule:
+    # 03:00 UTC every day
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  attestations: write
+  contents: write
+  id-token: write
+
+jobs:
+  check-changes:
+    name: Check for new commits
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Compare HEAD with nightly tag
+        id: check
+        shell: bash
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git fetch origin tag nightly --no-tags || true
+          tag_commit=$(git rev-parse -q --verify 'nightly^{commit}' || true)
+          if [ -n "$tag_commit" ] && [ "$tag_commit" = "$(git rev-parse HEAD)" ]; then
+            echo "No new commits since last nightly; skipping"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-nightly:
+    name: Build nightly binaries
+    needs: check-changes
+    if: ${{ needs.check-changes.outputs.changed == 'true' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build:
+          - {
+              NAME: aarch64-linux,
+              TARGET: aarch64-unknown-linux-musl,
+            }
+          - {
+              NAME: riscv64-linux,
+              TARGET: riscv64gc-unknown-linux-musl
+            }
+          - {
+              NAME: x86_64-linux,
+              TARGET: x86_64-unknown-linux-musl,
+            }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          sudo apt update -y
+          sudo apt install b3sum findutils file -y
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.build.TARGET }}
+
+      - name: Install Cross
+        shell: bash
+        run: |
+          cargo install cross --git "https://github.com/cross-rs/cross" --jobs="$(($(nproc)+1))"
+          hash -r &>/dev/null
+          command -v cross &>/dev/null || { echo "cross command not found" >&2; exit 1; }
+
+      - name: Build
+        env:
+          RUSTFLAGS: "-C target-feature=+crt-static \
+                      -C link-self-contained=yes \
+                      -C link-arg=-Wl,--build-id=none"
+          SOAR_NIGHTLY: "1"
+        run: cross build --release -F self --locked --target "${{ matrix.build.TARGET }}" --jobs="$(($(nproc)+1))" --verbose
+
+      - name: Prepare release assets
+        shell: bash
+        run: |
+          mkdir -p release
+          cp {LICENSE,README.md} release/
+          cp "target/${{ matrix.build.TARGET }}/release/soar" release/
+
+      - name: Create release artifacts
+        env:
+          ARTIFACT: "soar-${{ matrix.build.NAME }}"
+        shell: bash
+        run: |
+          cp release/soar "${ARTIFACT}"
+          b3sum "${ARTIFACT}" > "${ARTIFACT}.b3sum"
+
+          tar -czvf "${ARTIFACT}.tar.gz" release/
+          b3sum "${ARTIFACT}.tar.gz" > "${ARTIFACT}.tar.gz.b3sum"
+          bash -c 'realpath "${ARTIFACT}" ; realpath "${ARTIFACT}.tar.gz"' | xargs -I "{}" bash -c \
+           'printf "\nFile: $(basename {})\n  Type: $(file -b {})\n  B3sum: $(b3sum {} | cut -d" " -f1)\n  SHA256sum: $(sha256sum {} | cut -d" " -f1)\n  Size: $(du -bh {} | cut -f1)\n"'
+
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@v3.0.0
+        with:
+          subject-name: "soar-nightly-${{ matrix.build.NAME }}"
+          subject-path: |
+            soar-${{ matrix.build.NAME }}*
+          show-summary: true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: soar-${{ matrix.build.NAME }}
+          path: soar-${{ matrix.build.NAME }}*
+
+  publish-nightly:
+    name: Republish nightly release
+    needs: [check-changes, build-nightly]
+    if: ${{ !cancelled() && needs.check-changes.outputs.changed == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: soar-*
+          merge-multiple: true
+          path: dist
+
+      - name: Check artifacts
+        shell: bash
+        run: |
+          shopt -s nullglob
+          files=(dist/*)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No artifacts produced; nothing to publish" >&2
+            exit 1
+          fi
+
+      - name: Compose release notes
+        shell: bash
+        run: |
+          {
+            echo "Rolling nightly build from \`main\`, rebuilt every day."
+            echo
+            echo "**Commit:** [\`$(git rev-parse --short HEAD)\`](https://github.com/${GITHUB_REPOSITORY}/commit/$(git rev-parse HEAD)) — $(git log -1 --pretty=%s)"
+            echo "**Built:** $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+            echo
+            echo "These binaries track \`main\` and may be unstable. For stable builds see https://github.com/${GITHUB_REPOSITORY}/releases/latest."
+          } > NIGHTLY_NOTES.md
+
+      - name: Refresh nightly tag
+        run: |
+          git tag -f nightly
+          git push origin nightly --force
+
+      - name: Delete previous nightly release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release delete nightly --yes || true
+
+      - name: Publish nightly release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create nightly \
+            --title "nightly-$(git rev-parse --short HEAD)" \
+            --prerelease \
+            --notes-file NIGHTLY_NOTES.md \
+            dist/*

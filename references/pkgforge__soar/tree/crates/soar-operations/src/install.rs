@@ -1,0 +1,1407 @@
+use std::{
+    fs::{self, File},
+    io::{BufReader, Read},
+    path::{Path, PathBuf},
+    sync::{
+        atomic::{AtomicU32, Ordering},
+        Arc, Mutex,
+    },
+    time::Duration,
+};
+
+use minisign_verify::{PublicKey, Signature};
+use soar_config::utils::default_install_patterns;
+use soar_core::{
+    database::{
+        connection::{DieselDatabase, MetadataManager},
+        models::{InstalledPackage, Package},
+    },
+    error::{ErrorContext, SoarError},
+    package::{
+        install::{InstallMarker, InstallTarget, PackageInstaller},
+        local::LocalPackage,
+        query::PackageQuery,
+        remove::make_tree_writable,
+        update::remove_old_versions,
+        url::UrlPackage,
+    },
+    SoarResult,
+};
+use soar_db::repository::{
+    core::{CoreRepository, SortDirection},
+    metadata::{narrow_by_pkg_id, MetadataRepository},
+};
+use soar_events::{InstallStage, SoarEvent, VerifyStage};
+use soar_package::integrate_package;
+use soar_utils::{
+    hash::{calculate_checksum, hash_string},
+    lock::FileLock,
+    path::is_safe_component,
+    pattern::apply_sig_variants,
+    version::compare_versions,
+};
+use tokio::sync::Semaphore;
+use tracing::{debug, trace, warn};
+
+use crate::{
+    progress::{create_progress_bridge, next_op_id},
+    utils::{has_desktop_integration, link_shared_files, mangle_package_symlinks},
+    FailedInfo, InstallOptions, InstallReport, InstalledInfo, ResolveResult, SoarContext,
+};
+
+/// Build an install target for a package the caller has already chosen.
+///
+/// Resolving it again by name would pose the same ambiguous question that the
+/// choice just answered.
+pub fn target_for(
+    ctx: &SoarContext,
+    package: Package,
+    options: &InstallOptions,
+) -> SoarResult<InstallTarget> {
+    let diesel_db = ctx.diesel_core_db()?.clone();
+    let existing_install: Option<InstalledPackage> = diesel_db
+        .with_conn(|conn| {
+            CoreRepository::list_filtered(
+                conn,
+                Some(&package.repo_name),
+                Some(&package.pkg_name),
+                package.pkg_id.as_deref(),
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+        })?
+        .into_iter()
+        // The query cannot narrow by family, and an uninstalled row of the
+        // same name would otherwise stand in for the installed one.
+        .filter(|ip| ip.pkg_family.as_deref() == package.pkg_family.as_deref())
+        .find(|ip| ip.is_installed)
+        .map(Into::into);
+    let pinned = options.version_override.is_some();
+    let package = package.resolve(options.version_override.as_deref());
+    Ok(InstallTarget {
+        package,
+        existing_install,
+        pinned,
+        profile: None,
+        ..Default::default()
+    })
+}
+
+/// Resolve package queries into install targets or ambiguity results.
+///
+/// For each query string, returns a [`ResolveResult`] indicating whether the
+/// package was resolved, is ambiguous (multiple candidates), not found, or
+/// already installed.
+pub async fn resolve_packages(
+    ctx: &SoarContext,
+    packages: &[String],
+    options: &InstallOptions,
+) -> SoarResult<Vec<ResolveResult>> {
+    debug!(count = packages.len(), "resolving packages for install");
+    let metadata_mgr = ctx.metadata_manager().await?;
+    let diesel_db = ctx.diesel_core_db()?;
+
+    let mut results = Vec::with_capacity(packages.len());
+
+    for package in packages {
+        if LocalPackage::is_local(package) {
+            results.push(resolve_local_package(diesel_db, package, options)?);
+            continue;
+        }
+
+        if UrlPackage::is_remote(package) {
+            results.push(resolve_url_package(diesel_db, package, options)?);
+            continue;
+        }
+
+        let query = PackageQuery::try_from(package.as_str())?;
+
+        // Handle #all: install all packages with same pkg_id
+        if let Some(ref pkg_id) = query.pkg_id {
+            if pkg_id == "all" {
+                results.push(resolve_all_variants(
+                    metadata_mgr,
+                    diesel_db,
+                    &query,
+                    options,
+                )?);
+                continue;
+            }
+        }
+
+        // Handle pkg_id-only queries (no name)
+        if query.name.is_none() && query.pkg_id.is_some() {
+            results.push(resolve_by_pkg_id(metadata_mgr, diesel_db, &query, options)?);
+            continue;
+        }
+
+        // Normal resolution
+        results.push(resolve_normal(
+            metadata_mgr,
+            diesel_db,
+            package,
+            &query,
+            options,
+        )?);
+    }
+
+    Ok(results)
+}
+
+fn resolve_url_package(
+    diesel_db: &DieselDatabase,
+    package: &str,
+    options: &InstallOptions,
+) -> SoarResult<ResolveResult> {
+    let url_pkg = UrlPackage::from_remote(
+        package,
+        options.name_override.as_deref(),
+        options.version_override.as_deref(),
+        options.pkg_type_override.as_deref(),
+        options.pkg_id_override.as_deref(),
+    )?;
+
+    resolve_synthetic_target(diesel_db, url_pkg.to_package(), options)
+}
+
+fn resolve_local_package(
+    diesel_db: &DieselDatabase,
+    package: &str,
+    options: &InstallOptions,
+) -> SoarResult<ResolveResult> {
+    let local_pkg = LocalPackage::from_path(
+        package,
+        options.name_override.as_deref(),
+        options.version_override.as_deref(),
+        options.pkg_type_override.as_deref(),
+        options.pkg_id_override.as_deref(),
+    )?;
+
+    resolve_synthetic_target(diesel_db, local_pkg.to_package(), options)
+}
+
+/// Build an install target for a synthetic (`local` repo) package, honoring
+/// the already-installed / `--force` checks. Shared by URL/GHCR and local-file
+/// installs.
+fn resolve_synthetic_target(
+    diesel_db: &DieselDatabase,
+    package: Package,
+    options: &InstallOptions,
+) -> SoarResult<ResolveResult> {
+    let installed_packages: Vec<InstalledPackage> = diesel_db
+        .with_conn(|conn| {
+            CoreRepository::list_filtered(
+                conn,
+                Some("local"),
+                Some(&package.pkg_name),
+                package.pkg_id.as_deref(),
+                None,
+                None,
+                None,
+                None,
+                Some(SortDirection::Asc),
+            )
+        })?
+        .into_iter()
+        .map(Into::into)
+        .collect();
+
+    let installed_pkg = installed_packages.iter().find(|ip| ip.is_installed);
+
+    if let Some(installed) = installed_pkg {
+        if !options.force {
+            return Ok(ResolveResult::AlreadyInstalled {
+                pkg_name: installed.pkg_name.clone(),
+                repo_name: installed.repo_name.clone(),
+                version: installed.version.clone(),
+            });
+        }
+    }
+
+    let existing_install = installed_pkg
+        .cloned()
+        .or_else(|| installed_packages.into_iter().next());
+
+    Ok(ResolveResult::Resolved(vec![InstallTarget {
+        package,
+        existing_install,
+        pinned: false,
+        profile: None,
+        ..Default::default()
+    }]))
+}
+
+fn resolve_all_variants(
+    metadata_mgr: &MetadataManager,
+    diesel_db: &DieselDatabase,
+    query: &PackageQuery,
+    options: &InstallOptions,
+) -> SoarResult<ResolveResult> {
+    let variants: Vec<Package> = if let Some(ref repo_name) = query.repo_name {
+        metadata_mgr
+            .query_repo(repo_name, |conn| {
+                MetadataRepository::find_filtered(
+                    conn,
+                    query.name.as_deref(),
+                    None,
+                    None,
+                    None,
+                    None,
+                    Some(SortDirection::Asc),
+                )
+            })?
+            .unwrap_or_default()
+            .into_iter()
+            .map(|p| {
+                let mut pkg: Package = p.into();
+                pkg.repo_name = repo_name.clone();
+                pkg
+            })
+            .collect()
+    } else {
+        metadata_mgr.query_all_flat(|repo_name, conn| {
+            let pkgs = MetadataRepository::find_filtered(
+                conn,
+                query.name.as_deref(),
+                None,
+                None,
+                None,
+                None,
+                Some(SortDirection::Asc),
+            )?;
+            Ok(pkgs
+                .into_iter()
+                .map(|p| {
+                    let mut pkg: Package = p.into();
+                    pkg.repo_name = repo_name.to_string();
+                    pkg
+                })
+                .collect())
+        })?
+    };
+
+    if variants.is_empty() {
+        return Ok(ResolveResult::NotFound(
+            query.name.clone().unwrap_or_default(),
+        ));
+    }
+
+    // Multiple distinct pkg_ids -> ambiguous, caller must pick
+    if variants.len() > 1 {
+        let first_pkg_id = &variants[0].pkg_id;
+        let all_same_pkg_id = variants.iter().all(|v| v.pkg_id == *first_pkg_id);
+        if !all_same_pkg_id {
+            return Ok(ResolveResult::Ambiguous(crate::AmbiguousPackage {
+                query: query.name.clone().unwrap_or_default(),
+                candidates: variants,
+            }));
+        }
+    }
+
+    let target_pkg_id = variants[0].pkg_id.clone();
+    let target_pkg_name = variants[0].pkg_name.clone();
+    let target_pkg_family = variants[0].pkg_family.clone();
+
+    // Without an id every filter below would be None, which reads as "no
+    // filter" and returns the whole metadata table. Fall back to the selected
+    // package's own name and family instead.
+    let (name_filter, id_filter, family_filter) = match target_pkg_id.as_deref() {
+        Some(id) => (None, Some(id), None),
+        None => {
+            (
+                Some(target_pkg_name.as_str()),
+                None,
+                target_pkg_family.as_deref(),
+            )
+        }
+    };
+
+    // Find all packages with this identity
+    let all_pkgs: Vec<Package> = if let Some(ref repo_name) = query.repo_name {
+        metadata_mgr
+            .query_repo(repo_name, |conn| {
+                MetadataRepository::find_filtered(
+                    conn,
+                    name_filter,
+                    id_filter,
+                    family_filter,
+                    None,
+                    None,
+                    Some(SortDirection::Asc),
+                )
+            })?
+            .unwrap_or_default()
+            .into_iter()
+            .map(|p| {
+                let mut pkg: Package = p.into();
+                pkg.repo_name = repo_name.clone();
+                pkg
+            })
+            .collect()
+    } else {
+        metadata_mgr.query_all_flat(|repo_name, conn| {
+            let pkgs = MetadataRepository::find_filtered(
+                conn,
+                name_filter,
+                id_filter,
+                family_filter,
+                None,
+                None,
+                Some(SortDirection::Asc),
+            )?;
+            Ok(pkgs
+                .into_iter()
+                .map(|p| {
+                    let mut pkg: Package = p.into();
+                    pkg.repo_name = repo_name.to_string();
+                    pkg
+                })
+                .collect())
+        })?
+    };
+
+    let installed_packages: Vec<InstalledPackage> = diesel_db
+        .with_conn(|conn| {
+            CoreRepository::list_filtered(
+                conn,
+                query.repo_name.as_deref(),
+                name_filter,
+                id_filter,
+                None,
+                None,
+                None,
+                None,
+                Some(SortDirection::Asc),
+            )
+        })?
+        .into_iter()
+        .map(Into::into)
+        .collect();
+
+    let mut targets = Vec::new();
+    for pkg in all_pkgs {
+        let existing_install = installed_packages
+            .iter()
+            .find(|ip| ip.pkg_name == pkg.pkg_name)
+            .cloned();
+
+        if let Some(ref existing) = existing_install {
+            if existing.is_installed && !options.force {
+                continue;
+            }
+        }
+
+        let pkg = pkg.resolve(query.version.as_deref());
+
+        targets.push(InstallTarget {
+            package: pkg,
+            existing_install,
+            pinned: query.version.is_some(),
+            profile: None,
+            ..Default::default()
+        });
+    }
+
+    Ok(ResolveResult::Resolved(targets))
+}
+
+fn resolve_by_pkg_id(
+    metadata_mgr: &MetadataManager,
+    diesel_db: &DieselDatabase,
+    query: &PackageQuery,
+    options: &InstallOptions,
+) -> SoarResult<ResolveResult> {
+    let installed_packages: Vec<InstalledPackage> = diesel_db
+        .with_conn(|conn| {
+            CoreRepository::list_filtered(
+                conn,
+                query.repo_name.as_deref(),
+                query.name.as_deref(),
+                query.pkg_id.as_deref(),
+                None,
+                None,
+                None,
+                None,
+                Some(SortDirection::Asc),
+            )
+        })?
+        .into_iter()
+        .map(Into::into)
+        .collect();
+
+    let repo_pkgs: Vec<Package> = if let Some(ref repo_name) = query.repo_name {
+        metadata_mgr
+            .query_repo(repo_name, |conn| {
+                MetadataRepository::find_filtered(
+                    conn,
+                    None,
+                    query.pkg_id.as_deref(),
+                    query.family.as_deref(),
+                    None,
+                    None,
+                    None,
+                )
+            })?
+            .unwrap_or_default()
+            .into_iter()
+            .map(|p| {
+                let mut pkg: Package = p.into();
+                pkg.repo_name = repo_name.clone();
+                pkg
+            })
+            .collect()
+    } else {
+        metadata_mgr.query_all_flat(|repo_name, conn| {
+            let pkgs = MetadataRepository::find_filtered(
+                conn,
+                None,
+                query.pkg_id.as_deref(),
+                query.family.as_deref(),
+                None,
+                None,
+                None,
+            )?;
+            Ok(pkgs
+                .into_iter()
+                .map(|p| {
+                    let mut pkg: Package = p.into();
+                    pkg.repo_name = repo_name.to_string();
+                    pkg
+                })
+                .collect())
+        })?
+    };
+
+    let repo_pkgs: Vec<Package> = if let Some(ref version) = query.version {
+        repo_pkgs
+            .into_iter()
+            .filter(|p| p.has_version(version))
+            .collect()
+    } else {
+        repo_pkgs
+    };
+
+    let mut targets = Vec::new();
+    for pkg in repo_pkgs {
+        let pkg = pkg.resolve(query.version.as_deref());
+
+        let existing_install = installed_packages
+            .iter()
+            .find(|ip| ip.pkg_name == pkg.pkg_name)
+            .cloned();
+
+        if let Some(ref existing) = existing_install {
+            if existing.is_installed && !options.force {
+                continue;
+            }
+        }
+
+        targets.push(InstallTarget {
+            package: pkg,
+            existing_install,
+            pinned: query.version.is_some(),
+            profile: None,
+            ..Default::default()
+        });
+    }
+
+    Ok(ResolveResult::Resolved(targets))
+}
+
+fn resolve_normal(
+    metadata_mgr: &MetadataManager,
+    diesel_db: &DieselDatabase,
+    package_name: &str,
+    query: &PackageQuery,
+    options: &InstallOptions,
+) -> SoarResult<ResolveResult> {
+    let installed_packages: Vec<InstalledPackage> = diesel_db
+        .with_conn(|conn| {
+            CoreRepository::list_filtered(
+                conn,
+                query.repo_name.as_deref(),
+                query.name.as_deref(),
+                query.pkg_id.as_deref(),
+                None,
+                None,
+                None,
+                None,
+                Some(SortDirection::Asc),
+            )
+        })?
+        .into_iter()
+        .map(Into::into)
+        .collect();
+
+    let maybe_existing = installed_packages.first().cloned();
+
+    let packages: Vec<Package> = find_packages(metadata_mgr, query, &maybe_existing)?;
+
+    let packages: Vec<Package> = if let Some(ref version) = query.version {
+        packages
+            .into_iter()
+            .filter(|p| p.has_version(version))
+            .collect()
+    } else {
+        packages
+    };
+
+    match packages.len() {
+        0 => Ok(ResolveResult::NotFound(package_name.to_string())),
+        1 => {
+            let pkg = packages.into_iter().next().unwrap();
+            // Same name from another repository is a different package, so it
+            // must not be mistaken for this one already being installed.
+            let installed_pkg = installed_packages
+                .iter()
+                .find(|ip| ip.is_installed && ip.repo_name == pkg.repo_name);
+
+            if let Some(installed) = installed_pkg {
+                if !options.force {
+                    return Ok(ResolveResult::AlreadyInstalled {
+                        pkg_name: installed.pkg_name.clone(),
+                        repo_name: installed.repo_name.clone(),
+                        version: installed.version.clone(),
+                    });
+                }
+            }
+
+            let existing_install = installed_packages
+                .iter()
+                .find(|ip| ip.version == pkg.version)
+                .cloned();
+
+            let pkg = pkg.resolve(query.version.as_deref());
+
+            Ok(ResolveResult::Resolved(vec![InstallTarget {
+                package: pkg,
+                existing_install,
+                pinned: query.version.is_some(),
+                profile: None,
+                ..Default::default()
+            }]))
+        }
+        _ => {
+            // Several versions of one package are not competing variants, and
+            // asking which to install would be asking the same question the
+            // caller already answered by naming it. The newest wins; anything
+            // else is chosen with an explicit @version.
+            let identity = |p: &Package| {
+                (
+                    p.pkg_name.clone(),
+                    p.pkg_id.clone(),
+                    p.pkg_family.clone(),
+                    p.repo_name.clone(),
+                )
+            };
+            let first = identity(&packages[0]);
+            if packages.iter().all(|p| identity(p) == first) {
+                let newest = packages
+                    .into_iter()
+                    .max_by(|a, b| compare_versions(&a.version, &b.version))
+                    .unwrap();
+                let installed_pkg = installed_packages
+                    .iter()
+                    .find(|ip| ip.is_installed && ip.repo_name == newest.repo_name);
+                if let Some(installed) = installed_pkg {
+                    if !options.force {
+                        return Ok(ResolveResult::AlreadyInstalled {
+                            pkg_name: installed.pkg_name.clone(),
+                            repo_name: installed.repo_name.clone(),
+                            version: installed.version.clone(),
+                        });
+                    }
+                }
+                let existing_install = installed_packages
+                    .iter()
+                    .find(|ip| {
+                        ip.version == newest.version
+                            && ip.repo_name == newest.repo_name
+                            && ip.pkg_family.as_deref() == newest.pkg_family.as_deref()
+                    })
+                    .cloned();
+                let newest = newest.resolve(query.version.as_deref());
+                return Ok(ResolveResult::Resolved(vec![InstallTarget {
+                    package: newest,
+                    existing_install,
+                    pinned: query.version.is_some(),
+                    profile: None,
+                    ..Default::default()
+                }]));
+            }
+
+            Ok(ResolveResult::Ambiguous(crate::AmbiguousPackage {
+                query: package_name.to_string(),
+                candidates: packages,
+            }))
+        }
+    }
+}
+
+fn find_packages(
+    metadata_mgr: &MetadataManager,
+    query: &PackageQuery,
+    existing_install: &Option<InstalledPackage>,
+) -> SoarResult<Vec<Package>> {
+    // Naming a repository is a choice, so it outranks where an existing install
+    // happened to come from.
+    // If we have an existing install, try to find it in its original repo first
+    if let Some(existing) = existing_install
+        .as_ref()
+        .filter(|_| query.repo_name.is_none())
+    {
+        let existing_pkgs: Vec<Package> = narrow_by_pkg_id(
+            metadata_mgr
+                .query_repo(&existing.repo_name, |conn| {
+                    MetadataRepository::find_filtered(
+                        conn,
+                        Some(&existing.pkg_name),
+                        None,
+                        existing.pkg_family.as_deref(),
+                        None,
+                        None,
+                        None,
+                    )
+                })?
+                .unwrap_or_default(),
+            existing.pkg_id.as_deref(),
+        )
+        .into_iter()
+        .map(|p| {
+            let mut pkg: Package = p.into();
+            pkg.repo_name = existing.repo_name.clone();
+            pkg
+        })
+        .collect();
+
+        if !existing_pkgs.is_empty() {
+            return Ok(existing_pkgs);
+        }
+    }
+
+    if let Some(ref repo_name) = query.repo_name {
+        Ok(metadata_mgr
+            .query_repo(repo_name, |conn| {
+                MetadataRepository::find_filtered(
+                    conn,
+                    query.name.as_deref(),
+                    query.pkg_id.as_deref(),
+                    query.family.as_deref(),
+                    None,
+                    None,
+                    None,
+                )
+            })?
+            .unwrap_or_default()
+            .into_iter()
+            .map(|p| {
+                let mut pkg: Package = p.into();
+                pkg.repo_name = repo_name.clone();
+                pkg
+            })
+            .collect())
+    } else {
+        metadata_mgr.query_all_flat(|repo_name, conn| {
+            let pkgs = MetadataRepository::find_filtered(
+                conn,
+                query.name.as_deref(),
+                query.pkg_id.as_deref(),
+                query.family.as_deref(),
+                None,
+                None,
+                None,
+            )?;
+            Ok(pkgs
+                .into_iter()
+                .map(|p| {
+                    let mut pkg: Package = p.into();
+                    pkg.repo_name = repo_name.to_string();
+                    pkg
+                })
+                .collect())
+        })
+    }
+}
+
+/// Install resolved targets. Emits events through the context's event sink.
+///
+/// Handles concurrency control, download, verification, symlink creation,
+/// desktop integration, and database recording.
+pub async fn perform_installation(
+    ctx: &SoarContext,
+    targets: Vec<InstallTarget>,
+    options: &InstallOptions,
+) -> SoarResult<InstallReport> {
+    debug!(count = targets.len(), "performing installation");
+    let diesel_db = ctx.diesel_core_db()?.clone();
+    let parallel_limit = ctx.config().parallel_limit.unwrap_or(4);
+    let semaphore = Arc::new(Semaphore::new(parallel_limit as usize));
+
+    let installed = Arc::new(Mutex::new(Vec::new()));
+    let failed = Arc::new(Mutex::new(Vec::new()));
+    let warnings = Arc::new(Mutex::new(Vec::new()));
+
+    let total = targets.len() as u32;
+    let completed = Arc::new(AtomicU32::new(0));
+    let failed_count = Arc::new(AtomicU32::new(0));
+
+    // Without this the count only appears once the first package is done.
+    if total > 1 {
+        ctx.events().emit(SoarEvent::BatchProgress {
+            completed: 0,
+            total,
+            failed: 0,
+        });
+    }
+
+    let mut handles = Vec::new();
+
+    for target in targets {
+        let permit = semaphore.clone().acquire_owned().await.unwrap();
+        let ctx = ctx.clone();
+        let db = diesel_db.clone();
+        let installed = installed.clone();
+        let failed = failed.clone();
+        let warnings = warnings.clone();
+        let completed = completed.clone();
+        let failed_count = failed_count.clone();
+        let binary_only = options.binary_only;
+        let no_verify = options.no_verify;
+        let portable = options.portable.clone();
+        let portable_home = options.portable_home.clone();
+        let portable_config = options.portable_config.clone();
+        let portable_share = options.portable_share.clone();
+        let portable_cache = options.portable_cache.clone();
+
+        let handle = tokio::spawn(async move {
+            let result = install_single_package(
+                &ctx,
+                &target,
+                db.clone(),
+                binary_only,
+                no_verify,
+                portable.as_deref(),
+                portable_home.as_deref(),
+                portable_config.as_deref(),
+                portable_share.as_deref(),
+                portable_cache.as_deref(),
+            )
+            .await;
+
+            match result {
+                Ok((install_dir, symlinks, shared)) => {
+                    if !install_dir.as_os_str().is_empty() {
+                        installed.lock().unwrap().push(InstalledInfo {
+                            pkg_name: target.package.pkg_name.clone(),
+                            pkg_family: target.package.pkg_family.clone(),
+                            repo_name: target.package.repo_name.clone(),
+                            version: target.package.version.clone(),
+                            install_dir,
+                            symlinks,
+                            shared,
+                            notes: target.package.notes.clone(),
+                        });
+                    }
+                    if let Err(err) = remove_old_versions(&target.package, &db, false) {
+                        warn!(error = %err, "could not remove the superseded version");
+                    }
+                }
+                Err(err) => {
+                    match err {
+                        SoarError::Warning(msg) => {
+                            warnings.lock().unwrap().push(msg);
+                            if let Err(err) = remove_old_versions(&target.package, &db, false) {
+                                warn!(error = %err, "could not remove the superseded version");
+                            }
+                        }
+                        _ => {
+                            let op_id = next_op_id();
+                            ctx.events().emit(SoarEvent::OperationFailed {
+                                op_id,
+                                pkg_name: target.package.pkg_name.clone(),
+                                error: err.to_string(),
+                            });
+                            failed.lock().unwrap().push(FailedInfo {
+                                pkg_name: target.package.pkg_name.clone(),
+                                error: err.to_string(),
+                            });
+                            failed_count.fetch_add(1, Ordering::Relaxed);
+                        }
+                    }
+                }
+            }
+
+            let done = completed.fetch_add(1, Ordering::Relaxed) + 1;
+            ctx.events().emit(SoarEvent::BatchProgress {
+                completed: done,
+                total,
+                failed: failed_count.load(Ordering::Relaxed),
+            });
+
+            drop(permit);
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle
+            .await
+            .map_err(|err| SoarError::Custom(format!("Join handle error: {err}")))?;
+    }
+
+    let installed = Arc::try_unwrap(installed).unwrap().into_inner().unwrap();
+    let failed = Arc::try_unwrap(failed).unwrap().into_inner().unwrap();
+    let warnings = Arc::try_unwrap(warnings).unwrap().into_inner().unwrap();
+
+    Ok(InstallReport {
+        installed,
+        failed,
+        warnings,
+    })
+}
+
+/// Whether the registry-style "checksum or signature required" integrity gate is
+/// inapplicable to this package's source.
+/// Exemption only skips the gate; an explicit `bsum` (e.g. a user-provided pin) is still
+/// enforced by checksum verification.
+fn source_skips_integrity_gate(pkg: &Package) -> bool {
+    pkg.repo_name == "local" || pkg.ghcr_pkg.is_some()
+}
+
+#[allow(clippy::too_many_arguments)]
+// Reads install_patterns while the OCI path exists; see the field's deprecation.
+#[allow(deprecated)]
+async fn install_single_package(
+    ctx: &SoarContext,
+    target: &InstallTarget,
+    core_db: DieselDatabase,
+    binary_only: bool,
+    no_verify: bool,
+    portable: Option<&str>,
+    portable_home: Option<&str>,
+    portable_config: Option<&str>,
+    portable_share: Option<&str>,
+    portable_cache: Option<&str>,
+) -> SoarResult<(PathBuf, Vec<(PathBuf, PathBuf)>, Vec<(PathBuf, PathBuf)>)> {
+    let op_id = next_op_id();
+    let events = ctx.events().clone();
+    let pkg = &target.package;
+
+    debug!(
+        pkg_name = pkg.pkg_name,
+        pkg_id = pkg.pkg_id,
+        version = pkg.version,
+        "installing package"
+    );
+
+    // Acquire lock with a bounded retry count to avoid hanging on stale locks
+    const MAX_LOCK_ATTEMPTS: u32 = 120; // 60 seconds at 500ms intervals
+    let mut lock_attempts = 0u32;
+    let _package_lock = loop {
+        match FileLock::try_acquire(&pkg.pkg_name) {
+            Ok(Some(lock)) => break Ok(lock),
+            Ok(None) => {
+                lock_attempts += 1;
+                if lock_attempts == 1 {
+                    debug!("waiting for lock on '{}'", pkg.pkg_name);
+                }
+                if lock_attempts >= MAX_LOCK_ATTEMPTS {
+                    break Err(soar_utils::error::LockError::AcquireFailed(format!(
+                        "timed out waiting for lock on '{}' after {}s",
+                        pkg.pkg_name,
+                        MAX_LOCK_ATTEMPTS / 2
+                    )));
+                }
+                tokio::time::sleep(Duration::from_millis(500)).await;
+            }
+            Err(err) => break Err(err),
+        }
+    }
+    .map_err(|e| SoarError::Custom(format!("Failed to acquire package lock: {}", e)))?;
+
+    // Re-check if package is already installed after acquiring lock
+    let freshly_installed = core_db
+        .with_conn(|conn| {
+            CoreRepository::list_filtered(
+                conn,
+                Some(&pkg.repo_name),
+                Some(&pkg.pkg_name),
+                pkg.pkg_id.as_deref(),
+                Some(&pkg.version),
+                Some(true),
+                None,
+                None,
+                Some(SortDirection::Asc),
+            )
+        })?
+        .into_iter()
+        // The query cannot narrow by family, so it is compared here: two
+        // packages sharing a name in one batch are still two packages.
+        //
+        // The row being replaced is not somebody else's install. A rolling
+        // build keeps one version across every build, so without this an
+        // update of one would look like an install that already happened.
+        .find(|ip| {
+            ip.is_installed
+                && ip.pkg_family.as_deref() == pkg.pkg_family.as_deref()
+                && Some(u64::from(ip.id.unsigned_abs()))
+                    != target.existing_install.as_ref().map(|e| e.id)
+        });
+
+    if freshly_installed.is_some() {
+        return Ok((PathBuf::new(), Vec::new(), Vec::new()));
+    }
+
+    let config = ctx.config();
+    let bin_dir = config.get_bin_path()?;
+
+    let skip_integrity_gate = source_skips_integrity_gate(pkg);
+
+    if !no_verify && !skip_integrity_gate && pkg.bsum.is_none() {
+        let has_signing = config
+            .get_repository(&pkg.repo_name)
+            .map(|repo| repo.signature_verification() && repo.pubkey.is_some())
+            .unwrap_or(false);
+        if !has_signing {
+            return Err(SoarError::Custom(format!(
+                "Refusing to install {}: no checksum or signature available to verify integrity (use --no-verify to override)",
+                pkg.pkg_name
+            )));
+        }
+    }
+
+    // Keyed on the whole identity rather than the artifact's hash. Two
+    // repositories shipping byte-identical builds are still two installs, and
+    // sharing a directory means removing one deletes the other's files.
+    let content = pkg
+        .bsum
+        .as_deref()
+        .or(pkg.pkg_id.as_deref())
+        .or(pkg.ghcr_pkg.as_deref())
+        .unwrap_or(pkg.download_url.as_str());
+    let dir_suffix: String = hash_string(&format!(
+        "{}:{}:{}:{}:{}",
+        pkg.repo_name,
+        pkg.pkg_family.as_deref().unwrap_or_default(),
+        pkg.pkg_name,
+        pkg.version,
+        content
+    ))[..12]
+        .to_string();
+
+    // pkg_name is joined into install_dir and interpolated into resource paths
+    // downstream, so it must not be able to escape the packages dir.
+    if !is_safe_component(&pkg.pkg_name) {
+        return Err(SoarError::Custom(format!(
+            "Refusing to install {}: package name is not a valid path component",
+            pkg.pkg_name
+        )));
+    }
+
+    // The version is in the name so a directory can be read at a glance. It is
+    // not the identity: the hash still is, since two builds of one version must
+    // not collide.
+    let dir_name = if is_safe_component(&pkg.version) {
+        format!("{}-{}-{}", pkg.pkg_name, pkg.version, dir_suffix)
+    } else {
+        format!("{}-{}", pkg.pkg_name, dir_suffix)
+    };
+    let install_dir = config
+        .get_packages_path(target.profile.clone())?
+        .join(dir_name);
+    let main_binary_name = pkg
+        .provides
+        .as_ref()
+        .and_then(|provides| provides.iter().find(|p| !p.symlink_to_bin))
+        .map(|p| p.name.as_str())
+        .unwrap_or(&pkg.pkg_name);
+    let real_bin = install_dir.join(main_binary_name);
+
+    let (
+        unlinked,
+        eff_portable,
+        eff_portable_home,
+        eff_portable_config,
+        eff_portable_share,
+        eff_portable_cache,
+        excludes,
+    ) = if let Some(ref existing) = target.existing_install {
+        (
+            existing.unlinked,
+            existing.portable_path.as_deref(),
+            existing.portable_home.as_deref(),
+            existing.portable_config.as_deref(),
+            existing.portable_share.as_deref(),
+            existing.portable_cache.as_deref(),
+            existing.install_patterns.as_deref(),
+        )
+    } else {
+        (
+            false,
+            portable,
+            portable_home,
+            portable_config,
+            portable_share,
+            portable_cache,
+            None,
+        )
+    };
+
+    let should_cleanup = if let Some(ref existing) = target.existing_install {
+        if existing.is_installed {
+            true
+        } else {
+            match InstallMarker::read_from_dir(&install_dir) {
+                Some(marker) => !marker.matches_package(pkg),
+                None => true,
+            }
+        }
+    } else {
+        false
+    };
+
+    if should_cleanup && install_dir.exists() {
+        debug!(path = %install_dir.display(), "cleaning up existing installation directory");
+        // An archive may ship its directories read-only, and removing an entry
+        // needs write permission on the directory holding it.
+        make_tree_writable(&install_dir);
+        fs::remove_dir_all(&install_dir).map_err(|err| {
+            SoarError::Custom(format!(
+                "Failed to clean up install directory {}: {}",
+                install_dir.display(),
+                err
+            ))
+        })?;
+    }
+
+    let install_patterns = excludes.map(|e| e.to_vec()).unwrap_or_else(|| {
+        if binary_only {
+            let mut patterns = default_install_patterns();
+            patterns.extend(
+                ["!*.png", "!*.svg", "!*.desktop", "!LICENSE", "!CHECKSUM"]
+                    .iter()
+                    .map(ToString::to_string),
+            );
+            patterns
+        } else {
+            config.install_patterns.clone().unwrap_or_default()
+        }
+    });
+    let install_patterns = apply_sig_variants(install_patterns);
+
+    // Create progress bridge for download events
+    let progress_callback = create_progress_bridge(events.clone(), op_id, pkg.pkg_name.clone());
+
+    trace!(install_dir = %install_dir.display(), "creating package installer");
+    let installer = PackageInstaller::new(
+        target,
+        &install_dir,
+        Some(progress_callback),
+        core_db.clone(),
+        install_patterns.to_vec(),
+        config.clone(),
+        events.clone(),
+        op_id,
+    )
+    .await?;
+
+    // Download
+    let downloaded_checksum = installer.download_package().await?;
+
+    // Signature verification
+    let mut verified_sig_count = 0usize;
+    if let Some(repository) = config.get_repository(&pkg.repo_name) {
+        if repository.signature_verification() {
+            events.emit(SoarEvent::Verifying {
+                op_id,
+                pkg_name: pkg.pkg_name.clone(),
+                stage: VerifyStage::Signature,
+            });
+
+            if let Some(ref pubkey) = repository.pubkey {
+                verified_sig_count = verify_signatures(pubkey, &install_dir)?;
+            } else {
+                warn!(
+                    "{} - Signature verification skipped as no pubkey was found.",
+                    pkg.pkg_name
+                );
+            }
+        }
+    } else {
+        // Clean up .sig files for packages without signature verification
+        cleanup_sig_files(&install_dir);
+    }
+
+    if !no_verify && !skip_integrity_gate && pkg.bsum.is_none() && verified_sig_count == 0 {
+        return Err(SoarError::Custom(format!(
+            "Refusing to install {}: no checksum and no valid signature found to verify integrity (use --no-verify to override)",
+            pkg.pkg_name
+        )));
+    }
+
+    // Checksum verification
+    if !no_verify {
+        events.emit(SoarEvent::Verifying {
+            op_id,
+            pkg_name: pkg.pkg_name.clone(),
+            stage: VerifyStage::Checksum,
+        });
+
+        let final_checksum = if pkg.ghcr_pkg.is_some() {
+            let fallback_bin = install_dir.join(&pkg.pkg_name);
+            if real_bin.exists() {
+                Some(calculate_checksum(&real_bin)?)
+            } else if fallback_bin.exists() {
+                Some(calculate_checksum(&fallback_bin)?)
+            } else {
+                None
+            }
+        } else {
+            downloaded_checksum
+        };
+
+        match (final_checksum, pkg.bsum.as_ref()) {
+            (Some(calculated), Some(expected)) if calculated != *expected => {
+                events.emit(SoarEvent::Verifying {
+                    op_id,
+                    pkg_name: pkg.pkg_name.clone(),
+                    stage: VerifyStage::Failed("checksum mismatch".into()),
+                });
+                return Err(SoarError::Custom(
+                    "Invalid checksum, skipped installation.".into(),
+                ));
+            }
+            (Some(ref calculated), Some(expected)) if calculated == expected => {
+                events.emit(SoarEvent::Verifying {
+                    op_id,
+                    pkg_name: pkg.pkg_name.clone(),
+                    stage: VerifyStage::Passed,
+                });
+            }
+            (None, Some(_)) => {
+                events.emit(SoarEvent::Verifying {
+                    op_id,
+                    pkg_name: pkg.pkg_name.clone(),
+                    stage: VerifyStage::Failed("checksum unavailable".into()),
+                });
+                return Err(SoarError::Custom(format!(
+                    "Could not verify {}: expected a checksum but none could be computed",
+                    pkg.pkg_name
+                )));
+            }
+            _ => {}
+        }
+    }
+
+    // Create symlinks
+    events.emit(SoarEvent::Installing {
+        op_id,
+        pkg_name: pkg.pkg_name.clone(),
+        stage: InstallStage::LinkingBinaries,
+    });
+
+    // Only what packages.toml declares: a repository says where its files go
+    // through `files`, not through a binary mapping.
+    let binaries = target.binaries.clone().filter(|bins| !bins.is_empty());
+
+    let symlinks = mangle_package_symlinks(
+        &install_dir,
+        &bin_dir,
+        pkg.provides.as_deref(),
+        &pkg.pkg_name,
+        &pkg.version,
+        target.entrypoint.as_deref(),
+        binaries.as_deref(),
+        target.arch_map.as_ref(),
+        pkg.files.as_deref(),
+    )
+    .await?;
+
+    // Man pages and completions only mean anything where the system looks for
+    // them, so they are linked out of the package the same way binaries are.
+    let shared = link_shared_files(&install_dir, &bin_dir, &ctx.config().completion_shells())?;
+
+    // Desktop integration
+    if !unlinked || has_desktop_integration(pkg, ctx.config()) {
+        events.emit(SoarEvent::Installing {
+            op_id,
+            pkg_name: pkg.pkg_name.clone(),
+            stage: InstallStage::DesktopIntegration,
+        });
+
+        let actual_bin = symlinks.first().map(|(src, _)| src.as_path());
+        integrate_package(
+            &install_dir,
+            pkg,
+            actual_bin,
+            eff_portable,
+            eff_portable_home,
+            eff_portable_config,
+            eff_portable_share,
+            eff_portable_cache,
+            ctx.config(),
+        )
+        .await?;
+    }
+
+    // Record to database
+    events.emit(SoarEvent::Installing {
+        op_id,
+        pkg_name: pkg.pkg_name.clone(),
+        stage: InstallStage::RecordingDatabase,
+    });
+
+    installer
+        .record(
+            unlinked,
+            eff_portable,
+            eff_portable_home,
+            eff_portable_config,
+            eff_portable_share,
+            eff_portable_cache,
+        )
+        .await?;
+
+    installer.run_post_install_hook()?;
+
+    events.emit(SoarEvent::OperationComplete {
+        op_id,
+        pkg_name: pkg.pkg_name.clone(),
+    });
+
+    debug!(
+        pkg_name = pkg.pkg_name,
+        pkg_id = pkg.pkg_id,
+        version = pkg.version,
+        "installation complete"
+    );
+    Ok((install_dir, symlinks, shared))
+}
+
+fn verify_signatures(pubkey_str: &str, install_dir: &Path) -> SoarResult<usize> {
+    let pubkey = PublicKey::from_base64(pubkey_str.trim())
+        .map_err(|err| SoarError::Custom(format!("Failed to parse public key: {}", err)))?;
+
+    let entries = fs::read_dir(install_dir)
+        .with_context(|| format!("reading package directory {}", install_dir.display()))?;
+
+    let mut verified = 0usize;
+    for entry in entries {
+        let path = entry
+            .with_context(|| format!("reading entry from directory {}", install_dir.display()))?
+            .path();
+        let is_signature_file = path.extension().is_some_and(|ext| ext == "sig");
+        let original_file = path.with_extension("");
+        if is_signature_file && path.is_file() && original_file.is_file() {
+            let signature = Signature::from_file(&path).map_err(|err| {
+                SoarError::Custom(format!(
+                    "Failed to load signature file from {}: {}",
+                    path.display(),
+                    err
+                ))
+            })?;
+            let mut stream_verifier = pubkey.verify_stream(&signature).map_err(|err| {
+                SoarError::Custom(format!("Failed to setup stream verifier: {err}"))
+            })?;
+
+            let file = File::open(&original_file).with_context(|| {
+                format!(
+                    "opening file {} for signature verification",
+                    original_file.display()
+                )
+            })?;
+            let mut buf_reader = BufReader::new(file);
+
+            let mut buffer = [0u8; 8192];
+            loop {
+                match buf_reader.read(&mut buffer).with_context(|| {
+                    format!("reading to buffer from {}", original_file.display())
+                })? {
+                    0 => break,
+                    n => {
+                        stream_verifier.update(&buffer[..n]);
+                    }
+                }
+            }
+
+            stream_verifier.finalize().map_err(|_| {
+                SoarError::Custom(format!(
+                    "Signature verification failed for {}",
+                    original_file.display()
+                ))
+            })?;
+
+            fs::remove_file(&path)
+                .with_context(|| format!("removing minisign file {}", path.display()))?;
+            verified += 1;
+        }
+    }
+
+    Ok(verified)
+}
+
+fn cleanup_sig_files(install_dir: &Path) {
+    if let Ok(entries) = fs::read_dir(install_dir) {
+        for entry in entries.filter_map(|e| e.ok()) {
+            let path = entry.path();
+            if path.extension().is_some_and(|ext| ext == "sig") && path.is_file() {
+                fs::remove_file(&path).ok();
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn pkg(repo_name: &str, ghcr: Option<&str>, bsum: Option<&str>) -> Package {
+        Package {
+            repo_name: repo_name.to_string(),
+            ghcr_pkg: ghcr.map(String::from),
+            bsum: bsum.map(String::from),
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn local_source_skips_integrity_gate() {
+        assert!(source_skips_integrity_gate(&pkg("local", None, None)));
+    }
+
+    #[test]
+    fn ghcr_source_skips_integrity_gate() {
+        assert!(source_skips_integrity_gate(&pkg(
+            "local",
+            Some("ghcr.io/org/repo:tag"),
+            None
+        )));
+        assert!(source_skips_integrity_gate(&pkg(
+            "some-repo",
+            Some("ghcr.io/org/repo:tag"),
+            None
+        )));
+    }
+
+    #[test]
+    fn registry_source_is_subject_to_integrity_gate() {
+        assert!(!source_skips_integrity_gate(&pkg("soarpkgs", None, None)));
+    }
+
+    #[test]
+    fn integrity_gate_exemption_is_independent_of_pinned_bsum() {
+        assert!(source_skips_integrity_gate(&pkg(
+            "local",
+            None,
+            Some("deadbeef")
+        )));
+        assert!(!source_skips_integrity_gate(&pkg(
+            "soarpkgs",
+            None,
+            Some("deadbeef")
+        )));
+    }
+}

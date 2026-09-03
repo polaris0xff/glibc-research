@@ -1,0 +1,147 @@
+.card.accent,
+.app-card.accent {
+    background-color: @accent_bg_color;
+    color: @accent_fg_color;
+}
+.card.accent label,
+.app-card.accent label {
+    color: @accent_fg_color;
+}
+.card.destructive,
+.app-card.destructive {
+    background-color: @destructive_bg_color;
+    color: @destructive_fg_color;
+}
+.card.destructive label,
+.app-card.destructive label {
+    color: @destructive_fg_color;
+}
+.card.terminal,
+.app-card.terminal {
+    background-color: #535252ff;
+    color: #ffffff;
+}
+.card.terminal label,
+.app-card.terminal label {
+    color: #ffffff;
+}
+.app-card-label {
+    border-radius: 999px;
+    background-color: alpha(@window_bg_color, 0.6);
+    color: inherit;
+    padding: 0.2em 0.8em;
+}
+.app-card-label.accent-badge {
+    background-color: @accent_bg_color;
+    color: @accent_fg_color;
+}
+.app-card-label.terminal-badge {
+    background-color: #535252ff;
+    color: #ffffff;
+}
+.update-success-badge {
+    min-width: 18px;
+    min-height: 18px;
+}
+.extracted-app .title > label {
+    color: @accent_color;
+    font-weight: bold;
+}
+.update-indicator {
+    color: @accent_color;
+    font-size: 10px;
+}
+.main-apps-page > scrolledwindow > viewport > clamp > box {
+    padding-bottom: 30px;
+}
+
+/* Frozen title bar */
+.apps-title-bar {
+    padding: 12px 16px 0px 16px;
+}
+
+/* Grid view styles */
+.app-grid flowboxchild {
+    padding: 6px;
+    border-radius: 12px;
+    transition: background-color 200ms ease;
+}
+.app-grid flowboxchild:hover {
+    background-color: alpha(currentColor, 0.07);
+}
+.app-grid-cell {
+    padding: 12px 8px 8px 8px;
+}
+.grid-update-indicator {
+    color: @accent_color;
+    font-size: 10px;
+    background-color: @window_bg_color;
+    border-radius: 50%;
+    padding: 0px 2px;
+}
+.grid-update-spinner {
+    background-color: alpha(@window_bg_color, 0.8);
+    border-radius: 50%;
+    padding: 2px;
+}
+
+/* Warning indicators for failed updates */
+.update-warning-indicator {
+    color: @warning_color;
+}
+.grid-update-warning {
+    color: @warning_color;
+    background-color: alpha(@window_bg_color, 0.8);
+    border-radius: 50%;
+    padding: 2px;
+}
+.update-failed-button {
+    color: @warning_color;
+}
+.clickable-icon-column {
+    padding: 8px 14px;
+    border-radius: 12px;
+    transition: background-color 100ms ease;
+}
+.clickable-icon-column.selected {
+    background-color: alpha(currentColor, 0.12);
+}
+/* Direct child only: a plain `label` descendant selector would also match the
+   labels of a context menu popover parented to this column. Constant padding is
+   always reserved so selecting never shifts the layout; only the colours change. */
+.clickable-icon-column > label {
+    border-radius: 7px;
+    padding: 2px 8px;
+}
+.clickable-icon-column.selected > label {
+    background-color: @accent_bg_color;
+    color: @accent_fg_color;
+}
+.depth-icon {
+    -gtk-icon-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+/* Download progress overlaid on an app icon: drop the theme's 150px minimum
+   trough so the widget's own width request decides. */
+progressbar.download-progress > trough {
+    min-width: 0;
+}
+.drop-target-highlight {
+    background-color: alpha(@accent_bg_color, 0.15);
+    border-radius: 12px;
+    transition: background-color 150ms ease-in-out;
+}
+
+/* Details page header (icon + name container) */
+.details-header {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 12px;
+    min-height: 128px;
+}
+
+/* Small pill-shaped "Open" button in details header */
+button.open-button {
+    min-height: 24px;
+    min-width: 56px;
+    padding: 4px 16px;
+}

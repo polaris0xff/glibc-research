@@ -1,0 +1,2012 @@
+[
+ {
+  "name": "v0.13.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.13.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.13.3",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTMuMw"
+ },
+ {
+  "name": "v0.13.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.13.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.13.2",
+  "commit": {
+   "sha": "e016815df02b246b03aa5935794c645ff5911f9f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e016815df02b246b03aa5935794c645ff5911f9f"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTMuMg"
+ },
+ {
+  "name": "v0.13.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.13.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.13.1",
+  "commit": {
+   "sha": "ae017bd343cbbd16e43d074773604ec554244724",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/ae017bd343cbbd16e43d074773604ec554244724"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTMuMQ"
+ },
+ {
+  "name": "v0.13.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.13.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.13.0",
+  "commit": {
+   "sha": "d5f811f0189a9fe6da695b58a6a7fcccfcbccde6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d5f811f0189a9fe6da695b58a6a7fcccfcbccde6"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTMuMA"
+ },
+ {
+  "name": "v0.12.7",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.12.7",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.12.7",
+  "commit": {
+   "sha": "462b62c40b66d90dcb9efc30318cdc6f924e2944",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/462b62c40b66d90dcb9efc30318cdc6f924e2944"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTIuNw"
+ },
+ {
+  "name": "v0.12.6",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.12.6",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.12.6",
+  "commit": {
+   "sha": "86ebc9e3ea85ec96911aebdb7502766f55453929",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/86ebc9e3ea85ec96911aebdb7502766f55453929"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTIuNg"
+ },
+ {
+  "name": "v0.12.5",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.12.5",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.12.5",
+  "commit": {
+   "sha": "65b4140775202eca98acf2b9f9504ad14e85901c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/65b4140775202eca98acf2b9f9504ad14e85901c"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTIuNQ"
+ },
+ {
+  "name": "v0.12.4",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.12.4",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.12.4",
+  "commit": {
+   "sha": "d8df544f28b426064436ebdbde9eb309d71d9398",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d8df544f28b426064436ebdbde9eb309d71d9398"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTIuNA"
+ },
+ {
+  "name": "v0.12.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.12.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.12.3",
+  "commit": {
+   "sha": "7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTIuMw"
+ },
+ {
+  "name": "v0.12.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.12.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.12.2",
+  "commit": {
+   "sha": "fe7a6f47ae9eec67640d11f4fde0d03ed7a23287",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/fe7a6f47ae9eec67640d11f4fde0d03ed7a23287"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTIuMg"
+ },
+ {
+  "name": "v0.12.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.12.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.12.1",
+  "commit": {
+   "sha": "4ba0df57fdde17b929cfa3667aa2c967f2925751",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/4ba0df57fdde17b929cfa3667aa2c967f2925751"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTIuMQ"
+ },
+ {
+  "name": "v0.12.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.12.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.12.0",
+  "commit": {
+   "sha": "c86323b3b85338fdd81ecba7075800f0a1607e63",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c86323b3b85338fdd81ecba7075800f0a1607e63"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTIuMA"
+ },
+ {
+  "name": "v0.11.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.11.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.11.0",
+  "commit": {
+   "sha": "1495d99b81903d03114f4b1a541e097cbfccac37",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1495d99b81903d03114f4b1a541e097cbfccac37"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTEuMA"
+ },
+ {
+  "name": "v0.10.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.10.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.10.3",
+  "commit": {
+   "sha": "944c925bc5d312ca25a9db3905298dc931e0fd2e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/944c925bc5d312ca25a9db3905298dc931e0fd2e"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTAuMw"
+ },
+ {
+  "name": "v0.10.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.10.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.10.2",
+  "commit": {
+   "sha": "df832960fc4b1c88b20f2ad0474a7b1d016d9da6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/df832960fc4b1c88b20f2ad0474a7b1d016d9da6"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTAuMg"
+ },
+ {
+  "name": "v0.10.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.10.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.10.1",
+  "commit": {
+   "sha": "0f2f264b7981b7c7f2d03307143acf0d0864671e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/0f2f264b7981b7c7f2d03307143acf0d0864671e"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTAuMQ"
+ },
+ {
+  "name": "v0.10.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.10.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.10.0",
+  "commit": {
+   "sha": "a7ecca38101aadcc481dc8264f4befdfa66839b4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a7ecca38101aadcc481dc8264f4befdfa66839b4"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuMTAuMA"
+ },
+ {
+  "name": "v0.9.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.9.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.9.1",
+  "commit": {
+   "sha": "1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuOS4x"
+ },
+ {
+  "name": "v0.9.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.9.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.9.0",
+  "commit": {
+   "sha": "062a587f5b79737837819bfbd8c34d3a01e72df0",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/062a587f5b79737837819bfbd8c34d3a01e72df0"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuOS4w"
+ },
+ {
+  "name": "v0.8.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.8.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.8.1",
+  "commit": {
+   "sha": "3b7cb1f8a973dd5ff4704dcd305a3ac2e41f924a",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/3b7cb1f8a973dd5ff4704dcd305a3ac2e41f924a"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuOC4x"
+ },
+ {
+  "name": "v0.8.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.8.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.8.0",
+  "commit": {
+   "sha": "2ea50c9de73a72acb553a7193e310e02e5d721e9",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2ea50c9de73a72acb553a7193e310e02e5d721e9"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuOC4w"
+ },
+ {
+  "name": "v0.7.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.7.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.7.0",
+  "commit": {
+   "sha": "a3c7c556ca710227363a505b439371d51338746d",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a3c7c556ca710227363a505b439371d51338746d"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNy4w"
+ },
+ {
+  "name": "v0.6.6",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.6.6",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.6.6",
+  "commit": {
+   "sha": "149b561c1678465608bb841324328c2378358a6e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/149b561c1678465608bb841324328c2378358a6e"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNi42"
+ },
+ {
+  "name": "v0.6.5",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.6.5",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.6.5",
+  "commit": {
+   "sha": "c5cd133d7d7a8b7b79be28d79b2264f8abcfd658",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c5cd133d7d7a8b7b79be28d79b2264f8abcfd658"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNi41"
+ },
+ {
+  "name": "v0.6.4",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.6.4",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.6.4",
+  "commit": {
+   "sha": "9f49b45b4e14ff4e48b41e99bdcaece4a741250c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/9f49b45b4e14ff4e48b41e99bdcaece4a741250c"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNi40"
+ },
+ {
+  "name": "v0.6.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.6.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.6.3",
+  "commit": {
+   "sha": "e0e3277a243f4be33798c85865c60e2188021a1f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e0e3277a243f4be33798c85865c60e2188021a1f"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNi4z"
+ },
+ {
+  "name": "v0.6.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.6.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.6.2",
+  "commit": {
+   "sha": "8cf22aed28b9c02d94a951082243ab1cd5e1d0cf",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/8cf22aed28b9c02d94a951082243ab1cd5e1d0cf"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNi4y"
+ },
+ {
+  "name": "v0.6.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.6.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.6.1",
+  "commit": {
+   "sha": "ff356228b7f5aae6ded66bdc81f7ff829d567dcb",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/ff356228b7f5aae6ded66bdc81f7ff829d567dcb"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNi4x"
+ },
+ {
+  "name": "v0.6.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.6.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.6.0",
+  "commit": {
+   "sha": "f0774a38809b22faa8bc4037d91cf14f9ea3ae8e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/f0774a38809b22faa8bc4037d91cf14f9ea3ae8e"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNi4w"
+ },
+ {
+  "name": "v0.5.15",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.15",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.15",
+  "commit": {
+   "sha": "a9c0487249ddf06a139c38f6e38c3a5cb0c25386",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a9c0487249ddf06a139c38f6e38c3a5cb0c25386"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuNS4xNQ"
+ },
+ {
+  "name": "v0.5.14",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.14",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.14",
+  "commit": {
+   "sha": "56dbb2706c48a0a1220da535fa8ddf358ab15fc7",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/56dbb2706c48a0a1220da535fa8ddf358ab15fc7"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuNS4xNA"
+ },
+ {
+  "name": "v0.5.13",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.13",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.13",
+  "commit": {
+   "sha": "4f1a6ec91d8abac25245d3705a9dfd1dcadaa11a",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/4f1a6ec91d8abac25245d3705a9dfd1dcadaa11a"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuNS4xMw"
+ },
+ {
+  "name": "v0.5.12",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.12",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.12",
+  "commit": {
+   "sha": "51eef0307879f9462bce178790926ad63d0eeae2",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/51eef0307879f9462bce178790926ad63d0eeae2"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuNS4xMg"
+ },
+ {
+  "name": "v0.5.11",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.11",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.11",
+  "commit": {
+   "sha": "531f5102d437723b50d9cb7c466700ed2502a8a9",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/531f5102d437723b50d9cb7c466700ed2502a8a9"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuNS4xMQ"
+ },
+ {
+  "name": "v0.5.10",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.10",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.10",
+  "commit": {
+   "sha": "9d739e3d6c24b7b94b29d3b924b96ff0ab6692a7",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/9d739e3d6c24b7b94b29d3b924b96ff0ab6692a7"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvdjAuNS4xMA"
+ },
+ {
+  "name": "v0.5.9",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.9",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.9",
+  "commit": {
+   "sha": "5727e1a0c8c1db9d3c49f787cd3e74ec0fe54c3e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/5727e1a0c8c1db9d3c49f787cd3e74ec0fe54c3e"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNS45"
+ },
+ {
+  "name": "v0.5.8",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.8",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.8",
+  "commit": {
+   "sha": "303891f5c7716f81e6ca7c3a8a8d48b43517131a",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/303891f5c7716f81e6ca7c3a8a8d48b43517131a"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNS44"
+ },
+ {
+  "name": "v0.5.7",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.7",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.7",
+  "commit": {
+   "sha": "44aa99e59ea705d6229bcbb1b4c1431d5c11600a",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/44aa99e59ea705d6229bcbb1b4c1431d5c11600a"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNS43"
+ },
+ {
+  "name": "v0.5.6",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.6",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.6",
+  "commit": {
+   "sha": "be4021059512877d51e8b8365cfe23d7cd838512",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/be4021059512877d51e8b8365cfe23d7cd838512"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNS42"
+ },
+ {
+  "name": "v0.5.5",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.5",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.5",
+  "commit": {
+   "sha": "921868c05b804b5c856e67ac8580c821ac032439",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/921868c05b804b5c856e67ac8580c821ac032439"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNS41"
+ },
+ {
+  "name": "v0.5.4",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.4",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.4",
+  "commit": {
+   "sha": "0d2d7c789d8f89afb0f6beed46f305ec66fb8584",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/0d2d7c789d8f89afb0f6beed46f305ec66fb8584"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNS40"
+ },
+ {
+  "name": "v0.5.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.3",
+  "commit": {
+   "sha": "abf485e4453dc40c6278c72b8cca559a598ea85c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/abf485e4453dc40c6278c72b8cca559a598ea85c"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNS4z"
+ },
+ {
+  "name": "v0.5.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.2",
+  "commit": {
+   "sha": "5003aa795c9de53fd37ede0394112f1fa6adac09",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/5003aa795c9de53fd37ede0394112f1fa6adac09"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNS4y"
+ },
+ {
+  "name": "v0.5.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.1",
+  "commit": {
+   "sha": "81037c48fcf80e144e113b296e8dd3f5a1e8ce8c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/81037c48fcf80e144e113b296e8dd3f5a1e8ce8c"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNS4x"
+ },
+ {
+  "name": "v0.5.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.5.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.5.0",
+  "commit": {
+   "sha": "bb62e69223be751aea0d3931d4a3ac026f42270b",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/bb62e69223be751aea0d3931d4a3ac026f42270b"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNS4w"
+ },
+ {
+  "name": "v0.4.8",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.4.8",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.4.8",
+  "commit": {
+   "sha": "f75f100e93befc6cde7a2abe44fd85c77f037c8e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/f75f100e93befc6cde7a2abe44fd85c77f037c8e"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNC44"
+ },
+ {
+  "name": "v0.4.7",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.4.7",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.4.7",
+  "commit": {
+   "sha": "d00698538cfd94bdddc8ead8e0dd6ae9f097c508",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d00698538cfd94bdddc8ead8e0dd6ae9f097c508"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNC43"
+ },
+ {
+  "name": "v0.4.6",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.4.6",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.4.6",
+  "commit": {
+   "sha": "181332a7a51f739fecda5cec3754467d41403f8f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/181332a7a51f739fecda5cec3754467d41403f8f"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNC42"
+ },
+ {
+  "name": "v0.4.5",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.4.5",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.4.5",
+  "commit": {
+   "sha": "288823f73b8b63cd33480b5164b11d028a1e89b3",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/288823f73b8b63cd33480b5164b11d028a1e89b3"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNC41"
+ },
+ {
+  "name": "v0.4.4",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.4.4",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.4.4",
+  "commit": {
+   "sha": "6ad532d8d863c096c28cc0d03dd154718d4adda7",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/6ad532d8d863c096c28cc0d03dd154718d4adda7"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNC40"
+ },
+ {
+  "name": "v0.4.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.4.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.4.3",
+  "commit": {
+   "sha": "b8c2d7b1a6517c28dcdffabdad89937126d9eeb1",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/b8c2d7b1a6517c28dcdffabdad89937126d9eeb1"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNC4z"
+ },
+ {
+  "name": "v0.4.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.4.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.4.2",
+  "commit": {
+   "sha": "4bd97391e620a357d97311a7d41d530a2af5122c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/4bd97391e620a357d97311a7d41d530a2af5122c"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNC4y"
+ },
+ {
+  "name": "v0.4.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.4.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.4.1",
+  "commit": {
+   "sha": "8004f8f4cbf10f99ea0ad289a48cfaca94abb4b4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/8004f8f4cbf10f99ea0ad289a48cfaca94abb4b4"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNC4x"
+ },
+ {
+  "name": "v0.4.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.4.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.4.0",
+  "commit": {
+   "sha": "e51d9c95b7b1dc52d47151ab161358c06bd33241",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e51d9c95b7b1dc52d47151ab161358c06bd33241"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuNC4w"
+ },
+ {
+  "name": "v0.3.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.3.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.3.1",
+  "commit": {
+   "sha": "7e8bb26d57df56c77e9728fce12cf885757b41ed",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/7e8bb26d57df56c77e9728fce12cf885757b41ed"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuMy4x"
+ },
+ {
+  "name": "v0.3.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.3.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.3.0",
+  "commit": {
+   "sha": "053108375d200e0c3e1d9ce9981e791bd63c6d71",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/053108375d200e0c3e1d9ce9981e791bd63c6d71"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuMy4w"
+ },
+ {
+  "name": "v0.2.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.2.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.2.0",
+  "commit": {
+   "sha": "5831e603ea31da15372295a27d0f4528e2b7edf2",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/5831e603ea31da15372295a27d0f4528e2b7edf2"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuMi4w"
+ },
+ {
+  "name": "v0.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/v0.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/v0.1.0",
+  "commit": {
+   "sha": "e6f474872287658356fef44bf77a121aec184514",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e6f474872287658356fef44bf77a121aec184514"
+  },
+  "node_id": "REF_kwDOM6tDKbByZWZzL3RhZ3MvdjAuMS4w"
+ },
+ {
+  "name": "soar-utils-v0.5.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.5.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.5.2",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC41LjI"
+ },
+ {
+  "name": "soar-utils-v0.5.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.5.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.5.1",
+  "commit": {
+   "sha": "e016815df02b246b03aa5935794c645ff5911f9f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e016815df02b246b03aa5935794c645ff5911f9f"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC41LjE"
+ },
+ {
+  "name": "soar-utils-v0.5.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.5.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.5.0",
+  "commit": {
+   "sha": "d5f811f0189a9fe6da695b58a6a7fcccfcbccde6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d5f811f0189a9fe6da695b58a6a7fcccfcbccde6"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC41LjA"
+ },
+ {
+  "name": "soar-utils-v0.4.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.4.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.4.3",
+  "commit": {
+   "sha": "462b62c40b66d90dcb9efc30318cdc6f924e2944",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/462b62c40b66d90dcb9efc30318cdc6f924e2944"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC40LjM"
+ },
+ {
+  "name": "soar-utils-v0.4.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.4.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.4.2",
+  "commit": {
+   "sha": "65b4140775202eca98acf2b9f9504ad14e85901c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/65b4140775202eca98acf2b9f9504ad14e85901c"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC40LjI"
+ },
+ {
+  "name": "soar-utils-v0.4.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.4.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.4.1",
+  "commit": {
+   "sha": "fe7a6f47ae9eec67640d11f4fde0d03ed7a23287",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/fe7a6f47ae9eec67640d11f4fde0d03ed7a23287"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC40LjE"
+ },
+ {
+  "name": "soar-utils-v0.4.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.4.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.4.0",
+  "commit": {
+   "sha": "c86323b3b85338fdd81ecba7075800f0a1607e63",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c86323b3b85338fdd81ecba7075800f0a1607e63"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC40LjA"
+ },
+ {
+  "name": "soar-utils-v0.3.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.3.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.3.0",
+  "commit": {
+   "sha": "1495d99b81903d03114f4b1a541e097cbfccac37",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1495d99b81903d03114f4b1a541e097cbfccac37"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC4zLjA"
+ },
+ {
+  "name": "soar-utils-v0.2.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.2.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.2.0",
+  "commit": {
+   "sha": "a7ecca38101aadcc481dc8264f4befdfa66839b4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a7ecca38101aadcc481dc8264f4befdfa66839b4"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC4yLjA"
+ },
+ {
+  "name": "soar-utils-v0.1.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.1.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.1.1",
+  "commit": {
+   "sha": "1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC4xLjE"
+ },
+ {
+  "name": "soar-utils-v0.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-utils-v0.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-utils-v0.1.0",
+  "commit": {
+   "sha": "062a587f5b79737837819bfbd8c34d3a01e72df0",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/062a587f5b79737837819bfbd8c34d3a01e72df0"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci11dGlscy12MC4xLjA"
+ },
+ {
+  "name": "soar-registry-v0.6.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.6.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.6.3",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC42LjM"
+ },
+ {
+  "name": "soar-registry-v0.6.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.6.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.6.2",
+  "commit": {
+   "sha": "e016815df02b246b03aa5935794c645ff5911f9f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e016815df02b246b03aa5935794c645ff5911f9f"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC42LjI"
+ },
+ {
+  "name": "soar-registry-v0.6.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.6.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.6.1",
+  "commit": {
+   "sha": "ae017bd343cbbd16e43d074773604ec554244724",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/ae017bd343cbbd16e43d074773604ec554244724"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC42LjE"
+ },
+ {
+  "name": "soar-registry-v0.6.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.6.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.6.0",
+  "commit": {
+   "sha": "d5f811f0189a9fe6da695b58a6a7fcccfcbccde6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d5f811f0189a9fe6da695b58a6a7fcccfcbccde6"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC42LjA"
+ },
+ {
+  "name": "soar-registry-v0.5.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.5.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.5.1",
+  "commit": {
+   "sha": "462b62c40b66d90dcb9efc30318cdc6f924e2944",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/462b62c40b66d90dcb9efc30318cdc6f924e2944"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC41LjE"
+ },
+ {
+  "name": "soar-registry-v0.5.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.5.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.5.0",
+  "commit": {
+   "sha": "65b4140775202eca98acf2b9f9504ad14e85901c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/65b4140775202eca98acf2b9f9504ad14e85901c"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC41LjA"
+ },
+ {
+  "name": "soar-registry-v0.4.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.4.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.4.3",
+  "commit": {
+   "sha": "7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC40LjM"
+ },
+ {
+  "name": "soar-registry-v0.4.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.4.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.4.2",
+  "commit": {
+   "sha": "fe7a6f47ae9eec67640d11f4fde0d03ed7a23287",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/fe7a6f47ae9eec67640d11f4fde0d03ed7a23287"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC40LjI"
+ },
+ {
+  "name": "soar-registry-v0.4.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.4.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.4.1",
+  "commit": {
+   "sha": "4ba0df57fdde17b929cfa3667aa2c967f2925751",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/4ba0df57fdde17b929cfa3667aa2c967f2925751"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC40LjE"
+ },
+ {
+  "name": "soar-registry-v0.4.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.4.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.4.0",
+  "commit": {
+   "sha": "c86323b3b85338fdd81ecba7075800f0a1607e63",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c86323b3b85338fdd81ecba7075800f0a1607e63"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC40LjA"
+ },
+ {
+  "name": "soar-registry-v0.3.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.3.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.3.0",
+  "commit": {
+   "sha": "1495d99b81903d03114f4b1a541e097cbfccac37",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1495d99b81903d03114f4b1a541e097cbfccac37"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC4zLjA"
+ },
+ {
+  "name": "soar-registry-v0.2.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.2.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.2.2",
+  "commit": {
+   "sha": "944c925bc5d312ca25a9db3905298dc931e0fd2e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/944c925bc5d312ca25a9db3905298dc931e0fd2e"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC4yLjI"
+ },
+ {
+  "name": "soar-registry-v0.2.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.2.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.2.1",
+  "commit": {
+   "sha": "df832960fc4b1c88b20f2ad0474a7b1d016d9da6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/df832960fc4b1c88b20f2ad0474a7b1d016d9da6"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC4yLjE"
+ },
+ {
+  "name": "soar-registry-v0.2.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.2.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.2.0",
+  "commit": {
+   "sha": "a7ecca38101aadcc481dc8264f4befdfa66839b4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a7ecca38101aadcc481dc8264f4befdfa66839b4"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC4yLjA"
+ },
+ {
+  "name": "soar-registry-v0.1.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.1.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.1.1",
+  "commit": {
+   "sha": "1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC4xLjE"
+ },
+ {
+  "name": "soar-registry-v0.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-registry-v0.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-registry-v0.1.0",
+  "commit": {
+   "sha": "062a587f5b79737837819bfbd8c34d3a01e72df0",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/062a587f5b79737837819bfbd8c34d3a01e72df0"
+  },
+  "node_id": "REF_kwDOM6tDKb5yZWZzL3RhZ3Mvc29hci1yZWdpc3RyeS12MC4xLjA"
+ },
+ {
+  "name": "soar-package-v0.5.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.5.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.5.2",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjUuMg"
+ },
+ {
+  "name": "soar-package-v0.5.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.5.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.5.1",
+  "commit": {
+   "sha": "e016815df02b246b03aa5935794c645ff5911f9f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e016815df02b246b03aa5935794c645ff5911f9f"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjUuMQ"
+ },
+ {
+  "name": "soar-package-v0.5.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.5.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.5.0",
+  "commit": {
+   "sha": "d5f811f0189a9fe6da695b58a6a7fcccfcbccde6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d5f811f0189a9fe6da695b58a6a7fcccfcbccde6"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjUuMA"
+ },
+ {
+  "name": "soar-package-v0.4.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.4.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.4.2",
+  "commit": {
+   "sha": "462b62c40b66d90dcb9efc30318cdc6f924e2944",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/462b62c40b66d90dcb9efc30318cdc6f924e2944"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjQuMg"
+ },
+ {
+  "name": "soar-package-v0.4.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.4.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.4.1",
+  "commit": {
+   "sha": "65b4140775202eca98acf2b9f9504ad14e85901c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/65b4140775202eca98acf2b9f9504ad14e85901c"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjQuMQ"
+ },
+ {
+  "name": "soar-package-v0.4.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.4.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.4.0",
+  "commit": {
+   "sha": "d8df544f28b426064436ebdbde9eb309d71d9398",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d8df544f28b426064436ebdbde9eb309d71d9398"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjQuMA"
+ },
+ {
+  "name": "soar-package-v0.3.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.3.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.3.3",
+  "commit": {
+   "sha": "7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjMuMw"
+ },
+ {
+  "name": "soar-package-v0.3.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.3.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.3.2",
+  "commit": {
+   "sha": "fe7a6f47ae9eec67640d11f4fde0d03ed7a23287",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/fe7a6f47ae9eec67640d11f4fde0d03ed7a23287"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjMuMg"
+ },
+ {
+  "name": "soar-package-v0.3.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.3.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.3.1",
+  "commit": {
+   "sha": "4ba0df57fdde17b929cfa3667aa2c967f2925751",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/4ba0df57fdde17b929cfa3667aa2c967f2925751"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjMuMQ"
+ },
+ {
+  "name": "soar-package-v0.3.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.3.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.3.0",
+  "commit": {
+   "sha": "c86323b3b85338fdd81ecba7075800f0a1607e63",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c86323b3b85338fdd81ecba7075800f0a1607e63"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjMuMA"
+ },
+ {
+  "name": "soar-package-v0.2.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.2.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.2.3",
+  "commit": {
+   "sha": "1495d99b81903d03114f4b1a541e097cbfccac37",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1495d99b81903d03114f4b1a541e097cbfccac37"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjIuMw"
+ },
+ {
+  "name": "soar-package-v0.2.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.2.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.2.2",
+  "commit": {
+   "sha": "944c925bc5d312ca25a9db3905298dc931e0fd2e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/944c925bc5d312ca25a9db3905298dc931e0fd2e"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjIuMg"
+ },
+ {
+  "name": "soar-package-v0.2.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.2.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.2.1",
+  "commit": {
+   "sha": "df832960fc4b1c88b20f2ad0474a7b1d016d9da6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/df832960fc4b1c88b20f2ad0474a7b1d016d9da6"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjIuMQ"
+ },
+ {
+  "name": "soar-package-v0.2.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.2.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.2.0",
+  "commit": {
+   "sha": "a7ecca38101aadcc481dc8264f4befdfa66839b4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a7ecca38101aadcc481dc8264f4befdfa66839b4"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjIuMA"
+ },
+ {
+  "name": "soar-package-v0.1.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.1.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.1.1",
+  "commit": {
+   "sha": "1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjEuMQ"
+ },
+ {
+  "name": "soar-package-v0.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-package-v0.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-package-v0.1.0",
+  "commit": {
+   "sha": "062a587f5b79737837819bfbd8c34d3a01e72df0",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/062a587f5b79737837819bfbd8c34d3a01e72df0"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1wYWNrYWdlLXYwLjEuMA"
+ },
+ {
+  "name": "soar-operations-v0.5.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.5.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.5.1",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuNS4x"
+ },
+ {
+  "name": "soar-operations-v0.5.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.5.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.5.0",
+  "commit": {
+   "sha": "e016815df02b246b03aa5935794c645ff5911f9f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e016815df02b246b03aa5935794c645ff5911f9f"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuNS4w"
+ },
+ {
+  "name": "soar-operations-v0.4.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.4.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.4.1",
+  "commit": {
+   "sha": "ae017bd343cbbd16e43d074773604ec554244724",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/ae017bd343cbbd16e43d074773604ec554244724"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuNC4x"
+ },
+ {
+  "name": "soar-operations-v0.4.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.4.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.4.0",
+  "commit": {
+   "sha": "d5f811f0189a9fe6da695b58a6a7fcccfcbccde6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d5f811f0189a9fe6da695b58a6a7fcccfcbccde6"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuNC4w"
+ },
+ {
+  "name": "soar-operations-v0.3.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.3.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.3.2",
+  "commit": {
+   "sha": "462b62c40b66d90dcb9efc30318cdc6f924e2944",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/462b62c40b66d90dcb9efc30318cdc6f924e2944"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuMy4y"
+ },
+ {
+  "name": "soar-operations-v0.3.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.3.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.3.1",
+  "commit": {
+   "sha": "86ebc9e3ea85ec96911aebdb7502766f55453929",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/86ebc9e3ea85ec96911aebdb7502766f55453929"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuMy4x"
+ },
+ {
+  "name": "soar-operations-v0.3.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.3.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.3.0",
+  "commit": {
+   "sha": "65b4140775202eca98acf2b9f9504ad14e85901c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/65b4140775202eca98acf2b9f9504ad14e85901c"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuMy4w"
+ },
+ {
+  "name": "soar-operations-v0.2.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.2.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.2.3",
+  "commit": {
+   "sha": "d8df544f28b426064436ebdbde9eb309d71d9398",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d8df544f28b426064436ebdbde9eb309d71d9398"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuMi4z"
+ },
+ {
+  "name": "soar-operations-v0.2.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.2.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.2.2",
+  "commit": {
+   "sha": "7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuMi4y"
+ },
+ {
+  "name": "soar-operations-v0.2.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.2.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.2.1",
+  "commit": {
+   "sha": "fe7a6f47ae9eec67640d11f4fde0d03ed7a23287",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/fe7a6f47ae9eec67640d11f4fde0d03ed7a23287"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuMi4x"
+ },
+ {
+  "name": "soar-operations-v0.2.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.2.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.2.0",
+  "commit": {
+   "sha": "4ba0df57fdde17b929cfa3667aa2c967f2925751",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/4ba0df57fdde17b929cfa3667aa2c967f2925751"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuMi4w"
+ },
+ {
+  "name": "soar-operations-v0.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-operations-v0.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-operations-v0.1.0",
+  "commit": {
+   "sha": "c86323b3b85338fdd81ecba7075800f0a1607e63",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c86323b3b85338fdd81ecba7075800f0a1607e63"
+  },
+  "node_id": "REF_kwDOM6tDKdoAIHJlZnMvdGFncy9zb2FyLW9wZXJhdGlvbnMtdjAuMS4w"
+ },
+ {
+  "name": "soar-events-v0.3.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-events-v0.3.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-events-v0.3.1",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1ldmVudHMtdjAuMy4x"
+ },
+ {
+  "name": "soar-events-v0.3.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-events-v0.3.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-events-v0.3.0",
+  "commit": {
+   "sha": "e016815df02b246b03aa5935794c645ff5911f9f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e016815df02b246b03aa5935794c645ff5911f9f"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1ldmVudHMtdjAuMy4w"
+ },
+ {
+  "name": "soar-events-v0.2.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-events-v0.2.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-events-v0.2.0",
+  "commit": {
+   "sha": "d5f811f0189a9fe6da695b58a6a7fcccfcbccde6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d5f811f0189a9fe6da695b58a6a7fcccfcbccde6"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1ldmVudHMtdjAuMi4w"
+ },
+ {
+  "name": "soar-events-v0.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-events-v0.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-events-v0.1.0",
+  "commit": {
+   "sha": "c86323b3b85338fdd81ecba7075800f0a1607e63",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c86323b3b85338fdd81ecba7075800f0a1607e63"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1ldmVudHMtdjAuMS4w"
+ },
+ {
+  "name": "soar-dl-v0.12.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.12.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.12.2",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKblyZWZzL3RhZ3Mvc29hci1kbC12MC4xMi4y"
+ },
+ {
+  "name": "soar-dl-v0.12.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.12.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.12.1",
+  "commit": {
+   "sha": "e016815df02b246b03aa5935794c645ff5911f9f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e016815df02b246b03aa5935794c645ff5911f9f"
+  },
+  "node_id": "REF_kwDOM6tDKblyZWZzL3RhZ3Mvc29hci1kbC12MC4xMi4x"
+ },
+ {
+  "name": "soar-dl-v0.12.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.12.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.12.0",
+  "commit": {
+   "sha": "ae017bd343cbbd16e43d074773604ec554244724",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/ae017bd343cbbd16e43d074773604ec554244724"
+  },
+  "node_id": "REF_kwDOM6tDKblyZWZzL3RhZ3Mvc29hci1kbC12MC4xMi4w"
+ },
+ {
+  "name": "soar-dl-v0.11.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.11.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.11.0",
+  "commit": {
+   "sha": "d5f811f0189a9fe6da695b58a6a7fcccfcbccde6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d5f811f0189a9fe6da695b58a6a7fcccfcbccde6"
+  },
+  "node_id": "REF_kwDOM6tDKblyZWZzL3RhZ3Mvc29hci1kbC12MC4xMS4w"
+ },
+ {
+  "name": "soar-dl-v0.10.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.10.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.10.2",
+  "commit": {
+   "sha": "462b62c40b66d90dcb9efc30318cdc6f924e2944",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/462b62c40b66d90dcb9efc30318cdc6f924e2944"
+  },
+  "node_id": "REF_kwDOM6tDKblyZWZzL3RhZ3Mvc29hci1kbC12MC4xMC4y"
+ },
+ {
+  "name": "soar-dl-v0.10.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.10.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.10.1",
+  "commit": {
+   "sha": "65b4140775202eca98acf2b9f9504ad14e85901c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/65b4140775202eca98acf2b9f9504ad14e85901c"
+  },
+  "node_id": "REF_kwDOM6tDKblyZWZzL3RhZ3Mvc29hci1kbC12MC4xMC4x"
+ },
+ {
+  "name": "soar-dl-v0.10.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.10.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.10.0",
+  "commit": {
+   "sha": "fe7a6f47ae9eec67640d11f4fde0d03ed7a23287",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/fe7a6f47ae9eec67640d11f4fde0d03ed7a23287"
+  },
+  "node_id": "REF_kwDOM6tDKblyZWZzL3RhZ3Mvc29hci1kbC12MC4xMC4w"
+ },
+ {
+  "name": "soar-dl-v0.9.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.9.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.9.1",
+  "commit": {
+   "sha": "4ba0df57fdde17b929cfa3667aa2c967f2925751",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/4ba0df57fdde17b929cfa3667aa2c967f2925751"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kbC12MC45LjE"
+ },
+ {
+  "name": "soar-dl-v0.9.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.9.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.9.0",
+  "commit": {
+   "sha": "c86323b3b85338fdd81ecba7075800f0a1607e63",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c86323b3b85338fdd81ecba7075800f0a1607e63"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kbC12MC45LjA"
+ },
+ {
+  "name": "soar-dl-v0.8.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.8.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.8.0",
+  "commit": {
+   "sha": "1495d99b81903d03114f4b1a541e097cbfccac37",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1495d99b81903d03114f4b1a541e097cbfccac37"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kbC12MC44LjA"
+ },
+ {
+  "name": "soar-dl-v0.7.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.7.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.7.3",
+  "commit": {
+   "sha": "944c925bc5d312ca25a9db3905298dc931e0fd2e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/944c925bc5d312ca25a9db3905298dc931e0fd2e"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kbC12MC43LjM"
+ },
+ {
+  "name": "soar-dl-v0.7.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.7.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.7.2",
+  "commit": {
+   "sha": "a7ecca38101aadcc481dc8264f4befdfa66839b4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a7ecca38101aadcc481dc8264f4befdfa66839b4"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kbC12MC43LjI"
+ },
+ {
+  "name": "soar-dl-v0.7.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.7.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.7.1",
+  "commit": {
+   "sha": "1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kbC12MC43LjE"
+ },
+ {
+  "name": "soar-dl-v0.7.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-dl-v0.7.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-dl-v0.7.0",
+  "commit": {
+   "sha": "062a587f5b79737837819bfbd8c34d3a01e72df0",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/062a587f5b79737837819bfbd8c34d3a01e72df0"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kbC12MC43LjA"
+ },
+ {
+  "name": "soar-db-v0.7.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.7.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.7.1",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC43LjE"
+ },
+ {
+  "name": "soar-db-v0.7.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.7.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.7.0",
+  "commit": {
+   "sha": "e016815df02b246b03aa5935794c645ff5911f9f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e016815df02b246b03aa5935794c645ff5911f9f"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC43LjA"
+ },
+ {
+  "name": "soar-db-v0.6.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.6.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.6.1",
+  "commit": {
+   "sha": "ae017bd343cbbd16e43d074773604ec554244724",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/ae017bd343cbbd16e43d074773604ec554244724"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC42LjE"
+ },
+ {
+  "name": "soar-db-v0.6.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.6.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.6.0",
+  "commit": {
+   "sha": "d5f811f0189a9fe6da695b58a6a7fcccfcbccde6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d5f811f0189a9fe6da695b58a6a7fcccfcbccde6"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC42LjA"
+ },
+ {
+  "name": "soar-db-v0.5.5",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.5.5",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.5.5",
+  "commit": {
+   "sha": "462b62c40b66d90dcb9efc30318cdc6f924e2944",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/462b62c40b66d90dcb9efc30318cdc6f924e2944"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC41LjU"
+ },
+ {
+  "name": "soar-db-v0.5.4",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.5.4",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.5.4",
+  "commit": {
+   "sha": "65b4140775202eca98acf2b9f9504ad14e85901c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/65b4140775202eca98acf2b9f9504ad14e85901c"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC41LjQ"
+ },
+ {
+  "name": "soar-db-v0.5.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.5.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.5.3",
+  "commit": {
+   "sha": "7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC41LjM"
+ },
+ {
+  "name": "soar-db-v0.5.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.5.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.5.2",
+  "commit": {
+   "sha": "fe7a6f47ae9eec67640d11f4fde0d03ed7a23287",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/fe7a6f47ae9eec67640d11f4fde0d03ed7a23287"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC41LjI"
+ },
+ {
+  "name": "soar-db-v0.5.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.5.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.5.1",
+  "commit": {
+   "sha": "4ba0df57fdde17b929cfa3667aa2c967f2925751",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/4ba0df57fdde17b929cfa3667aa2c967f2925751"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC41LjE"
+ },
+ {
+  "name": "soar-db-v0.5.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.5.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.5.0",
+  "commit": {
+   "sha": "c86323b3b85338fdd81ecba7075800f0a1607e63",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c86323b3b85338fdd81ecba7075800f0a1607e63"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC41LjA"
+ },
+ {
+  "name": "soar-db-v0.4.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.4.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.4.0",
+  "commit": {
+   "sha": "1495d99b81903d03114f4b1a541e097cbfccac37",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1495d99b81903d03114f4b1a541e097cbfccac37"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC40LjA"
+ },
+ {
+  "name": "soar-db-v0.3.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.3.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.3.2",
+  "commit": {
+   "sha": "944c925bc5d312ca25a9db3905298dc931e0fd2e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/944c925bc5d312ca25a9db3905298dc931e0fd2e"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC4zLjI"
+ },
+ {
+  "name": "soar-db-v0.3.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.3.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.3.1",
+  "commit": {
+   "sha": "df832960fc4b1c88b20f2ad0474a7b1d016d9da6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/df832960fc4b1c88b20f2ad0474a7b1d016d9da6"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC4zLjE"
+ },
+ {
+  "name": "soar-db-v0.3.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.3.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.3.0",
+  "commit": {
+   "sha": "a7ecca38101aadcc481dc8264f4befdfa66839b4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a7ecca38101aadcc481dc8264f4befdfa66839b4"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC4zLjA"
+ },
+ {
+  "name": "soar-db-v0.2.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.2.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.2.0",
+  "commit": {
+   "sha": "1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC4yLjA"
+ },
+ {
+  "name": "soar-db-v0.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-db-v0.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-db-v0.1.0",
+  "commit": {
+   "sha": "062a587f5b79737837819bfbd8c34d3a01e72df0",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/062a587f5b79737837819bfbd8c34d3a01e72df0"
+  },
+  "node_id": "REF_kwDOM6tDKbhyZWZzL3RhZ3Mvc29hci1kYi12MC4xLjA"
+ },
+ {
+  "name": "soar-core-v0.17.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.17.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.17.3",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE3LjM"
+ },
+ {
+  "name": "soar-core-v0.17.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.17.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.17.2",
+  "commit": {
+   "sha": "e016815df02b246b03aa5935794c645ff5911f9f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e016815df02b246b03aa5935794c645ff5911f9f"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE3LjI"
+ },
+ {
+  "name": "soar-core-v0.17.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.17.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.17.1",
+  "commit": {
+   "sha": "ae017bd343cbbd16e43d074773604ec554244724",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/ae017bd343cbbd16e43d074773604ec554244724"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE3LjE"
+ },
+ {
+  "name": "soar-core-v0.17.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.17.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.17.0",
+  "commit": {
+   "sha": "d5f811f0189a9fe6da695b58a6a7fcccfcbccde6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d5f811f0189a9fe6da695b58a6a7fcccfcbccde6"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE3LjA"
+ },
+ {
+  "name": "soar-core-v0.16.4",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.16.4",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.16.4",
+  "commit": {
+   "sha": "462b62c40b66d90dcb9efc30318cdc6f924e2944",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/462b62c40b66d90dcb9efc30318cdc6f924e2944"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE2LjQ"
+ },
+ {
+  "name": "soar-core-v0.16.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.16.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.16.3",
+  "commit": {
+   "sha": "65b4140775202eca98acf2b9f9504ad14e85901c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/65b4140775202eca98acf2b9f9504ad14e85901c"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE2LjM"
+ },
+ {
+  "name": "soar-core-v0.16.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.16.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.16.2",
+  "commit": {
+   "sha": "d8df544f28b426064436ebdbde9eb309d71d9398",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d8df544f28b426064436ebdbde9eb309d71d9398"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE2LjI"
+ },
+ {
+  "name": "soar-core-v0.16.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.16.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.16.1",
+  "commit": {
+   "sha": "7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE2LjE"
+ },
+ {
+  "name": "soar-core-v0.16.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.16.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.16.0",
+  "commit": {
+   "sha": "fe7a6f47ae9eec67640d11f4fde0d03ed7a23287",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/fe7a6f47ae9eec67640d11f4fde0d03ed7a23287"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE2LjA"
+ },
+ {
+  "name": "soar-core-v0.15.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.15.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.15.0",
+  "commit": {
+   "sha": "4ba0df57fdde17b929cfa3667aa2c967f2925751",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/4ba0df57fdde17b929cfa3667aa2c967f2925751"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE1LjA"
+ },
+ {
+  "name": "soar-core-v0.14.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.14.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.14.0",
+  "commit": {
+   "sha": "c86323b3b85338fdd81ecba7075800f0a1607e63",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c86323b3b85338fdd81ecba7075800f0a1607e63"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjE0LjA"
+ },
+ {
+  "name": "soar-core-v0.13.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.13.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.13.0",
+  "commit": {
+   "sha": "1495d99b81903d03114f4b1a541e097cbfccac37",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1495d99b81903d03114f4b1a541e097cbfccac37"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEzLjA"
+ },
+ {
+  "name": "soar-core-v0.12.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.12.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.12.0",
+  "commit": {
+   "sha": "944c925bc5d312ca25a9db3905298dc931e0fd2e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/944c925bc5d312ca25a9db3905298dc931e0fd2e"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEyLjA"
+ },
+ {
+  "name": "soar-core-v0.11.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.11.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.11.1",
+  "commit": {
+   "sha": "df832960fc4b1c88b20f2ad0474a7b1d016d9da6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/df832960fc4b1c88b20f2ad0474a7b1d016d9da6"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjExLjE"
+ },
+ {
+  "name": "soar-core-v0.11.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.11.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.11.0",
+  "commit": {
+   "sha": "a7ecca38101aadcc481dc8264f4befdfa66839b4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a7ecca38101aadcc481dc8264f4befdfa66839b4"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjExLjA"
+ },
+ {
+  "name": "soar-core-v0.10.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.10.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.10.0",
+  "commit": {
+   "sha": "1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca"
+  },
+  "node_id": "REF_kwDOM6tDKbtyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEwLjA"
+ },
+ {
+  "name": "soar-core-v0.9.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.9.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.9.0",
+  "commit": {
+   "sha": "062a587f5b79737837819bfbd8c34d3a01e72df0",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/062a587f5b79737837819bfbd8c34d3a01e72df0"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjkuMA"
+ },
+ {
+  "name": "soar-core-v0.8.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.8.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.8.1",
+  "commit": {
+   "sha": "3b7cb1f8a973dd5ff4704dcd305a3ac2e41f924a",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/3b7cb1f8a973dd5ff4704dcd305a3ac2e41f924a"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjguMQ"
+ },
+ {
+  "name": "soar-core-v0.8.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.8.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.8.0",
+  "commit": {
+   "sha": "2ea50c9de73a72acb553a7193e310e02e5d721e9",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2ea50c9de73a72acb553a7193e310e02e5d721e9"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjguMA"
+ },
+ {
+  "name": "soar-core-v0.7.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.7.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.7.0",
+  "commit": {
+   "sha": "a3c7c556ca710227363a505b439371d51338746d",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a3c7c556ca710227363a505b439371d51338746d"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjcuMA"
+ },
+ {
+  "name": "soar-core-v0.6.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.6.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.6.0",
+  "commit": {
+   "sha": "149b561c1678465608bb841324328c2378358a6e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/149b561c1678465608bb841324328c2378358a6e"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjYuMA"
+ },
+ {
+  "name": "soar-core-v0.5.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.5.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.5.0",
+  "commit": {
+   "sha": "c5cd133d7d7a8b7b79be28d79b2264f8abcfd658",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c5cd133d7d7a8b7b79be28d79b2264f8abcfd658"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjUuMA"
+ },
+ {
+  "name": "soar-core-v0.4.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.4.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.4.2",
+  "commit": {
+   "sha": "9f49b45b4e14ff4e48b41e99bdcaece4a741250c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/9f49b45b4e14ff4e48b41e99bdcaece4a741250c"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjQuMg"
+ },
+ {
+  "name": "soar-core-v0.4.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.4.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.4.1",
+  "commit": {
+   "sha": "e0e3277a243f4be33798c85865c60e2188021a1f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e0e3277a243f4be33798c85865c60e2188021a1f"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjQuMQ"
+ },
+ {
+  "name": "soar-core-v0.4.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.4.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.4.0",
+  "commit": {
+   "sha": "8cf22aed28b9c02d94a951082243ab1cd5e1d0cf",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/8cf22aed28b9c02d94a951082243ab1cd5e1d0cf"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjQuMA"
+ },
+ {
+  "name": "soar-core-v0.3.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.3.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.3.3",
+  "commit": {
+   "sha": "ff356228b7f5aae6ded66bdc81f7ff829d567dcb",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/ff356228b7f5aae6ded66bdc81f7ff829d567dcb"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjMuMw"
+ },
+ {
+  "name": "soar-core-v0.3.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.3.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.3.2",
+  "commit": {
+   "sha": "f0774a38809b22faa8bc4037d91cf14f9ea3ae8e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/f0774a38809b22faa8bc4037d91cf14f9ea3ae8e"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjMuMg"
+ },
+ {
+  "name": "soar-core-v0.3.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.3.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.3.1",
+  "commit": {
+   "sha": "a9c0487249ddf06a139c38f6e38c3a5cb0c25386",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a9c0487249ddf06a139c38f6e38c3a5cb0c25386"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjMuMQ"
+ },
+ {
+  "name": "soar-core-v0.1.9",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.1.9",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.1.9",
+  "commit": {
+   "sha": "5727e1a0c8c1db9d3c49f787cd3e74ec0fe54c3e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/5727e1a0c8c1db9d3c49f787cd3e74ec0fe54c3e"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEuOQ"
+ },
+ {
+  "name": "soar-core-v0.1.8",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.1.8",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.1.8",
+  "commit": {
+   "sha": "303891f5c7716f81e6ca7c3a8a8d48b43517131a",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/303891f5c7716f81e6ca7c3a8a8d48b43517131a"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEuOA"
+ },
+ {
+  "name": "soar-core-v0.1.7",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.1.7",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.1.7",
+  "commit": {
+   "sha": "44aa99e59ea705d6229bcbb1b4c1431d5c11600a",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/44aa99e59ea705d6229bcbb1b4c1431d5c11600a"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEuNw"
+ },
+ {
+  "name": "soar-core-v0.1.6",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.1.6",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.1.6",
+  "commit": {
+   "sha": "be4021059512877d51e8b8365cfe23d7cd838512",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/be4021059512877d51e8b8365cfe23d7cd838512"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEuNg"
+ },
+ {
+  "name": "soar-core-v0.1.5",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.1.5",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.1.5",
+  "commit": {
+   "sha": "921868c05b804b5c856e67ac8580c821ac032439",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/921868c05b804b5c856e67ac8580c821ac032439"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEuNQ"
+ },
+ {
+  "name": "soar-core-v0.1.4",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.1.4",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.1.4",
+  "commit": {
+   "sha": "0d2d7c789d8f89afb0f6beed46f305ec66fb8584",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/0d2d7c789d8f89afb0f6beed46f305ec66fb8584"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEuNA"
+ },
+ {
+  "name": "soar-core-v0.1.3",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.1.3",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.1.3",
+  "commit": {
+   "sha": "abf485e4453dc40c6278c72b8cca559a598ea85c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/abf485e4453dc40c6278c72b8cca559a598ea85c"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEuMw"
+ },
+ {
+  "name": "soar-core-v0.1.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.1.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.1.2",
+  "commit": {
+   "sha": "5003aa795c9de53fd37ede0394112f1fa6adac09",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/5003aa795c9de53fd37ede0394112f1fa6adac09"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEuMg"
+ },
+ {
+  "name": "soar-core-v0.1.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.1.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.1.1",
+  "commit": {
+   "sha": "81037c48fcf80e144e113b296e8dd3f5a1e8ce8c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/81037c48fcf80e144e113b296e8dd3f5a1e8ce8c"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEuMQ"
+ },
+ {
+  "name": "soar-core-v0.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-core-v0.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-core-v0.1.0",
+  "commit": {
+   "sha": "bb62e69223be751aea0d3931d4a3ac026f42270b",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/bb62e69223be751aea0d3931d4a3ac026f42270b"
+  },
+  "node_id": "REF_kwDOM6tDKbpyZWZzL3RhZ3Mvc29hci1jb3JlLXYwLjEuMA"
+ },
+ {
+  "name": "soar-config-v0.12.2",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.12.2",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.12.2",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1jb25maWctdjAuMTIuMg"
+ },
+ {
+  "name": "soar-config-v0.12.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.12.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.12.1",
+  "commit": {
+   "sha": "e016815df02b246b03aa5935794c645ff5911f9f",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/e016815df02b246b03aa5935794c645ff5911f9f"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1jb25maWctdjAuMTIuMQ"
+ },
+ {
+  "name": "soar-config-v0.12.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.12.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.12.0",
+  "commit": {
+   "sha": "d5f811f0189a9fe6da695b58a6a7fcccfcbccde6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/d5f811f0189a9fe6da695b58a6a7fcccfcbccde6"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1jb25maWctdjAuMTIuMA"
+ },
+ {
+  "name": "soar-config-v0.11.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.11.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.11.0",
+  "commit": {
+   "sha": "462b62c40b66d90dcb9efc30318cdc6f924e2944",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/462b62c40b66d90dcb9efc30318cdc6f924e2944"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1jb25maWctdjAuMTEuMA"
+ },
+ {
+  "name": "soar-config-v0.10.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.10.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.10.0",
+  "commit": {
+   "sha": "65b4140775202eca98acf2b9f9504ad14e85901c",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/65b4140775202eca98acf2b9f9504ad14e85901c"
+  },
+  "node_id": "REF_kwDOM6tDKb1yZWZzL3RhZ3Mvc29hci1jb25maWctdjAuMTAuMA"
+ },
+ {
+  "name": "soar-config-v0.9.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.9.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.9.0",
+  "commit": {
+   "sha": "7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/7e0f7cabbc9b74ca5d8d1a4f6381ccfd08204f75"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1jb25maWctdjAuOS4w"
+ },
+ {
+  "name": "soar-config-v0.8.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.8.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.8.0",
+  "commit": {
+   "sha": "fe7a6f47ae9eec67640d11f4fde0d03ed7a23287",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/fe7a6f47ae9eec67640d11f4fde0d03ed7a23287"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1jb25maWctdjAuOC4w"
+ },
+ {
+  "name": "soar-config-v0.7.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.7.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.7.0",
+  "commit": {
+   "sha": "4ba0df57fdde17b929cfa3667aa2c967f2925751",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/4ba0df57fdde17b929cfa3667aa2c967f2925751"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1jb25maWctdjAuNy4w"
+ },
+ {
+  "name": "soar-config-v0.6.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.6.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.6.0",
+  "commit": {
+   "sha": "c86323b3b85338fdd81ecba7075800f0a1607e63",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/c86323b3b85338fdd81ecba7075800f0a1607e63"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1jb25maWctdjAuNi4w"
+ },
+ {
+  "name": "soar-config-v0.5.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.5.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.5.0",
+  "commit": {
+   "sha": "1495d99b81903d03114f4b1a541e097cbfccac37",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1495d99b81903d03114f4b1a541e097cbfccac37"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1jb25maWctdjAuNS4w"
+ },
+ {
+  "name": "soar-config-v0.4.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.4.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.4.0",
+  "commit": {
+   "sha": "944c925bc5d312ca25a9db3905298dc931e0fd2e",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/944c925bc5d312ca25a9db3905298dc931e0fd2e"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1jb25maWctdjAuNC4w"
+ },
+ {
+  "name": "soar-config-v0.3.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.3.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.3.0",
+  "commit": {
+   "sha": "df832960fc4b1c88b20f2ad0474a7b1d016d9da6",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/df832960fc4b1c88b20f2ad0474a7b1d016d9da6"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1jb25maWctdjAuMy4w"
+ },
+ {
+  "name": "soar-config-v0.2.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.2.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.2.0",
+  "commit": {
+   "sha": "a7ecca38101aadcc481dc8264f4befdfa66839b4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/a7ecca38101aadcc481dc8264f4befdfa66839b4"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1jb25maWctdjAuMi4w"
+ },
+ {
+  "name": "soar-config-v0.1.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.1.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.1.1",
+  "commit": {
+   "sha": "1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/1d90648dd3d736e5ce4f9989e1f4b355fd98a9ca"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1jb25maWctdjAuMS4x"
+ },
+ {
+  "name": "soar-config-v0.1.0",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/soar-config-v0.1.0",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/soar-config-v0.1.0",
+  "commit": {
+   "sha": "062a587f5b79737837819bfbd8c34d3a01e72df0",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/062a587f5b79737837819bfbd8c34d3a01e72df0"
+  },
+  "node_id": "REF_kwDOM6tDKbxyZWZzL3RhZ3Mvc29hci1jb25maWctdjAuMS4w"
+ },
+ {
+  "name": "nightly",
+  "zipball_url": "https://api.github.com/repos/pkgforge/soar/zipball/refs/tags/nightly",
+  "tarball_url": "https://api.github.com/repos/pkgforge/soar/tarball/refs/tags/nightly",
+  "commit": {
+   "sha": "2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4",
+   "url": "https://api.github.com/repos/pkgforge/soar/commits/2b5374e5eea3eeed9ed4cc775263c55d9d2f76c4"
+  },
+  "node_id": "REF_kwDOM6tDKbFyZWZzL3RhZ3MvbmlnaHRseQ"
+ }
+]

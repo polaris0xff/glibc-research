@@ -1,0 +1,2238 @@
+using AppManager.Core;
+using AppManager.Utils;
+
+namespace AppManager {
+    public class MainWindow : Adw.Window {
+        private Application app_ref;
+        private InstallationRegistry registry;
+        private Installer installer;
+        private Settings settings;
+        private Updater updater;
+        private Adw.PreferencesGroup apps_group;
+        private Adw.PreferencesPage general_page;
+        private Gtk.Stack content_stack;
+        private Gtk.Box empty_state_box;
+        private Gtk.Label empty_state_label;
+        private Gee.ArrayList<Adw.PreferencesRow> app_rows;
+        private Gtk.ShortcutsWindow? shortcuts_window;
+        private Adw.NavigationView navigation_view;
+        private Adw.ToastOverlay toast_overlay;
+        private Adw.BottomSheet bottom_sheet;
+        private Gtk.Widget bottom_bar_widget;
+        private Gtk.Button? update_button;
+        private Gtk.Button? cancel_button;
+        private Gtk.Label? update_button_label_widget;
+        private Gtk.Spinner? update_button_spinner_widget;
+        private UpdateWorkflowState update_state = UpdateWorkflowState.READY_TO_CHECK;
+        private GLib.Cancellable? update_cancellable;
+        private Gee.HashSet<string> pending_update_keys;
+        private Gee.HashMap<string, int64?> record_size_cache;
+        private Gee.HashSet<string> updating_records;
+        private Gee.HashMap<string, string> failed_update_keys; // key -> error message
+        private DetailsWindow? active_details_window;
+        private const string SHORTCUTS_RESOURCE = "/com/github/AppManager/ui/main-window-shortcuts.ui";
+        private const string APPDATA_RESOURCE = "/com/github/AppManager/com.github.AppManager.metainfo.xml";
+
+        private Gtk.ToggleButton? search_button;
+        private Gtk.SearchBar? search_bar;
+        private Gtk.SearchEntry? search_entry;
+        private GLib.SimpleActionGroup? window_actions;
+        private Gtk.MenuButton? main_menu_button;
+        private GLib.Menu? fullscreen_menu_section;
+        private Adw.Banner? fuse_banner;
+        private string current_search_query = "";
+        private bool has_installations = true;
+        private StagedUpdatesManager staged_updates;
+
+        // Grid view fields
+        private Gtk.FlowBox? grid_flow_box;
+        private Gtk.ScrolledWindow? grid_scroll;
+        private Adw.SplitButton? view_sort_button;
+        private Gtk.Box? apps_title_bar;
+        private Gtk.Label? apps_title_label;
+        private Gtk.Label? launch_hint_label;
+        private string view_mode = "list";
+        private string sort_mode = "default";
+        private bool size_sort_ascending = false;
+        private bool name_sort_ascending = true;
+        private bool _fullscreen_active = false;
+        private string pre_fullscreen_view_mode = "list";
+        private Gtk.Widget? import_hint_widget;
+        private bool import_in_progress = false;
+        private bool import_cancel_requested = false;
+
+        public void push_page(Adw.NavigationPage page) {
+            navigation_view.push(page);
+        }
+
+        public MainWindow(Application app, InstallationRegistry registry, Installer installer, Settings settings) {
+            Object(application: app);
+            debug("MainWindow: constructor called");
+            this.title = _("AppManager");
+            this.app_ref = app;
+            this.registry = registry;
+            this.installer = installer;
+            this.settings = settings;
+            this.updater = new Updater(registry, installer);
+            this.staged_updates = new StagedUpdatesManager();
+            this.pending_update_keys = new Gee.HashSet<string>();
+            this.record_size_cache = new Gee.HashMap<string, int64?>();
+            this.updating_records = new Gee.HashSet<string>();
+            this.failed_update_keys = new Gee.HashMap<string, string>();
+            this.active_details_window = null;
+            this.app_rows = new Gee.ArrayList<Adw.PreferencesRow>();
+            this.view_mode = settings.get_string("app-list-view-mode");
+            if (this.view_mode != "list" && this.view_mode != "grid") {
+                this.view_mode = "list";
+            }
+            this.sort_mode = settings.get_string("app-list-sort-mode");
+            if (this.sort_mode != "default" && this.sort_mode != "name" && this.sort_mode != "size") {
+                this.sort_mode = "default";
+            }
+            this.size_sort_ascending = settings.get_boolean("app-list-sort-size-ascending");
+            this.name_sort_ascending = settings.get_boolean("app-list-sort-name-ascending");
+            this.set_default_size(settings.get_int("window-width"), settings.get_int("window-height"));
+            build_ui();
+            setup_window_actions();
+            setup_drag_drop();
+            load_staged_updates();
+            refresh_installations();
+            registry.changed.connect(on_registry_changed);
+
+            // Track fullscreen state changes (works on both X11 and Wayland)
+            this.notify["fullscreened"].connect(() => {
+                apply_fullscreen_state(this.fullscreened);
+            });
+        }
+
+        /**
+         * Loads staged updates from disk and populates pending_update_keys.
+         * Called on startup to show updates discovered by background service.
+         */
+        private void load_staged_updates() {
+            if (!staged_updates.has_updates()) {
+                return;
+            }
+
+            var records = registry.list();
+            var staged_ids = staged_updates.get_record_ids();
+            int loaded = 0;
+
+            foreach (var record in records) {
+                if (staged_ids.contains(record.id)) {
+                    pending_update_keys.add(record_state_key(record));
+                    loaded++;
+                }
+            }
+
+            if (loaded > 0) {
+                debug("MainWindow: loaded %d staged update(s)", loaded);
+                // Switch to "ready to update" state if we have pending updates
+                set_update_button_state(UpdateWorkflowState.READY_TO_UPDATE);
+            }
+        }
+
+        private void on_registry_changed() {
+            debug("MainWindow: received registry changed signal");
+            if (import_in_progress) {
+                return;
+            }
+            refresh_installations();
+        }
+
+        private void build_ui() {
+            navigation_view = new Adw.NavigationView();
+            navigation_view.pop_on_escape = true;
+
+            // Bottom sheet with "Get more ..." button
+            bottom_sheet = new Adw.BottomSheet();
+            bottom_sheet.set_content(navigation_view);
+            bottom_bar_widget = build_get_more_bottom_bar();
+            bottom_sheet.set_bottom_bar(bottom_bar_widget);
+            bottom_sheet.set_sheet(build_get_more_sheet());
+
+            // Toast overlay wraps bottom sheet so toasts appear above the bottom bar
+            toast_overlay = new Adw.ToastOverlay();
+            toast_overlay.set_child(bottom_sheet);
+            this.set_content(toast_overlay);
+
+            general_page = new Adw.PreferencesPage();
+            general_page.add_css_class("main-apps-page");
+
+            apps_group = new Adw.PreferencesGroup();
+            general_page.add(apps_group);
+
+            // Grid view: FlowBox in its own ScrolledWindow for smooth scrolling
+            grid_flow_box = new Gtk.FlowBox();
+            grid_flow_box.set_valign(Gtk.Align.START);
+            grid_flow_box.set_halign(Gtk.Align.FILL);
+            grid_flow_box.set_homogeneous(true);
+            grid_flow_box.set_min_children_per_line(2);
+            grid_flow_box.set_column_spacing(6);
+            grid_flow_box.set_row_spacing(6);
+            grid_flow_box.set_selection_mode(Gtk.SelectionMode.NONE);
+            grid_flow_box.add_css_class("app-grid");
+            grid_flow_box.child_activated.connect(on_grid_child_activated);
+
+            grid_scroll = new Gtk.ScrolledWindow();
+            grid_scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC);
+            grid_scroll.set_hexpand(true);
+            grid_scroll.set_vexpand(true);
+            grid_scroll.set_child(grid_flow_box);
+
+            empty_state_box = build_empty_state();
+
+            content_stack = new Gtk.Stack();
+            content_stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE);
+            content_stack.set_hexpand(true);
+            content_stack.set_vexpand(true);
+            content_stack.add_named(general_page, "list");
+            content_stack.add_named(grid_scroll, "grid");
+            content_stack.add_named(empty_state_box, "empty");
+            content_stack.set_visible_child_name("list");
+
+            // GNOME-style hint overlay: title + subtitle, centered in
+            // the content area when only AppManager itself is installed.
+            var hint_title = new Gtk.Label(_("No Apps Yet"));
+            hint_title.add_css_class("title-2");
+            hint_title.set_halign(Gtk.Align.CENTER);
+
+            var hint_subtitle = new Gtk.Label(_("To install AppImages, drag and drop them onto this window or double click the file"));
+            hint_subtitle.add_css_class("dim-label");
+            hint_subtitle.set_halign(Gtk.Align.CENTER);
+            hint_subtitle.set_wrap(true);
+            hint_subtitle.set_max_width_chars(42);
+            hint_subtitle.set_justify(Gtk.Justification.CENTER);
+
+            var hint_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 12);
+            hint_box.set_halign(Gtk.Align.CENTER);
+            hint_box.set_valign(Gtk.Align.CENTER);
+            hint_box.set_visible(false);
+            hint_box.append(hint_title);
+            hint_box.append(hint_subtitle);
+            import_hint_widget = hint_box;
+
+            var content_overlay = new Gtk.Overlay();
+            content_overlay.set_child(content_stack);
+            content_overlay.add_overlay(hint_box);
+
+            var root_toolbar = create_toolbar_with_header(content_overlay, true);
+            var root_page = new Adw.NavigationPage(root_toolbar, "main");
+            root_page.title = _("AppManager");
+            navigation_view.add(root_page);
+
+            // Show/hide bottom bar based on navigation depth
+            navigation_view.popped.connect(() => {
+                if (navigation_view.navigation_stack.get_n_items() == 1 && !_fullscreen_active) {
+                    bottom_bar_widget.visible = true;
+                }
+            });
+
+            this.close_request.connect(() => {
+                if (import_in_progress) {
+                    return true;
+                }
+                settings.set_int("window-width", this.get_width());
+                settings.set_int("window-height", this.get_height());
+                return false;
+            });
+        }
+
+        /**
+         * Sets up drag and drop support to install AppImages by dropping them on the main window.
+         */
+        private void setup_drag_drop() {
+            var drop_target = new Gtk.DropTarget(typeof(Gdk.FileList), Gdk.DragAction.COPY);
+            
+            drop_target.drop.connect((value, x, y) => {
+                var file_list = (Gdk.FileList)value;
+                var files = file_list.get_files();
+                
+                foreach (var file in files) {
+                    app_ref.open_drop_window(file);
+                }
+                
+                return files.length() > 0;
+            });
+            
+            toast_overlay.add_controller(drop_target);
+        }
+
+        public void add_toast(string message) {
+            var toast = new Adw.Toast(message);
+            toast_overlay.add_toast(toast);
+        }
+
+        public Adw.Toast add_toast_with_button(string message, string button_label) {
+            var toast = new Adw.Toast(message);
+            toast.set_button_label(button_label);
+            toast_overlay.add_toast(toast);
+            return toast;
+        }
+
+        private Gtk.Widget build_get_more_bottom_bar() {
+            var box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 6);
+            box.halign = Gtk.Align.CENTER;
+            box.valign = Gtk.Align.CENTER;
+            box.margin_top = 12;
+            box.margin_bottom = 12;
+            box.append(new Gtk.Image.from_icon_name("folder-download-symbolic"));
+            box.append(new Gtk.Label(_("Get more ...")));
+            return box;
+        }
+
+        private Gtk.Widget build_get_more_sheet() {
+            var sheet_toolbar = new Adw.ToolbarView();
+            var header = new Adw.HeaderBar();
+            header.show_title = false;
+            sheet_toolbar.add_top_bar(header);
+
+            var page = new Adw.PreferencesPage();
+            var links_group = new Adw.PreferencesGroup();
+            links_group.title = _("Find more AppImages");
+            links_group.description = _("Browse these sources to discover and download AppImages");
+
+            var pkgforge_row = new Adw.ActionRow();
+            pkgforge_row.title = "Anylinux AppImages";
+            pkgforge_row.subtitle = "pkgforge-dev.github.io";
+            pkgforge_row.activatable = true;
+            pkgforge_row.add_suffix(new Gtk.Image.from_icon_name("external-link-symbolic"));
+            pkgforge_row.activated.connect(() => {
+                UiUtils.open_url("https://pkgforge-dev.github.io/Anylinux-AppImages/");
+            });
+            links_group.add(pkgforge_row);
+
+            var appimage_catalog_row = new Adw.ActionRow();
+            appimage_catalog_row.title = "Portable Linux Apps";
+            appimage_catalog_row.subtitle = "portable-linux-apps.github.io";
+            appimage_catalog_row.activatable = true;
+            appimage_catalog_row.add_suffix(new Gtk.Image.from_icon_name("external-link-symbolic"));
+            appimage_catalog_row.activated.connect(() => {
+                UiUtils.open_url("https://portable-linux-apps.github.io//apps.html");
+            });
+            links_group.add(appimage_catalog_row);
+
+            page.add(links_group);
+
+            var import_group = new Adw.PreferencesGroup();
+            var import_row = new Adw.ActionRow();
+            import_row.title = _("Import AppImages from folder ...");
+            import_row.activatable = true;
+            import_row.add_prefix(new Gtk.Image.from_icon_name("folder-open-symbolic"));
+            import_row.add_suffix(new Gtk.Image.from_icon_name("go-next-symbolic"));
+            import_row.activated.connect(() => {
+                bottom_sheet.open = false;
+                present_import_folder_dialog();
+            });
+            import_group.add(import_row);
+            page.add(import_group);
+
+            sheet_toolbar.set_content(page);
+            return sheet_toolbar;
+        }
+
+        private void ensure_apps_group_present() {
+            if (apps_group == null) {
+                apps_group = new Adw.PreferencesGroup();
+            }
+            if (apps_group.get_parent() == null) {
+                general_page.add(apps_group);
+            }
+        }
+
+        private void clear_apps_group_rows() {
+            if (apps_group == null) {
+                return;
+            }
+
+            foreach (var row in app_rows) {
+                if (row.get_parent() != null) {
+                    apps_group.remove(row);
+                }
+            }
+            app_rows.clear();
+        }
+
+        private Gtk.Box build_empty_state() {
+            empty_state_label = new Gtk.Label(_("No AppImage apps installed"));
+            empty_state_label.add_css_class("title-1");
+            empty_state_label.set_wrap(true);
+            empty_state_label.set_justify(Gtk.Justification.CENTER);
+
+            var subtitle = new Gtk.Label(_("To install AppImages, drag and drop them onto this window or double click the files"));
+            subtitle.add_css_class("dim-label");
+            subtitle.set_wrap(true);
+            subtitle.set_justify(Gtk.Justification.CENTER);
+            subtitle.set_margin_top(12);
+
+            var box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            box.set_hexpand(true);
+            box.set_vexpand(true);
+            box.set_halign(Gtk.Align.CENTER);
+            box.set_valign(Gtk.Align.CENTER);
+            box.append(empty_state_label);
+            box.append(subtitle);
+
+            return box;
+        }
+
+        private void show_empty_state(string message) {
+            if (empty_state_label != null) {
+                empty_state_label.set_text(message);
+            }
+            if (apps_title_bar != null) {
+                apps_title_bar.set_visible(false);
+            }
+            content_stack.set_visible_child_name("empty");
+        }
+
+        private void show_list_state() {
+            if (apps_title_bar != null) {
+                apps_title_bar.set_visible(true);
+            }
+            content_stack.set_visible_child_name("list");
+        }
+
+        private void show_grid_state() {
+            if (apps_title_bar != null) {
+                apps_title_bar.set_visible(true);
+            }
+            content_stack.set_visible_child_name("grid");
+        }
+
+        private void refresh_installations() {
+            debug("MainWindow: refresh_installations called");
+            ensure_apps_group_present();
+            clear_apps_group_rows();
+
+            var all_records = registry.list();
+            has_installations = all_records.length > 0;
+            update_fuse_banner(all_records);
+            var filtered_list = new Gee.ArrayList<InstallationRecord>();
+
+            foreach (var record in all_records) {
+                if (current_search_query != "") {
+                    var name = record.name ?? "";
+                    if (!name.down().contains(current_search_query)) {
+                        continue;
+                    }
+                }
+                filtered_list.add(record);
+            }
+
+            // Show the import hint (overlay) when only AppManager itself is installed.
+            // Hide it when filtered_list is empty - the empty-state page has its own button.
+            bool only_self = has_only_self_records(all_records);
+            if (import_hint_widget != null) {
+                import_hint_widget.set_visible(only_self && filtered_list.size > 0);
+            }
+
+            // Prune based on all records (not filtered) to avoid removing staged updates during search
+            prune_pending_keys_and_staged_updates(all_records);
+            prune_size_cache(filtered_list);
+            update_apps_group_title(filtered_list.size);
+            update_update_button_sensitive();
+
+            if (filtered_list.size == 0) {
+                var message = current_search_query != "" ? _("No results found") : _("No AppImage apps installed");
+                show_empty_state(message);
+                return;
+            }
+
+            var sorted = new Gee.ArrayList<InstallationRecord>();
+            sorted.add_all(filtered_list);
+            sort_records(sorted);
+
+            if (view_mode == "grid") {
+                clear_grid_children();
+                show_grid_state();
+                populate_grid(sorted);
+            } else {
+                show_list_state();
+                populate_group(apps_group, sorted);
+            }
+        }
+
+        private void prune_pending_keys_and_staged_updates(InstallationRecord[] records) {
+            var valid_keys = new Gee.HashSet<string>();
+            var valid_ids = new Gee.HashSet<string>();
+            foreach (var record in records) {
+                valid_keys.add(record_state_key(record));
+                valid_ids.add(record.id);
+            }
+            
+            // Prune pending_update_keys
+            var keys_to_remove = new Gee.ArrayList<string>();
+            foreach (var key in pending_update_keys) {
+                if (!valid_keys.contains(key)) {
+                    keys_to_remove.add(key);
+                }
+            }
+            foreach (var key in keys_to_remove) {
+                pending_update_keys.remove(key);
+            }
+            
+            // Prune staged updates for uninstalled apps
+            var staged_ids = staged_updates.get_record_ids();
+            var ids_to_remove = new Gee.ArrayList<string>();
+            foreach (var id in staged_ids) {
+                if (!valid_ids.contains(id)) {
+                    ids_to_remove.add(id);
+                }
+            }
+            if (ids_to_remove.size > 0) {
+                foreach (var id in ids_to_remove) {
+                    staged_updates.remove(id);
+                }
+                staged_updates.save();
+            }
+            
+            // Update button state after pruning
+            if (keys_to_remove.size > 0) {
+                update_global_update_state_from_pending();
+            }
+        }
+
+        private void prune_size_cache(Gee.Collection<InstallationRecord> records) {
+            var valid = new Gee.HashSet<string>();
+            foreach (var record in records) {
+                valid.add(record_state_key(record));
+            }
+            var to_remove = new Gee.ArrayList<string>();
+            foreach (var key in record_size_cache.keys) {
+                if (!valid.contains(key)) {
+                    to_remove.add(key);
+                }
+            }
+            foreach (var key in to_remove) {
+                record_size_cache.unset(key);
+            }
+        }
+
+        private void update_apps_group_title(int count) {
+            if (apps_title_label == null) {
+                return;
+            }
+            var base_title = _("My Apps");
+            apps_title_label.set_text(count > 0 ? "%s (%d)".printf(base_title, count) : base_title);
+        }
+
+        private void sort_records(Gee.ArrayList<InstallationRecord> records) {
+            switch (sort_mode) {
+                case "name":
+                    records.sort((a, b) => {
+                        int cmp = compare_record_names(a, b);
+                        return name_sort_ascending ? cmp : -cmp;
+                    });
+                    break;
+                case "size":
+                    records.sort((a, b) => {
+                        int64 a_size = get_record_raw_size(a);
+                        int64 b_size = get_record_raw_size(b);
+                        if (a_size == b_size) {
+                            return compare_record_names(a, b);
+                        }
+                        if (size_sort_ascending) {
+                            return a_size < b_size ? -1 : 1;
+                        }
+                        return a_size > b_size ? -1 : 1;
+                    });
+                    break;
+                default:
+                    sort_records_by_updated(records);
+                    break;
+            }
+        }
+
+        private void sort_records_by_updated(Gee.ArrayList<InstallationRecord> records) {
+            records.sort((a, b) => {
+                // Use updated_at if available, otherwise use installed_at
+                int64 a_time = a.updated_at > 0 ? a.updated_at : a.installed_at;
+                int64 b_time = b.updated_at > 0 ? b.updated_at : b.installed_at;
+                
+                if (a_time == b_time) {
+                    return compare_record_names(a, b);
+                }
+                return a_time > b_time ? -1 : 1;
+            });
+        }
+
+        private int compare_record_names(InstallationRecord a, InstallationRecord b) {
+            if (a.name == null && b.name == null) {
+                return 0;
+            }
+            if (a.name == null) {
+                return 1;
+            }
+            if (b.name == null) {
+                return -1;
+            }
+            return a.name.collate(b.name);
+        }
+
+        private void populate_group(Adw.PreferencesGroup group, Gee.ArrayList<InstallationRecord> records) {
+            foreach (var record in records) {
+                var row = new Adw.ActionRow();
+                row.title = record.name;
+                if (record.mode == InstallMode.EXTRACTED) {
+                    row.add_css_class("extracted-app");
+                }
+                
+                row.subtitle = build_row_subtitle(record);
+
+                // Add icon if available
+                if (record.icon_path != null && record.icon_path.strip() != "") {
+                    var icon_image = UiUtils.load_app_icon(record.icon_path);
+                    if (icon_image != null) {
+                        row.add_prefix(icon_image);
+                    }
+                }
+
+                // Make row activatable to show detail page
+                row.activatable = true;
+                row.activated.connect(() => { show_detail_page(record); });
+
+                // Add navigation arrow
+                var arrow = new Gtk.Image.from_icon_name("go-next-symbolic");
+                arrow.add_css_class("dim-label");
+
+                var suffix_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 6);
+                suffix_box.set_valign(Gtk.Align.CENTER);
+
+                var state_key = record_state_key(record);
+                if (updating_records.contains(state_key)) {
+                    var spinner = new Gtk.Spinner();
+                    spinner.set_size_request(16, 16);
+                    spinner.set_valign(Gtk.Align.CENTER);
+                    spinner.set_tooltip_text(_("Updating..."));
+                    spinner.spinning = true;
+                    suffix_box.append(spinner);
+                } else if (pending_update_keys.contains(state_key)) {
+                    var update_dot = new Gtk.Label("●");
+                    update_dot.add_css_class("update-indicator");
+                    update_dot.set_valign(Gtk.Align.CENTER);
+                    update_dot.set_tooltip_text(_("Update available"));
+                    suffix_box.append(update_dot);
+                } else if (failed_update_keys.has_key(state_key)) {
+                    var warn_icon = new Gtk.Image.from_icon_name("dialog-warning-symbolic");
+                    warn_icon.add_css_class("update-warning-indicator");
+                    warn_icon.set_valign(Gtk.Align.CENTER);
+                    warn_icon.set_tooltip_text(failed_update_keys.get(state_key));
+                    suffix_box.append(warn_icon);
+                }
+
+                suffix_box.append(arrow);
+                row.add_suffix(suffix_box);
+
+                group.add(row);
+                app_rows.add(row);
+            }
+        }
+
+        private void clear_grid_children() {
+            if (grid_flow_box == null) {
+                return;
+            }
+            var child = grid_flow_box.get_first_child();
+            while (child != null) {
+                var next = child.get_next_sibling();
+                grid_flow_box.remove(child);
+                child = next;
+            }
+        }
+
+        private void populate_grid(Gee.ArrayList<InstallationRecord> records) {
+            clear_grid_children();
+            foreach (var record in records) {
+                var cell = build_grid_cell(record);
+                grid_flow_box.append(cell);
+            }
+        }
+
+        private Gtk.Widget build_grid_cell(InstallationRecord record) {
+            var cell_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            cell_box.add_css_class("app-grid-cell");
+            cell_box.set_halign(Gtk.Align.CENTER);
+            cell_box.set_valign(Gtk.Align.START);
+
+            // Icon with overlay for status indicators
+            var overlay = new Gtk.Overlay();
+            overlay.set_halign(Gtk.Align.CENTER);
+
+            Gtk.Image icon_image = null;
+            if (record.icon_path != null && record.icon_path.strip() != "") {
+                icon_image = UiUtils.load_app_icon(record.icon_path, 96);
+            }
+            if (icon_image == null) {
+                icon_image = new Gtk.Image.from_icon_name("application-x-executable-symbolic");
+                icon_image.set_pixel_size(96);
+            }
+            overlay.set_child(icon_image);
+
+            // Status overlay: spinner or update dot
+            var state_key = record_state_key(record);
+            if (updating_records.contains(state_key)) {
+                var spinner = new Gtk.Spinner();
+                spinner.set_size_request(18, 18);
+                spinner.spinning = true;
+                spinner.set_halign(Gtk.Align.END);
+                spinner.set_valign(Gtk.Align.END);
+                spinner.add_css_class("grid-update-spinner");
+                spinner.set_tooltip_text(_("Updating..."));
+                overlay.add_overlay(spinner);
+            } else if (pending_update_keys.contains(state_key)) {
+                var update_dot = new Gtk.Label("●");
+                update_dot.add_css_class("grid-update-indicator");
+                update_dot.set_halign(Gtk.Align.END);
+                update_dot.set_valign(Gtk.Align.END);
+                update_dot.set_tooltip_text(_("Update available"));
+                overlay.add_overlay(update_dot);
+            } else if (failed_update_keys.has_key(state_key)) {
+                var warn_icon = new Gtk.Image.from_icon_name("dialog-warning-symbolic");
+                warn_icon.add_css_class("grid-update-warning");
+                warn_icon.set_pixel_size(18);
+                warn_icon.set_halign(Gtk.Align.END);
+                warn_icon.set_valign(Gtk.Align.END);
+                warn_icon.set_tooltip_text(failed_update_keys.get(state_key));
+                overlay.add_overlay(warn_icon);
+            }
+
+            cell_box.append(overlay);
+
+            // App name label (same size as list view)
+            var name_label = new Gtk.Label(record.name ?? _("Unknown"));
+            name_label.set_ellipsize(Pango.EllipsizeMode.END);
+            name_label.set_max_width_chars(16);
+            name_label.set_justify(Gtk.Justification.CENTER);
+            name_label.set_halign(Gtk.Align.CENTER);
+            cell_box.append(name_label);
+
+            // Size line
+            var size_text = format_record_size(record);
+            if (size_text != null) {
+                var size_label = new Gtk.Label(size_text);
+                size_label.add_css_class("dim-label");
+                size_label.add_css_class("caption");
+                size_label.set_halign(Gtk.Align.CENTER);
+                cell_box.append(size_label);
+            }
+
+            // Install/update time line
+            var time_text = format_time_label(record);
+            if (time_text != null) {
+                var time_label = new Gtk.Label(time_text);
+                time_label.add_css_class("dim-label");
+                time_label.add_css_class("caption");
+                time_label.set_ellipsize(Pango.EllipsizeMode.END);
+                time_label.set_max_width_chars(18);
+                time_label.set_halign(Gtk.Align.CENTER);
+                cell_box.append(time_label);
+            }
+
+            // Store record reference for click handling
+            cell_box.set_data<InstallationRecord>("record", record);
+
+            return cell_box;
+        }
+
+        private void on_grid_child_activated(Gtk.FlowBoxChild child) {
+            var cell_box = child.get_child();
+            if (cell_box == null) return;
+
+            var record = cell_box.get_data<InstallationRecord>("record");
+            if (record == null) return;
+
+            // Shift+click launches the app
+            var display = Gdk.Display.get_default();
+            var seat = display.get_default_seat();
+            var keyboard = seat.get_keyboard();
+            if (keyboard != null) {
+                var mask = keyboard.get_modifier_state();
+                if (Gdk.ModifierType.SHIFT_MASK in mask) {
+                    // Launch the app with icon spin animation
+                    var icon_overlay = cell_box.get_first_child();
+                    if (icon_overlay != null) {
+                        var icon_widget = icon_overlay.get_first_child();
+                        if (icon_widget != null) {
+                            UiUtils.spin_launch_icon(icon_widget);
+                        }
+                    }
+                    launch_app(record);
+                    return;
+                }
+            }
+
+            // Normal click opens app details
+            show_detail_page(record);
+        }
+
+        private void launch_app(InstallationRecord record) {
+            try {
+                if (record.desktop_file != null && record.desktop_file.strip() != "") {
+                    var app_info = new DesktopAppInfo.from_filename(record.desktop_file);
+                    if (app_info != null) {
+                        app_info.launch(null, null);
+                    }
+                }
+            } catch (Error e) {
+                warning("Failed to launch %s: %s", record.name, e.message);
+            }
+        }
+
+        private string build_row_subtitle(InstallationRecord record) {
+            var parts = new Gee.ArrayList<string>();
+
+            var size_text = format_record_size(record);
+            if (size_text != null) {
+                parts.add(size_text);
+            }
+
+            var time_text = format_time_label(record);
+            if (time_text != null) {
+                parts.add(time_text);
+            }
+
+            if (record.mode == InstallMode.EXTRACTED) {
+                parts.add(_("extracted"));
+            }
+
+            // Build native string array to avoid Gee.to_array() void** warning
+            var arr = new string[parts.size];
+            for (int i = 0; i < parts.size; i++) {
+                arr[i] = parts.get(i);
+            }
+            return string.joinv(" ･ ", arr);
+        }
+
+        private int64 get_record_raw_size(InstallationRecord record) {
+            if (record.installed_path == null || record.installed_path.strip() == "") {
+                return -1;
+            }
+
+            var cache_key = record_state_key(record);
+            if (record_size_cache.has_key(cache_key)) {
+                return record_size_cache.get(cache_key);
+            }
+
+            int64 size;
+            try {
+                size = AppManager.Utils.FileUtils.get_path_size(record.installed_path);
+            } catch (Error e) {
+                warning("Failed to calculate size for %s: %s", record.name, e.message);
+                size = -1;
+            }
+
+            record_size_cache.set(cache_key, size);
+            return size;
+        }
+
+        private string? format_record_size(InstallationRecord record) {
+            var size = get_record_raw_size(record);
+            if (size <= 0) {
+                return null;
+            }
+            return UiUtils.format_size(size);
+        }
+
+        private string? format_time_label(InstallationRecord record) {
+            // Determine label type: imported, updated, or installed
+            bool is_imported = import_in_progress;
+            bool is_updated = !is_imported && record.updated_at > 0;
+            
+            // Use updated_at if available, otherwise use installed_at for the timestamp
+            int64 timestamp = record.updated_at > 0 ? record.updated_at : record.installed_at;
+            
+            if (timestamp <= 0) {
+                return null;
+            }
+
+            var now = GLib.get_real_time();
+            var delta = now - timestamp;
+            if (delta < 0) {
+                delta = 0;
+            }
+
+            var seconds = delta / 1000000;
+            if (seconds < 60) {
+                return is_imported ? _("Imported just now") : is_updated ? _("Updated just now") : _("Installed just now");
+            }
+
+            if (seconds < 3600) {
+                var minutes = (int)(seconds / 60);
+                if (minutes == 0) {
+                    minutes = 1;
+                }
+                return is_imported ? _("Imported %d min ago").printf(minutes) : is_updated ? _("Updated %d min ago").printf(minutes) : _("Installed %d min ago").printf(minutes);
+            }
+
+            if (seconds < 86400) {
+                var hours = (int)(seconds / 3600);
+                if (hours == 0) {
+                    hours = 1;
+                }
+                return is_imported ? _("Imported %d hours ago").printf(hours) : is_updated ? _("Updated %d hours ago").printf(hours) : _("Installed %d hours ago").printf(hours);
+            }
+
+            var days = (int)(seconds / 86400);
+            if (days == 0) {
+                days = 1;
+            }
+            return is_imported ? _("Imported %d days ago").printf(days) : is_updated ? _("Updated %d days ago").printf(days) : _("Installed %d days ago").printf(days);
+        }
+
+
+
+        public void present_shortcuts_dialog() {
+            ensure_shortcuts_window();
+            if (shortcuts_window == null) {
+                return;
+            }
+            shortcuts_window.set_transient_for(this);
+            shortcuts_window.present();
+        }
+
+        private GLib.MenuModel build_menu_model() {
+            var menu = new GLib.Menu();
+
+            fullscreen_menu_section = new GLib.Menu();
+            fullscreen_menu_section.append(
+                _fullscreen_active ? _("Leave Fullscreen") : _("Fullscreen"),
+                "win.toggle_fullscreen");
+            menu.append_section(null, fullscreen_menu_section);
+
+            var middle_section = new GLib.Menu();
+            middle_section.append(_("Preferences"), "app.show_preferences");
+            middle_section.append(_("Keyboard shortcuts"), "app.show_shortcuts");
+            middle_section.append(_("About AppManager"), "app.show_about");
+            menu.append_section(null, middle_section);
+
+            var quit_section = new GLib.Menu();
+            quit_section.append(_("Quit"), "app.quit");
+            menu.append_section(null, quit_section);
+
+            return menu;
+        }
+
+        private void present_sponsor_dialog() {
+            var dialog = new Adw.Dialog();
+            dialog.set_content_width(360);
+            dialog.set_content_height(480);
+
+            var toolbar_view = new Adw.ToolbarView();
+            var header_bar = new Adw.HeaderBar();
+            header_bar.set_show_title(true);
+            header_bar.set_title_widget(new Adw.WindowTitle(_("Support AppManager"), ""));
+            toolbar_view.add_top_bar(header_bar);
+
+            var content_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 16);
+            content_box.set_margin_top(24);
+            content_box.set_margin_bottom(24);
+            content_box.set_margin_start(24);
+            content_box.set_margin_end(24);
+            content_box.set_halign(Gtk.Align.CENTER);
+            content_box.set_valign(Gtk.Align.CENTER);
+
+            // QR code button linking to Buy Me a Coffee
+            var qr_button = new Gtk.Button();
+            qr_button.add_css_class("flat");
+            qr_button.set_halign(Gtk.Align.CENTER);
+            qr_button.set_tooltip_text(_("Buy Me a Coffee"));
+            var qr_image = new Gtk.Image.from_icon_name("qrcode-symbolic");
+            qr_image.set_pixel_size(160);
+            qr_button.set_child(qr_image);
+            qr_button.clicked.connect(() => {
+                var launcher = new Gtk.UriLauncher("https://buymeacoffee.com/arnisk");
+                launcher.launch.begin(this, null);
+            });
+            content_box.append(qr_button);
+
+            // Button box with homogeneous sizing
+            var buttons_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 12);
+            buttons_box.set_homogeneous(true);
+            buttons_box.set_halign(Gtk.Align.CENTER);
+
+            // Sponsor button with GitHub icon
+            var sponsor_btn = new Gtk.Button();
+            sponsor_btn.add_css_class("pill");
+            sponsor_btn.add_css_class("suggested-action");
+            sponsor_btn.set_tooltip_text(_("Become a sponsor on GitHub"));
+            var sponsor_content = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 8);
+            sponsor_content.set_halign(Gtk.Align.CENTER);
+            var github_icon = new Gtk.Image.from_icon_name("github-symbolic");
+            sponsor_content.append(github_icon);
+            sponsor_content.append(new Gtk.Label(_("Sponsor Me ♡")));
+            sponsor_btn.set_child(sponsor_content);
+            sponsor_btn.clicked.connect(() => {
+                var launcher = new Gtk.UriLauncher("https://github.com/sponsors/kem-a");
+                launcher.launch.begin(this, null);
+            });
+            buttons_box.append(sponsor_btn);
+
+            // Star on GitHub button
+            var star_btn = new Gtk.Button();
+            star_btn.add_css_class("pill");
+            star_btn.set_tooltip_text(_("Star AppManager on GitHub"));
+            var star_content = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 8);
+            star_content.set_halign(Gtk.Align.CENTER);
+            var star_icon = new Gtk.Image.from_icon_name("starred-symbolic");
+            star_content.append(star_icon);
+            star_content.append(new Gtk.Label(_("Star AppManager")));
+            star_btn.set_child(star_content);
+            star_btn.clicked.connect(() => {
+                var launcher = new Gtk.UriLauncher("https://github.com/kem-a/AppManager");
+                launcher.launch.begin(this, null);
+            });
+            buttons_box.append(star_btn);
+
+            // Contributors button
+            var contributors_btn = new Gtk.Button();
+            contributors_btn.add_css_class("pill");
+            contributors_btn.set_tooltip_text(_("View contributors on GitHub"));
+            var contributors_content = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 8);
+            contributors_content.set_halign(Gtk.Align.CENTER);
+            var contributors_icon = new Gtk.Image.from_icon_name("system-users-symbolic");
+            contributors_content.append(contributors_icon);
+            contributors_content.append(new Gtk.Label(_("Contributors")));
+            contributors_btn.set_child(contributors_content);
+            contributors_btn.clicked.connect(() => {
+                var launcher = new Gtk.UriLauncher("https://github.com/kem-a/AppManager/graphs/contributors");
+                launcher.launch.begin(this, null);
+            });
+            buttons_box.append(contributors_btn);
+
+            content_box.append(buttons_box);
+
+            toolbar_view.set_content(content_box);
+            dialog.set_child(toolbar_view);
+
+            dialog.present(this);
+        }
+
+        private Adw.ToolbarView create_toolbar_with_header(Gtk.Widget content, bool include_menu_button) {
+            var toolbar = new Adw.ToolbarView();
+            var header = new Adw.HeaderBar();
+
+            if (include_menu_button) {
+                search_button = new Gtk.ToggleButton();
+                search_button.icon_name = "system-search-symbolic";
+                search_button.tooltip_text = _("Search");
+                header.pack_start(search_button);
+
+                // Sponsor button opens dialog
+                var sponsor_button = new Gtk.Button();
+                sponsor_button.icon_name = "emblem-favorite-symbolic";
+                sponsor_button.tooltip_text = _("Support this project");
+                sponsor_button.add_css_class("flat");
+                sponsor_button.clicked.connect(() => {
+                    present_sponsor_dialog();
+                });
+                header.pack_start(sponsor_button);
+
+                main_menu_button = new Gtk.MenuButton();
+                main_menu_button.set_icon_name("open-menu-symbolic");
+                main_menu_button.menu_model = build_menu_model();
+                main_menu_button.tooltip_text = _("More actions");
+                header.pack_end(main_menu_button);
+                ensure_update_button(header);
+            }
+
+            toolbar.add_top_bar(header);
+
+            if (include_menu_button) {
+                search_bar = new Gtk.SearchBar();
+                search_bar.show_close_button = true;
+                if (search_button != null) {
+                    search_button.bind_property("active", search_bar, "search-mode-enabled", GLib.BindingFlags.BIDIRECTIONAL);
+                }
+                
+                search_entry = new Gtk.SearchEntry();
+                search_entry.placeholder_text = _("Search apps...");
+                search_entry.search_changed.connect(on_search_changed);
+                search_bar.set_child(search_entry);
+                search_bar.connect_entry(search_entry);
+                
+                toolbar.add_top_bar(search_bar);
+
+                // FUSE is not installed warning banner
+                fuse_banner = new Adw.Banner(_("FUSE is missing, some apps may fail to run.") +
+                    " <a href=\"https://github.com/AppImage/AppImageKit/wiki/FUSE\">" + _("Learn more") + "</a>");
+                fuse_banner.use_markup = true;
+                fuse_banner.add_css_class("warning");
+                fuse_banner.button_label = _("Dismiss");
+                fuse_banner.button_clicked.connect(() => {
+                    settings.set_boolean("fuse-banner-dismissed", true);
+                    fuse_banner.revealed = false;
+                });
+                fuse_banner.revealed = false;  // set from update_fuse_banner() once records are known
+                toolbar.add_top_bar(fuse_banner);
+
+                // Frozen "My Apps" title bar with view mode toggle
+                apps_title_bar = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 6);
+                apps_title_bar.add_css_class("apps-title-bar");
+
+                var title_column = new Gtk.Box(Gtk.Orientation.VERTICAL, 2);
+                title_column.set_hexpand(true);
+                title_column.set_halign(Gtk.Align.START);
+
+                apps_title_label = new Gtk.Label(_("My Apps"));
+                apps_title_label.add_css_class("heading");
+                apps_title_label.set_halign(Gtk.Align.START);
+                title_column.append(apps_title_label);
+
+                launch_hint_label = new Gtk.Label(_("Shift+click to launch app"));
+                launch_hint_label.add_css_class("dim-label");
+                launch_hint_label.add_css_class("caption");
+                launch_hint_label.set_halign(Gtk.Align.START);
+                launch_hint_label.set_visible(view_mode == "grid");
+                title_column.append(launch_hint_label);
+
+                // Split button: the main part toggles list/grid view, the
+                // dropdown holds the sort options.
+                view_sort_button = new Adw.SplitButton();
+                view_sort_button.add_css_class("flat");
+                view_sort_button.set_menu_model(build_sort_menu());
+                view_sort_button.set_dropdown_tooltip(_("Sort apps"));
+                update_view_toggle_icon();
+                view_sort_button.clicked.connect(() => {
+                    if (view_mode == "list") {
+                        view_mode = "grid";
+                    } else {
+                        view_mode = "list";
+                    }
+                    settings.set_string("app-list-view-mode", view_mode);
+                    launch_hint_label.set_visible(view_mode == "grid");
+                    update_view_toggle_icon();
+                    refresh_installations();
+                });
+
+                apps_title_bar.append(title_column);
+                apps_title_bar.append(view_sort_button);
+                toolbar.add_top_bar(apps_title_bar);
+            }
+
+            toolbar.set_content(content);
+            return toolbar;
+        }
+
+        private void update_view_toggle_icon() {
+            if (view_sort_button == null) {
+                return;
+            }
+            if (view_mode == "list") {
+                view_sort_button.set_icon_name("view-grid-symbolic");
+                view_sort_button.set_tooltip_text(_("Switch to grid view"));
+            } else {
+                view_sort_button.set_icon_name("view-list-symbolic");
+                view_sort_button.set_tooltip_text(_("Switch to list view"));
+            }
+        }
+
+        private GLib.MenuModel build_sort_menu() {
+            var menu = new GLib.Menu();
+            menu.append(_("Default"), "win.sort::default");
+
+            var name_section = new GLib.Menu();
+            name_section.append(_("Name (A-Z)"), "win.sort::name-asc");
+            name_section.append(_("Name (Z-A)"), "win.sort::name-desc");
+            menu.append_section(null, name_section);
+
+            var size_section = new GLib.Menu();
+            size_section.append(_("Size (smallest first)"), "win.sort::size-asc");
+            size_section.append(_("Size (largest first)"), "win.sort::size-desc");
+            menu.append_section(null, size_section);
+
+            return menu;
+        }
+
+        // The combined value (field + direction) the sort action exposes, so
+        // the menu radio reflects the current selection.
+        private string current_sort_value() {
+            switch (sort_mode) {
+                case "name":
+                    return name_sort_ascending ? "name-asc" : "name-desc";
+                case "size":
+                    return size_sort_ascending ? "size-asc" : "size-desc";
+                default:
+                    return "default";
+            }
+        }
+
+        private void apply_sort_value(string value) {
+            switch (value) {
+                case "name-asc":
+                    sort_mode = "name"; name_sort_ascending = true; break;
+                case "name-desc":
+                    sort_mode = "name"; name_sort_ascending = false; break;
+                case "size-asc":
+                    sort_mode = "size"; size_sort_ascending = true; break;
+                case "size-desc":
+                    sort_mode = "size"; size_sort_ascending = false; break;
+                default:
+                    sort_mode = "default"; break;
+            }
+            settings.set_string("app-list-sort-mode", sort_mode);
+            settings.set_boolean("app-list-sort-size-ascending", size_sort_ascending);
+            settings.set_boolean("app-list-sort-name-ascending", name_sort_ascending);
+            refresh_installations();
+        }
+
+        // Warn only when an installed app actually needs FUSE bits this system
+        // lacks. Apps on uruntime mount through a user namespace instead, so
+        // they never trigger the banner.
+        private void update_fuse_banner(InstallationRecord[] records) {
+            if (fuse_banner == null) {
+                return;
+            }
+
+            if (settings.get_boolean("fuse-banner-dismissed")) {
+                fuse_banner.revealed = false;
+                return;
+            }
+
+            foreach (var record in records) {
+                if (FuseSupport.record_cannot_mount(record)) {
+                    fuse_banner.revealed = true;
+                    return;
+                }
+            }
+            fuse_banner.revealed = false;
+        }
+
+        private void on_search_changed() {
+            if (search_entry != null) {
+                current_search_query = search_entry.text.strip().down();
+                refresh_installations();
+            }
+        }
+
+        private void setup_window_actions() {
+            var search_action = new GLib.SimpleAction("toggle_search", null);
+            search_action.activate.connect(() => {
+                toggle_search_mode();
+            });
+            add_window_action(search_action);
+
+            var check_updates_action = new GLib.SimpleAction("check_updates", null);
+            check_updates_action.activate.connect(on_check_updates_accel);
+            add_window_action(check_updates_action);
+
+            var update_apps_action = new GLib.SimpleAction("update_apps", null);
+            update_apps_action.activate.connect(on_update_apps_accel);
+            add_window_action(update_apps_action);
+
+            var show_menu_action = new GLib.SimpleAction("show_menu", null);
+            show_menu_action.activate.connect(() => {
+                if (main_menu_button != null) {
+                    main_menu_button.activate();
+                }
+            });
+            add_window_action(show_menu_action);
+
+            var fullscreen_action = new GLib.SimpleAction("toggle_fullscreen", null);
+            fullscreen_action.activate.connect(on_toggle_fullscreen);
+            add_window_action(fullscreen_action);
+
+            var sort_action = new GLib.SimpleAction.stateful(
+                "sort", GLib.VariantType.STRING, new GLib.Variant.string(current_sort_value()));
+            sort_action.activate.connect((param) => {
+                apply_sort_value(param.get_string());
+                sort_action.set_state(param);
+            });
+            add_window_action(sort_action);
+        }
+
+        private void add_window_action(GLib.Action action) {
+            var group = ensure_window_action_group();
+            group.add_action(action);
+        }
+
+        private GLib.SimpleActionGroup ensure_window_action_group() {
+            if (window_actions == null) {
+                window_actions = new GLib.SimpleActionGroup();
+                this.insert_action_group("win", window_actions);
+            }
+            return window_actions;
+        }
+
+        private void on_toggle_fullscreen() {
+            if (_fullscreen_active) {
+                unfullscreen();
+            } else {
+                fullscreen();
+            }
+        }
+
+        private void update_fullscreen_menu_label() {
+            if (fullscreen_menu_section == null) {
+                return;
+            }
+            fullscreen_menu_section.remove(0);
+            fullscreen_menu_section.append(
+                _fullscreen_active ? _("Leave Fullscreen") : _("Fullscreen"),
+                "win.toggle_fullscreen");
+        }
+
+        private void apply_fullscreen_state(bool entering) {
+            _fullscreen_active = entering;
+            update_fullscreen_menu_label();
+            if (entering) {
+                // Hide bottom sheet bar
+                bottom_sheet.open = false;
+                bottom_bar_widget.visible = false;
+
+                // Save current view mode and switch to grid
+                pre_fullscreen_view_mode = view_mode;
+                if (view_mode != "grid") {
+                    view_mode = "grid";
+                    update_view_toggle_icon();
+                    refresh_installations();
+                }
+
+                // Show hint label since we're in grid mode
+                if (launch_hint_label != null) {
+                    launch_hint_label.visible = true;
+                }
+
+                // Hide view toggle button
+                if (view_sort_button != null) {
+                    view_sort_button.visible = false;
+                }
+            } else {
+                // Restore bottom bar (only on main page)
+                if (navigation_view.navigation_stack.get_n_items() == 1) {
+                    bottom_bar_widget.visible = true;
+                }
+
+                // Restore previous view mode
+                if (pre_fullscreen_view_mode != view_mode) {
+                    view_mode = pre_fullscreen_view_mode;
+                    update_view_toggle_icon();
+                    refresh_installations();
+                }
+
+                // Show view toggle button
+                if (view_sort_button != null) {
+                    view_sort_button.visible = true;
+                }
+
+                // Update hint label visibility for restored view mode
+                if (launch_hint_label != null) {
+                    launch_hint_label.visible = (view_mode == "grid");
+                }
+            }
+        }
+
+        private void on_check_updates_accel() {
+            if (update_state == UpdateWorkflowState.CHECKING || update_state == UpdateWorkflowState.UPDATING) {
+                add_toast(_("Updates already running"));
+                return;
+            }
+            start_update_check();
+        }
+
+        private void on_update_apps_accel() {
+            if (update_state == UpdateWorkflowState.READY_TO_UPDATE) {
+                start_update_install();
+            }
+        }
+
+        private void toggle_search_mode() {
+            if (search_bar == null) {
+                return;
+            }
+
+            var enable = !search_bar.search_mode_enabled;
+            search_bar.search_mode_enabled = enable;
+
+            if (search_button != null) {
+                search_button.set_active(enable);
+            }
+
+            if (enable && search_entry != null) {
+                search_entry.grab_focus();
+                search_entry.set_position(-1);
+            }
+        }
+
+        private void ensure_update_button(Adw.HeaderBar header) {
+            if (update_button == null) {
+                update_button = new Gtk.Button();
+                var button_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 6);
+                button_box.set_valign(Gtk.Align.CENTER);
+                button_box.set_halign(Gtk.Align.CENTER);
+
+                update_button_spinner_widget = new Gtk.Spinner();
+                update_button_spinner_widget.set_visible(false);
+                update_button_spinner_widget.set_valign(Gtk.Align.CENTER);
+                button_box.append(update_button_spinner_widget);
+
+                update_button_label_widget = new Gtk.Label("");
+                update_button_label_widget.add_css_class("title-6");
+                update_button_label_widget.set_valign(Gtk.Align.CENTER);
+                button_box.append(update_button_label_widget);
+
+                update_button.set_child(button_box);
+                update_button.clicked.connect(handle_update_button_clicked);
+                set_update_button_state(UpdateWorkflowState.READY_TO_CHECK);
+            }
+            if (cancel_button == null) {
+                cancel_button = new Gtk.Button();
+                cancel_button.set_icon_name("process-stop-symbolic");
+                cancel_button.set_tooltip_text(_("Cancel update"));
+                cancel_button.add_css_class("flat");
+                cancel_button.set_visible(false);
+                cancel_button.clicked.connect(handle_cancel_clicked);
+            }
+            if (update_button.get_parent() == null) {
+                header.pack_end(update_button);
+            }
+            if (cancel_button.get_parent() == null) {
+                header.pack_end(cancel_button);
+            }
+        }
+
+        private void handle_update_button_clicked() {
+            switch (update_state) {
+                case UpdateWorkflowState.READY_TO_CHECK:
+                    start_update_check();
+                    break;
+                case UpdateWorkflowState.READY_TO_UPDATE:
+                    start_update_install();
+                    break;
+                case UpdateWorkflowState.CHECKING:
+                case UpdateWorkflowState.UPDATING:
+                    add_toast(_("Updates already running"));
+                    break;
+            }
+        }
+
+        private void handle_cancel_clicked() {
+            if (update_cancellable != null && !update_cancellable.is_cancelled()) {
+                update_cancellable.cancel();
+                add_toast(_("Cancelling..."));
+                if (cancel_button != null) {
+                    cancel_button.set_sensitive(false);
+                }
+            }
+        }
+
+        private void start_update_check() {
+            update_cancellable = new GLib.Cancellable();
+            set_update_button_state(UpdateWorkflowState.CHECKING);
+            start_update_check_async.begin();
+        }
+
+        private async void start_update_check_async() {
+            SourceFunc callback = start_update_check_async.callback;
+            Gee.ArrayList<UpdateProbeResult>? probes = null;
+            var cancellable = update_cancellable;
+
+            new Thread<void>("appmgr-check-updates", () => {
+                probes = updater.probe_updates(cancellable);
+                Idle.add((owned) callback);
+            });
+
+            yield;
+
+            if (cancellable != null && cancellable.is_cancelled()) {
+                add_toast(_("Update check cancelled"));
+                set_update_button_state(UpdateWorkflowState.READY_TO_CHECK);
+                return;
+            }
+
+            if (probes != null) {
+                handle_probe_results(probes);
+            }
+        }
+
+        private void handle_probe_results(Gee.ArrayList<UpdateProbeResult> probes) {
+            pending_update_keys.clear();
+            // Clear staged updates since we're doing a fresh check
+            staged_updates.clear();
+            
+            int available = 0;
+            foreach (var result in probes) {
+                if (result.has_update) {
+                    pending_update_keys.add(record_state_key(result.record));
+                    // Stage the update so it persists across app restarts
+                    staged_updates.add(result.record.id, result.record.name, result.available_version);
+                    available++;
+                }
+                sync_details_window_state(result.record);
+            }
+            // Save staged updates after processing all results
+            staged_updates.save();
+            
+            refresh_installations();
+            if (available > 0) {
+                add_toast(_("%d app(s) have updates").printf(available));
+                set_update_button_state(UpdateWorkflowState.READY_TO_UPDATE);
+            } else {
+                add_toast(_("No updates available right now"));
+                set_update_button_state(UpdateWorkflowState.READY_TO_CHECK);
+            }
+        }
+
+        private void start_update_install() {
+            if (pending_update_keys.size == 0) {
+                add_toast(_("Nothing queued for updating"));
+                set_update_button_state(UpdateWorkflowState.READY_TO_CHECK);
+                return;
+            }
+
+            update_cancellable = new GLib.Cancellable();
+            set_update_button_state(UpdateWorkflowState.UPDATING);
+            foreach (var key in pending_update_keys) {
+                updating_records.add(key);
+            }
+            refresh_installations();
+            start_update_install_async.begin();
+        }
+
+        private async void start_update_install_async() {
+            SourceFunc callback = start_update_install_async.callback;
+            Gee.ArrayList<UpdateResult>? results = null;
+            var cancellable = update_cancellable;
+
+            new Thread<void>("appmgr-update", () => {
+                results = updater.update_all(cancellable);
+                Idle.add((owned) callback);
+            });
+
+            yield;
+
+            if (cancellable != null && cancellable.is_cancelled()) {
+                add_toast(_("Update cancelled"));
+                updating_records.clear();
+                refresh_installations();
+                update_global_update_state_from_pending();
+                return;
+            }
+
+            if (results != null) {
+                handle_update_results(results);
+                finalize_update_workflow(results);
+            }
+        }
+
+        private void trigger_single_update(InstallationRecord record) {
+            var key = record_state_key(record);
+            updating_records.add(key);
+            failed_update_keys.unset(key);  // Clear any previous failure
+            if (active_details_window != null && active_details_window.matches_record(record)) {
+                // Order matters: set_update_loading first, then set_update_updating
+                // because refresh_update_button() resets update_updating when update_loading is false
+                active_details_window.set_update_loading(true);
+                active_details_window.set_update_updating(true);
+            }
+            refresh_installations();
+            trigger_single_update_async.begin(record);
+        }
+
+        private async void trigger_single_update_async(InstallationRecord record) {
+            SourceFunc callback = trigger_single_update_async.callback;
+            UpdateResult? result = null;
+
+            new Thread<void>("appmgr-update-single", () => {
+                result = updater.update_single(record);
+                Idle.add((owned) callback);
+            });
+
+            yield;
+
+            if (active_details_window != null && active_details_window.matches_record(record)) {
+                active_details_window.set_update_loading(false);
+            }
+            if (result != null) {
+                var payload = new Gee.ArrayList<UpdateResult>();
+                payload.add(result);
+                handle_update_results(payload);
+                finalize_single_update(result);
+            }
+        }
+
+        private void finalize_single_update(UpdateResult result) {
+            var key = record_state_key(result.record);
+            updating_records.remove(key);
+            // Always remove from pending - whether success or failure
+            pending_update_keys.remove(key);
+            if (result.status == UpdateStatus.UPDATED) {
+                failed_update_keys.unset(key);
+                record_size_cache.unset(result.record.id);
+                // Remove from staged updates and save
+                staged_updates.remove(result.record.id);
+                staged_updates.save();
+                // Refresh details window with updated record data
+                if (active_details_window != null && active_details_window.matches_record(result.record)) {
+                    active_details_window.refresh_with_record(result.record);
+                }
+            } else if (result.status == UpdateStatus.FAILED) {
+                failed_update_keys.set(key, result.message ?? _("Update failed"));
+                staged_updates.remove(result.record.id);
+                staged_updates.save();
+            }
+            refresh_installations();
+            sync_details_window_state(result.record);
+            update_global_update_state_from_pending();
+        }
+
+        private void finalize_update_workflow(Gee.ArrayList<UpdateResult> results) {
+            bool staged_changed = false;
+            foreach (var result in results) {
+                var key = record_state_key(result.record);
+                updating_records.remove(key);
+                if (result.status == UpdateStatus.UPDATED) {
+                    failed_update_keys.unset(key);
+                    record_size_cache.unset(result.record.id);
+                    staged_updates.remove(result.record.id);
+                    staged_changed = true;
+                } else if (result.status == UpdateStatus.FAILED) {
+                    failed_update_keys.set(key, result.message ?? _("Update failed"));
+                    staged_updates.remove(result.record.id);
+                    staged_changed = true;
+                }
+                sync_details_window_state(result.record);
+            }
+            if (staged_changed) {
+                staged_updates.save();
+            }
+
+            // Remove all from pending - failures are no longer "pending"
+            pending_update_keys.clear();
+            refresh_installations();
+            set_update_button_state(UpdateWorkflowState.READY_TO_CHECK);
+        }
+
+        private void update_global_update_state_from_pending() {
+            if (update_state == UpdateWorkflowState.CHECKING || update_state == UpdateWorkflowState.UPDATING) {
+                return;
+            }
+            if (pending_update_keys.size > 0) {
+                set_update_button_state(UpdateWorkflowState.READY_TO_UPDATE);
+            } else {
+                set_update_button_state(UpdateWorkflowState.READY_TO_CHECK);
+            }
+        }
+
+        private void set_update_button_state(UpdateWorkflowState state) {
+            update_state = state;
+            if (update_button == null || update_button_label_widget == null || update_button_spinner_widget == null) {
+                return;
+            }
+
+            var busy = (state == UpdateWorkflowState.CHECKING || state == UpdateWorkflowState.UPDATING);
+            update_update_button_sensitive(busy);
+
+            // Show/hide cancel button
+            if (cancel_button != null) {
+                cancel_button.set_visible(busy);
+                cancel_button.set_sensitive(busy);
+            }
+
+            if (busy) {
+                update_button_spinner_widget.set_visible(true);
+                update_button_spinner_widget.start();
+            } else {
+                update_button_spinner_widget.stop();
+                update_button_spinner_widget.set_visible(false);
+            }
+
+            string label;
+            switch (state) {
+                case UpdateWorkflowState.CHECKING:
+                    label = _("Checking updates");
+                    break;
+                case UpdateWorkflowState.READY_TO_UPDATE:
+                    label = _("Update Apps");
+                    break;
+                case UpdateWorkflowState.UPDATING:
+                    label = _("Updating apps");
+                    break;
+                default:
+                    label = _("Check updates");
+                    break;
+            }
+            update_button_label_widget.set_text(label);
+
+            update_button.remove_css_class("suggested-action");
+            if (state == UpdateWorkflowState.READY_TO_UPDATE || state == UpdateWorkflowState.UPDATING) {
+                update_button.add_css_class("suggested-action");
+            }
+        }
+
+        private void update_update_button_sensitive(bool force_busy = false) {
+            if (update_button == null) {
+                return;
+            }
+            if (force_busy) {
+                update_button.set_sensitive(false);
+                return;
+            }
+            update_button.set_sensitive(has_installations);
+        }
+
+        private void handle_update_results(Gee.ArrayList<UpdateResult> results) {
+            if (results.size == 0) {
+                add_toast(_("No installed apps to update"));
+                return;
+            }
+
+            int updated = 0;
+            int failed = 0;
+            int missing_address = 0;
+            int unsupported = 0;
+            int already_current = 0;
+
+            foreach (var result in results) {
+                switch (result.status) {
+                    case UpdateStatus.UPDATED:
+                        updated++;
+                        break;
+                    case UpdateStatus.FAILED:
+                        failed++;
+                        break;
+                    case UpdateStatus.SKIPPED:
+                        if (result.skip_reason == null) {
+                            break;
+                        }
+                        switch (result.skip_reason) {
+                            case UpdateSkipReason.NO_UPDATE_URL:
+                                missing_address++;
+                                break;
+                            case UpdateSkipReason.UNSUPPORTED_SOURCE:
+                                unsupported++;
+                                break;
+                            case UpdateSkipReason.ALREADY_CURRENT:
+                                already_current++;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                }
+            }
+
+            if (updated > 0) {
+                add_toast(_("Updated %d app(s)").printf(updated));
+            }
+            if (failed > 0) {
+                add_toast(_("%d update(s) failed").printf(failed));
+            }
+
+            var total = results.size;
+            var supported = total - missing_address;
+            var actionable = supported - unsupported;
+
+            if (supported == 0) {
+                add_toast(_("Add update addresses in Details to enable updates"));
+            } else if (updated == 0 && failed == 0 && actionable > 0 && already_current == actionable) {
+                add_toast(_("All supported apps are already up to date"));
+            }
+
+            if (unsupported > 0) {
+                add_toast(_("%d app(s) use unsupported update links").printf(unsupported));
+            }
+        }
+
+        /**
+         * Returns true when every record in the registry is AppManager managing itself.
+         * In that case the list is treated as effectively empty so the import prompt shows.
+         */
+        private bool has_only_self_records(InstallationRecord[] records) {
+            if (records.length == 0) return false;
+            foreach (var rec in records) {
+                if (!is_self_app_record(rec)) return false;
+            }
+            return true;
+        }
+
+        /**
+         * Heuristic: does this record look like AppManager itself?
+         * Checks the app name and desktop file path for "appmanager".
+         */
+        private bool is_self_app_record(InstallationRecord record) {
+            if (record.name != null) {
+                var name = record.name.strip().down().replace(" ", "").replace("-", "");
+                if (name.has_prefix("appmanager")) return true;
+            }
+            if (record.desktop_file != null &&
+                    record.desktop_file.down().contains("appmanager")) {
+                return true;
+            }
+            return false;
+        }
+
+        private string record_state_key(InstallationRecord record) {
+            if (record.desktop_file != null && record.desktop_file.strip() != "") {
+                return record.desktop_file;
+            }
+            if (record.installed_path != null && record.installed_path.strip() != "") {
+                return record.installed_path;
+            }
+            return record.id;
+        }
+
+        private void start_single_probe(InstallationRecord record, DetailsWindow? source = null) {
+            // Clear any previous failure when re-checking
+            var key = record_state_key(record);
+            failed_update_keys.unset(key);
+            if (source != null) {
+                source.set_update_loading(true);
+                source.set_update_failed(null);
+            }
+            start_single_probe_async.begin(record, source);
+        }
+
+        private async void start_single_probe_async(InstallationRecord record, DetailsWindow? source) {
+            SourceFunc callback = start_single_probe_async.callback;
+            UpdateProbeResult? result = null;
+
+            new Thread<void>("appmgr-probe-single", () => {
+                result = updater.probe_single(record);
+                Idle.add((owned) callback);
+            });
+
+            yield;
+
+            if (source != null) {
+                source.set_update_loading(false);
+            }
+            if (result != null) {
+                handle_single_probe_result(result, source);
+            }
+        }
+
+        private void handle_single_probe_result(UpdateProbeResult result, DetailsWindow? source) {
+            var key = record_state_key(result.record);
+            if (result.has_update) {
+                pending_update_keys.add(key);
+                // Stage the update so it persists across app restarts
+                staged_updates.add(result.record.id, result.record.name, result.available_version);
+                staged_updates.save();
+            } else {
+                pending_update_keys.remove(key);
+                // Remove from staged updates if no longer has an update
+                staged_updates.remove(result.record.id);
+                staged_updates.save();
+            }
+
+            refresh_installations();
+            sync_details_window_state(result.record);
+            update_global_update_state_from_pending();
+
+            if (source != null && source.matches_record(result.record)) {
+                source.set_update_available(result.has_update);
+            }
+
+            if (result.has_update) {
+                add_toast(_("Update available for %s").printf(result.record.name));
+            } else if (result.message != null && result.message.strip() != "") {
+                add_toast(result.message);
+            }
+        }
+
+        private void sync_details_window_state(InstallationRecord record) {
+            if (active_details_window == null) {
+                return;
+            }
+            if (!active_details_window.matches_record(record)) {
+                return;
+            }
+            var key = record_state_key(record);
+            var has_update = pending_update_keys.contains(key);
+            active_details_window.set_update_available(has_update);
+            if (failed_update_keys.has_key(key)) {
+                active_details_window.set_update_failed(failed_update_keys.get(key));
+            } else {
+                active_details_window.set_update_failed(null);
+            }
+        }
+
+        private enum UpdateWorkflowState {
+            READY_TO_CHECK,
+            CHECKING,
+            READY_TO_UPDATE,
+            UPDATING
+        }
+
+        private void ensure_shortcuts_window() {
+            if (shortcuts_window != null) {
+                return;
+            }
+            try {
+                var builder = new Gtk.Builder();
+                builder.add_from_resource(SHORTCUTS_RESOURCE);
+                shortcuts_window = builder.get_object("shortcuts_window") as Gtk.ShortcutsWindow;
+                if (shortcuts_window == null) {
+                    warning("Failed to create shortcuts window");
+                    return;
+                }
+                shortcuts_window.set_transient_for(this);
+
+                var section = builder.get_object("general_section") as Gtk.ShortcutsSection;
+                if (section != null) {
+                    section.title = _("General");
+                }
+                var navigation = builder.get_object("navigation_group") as Gtk.ShortcutsGroup;
+                if (navigation != null) {
+                    navigation.title = _("Navigation");
+                }
+                var window_group = builder.get_object("window_group") as Gtk.ShortcutsGroup;
+                if (window_group != null) {
+                    window_group.title = _("Window");
+                }
+                assign_shortcut_title(builder, "shortcut_check_updates", _("Check for updates"));
+                assign_shortcut_title(builder, "shortcut_update_apps", _("Update apps"));
+                assign_shortcut_title(builder, "shortcut_main_menu", _("Show main menu"));
+                assign_shortcut_title(builder, "shortcut_search", _("Search"));
+                assign_shortcut_title(builder, "shortcut_show_overlay", _("Show shortcuts"));
+                assign_shortcut_title(builder, "shortcut_about", _("About AppManager"));
+                assign_shortcut_title(builder, "shortcut_close_window", _("Close window"));
+                assign_shortcut_title(builder, "shortcut_quit", _("Quit AppManager"));
+                assign_shortcut_title(builder, "shortcut_fullscreen", _("Toggle fullscreen"));
+            } catch (Error e) {
+                warning("Failed to load shortcuts UI: %s", e.message);
+            }
+        }
+
+        private void assign_shortcut_title(Gtk.Builder builder, string id, string title) {
+            var shortcut = builder.get_object(id) as Gtk.ShortcutsShortcut;
+            if (shortcut != null) {
+                shortcut.title = title;
+            }
+        }
+
+        public void present_about_dialog() {
+            var dialog = new Adw.AboutDialog.from_appdata(APPDATA_RESOURCE, null);
+            dialog.version = APPLICATION_VERSION;
+            string[] credits = { _("Contributors") + " https://github.com/kem-a/AppManager/graphs/contributors" };
+            dialog.add_credit_section(_("Credits"), credits);
+
+            // Load legal sections from metainfo
+            load_legal_sections_from_appdata(dialog);
+
+            dialog.present(this);
+        }
+
+        private void load_legal_sections_from_appdata(Adw.AboutDialog dialog) {
+            try {
+                var file = GLib.resources_open_stream(APPDATA_RESOURCE, GLib.ResourceLookupFlags.NONE);
+
+                // Read the entire resource
+                var data = new uint8[8192];
+                size_t bytes_read;
+                var content = new StringBuilder();
+                while ((bytes_read = file.read(data)) > 0) {
+                    content.append_len((string) data, (ssize_t) bytes_read);
+                }
+
+                // Parse copyright from custom section
+                var copyright_regex = /<value key="Copyright">([^<]+)<\/value>/;
+                GLib.MatchInfo match;
+                if (copyright_regex.match(content.str, 0, out match)) {
+                    dialog.copyright = match.fetch(1);
+                }
+
+                // Parse bundle elements for legal sections
+                var bundle_regex = /<bundle type="legal">\s*<name>([^<]+)<\/name>\s*<copyright>([^<]+)<\/copyright>\s*<license>([^<]+)<\/license>\s*<\/bundle>/s;
+                if (bundle_regex.match(content.str, 0, out match)) {
+                    do {
+                        var name = match.fetch(1);
+                        var copyright = match.fetch(2);
+                        var license_id = match.fetch(3);
+                        var license_type = spdx_to_gtk_license(license_id);
+                        var license_text = license_type == Gtk.License.CUSTOM ? license_id : null;
+                        dialog.add_legal_section(name, copyright, license_type, license_text);
+                    } while (match.next());
+                }
+            } catch (Error e) {
+                warning("Failed to load legal sections from appdata: %s", e.message);
+            }
+        }
+
+        private Gtk.License spdx_to_gtk_license(string spdx_id) {
+            switch (spdx_id) {
+                case "GPL-2.0":
+                case "GPL-2.0-only":
+                    return Gtk.License.GPL_2_0;
+                case "GPL-2.0-or-later":
+                case "GPL-2.0+":
+                    return Gtk.License.GPL_2_0;
+                case "GPL-3.0":
+                case "GPL-3.0-only":
+                    return Gtk.License.GPL_3_0;
+                case "GPL-3.0-or-later":
+                case "GPL-3.0+":
+                    return Gtk.License.GPL_3_0;
+                case "LGPL-2.1":
+                case "LGPL-2.1-only":
+                case "LGPL-2.1-or-later":
+                case "LGPL-2.1+":
+                    return Gtk.License.LGPL_2_1;
+                case "LGPL-3.0":
+                case "LGPL-3.0-only":
+                case "LGPL-3.0-or-later":
+                case "LGPL-3.0+":
+                    return Gtk.License.LGPL_3_0;
+                case "MIT":
+                    return Gtk.License.MIT_X11;
+                case "BSD-2-Clause":
+                case "BSD-3-Clause":
+                    return Gtk.License.BSD;
+                case "Apache-2.0":
+                    return Gtk.License.APACHE_2_0;
+                case "Artistic-2.0":
+                    return Gtk.License.ARTISTIC;
+                default:
+                    return Gtk.License.CUSTOM;
+            }
+        }
+
+        private void present_import_folder_dialog() {
+            var file_dialog = new Gtk.FileDialog();
+            file_dialog.set_title(_("Select folder with AppImages"));
+            file_dialog.select_folder.begin(this, null, (obj, res) => {
+                GLib.File folder;
+                try {
+                    folder = file_dialog.select_folder.end(res);
+                } catch (Error e) {
+                    // User cancelled or error
+                    return;
+                }
+                if (folder == null) {
+                    return;
+                }
+                if (AppPaths.is_inside_applications_dir(folder.get_path())) {
+                    var err_dialog = new Adw.AlertDialog(
+                        _("Cannot import from this location"),
+                        _("This folder is inside the install folder (%s). Select a different folder to import from.").printf(AppPaths.applications_dir));
+                    err_dialog.add_response("close", _("Close"));
+                    err_dialog.present(this);
+                    return;
+                }
+                present_import_options_dialog(folder);
+            });
+        }
+
+        private void present_import_options_dialog(GLib.File folder) {
+            var dialog = new Adw.AlertDialog(
+                _("Import AppImages"),
+                _("Install AppImages found in %s").printf(folder.get_basename()));
+
+            var move_check = new Gtk.CheckButton.with_label(_("Move AppImages"));
+            move_check.set_active(true);
+            move_check.set_margin_start(12);
+            move_check.set_margin_end(12);
+            dialog.set_extra_child(move_check);
+
+            dialog.add_response("cancel", _("Cancel"));
+            dialog.add_response("import", _("Import"));
+            dialog.set_response_appearance("import", Adw.ResponseAppearance.SUGGESTED);
+            dialog.set_default_response("import");
+
+            dialog.response.connect((response_id) => {
+                if (response_id == "import") {
+                    var move = move_check.get_active();
+                    run_folder_import.begin(folder, move);
+                }
+            });
+
+            dialog.present(this);
+        }
+
+        private async void run_folder_import(GLib.File folder, bool move) {
+            var appimages = new Gee.ArrayList<string>();
+            try {
+                var enumerator = folder.enumerate_children("standard::name,standard::type", FileQueryInfoFlags.NONE);
+                FileInfo info;
+                while ((info = enumerator.next_file()) != null) {
+                    if (info.get_file_type() != FileType.REGULAR) {
+                        continue;
+                    }
+                    var name = info.get_name();
+                    var full_path = Path.build_filename(folder.get_path(), name);
+                    if (AppImageAssets.detect_format(full_path) != AppImageFormat.UNKNOWN) {
+                        appimages.add(full_path);
+                    }
+                }
+            } catch (Error e) {
+                add_toast(_("Failed to read folder: %s").printf(e.message));
+                return;
+            }
+
+            if (appimages.size == 0) {
+                add_toast(_("No AppImage files found in folder"));
+                return;
+            }
+
+            int total = appimages.size;
+            int imported = 0;
+            int skipped_arch = 0;
+            int failed = 0;
+            int cancelled = 0;
+
+            var progress_dialog = new Adw.AlertDialog(
+                _("Importing AppImages…"),
+                _("Installing %d AppImage(s)…").printf(total));
+            progress_dialog.add_response("cancel", _("Cancel"));
+            progress_dialog.set_response_appearance("cancel", Adw.ResponseAppearance.DESTRUCTIVE);
+            progress_dialog.close_response = "cancel";
+            progress_dialog.can_close = false;
+
+            var progress_bar = new Gtk.ProgressBar();
+            progress_bar.show_text = true;
+            progress_bar.margin_start = 12;
+            progress_bar.margin_end = 12;
+            progress_bar.margin_top = 12;
+            progress_bar.margin_bottom = 4;
+            progress_bar.fraction = 0.0;
+            progress_bar.text = _("Starting…");
+            progress_dialog.extra_child = progress_bar;
+
+            import_in_progress = true;
+            import_cancel_requested = false;
+
+            progress_dialog.response.connect((response_id) => {
+                if (response_id == "cancel") {
+                    import_cancel_requested = true;
+                    progress_bar.text = _("Cancelling…");
+                }
+            });
+
+            progress_dialog.present(this);
+
+            int index = 0;
+            foreach (var path in appimages) {
+                index++;
+
+                if (import_cancel_requested) {
+                    cancelled = total - (imported + skipped_arch + failed);
+                    break;
+                }
+
+                var basename = Path.get_basename(path);
+                progress_bar.fraction = (double)(index - 1) / (double)total;
+                progress_bar.text = _("%d of %d: %s").printf(index, total, basename);
+
+                SourceFunc callback = run_folder_import.callback;
+                InstallationRecord? record = null;
+                Error? install_error = null;
+
+                string staged_path;
+                string staged_dir;
+                try {
+                    staged_dir = Utils.FileUtils.create_temp_dir("appmgr-import-");
+                    if (move) {
+                        staged_path = Path.build_filename(staged_dir, Path.get_basename(path));
+                        var src = GLib.File.new_for_path(path);
+                        var dest = GLib.File.new_for_path(staged_path);
+                        src.move(dest, FileCopyFlags.OVERWRITE, null, null);
+                    } else {
+                        staged_path = Path.build_filename(staged_dir, Path.get_basename(path));
+                        Utils.FileUtils.file_copy(path, staged_path);
+                    }
+                } catch (Error e) {
+                    warning("Failed to stage %s: %s", path, e.message);
+                    failed++;
+                    continue;
+                }
+
+                var final_staged_dir = staged_dir;
+                new Thread<void>("appmgr-import", () => {
+                    try {
+                        bool unused;
+                        record = installer.install_or_upgrade(staged_path, out unused);
+                    } catch (Error e) {
+                        install_error = e;
+                    }
+                    Idle.add((owned) callback);
+                });
+
+                yield;
+
+                Utils.FileUtils.remove_dir_recursive(final_staged_dir);
+
+                if (install_error != null) {
+                    if (install_error is InstallerError.INCOMPATIBLE_ARCHITECTURE) {
+                        warning("Skipping %s: incompatible architecture %s", path, install_error.message);
+                        skipped_arch++;
+                    } else {
+                        warning("Failed to install %s: %s", path, install_error.message);
+                        failed++;
+                    }
+                } else {
+                    imported++;
+                }
+
+                progress_bar.fraction = (double)index / (double)total;
+            }
+
+            progress_dialog.can_close = true;
+            progress_dialog.force_close();
+
+            if (imported > 0) {
+                add_toast(_("Imported %d app(s)").printf(imported));
+            }
+            if (skipped_arch > 0) {
+                add_toast(_("Skipped %d incompatible architecture app(s)").printf(skipped_arch));
+            }
+            if (failed > 0) {
+                add_toast(_("%d app(s) failed to import").printf(failed));
+            }
+            if (cancelled > 0) {
+                add_toast(_("Cancelled — %d app(s) not imported").printf(cancelled));
+            }
+
+            refresh_installations();
+            // Defer clearing import_in_progress so that any registry.changed
+            // idle callbacks queued during the import loop still see the flag
+            // as true and get suppressed by on_registry_changed().
+            Idle.add(() => {
+                import_in_progress = false;
+                return Source.REMOVE;
+            });
+        }
+
+        private void show_detail_page(InstallationRecord record) {
+            var key = record_state_key(record);
+            var has_update = pending_update_keys.contains(key);
+            var is_updating = updating_records.contains(key);
+            var details_window = new DetailsWindow(record, registry, installer, has_update);
+            if (is_updating) {
+                details_window.set_update_loading(true);
+            }
+            if (failed_update_keys.has_key(key)) {
+                details_window.set_update_failed(failed_update_keys.get(key));
+            }
+            details_window.uninstall_requested.connect((r, permanently, preserve_portable) => {
+                navigation_view.pop();
+                if (active_details_window == details_window) {
+                    active_details_window = null;
+                }
+                app_ref.uninstall_record(r, this, permanently, preserve_portable);
+            });
+            details_window.update_requested.connect((r) => {
+                trigger_single_update(r);
+            });
+            details_window.check_update_requested.connect((r) => {
+                start_single_probe(r, details_window);
+            });
+            details_window.extract_requested.connect((r) => {
+                navigation_view.pop();
+                if (active_details_window == details_window) {
+                    active_details_window = null;
+                }
+                app_ref.extract_installation(r, this);
+            });
+            details_window.destroy.connect(() => {
+                if (active_details_window == details_window) {
+                    active_details_window = null;
+                }
+            });
+            active_details_window = details_window;
+            bottom_sheet.open = false;
+            bottom_bar_widget.visible = false;
+            navigation_view.push(details_window);
+        }
+    }
+}

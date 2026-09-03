@@ -1,0 +1,1822 @@
+[
+ {
+  "name": "10.4.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/10.4.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/10.4.1",
+  "commit": {
+   "sha": "815afd296f8f778bb8581b46ff50f3ab2d4c77db",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/815afd296f8f778bb8581b46ff50f3ab2d4c77db"
+  },
+  "node_id": "REF_kwDOGZAit7ByZWZzL3RhZ3MvMTAuNC4x"
+ },
+ {
+  "name": "10.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/10.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/10.4",
+  "commit": {
+   "sha": "4d99316b854dae68ff72ef7537957e431e747e32",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/4d99316b854dae68ff72ef7537957e431e747e32"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvMTAuNA"
+ },
+ {
+  "name": "10.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/10.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/10.3",
+  "commit": {
+   "sha": "ff1e313142d804fda343187b8bd957c5a17f3afc",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/ff1e313142d804fda343187b8bd957c5a17f3afc"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvMTAuMw"
+ },
+ {
+  "name": "10.2.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/10.2.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/10.2.1",
+  "commit": {
+   "sha": "0540c045ae856eb3aae5c4a8051e6a7333a4686f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/0540c045ae856eb3aae5c4a8051e6a7333a4686f"
+  },
+  "node_id": "REF_kwDOGZAit7ByZWZzL3RhZ3MvMTAuMi4x"
+ },
+ {
+  "name": "10.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/10.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/10.2",
+  "commit": {
+   "sha": "3885b19ffc4520454e31023f3468e1ec17207325",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/3885b19ffc4520454e31023f3468e1ec17207325"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvMTAuMg"
+ },
+ {
+  "name": "10.1.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/10.1.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/10.1.1",
+  "commit": {
+   "sha": "cf56d83ec656797f0a9df9fd04e9d3c5088f1595",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/cf56d83ec656797f0a9df9fd04e9d3c5088f1595"
+  },
+  "node_id": "REF_kwDOGZAit7ByZWZzL3RhZ3MvMTAuMS4x"
+ },
+ {
+  "name": "10.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/10.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/10.1",
+  "commit": {
+   "sha": "294b4059c638d435b109cf9c28ffdfe772ff63eb",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/294b4059c638d435b109cf9c28ffdfe772ff63eb"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvMTAuMQ"
+ },
+ {
+  "name": "10",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/10",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/10",
+  "commit": {
+   "sha": "2bbc21a815f70f62ae8e3e84edefb18063eed026",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/2bbc21a815f70f62ae8e3e84edefb18063eed026"
+  },
+  "node_id": "REF_kwDOGZAit6xyZWZzL3RhZ3MvMTA"
+ },
+ {
+  "name": "9.9.5",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.9.5",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.9.5",
+  "commit": {
+   "sha": "cd3710e07dfb30e0bf84757cd877c73bef0b4efe",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/cd3710e07dfb30e0bf84757cd877c73bef0b4efe"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS45LjU"
+ },
+ {
+  "name": "9.9.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.9.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.9.4",
+  "commit": {
+   "sha": "190b8af1f30d1a6fd3e7c29f6fb5cf5a78296fae",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/190b8af1f30d1a6fd3e7c29f6fb5cf5a78296fae"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS45LjQ"
+ },
+ {
+  "name": "9.9.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.9.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.9.3",
+  "commit": {
+   "sha": "d88d34f5b81ce6fe1a7f5684d628548cba7f158c",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/d88d34f5b81ce6fe1a7f5684d628548cba7f158c"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS45LjM"
+ },
+ {
+  "name": "9.9.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.9.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.9.2",
+  "commit": {
+   "sha": "7bfb087613003f486d94058356307e9338da66c3",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/7bfb087613003f486d94058356307e9338da66c3"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS45LjI"
+ },
+ {
+  "name": "9.9.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.9.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.9.1",
+  "commit": {
+   "sha": "5c126c77a364d0e653646b26d0f35b78765e96b4",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/5c126c77a364d0e653646b26d0f35b78765e96b4"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS45LjE"
+ },
+ {
+  "name": "9.9",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.9",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.9",
+  "commit": {
+   "sha": "e22d654489b1b9a1db2f9bd9bfef986092185f8e",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/e22d654489b1b9a1db2f9bd9bfef986092185f8e"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOS45"
+ },
+ {
+  "name": "9.8.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.8.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.8.2",
+  "commit": {
+   "sha": "ba457519adb4ac46891234b12a2e9152f1972a76",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/ba457519adb4ac46891234b12a2e9152f1972a76"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS44LjI"
+ },
+ {
+  "name": "9.8.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.8.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.8.1",
+  "commit": {
+   "sha": "877b626242e52d89c4162d487cb829ae6176b04e",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/877b626242e52d89c4162d487cb829ae6176b04e"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS44LjE"
+ },
+ {
+  "name": "9.8",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.8",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.8",
+  "commit": {
+   "sha": "6a5309999aa9449d03e48693ee1d10a64359e576",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/6a5309999aa9449d03e48693ee1d10a64359e576"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOS44"
+ },
+ {
+  "name": "9.7.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.7.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.7.1",
+  "commit": {
+   "sha": "96734d092527333a204e907fd3352a282720d6a0",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/96734d092527333a204e907fd3352a282720d6a0"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS43LjE"
+ },
+ {
+  "name": "9.7",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.7",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.7",
+  "commit": {
+   "sha": "96e523d36ee9db72c73fe7c1e82da2e9c96889e8",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/96e523d36ee9db72c73fe7c1e82da2e9c96889e8"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOS43"
+ },
+ {
+  "name": "9.6.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.6.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.6.2",
+  "commit": {
+   "sha": "19d80c15dc3718efa110c4be838885f8c05a4dfb",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/19d80c15dc3718efa110c4be838885f8c05a4dfb"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS42LjI"
+ },
+ {
+  "name": "9.6.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.6.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.6.1",
+  "commit": {
+   "sha": "d1f3dd02fda1f61cc9cdf166beb346dcce427325",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/d1f3dd02fda1f61cc9cdf166beb346dcce427325"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS42LjE"
+ },
+ {
+  "name": "9.6",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.6",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.6",
+  "commit": {
+   "sha": "619a53355b13dd02ed488595f47acb86621f8ace",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/619a53355b13dd02ed488595f47acb86621f8ace"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOS42"
+ },
+ {
+  "name": "9.5",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.5",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.5",
+  "commit": {
+   "sha": "0c9b0cc11f87850f50b0fad93e4f8d60a19ff059",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/0c9b0cc11f87850f50b0fad93e4f8d60a19ff059"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOS41"
+ },
+ {
+  "name": "9.4.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.4.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.4.4",
+  "commit": {
+   "sha": "afc3d06b8eaa041c8f1b11dd219b5cebc8d7e1c2",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/afc3d06b8eaa041c8f1b11dd219b5cebc8d7e1c2"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS40LjQ"
+ },
+ {
+  "name": "9.4.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.4.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.4.3",
+  "commit": {
+   "sha": "c9c3312323552c9b46c3cf4a866856a47cde2313",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/c9c3312323552c9b46c3cf4a866856a47cde2313"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS40LjM"
+ },
+ {
+  "name": "9.4.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.4.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.4.2",
+  "commit": {
+   "sha": "2476797e2706510df6304d3b9ae7d4d81b1298bc",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/2476797e2706510df6304d3b9ae7d4d81b1298bc"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS40LjI"
+ },
+ {
+  "name": "9.4.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.4.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.4.1",
+  "commit": {
+   "sha": "b6ab149668a198c81acef98d76439d737781dcb1",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/b6ab149668a198c81acef98d76439d737781dcb1"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS40LjE"
+ },
+ {
+  "name": "9.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.4",
+  "commit": {
+   "sha": "69c889ade9f58571d76fe2687f5afc8ff4243efb",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/69c889ade9f58571d76fe2687f5afc8ff4243efb"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOS40"
+ },
+ {
+  "name": "9.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.3",
+  "commit": {
+   "sha": "143a40eede9fed3ed4f69e093d87948623372819",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/143a40eede9fed3ed4f69e093d87948623372819"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOS4z"
+ },
+ {
+  "name": "9.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.2",
+  "commit": {
+   "sha": "f5a1cede4dbebea9b9a1b03d1699f53667db5f14",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/f5a1cede4dbebea9b9a1b03d1699f53667db5f14"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOS4y"
+ },
+ {
+  "name": "9.1.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.1.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.1.3",
+  "commit": {
+   "sha": "c86b2e4f484780bc8612557f42fb8c87e49851a8",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/c86b2e4f484780bc8612557f42fb8c87e49851a8"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS4xLjM"
+ },
+ {
+  "name": "9.1.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.1.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.1.2",
+  "commit": {
+   "sha": "734a61e6a6d2b035a54dc2cf2c30cc3be3a5d0c7",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/734a61e6a6d2b035a54dc2cf2c30cc3be3a5d0c7"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS4xLjI"
+ },
+ {
+  "name": "9.1.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.1.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.1.1",
+  "commit": {
+   "sha": "37d8edda134a1643fd6705b0898073bf75e776f5",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/37d8edda134a1643fd6705b0898073bf75e776f5"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS4xLjE"
+ },
+ {
+  "name": "9.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.1",
+  "commit": {
+   "sha": "322a545ce910e16c4e4d0995b7849473ba830524",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/322a545ce910e16c4e4d0995b7849473ba830524"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOS4x"
+ },
+ {
+  "name": "9.0.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.0.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.0.2",
+  "commit": {
+   "sha": "bb681f64545cd4af1622d8dfdfc37cae3de5847e",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/bb681f64545cd4af1622d8dfdfc37cae3de5847e"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS4wLjI"
+ },
+ {
+  "name": "9.0.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9.0.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9.0.1",
+  "commit": {
+   "sha": "4a6e97cf75cd95ec93bba9cf92a8b80dbb07569a",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/4a6e97cf75cd95ec93bba9cf92a8b80dbb07569a"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS4wLjE"
+ },
+ {
+  "name": "9",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9",
+  "commit": {
+   "sha": "9007ec704e2b6fc20cf0cd97cdd0c10ea87b6c61",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/9007ec704e2b6fc20cf0cd97cdd0c10ea87b6c61"
+  },
+  "node_id": "REF_kwDOGZAit6tyZWZzL3RhZ3MvOQ"
+ },
+ {
+  "name": "9-rc2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9-rc2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9-rc2",
+  "commit": {
+   "sha": "616cf46a59b3e52be8b31d41bf35af33cacbdfe4",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/616cf46a59b3e52be8b31d41bf35af33cacbdfe4"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS1yYzI"
+ },
+ {
+  "name": "9-rc1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/9-rc1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/9-rc1",
+  "commit": {
+   "sha": "ad3dec3a429227470b231669eacffee61823dde2",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/ad3dec3a429227470b231669eacffee61823dde2"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOS1yYzE"
+ },
+ {
+  "name": "8.4.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8.4.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8.4.1",
+  "commit": {
+   "sha": "1a08a534101f679506e2b8ea7872ba06d23e85bd",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/1a08a534101f679506e2b8ea7872ba06d23e85bd"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOC40LjE"
+ },
+ {
+  "name": "8.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8.4",
+  "commit": {
+   "sha": "0a322191a19991533866d9d3bbeeba6e852ec391",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/0a322191a19991533866d9d3bbeeba6e852ec391"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOC40"
+ },
+ {
+  "name": "8.3.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8.3.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8.3.2",
+  "commit": {
+   "sha": "e1a1706f27fd8487f393c9434d3bfa95c9d7bc18",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/e1a1706f27fd8487f393c9434d3bfa95c9d7bc18"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOC4zLjI"
+ },
+ {
+  "name": "8.3.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8.3.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8.3.1",
+  "commit": {
+   "sha": "1d216237fbc920e2841a3b14ed302195d4ffd557",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/1d216237fbc920e2841a3b14ed302195d4ffd557"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOC4zLjE"
+ },
+ {
+  "name": "8.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8.3",
+  "commit": {
+   "sha": "ccff40a406cfda86387ec08d27e84f41e2e16635",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/ccff40a406cfda86387ec08d27e84f41e2e16635"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOC4z"
+ },
+ {
+  "name": "8.2.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8.2.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8.2.1",
+  "commit": {
+   "sha": "783af21d28c28f61e1e5df2170fa67df31233765",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/783af21d28c28f61e1e5df2170fa67df31233765"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOC4yLjE"
+ },
+ {
+  "name": "8.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8.2",
+  "commit": {
+   "sha": "146d43ccc5a891ad2e764d65231376eb2e5106c8",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/146d43ccc5a891ad2e764d65231376eb2e5106c8"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOC4y"
+ },
+ {
+  "name": "8.1.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8.1.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8.1.1",
+  "commit": {
+   "sha": "df4fdd1aefb3f853d4cc7cff784fb5de93b58bd9",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/df4fdd1aefb3f853d4cc7cff784fb5de93b58bd9"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvOC4xLjE"
+ },
+ {
+  "name": "8.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8.1",
+  "commit": {
+   "sha": "8badc23d51d4c337f068e29dda1f2110d32d5d21",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/8badc23d51d4c337f068e29dda1f2110d32d5d21"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvOC4x"
+ },
+ {
+  "name": "8",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8",
+  "commit": {
+   "sha": "c91bfacdefd16e94644ab1c5b9b1c95805579079",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/c91bfacdefd16e94644ab1c5b9b1c95805579079"
+  },
+  "node_id": "REF_kwDOGZAit6tyZWZzL3RhZ3MvOA"
+ },
+ {
+  "name": "8beta1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8beta1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8beta1",
+  "commit": {
+   "sha": "49d43b6123121971434beae64d35298e332d8f3c",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/49d43b6123121971434beae64d35298e332d8f3c"
+  },
+  "node_id": "REF_kwDOGZAit7ByZWZzL3RhZ3MvOGJldGEx"
+ },
+ {
+  "name": "8alpha2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8alpha2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8alpha2",
+  "commit": {
+   "sha": "671eb45acc6b0841a03f5345159d4ace5309e07f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/671eb45acc6b0841a03f5345159d4ace5309e07f"
+  },
+  "node_id": "REF_kwDOGZAit7FyZWZzL3RhZ3MvOGFscGhhMg"
+ },
+ {
+  "name": "8alpha1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/8alpha1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/8alpha1",
+  "commit": {
+   "sha": "70779e58aa7d147031c734a538e66d800455d112",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/70779e58aa7d147031c734a538e66d800455d112"
+  },
+  "node_id": "REF_kwDOGZAit7FyZWZzL3RhZ3MvOGFscGhhMQ"
+ },
+ {
+  "name": "7.8.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.8.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.8.1",
+  "commit": {
+   "sha": "e802446211df715310eb4866dd94132dc750c923",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/e802446211df715310eb4866dd94132dc750c923"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNy44LjE"
+ },
+ {
+  "name": "7.8",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.8",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.8",
+  "commit": {
+   "sha": "3433d38213b1dc06c5c96c98e8959da90db7c94f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/3433d38213b1dc06c5c96c98e8959da90db7c94f"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNy44"
+ },
+ {
+  "name": "7.7",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.7",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.7",
+  "commit": {
+   "sha": "e8abedace64c32023086a9c79fe646d84588a995",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/e8abedace64c32023086a9c79fe646d84588a995"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNy43"
+ },
+ {
+  "name": "7.6.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.6.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.6.2",
+  "commit": {
+   "sha": "05cb06683e719254c326cbd658bfdcc56a092ef7",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/05cb06683e719254c326cbd658bfdcc56a092ef7"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNy42LjI"
+ },
+ {
+  "name": "7.6.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.6.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.6.1",
+  "commit": {
+   "sha": "d623ca51314e1947ae34830a7bb71fbe0583495d",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/d623ca51314e1947ae34830a7bb71fbe0583495d"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNy42LjE"
+ },
+ {
+  "name": "7.6",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.6",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.6",
+  "commit": {
+   "sha": "dd5cac6ef7eacb36ed76743b07b9556c559a9186",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/dd5cac6ef7eacb36ed76743b07b9556c559a9186"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNy42"
+ },
+ {
+  "name": "7.5",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.5",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.5",
+  "commit": {
+   "sha": "0589809fbbd117594cc3168dfef4ab807c8edc14",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/0589809fbbd117594cc3168dfef4ab807c8edc14"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNy41"
+ },
+ {
+  "name": "7.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.4",
+  "commit": {
+   "sha": "faad7a9294449e2484b29e1a378aa7b36b499eeb",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/faad7a9294449e2484b29e1a378aa7b36b499eeb"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNy40"
+ },
+ {
+  "name": "7.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.3",
+  "commit": {
+   "sha": "66d16ec8be7226f03fc46f673072a29ee53a839c",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/66d16ec8be7226f03fc46f673072a29ee53a839c"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNy4z"
+ },
+ {
+  "name": "7.2.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.2.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.2.1",
+  "commit": {
+   "sha": "eb7e869e3384e9af5e72211c3de3979cec6605b3",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/eb7e869e3384e9af5e72211c3de3979cec6605b3"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNy4yLjE"
+ },
+ {
+  "name": "7.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.2",
+  "commit": {
+   "sha": "4664b0c10034115ce84d6361fa388b82e382ced0",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/4664b0c10034115ce84d6361fa388b82e382ced0"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNy4y"
+ },
+ {
+  "name": "7.1.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.1.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.1.1",
+  "commit": {
+   "sha": "31fe789d4fddf5768604ba72dc1658164f4fa156",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/31fe789d4fddf5768604ba72dc1658164f4fa156"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNy4xLjE"
+ },
+ {
+  "name": "7.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7.1",
+  "commit": {
+   "sha": "3447cc69345d205ad79166fb6e6cc724a7be2bf8",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/3447cc69345d205ad79166fb6e6cc724a7be2bf8"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNy4x"
+ },
+ {
+  "name": "7",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/7",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/7",
+  "commit": {
+   "sha": "f68d5daa50df14a1a3cfaacba8b4431a25a3017f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/f68d5daa50df14a1a3cfaacba8b4431a25a3017f"
+  },
+  "node_id": "REF_kwDOGZAit6tyZWZzL3RhZ3MvNw"
+ },
+ {
+  "name": "6.16",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.16",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.16",
+  "commit": {
+   "sha": "189a72adaad9acad6c19a1ccb79f65a17596c45e",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/189a72adaad9acad6c19a1ccb79f65a17596c45e"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvNi4xNg"
+ },
+ {
+  "name": "6.15.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.15.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.15.1",
+  "commit": {
+   "sha": "d4f77fbcc301909270fdd342370afd63fb46030f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/d4f77fbcc301909270fdd342370afd63fb46030f"
+  },
+  "node_id": "REF_kwDOGZAit7ByZWZzL3RhZ3MvNi4xNS4x"
+ },
+ {
+  "name": "6.15",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.15",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.15",
+  "commit": {
+   "sha": "d4180c8b7514f7c10889e0c8dee8c263290737f1",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/d4180c8b7514f7c10889e0c8dee8c263290737f1"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvNi4xNQ"
+ },
+ {
+  "name": "6.14",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.14",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.14",
+  "commit": {
+   "sha": "d5bf26b5ce62376a8aab2d1c6689973a7dad14da",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/d5bf26b5ce62376a8aab2d1c6689973a7dad14da"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvNi4xNA"
+ },
+ {
+  "name": "6.13",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.13",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.13",
+  "commit": {
+   "sha": "df931dac5c40c21d36c5808f052374a4c1c36448",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/df931dac5c40c21d36c5808f052374a4c1c36448"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvNi4xMw"
+ },
+ {
+  "name": "6.12.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.12.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.12.1",
+  "commit": {
+   "sha": "d14e3d8e4a2c22ec88821d247ba448f01e7f68c8",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/d14e3d8e4a2c22ec88821d247ba448f01e7f68c8"
+  },
+  "node_id": "REF_kwDOGZAit7ByZWZzL3RhZ3MvNi4xMi4x"
+ },
+ {
+  "name": "6.12",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.12",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.12",
+  "commit": {
+   "sha": "2c8e3a9e9fe7e38d2dd71d3829b688a62bca61c4",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/2c8e3a9e9fe7e38d2dd71d3829b688a62bca61c4"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvNi4xMg"
+ },
+ {
+  "name": "6.12-beta",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.12-beta",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.12-beta",
+  "commit": {
+   "sha": "f83a813c1b3a5a76facbb7855dcf0bb8a3abacc8",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/f83a813c1b3a5a76facbb7855dcf0bb8a3abacc8"
+  },
+  "node_id": "REF_kwDOGZAit7NyZWZzL3RhZ3MvNi4xMi1iZXRh"
+ },
+ {
+  "name": "6.11",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.11",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.11",
+  "commit": {
+   "sha": "b108b71c0a3600a6985ddcf2a02c6b1646b77a49",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/b108b71c0a3600a6985ddcf2a02c6b1646b77a49"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvNi4xMQ"
+ },
+ {
+  "name": "6.10.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.10.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.10.4",
+  "commit": {
+   "sha": "3662b4a6e7d52750958d07d843ee367fee8308c5",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/3662b4a6e7d52750958d07d843ee367fee8308c5"
+  },
+  "node_id": "REF_kwDOGZAit7ByZWZzL3RhZ3MvNi4xMC40"
+ },
+ {
+  "name": "6.10.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.10.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.10.3",
+  "commit": {
+   "sha": "7c39892c10960ea9fb2b4f522255479627f8951f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/7c39892c10960ea9fb2b4f522255479627f8951f"
+  },
+  "node_id": "REF_kwDOGZAit7ByZWZzL3RhZ3MvNi4xMC4z"
+ },
+ {
+  "name": "6.10.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.10.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.10.2",
+  "commit": {
+   "sha": "db05d66d206650259dd9fc2d37cea889fcf0a444",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/db05d66d206650259dd9fc2d37cea889fcf0a444"
+  },
+  "node_id": "REF_kwDOGZAit7ByZWZzL3RhZ3MvNi4xMC4y"
+ },
+ {
+  "name": "6.10.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.10.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.10.1",
+  "commit": {
+   "sha": "ce9bbbd41a5674ed5b551ec8b98cf6542de46045",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/ce9bbbd41a5674ed5b551ec8b98cf6542de46045"
+  },
+  "node_id": "REF_kwDOGZAit7ByZWZzL3RhZ3MvNi4xMC4x"
+ },
+ {
+  "name": "6.10",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.10",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.10",
+  "commit": {
+   "sha": "fe256a29bf89539c5662f48fe715761d8043cf7e",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/fe256a29bf89539c5662f48fe715761d8043cf7e"
+  },
+  "node_id": "REF_kwDOGZAit65yZWZzL3RhZ3MvNi4xMA"
+ },
+ {
+  "name": "6.9",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.9",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.9",
+  "commit": {
+   "sha": "f861d8f63db2e3ca4840b6f03980adef1233d9c7",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/f861d8f63db2e3ca4840b6f03980adef1233d9c7"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNi45"
+ },
+ {
+  "name": "6.8.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.8.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.8.4",
+  "commit": {
+   "sha": "cf125da7176ef749b19c6fae9de8ffe055fcca50",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/cf125da7176ef749b19c6fae9de8ffe055fcca50"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi44LjQ"
+ },
+ {
+  "name": "6.8.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.8.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.8.3",
+  "commit": {
+   "sha": "57f26b50d713d7d7ec2d2a4e70e5ccc83664b46a",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/57f26b50d713d7d7ec2d2a4e70e5ccc83664b46a"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi44LjM"
+ },
+ {
+  "name": "6.8.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.8.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.8.2",
+  "commit": {
+   "sha": "46d74b6d96ab78200aaae162a397aa17d59c03cc",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/46d74b6d96ab78200aaae162a397aa17d59c03cc"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi44LjI"
+ },
+ {
+  "name": "6.8.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.8.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.8.1",
+  "commit": {
+   "sha": "2b0bc167981cca4de8e60efd7e3956cb8c480799",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/2b0bc167981cca4de8e60efd7e3956cb8c480799"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi44LjE"
+ },
+ {
+  "name": "6.8",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.8",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.8",
+  "commit": {
+   "sha": "7fb4322ca2d3259a96adfa731a16bc4bd963b3ca",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/7fb4322ca2d3259a96adfa731a16bc4bd963b3ca"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNi44"
+ },
+ {
+  "name": "6.7.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.7.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.7.1",
+  "commit": {
+   "sha": "1bf42fd2f472a731649820a55e2564ba726dacaa",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/1bf42fd2f472a731649820a55e2564ba726dacaa"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi43LjE"
+ },
+ {
+  "name": "6.7",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.7",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.7",
+  "commit": {
+   "sha": "12ef15789b64a96327a0a39776e07751e4f62a92",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/12ef15789b64a96327a0a39776e07751e4f62a92"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNi43"
+ },
+ {
+  "name": "6.6.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.6.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.6.4",
+  "commit": {
+   "sha": "1d2ae922c7d82e119f6d28efb8117c0c8adc957e",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/1d2ae922c7d82e119f6d28efb8117c0c8adc957e"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi42LjQ"
+ },
+ {
+  "name": "6.6.3.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.6.3.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.6.3.1",
+  "commit": {
+   "sha": "38e206680377c2280f2a9944366cf55bf517b555",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/38e206680377c2280f2a9944366cf55bf517b555"
+  },
+  "node_id": "REF_kwDOGZAit7FyZWZzL3RhZ3MvNi42LjMuMQ"
+ },
+ {
+  "name": "6.6.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.6.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.6.3",
+  "commit": {
+   "sha": "45ff3a5d66edd41b79e53004512aeaac7110cf1c",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/45ff3a5d66edd41b79e53004512aeaac7110cf1c"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi42LjM"
+ },
+ {
+  "name": "6.6.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.6.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.6.2",
+  "commit": {
+   "sha": "abb761fc1a4e2f7ceba322cb21d57205fabe0788",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/abb761fc1a4e2f7ceba322cb21d57205fabe0788"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi42LjI"
+ },
+ {
+  "name": "6.6.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.6.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.6.1",
+  "commit": {
+   "sha": "90ce4babac003baa3da6f0cd3c4d11af17e3b30b",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/90ce4babac003baa3da6f0cd3c4d11af17e3b30b"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi42LjE"
+ },
+ {
+  "name": "6.6",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.6",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.6",
+  "commit": {
+   "sha": "55c67d265e2f1f57be7bde836c3161ea6df30b91",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/55c67d265e2f1f57be7bde836c3161ea6df30b91"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNi42"
+ },
+ {
+  "name": "6.5.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.5.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.5.3",
+  "commit": {
+   "sha": "5717606844a2dc8437e39a51eb18ffda9847d62c",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/5717606844a2dc8437e39a51eb18ffda9847d62c"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi41LjM"
+ },
+ {
+  "name": "6.5.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.5.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.5.2",
+  "commit": {
+   "sha": "68e3c2b0eb2a9a09abeb13c660c473baa2d4f6ed",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/68e3c2b0eb2a9a09abeb13c660c473baa2d4f6ed"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi41LjI"
+ },
+ {
+  "name": "6.5.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.5.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.5.1",
+  "commit": {
+   "sha": "a9e0c5c6e1ab8d24f93e103e6db28c5d02beb406",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/a9e0c5c6e1ab8d24f93e103e6db28c5d02beb406"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi41LjE"
+ },
+ {
+  "name": "6.5",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.5",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.5",
+  "commit": {
+   "sha": "4446a7f333ba68dd48b45455de8865c6ef7739b2",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/4446a7f333ba68dd48b45455de8865c6ef7739b2"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNi41"
+ },
+ {
+  "name": "6.4.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.4.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.4.1",
+  "commit": {
+   "sha": "6bdc7ab0e2f97f7b4a139c6cbc0e313d3f04bdc0",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/6bdc7ab0e2f97f7b4a139c6cbc0e313d3f04bdc0"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi40LjE"
+ },
+ {
+  "name": "6.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.4",
+  "commit": {
+   "sha": "8d817e928104aa4922e236ac7ddfd6879367a054",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/8d817e928104aa4922e236ac7ddfd6879367a054"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNi40"
+ },
+ {
+  "name": "6.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.3",
+  "commit": {
+   "sha": "c7413f260e653e2bc013b89bb43515d95004b160",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/c7413f260e653e2bc013b89bb43515d95004b160"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNi4z"
+ },
+ {
+  "name": "6.2.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.2.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.2.1",
+  "commit": {
+   "sha": "9d21f94de52575c493cf607f0a310694dd5ea72f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/9d21f94de52575c493cf607f0a310694dd5ea72f"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi4yLjE"
+ },
+ {
+  "name": "6.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.2",
+  "commit": {
+   "sha": "c494b7a5e6e05c87f0e635609e24975367d19fee",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/c494b7a5e6e05c87f0e635609e24975367d19fee"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNi4y"
+ },
+ {
+  "name": "6.1.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.1.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.1.4",
+  "commit": {
+   "sha": "553358cc4fb2cd2a4dc9c6260a1acc303d172101",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/553358cc4fb2cd2a4dc9c6260a1acc303d172101"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi4xLjQ"
+ },
+ {
+  "name": "6.1.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.1.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.1.3",
+  "commit": {
+   "sha": "8db29dd2fc202cb7b8e4b7b2776975e2e5d9213f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/8db29dd2fc202cb7b8e4b7b2776975e2e5d9213f"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi4xLjM"
+ },
+ {
+  "name": "6.1.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.1.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.1.2",
+  "commit": {
+   "sha": "8db29dd2fc202cb7b8e4b7b2776975e2e5d9213f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/8db29dd2fc202cb7b8e4b7b2776975e2e5d9213f"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi4xLjI"
+ },
+ {
+  "name": "6.1.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.1.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.1.1",
+  "commit": {
+   "sha": "8db29dd2fc202cb7b8e4b7b2776975e2e5d9213f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/8db29dd2fc202cb7b8e4b7b2776975e2e5d9213f"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi4xLjE"
+ },
+ {
+  "name": "6.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.1",
+  "commit": {
+   "sha": "553358cc4fb2cd2a4dc9c6260a1acc303d172101",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/553358cc4fb2cd2a4dc9c6260a1acc303d172101"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNi4x"
+ },
+ {
+  "name": "6.0.5",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.0.5",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.0.5",
+  "commit": {
+   "sha": "46e8af2c8aa5b23ac0e3dabc7505e26b38da33b1",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/46e8af2c8aa5b23ac0e3dabc7505e26b38da33b1"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi4wLjU"
+ },
+ {
+  "name": "6.0.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.0.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.0.4",
+  "commit": {
+   "sha": "12253b7aa459e470104122353461bb6c72208e35",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/12253b7aa459e470104122353461bb6c72208e35"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi4wLjQ"
+ },
+ {
+  "name": "6.0.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.0.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.0.3",
+  "commit": {
+   "sha": "a9d3f045aed5cb3a6ed000649cbfeacee80d7ade",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/a9d3f045aed5cb3a6ed000649cbfeacee80d7ade"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi4wLjM"
+ },
+ {
+  "name": "6.0.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.0.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.0.2",
+  "commit": {
+   "sha": "0781a3ca46ebf86d389fcfe08034b40bb1a0f69b",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/0781a3ca46ebf86d389fcfe08034b40bb1a0f69b"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi4wLjI"
+ },
+ {
+  "name": "6.0.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6.0.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6.0.1",
+  "commit": {
+   "sha": "829be9d1f5352e437892e967656179cc34fea6dd",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/829be9d1f5352e437892e967656179cc34fea6dd"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNi4wLjE"
+ },
+ {
+  "name": "6",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/6",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/6",
+  "commit": {
+   "sha": "677eb3477ac6c7a4ba748864349ce37695782acf",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/677eb3477ac6c7a4ba748864349ce37695782acf"
+  },
+  "node_id": "REF_kwDOGZAit6tyZWZzL3RhZ3MvNg"
+ },
+ {
+  "name": "5.8.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.8.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.8.3",
+  "commit": {
+   "sha": "0a7f3eac44b81d72ff94f796b666a8e2bec7cfe8",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/0a7f3eac44b81d72ff94f796b666a8e2bec7cfe8"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNS44LjM"
+ },
+ {
+  "name": "5.8.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.8.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.8.2",
+  "commit": {
+   "sha": "5d10cd1235589199c3a54850fdb0aa0246a645c5",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/5d10cd1235589199c3a54850fdb0aa0246a645c5"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNS44LjI"
+ },
+ {
+  "name": "5.8.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.8.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.8.1",
+  "commit": {
+   "sha": "182c561e5e987bccbb8dd62e7f88587e681bce64",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/182c561e5e987bccbb8dd62e7f88587e681bce64"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNS44LjE"
+ },
+ {
+  "name": "5.8",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.8",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.8",
+  "commit": {
+   "sha": "10a30b6b564733bedcd6e94c600742ba683b867b",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/10a30b6b564733bedcd6e94c600742ba683b867b"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNS44"
+ },
+ {
+  "name": "5.7",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.7",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.7",
+  "commit": {
+   "sha": "64afb9fa8ff2b40dbca1f751c45098c28d6dd254",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/64afb9fa8ff2b40dbca1f751c45098c28d6dd254"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNS43"
+ },
+ {
+  "name": "5.6.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.6.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.6.4",
+  "commit": {
+   "sha": "26753ad36d3ee83f72ac6b87b015d247b5f443ae",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/26753ad36d3ee83f72ac6b87b015d247b5f443ae"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNS42LjQ"
+ },
+ {
+  "name": "5.6.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.6.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.6.3",
+  "commit": {
+   "sha": "dcee21b0b841caf79c75777c7452acfff7651cd8",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/dcee21b0b841caf79c75777c7452acfff7651cd8"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNS42LjM"
+ },
+ {
+  "name": "5.6.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.6.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.6.2",
+  "commit": {
+   "sha": "82feb23f6ddf09a37e8b8a2f70cb49c470ae877c",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/82feb23f6ddf09a37e8b8a2f70cb49c470ae877c"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNS42LjI"
+ },
+ {
+  "name": "5.6.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.6.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.6.1",
+  "commit": {
+   "sha": "438aba8be62abdf27fae7debef04ae871b8a9ba1",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/438aba8be62abdf27fae7debef04ae871b8a9ba1"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNS42LjE"
+ },
+ {
+  "name": "5.6",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.6",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.6",
+  "commit": {
+   "sha": "62b381a812fa21751f3f7de280ec16ec495f1142",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/62b381a812fa21751f3f7de280ec16ec495f1142"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNS42"
+ },
+ {
+  "name": "5.5",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.5",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.5",
+  "commit": {
+   "sha": "5af53e0080c620815f230bcb03b5b076ef7a29cd",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/5af53e0080c620815f230bcb03b5b076ef7a29cd"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNS41"
+ },
+ {
+  "name": "5.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.4",
+  "commit": {
+   "sha": "5e0b3f354233883bb2a2852f2a27544bd580c5d5",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/5e0b3f354233883bb2a2852f2a27544bd580c5d5"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNS40"
+ },
+ {
+  "name": "5.3.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.3.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.3.1",
+  "commit": {
+   "sha": "60a4205ee77b2657b3eb5d2e32a22c4414470cd1",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/60a4205ee77b2657b3eb5d2e32a22c4414470cd1"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNS4zLjE"
+ },
+ {
+  "name": "5.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.3",
+  "commit": {
+   "sha": "9c94a4dd6c75693cbcdacbd4f21f5bf26837c3a1",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/9c94a4dd6c75693cbcdacbd4f21f5bf26837c3a1"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNS4z"
+ },
+ {
+  "name": "5.2.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.2.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.2.1",
+  "commit": {
+   "sha": "4432d48a1120fc747b670b11b577c4fd668396a9",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/4432d48a1120fc747b670b11b577c4fd668396a9"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNS4yLjE"
+ },
+ {
+  "name": "5.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.2",
+  "commit": {
+   "sha": "aba5f2fe8e71f39aab659ae21871861ad0d58f37",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/aba5f2fe8e71f39aab659ae21871861ad0d58f37"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNS4y"
+ },
+ {
+  "name": "5.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5.1",
+  "commit": {
+   "sha": "89864593d8d37729fd4c7dd2df5dae888f4114a1",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/89864593d8d37729fd4c7dd2df5dae888f4114a1"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNS4x"
+ },
+ {
+  "name": "5",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/5",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/5",
+  "commit": {
+   "sha": "f569c028ff74bd83acb58556e2f161160de61f6f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/f569c028ff74bd83acb58556e2f161160de61f6f"
+  },
+  "node_id": "REF_kwDOGZAit6tyZWZzL3RhZ3MvNQ"
+ },
+ {
+  "name": "4.4.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.4.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.4.3",
+  "commit": {
+   "sha": "55ed39b55b86d8ed1da5bacd6d4a2666c1528259",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/55ed39b55b86d8ed1da5bacd6d4a2666c1528259"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC40LjM"
+ },
+ {
+  "name": "4.4.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.4.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.4.2",
+  "commit": {
+   "sha": "4b2876f52e2967a7050c332e709fbbc863c7015a",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/4b2876f52e2967a7050c332e709fbbc863c7015a"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC40LjI"
+ },
+ {
+  "name": "4.4.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.4.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.4.1",
+  "commit": {
+   "sha": "003c4f24744f666c9d8ede4d46ed94b037a9e6fd",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/003c4f24744f666c9d8ede4d46ed94b037a9e6fd"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC40LjE"
+ },
+ {
+  "name": "4.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.4",
+  "commit": {
+   "sha": "d42cf71885d7270187644d71fc971393a135bfe1",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/d42cf71885d7270187644d71fc971393a135bfe1"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNC40"
+ },
+ {
+  "name": "4.3.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.3.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.3.3",
+  "commit": {
+   "sha": "b4e8a8f7d1f974244d1bd5a4512b650fe02d3e6e",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/b4e8a8f7d1f974244d1bd5a4512b650fe02d3e6e"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC4zLjM"
+ },
+ {
+  "name": "4.3.3-1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.3.3-1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.3.3-1",
+  "commit": {
+   "sha": "4713e3bcd4621ed870a29b7a60c3b58ce84c8fac",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/4713e3bcd4621ed870a29b7a60c3b58ce84c8fac"
+  },
+  "node_id": "REF_kwDOGZAit7FyZWZzL3RhZ3MvNC4zLjMtMQ"
+ },
+ {
+  "name": "4.3.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.3.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.3.2",
+  "commit": {
+   "sha": "f21a81400b6cce346035838d81b094947fe1a39b",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/f21a81400b6cce346035838d81b094947fe1a39b"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC4zLjI"
+ },
+ {
+  "name": "4.3.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.3.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.3.1",
+  "commit": {
+   "sha": "2822a8c56f9539102f1ebe80572439101ddf9236",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/2822a8c56f9539102f1ebe80572439101ddf9236"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC4zLjE"
+ },
+ {
+  "name": "4.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.3",
+  "commit": {
+   "sha": "8c7e27c0c7a628b2e0c9b3b63f7c64f377bb51d5",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/8c7e27c0c7a628b2e0c9b3b63f7c64f377bb51d5"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNC4z"
+ },
+ {
+  "name": "4.2.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.2.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.2.2",
+  "commit": {
+   "sha": "6d72f2d443c751546fc2fd7e3f8b674f84816c27",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/6d72f2d443c751546fc2fd7e3f8b674f84816c27"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC4yLjI"
+ },
+ {
+  "name": "4.2.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.2.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.2.1",
+  "commit": {
+   "sha": "dcc9bf04beee1cf200e2df612f52ca1710e465b3",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/dcc9bf04beee1cf200e2df612f52ca1710e465b3"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC4yLjE"
+ },
+ {
+  "name": "4.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.2",
+  "commit": {
+   "sha": "bc2f3baac98ad269d2adc6d12d7090c858d599e8",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/bc2f3baac98ad269d2adc6d12d7090c858d599e8"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNC4y"
+ },
+ {
+  "name": "4.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.1",
+  "commit": {
+   "sha": "b160c4fe5aca4a2c51a59be2194b02b63aae7626",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/b160c4fe5aca4a2c51a59be2194b02b63aae7626"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvNC4x"
+ },
+ {
+  "name": "4.0.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.0.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.0.3",
+  "commit": {
+   "sha": "d994fc9d62930eb28ebb8af9e61842dee59b744a",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/d994fc9d62930eb28ebb8af9e61842dee59b744a"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC4wLjM"
+ },
+ {
+  "name": "4.0.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.0.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.0.2",
+  "commit": {
+   "sha": "b30fd1be22a3154dbe438750753a24e37ddba608",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/b30fd1be22a3154dbe438750753a24e37ddba608"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC4wLjI"
+ },
+ {
+  "name": "4.0.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.0.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.0.1",
+  "commit": {
+   "sha": "0eafe79a272d74990f35a8a6ce7e6b505fc15eae",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/0eafe79a272d74990f35a8a6ce7e6b505fc15eae"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC4wLjE"
+ },
+ {
+  "name": "4.0.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/4.0.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/4.0.0",
+  "commit": {
+   "sha": "abe2fa0e14d6c8f0a0591f0f7723207ca992d792",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/abe2fa0e14d6c8f0a0591f0f7723207ca992d792"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvNC4wLjA"
+ },
+ {
+  "name": "3.0.6",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/3.0.6",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/3.0.6",
+  "commit": {
+   "sha": "4d289dcb22997f35158a933dfe2f1fde42e8ba00",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/4d289dcb22997f35158a933dfe2f1fde42e8ba00"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMy4wLjY"
+ },
+ {
+  "name": "3.0.5",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/3.0.5",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/3.0.5",
+  "commit": {
+   "sha": "5306a4b7e43c9597c5980f517ba73665a4832aab",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/5306a4b7e43c9597c5980f517ba73665a4832aab"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMy4wLjU"
+ },
+ {
+  "name": "3.0.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/3.0.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/3.0.4",
+  "commit": {
+   "sha": "5ba68f5ca45fe19bbaf84c3009d06eddc6376339",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/5ba68f5ca45fe19bbaf84c3009d06eddc6376339"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMy4wLjQ"
+ },
+ {
+  "name": "3.0.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/3.0.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/3.0.3",
+  "commit": {
+   "sha": "a304002fda7a77f5430ffc3d802c159ccf136797",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/a304002fda7a77f5430ffc3d802c159ccf136797"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMy4wLjM"
+ },
+ {
+  "name": "3.0.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/3.0.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/3.0.2",
+  "commit": {
+   "sha": "63d7ea0ed3948aa4f4aef3a1bd456f985b452fcb",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/63d7ea0ed3948aa4f4aef3a1bd456f985b452fcb"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMy4wLjI"
+ },
+ {
+  "name": "3.0.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/3.0.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/3.0.1",
+  "commit": {
+   "sha": "a181da4b957b2c65d0cf44a7315c745846366696",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/a181da4b957b2c65d0cf44a7315c745846366696"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMy4wLjE"
+ },
+ {
+  "name": "3.0.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/3.0.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/3.0.0",
+  "commit": {
+   "sha": "81c418318ffebf04a2d5c81aa3dafb3a2e2c5f6a",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/81c418318ffebf04a2d5c81aa3dafb3a2e2c5f6a"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMy4wLjA"
+ },
+ {
+  "name": "2.7.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.7.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.7.0",
+  "commit": {
+   "sha": "35c50393aa52397dcf66dc72295dac1a8017f01b",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/35c50393aa52397dcf66dc72295dac1a8017f01b"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi43LjA"
+ },
+ {
+  "name": "2.6.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.6.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.6.1",
+  "commit": {
+   "sha": "2dbe8141fb5931c8795865f0575c1da6bb0ff07a",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/2dbe8141fb5931c8795865f0575c1da6bb0ff07a"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi42LjE"
+ },
+ {
+  "name": "2.6.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.6.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.6.0",
+  "commit": {
+   "sha": "6110b9499fe746ee6f77c3045fc181429697ae1c",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/6110b9499fe746ee6f77c3045fc181429697ae1c"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi42LjA"
+ },
+ {
+  "name": "2.5.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.5.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.5.1",
+  "commit": {
+   "sha": "6cb0f8abaf4e5182e65616b87fe195ece88b6cdb",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/6cb0f8abaf4e5182e65616b87fe195ece88b6cdb"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi41LjE"
+ },
+ {
+  "name": "2.5.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.5.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.5.0",
+  "commit": {
+   "sha": "9c173434fb09e23506e25365f0edb0f51421a0a8",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/9c173434fb09e23506e25365f0edb0f51421a0a8"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi41LjA"
+ },
+ {
+  "name": "2.4.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.4.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.4.0",
+  "commit": {
+   "sha": "e7e595e96917be1dae9f57c6aa437db06b4e4c2c",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/e7e595e96917be1dae9f57c6aa437db06b4e4c2c"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi40LjA"
+ },
+ {
+  "name": "2.3.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.3.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.3.1",
+  "commit": {
+   "sha": "0fc458b1695131f461b364de7c198bd8199bfc29",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/0fc458b1695131f461b364de7c198bd8199bfc29"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4zLjE"
+ },
+ {
+  "name": "2.3.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.3.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.3.0",
+  "commit": {
+   "sha": "22d3a7c2c516c3766e2e00c2110dc61bd5085a7c",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/22d3a7c2c516c3766e2e00c2110dc61bd5085a7c"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4zLjA"
+ },
+ {
+  "name": "2.2.5",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.2.5",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.2.5",
+  "commit": {
+   "sha": "129a2c9be954f41b26920461d318295f60be0fef",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/129a2c9be954f41b26920461d318295f60be0fef"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4yLjU"
+ },
+ {
+  "name": "2.2.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.2.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.2.4",
+  "commit": {
+   "sha": "4ca76b549288f5fdb756f1d258ef9e9a4fb07ff7",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/4ca76b549288f5fdb756f1d258ef9e9a4fb07ff7"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4yLjQ"
+ },
+ {
+  "name": "2.2.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.2.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.2.3",
+  "commit": {
+   "sha": "8302737df939e3f8db546995d65bb30dee78b69d",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/8302737df939e3f8db546995d65bb30dee78b69d"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4yLjM"
+ },
+ {
+  "name": "2.2.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.2.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.2.2",
+  "commit": {
+   "sha": "ced6ab8a6ce87cae20f888e19fc1da55620271d1",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/ced6ab8a6ce87cae20f888e19fc1da55620271d1"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4yLjI"
+ },
+ {
+  "name": "2.2.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.2.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.2.1",
+  "commit": {
+   "sha": "dbe3c04f93a8f6b8236073f7cb8f4885216d32e4",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/dbe3c04f93a8f6b8236073f7cb8f4885216d32e4"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4yLjE"
+ },
+ {
+  "name": "2.2.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.2.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.2.0",
+  "commit": {
+   "sha": "c172b289a5caccd05079e4e92731ef2e54ae8d0b",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/c172b289a5caccd05079e4e92731ef2e54ae8d0b"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4yLjA"
+ },
+ {
+  "name": "2.1.5",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.1.5",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.1.5",
+  "commit": {
+   "sha": "2dd3b3d96ba0cc4a6d1e5c6dec98f66c259ee2e1",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/2dd3b3d96ba0cc4a6d1e5c6dec98f66c259ee2e1"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4xLjU"
+ },
+ {
+  "name": "2.1.4",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.1.4",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.1.4",
+  "commit": {
+   "sha": "bde4174196f91d18fd5dc1aeb1bdc8f7d6d62098",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/bde4174196f91d18fd5dc1aeb1bdc8f7d6d62098"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4xLjQ"
+ },
+ {
+  "name": "2.1.3",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.1.3",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.1.3",
+  "commit": {
+   "sha": "026b928f92d4b99bc99287850f9465612ec7633f",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/026b928f92d4b99bc99287850f9465612ec7633f"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4xLjM"
+ },
+ {
+  "name": "2.1.2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.1.2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.1.2",
+  "commit": {
+   "sha": "c213c585809000c0cbb0944959c5bb0c102069b0",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/c213c585809000c0cbb0944959c5bb0c102069b0"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4xLjI"
+ },
+ {
+  "name": "2.1.1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.1.1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.1.1",
+  "commit": {
+   "sha": "fc4620b8eeea33f4f9273f78ae89352b039d047e",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/fc4620b8eeea33f4f9273f78ae89352b039d047e"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4xLjE"
+ },
+ {
+  "name": "2.1.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.1.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.1.0",
+  "commit": {
+   "sha": "cca46b70a186647c3217d9655ce1df54a00ceced",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/cca46b70a186647c3217d9655ce1df54a00ceced"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4xLjA"
+ },
+ {
+  "name": "2.0.9",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.0.9",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.0.9",
+  "commit": {
+   "sha": "e05a9d76abf4f6fa7c523e601d96601cc09eb3bd",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/e05a9d76abf4f6fa7c523e601d96601cc09eb3bd"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4wLjk"
+ },
+ {
+  "name": "2.0.8",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.0.8",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.0.8",
+  "commit": {
+   "sha": "4a38cc51ba91e0dc3b1fcef156df9a3ee8298b9b",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/4a38cc51ba91e0dc3b1fcef156df9a3ee8298b9b"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4wLjg"
+ },
+ {
+  "name": "2.0.7",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.0.7",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.0.7",
+  "commit": {
+   "sha": "a8a9bd44be0990fcc5c11b2e46891da5b642eaab",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/a8a9bd44be0990fcc5c11b2e46891da5b642eaab"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4wLjc"
+ },
+ {
+  "name": "2.0.6",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.0.6",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.0.6",
+  "commit": {
+   "sha": "b599e91d5aa012625a6b8576fc25589866ee97ef",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/b599e91d5aa012625a6b8576fc25589866ee97ef"
+  },
+  "node_id": "REF_kwDOGZAit69yZWZzL3RhZ3MvMi4wLjY"
+ },
+ {
+  "name": "2.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/2.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/2.0",
+  "commit": {
+   "sha": "58cdc01956175b90054857b7ad3d18266fddb68c",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/58cdc01956175b90054857b7ad3d18266fddb68c"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvMi4w"
+ },
+ {
+  "name": "1.0",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/AM/zipball/refs/tags/1.0",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/AM/tarball/refs/tags/1.0",
+  "commit": {
+   "sha": "7b9542e2563432ac96fe4c005fca2c43c122428a",
+   "url": "https://api.github.com/repos/ivan-hc/AM/commits/7b9542e2563432ac96fe4c005fca2c43c122428a"
+  },
+  "node_id": "REF_kwDOGZAit61yZWZzL3RhZ3MvMS4w"
+ }
+]

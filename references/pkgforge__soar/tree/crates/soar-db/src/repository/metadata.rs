@@ -1,0 +1,790 @@
+//! Metadata database repository for package queries.
+
+// `QueryableByName` expands to `Type { field: field }`, which clippy
+// reports against the field it was generated from.
+#![allow(clippy::redundant_field_names)]
+
+use std::sync::OnceLock;
+
+use diesel::{dsl::sql, prelude::*, sql_types::Text};
+use regex::Regex;
+use serde_json::json;
+use soar_registry::RemotePackage;
+use soar_utils::{
+    path::is_safe_component,
+    version::{compare_versions, is_newer, is_ordered},
+};
+use tracing::{debug, trace, warn};
+
+/// Regex for extracting name and contact from maintainer string format "Name (contact)".
+static MAINTAINER_RE: OnceLock<Regex> = OnceLock::new();
+
+use super::core::SortDirection;
+use crate::{
+    models::{
+        metadata::{
+            FuzzyCandidate, Maintainer, NewMaintainer, NewPackage, NewPackageMaintainer,
+            NewRepository, Package, PackageListing,
+        },
+        types::PackageProvide,
+    },
+    schema::metadata::{maintainers, package_maintainers, packages, repository},
+};
+
+/// Helper struct for raw SQL queries returning just pkg_id.
+#[derive(Debug, QueryableByName)]
+struct PkgIdOnly {
+    #[diesel(sql_type = Text)]
+    pkg_id: String,
+}
+
+/// Narrow candidates to those carrying `pkg_id`, unless none of them do.
+///
+/// An id recorded at install time may have disappeared from the metadata,
+/// since a repository that moved to the declarative format publishes none.
+/// Demanding a match there would report the package as up to date forever,
+/// while ignoring the id altogether lets a different package of the same name
+/// pass as a newer build of this one.
+pub fn narrow_by_pkg_id(candidates: Vec<Package>, pkg_id: Option<&str>) -> Vec<Package> {
+    let Some(id) = pkg_id else {
+        return candidates;
+    };
+    let matches_id = |p: &Package| p.pkg_id.as_deref() == Some(id);
+    if !candidates.iter().any(matches_id) {
+        return candidates;
+    }
+    candidates.into_iter().filter(matches_id).collect()
+}
+
+/// Narrow candidates to those carrying `pkg_family`, unless none of them do.
+///
+/// The same reasoning as [`narrow_by_pkg_id`]: a repository that stopped
+/// publishing families leaves every install recorded under one unable to match
+/// anything, which would report those packages as up to date for good. Where
+/// the repository still publishes families, one that differs is a different
+/// package and has to be excluded.
+pub fn narrow_by_pkg_family(candidates: Vec<Package>, pkg_family: Option<&str>) -> Vec<Package> {
+    let Some(family) = pkg_family else {
+        return candidates;
+    };
+    let matches_family = |p: &Package| p.pkg_family.as_deref() == Some(family);
+    if !candidates.iter().any(matches_family) {
+        return candidates;
+    }
+    candidates.into_iter().filter(matches_family).collect()
+}
+
+/// Whether a candidate supersedes an installed copy whose versions cannot be
+/// ordered against each other.
+///
+/// Two commit hashes carry no order, so no version comparison can ever offer
+/// one over the other. What the artifact is settles it instead: a different
+/// checksum is a different build, and following the repository is the only
+/// coherent thing to do for a package versioned this way. Where either side
+/// keeps no checksum there is nothing to go on, and it is left alone.
+fn supersedes_unordered(
+    offered_version: &str,
+    offered_checksum: Option<&str>,
+    current_version: &str,
+    current_checksum: Option<&str>,
+) -> bool {
+    if is_ordered(offered_version) || is_ordered(current_version) {
+        return false;
+    }
+
+    match (offered_checksum, current_checksum) {
+        (Some(offered), Some(held)) => offered != held,
+        _ => false,
+    }
+}
+
+/// Repository for package metadata operations.
+pub struct MetadataRepository;
+
+impl MetadataRepository {
+    /// Lists all packages using Diesel DSL.
+    pub fn list_all(conn: &mut SqliteConnection) -> QueryResult<Vec<Package>> {
+        trace!("listing all packages");
+        let result = packages::table
+            .order(packages::pkg_name.asc())
+            .select(Package::as_select())
+            .load(conn);
+        if let Ok(ref packages) = result {
+            debug!(count = packages.len(), "listed all packages");
+        }
+        result
+    }
+
+    /// Lists all packages with only the fields needed for display.
+    /// This is much more memory-efficient than list_all for large package lists.
+    pub fn list_all_minimal(conn: &mut SqliteConnection) -> QueryResult<Vec<PackageListing>> {
+        trace!("listing all packages (minimal fields)");
+        let result = packages::table
+            .order(packages::pkg_name.asc())
+            .select(PackageListing::as_select())
+            .load(conn);
+        if let Ok(ref packages) = result {
+            debug!(count = packages.len(), "listed all packages (minimal)");
+        }
+        result
+    }
+
+    /// Loads lightweight package data for fuzzy matching.
+    /// Returns only (id, pkg_name, pkg_id, description) to minimize memory and deserialization.
+    pub fn load_fuzzy_candidates(conn: &mut SqliteConnection) -> QueryResult<Vec<FuzzyCandidate>> {
+        trace!("loading fuzzy candidates");
+        packages::table
+            .select(FuzzyCandidate::as_select())
+            .load(conn)
+    }
+
+    /// Fetches full package details for a set of package IDs.
+    pub fn find_by_ids(conn: &mut SqliteConnection, ids: &[i32]) -> QueryResult<Vec<Package>> {
+        if ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        packages::table
+            .filter(packages::id.eq_any(ids))
+            .select(Package::as_select())
+            .load(conn)
+    }
+
+    /// Lists packages with pagination and sorting using Diesel DSL.
+    pub fn list_paginated(
+        conn: &mut SqliteConnection,
+        page: i64,
+        per_page: i64,
+    ) -> QueryResult<Vec<Package>> {
+        let offset = (page - 1) * per_page;
+        trace!(
+            page = page,
+            per_page = per_page,
+            offset = offset,
+            "listing paginated packages"
+        );
+
+        let result = packages::table
+            .order(packages::pkg_name.asc())
+            .limit(per_page)
+            .offset(offset)
+            .select(Package::as_select())
+            .load(conn);
+        if let Ok(ref packages) = result {
+            debug!(
+                count = packages.len(),
+                page = page,
+                "fetched paginated packages"
+            );
+        }
+        result
+    }
+
+    /// Gets the repository name from the database.
+    pub fn get_repo_name(conn: &mut SqliteConnection) -> QueryResult<Option<String>> {
+        repository::table
+            .select(repository::name)
+            .first(conn)
+            .optional()
+    }
+
+    /// Gets the repository etag from the database.
+    pub fn get_repo_etag(conn: &mut SqliteConnection) -> QueryResult<Option<String>> {
+        repository::table
+            .select(repository::etag)
+            .first(conn)
+            .optional()
+    }
+
+    /// Updates the repository metadata (name and etag).
+    pub fn update_repo_metadata(
+        conn: &mut SqliteConnection,
+        name: &str,
+        etag: &str,
+    ) -> QueryResult<usize> {
+        diesel::update(repository::table)
+            .set((repository::name.eq(name), repository::etag.eq(etag)))
+            .execute(conn)
+    }
+
+    /// Finds a package by ID using Diesel DSL.
+    pub fn find_by_id(conn: &mut SqliteConnection, id: i32) -> QueryResult<Option<Package>> {
+        trace!(id = id, "finding package by id");
+        let result = packages::table
+            .filter(packages::id.eq(id))
+            .select(Package::as_select())
+            .first(conn)
+            .optional();
+        if let Ok(ref pkg) = result {
+            if pkg.is_some() {
+                debug!(id = id, "found package by id");
+            } else {
+                trace!(id = id, "package not found by id");
+            }
+        }
+        result
+    }
+
+    /// Finds packages by name (exact match) using Diesel DSL.
+    pub fn find_by_name(conn: &mut SqliteConnection, name: &str) -> QueryResult<Vec<Package>> {
+        trace!(name = name, "finding packages by name");
+        let result = packages::table
+            .filter(packages::pkg_name.eq(name))
+            .select(Package::as_select())
+            .load(conn);
+        if let Ok(ref packages) = result {
+            debug!(
+                name = name,
+                count = packages.len(),
+                "found packages by name"
+            );
+        }
+        result
+    }
+
+    /// Finds a package by pkg_id using Diesel DSL.
+    pub fn find_by_pkg_id(
+        conn: &mut SqliteConnection,
+        pkg_id: &str,
+    ) -> QueryResult<Option<Package>> {
+        trace!(pkg_id = pkg_id, "finding package by pkg_id");
+        let result = packages::table
+            .filter(packages::pkg_id.eq(pkg_id))
+            .select(Package::as_select())
+            .first(conn)
+            .optional();
+        if let Ok(ref pkg) = result {
+            if pkg.is_some() {
+                debug!(pkg_id = pkg_id, "found package by pkg_id");
+            } else {
+                trace!(pkg_id = pkg_id, "package not found by pkg_id");
+            }
+        }
+        result
+    }
+
+    /// Finds packages that match pkg_name and optionally pkg_id and version using Diesel DSL.
+    pub fn find_by_query(
+        conn: &mut SqliteConnection,
+        pkg_name: Option<&str>,
+        pkg_id: Option<&str>,
+        version: Option<&str>,
+    ) -> QueryResult<Vec<Package>> {
+        let mut query = packages::table.into_boxed();
+
+        if let Some(name) = pkg_name {
+            query = query.filter(packages::pkg_name.eq(name));
+        }
+        if let Some(id) = pkg_id {
+            if id != "all" {
+                query = query.filter(packages::pkg_id.eq(id));
+            }
+        }
+        if let Some(ver) = version {
+            query = query.filter(packages::version.eq(ver));
+        }
+
+        query.select(Package::as_select()).load(conn)
+    }
+
+    /// Searches packages by pattern (case-insensitive LIKE query) using Diesel DSL.
+    /// Searches across pkg_name and pkg_id fields.
+    pub fn search(
+        conn: &mut SqliteConnection,
+        pattern: &str,
+        limit: Option<i64>,
+    ) -> QueryResult<Vec<Package>> {
+        debug!(pattern = pattern, limit = ?limit, "searching packages");
+        let like_pattern = format!("%{}%", pattern.to_lowercase());
+
+        let mut query = packages::table
+            .filter(
+                sql::<diesel::sql_types::Bool>("LOWER(pkg_name) LIKE ")
+                    .bind::<Text, _>(&like_pattern)
+                    .sql(" OR LOWER(pkg_id) LIKE ")
+                    .bind::<Text, _>(&like_pattern),
+            )
+            .order(packages::pkg_name.asc())
+            .into_boxed();
+
+        if let Some(lim) = limit {
+            query = query.limit(lim);
+        }
+
+        let result = query.select(Package::as_select()).load(conn);
+        if let Ok(ref packages) = result {
+            debug!(
+                pattern = pattern,
+                count = packages.len(),
+                "search completed"
+            );
+        }
+        result
+    }
+
+    /// Searches packages (case-sensitive LIKE query) using Diesel DSL.
+    pub fn search_case_sensitive(
+        conn: &mut SqliteConnection,
+        pattern: &str,
+        limit: Option<i64>,
+    ) -> QueryResult<Vec<Package>> {
+        let like_pattern = format!("%{}%", pattern);
+
+        let mut query = packages::table
+            .filter(
+                packages::pkg_name
+                    .like(&like_pattern)
+                    .or(packages::pkg_id.like(&like_pattern)),
+            )
+            .order(packages::pkg_name.asc())
+            .into_boxed();
+
+        if let Some(lim) = limit {
+            query = query.limit(lim);
+        }
+
+        query.select(Package::as_select()).load(conn)
+    }
+
+    /// Checks if a package exists that replaces the given pkg_id.
+    /// Returns the pkg_id of the replacement package if found.
+    /// Uses raw SQL for JSON array search since Diesel doesn't support json_each.
+    pub fn find_replacement_pkg_id(
+        conn: &mut SqliteConnection,
+        pkg_id: &str,
+    ) -> QueryResult<Option<String>> {
+        // Only rows that have an id: the projection cannot hold a NULL, and a
+        // package without an id has nothing to answer with anyway.
+        let query = "SELECT pkg_id FROM packages WHERE pkg_id IS NOT NULL AND EXISTS \
+                     (SELECT 1 FROM json_each(replaces) WHERE json_each.value = ?) LIMIT 1";
+
+        diesel::sql_query(query)
+            .bind::<Text, _>(pkg_id)
+            .load::<PkgIdOnly>(conn)
+            .map(|mut v| v.pop().map(|p| p.pkg_id))
+    }
+
+    /// Counts total packages.
+    pub fn count(conn: &mut SqliteConnection) -> QueryResult<i64> {
+        packages::table.count().get_result(conn)
+    }
+
+    /// How many packages the repository offers under each name, counting a
+    /// name once per family it is published under.
+    ///
+    /// A name standing for a single package means the same package however
+    /// its family is recorded, which is what lets one installed under a
+    /// family since dropped go on being recognised.
+    pub fn count_names(conn: &mut SqliteConnection) -> QueryResult<Vec<(String, i64)>> {
+        trace!("counting what each package name stands for");
+        packages::table
+            .group_by(packages::pkg_name)
+            .select((
+                packages::pkg_name,
+                sql::<diesel::sql_types::BigInt>("COUNT(DISTINCT COALESCE(pkg_family, ''))"),
+            ))
+            .load(conn)
+    }
+
+    /// Counts packages matching a search pattern using Diesel DSL.
+    pub fn count_search(conn: &mut SqliteConnection, pattern: &str) -> QueryResult<i64> {
+        let like_pattern = format!("%{}%", pattern.to_lowercase());
+
+        packages::table
+            .filter(
+                sql::<diesel::sql_types::Bool>("LOWER(pkg_name) LIKE ")
+                    .bind::<Text, _>(&like_pattern)
+                    .sql(" OR LOWER(pkg_id) LIKE ")
+                    .bind::<Text, _>(&like_pattern),
+            )
+            .count()
+            .get_result(conn)
+    }
+
+    /// Inserts a new package.
+    pub fn insert(conn: &mut SqliteConnection, package: &NewPackage) -> QueryResult<usize> {
+        diesel::insert_into(packages::table)
+            .values(package)
+            .execute(conn)
+    }
+
+    /// Gets the last inserted package ID.
+    pub fn last_insert_id(conn: &mut SqliteConnection) -> QueryResult<i32> {
+        diesel::select(sql::<diesel::sql_types::Integer>("last_insert_rowid()")).get_result(conn)
+    }
+
+    /// Finds or creates a maintainer.
+    pub fn find_or_create_maintainer(
+        conn: &mut SqliteConnection,
+        contact: &str,
+        name: &str,
+    ) -> QueryResult<i32> {
+        let existing: Option<Maintainer> = maintainers::table
+            .filter(maintainers::contact.eq(contact))
+            .select(Maintainer::as_select())
+            .first(conn)
+            .optional()?;
+
+        if let Some(m) = existing {
+            return Ok(m.id);
+        }
+
+        let new_maintainer = NewMaintainer {
+            contact,
+            name,
+        };
+        diesel::insert_into(maintainers::table)
+            .values(&new_maintainer)
+            .execute(conn)?;
+
+        Self::last_insert_id(conn)
+    }
+
+    /// Links a maintainer to a package.
+    pub fn link_maintainer(
+        conn: &mut SqliteConnection,
+        package_id: i32,
+        maintainer_id: i32,
+    ) -> QueryResult<usize> {
+        let link = NewPackageMaintainer {
+            package_id,
+            maintainer_id,
+        };
+        diesel::insert_into(package_maintainers::table)
+            .values(&link)
+            .on_conflict_do_nothing()
+            .execute(conn)
+    }
+
+    /// Gets maintainers for a package.
+    pub fn get_maintainers(
+        conn: &mut SqliteConnection,
+        package_id: i32,
+    ) -> QueryResult<Vec<Maintainer>> {
+        maintainers::table
+            .inner_join(
+                package_maintainers::table
+                    .on(maintainers::id.eq(package_maintainers::maintainer_id)),
+            )
+            .filter(package_maintainers::package_id.eq(package_id))
+            .select(Maintainer::as_select())
+            .load(conn)
+    }
+
+    /// Deletes all packages (for reimport).
+    pub fn delete_all(conn: &mut SqliteConnection) -> QueryResult<usize> {
+        diesel::delete(packages::table).execute(conn)
+    }
+
+    /// Finds packages with flexible filtering using Diesel DSL.
+    #[allow(clippy::too_many_arguments)]
+    pub fn find_filtered(
+        conn: &mut SqliteConnection,
+        pkg_name: Option<&str>,
+        pkg_id: Option<&str>,
+        pkg_family: Option<&str>,
+        version: Option<&str>,
+        limit: Option<i64>,
+        sort_by_name: Option<SortDirection>,
+    ) -> QueryResult<Vec<Package>> {
+        let mut query = packages::table.into_boxed();
+
+        if let Some(name) = pkg_name {
+            query = query.filter(packages::pkg_name.eq(name));
+        }
+        if let Some(family) = pkg_family {
+            if family != "all" {
+                query = query.filter(packages::pkg_family.eq(family));
+            }
+        }
+        if let Some(id) = pkg_id {
+            if id != "all" {
+                query = query.filter(packages::pkg_id.eq(id));
+            }
+        }
+        if let Some(ver) = version {
+            query = query.filter(packages::version.eq(ver));
+        }
+
+        if let Some(direction) = sort_by_name {
+            query = match direction {
+                SortDirection::Asc => query.order(packages::pkg_name.asc()),
+                SortDirection::Desc => query.order(packages::pkg_name.desc()),
+            };
+        }
+
+        if let Some(lim) = limit {
+            query = query.limit(lim);
+        }
+
+        query.select(Package::as_select()).load(conn)
+    }
+
+    /// Finds packages with a newer version than the given version.
+    /// Used for update checking.
+    /// Uses Diesel DSL with raw SQL filter for version comparison.
+    ///
+    /// `current_checksum` is what the installed copy is, which settles the
+    /// packages whose versions carry no order to compare.
+    pub fn find_newer_version(
+        conn: &mut SqliteConnection,
+        pkg_name: &str,
+        pkg_id: Option<&str>,
+        pkg_family: Option<&str>,
+        current_version: &str,
+        current_checksum: Option<&str>,
+    ) -> QueryResult<Option<Package>> {
+        trace!(
+            pkg_name = pkg_name,
+            current_version = current_version,
+            "checking for newer version"
+        );
+        // Ordering cannot be left to SQL: a string comparison puts 10 below 9
+        // and the rebuild suffix in 1.14.0-1 below 1.14.0. Candidates are
+        // loaded and compared segment-wise instead.
+        let candidates = packages::table
+            .filter(packages::pkg_name.eq(pkg_name))
+            .select(Package::as_select())
+            .load(conn)?;
+        let candidates = narrow_by_pkg_family(narrow_by_pkg_id(candidates, pkg_id), pkg_family);
+
+        let result: QueryResult<Option<Package>> = Ok(candidates
+            .into_iter()
+            .filter(|p| {
+                is_newer(&p.version, current_version)
+                    || supersedes_unordered(
+                        &p.version,
+                        p.bsum.as_deref(),
+                        current_version,
+                        current_checksum,
+                    )
+            })
+            .max_by(|a, b| compare_versions(&a.version, &b.version)));
+        if let Ok(Some(ref p)) = result {
+            debug!("newer version available: {} -> {}", pkg_name, p.version);
+        }
+        result
+    }
+
+    /// Checks if a package with the given pkg_id exists.
+    pub fn exists_by_pkg_id(conn: &mut SqliteConnection, pkg_id: &str) -> QueryResult<bool> {
+        diesel::select(diesel::dsl::exists(
+            packages::table.filter(packages::pkg_id.eq(pkg_id)),
+        ))
+        .get_result(conn)
+    }
+
+    /// Imports packages from remote metadata (JSON format).
+    pub fn import_packages(
+        conn: &mut SqliteConnection,
+        metadata: &[RemotePackage],
+        repo_name: &str,
+    ) -> QueryResult<usize> {
+        debug!(
+            repo_name = repo_name,
+            count = metadata.len(),
+            "importing packages from remote metadata"
+        );
+        conn.transaction(|conn| {
+            diesel::insert_into(repository::table)
+                .values(NewRepository {
+                    name: repo_name,
+                    etag: "",
+                })
+                .on_conflict(repository::name)
+                .do_update()
+                .set(repository::etag.eq(""))
+                .execute(conn)?;
+            trace!(repo_name = repo_name, "repository record upserted");
+
+            let mut imported = 0usize;
+            for package in metadata {
+                if Self::insert_remote_package(conn, package)? {
+                    imported += 1;
+                }
+            }
+            debug!(
+                repo_name = repo_name,
+                offered = metadata.len(),
+                imported,
+                "package import completed"
+            );
+            Ok(imported)
+        })
+    }
+
+    /// Inserts a single remote package.
+    /// Returns whether the package was accepted; rejected entries are skipped
+    /// rather than failing the whole import.
+    fn insert_remote_package(
+        conn: &mut SqliteConnection,
+        package: &RemotePackage,
+    ) -> QueryResult<bool> {
+        trace!(
+            pkg_id = package.pkg_id,
+            pkg_name = package.pkg_name,
+            version = package.version,
+            "inserting remote package"
+        );
+
+        // Stored as absent rather than invented: a repository whose names are
+        // already unique has no id to give, and inventing one from the name
+        // makes a fabricated value indistinguishable from a published one.
+        let pkg_id = package.pkg_id.as_deref().filter(|s| !s.is_empty());
+
+        // pkg_name and pkg_id are joined into the install dir and interpolated
+        // into resource paths, so a name with separators or '..' would escape it.
+        if !is_safe_component(&package.pkg_name) || pkg_id.is_some_and(|id| !is_safe_component(id))
+        {
+            warn!(
+                pkg_name = package.pkg_name,
+                "skipping package with unsafe path component in pkg_name/pkg_id"
+            );
+            return Ok(false);
+        }
+
+        let provides = package.provides.as_ref().map(|vec| {
+            vec.iter()
+                .map(|p| PackageProvide::from_string(p))
+                .filter(|provide| {
+                    let safe = provide.is_safe();
+                    if !safe {
+                        warn!(
+                            pkg_id = package.pkg_id,
+                            pkg_name = package.pkg_name,
+                            provide = provide.name,
+                            "skipping provide with unsafe path component"
+                        );
+                    }
+                    safe
+                })
+                .collect::<Vec<_>>()
+        });
+
+        let new_package = NewPackage {
+            pkg_id,
+            pkg_name: &package.pkg_name,
+            pkg_family: package.pkg_family.as_deref(),
+            pkg_type: package.pkg_type.as_deref(),
+            app_id: package.app_id.as_deref(),
+            description: Some(&package.description),
+            version: &package.version,
+            licenses: Some(json!(package.licenses)),
+            download_url: &package.download_url,
+            size: package.size_raw.or(package.size).map(|s| s as i64),
+            ghcr_pkg: package.ghcr_pkg.as_deref(),
+            ghcr_size: package.ghcr_size_raw.map(|s| s as i64),
+            ghcr_blob: package.ghcr_blob.as_deref(),
+            ghcr_url: package.ghcr_url.as_deref(),
+            bsum: package.bsum.as_deref(),
+            icon: package.icon.as_deref(),
+            desktop: package.desktop.as_deref(),
+            appstream: package.appstream.as_deref(),
+            homepages: Some(json!(package.homepages)),
+            notes: Some(json!(package.notes)),
+            source_urls: Some(json!(package.src_urls)),
+            categories: Some(json!(package.categories)),
+            build_id: package.build_id.as_deref(),
+            build_date: package.build_date.as_deref(),
+            build_action: package.build_action.as_deref(),
+            build_script: package.build_script.as_deref(),
+            build_log: package.build_log.as_deref(),
+            provides: Some(json!(provides)),
+            snapshots: Some(json!(package.snapshots)),
+            replaces: Some(json!(package.replaces)),
+            soar_syms: package.soar_syms.unwrap_or(false),
+            desktop_integration: package.desktop_integration,
+            portable: package.portable,
+            extra: package.extra.as_ref().map(|e| json!(e)),
+            files: package.files.as_ref().map(|f| json!(f)),
+        };
+
+        let inserted = diesel::insert_into(packages::table)
+            .values(&new_package)
+            .on_conflict_do_nothing()
+            .execute(conn)?;
+
+        if inserted == 0 {
+            trace!(pkg_id, "package already exists, skipping");
+            return Ok(false);
+        }
+
+        let package_id = Self::last_insert_id(conn)?;
+
+        if let Some(maintainers) = &package.maintainers {
+            for maintainer in maintainers {
+                if let Some((name, contact)) = Self::extract_name_and_contact(maintainer) {
+                    let maintainer_id = Self::find_or_create_maintainer(conn, &contact, &name)?;
+                    Self::link_maintainer(conn, package_id, maintainer_id)?;
+                }
+            }
+        }
+
+        Ok(true)
+    }
+
+    /// Extracts name and contact from maintainer string format "Name (contact)".
+    fn extract_name_and_contact(input: &str) -> Option<(String, String)> {
+        let re = MAINTAINER_RE.get_or_init(|| Regex::new(r"^([^()]+) \(([^)]+)\)$").unwrap());
+
+        if let Some(captures) = re.captures(input) {
+            let name = captures.get(1).map_or("", |m| m.as_str()).to_string();
+            let contact = captures.get(2).map_or("", |m| m.as_str()).to_string();
+            Some((name, contact))
+        } else {
+            None
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::supersedes_unordered;
+
+    const HELD: &str = "89c99d2a9";
+    const OFFERED: &str = "0f3a21b";
+
+    #[test]
+    fn a_different_artifact_supersedes_a_version_carrying_no_order() {
+        assert!(supersedes_unordered(
+            OFFERED,
+            Some("bsum-new"),
+            HELD,
+            Some("bsum-old")
+        ));
+    }
+
+    #[test]
+    fn the_same_artifact_supersedes_nothing() {
+        assert!(!supersedes_unordered(
+            OFFERED,
+            Some("bsum-same"),
+            HELD,
+            Some("bsum-same")
+        ));
+    }
+
+    #[test]
+    fn a_version_that_can_be_ordered_is_left_to_the_version() {
+        // Ordinary versions are settled by comparing them, so a rebuild
+        // publishing a new checksum under the same version is not an update
+        // this decides.
+        assert!(!supersedes_unordered(
+            "3.5.2",
+            Some("bsum-new"),
+            "3.5.2",
+            Some("bsum-old")
+        ));
+        assert!(!supersedes_unordered(
+            "3.5.3",
+            Some("bsum-new"),
+            HELD,
+            Some("bsum-old")
+        ));
+    }
+
+    #[test]
+    fn nothing_is_claimed_where_a_checksum_is_missing() {
+        assert!(!supersedes_unordered(OFFERED, None, HELD, Some("bsum-old")));
+        assert!(!supersedes_unordered(OFFERED, Some("bsum-new"), HELD, None));
+    }
+}

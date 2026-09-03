@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <object class="GtkShortcutsWindow" id="shortcuts_window">
+        <property name="modal">True</property>
+        <property name="hide-on-close">True</property>
+        <child>
+            <object class="GtkShortcutsSection" id="general_section">
+                <child>
+                    <object class="GtkShortcutsGroup" id="navigation_group">
+                        <child>
+                            <object class="GtkShortcutsShortcut" id="shortcut_check_updates">
+                                <property name="accelerator">&lt;Primary&gt;u</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkShortcutsShortcut" id="shortcut_update_apps">
+                                <property name="accelerator">&lt;Primary&gt;&lt;Shift&gt;u</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkShortcutsShortcut" id="shortcut_main_menu">
+                                <property name="accelerator">F10</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkShortcutsShortcut" id="shortcut_search">
+                                <property name="accelerator">&lt;Primary&gt;f</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkShortcutsShortcut" id="shortcut_show_overlay">
+                                <property name="accelerator">&lt;Primary&gt;question</property>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+                <child>
+                    <object class="GtkShortcutsGroup" id="window_group">
+                        <child>
+                            <object class="GtkShortcutsShortcut" id="shortcut_close_window">
+                                <property name="accelerator">&lt;Primary&gt;w</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkShortcutsShortcut" id="shortcut_quit">
+                                <property name="accelerator">&lt;Primary&gt;q</property>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkShortcutsShortcut" id="shortcut_fullscreen">
+                                <property name="accelerator">F11</property>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </object>
+</interface>

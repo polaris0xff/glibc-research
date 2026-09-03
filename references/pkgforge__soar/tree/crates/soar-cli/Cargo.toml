@@ -1,0 +1,46 @@
+[package]
+name = "soar-cli"
+version = "0.13.3"
+description = "A modern package manager for Linux"
+default-run = "soar"
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+keywords.workspace = true
+readme.workspace = true
+categories.workspace = true
+
+[[bin]]
+name = "soar"
+path = "src/main.rs"
+
+[features]
+self = []
+
+[dependencies]
+clap = { workspace = true }
+clap_complete = { workspace = true }
+indicatif = { workspace = true }
+miette = { workspace = true }
+nix = { workspace = true }
+nu-ansi-term = { workspace = true }
+regex = { workspace = true }
+semver = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+soar-config = { workspace = true }
+soar-core = { workspace = true }
+soar-db = { workspace = true }
+soar-dl = { workspace = true }
+soar-events = { workspace = true }
+soar-operations = { workspace = true }
+soar-package = { workspace = true }
+soar-registry = { workspace = true }
+soar-utils = { workspace = true }
+tabled = { workspace = true }
+terminal_size = { workspace = true }
+tokio = { workspace = true }
+toml = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+ureq = { workspace = true }

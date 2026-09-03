@@ -1,0 +1,1708 @@
+# Swedish translation for app-manager
+# Copyright (C) 2026 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the app-manager package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: app-manager\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-22 11:40+0300\n"
+"PO-Revision-Date: 2026-01-27 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Swedish\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/application.vala:312
+msgid "Cannot install from this location"
+msgstr ""
+
+#: src/application.vala:313
+#, c-format
+msgid ""
+"This AppImage is already inside the install folder (%s). Move it elsewhere "
+"first to install it."
+msgstr ""
+
+#: src/application.vala:314 src/application.vala:358 src/application.vala:370
+#: src/application.vala:1001 src/application.vala:1112
+#: src/application.vala:1124 src/windows/dialog_window.vala:95
+#: src/windows/drop_window.vala:119 src/windows/drop_window.vala:129
+#: src/windows/main_window.vala:2015
+msgid "Close"
+msgstr "Stäng"
+
+#: src/application.vala:356
+msgid "Incompatible AppImage"
+msgstr "Inkompatibel AppImage"
+
+#: src/application.vala:357
+msgid ""
+"This AppImage is incompatible or corrupted. Missing required files "
+"(AppRun, .desktop, or icon)."
+msgstr ""
+"Denna AppImage är inkompatibel eller skadad. Obligatoriska filer saknas "
+"(AppRun, .desktop eller ikon)."
+
+#: src/application.vala:366 src/windows/drop_window.vala:386
+msgid "unknown"
+msgstr "okänd"
+
+#: src/application.vala:368
+msgid "Architecture Mismatch"
+msgstr "Arkitektur mismatch"
+
+#: src/application.vala:369 src/windows/drop_window.vala:387
+#, c-format
+msgid "This app is built for %s and cannot run here"
+msgstr "Den här appen är byggd för %s och kan inte köras här"
+
+#: src/application.vala:460 src/windows/drop_window.vala:295
+#, c-format
+msgid "Open %s?"
+msgstr "Öppna %s?"
+
+#: src/application.vala:464 src/windows/drop_window.vala:298
+#, c-format
+msgid ""
+"Origins of %s application can not be verified. Are you sure you want to open "
+"it?"
+msgstr ""
+"Ursprunget för %s kan inte verifieras. Är du säker på att du vill öppna den?"
+
+#: src/application.vala:467 src/windows/drop_window.vala:305
+msgid "Install the AppImage to add it to your applications."
+msgstr "Installera AppImage för att lägga till den i dina program."
+
+#: src/application.vala:469 src/windows/drop_window.vala:308
+msgid "Install"
+msgstr "Installera"
+
+#: src/application.vala:470 src/application.vala:985
+#: src/windows/details_window.vala:698 src/windows/details_window.vala:1345
+#: src/windows/details_window.vala:1412 src/windows/details_window.vala:1429
+#: src/windows/drop_window.vala:309 src/windows/drop_window.vala:1200
+#: src/windows/main_window.vala:2034 src/windows/main_window.vala:2083
+#: src/windows/preferences_window.vala:450
+#: src/windows/preferences_window.vala:484
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: src/application.vala:488 src/windows/drop_window.vala:443
+#, c-format
+msgid "Replace %s?"
+msgstr "Ersätt %s?"
+
+#: src/application.vala:495 src/windows/drop_window.vala:447
+#, c-format
+msgid ""
+"An older item named \"%s\" already exists in this location. Do you want to "
+"replace it with newer one you're copying?"
+msgstr ""
+
+#: src/application.vala:497 src/windows/drop_window.vala:449
+#, c-format
+msgid ""
+"A newer item named %s already exists in this location. Do you want to "
+"replace it with the older one you're copying?"
+msgstr ""
+"Ett nyare objekt med namnet %s finns redan på denna plats. Vill du ersätta "
+"det med det äldre du kopierar?"
+
+#: src/application.vala:499 src/windows/drop_window.vala:451
+#, c-format
+msgid ""
+"An item named %s already exists in this location. Do you want to replace it "
+"with one you're copying?"
+msgstr ""
+"Ett objekt med namnet %s finns redan på denna plats. Vill du ersätta det med "
+"det du kopierar?"
+
+#: src/application.vala:502 src/windows/drop_window.vala:455
+#, c-format
+msgid "Installed: %s | Incoming: %s"
+msgstr "Installerad: %s | Inkommande: %s"
+
+#: src/application.vala:508 src/windows/drop_window.vala:460
+msgid "Keep Both"
+msgstr ""
+
+#: src/application.vala:509 src/windows/drop_window.vala:461
+msgid "Stop"
+msgstr "Stoppa"
+
+#: src/application.vala:510 src/windows/drop_window.vala:462
+msgid "Replace"
+msgstr "Ersätt"
+
+#: src/application.vala:599 src/windows/drop_window.vala:546
+msgid "Successfully Updated"
+msgstr "Uppdaterades framgångsrikt"
+
+#: src/application.vala:599 src/windows/drop_window.vala:544
+msgid "Successfully Installed"
+msgstr "Installerades framgångsrikt"
+
+#: src/application.vala:615 src/windows/drop_window.vala:563
+msgid "Unknown version"
+msgstr "Okänd version"
+
+#: src/application.vala:616 src/windows/drop_window.vala:564
+#, c-format
+msgid "Version %s"
+msgstr "Version %s"
+
+#: src/application.vala:620 src/windows/details_window.vala:189
+#: src/windows/drop_window.vala:568 src/windows/drop_window.vala:707
+msgid "Open"
+msgstr "Öppna"
+
+#: src/application.vala:621 src/windows/drop_window.vala:569
+msgid "Done"
+msgstr "Klart"
+
+#: src/application.vala:646 src/windows/drop_window.vala:595
+msgid "Installation failed"
+msgstr "Installation misslyckades"
+
+#: src/application.vala:648 src/windows/drop_window.vala:605
+msgid "Dismiss"
+msgstr "Avfärda"
+
+#: src/application.vala:763
+msgid "Leftover portable folder found"
+msgstr ""
+
+#: src/application.vala:764
+#, c-format
+msgid ""
+"A leftover portable folder was found next to AppManager (%s). AppManager "
+"does not support portable mode for itself. The folder may contain apps "
+"installed while this bug was active — move anything you need out of it (e.g. "
+"AppImages under its Applications subfolder), then delete it."
+msgstr ""
+
+#: src/application.vala:766
+msgid "Ignore"
+msgstr ""
+
+#: src/application.vala:767 src/core/installer.vala:1053
+#: src/core/installer.vala:1118 src/core/path_migration_service.vala:350
+#: src/windows/details_window.vala:1333 src/windows/details_window.vala:1374
+msgid "Move to Trash"
+msgstr "Flytta till papperskorgen"
+
+#: src/application.vala:982
+msgid "Cannot move to trash"
+msgstr "Flytta till papperskorgen"
+
+#: src/application.vala:983
+#, c-format
+msgid ""
+"%s could not be moved to the trash. Do you want to delete it permanently "
+"instead?\n"
+"\n"
+"This action cannot be undone."
+msgstr ""
+
+#: src/application.vala:986 src/core/installer.vala:1053
+#: src/core/installer.vala:1118 src/core/path_migration_service.vala:350
+#: src/windows/details_window.vala:1329 src/windows/details_window.vala:1346
+#: src/windows/details_window.vala:1368
+msgid "Delete Permanently"
+msgstr "Radera permanent"
+
+#: src/application.vala:998
+msgid "Uninstall failed"
+msgstr "Avinstallation misslyckades"
+
+#: src/application.vala:999
+#, c-format
+msgid "%s could not be removed: %s"
+msgstr "%s kunde inte tas bort: %s"
+
+#: src/application.vala:1007
+msgid "Deleted permanently"
+msgstr "Permanent raderad"
+
+#: src/application.vala:1009 src/application.vala:1015
+#, c-format
+#, fuzzy
+msgid "%s moved to Trash"
+msgstr "Flyttad till papperskorgen"
+
+#: src/application.vala:1010
+msgid "Undo"
+msgstr "Ångra"
+
+#: src/application.vala:1047
+msgid "Undo failed"
+msgstr "Avinstallation misslyckades"
+
+#: src/application.vala:1050
+msgid "Restored"
+msgstr "Återställ standard"
+
+#: src/application.vala:1070
+msgid "Extraction is only available for portable installations."
+msgstr "Extrahering är endast tillgängligt för portabla installationer."
+
+#: src/application.vala:1106
+msgid "Extracted for faster launch"
+msgstr "Extraherad för snabbare start"
+
+#: src/application.vala:1109
+msgid "Extraction complete"
+msgstr "Extrahering klar"
+
+#: src/application.vala:1110
+#, c-format
+msgid "%s was extracted and will open faster."
+msgstr "%s extraherades och kommer att öppnas snabbare."
+
+#: src/application.vala:1121
+msgid "Extraction failed"
+msgstr "Extrahering misslyckades"
+
+#: src/application.vala:1122
+#, c-format
+msgid "%s could not be extracted: %s"
+msgstr "%s kunde inte extraheras: %s"
+
+#: src/core/background_update_service.vala:296
+#: src/core/background_update_service.vala:453
+msgid "App updates available"
+msgstr "Appuppdateringar tillgängliga"
+
+#: src/core/background_update_service.vala:297
+#: src/core/background_update_service.vala:454
+#, c-format
+msgid "%d app update(s) available"
+msgstr "%d appuppdatering(ar) tillgängliga"
+
+#: src/core/background_update_service.vala:347
+msgid "App updates failed"
+msgstr "Appuppdateringar tillgängliga"
+
+#: src/core/background_update_service.vala:348
+#, c-format
+msgid "%d app update(s) failed"
+msgstr "%d uppdatering(ar) misslyckades"
+
+#: src/core/background_update_service.vala:369
+msgid "Open AppManager"
+msgstr "Öppna AppManager"
+
+#: src/core/path_migration_service.vala:42
+msgid "Path must be absolute"
+msgstr "Vägen måste vara absolut"
+
+#: src/core/path_migration_service.vala:47
+msgid "This is already the current directory"
+msgstr "Detta är redan den aktuella katalogen"
+
+#: src/core/path_migration_service.vala:56
+msgid "Directory is not writable"
+msgstr "Katalog är inte skrivbar"
+
+#: src/core/path_migration_service.vala:59
+#, c-format
+msgid "Cannot access directory: %s"
+msgstr "Kan inte komma åt katalogen: %s"
+
+#: src/core/path_migration_service.vala:63
+msgid "Path exists but is not a directory"
+msgstr "Sökvägen finns men är inte en katalog"
+
+#: src/core/path_migration_service.vala:69
+msgid "Invalid path"
+msgstr "Ogiltig sökväg"
+
+#: src/core/path_migration_service.vala:72
+msgid "Parent directory does not exist"
+msgstr "Överordnad katalog finns inte"
+
+#: src/core/path_migration_service.vala:77
+msgid "Cannot create directory: parent is not writable"
+msgstr "Kan inte skapa katalog: förälder är inte skrivbar"
+
+#: src/core/path_migration_service.vala:80
+#, c-format
+msgid "Cannot access parent directory: %s"
+msgstr "Kan inte komma åt överordnad katalog: %s"
+
+#: src/core/path_migration_service.vala:170
+#, c-format
+msgid "Failed to create directory: %s"
+msgstr "Det gick inte att skapa katalogen: %s"
+
+#: src/core/path_migration_service.vala:178
+#, c-format
+msgid "Failed to create extracted directory: %s"
+msgstr "Det gick inte att skapa extraherad katalog: %s"
+
+#: src/core/path_migration_service.vala:189
+#, c-format
+msgid "Migrating %s (%d/%d)…"
+msgstr "Migrerar %s (%d/%d)..."
+
+#: src/core/path_migration_service.vala:215
+#, c-format
+msgid ""
+"Some apps failed to migrate:\n"
+"%s"
+msgstr ""
+"Vissa appar kunde inte migreras:\n"
+"%s"
+
+#: src/core/updater.vala:633 src/core/updater.vala:700
+msgid "No update address configured"
+msgstr "Ingen uppdateringsadress konfigurerad"
+
+#: src/core/updater.vala:638 src/core/updater.vala:709
+msgid "Update source not supported"
+msgstr "Uppdateringskälla stöds inte"
+
+#: src/core/updater.vala:654 src/core/updater.vala:727
+msgid "Unable to read releases"
+msgstr "Kunde inte läsa versioner"
+
+#: src/core/updater.vala:659 src/core/updater.vala:755
+#, c-format
+msgid "No matching AppImage found for %s"
+msgstr "Ingen matchande AppImage hittades för %s"
+
+#: src/core/updater.vala:669 src/core/updater.vala:675
+#: src/core/updater.vala:739 src/core/updater.vala:747
+#: src/core/updater.vala:897 src/core/updater.vala:922
+#: src/core/updater.vala:1556 src/core/updater.vala:1572
+#: src/core/updater.vala:1668 src/core/updater.vala:1679
+msgid "Already up to date"
+msgstr "Redan uppdaterad"
+
+#: src/core/updater.vala:802 src/core/updater.vala:1748
+#: src/core/updater.vala:1847
+#, c-format
+msgid "Updated to %s"
+msgstr "Uppdaterad till %s"
+
+#: src/core/updater.vala:812 src/core/updater.vala:814
+msgid "App identity mismatch"
+msgstr "Arkitektur inte matchar"
+
+#: src/core/updater.vala:885 src/core/updater.vala:915
+msgid "Server does not provide change tracking headers"
+msgstr "Servern tillhandahåller inte ändringsspårningsrubriker"
+
+#: src/core/updater.vala:893
+msgid "Baseline recorded"
+msgstr "Baslinje registrerad"
+
+#: src/core/updater.vala:955 src/core/updater.vala:1749
+#: src/core/updater.vala:1848
+msgid "Updated"
+msgstr "Uppdaterad"
+
+#: src/core/updater.vala:1070 src/core/updater.vala:1078
+msgid "Downloaded file is not a valid AppImage"
+msgstr "Den nedladdade filen är inte en giltig AppImage"
+
+#: src/core/updater.vala:1081
+#, c-format
+msgid "AppImage architecture '%s' is incompatible with this system"
+msgstr "AppImage-arkitekturen '%s' är inte kompatibel med detta system"
+
+#: src/core/updater.vala:1131
+#, c-format
+msgid "App identity mismatch: expected '%s' but got '%s'"
+msgstr "App-identitet stämmer inte: förväntade '%s' men fick '%s'"
+
+#: src/core/updater.vala:1173
+msgid ""
+"GitHub authentication failed (401). Check your token in Preferences → GitHub."
+msgstr ""
+"GitHub-autentisering misslyckades (401). Kontrollera din token i "
+"Inställningar → GitHub."
+
+#: src/core/updater.vala:1178
+msgid ""
+"GitHub API rate limit exceeded. Add a token in Preferences → GitHub to "
+"increase your limit."
+msgstr ""
+"GitHub API-hastighetsgräns har överskridits. Lägg till en token i "
+"Inställningar → GitHub för att öka din gräns."
+
+#: src/core/updater.vala:1180
+msgid ""
+"GitHub access forbidden (403). Your token may lack the required permissions."
+msgstr ""
+"GitHub-åtkomst förbjuden (403). Din token kan sakna de nödvändiga "
+"behörigheterna."
+
+#: src/core/updater.vala:1512
+msgid "Unknown zsync source type"
+msgstr "Okänd zsync-källtyp"
+
+#: src/core/updater.vala:1537 src/core/updater.vala:1656
+msgid "Malformed zsync file (no checksum)"
+msgstr "Felaktig zsync-fil (ingen checksumma)"
+
+#: src/core/updater.vala:1552
+msgid "Failed to compute local checksum"
+msgstr "Kunde inte beräkna lokal checksumma"
+
+#: src/core/updater.vala:1633
+msgid "Unknown zsync source"
+msgstr "Okänd zsync-källa"
+
+#: src/core/updater.vala:1801
+msgid "Cannot determine download URL from zsync URL"
+msgstr "Kan inte fastställa nedladdnings-URL från zsync URL"
+
+#: src/windows/details_window.vala:120
+#, c-format
+msgid "⚠️ '%s' is not in $PATH. App will not launch from the terminal"
+msgstr ""
+"⚠️ '%s' finns inte i $PATH. Appen kommer inte att starta från terminalen"
+
+#: src/windows/details_window.vala:246 src/windows/drop_window.vala:712
+msgid "Show in Files"
+msgstr "Visa i Filer"
+
+#: src/windows/details_window.vala:248
+msgid "Portable"
+msgstr "Portabel"
+
+#: src/windows/details_window.vala:248
+msgid "Extracted"
+msgstr "Extraherad"
+
+#: src/windows/details_window.vala:267
+msgid "App version"
+msgstr "Version"
+
+#: src/windows/details_window.vala:278
+msgid "Terminal"
+msgstr "Terminal"
+
+#: src/windows/details_window.vala:286
+msgid "This app supports efficient delta updates"
+msgstr "Denna app stöder effektiva deltauppdateringar"
+
+#: src/windows/details_window.vala:293
+msgid "Hidden"
+msgstr "Dold"
+
+#: src/windows/details_window.vala:304
+msgid "Web"
+msgstr ""
+
+#: src/windows/details_window.vala:323
+msgid "Properties"
+msgstr "Egenskaper"
+
+#: src/windows/details_window.vala:328
+msgid "Command line arguments"
+msgstr "Kommandoradsargument"
+
+#: src/windows/details_window.vala:366 src/windows/details_window.vala:420
+msgid "App Updates"
+msgstr ""
+
+#: src/windows/details_window.vala:367
+msgid "Edit app update details"
+msgstr ""
+
+#: src/windows/details_window.vala:369 src/windows/details_window.vala:413
+msgid "On"
+msgstr ""
+
+#: src/windows/details_window.vala:369 src/windows/details_window.vala:413
+msgid "Off"
+msgstr ""
+
+#: src/windows/details_window.vala:388
+msgid ""
+"Update info lets AppManager fetch new builds for you. Paste the download "
+"link and AppManager will do the rest."
+msgstr ""
+"Uppdateringsinformation låter AppManager hämta nya versioner åt dig. Klistra "
+"in nedladdningslänken så gör AppManager resten."
+
+#: src/windows/details_window.vala:389
+msgid ""
+"Currently GitHub and GitLab URL formats are fully supported. Direct download "
+"links also work if the server provides Last-Modified or Content-Length "
+"headers."
+msgstr ""
+"För närvarande stöds GitHub och GitLab URL-format fullt ut. Direkta "
+"nedladdningslänkar fungerar också om servern tillhandahåller Last-Modified "
+"eller Content-Length-headers."
+
+#: src/windows/details_window.vala:391
+msgid "Update links"
+msgstr "Uppdateringslänkar"
+
+#: src/windows/details_window.vala:398
+msgid "Enable app updates"
+msgstr ""
+
+#: src/windows/details_window.vala:424
+msgid "Update details"
+msgstr ""
+
+#: src/windows/details_window.vala:434
+msgid "Pre-release Updates"
+msgstr "Förhandsversioner"
+
+#: src/windows/details_window.vala:435
+msgid "Include pre-release versions when checking for updates"
+msgstr "Inkludera förhandsversioner vid sökning efter uppdateringar"
+
+#: src/windows/details_window.vala:455
+msgid "Update link is managed by the embedded zsync update mechanism"
+msgstr "Uppdateringslänken hanteras av den inbäddade zsync-mekanismen"
+
+#: src/windows/details_window.vala:489
+msgid "Update Link"
+msgstr "Uppdateringslänk"
+
+#: src/windows/details_window.vala:545
+msgid "Web Page"
+msgstr "Webbsida"
+
+#: src/windows/details_window.vala:579
+msgid "Open web page"
+msgstr "Öppna webbsida"
+
+#: src/windows/details_window.vala:595 src/windows/details_window.vala:628
+msgid "Advanced Settings"
+msgstr ""
+
+#: src/windows/details_window.vala:596
+msgid ""
+"Change app icon, Startup WM Class, Keywords, $PATH or environment variables"
+msgstr ""
+
+#: src/windows/details_window.vala:612
+msgid "App Settings"
+msgstr ""
+
+#: src/windows/details_window.vala:641
+#, fuzzy
+msgid "Portable .home folder"
+msgstr "Portabel"
+
+#: src/windows/details_window.vala:642
+msgid "Store the app's home directory in a .home folder next to the AppImage"
+msgstr ""
+
+#: src/windows/details_window.vala:643
+msgid ".home"
+msgstr ""
+
+#: src/windows/details_window.vala:652
+#, fuzzy
+msgid "Portable .config folder"
+msgstr "Portabel"
+
+#: src/windows/details_window.vala:653
+msgid "Store the app's config in a .config folder next to the AppImage"
+msgstr ""
+
+#: src/windows/details_window.vala:654
+msgid ".config"
+msgstr ""
+
+#: src/windows/details_window.vala:695
+#, c-format
+msgid "Remove portable %s folder?"
+msgstr ""
+
+#: src/windows/details_window.vala:696
+#, c-format
+msgid ""
+"The %s folder next to this AppImage will be permanently removed, including "
+"any data it contains."
+msgstr ""
+
+#: src/windows/details_window.vala:699
+#, fuzzy
+msgid "Remove Data"
+msgstr "Ta bort variabel"
+
+#: src/windows/details_window.vala:717
+msgid "Environment Variables"
+msgstr "Miljövariabler"
+
+#: src/windows/details_window.vala:718
+msgid "Set custom environment variables for this app"
+msgstr "Ange anpassade miljövariabler för denna app"
+
+#: src/windows/details_window.vala:780
+msgid "NAME"
+msgstr "NAMN"
+
+#: src/windows/details_window.vala:796
+msgid "value"
+msgstr "värde"
+
+#: src/windows/details_window.vala:810
+msgid "Remove variable"
+msgstr "Ta bort variabel"
+
+#: src/windows/details_window.vala:941
+msgid "App Name"
+msgstr ""
+
+#: src/windows/details_window.vala:955
+msgid "Keywords"
+msgstr "Nyckelord"
+
+#: src/windows/details_window.vala:965
+msgid "Icon name"
+msgstr "Ikonnamn"
+
+#: src/windows/details_window.vala:975
+msgid "Startup WM Class"
+msgstr "Start WM-klass"
+
+#: src/windows/details_window.vala:985
+msgid "Version"
+msgstr "Version"
+
+#: src/windows/details_window.vala:1005
+msgid "Hide from app drawer"
+msgstr "Dölj från applådan"
+
+#: src/windows/details_window.vala:1006
+msgid "Don't show in application menu"
+msgstr "Visa inte i programmenyn"
+
+#: src/windows/details_window.vala:1019
+msgid "Add to $PATH"
+msgstr "Lägg till i $PATH"
+
+#: src/windows/details_window.vala:1020
+#, c-format
+msgid "Create a launcher in %s so you can run it from the terminal"
+msgstr "Skapa en startare i %s så att du kan köra den från terminalen"
+
+#: src/windows/details_window.vala:1086
+msgid "Actions"
+msgstr "Åtgärder"
+
+#: src/windows/details_window.vala:1125
+msgid "Extract AppImage"
+msgstr "Extrahera AppImage"
+
+#: src/windows/details_window.vala:1165
+msgid "Restore default"
+msgstr "Återställ standard"
+
+#: src/windows/details_window.vala:1177 src/windows/main_window.vala:633
+#: src/windows/main_window.vala:707
+msgid "Updating..."
+msgstr "Uppdaterar..."
+
+#: src/windows/details_window.vala:1179
+msgid "Checking..."
+msgstr "Kontrollerar..."
+
+#: src/windows/details_window.vala:1199
+msgid "Update"
+msgstr "Uppdatera"
+
+#: src/windows/details_window.vala:1206
+msgid "Update Failed"
+msgstr "Uppdatering tillgänglig"
+
+#: src/windows/details_window.vala:1213
+msgid "Check Update"
+msgstr "Sök uppdatering"
+
+#: src/windows/details_window.vala:1334
+msgid "Hold Shift to delete permanently"
+msgstr "Håll Skift för att radera permanent"
+
+#: src/windows/details_window.vala:1341 src/windows/details_window.vala:1369
+#, c-format
+msgid "<b>%s</b> will be permanently deleted. This action cannot be undone."
+msgstr "<b>%s</b> kommer att raderas permanent. Denna åtgärd kan inte ångras."
+
+#: src/windows/details_window.vala:1342 src/windows/details_window.vala:1367
+msgid "Delete permanently?"
+msgstr "Radera permanent?"
+
+#: src/windows/details_window.vala:1370
+msgid "Delete All Data"
+msgstr ""
+
+#: src/windows/details_window.vala:1371
+msgid "Permanently erase user data to save space"
+msgstr ""
+
+#: src/windows/details_window.vala:1373
+msgid "Move to Trash?"
+msgstr ""
+
+#: src/windows/details_window.vala:1375
+#, c-format
+msgid "<b>%s</b> will be moved to the Trash."
+msgstr ""
+
+#: src/windows/details_window.vala:1376
+msgid "Trash All Data"
+msgstr ""
+
+#: src/windows/details_window.vala:1377
+msgid "Move user data to Trash along with the app"
+msgstr ""
+
+#: src/windows/details_window.vala:1393
+msgid "Keep User Data"
+msgstr ""
+
+#: src/windows/details_window.vala:1394
+msgid "Allow restoring personal settings &amp; content"
+msgstr ""
+
+#: src/windows/details_window.vala:1427
+msgid ""
+"Extracting will unpack the application so it opens faster, but it will "
+"consume more disk space. This action cannot be reversed automatically."
+msgstr ""
+"Extrahering packar upp applikationen så att den öppnas snabbare, men det tar "
+"mer diskutrymme. Denna åtgärd kan inte ångras automatiskt."
+
+#: src/windows/details_window.vala:1428
+msgid "Extract application?"
+msgstr "Extrahera applikation?"
+
+#: src/windows/details_window.vala:1430
+msgid "Extract"
+msgstr "Extrahera"
+
+#: src/windows/dialog_window.vala:86
+msgid "App removed"
+msgstr "App borttagen"
+
+#: src/windows/dialog_window.vala:94
+msgid "The application was uninstalled successfully."
+msgstr "Applikationen avinstallerades framgångsrikt."
+
+#: src/windows/drop_window.vala:66 src/windows/drop_window.vala:811
+msgid "AppImage Installer"
+msgstr "AppImage-installerare"
+
+#: src/windows/drop_window.vala:111 src/windows/drop_window.vala:1206
+msgid "Verify"
+msgstr "Verifiera"
+
+#: src/windows/drop_window.vala:112
+msgid "Verify AppImage with SHA256 hash"
+msgstr "Verifiera AppImage med SHA256-hash"
+
+#: src/windows/drop_window.vala:138
+msgid "SHA256 hash does not match. Verification failed."
+msgstr "SHA256-hash matchar inte. Verifiering misslyckades."
+
+#: src/windows/drop_window.vala:169
+#, c-format
+msgid "Drag and drop to install into %s"
+msgstr "Dra och släpp för att installera i %s"
+
+#: src/windows/drop_window.vala:303
+msgid "This is a terminal application and will be installed in portable mode."
+msgstr ""
+"Detta är en terminalapplikation och kommer att installeras i portabelt läge."
+
+#: src/windows/drop_window.vala:376
+msgid "This AppImage is incompatible or corrupted"
+msgstr "Denna AppImage är inkompatibel eller korrupt"
+
+#: src/windows/drop_window.vala:378
+msgid "Missing required files (AppRun, .desktop, or icon)"
+msgstr "Saknar nödvändiga filer (AppRun, .desktop eller ikon)"
+
+#: src/windows/drop_window.vala:389
+msgid "Architecture mismatch"
+msgstr "Arkitektur inte matchar"
+
+#: src/windows/drop_window.vala:502
+msgid "Unable to prepare AppImage for installation"
+msgstr "Kunde inte förbereda AppImage för installation"
+
+#: src/windows/drop_window.vala:546
+msgid "Successfully Replaced"
+msgstr "Ersattes framgångsrikt"
+
+#: src/windows/drop_window.vala:708
+msgid "Get Info"
+msgstr ""
+
+#: src/windows/drop_window.vala:709
+msgid "Copy"
+msgstr ""
+
+#: src/windows/drop_window.vala:715
+msgid "New Terminal at Folder"
+msgstr ""
+
+#: src/windows/drop_window.vala:1167
+msgid "Verify AppImage"
+msgstr "Verifiera AppImage"
+
+#: src/windows/drop_window.vala:1185
+msgid "Verify the authenticity of this AppImage."
+msgstr "Verifiera äktheten av denna AppImage."
+
+#: src/windows/drop_window.vala:1191
+msgid "Enter the SHA256 hash "
+msgstr "Ange SHA256-hash "
+
+#: src/windows/main_window.vala:71 src/windows/main_window.vala:234
+msgid "AppManager"
+msgstr "AppManager"
+
+#: src/windows/main_window.vala:196
+msgid "No Apps Yet"
+msgstr "Inga appar ännu"
+
+#: src/windows/main_window.vala:200
+msgid "Import your AppImages to manage and update them here"
+msgstr "Importera dina AppImages för att hantera och uppdatera dem här"
+
+#: src/windows/main_window.vala:215 src/windows/main_window.vala:388
+msgid "Import AppImages ..."
+msgstr "Importera AppImages ..."
+
+#: src/windows/main_window.vala:293
+msgid "Get more ..."
+msgstr "Hämta fler ..."
+
+#: src/windows/main_window.vala:305
+msgid "Find more AppImages"
+msgstr "Hitta fler AppImages"
+
+#: src/windows/main_window.vala:306
+msgid "Browse these sources to discover and download AppImages"
+msgstr "Bläddra bland dessa källor för att upptäcka och ladda ner AppImages"
+
+#: src/windows/main_window.vala:332
+msgid "Import AppImages from folder ..."
+msgstr "Importera AppImages från mapp ..."
+
+#: src/windows/main_window.vala:370 src/windows/main_window.vala:463
+msgid "No AppImage apps installed"
+msgstr "Inga AppImage-appar installerade"
+
+#: src/windows/main_window.vala:375
+msgid "Download AppImage and double click to install with AppManager"
+msgstr "Ladda ner AppImage och dubbelklicka för att installera med AppManager"
+
+#: src/windows/main_window.vala:463
+msgid "No results found"
+msgstr "Inga resultat hittades"
+
+#: src/windows/main_window.vala:542 src/windows/main_window.vala:1101
+msgid "My Apps"
+msgstr "Mina appar"
+
+#: src/windows/main_window.vala:640 src/windows/main_window.vala:714
+msgid "Update available"
+msgstr "Uppdatering tillgänglig"
+
+#: src/windows/main_window.vala:729
+msgid "Unknown"
+msgstr "Okänd"
+
+#: src/windows/main_window.vala:822
+msgid "extracted"
+msgstr "extraherad"
+
+#: src/windows/main_window.vala:883
+#, fuzzy
+msgid "Imported just now"
+msgstr "Uppdaterades nyss"
+
+#: src/windows/main_window.vala:883
+msgid "Updated just now"
+msgstr "Uppdaterades nyss"
+
+#: src/windows/main_window.vala:883
+msgid "Installed just now"
+msgstr "Installerades nyss"
+
+#: src/windows/main_window.vala:891
+#, fuzzy, c-format
+msgid "Imported %d min ago"
+msgstr "Uppdaterades för %d min sedan"
+
+#: src/windows/main_window.vala:891
+#, c-format
+msgid "Updated %d min ago"
+msgstr "Uppdaterades för %d min sedan"
+
+#: src/windows/main_window.vala:891
+#, c-format
+msgid "Installed %d min ago"
+msgstr "Installerades för %d min sedan"
+
+#: src/windows/main_window.vala:899
+#, fuzzy, c-format
+msgid "Imported %d hours ago"
+msgstr "Uppdaterades för %d timmar sedan"
+
+#: src/windows/main_window.vala:899
+#, c-format
+msgid "Updated %d hours ago"
+msgstr "Uppdaterades för %d timmar sedan"
+
+#: src/windows/main_window.vala:899
+#, c-format
+msgid "Installed %d hours ago"
+msgstr "Installerades för %d timmar sedan"
+
+#: src/windows/main_window.vala:906
+#, fuzzy, c-format
+msgid "Imported %d days ago"
+msgstr "Uppdaterades för %d dagar sedan"
+
+#: src/windows/main_window.vala:906
+#, c-format
+msgid "Updated %d days ago"
+msgstr "Uppdaterades för %d dagar sedan"
+
+#: src/windows/main_window.vala:906
+#, c-format
+msgid "Installed %d days ago"
+msgstr "Installerades för %d dagar sedan"
+
+#: src/windows/main_window.vala:925 src/windows/main_window.vala:1284
+msgid "Leave Fullscreen"
+msgstr "Avsluta helskärm"
+
+#: src/windows/main_window.vala:925 src/windows/main_window.vala:1284
+msgid "Fullscreen"
+msgstr "Helskärm"
+
+#: src/windows/main_window.vala:930 src/windows/preferences_window.vala:34
+msgid "Preferences"
+msgstr "Inställningar"
+
+#: src/windows/main_window.vala:931
+msgid "Keyboard shortcuts"
+msgstr "Tangentbordsgenvägar"
+
+#: src/windows/main_window.vala:932 src/windows/main_window.vala:1895
+msgid "About AppManager"
+msgstr "Om AppManager"
+
+#: src/windows/main_window.vala:936
+msgid "Quit"
+msgstr "Avsluta"
+
+#: src/windows/main_window.vala:950
+msgid "Support AppManager"
+msgstr "Support AppManager"
+
+#: src/windows/main_window.vala:965
+msgid "Buy Me a Coffee"
+msgstr "Köp mig en kaffe"
+
+#: src/windows/main_window.vala:984
+msgid "Become a sponsor on GitHub"
+msgstr "Bli sponsor på GitHub"
+
+#: src/windows/main_window.vala:989
+msgid "Sponsor Me ♡"
+msgstr "Sponsra mig ♡"
+
+#: src/windows/main_window.vala:1000
+msgid "Star AppManager on GitHub"
+msgstr "Stjärna AppManager på GitHub"
+
+#: src/windows/main_window.vala:1005
+msgid "Star AppManager"
+msgstr "Star AppManager"
+
+#: src/windows/main_window.vala:1016
+msgid "View contributors on GitHub"
+msgstr "Se bidragsgivare på GitHub"
+
+#: src/windows/main_window.vala:1021 src/windows/main_window.vala:1914
+msgid "Contributors"
+msgstr "Bidragsgivare"
+
+#: src/windows/main_window.vala:1044 src/windows/main_window.vala:1893
+msgid "Search"
+msgstr "Sök"
+
+#: src/windows/main_window.vala:1050
+msgid "Support this project"
+msgstr "Stöd detta projekt"
+
+#: src/windows/main_window.vala:1060
+msgid "More actions"
+msgstr "Fler åtgärder"
+
+#: src/windows/main_window.vala:1075
+msgid "Search apps..."
+msgstr "Sök appar..."
+
+#: src/windows/main_window.vala:1083
+msgid "FUSE is not installed. Some AppImages may fail to run"
+msgstr "FUSE är inte installerat. Vissa AppImages kanske inte fungerar"
+
+#: src/windows/main_window.vala:1085
+msgid "Learn More"
+msgstr "Läs mer"
+
+#: src/windows/main_window.vala:1106
+msgid "Shift+click to launch app"
+msgstr "Skift+klick för att starta app"
+
+#: src/windows/main_window.vala:1118
+msgid "Sort apps"
+msgstr ""
+
+#: src/windows/main_window.vala:1147
+msgid "Switch to grid view"
+msgstr "Växla till rutnätsvy"
+
+#: src/windows/main_window.vala:1150
+msgid "Switch to list view"
+msgstr "Växla till listvy"
+
+#: src/windows/main_window.vala:1156
+msgid "Default"
+msgstr ""
+
+#: src/windows/main_window.vala:1159
+msgid "Name (A-Z)"
+msgstr ""
+
+#: src/windows/main_window.vala:1160
+msgid "Name (Z-A)"
+msgstr ""
+
+#: src/windows/main_window.vala:1164
+msgid "Size (smallest first)"
+msgstr ""
+
+#: src/windows/main_window.vala:1165
+msgid "Size (largest first)"
+msgstr ""
+
+#: src/windows/main_window.vala:1340 src/windows/main_window.vala:1411
+msgid "Updates already running"
+msgstr "Uppdateringar körs redan"
+
+#: src/windows/main_window.vala:1388
+msgid "Cancel update"
+msgstr "Avbryt uppdatering"
+
+#: src/windows/main_window.vala:1419
+msgid "Cancelling..."
+msgstr "Avbryter..."
+
+#: src/windows/main_window.vala:1445
+msgid "Update check cancelled"
+msgstr "Uppdateringskontroll avbruten"
+
+#: src/windows/main_window.vala:1475
+#, c-format
+msgid "%d app(s) have updates"
+msgstr "%d app(ar) har uppdateringar"
+
+#: src/windows/main_window.vala:1478
+msgid "No updates available right now"
+msgstr "Inga uppdateringar tillgängliga just nu"
+
+#: src/windows/main_window.vala:1485
+msgid "Nothing queued for updating"
+msgstr "Inget köat för uppdatering"
+
+#: src/windows/main_window.vala:1512
+msgid "Update cancelled"
+msgstr "Uppdatering avbruten"
+
+#: src/windows/main_window.vala:1577 src/windows/main_window.vala:1597
+msgid "Update failed"
+msgstr "Uppdatering tillgänglig"
+
+#: src/windows/main_window.vala:1650
+msgid "Checking updates"
+msgstr "Söker efter uppdateringar"
+
+#: src/windows/main_window.vala:1653
+msgid "Update Apps"
+msgstr "Uppdatera appar"
+
+#: src/windows/main_window.vala:1656
+msgid "Updating apps"
+msgstr "Uppdaterar appar"
+
+#: src/windows/main_window.vala:1659
+msgid "Check updates"
+msgstr "Sök uppdateringar"
+
+#: src/windows/main_window.vala:1683
+msgid "No installed apps to update"
+msgstr "Inga installerade appar att uppdatera"
+
+#: src/windows/main_window.vala:1723
+#, c-format
+msgid "Updated %d app(s)"
+msgstr "Uppdaterade %d app(ar)"
+
+#: src/windows/main_window.vala:1726
+#, c-format
+msgid "%d update(s) failed"
+msgstr "%d uppdatering(ar) misslyckades"
+
+#: src/windows/main_window.vala:1734
+msgid "Add update addresses in Details to enable updates"
+msgstr ""
+"Lägg till uppdateringsadresser i Detaljer för att aktivera uppdateringar"
+
+#: src/windows/main_window.vala:1736
+msgid "All supported apps are already up to date"
+msgstr "Alla appar som stöds är redan uppdaterade"
+
+#: src/windows/main_window.vala:1740
+#, c-format
+msgid "%d app(s) use unsupported update links"
+msgstr "%d app(ar) använder uppdateringslänkar som inte stöds"
+
+#: src/windows/main_window.vala:1835
+#, c-format
+msgid "Update available for %s"
+msgstr "Uppdatering tillgänglig för %s"
+
+#: src/windows/main_window.vala:1881
+msgid "General"
+msgstr "Allmänt"
+
+#: src/windows/main_window.vala:1885
+msgid "Navigation"
+msgstr "Navigering"
+
+#: src/windows/main_window.vala:1889
+msgid "Window"
+msgstr "Fönster"
+
+#: src/windows/main_window.vala:1891
+msgid "Check for updates"
+msgstr "Sök efter uppdateringar"
+
+#: src/windows/main_window.vala:1892
+msgid "Show main menu"
+msgstr "Visa huvudmeny"
+
+#: src/windows/main_window.vala:1894
+msgid "Show shortcuts"
+msgstr "Visa genvägar"
+
+#: src/windows/main_window.vala:1896
+msgid "Close window"
+msgstr "Stäng fönster"
+
+#: src/windows/main_window.vala:1897
+msgid "Quit AppManager"
+msgstr "Avsluta AppManager"
+
+#: src/windows/main_window.vala:1898
+msgid "Toggle fullscreen"
+msgstr "Växla helskärm"
+
+#: src/windows/main_window.vala:1915
+msgid "Credits"
+msgstr "Tack till"
+
+#: src/windows/main_window.vala:1999
+msgid "Select folder with AppImages"
+msgstr "Välj mapp med AppImages"
+
+#: src/windows/main_window.vala:2013
+msgid "Cannot import from this location"
+msgstr ""
+
+#: src/windows/main_window.vala:2014
+#, c-format
+msgid ""
+"This folder is inside the install folder (%s). Select a different folder to "
+"import from."
+msgstr ""
+
+#: src/windows/main_window.vala:2025
+msgid "Import AppImages"
+msgstr "Importera AppImages"
+
+#: src/windows/main_window.vala:2026
+#, c-format
+msgid "Install AppImages found in %s"
+msgstr "Installera AppImages som hittats i %s"
+
+#: src/windows/main_window.vala:2028
+msgid "Move AppImages"
+msgstr "Flytta AppImages"
+
+#: src/windows/main_window.vala:2035
+msgid "Import"
+msgstr "Importera"
+
+#: src/windows/main_window.vala:2065
+#, c-format
+msgid "Failed to read folder: %s"
+msgstr "Kunde inte läsa mapp: %s"
+
+#: src/windows/main_window.vala:2070
+msgid "No AppImage files found in folder"
+msgstr "Inga AppImage-filer hittades i mappen"
+
+#: src/windows/main_window.vala:2081
+msgid "Importing AppImages…"
+msgstr "Importerar AppImages…"
+
+#: src/windows/main_window.vala:2082
+#, c-format
+msgid "Installing %d AppImage(s)…"
+msgstr "Installerar %d AppImage(s)…"
+
+#: src/windows/main_window.vala:2095
+msgid "Starting…"
+msgstr "Startar…"
+
+#: src/windows/main_window.vala:2104
+msgid "Cancelling…"
+msgstr "Avbryter…"
+
+#: src/windows/main_window.vala:2121
+#, c-format
+msgid "%d of %d: %s"
+msgstr "%d av %d: %s"
+
+#: src/windows/main_window.vala:2180
+#, c-format
+msgid "Imported %d app(s)"
+msgstr "%d app(ar) importerade"
+
+#: src/windows/main_window.vala:2183
+#, fuzzy, c-format
+msgid "Skipped %d incompatible architecture app(s)"
+msgstr "%d redan installerad(e) app(ar) hoppades över"
+
+#: src/windows/main_window.vala:2186
+#, c-format
+msgid "%d app(s) failed to import"
+msgstr "%d app(ar) kunde inte importeras"
+
+#: src/windows/main_window.vala:2189
+#, c-format
+msgid "Cancelled — %d app(s) not imported"
+msgstr "Avbruten — %d app(ar) importerades inte"
+
+#: src/windows/preferences_window.vala:59
+msgid "Installation"
+msgstr "Installation"
+
+#: src/windows/preferences_window.vala:60
+msgid "Configure where AppImages are installed (default: ~/Applications)"
+msgstr "Konfigurera var AppImages installeras (standard: ~/Applications)"
+
+#: src/windows/preferences_window.vala:63
+msgid "Installation directory"
+msgstr "Installationskatalog"
+
+#: src/windows/preferences_window.vala:78
+msgid "Browse for folder"
+msgstr "Bläddra efter mapp"
+
+#: src/windows/preferences_window.vala:86
+msgid "Reset to default"
+msgstr "Återställ till standard"
+
+#: src/windows/preferences_window.vala:96
+msgid "Apply changes"
+msgstr "Tillämpa ändringar"
+
+#: src/windows/preferences_window.vala:107
+msgid "Skip drag-and-drop window"
+msgstr "Hoppa över dra-och-släpp-fönstret"
+
+#: src/windows/preferences_window.vala:108
+msgid "Show install dialog directly when opening AppImages"
+msgstr "Visa installationsdialogrutan direkt när du öppnar AppImages"
+
+#: src/windows/preferences_window.vala:112
+msgid "Portable .home by default"
+msgstr ""
+
+#: src/windows/preferences_window.vala:113
+msgid "Create a .home folder next to every newly installed AppImage"
+msgstr ""
+
+#: src/windows/preferences_window.vala:117
+msgid "Portable .config by default"
+msgstr ""
+
+#: src/windows/preferences_window.vala:118
+msgid "Create a .config folder next to every newly installed AppImage"
+msgstr ""
+
+#: src/windows/preferences_window.vala:122
+msgid "Keep file extension name"
+msgstr ""
+
+#: src/windows/preferences_window.vala:123
+msgid ""
+"Replace spaces with underscores in installed filenames and keep "
+"the .AppImage extension"
+msgstr ""
+
+#: src/windows/preferences_window.vala:135
+msgid "Automatic updates"
+msgstr "Automatiska uppdateringar"
+
+#: src/windows/preferences_window.vala:136
+msgid "Configure automatic update checking"
+msgstr "Konfigurera automatisk uppdateringskontroll"
+
+#: src/windows/preferences_window.vala:142
+msgid "Open update log"
+msgstr "Öppna uppdateringslogg"
+
+#: src/windows/preferences_window.vala:156
+msgid "Background update check"
+msgstr "Uppdateringskontroll i bakgrunden"
+
+#: src/windows/preferences_window.vala:157
+msgid "Will notify when new app updates are available"
+msgstr "Meddelar när nya appuppdateringar finns tillgängliga"
+
+#: src/windows/preferences_window.vala:168
+msgid "Auto update apps"
+msgstr "Uppdatera appar automatiskt"
+
+#: src/windows/preferences_window.vala:169
+msgid "Will update apps automatically in background"
+msgstr "Uppdaterar appar automatiskt i bakgrunden"
+
+#: src/windows/preferences_window.vala:175
+msgid "Check interval"
+msgstr "Kontrollintervall"
+
+#: src/windows/preferences_window.vala:177
+msgid "Daily"
+msgstr "Dagligen"
+
+#: src/windows/preferences_window.vala:178
+msgid "Weekly"
+msgstr "Veckovis"
+
+#: src/windows/preferences_window.vala:179
+msgid "Monthly"
+msgstr "Månadsvis"
+
+#: src/windows/preferences_window.vala:204
+msgid "Thumbnails"
+msgstr "Miniatyrer"
+
+#: src/windows/preferences_window.vala:207
+msgid "AppImage Thumbnailer"
+msgstr "AppImage-miniatyrgenerator"
+
+#: src/windows/preferences_window.vala:208
+msgid "Install appimage-thumbnailer to generate thumbnails for AppImages"
+msgstr ""
+"Installera appimage-thumbnailer för att generera miniatyrer för AppImages"
+
+#: src/windows/preferences_window.vala:217
+msgid "Hide Nautilus thumbnail background"
+msgstr "Dölj Nautilus miniatyrbakgrund"
+
+#: src/windows/preferences_window.vala:218
+msgid "Remove the alpha checkerboard behind thumbnails and icons"
+msgstr "Ta bort alfaschackbrädet bakom miniatyrer och ikoner"
+
+#: src/windows/preferences_window.vala:229
+msgid "GitHub"
+msgstr "GitHub"
+
+#: src/windows/preferences_window.vala:230
+msgid ""
+"Authenticate with GitHub to raise the API rate limit from 60 to 5,000 "
+"requests per hour"
+msgstr ""
+"Autentisera med GitHub för att höja API-hastighetsgränsen från 60 till 5 000 "
+"förfrågningar per timme"
+
+#: src/windows/preferences_window.vala:233
+msgid "Personal access token"
+msgstr "Personlig åtkomsttoken"
+
+#: src/windows/preferences_window.vala:244
+msgid "Apply token"
+msgstr "Använd token"
+
+#: src/windows/preferences_window.vala:247
+#: src/windows/preferences_window.vala:266
+msgid "GitHub token saved"
+msgstr "GitHub-token har sparats"
+
+#: src/windows/preferences_window.vala:253
+msgid "Clear token"
+msgstr "Rensa token"
+
+#: src/windows/preferences_window.vala:257
+msgid "GitHub token cleared"
+msgstr "GitHub-token rensades"
+
+#: src/windows/preferences_window.vala:273
+msgid "Test token"
+msgstr "Testtoken"
+
+#: src/windows/preferences_window.vala:274
+msgid "Verify your token works and check rate limit status"
+msgstr "Verifiera att din token fungerar och kontrollera hastighetsgränsstatus"
+
+#: src/windows/preferences_window.vala:278
+msgid "Test"
+msgstr "Testa"
+
+#: src/windows/preferences_window.vala:287
+msgid "Testing…"
+msgstr "Testning…"
+
+#: src/windows/preferences_window.vala:302
+msgid "Create a token on GitHub"
+msgstr "Skapa en token på GitHub"
+
+#: src/windows/preferences_window.vala:303
+msgid "Fine-grained token with read-only public repo access is sufficient"
+msgstr "Finkornig token med skrivskyddad offentlig repo-åtkomst räcker"
+
+#: src/windows/preferences_window.vala:360
+msgid "Select Installation Directory"
+msgstr "Välj Installationskatalog"
+
+#: src/windows/preferences_window.vala:427
+msgid "Invalid Path"
+msgstr "Ogiltig sökväg"
+
+#: src/windows/preferences_window.vala:437
+msgid "Installation directory updated"
+msgstr "Installationskatalogen uppdaterad"
+
+#: src/windows/preferences_window.vala:447
+msgid "Move Installed Apps?"
+msgstr "Flytta installerade appar?"
+
+#: src/windows/preferences_window.vala:448
+#, c-format
+msgid ""
+"This will move %d installed app(s) to the new location. This may take a "
+"while depending on the size of your apps."
+msgstr ""
+"Detta kommer att flytta %d installerade app(ar) till den nya platsen. Detta "
+"kan ta ett tag beroende på storleken på dina appar."
+
+#: src/windows/preferences_window.vala:451
+msgid "Move Apps"
+msgstr "Flytta appar"
+
+#: src/windows/preferences_window.vala:483
+msgid "Moving Apps…"
+msgstr "Flyttar appar..."
+
+#: src/windows/preferences_window.vala:483
+msgid "Please wait while your apps are being moved."
+msgstr "Vänta medan dina appar flyttas."
+
+#: src/windows/preferences_window.vala:520
+msgid "Apps moved successfully"
+msgstr "Appar har flyttats"
+
+#: src/windows/preferences_window.vala:522
+msgid "Migration Failed"
+msgstr "Migreringen misslyckades"
+
+#: src/windows/preferences_window.vala:522
+msgid "Unknown error occurred"
+msgstr "Okänt fel uppstod"
+
+#: src/windows/preferences_window.vala:540
+msgid "OK"
+msgstr "OK"
+
+#: src/windows/preferences_window.vala:580
+msgid "Authentication failed — token is invalid or expired"
+msgstr "Autentiseringen misslyckades – token är ogiltig eller har löpt ut"
+
+#: src/windows/preferences_window.vala:582
+msgid "Access forbidden — token lacks required permissions"
+msgstr "Åtkomst förbjuden – token saknar nödvändiga behörigheter"
+
+#: src/windows/preferences_window.vala:588
+#, c-format
+msgid "Token is valid — %s / %s requests remaining"
+msgstr "Token är giltig — %s / %s förfrågningar kvar"
+
+#: src/windows/preferences_window.vala:590
+msgid "Token is valid"
+msgstr "Token är giltig"
+
+#: src/windows/preferences_window.vala:593
+#, c-format
+msgid "Unexpected response (%u)"
+msgstr "Oväntat svar (%u)"
+
+#: src/windows/preferences_window.vala:596
+#, c-format
+msgid "Connection error: %s"
+msgstr "Anslutningsfel: %s"
+
+#. (itstool) path: component/id
+#: data/com.github.AppManager.metainfo.xml:3
+msgid "com.github.AppManager"
+msgstr ""
+
+#. (itstool) path: developer/name
+#. (itstool) path: component/developer_name
+#: data/com.github.AppManager.metainfo.xml:6
+#: data/com.github.AppManager.metainfo.xml:8
+msgid "Arnis Kemlers"
+msgstr "Arnis Kemlers"
+
+#. (itstool) path: component/summary
+#: data/com.github.AppManager.metainfo.xml:9
+msgid "Drag-and-drop AppImage installer and management application"
+msgstr "Dra och släpp AppImage-installationsprogram för GNOME"
+
+#. (itstool) path: component/metadata_license
+#: data/com.github.AppManager.metainfo.xml:10
+msgid "CC0-1.0"
+msgstr ""
+
+#. (itstool) path: component/project_license
+#: data/com.github.AppManager.metainfo.xml:11
+msgid "GPL-3.0-or-later"
+msgstr ""
+
+#. (itstool) path: custom/value
+#: data/com.github.AppManager.metainfo.xml:15
+msgid "© 2026 Arnis Kemlers"
+msgstr ""
+
+#. (itstool) path: bundle/name
+#: data/com.github.AppManager.metainfo.xml:20
+msgid "squashfs-tools (unsquashfs)"
+msgstr ""
+
+#. (itstool) path: bundle/copyright
+#: data/com.github.AppManager.metainfo.xml:21
+msgid "© Phillip Lougher"
+msgstr ""
+
+#. (itstool) path: bundle/license
+#: data/com.github.AppManager.metainfo.xml:22
+msgid "GPL-2.0-or-later"
+msgstr ""
+
+#. (itstool) path: bundle/name
+#: data/com.github.AppManager.metainfo.xml:25
+msgid "DwarFS"
+msgstr ""
+
+#. (itstool) path: bundle/copyright
+#: data/com.github.AppManager.metainfo.xml:26
+msgid "© Marcus Holland-Moritz"
+msgstr ""
+
+#. (itstool) path: bundle/license
+#: data/com.github.AppManager.metainfo.xml:27
+msgid "GPL-3.0"
+msgstr ""
+
+#. (itstool) path: bundle/name
+#: data/com.github.AppManager.metainfo.xml:30
+msgid "zsync2"
+msgstr ""
+
+#. (itstool) path: bundle/copyright
+#: data/com.github.AppManager.metainfo.xml:31
+msgid "© AppImageCommunity, © Colin Phipps"
+msgstr ""
+
+#. (itstool) path: bundle/license
+#: data/com.github.AppManager.metainfo.xml:32
+msgid "Artistic-2.0"
+msgstr ""
+
+#. (itstool) path: description/p
+#: data/com.github.AppManager.metainfo.xml:35
+msgid ""
+"AppManager lets you install or uninstall AppImages with a familiar drag-and-"
+"drop workflow inspired by macOS. It handles desktop integration, icon "
+"extraction, executable bits, and app updates."
+msgstr ""
+"AppManager låter dig installera eller avinstallera AppImages med ett "
+"välbekant dra-och-släpp-arbetsflöde inspirerat av macOS. Den hanterar "
+"skrivbordsintegration, ikonextraktion, körbara bitar och Nautilus-"
+"kontextmenyer."
+
+#. (itstool) path: component/launchable
+#: data/com.github.AppManager.metainfo.xml:37
+msgid "com.github.AppManager.desktop"
+msgstr ""
+
+#. (itstool) path: component/url
+#: data/com.github.AppManager.metainfo.xml:38
+msgid "https://github.com/kem-a/AppManager"
+msgstr ""
+
+#. (itstool) path: component/url
+#: data/com.github.AppManager.metainfo.xml:39
+msgid "https://github.com/kem-a/AppManager/issues"
+msgstr ""
+
+#. (itstool) path: component/url
+#: data/com.github.AppManager.metainfo.xml:40
+msgid "https://github.com/kem-a/AppManager/graphs/contributors"
+msgstr ""
+
+#. (itstool) path: provides/binary
+#: data/com.github.AppManager.metainfo.xml:42
+msgid "app-manager"
+msgstr ""
+
+#, c-format
+#~ msgid "Update %s?"
+#~ msgstr "Uppdatera %s?"
+
+#~ msgid "Version unknown"
+#~ msgstr "Version okänd"
+
+#, c-format
+#~ msgid "Will update to version %s"
+#~ msgstr "Kommer att uppdatera till version %s"
+
+#~ msgid "Update info"
+#~ msgstr "Uppdateringsinformation"
+
+#~ msgid "How update links work"
+#~ msgstr "Hur uppdateringslänkar fungerar"
+
+#~ msgid "Advanced"
+#~ msgstr "Avancerat"
+
+#~ msgid "Got it"
+#~ msgstr "Förstått"
+
+#~ msgid "Launch Application"
+#~ msgstr "Extrahera applikation?"

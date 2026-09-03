@@ -1,0 +1,1535 @@
+using AppManager.Core;
+using AppManager.Utils;
+using Gee;
+
+namespace AppManager {
+    public class DetailsWindow : Adw.NavigationPage {
+        private InstallationRecord record;
+        private InstallationRegistry registry;
+        private Installer installer;
+        private bool update_available;
+        private bool update_loading = false;
+        private bool update_updating = false;  // true when actually updating (vs just checking)
+        private string? update_failure_message = null;  // non-null when last update failed
+        private Gtk.Button? update_button;
+        private Gtk.Spinner? update_spinner;
+        private Gtk.Button? extract_button;
+        private Adw.Banner? path_banner;
+        private Adw.SwitchRow? path_row;
+        private Gtk.Button? delete_button;
+        private bool shift_held = false;
+        
+        // Shared state for build_ui sub-methods
+        private string exec_path;
+        private HashTable<string, string> desktop_props;
+        private Gtk.Widget? header_icon = null;
+        
+        public signal void uninstall_requested(InstallationRecord record, bool permanently, bool preserve_portable);
+        public signal void update_requested(InstallationRecord record);
+        public signal void check_update_requested(InstallationRecord record);
+        public signal void extract_requested(InstallationRecord record);
+
+        public DetailsWindow(InstallationRecord record, InstallationRegistry registry, Installer installer, bool update_available = false) {
+            Object(title: record.name, tag: record.id);
+            this.record = record;
+            this.registry = registry;
+            this.installer = installer;
+            this.update_available = update_available;
+            this.can_pop = true;
+            
+            build_ui();
+            setup_shift_key_controller();
+        }
+
+        public bool matches_record(InstallationRecord other) {
+            // Compare by name (case-insensitive) since ID is checksum and changes after update
+            return record.name.down() == other.name.down();
+        }
+
+        public void set_update_available(bool available) {
+            update_available = available;
+            refresh_update_button();
+        }
+
+        public void set_update_loading(bool loading) {
+            update_loading = loading;
+            refresh_update_button();
+        }
+
+        public void set_update_updating(bool updating) {
+            update_updating = updating;
+            refresh_update_button();
+        }
+
+        public void set_update_failed(string? message) {
+            update_failure_message = message;
+            refresh_update_button();
+        }
+
+        public void refresh_with_record(InstallationRecord updated_record) {
+            this.record = updated_record;
+            // Rebuild the entire UI with fresh data
+            this.child = null;
+            build_ui();
+        }
+
+        private void persist_record_and_refresh_desktop() {
+            registry.update(record);
+            installer.apply_record_customizations_to_desktop(record);
+        }
+
+        private void build_ui() {
+            // Initialize shared state
+            desktop_props = load_desktop_file_properties(record.desktop_file);
+            exec_path = installer.resolve_exec_path_for_record(record);
+            
+            var detail_page = new Adw.PreferencesPage();
+            
+            // Build UI sections
+            detail_page.add(build_header_group());
+            detail_page.add(build_cards_group());
+            
+            var props_group = build_properties_group();
+            // update_group will be handled inside build_app_updates_page()
+            var advanced_row = build_advanced_action_row();
+            // Portable .home/.config toggles only apply to portable (non-extracted) AppImages.
+            // They are never offered for AppManager itself: the AppImage runtime would
+            // redirect $HOME and AppManager would lose its own registry and settings
+            // (self-install loop, issue #140).
+            var is_self = record.original_startup_wm_class == Core.APPLICATION_ID;
+            if (record.mode == InstallMode.PORTABLE && !is_self) {
+                props_group.add(build_portable_home_row());
+                props_group.add(build_portable_config_row());
+            }
+            props_group.add(advanced_row);
+            
+            detail_page.add(props_group);
+            
+            var update_group_replacement = new Adw.PreferencesGroup();
+            update_group_replacement.add(build_update_info_action_row());
+            detail_page.add(update_group_replacement);
+            detail_page.add(build_actions_group());
+            
+            // Assemble final layout
+            var toolbar = new Adw.ToolbarView();
+            var header = new Adw.HeaderBar();
+            toolbar.add_top_bar(header);
+
+            var content_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+
+            path_banner = new Adw.Banner(_("⚠️ '%s' is not in $PATH. App will not launch from the terminal").printf(AppPaths.local_bin_dir));
+            content_box.append(path_banner);
+            update_path_banner_visibility();
+
+            if (FuseSupport.record_cannot_mount(record)) {
+                var fuse_banner = new Adw.Banner(_("FUSE is missing, this app cannot run.") +
+                    " <a href=\"https://github.com/AppImage/AppImageKit/wiki/FUSE\">" + _("Learn more") + "</a>");
+                fuse_banner.use_markup = true;
+                fuse_banner.add_css_class("warning");
+                fuse_banner.revealed = true;
+                content_box.append(fuse_banner);
+            }
+
+            content_box.append(detail_page);
+            toolbar.set_content(content_box);
+            this.child = toolbar;
+        }
+
+        private Adw.PreferencesGroup build_header_group() {
+            var header_group = new Adw.PreferencesGroup();
+            
+            var header_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 16);
+            header_box.set_halign(Gtk.Align.START);
+            header_box.add_css_class("details-header");
+            
+            // App icon on the left
+            header_icon = null;
+            if (record.icon_path != null && record.icon_path.strip() != "") {
+                var icon_image = UiUtils.load_app_icon(record.icon_path);
+                if (icon_image != null) {
+                    icon_image.set_pixel_size(128);
+                    header_icon = icon_image;
+                    icon_image.set_valign(Gtk.Align.START);
+                    header_box.append(icon_image);
+                }
+            }
+            
+            // Right side: name, description, open button
+            var info_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 4);
+            info_box.set_valign(Gtk.Align.FILL);
+            info_box.set_vexpand(true);
+            
+            // App name
+            var name_label = new Gtk.Label(record.name);
+            name_label.add_css_class("title-1");
+            name_label.set_wrap(true);
+            name_label.set_wrap_mode(Pango.WrapMode.WORD_CHAR);
+            name_label.set_xalign(0);
+            name_label.set_valign(Gtk.Align.START);
+            info_box.append(name_label);
+            
+            // App description: from record (metainfo/desktop), fallback to desktop Comment
+            var app_description = desktop_props.get("Comment");
+            if (app_description == null || app_description.strip() == "") {
+                app_description = record.description;
+            }
+            if (app_description != null) {
+                var desc_label = new Gtk.Label(app_description);
+                desc_label.add_css_class("dimmed");
+                desc_label.set_xalign(0);
+                desc_label.set_ellipsize(Pango.EllipsizeMode.END);
+                desc_label.set_max_width_chars(40);
+                desc_label.set_lines(2);
+                desc_label.set_single_line_mode(false);
+                desc_label.set_valign(Gtk.Align.START);
+                info_box.append(desc_label);
+            }
+
+            // Spacer to push open button to bottom
+            var spacer = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            spacer.set_vexpand(true);
+            info_box.append(spacer);
+            
+            // Open button with launch spinner
+            var open_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 8);
+            open_box.set_halign(Gtk.Align.START);
+            open_box.set_valign(Gtk.Align.END);
+
+            var open_button = new Gtk.Button.with_label(_("Open"));
+            open_button.add_css_class("pill");
+            open_button.add_css_class("suggested-action");
+            open_button.add_css_class("open-button");
+            open_button.sensitive = !FuseSupport.record_cannot_mount(record);
+
+            var launch_spinner = new Gtk.Spinner();
+            launch_spinner.set_visible(false);
+
+            open_button.clicked.connect(() => {
+                try {
+                    var app_info = new DesktopAppInfo.from_filename(record.desktop_file);
+                    if (app_info != null) {
+                        app_info.launch(null, null);
+
+                        // Show spinner for 3 seconds as launch feedback
+                        launch_spinner.set_visible(true);
+                        launch_spinner.start();
+                        open_button.sensitive = false;
+                        Timeout.add(3000, () => {
+                            launch_spinner.stop();
+                            launch_spinner.set_visible(false);
+                            open_button.sensitive = true;
+                            return Source.REMOVE;
+                        });
+                    }
+                } catch (Error e) {
+                    warning("Failed to launch %s: %s", record.name, e.message);
+                }
+            });
+
+            open_box.append(open_button);
+            open_box.append(launch_spinner);
+            info_box.append(open_box);
+            
+            header_box.append(info_box);
+            
+            var header_row = new Adw.PreferencesRow();
+            header_row.set_activatable(false);
+            header_row.set_child(header_box);
+            header_group.add(header_row);
+            
+            return header_group;
+        }
+
+        private Adw.PreferencesGroup build_cards_group() {
+            var cards_group = new Adw.PreferencesGroup();
+            
+            var cards_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 8);
+            cards_box.set_halign(Gtk.Align.CENTER);
+            
+            // Install mode card
+            var mode_button = new Gtk.Button();
+            mode_button.add_css_class("card");
+            if (record.mode == InstallMode.EXTRACTED) {
+                mode_button.add_css_class("accent");
+            }
+            mode_button.set_valign(Gtk.Align.CENTER);
+            mode_button.set_tooltip_text(_("Show in Files"));
+
+            var mode_label = new Gtk.Label(record.mode == InstallMode.PORTABLE ? _("Portable") : _("Extracted"));
+            mode_label.add_css_class("caption");
+            mode_label.set_margin_start(8);
+            mode_label.set_margin_end(8);
+            mode_label.set_margin_top(6);
+            mode_label.set_margin_bottom(6);
+            mode_button.set_child(mode_label);
+
+            mode_button.clicked.connect(() => {
+                var parent_window = this.get_root() as Gtk.Window;
+                var target_path = determine_reveal_path();
+                UiUtils.open_folder(target_path, parent_window);
+            });
+            cards_box.append(mode_button);
+            
+            // Version card (only show if version is known)
+            if (record.version != null && record.version.strip() != "") {
+                var version_text = record.version.strip();
+                var version_card = create_info_card(version_text.get_char(0).isdigit() ? "v%s".printf(version_text) : version_text);
+                version_card.set_tooltip_text(_("App version"));
+                cards_box.append(version_card);
+            }
+            
+            // Size on disk card
+            var size = calculate_installation_size(record);
+            var size_card = create_info_card(UiUtils.format_size(size));
+            cards_box.append(size_card);
+            
+            // Terminal app card (only show if is_terminal)
+            if (record.is_terminal) {
+                var terminal_card = create_info_card(_("Terminal"));
+                terminal_card.add_css_class("terminal");
+                cards_box.append(terminal_card);
+            }
+            
+            // Zsync delta updates badge (only show if app supports zsync)
+            if (record.zsync_update_info != null && record.zsync_update_info.strip() != "") {
+                var zsync_card = create_info_card("Zsync");
+                zsync_card.set_tooltip_text(_("This app supports efficient delta updates"));
+                cards_box.append(zsync_card);
+            }
+            
+            // Hidden from app drawer card (only show if NoDisplay=true)
+            var nodisplay_value = desktop_props.get("NoDisplay") ?? "false";
+            if (nodisplay_value.down() == "true") {
+                var hidden_card = create_info_card(_("Hidden"));
+                cards_box.append(hidden_card);
+            }
+
+            // Web page badge - clickable, shown only when a URL is set
+            var web_url = record.get_effective_web_page() ?? "";
+            if (web_url.strip() != "") {
+                var web_badge = new Gtk.Button();
+                web_badge.add_css_class("card");
+                web_badge.set_valign(Gtk.Align.CENTER);
+                web_badge.set_tooltip_text(web_url.strip());
+                var web_label = new Gtk.Label(_("Web"));
+                web_label.add_css_class("caption");
+                web_label.set_margin_start(8);
+                web_label.set_margin_end(8);
+                web_label.set_margin_top(6);
+                web_label.set_margin_bottom(6);
+                web_badge.set_child(web_label);
+                web_badge.clicked.connect(() => {
+                    UiUtils.open_url(web_url.strip());
+                });
+                cards_box.append(web_badge);
+            }
+
+            cards_group.add(cards_box);
+            return cards_group;
+        }
+
+        private Adw.PreferencesGroup build_properties_group() {
+            var props_group = new Adw.PreferencesGroup();
+            props_group.title = _("Properties");
+            
+            // Command line arguments
+            var current_args = record.get_effective_commandline_args() ?? "";
+            var exec_row = new Adw.EntryRow();
+            exec_row.title = _("Command line arguments");
+            exec_row.text = current_args;
+            
+            var restore_exec_button = create_restore_button(record.custom_commandline_args != null);
+            restore_exec_button.clicked.connect(() => {
+                record.custom_commandline_args = null;
+                exec_row.text = record.original_commandline_args ?? "";
+                persist_record_and_refresh_desktop();
+                restore_exec_button.set_visible(false);
+            });
+            exec_row.add_suffix(restore_exec_button);
+            
+            // Update the record on each keystroke (in-memory, cheap), but defer the .desktop
+            // file write to focus-leave / Enter so it isn't rewritten letter-by-letter. The
+            // flush reads only the record, so it is safe even during window teardown.
+            exec_row.changed.connect(() => {
+                var new_val = exec_row.text.strip();
+                var original_val = record.original_commandline_args ?? "";
+                if (new_val == original_val) {
+                    record.custom_commandline_args = null;
+                } else if (new_val == "") {
+                    record.custom_commandline_args = CLEARED_VALUE;
+                } else {
+                    record.custom_commandline_args = new_val;
+                }
+                restore_exec_button.set_visible(record.custom_commandline_args != null);
+            });
+            var exec_focus = new Gtk.EventControllerFocus();
+            exec_focus.leave.connect(() => { persist_record_and_refresh_desktop(); });
+            exec_row.add_controller(exec_focus);
+            exec_row.entry_activated.connect(() => { persist_record_and_refresh_desktop(); });
+            props_group.add(exec_row);
+            
+            return props_group;
+        }
+
+        private Adw.ActionRow build_update_info_action_row() {
+            var row = new Adw.ActionRow();
+            row.title = _("App Updates");
+            row.subtitle = _("Edit app update details");
+            
+            var status_label = new Gtk.Label(record.updates_enabled ? _("On") : _("Off"));
+            status_label.add_css_class("dim-label");
+            row.add_suffix(status_label);
+            
+            var icon = new Gtk.Image.from_icon_name("go-next-symbolic");
+            row.add_suffix(icon);
+            row.activatable = true;
+            row.activated.connect(() => {
+                var page = build_app_updates_page(row, status_label);
+                var main_win = (MainWindow) this.get_root();
+                main_win.push_page(page);
+            });
+            return row;
+        }
+
+        private Adw.NavigationPage build_app_updates_page(Adw.ActionRow parent_row, Gtk.Label status_label) {
+            var prefs_page = new Adw.PreferencesPage();
+
+            // Description group - aligned with rows via PreferencesGroup title + description
+            var body_text = _("Update info lets AppManager fetch new builds for you. Paste the download link and AppManager will do the rest.");
+            body_text += "\n\n" + _("Currently GitHub and GitLab URL formats are fully supported. Direct download links also work if the server provides Last-Modified or Content-Length headers.");
+            var info_group = new Adw.PreferencesGroup();
+            info_group.title = _("Update links");
+            info_group.description = body_text;
+            prefs_page.add(info_group);
+
+            // Enable / disable updates toggle
+            var toggle_group = new Adw.PreferencesGroup();
+            var enable_updates_row = new Adw.SwitchRow();
+            enable_updates_row.title = _("Enable app updates");
+            enable_updates_row.active = record.updates_enabled;
+            toggle_group.add(enable_updates_row);
+            prefs_page.add(toggle_group);
+
+            // Update link / web page rows
+            var update_group = build_update_info_group();
+            prefs_page.add(update_group);
+
+            // Sync logic
+            update_group.sensitive = record.updates_enabled;
+            enable_updates_row.notify["active"].connect(() => {
+                record.updates_enabled = enable_updates_row.active;
+                update_group.sensitive = enable_updates_row.active;
+                registry.update(record);
+                status_label.set_label(record.updates_enabled ? _("On") : _("Off"));
+            });
+
+            var toolbar = new Adw.ToolbarView();
+            toolbar.add_top_bar(new Adw.HeaderBar());
+            toolbar.set_content(prefs_page);
+
+            return new Adw.NavigationPage(toolbar, _("App Updates"));
+        }
+        private Adw.PreferencesGroup build_update_info_group() {
+            var update_group = new Adw.PreferencesGroup();
+            update_group.title = _("Update details");
+            
+            var has_zsync = record.zsync_update_info != null && record.zsync_update_info.strip() != "";
+            // gh-releases-zsync resolves through the GitHub releases API, so it can
+            // honor the pre-release channel. A direct zsync URL points at a single
+            // fixed file and has no channel to switch.
+            var is_gh_releases_zsync = has_zsync && record.zsync_update_info.has_prefix("gh-releases-zsync|");
+
+            // Pre-release toggle row (created early so update_row can reference it)
+            var prerelease_row = new Adw.SwitchRow();
+            prerelease_row.title = _("Pre-release Updates");
+            prerelease_row.subtitle = _("Include pre-release versions when checking for updates");
+            prerelease_row.active = record.prerelease_enabled;
+            prerelease_row.notify["active"].connect(() => {
+                record.prerelease_enabled = prerelease_row.active;
+                registry.update(record);
+            });
+            if (has_zsync) {
+                // zsync link is read-only, so visibility is fixed for the lifetime of the row
+                prerelease_row.visible = is_gh_releases_zsync;
+            } else {
+                // Initial visibility based on current URL
+                var initial_url = record.get_effective_update_link() ?? "";
+                prerelease_row.visible = initial_url.down().contains("github.com");
+            }
+
+            // Update link row. For zsync the link is read-only and its visibility must
+            // not track typing, so don't hand the toggle to the URL-sync handler.
+            var update_row = build_update_link_row(has_zsync ? null : prerelease_row);
+            if (has_zsync) {
+                update_row.sensitive = false;
+                update_row.tooltip_text = _("Update link is managed by the embedded zsync update mechanism");
+            }
+            update_group.add(update_row);
+
+            // Web page row
+            var webpage_row = build_webpage_row();
+            update_group.add(webpage_row);
+
+            // Add pre-release row after web page
+            update_group.add(prerelease_row);
+            
+            return update_group;
+        }
+
+        /**
+         * Syncs pre-release row visibility with the current URL text.
+         * If URL is not GitHub, turns off the toggle and hides the row.
+         */
+        private void sync_prerelease_visibility(Adw.SwitchRow? prerelease_row, string url) {
+            if (prerelease_row == null) return;
+            var is_github = url.down().contains("github.com");
+            if (is_github) {
+                prerelease_row.visible = true;
+            } else {
+                // Turn off and hide when not GitHub
+                if (prerelease_row.active) {
+                    prerelease_row.active = false;
+                }
+                prerelease_row.visible = false;
+            }
+        }
+
+        private Adw.EntryRow build_update_link_row(Adw.SwitchRow? prerelease_row) {
+            var update_row = new Adw.EntryRow();
+            update_row.title = _("Update Link");
+            update_row.text = record.get_effective_update_link() ?? "";
+            
+            var restore_update_button = create_restore_button(record.custom_update_link != null);
+            restore_update_button.clicked.connect(() => {
+                record.custom_update_link = null;
+                update_row.text = record.original_update_link ?? "";
+                persist_record_and_refresh_desktop();
+                restore_update_button.set_visible(false);
+                sync_prerelease_visibility(prerelease_row, update_row.text);
+            });
+            update_row.add_suffix(restore_update_button);
+            
+            // React to text changes in real-time for pre-release visibility
+            update_row.changed.connect(() => {
+                sync_prerelease_visibility(prerelease_row, update_row.text);
+            });
+            
+            // Normalize URL when user leaves the entry or presses Enter
+            var focus_controller = new Gtk.EventControllerFocus();
+            focus_controller.leave.connect(() => {
+                apply_update_link_value(update_row, restore_update_button);
+            });
+            update_row.add_controller(focus_controller);
+            
+            update_row.entry_activated.connect(() => {
+                apply_update_link_value(update_row, restore_update_button);
+            });
+            
+            return update_row;
+        }
+
+        private void apply_update_link_value(Adw.EntryRow row, Gtk.Button restore_button) {
+            if (row.text == null) return;
+            var raw_val = row.text.strip();
+            var normalized = Updater.normalize_update_url(raw_val);
+            var new_val = normalized ?? raw_val;
+            
+            if (new_val != raw_val && new_val != "") {
+                row.text = new_val;
+            }
+            
+            var original_val = record.original_update_link ?? "";
+            if (new_val == original_val) {
+                record.custom_update_link = null;
+            } else if (new_val == "") {
+                record.custom_update_link = CLEARED_VALUE;
+            } else {
+                record.custom_update_link = new_val;
+            }
+            persist_record_and_refresh_desktop();
+            restore_button.set_visible(record.custom_update_link != null);
+        }
+
+        private Adw.EntryRow build_webpage_row() {
+            var webpage_row = new Adw.EntryRow();
+            webpage_row.title = _("Web Page");
+            webpage_row.text = record.get_effective_web_page() ?? "";
+            
+            var restore_webpage_button = create_restore_button(record.custom_web_page != null);
+            restore_webpage_button.clicked.connect(() => {
+                record.custom_web_page = null;
+                webpage_row.text = record.original_web_page ?? "";
+                persist_record_and_refresh_desktop();
+                restore_webpage_button.set_visible(false);
+            });
+            webpage_row.add_suffix(restore_webpage_button);
+            
+            // Update the record on each keystroke (in-memory), defer the .desktop file write to
+            // focus-leave / Enter. The flush reads only the record, so it is safe during teardown.
+            webpage_row.changed.connect(() => {
+                var new_val = webpage_row.text.strip();
+                var original_val = record.original_web_page ?? "";
+                if (new_val == original_val) {
+                    record.custom_web_page = null;
+                } else if (new_val == "") {
+                    record.custom_web_page = CLEARED_VALUE;
+                } else {
+                    record.custom_web_page = new_val;
+                }
+                restore_webpage_button.set_visible(record.custom_web_page != null);
+            });
+            var webpage_focus = new Gtk.EventControllerFocus();
+            webpage_focus.leave.connect(() => { persist_record_and_refresh_desktop(); });
+            webpage_row.add_controller(webpage_focus);
+            webpage_row.entry_activated.connect(() => { persist_record_and_refresh_desktop(); });
+            
+            var open_web_button = new Gtk.Button.from_icon_name("external-link-symbolic");
+            open_web_button.add_css_class("flat");
+            open_web_button.set_valign(Gtk.Align.CENTER);
+            open_web_button.tooltip_text = _("Open web page");
+            open_web_button.set_visible(webpage_row.text.strip().length > 0);
+            open_web_button.clicked.connect(() => {
+                var url = webpage_row.text.strip();
+                if (url.length > 0) {
+                    UiUtils.open_url(url);
+                }
+            });
+            webpage_row.changed.connect(() => {
+                open_web_button.set_visible(webpage_row.text.strip().length > 0);
+            });
+            webpage_row.add_suffix(open_web_button);
+            
+            return webpage_row;
+        }        private Adw.ActionRow build_advanced_action_row() {
+            var row = new Adw.ActionRow();
+            row.title = _("Advanced Settings");
+            row.subtitle = _("Change app icon, Startup WM Class, Keywords, $PATH or environment variables");
+            var icon = new Gtk.Image.from_icon_name("go-next-symbolic");
+            row.add_suffix(icon);
+            row.activatable = true;
+            row.activated.connect(() => {
+                var page = build_advanced_settings_page();
+                var main_win = (MainWindow) this.get_root();
+                main_win.push_page(page);
+            });
+            return row;
+        }
+
+        private Adw.NavigationPage build_advanced_settings_page() {
+            var prefs_page = new Adw.PreferencesPage();
+            
+            var advanced_group = new Adw.PreferencesGroup();
+            advanced_group.title = _("App Settings");
+            advanced_group.add(build_name_row());
+            advanced_group.add(build_keywords_row());
+            advanced_group.add(build_icon_row());
+            advanced_group.add(build_wmclass_row());
+            advanced_group.add(build_version_row());
+            advanced_group.add(build_nodisplay_row());
+            advanced_group.add(build_path_row());
+            
+            prefs_page.add(advanced_group);
+            prefs_page.add(build_env_vars_group());
+            
+            var toolbar = new Adw.ToolbarView();
+            toolbar.add_top_bar(new Adw.HeaderBar());
+            toolbar.set_content(prefs_page);
+
+            var nav_page = new Adw.NavigationPage(toolbar, _("Advanced Settings"));
+            nav_page.shown.connect(() => {
+                GLib.Idle.add(() => {
+                    var win = nav_page.get_root() as Gtk.Window;
+                    if (win != null) win.set_focus(null);
+                    return GLib.Source.REMOVE;
+                });
+            });
+            return nav_page;
+        }
+
+        private Adw.SwitchRow build_portable_home_row() {
+            return build_portable_folder_row(
+                _("Portable .home folder"),
+                _("Store the app's home directory in a .home folder next to the AppImage"),
+                _(".home"),
+                () => Installer.has_portable_home(record),
+                () => installer.create_portable_home(record),
+                () => installer.remove_portable_home(record, false)
+            );
+        }
+
+        private Adw.SwitchRow build_portable_config_row() {
+            return build_portable_folder_row(
+                _("Portable .config folder"),
+                _("Store the app's config in a .config folder next to the AppImage"),
+                _(".config"),
+                () => Installer.has_portable_config(record),
+                () => installer.create_portable_config(record),
+                () => installer.remove_portable_config(record, false)
+            );
+        }
+
+        private delegate bool PortableHasFunc();
+        private delegate void PortableCreateFunc();
+        private delegate void PortableRemoveFunc();
+
+        private Adw.SwitchRow build_portable_folder_row(
+            string title,
+            string subtitle,
+            string folder_label,
+            PortableHasFunc has_folder,
+            PortableCreateFunc create_folder,
+            PortableRemoveFunc remove_folder
+        ) {
+            var row = new Adw.SwitchRow();
+            row.title = title;
+            row.subtitle = subtitle;
+            row.active = has_folder();
+
+            row.notify["active"].connect(() => {
+                if (row.active) {
+                    if (!has_folder()) {
+                        create_folder();
+                    }
+                } else {
+                    if (has_folder()) {
+                        present_portable_folder_disable_confirm(row, folder_label, has_folder, remove_folder);
+                    }
+                }
+            });
+
+            return row;
+        }
+
+        private void present_portable_folder_disable_confirm(Adw.SwitchRow row, string folder_label, PortableHasFunc has_folder, PortableRemoveFunc remove_folder) {
+            var dialog = new Adw.AlertDialog(
+                _("Remove portable %s folder?").printf(folder_label),
+                _("The %s folder next to this AppImage will be permanently removed, including any data it contains.").printf(folder_label)
+            );
+            dialog.add_response("cancel", _("Cancel"));
+            dialog.add_response("remove", _("Remove Data"));
+            dialog.set_response_appearance("remove", Adw.ResponseAppearance.DESTRUCTIVE);
+            dialog.set_close_response("cancel");
+            dialog.set_default_response("cancel");
+            dialog.response.connect((response) => {
+                if (response == "remove") {
+                    remove_folder();
+                } else {
+                    row.active = has_folder();
+                }
+            });
+            dialog.present(this);
+        }
+
+        private const int MAX_ENV_VARS = 5;
+
+        private Adw.PreferencesGroup build_env_vars_group() {
+            var env_expander = new Adw.PreferencesGroup();
+            env_expander.title = _("Environment Variables");
+            env_expander.description = _("Set custom environment variables for this app");
+
+            // Load existing env vars
+            var env_vars = record.custom_env_vars ?? new string[0];
+
+            // Track all env var rows for management
+            var env_rows = new Gee.ArrayList<Gtk.Widget>();
+
+            // Rebuild the record's env vars from current rows (in-memory only, no disk write).
+            // Called on each keystroke while rows are alive; the .desktop write is deferred to
+            // focus-leave / Enter via flush_env_vars(), which reads only the record.
+            void save_env_vars_from_rows() {
+                var new_env_vars = new Gee.ArrayList<string>();
+                foreach (var widget in env_rows) {
+                    if (widget is Adw.ActionRow) {
+                        var row = (Adw.ActionRow) widget;
+                        var box = row.get_child() as Gtk.Box;
+                        if (box != null) {
+                            string? name_val = null;
+                            string? value_val = null;
+                            var child = box.get_first_child();
+                            while (child != null) {
+                                if (child is Gtk.Entry) {
+                                    var entry = (Gtk.Entry) child;
+                                    // .text can be null during teardown; treat as empty.
+                                    var entry_text = entry.text ?? "";
+                                    if (name_val == null) {
+                                        name_val = entry_text.strip();
+                                    } else {
+                                        value_val = entry_text.strip();
+                                    }
+                                }
+                                child = child.get_next_sibling();
+                            }
+                            if (name_val != null && name_val != "") {
+                                var env_str = "%s=%s".printf(name_val, value_val ?? "");
+                                new_env_vars.add(env_str);
+                            }
+                        }
+                    }
+                }
+                record.custom_env_vars = new_env_vars.size > 0 ? new_env_vars.to_array() : null;
+            }
+
+            // Flush the current record to disk. Reads only the record (never the row widgets),
+            // so it is safe to call from focus-leave even during window teardown.
+            void flush_env_vars() {
+                persist_record_and_refresh_desktop();
+            }
+
+            // Create a row for a single env var
+            Adw.ActionRow create_env_var_row(string? initial_name, string? initial_value, Gtk.Button add_button) {
+                var row = new Adw.ActionRow();
+                
+                var content_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 6);
+                content_box.set_margin_top(8);
+                content_box.set_margin_bottom(8);
+                content_box.set_margin_start(12);
+                content_box.set_margin_end(12);
+                content_box.set_hexpand(true);
+                
+                var name_entry = new Gtk.Entry();
+                name_entry.set_placeholder_text(_("NAME"));
+                name_entry.set_hexpand(true);
+                name_entry.set_max_length(64);
+                name_entry.text = initial_name ?? "";
+                name_entry.changed.connect(() => { save_env_vars_from_rows(); });
+                var name_focus = new Gtk.EventControllerFocus();
+                name_focus.leave.connect(() => { flush_env_vars(); });
+                name_entry.add_controller(name_focus);
+                name_entry.activate.connect(() => { flush_env_vars(); });
+                content_box.append(name_entry);
+                
+                var equals_label = new Gtk.Label("=");
+                equals_label.add_css_class("dim-label");
+                content_box.append(equals_label);
+                
+                var value_entry = new Gtk.Entry();
+                value_entry.set_placeholder_text(_("value"));
+                value_entry.set_hexpand(true);
+                value_entry.set_max_length(256);
+                value_entry.text = initial_value ?? "";
+                value_entry.changed.connect(() => { save_env_vars_from_rows(); });
+                var value_focus = new Gtk.EventControllerFocus();
+                value_focus.leave.connect(() => { flush_env_vars(); });
+                value_entry.add_controller(value_focus);
+                value_entry.activate.connect(() => { flush_env_vars(); });
+                content_box.append(value_entry);
+                
+                var delete_button = new Gtk.Button.from_icon_name("user-trash-symbolic");
+                delete_button.add_css_class("flat");
+                delete_button.set_valign(Gtk.Align.CENTER);
+                delete_button.tooltip_text = _("Remove variable");
+                delete_button.clicked.connect(() => {
+                    env_rows.remove(row);
+                    env_expander.remove(row);
+                    save_env_vars_from_rows();
+                    flush_env_vars();
+                    // Re-enable add button if under limit
+                    if (env_rows.size < MAX_ENV_VARS) {
+                        add_button.sensitive = true;
+                    }
+                });
+                content_box.append(delete_button);
+                
+                row.set_child(content_box);
+                row.set_activatable(false);
+                
+                return row;
+            }
+
+            // Add button row
+            var add_row = new Adw.ActionRow();
+            add_row.set_activatable(false);
+            
+            var add_button = new Gtk.Button.from_icon_name("list-add-symbolic");
+            add_button.add_css_class("flat");
+            add_button.set_halign(Gtk.Align.CENTER);
+            add_button.set_margin_top(8);
+            add_button.set_margin_bottom(8);
+            
+            // Populate existing env vars
+            foreach (var env_var in env_vars) {
+                if (env_var == null || env_var.strip() == "") continue;
+                var eq_pos = env_var.index_of_char('=');
+                string name_part = "";
+                string value_part = "";
+                if (eq_pos >= 0) {
+                    name_part = env_var.substring(0, eq_pos);
+                    value_part = env_var.substring(eq_pos + 1);
+                } else {
+                    name_part = env_var;
+                }
+                var row = create_env_var_row(name_part, value_part, add_button);
+                env_rows.add(row);
+                env_expander.add(row);
+            }
+
+            // Update add button sensitivity
+            add_button.sensitive = env_rows.size < MAX_ENV_VARS;
+            
+            add_button.clicked.connect(() => {
+                if (env_rows.size >= MAX_ENV_VARS) {
+                    return;
+                }
+                var row = create_env_var_row(null, null, add_button);
+                env_rows.add(row);
+                // Remove add_row, add new row, re-add add_row to keep button at bottom
+                env_expander.remove(add_row);
+                env_expander.add(row);
+                env_expander.add(add_row);
+                // Disable add button if at limit
+                if (env_rows.size >= MAX_ENV_VARS) {
+                    add_button.sensitive = false;
+                }
+            });
+            
+            var add_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 0);
+            add_box.set_halign(Gtk.Align.CENTER);
+            add_box.set_hexpand(true);
+            add_box.append(add_button);
+            add_row.set_child(add_box);
+            
+            env_expander.add(add_row);
+            
+            return env_expander;
+        }
+
+        /**
+         * Delegate types for customizable entry row fields.
+         */
+        private delegate string? GetEffectiveFunc();
+        private delegate string? GetOriginalFunc();
+        private delegate string? GetCustomFunc();
+        private delegate void SetCustomFunc(string? val);
+
+        /**
+         * Generic factory for entry rows with restore button and change tracking.
+         */
+        private Adw.EntryRow build_customizable_entry_row(
+            string title,
+            GetEffectiveFunc get_effective,
+            GetOriginalFunc get_original,
+            GetCustomFunc get_custom,
+            SetCustomFunc set_custom
+        ) {
+            var row = new Adw.EntryRow();
+            row.title = title;
+            row.text = get_effective() ?? "";
+            
+            var restore_button = create_restore_button(get_custom() != null);
+            restore_button.clicked.connect(() => {
+                set_custom(null);
+                row.text = get_original() ?? "";
+                persist_record_and_refresh_desktop();
+                restore_button.set_visible(false);
+            });
+            row.add_suffix(restore_button);
+            
+            // Update the record on each keystroke (in-memory), defer the .desktop file write to
+            // focus-leave / Enter. The flush reads only the record, so it is safe during teardown.
+            row.changed.connect(() => {
+                var new_val = row.text.strip();
+                var original_val = get_original() ?? "";
+                if (new_val == original_val) {
+                    set_custom(null);
+                } else if (new_val == "") {
+                    set_custom(CLEARED_VALUE);
+                } else {
+                    set_custom(new_val);
+                }
+                restore_button.set_visible(get_custom() != null);
+            });
+            var focus = new Gtk.EventControllerFocus();
+            focus.leave.connect(() => { persist_record_and_refresh_desktop(); });
+            row.add_controller(focus);
+            row.entry_activated.connect(() => { persist_record_and_refresh_desktop(); });
+
+            return row;
+        }
+
+        private Adw.EntryRow build_name_row() {
+            return build_customizable_entry_row(
+                _("App Name"),
+                () => record.get_effective_name(),
+                () => record.original_name,
+                () => record.custom_name,
+                (v) => {
+                    record.custom_name = v;
+                    // Keep the display name in sync so the app list reflects the edit.
+                    record.name = record.get_effective_name();
+                }
+            );
+        }
+
+        private Adw.EntryRow build_keywords_row() {
+            return build_customizable_entry_row(
+                _("Keywords"),
+                () => record.get_effective_keywords(),
+                () => record.original_keywords,
+                () => record.custom_keywords,
+                (v) => { record.custom_keywords = v; }
+            );
+        }
+
+        private Adw.EntryRow build_icon_row() {
+            return build_customizable_entry_row(
+                _("Icon name"),
+                () => record.get_effective_icon_name(),
+                () => record.original_icon_name,
+                () => record.custom_icon_name,
+                (v) => { record.custom_icon_name = v; }
+            );
+        }
+
+        private Adw.EntryRow build_wmclass_row() {
+            return build_customizable_entry_row(
+                _("Startup WM Class"),
+                () => record.get_effective_startup_wm_class(),
+                () => record.original_startup_wm_class,
+                () => record.custom_startup_wm_class,
+                (v) => { record.custom_startup_wm_class = v; }
+            );
+        }
+
+        private Adw.EntryRow build_version_row() {
+            var version_row = new Adw.EntryRow();
+            version_row.title = _("Version");
+            version_row.text = record.version ?? "";
+            // Update the record on each keystroke (in-memory), defer the .desktop file write to
+            // focus-leave / Enter. The flush reads only the record, so it is safe during teardown.
+            version_row.changed.connect(() => {
+                record.version = version_row.text.strip() == "" ? null : version_row.text;
+            });
+            void flush_version() {
+                registry.update(record);
+                installer.set_desktop_entry_property(record.desktop_file, "X-AppImage-Version", record.version ?? "");
+            }
+            var version_focus = new Gtk.EventControllerFocus();
+            version_focus.leave.connect(() => { flush_version(); });
+            version_row.add_controller(version_focus);
+            version_row.entry_activated.connect(() => { flush_version(); });
+            return version_row;
+        }
+
+        private Adw.SwitchRow build_nodisplay_row() {
+            var nodisplay_row = new Adw.SwitchRow();
+            nodisplay_row.title = _("Hide from app drawer");
+            nodisplay_row.subtitle = _("Don't show in application menu");
+            var nodisplay_current = desktop_props.get("NoDisplay") ?? "false";
+            nodisplay_row.active = (nodisplay_current.down() == "true");
+            nodisplay_row.notify["active"].connect(() => {
+                record.custom_no_display = nodisplay_row.active ? "true" : "false";
+                registry.update(record);
+                installer.set_desktop_entry_property(record.desktop_file, "NoDisplay", nodisplay_row.active ? "true" : "false");
+            });
+            return nodisplay_row;
+        }
+
+        private Adw.SwitchRow build_path_row() {
+            path_row = new Adw.SwitchRow();
+            path_row.title = _("Add to $PATH");
+            path_row.subtitle = _("Create a launcher in %s so you can run it from the terminal").printf(AppPaths.local_bin_dir);
+
+            var symlink_name = "";
+
+            if (record.entry_exec != null && record.entry_exec.strip() != "") {
+                symlink_name = Path.get_basename(record.entry_exec.strip());
+            }
+
+            if (symlink_name == "" && record.installed_path != null && record.installed_path.strip() != "") {
+                symlink_name = installer.derive_slug_from_path(record.installed_path, record.mode == InstallMode.EXTRACTED);
+            }
+            
+            if (symlink_name == "") {
+                symlink_name = Path.get_basename(exec_path).down();
+            }
+
+            bool is_terminal_app = record.is_terminal;
+            bool symlink_exists = record.bin_symlink != null && record.bin_symlink.strip() != "" && File.new_for_path(record.bin_symlink).query_exists();
+
+            // Terminal apps must always stay on PATH
+            if (is_terminal_app && !symlink_exists) {
+                if (installer.ensure_bin_symlink_for_record(record, exec_path, symlink_name)) {
+                    symlink_exists = true;
+                }
+            }
+
+            // Clean up stale metadata if the recorded symlink is gone
+            if (!is_terminal_app && record.bin_symlink != null && !symlink_exists) {
+                installer.remove_bin_symlink_for_record(record);
+            }
+
+            path_row.active = is_terminal_app || symlink_exists;
+            path_row.sensitive = !is_terminal_app;
+
+            path_row.notify["active"].connect(() => {
+                if (is_terminal_app) {
+                    path_row.active = true;
+                    return;
+                }
+
+                if (path_row.active) {
+                    if (installer.ensure_bin_symlink_for_record(record, exec_path, symlink_name)) {
+                        symlink_exists = true;
+                        // Back to default - don't persist the redundant "true" override.
+                        record.custom_add_to_path = null;
+                        registry.update(record, false);
+                    } else {
+                        // The switch snapping back on its own says nothing about why (issue #175).
+                        var conflict = record.bin_conflict_slug;
+                        path_row.active = false;
+                        if (conflict != null) {
+                            show_toast(_("Not added to $PATH: '%s' already exists in %s")
+                                .printf(conflict, AppPaths.local_bin_dir));
+                        }
+                    }
+                } else {
+                    if (installer.remove_bin_symlink_for_record(record)) {
+                        symlink_exists = false;
+                        record.custom_add_to_path = "false";
+                        registry.update(record, false);
+                    } else {
+                        path_row.active = true;
+                    }
+                }
+                update_path_banner_visibility();
+            });
+            
+            return path_row;
+        }
+
+        private Adw.PreferencesGroup build_actions_group() {
+            var actions_group = new Adw.PreferencesGroup();
+            actions_group.title = _("Actions");
+            
+            var actions_box = new Gtk.Box(Gtk.Orientation.VERTICAL, 8);
+            actions_box.set_halign(Gtk.Align.CENTER);
+            actions_group.add(actions_box);
+
+            // First row: Update and Extract buttons
+            var row1 = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 8);
+            row1.set_halign(Gtk.Align.CENTER);
+
+            // Update button with spinner overlay
+            var update_wrapper = new Gtk.Overlay();
+            update_button = new Gtk.Button();
+            update_button.add_css_class("pill");
+            update_button.width_request = 200;
+            update_button.hexpand = false;
+            update_button.clicked.connect(() => {
+                if (update_loading) {
+                    return;
+                }
+                if (update_available) {
+                    update_requested(record);
+                } else {
+                    check_update_requested(record);
+                }
+            });
+            update_wrapper.set_child(update_button);
+            
+            update_spinner = new Gtk.Spinner();
+            update_spinner.valign = Gtk.Align.CENTER;
+            update_spinner.halign = Gtk.Align.START;
+            update_spinner.margin_start = 12;
+            update_spinner.visible = false;
+            update_wrapper.add_overlay(update_spinner);
+            
+            row1.append(update_wrapper);
+            refresh_update_button();
+
+            // Extract button
+            extract_button = new Gtk.Button.with_label(_("Extract AppImage"));
+            extract_button.add_css_class("pill");
+            extract_button.width_request = 200;
+            extract_button.hexpand = false;
+            var can_extract = record.mode == InstallMode.PORTABLE && !record.is_terminal;
+            extract_button.sensitive = can_extract;
+            extract_button.clicked.connect(() => {
+                present_extract_warning();
+            });
+            row1.append(extract_button);
+
+            actions_box.append(row1);
+
+            // Second row: Delete button
+            delete_button = new Gtk.Button();
+            delete_button.add_css_class("pill");
+            delete_button.width_request = 200;
+            delete_button.hexpand = false;
+            update_delete_button_label();
+            delete_button.add_css_class("destructive-action");
+            delete_button.clicked.connect(() => {
+                bool will_be_permanent = shift_held || record.mode == InstallMode.EXTRACTED || !is_path_trashable();
+                if (Installer.has_portable_folders(record)) {
+                    present_portable_delete_dialog(will_be_permanent);
+                } else if (will_be_permanent) {
+                    present_permanent_delete_warning();
+                } else {
+                    uninstall_requested(record, false, false);
+                }
+            });
+            
+            actions_box.append(delete_button);
+            
+            return actions_group;
+        }
+
+        private Gtk.Button create_restore_button(bool visible) {
+            var button = new Gtk.Button.from_icon_name("edit-undo-symbolic");
+            button.add_css_class("flat");
+            button.set_valign(Gtk.Align.CENTER);
+            button.tooltip_text = _("Restore default");
+            button.set_visible(visible);
+            return button;
+        }
+
+        private void refresh_update_button() {
+            if (update_button == null || update_spinner == null) {
+                return;
+            }
+
+            if (update_loading) {
+                if (update_updating) {
+                    update_button.set_label(_("Updating..."));
+                } else {
+                    update_button.set_label(_("Checking..."));
+                }
+                update_spinner.visible = true;
+                update_spinner.start();
+                update_button.sensitive = false;
+                update_button.remove_css_class("suggested-action");
+                update_button.remove_css_class("update-failed-button");
+                return;
+            }
+
+            update_spinner.visible = false;
+            update_spinner.stop();
+            update_button.sensitive = true;
+            update_updating = false;  // Reset updating state
+            update_button.remove_css_class("update-failed-button");
+
+            if (update_available) {
+                var update_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 6);
+                update_box.set_halign(Gtk.Align.CENTER);
+                update_box.append(new Gtk.Image.from_icon_name("software-update-available-symbolic"));
+                update_box.append(new Gtk.Label(_("Update")));
+                update_button.set_child(update_box);
+                update_button.add_css_class("suggested-action");
+            } else if (update_failure_message != null) {
+                var warn_box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 6);
+                warn_box.set_halign(Gtk.Align.CENTER);
+                warn_box.append(new Gtk.Image.from_icon_name("dialog-warning-symbolic"));
+                warn_box.append(new Gtk.Label(_("Update Failed")));
+                update_button.set_child(warn_box);
+                update_button.remove_css_class("suggested-action");
+                update_button.add_css_class("update-failed-button");
+                update_button.set_tooltip_text(update_failure_message);
+            } else {
+                update_button.set_child(null);
+                update_button.set_label(_("Check Update"));
+                update_button.remove_css_class("suggested-action");
+                update_button.set_tooltip_text(null);
+            }
+        }
+
+        private string determine_reveal_path() {
+            var installed_path = record.installed_path ?? "";
+            if (record.mode == InstallMode.PORTABLE) {
+                return AppPaths.applications_dir;
+            }
+            if (installed_path.strip() == "") {
+                return AppPaths.applications_dir;
+            }
+
+            var file = File.new_for_path(installed_path);
+            if (!file.query_exists()) {
+                return AppPaths.applications_dir;
+            }
+            if (file.query_file_type(FileQueryInfoFlags.NONE) == FileType.DIRECTORY) {
+                return installed_path;
+            }
+
+            return Path.get_dirname(installed_path);
+        }
+
+        private Gtk.Box create_info_card(string text) {
+            var card = new Gtk.Box(Gtk.Orientation.VERTICAL, 0);
+            card.add_css_class("card");
+            
+            var label = new Gtk.Label(text);
+            label.add_css_class("caption");
+            label.set_margin_start(8);
+            label.set_margin_end(8);
+            label.set_margin_top(6);
+            label.set_margin_bottom(6);
+            
+            card.append(label);
+            return card;
+        }
+
+        private int64 calculate_installation_size(InstallationRecord record) {
+            int64 total_size = 0;
+            
+            try {
+                // Add installed path size (AppImage or extracted directory)
+                if (record.installed_path != null && record.installed_path != "") {
+                    total_size += AppManager.Utils.FileUtils.get_path_size(record.installed_path);
+                }
+                
+                // Add icon size if exists
+                if (record.icon_path != null && record.icon_path != "") {
+                    total_size += AppManager.Utils.FileUtils.get_path_size(record.icon_path);
+                }
+                
+                // Add desktop file size
+                if (record.desktop_file != null && record.desktop_file != "") {
+                    total_size += AppManager.Utils.FileUtils.get_path_size(record.desktop_file);
+                }
+            } catch (Error e) {
+                warning("Failed to calculate size for %s: %s", record.name, e.message);
+            }
+            
+            return total_size;
+        }
+
+        private HashTable<string, string> load_desktop_file_properties(string desktop_file_path) {
+            var props = new HashTable<string, string>(str_hash, str_equal);
+            
+            var entry = new DesktopEntry(desktop_file_path);
+            if (entry.no_display) {
+                props.set("NoDisplay", "true");
+            }
+
+            if (entry.comment != null && entry.comment.strip() != "") {
+                props.set("Comment", entry.comment.strip());
+            }
+            
+            return props;
+        }
+        
+        private void setup_shift_key_controller() {
+            var key_controller = new Gtk.EventControllerKey();
+            key_controller.key_pressed.connect((keyval, keycode, state) => {
+                if (keyval == Gdk.Key.Shift_L || keyval == Gdk.Key.Shift_R) {
+                    shift_held = true;
+                    update_delete_button_label();
+                }
+                return false;
+            });
+            key_controller.key_released.connect((keyval, keycode, state) => {
+                if (keyval == Gdk.Key.Shift_L || keyval == Gdk.Key.Shift_R) {
+                    shift_held = false;
+                    update_delete_button_label();
+                }
+            });
+            // Attach to the toplevel window once it's realized
+            this.realize.connect(() => {
+                var toplevel = this.get_root() as Gtk.Window;
+                if (toplevel != null) {
+                    ((Gtk.Widget) toplevel).add_controller(key_controller);
+                }
+            });
+        }
+
+        private bool is_path_trashable() {
+            if (record.installed_path == null) return true;
+            var home = Environment.get_home_dir();
+            return record.installed_path.has_prefix(home + "/");
+        }
+
+        private void update_delete_button_label() {
+            if (delete_button == null) return;
+            var box = new Gtk.Box(Gtk.Orientation.HORIZONTAL, 6);
+            box.set_halign(Gtk.Align.CENTER);
+            if (shift_held || record.mode == InstallMode.EXTRACTED || !is_path_trashable()) {
+                box.append(new Gtk.Label(_("Delete Permanently")));
+                delete_button.tooltip_text = null;
+            } else {
+                box.append(new Gtk.Image.from_icon_name("user-trash-symbolic"));
+                box.append(new Gtk.Label(_("Move to Trash")));
+                delete_button.tooltip_text = _("Hold Shift to delete permanently");
+            }
+            delete_button.set_child(box);
+        }
+
+        private void present_permanent_delete_warning() {
+            var app_name = record.name ?? Path.get_basename(record.installed_path);
+            var body = _("<b>%s</b> will be permanently deleted. This action cannot be undone.").printf(GLib.Markup.escape_text(app_name));
+            var dialog = new Adw.AlertDialog(_("Delete permanently?"), null);
+            dialog.set_body_use_markup(true);
+            dialog.set_body(body);
+            dialog.add_response("cancel", _("Cancel"));
+            dialog.add_response("delete", _("Delete Permanently"));
+            dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE);
+            dialog.set_close_response("cancel");
+            dialog.set_default_response("cancel");
+            dialog.response.connect((response) => {
+                if (response == "delete") {
+                    uninstall_requested(record, true, false);
+                }
+            });
+            dialog.present(this);
+        }
+
+        private void present_portable_delete_dialog(bool permanently) {
+            var app_name = record.name ?? Path.get_basename(record.installed_path);
+
+            string title;
+            string confirm_label;
+            string body;
+            string delete_row_title;
+            string delete_row_subtitle;
+            if (permanently) {
+                title = _("Delete permanently?");
+                confirm_label = _("Delete Permanently");
+                body = _("<b>%s</b> will be permanently deleted. This action cannot be undone.").printf(GLib.Markup.escape_text(app_name));
+                delete_row_title = _("Delete All Data");
+                delete_row_subtitle = _("Permanently erase user data to save space");
+            } else {
+                title = _("Move to Trash?");
+                confirm_label = _("Move to Trash");
+                body = _("<b>%s</b> will be moved to the Trash.").printf(GLib.Markup.escape_text(app_name));
+                delete_row_title = _("Trash All Data");
+                delete_row_subtitle = _("Move user data to Trash along with the app");
+            }
+
+            var dialog = new Adw.AlertDialog(title, null);
+            dialog.set_body_use_markup(true);
+            dialog.set_body(body);
+
+            var keep_radio = new Gtk.CheckButton();
+            keep_radio.set_valign(Gtk.Align.CENTER);
+            keep_radio.set_active(true);
+
+            var delete_radio = new Gtk.CheckButton();
+            delete_radio.set_group(keep_radio);
+            delete_radio.set_valign(Gtk.Align.CENTER);
+
+            var keep_row = new Adw.ActionRow();
+            keep_row.set_title(_("Keep User Data"));
+            keep_row.set_subtitle(_("Allow restoring personal settings &amp; content"));
+            keep_row.add_prefix(keep_radio);
+            keep_row.set_activatable_widget(keep_radio);
+
+            var delete_row = new Adw.ActionRow();
+            delete_row.set_title(delete_row_title);
+            delete_row.set_subtitle(delete_row_subtitle);
+            delete_row.add_prefix(delete_radio);
+            delete_row.set_activatable_widget(delete_radio);
+
+            var list = new Gtk.ListBox();
+            list.set_selection_mode(Gtk.SelectionMode.NONE);
+            list.add_css_class("boxed-list");
+            list.append(keep_row);
+            list.append(delete_row);
+
+            dialog.set_extra_child(list);
+
+            dialog.add_response("cancel", _("Cancel"));
+            dialog.add_response("delete", confirm_label);
+            dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE);
+            dialog.set_close_response("cancel");
+            dialog.set_default_response("cancel");
+            dialog.response.connect((response) => {
+                if (response == "delete") {
+                    bool preserve = keep_radio.get_active();
+                    uninstall_requested(record, permanently, preserve);
+                }
+            });
+            dialog.present(this);
+        }
+
+        private void present_extract_warning() {
+            var body = _("Extracting will unpack the application so it opens faster, but it will consume more disk space. This action cannot be reversed automatically.");
+            var dialog = new Adw.AlertDialog(_("Extract application?"), body);
+            dialog.add_response("cancel", _("Cancel"));
+            dialog.add_response("extract", _("Extract"));
+            dialog.set_response_appearance("extract", Adw.ResponseAppearance.DESTRUCTIVE);
+            dialog.set_close_response("cancel");
+            dialog.set_default_response("cancel");
+            dialog.response.connect((response) => {
+                if (response == "extract") {
+                    extract_requested(record);
+                }
+            });
+            dialog.present(this);
+        }
+
+        /** Routes a message to the main window's toast overlay this page lives in. */
+        private void show_toast(string message) {
+            var window = this.get_root() as MainWindow;
+            if (window != null) {
+                window.add_toast(message);
+            }
+        }
+
+        private void update_path_banner_visibility() {
+            if (path_banner == null || path_row == null) {
+                return;
+            }
+
+            bool needs_path = path_row.active;
+            bool path_missing = !path_contains_local_bin();
+
+            path_banner.set_revealed(needs_path && path_missing);
+        }
+
+        private bool path_contains_local_bin() {
+            var home_bin = AppPaths.local_bin_dir;
+            var home_bin_file = File.new_for_path(home_bin);
+            
+            // 1. Check current environment PATH
+            var path_env = Environment.get_variable("PATH") ?? "";
+            if (check_path_string(path_env, home_bin, home_bin_file)) {
+                return true;
+            }
+            
+            // 2. Fallback: Try to get PATH from user's shell
+            try {
+                string shell = Environment.get_variable("SHELL");
+                if (shell == null || shell == "") {
+                    shell = "/bin/sh";
+                }
+                
+                string std_out;
+                string std_err;
+                int exit_status;
+                
+                // Use interactive login shell to ensure we get the full user configuration
+                // (sources .bashrc, .zshrc, .profile, etc.)
+                string[] argv = { shell, "-i", "-l", "-c", "echo $PATH" };
+                
+                Process.spawn_sync(null, argv, null, SpawnFlags.SEARCH_PATH, null, out std_out, out std_err, out exit_status);
+                
+                if (exit_status == 0 && std_out != null) {
+                    if (check_path_string(std_out, home_bin, home_bin_file)) {
+                        return true;
+                    }
+                }
+            } catch (Error e) {
+                warning("Failed to probe shell PATH: %s", e.message);
+            }
+            
+            return false;
+        }
+
+        private bool check_path_string(string path_str, string home_bin, File home_bin_file) {
+            foreach (var segment in path_str.split(":")) {
+                var clean_segment = segment.strip();
+                if (clean_segment == "") {
+                    continue;
+                }
+                
+                if (clean_segment == home_bin) {
+                    return true;
+                }
+                
+                if (File.new_for_path(clean_segment).equal(home_bin_file)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    }
+}

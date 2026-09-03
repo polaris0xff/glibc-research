@@ -1,0 +1,23 @@
+[package]
+name = "soar-package"
+version = "0.5.2"
+description = "Package format handling for soar package manager"
+edition.workspace = true
+readme.workspace = true
+repository.workspace = true
+license.workspace = true
+keywords.workspace = true
+categories.workspace = true
+
+[dependencies]
+image = { workspace = true }
+miette = { workspace = true }
+onelf-format = { workspace = true }
+regex = { workspace = true }
+soar-config = { workspace = true }
+soar-utils = { workspace = true }
+squishy = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+xxhash-rust = { workspace = true }
+zstd = { workspace = true }

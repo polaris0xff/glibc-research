@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="com.github.AppManager" path="/com/github/AppManager/">
+    <key name="remember-drop-window-position" type="b">
+      <default>true</default>
+      <summary>Remember the drag-and-drop window position</summary>
+      <description>If enabled, AppManager reopens the drop window at the last screen coordinates.</description>
+    </key>
+    <key name="window-width" type="i">
+      <default>600</default>
+      <summary>Main window width</summary>
+      <description>Stores the last known width so the preferences window can restore it.</description>
+    </key>
+    <key name="window-height" type="i">
+      <default>800</default>
+      <summary>Main window height</summary>
+      <description>Stores the last known height so the preferences window can restore it.</description>
+    </key>
+    <key name="auto-check-updates" type="b">
+      <default>false</default>
+      <summary>Automatically check for updates in background</summary>
+      <description>When enabled, AppManager will periodically check for AppImage updates using the XDG Background Portal</description>
+    </key>
+    <key name="update-check-interval" type="i">
+      <default>86400</default>
+      <summary>Update check interval in seconds</summary>
+      <description>How often to check for updates (options: daily=86400, weekly=604800, monthly=2592000)</description>
+    </key>
+    <key name="last-update-check" type="x">
+      <default>0</default>
+      <summary>Timestamp of last update check</summary>
+      <description>Unix timestamp of the last successful background update check</description>
+    </key>
+    <key name="auto-update-apps" type="b">
+      <default>false</default>
+      <summary>Automatically update apps in background</summary>
+      <description>When enabled, AppManager will automatically update apps when new versions are found. When disabled, only notifications will be shown.</description>
+    </key>
+    <key name="remove-thumbnail-checkerboard" type="b">
+      <default>false</default>
+      <summary>Remove checkered background from thumbnails</summary>
+      <description>When enabled, AppManager writes a GTK CSS override to hide the checkered alpha pattern behind thumbnails and icons.</description>
+    </key>
+    <key name="applications-dir" type="s">
+      <default>''</default>
+      <summary>Custom installation directory for AppImages</summary>
+      <description>Custom directory path for installed AppImages. When empty, uses the default ~/Applications directory.</description>
+    </key>
+    <key name="skip-drop-window" type="b">
+      <default>false</default>
+      <summary>Skip drag-and-drop installer window</summary>
+      <description>When enabled, opening an AppImage shows a confirmation dialog directly instead of the drag-and-drop installer window.</description>
+    </key>
+    <key name="portable-home-default" type="b">
+      <default>false</default>
+      <summary>Create a portable .home folder for new installations</summary>
+      <description>When enabled, AppManager creates a &lt;appname&gt;.home folder next to every newly installed AppImage so the app stores its home data alongside itself.</description>
+    </key>
+    <key name="portable-config-default" type="b">
+      <default>false</default>
+      <summary>Create a portable .config folder for new installations</summary>
+      <description>When enabled, AppManager creates a &lt;appname&gt;.config folder next to every newly installed AppImage so the app stores its config alongside itself.</description>
+    </key>
+    <key name="sanitize-filenames-default" type="b">
+      <default>false</default>
+      <summary>Keep the .AppImage extension on installed filenames</summary>
+      <description>When enabled, AppManager preserves the .AppImage suffix on installed filenames and replaces spaces with underscores. Applies to new installations and upgrades.</description>
+    </key>
+    <key name="app-list-view-mode" type="s">
+      <default>'list'</default>
+      <summary>App list view mode</summary>
+      <description>The layout mode for the app list. Either 'list' for a traditional list view or 'grid' for an icon grid view.</description>
+    </key>
+    <key name="app-list-sort-mode" type="s">
+      <default>'default'</default>
+      <summary>App list sort mode</summary>
+      <description>The sort order for the app list. Either 'default' for most-recently-updated first, 'name' for alphabetical, or 'size' to sort by installed size.</description>
+    </key>
+    <key name="app-list-sort-size-ascending" type="b">
+      <default>false</default>
+      <summary>Sort by size ascending</summary>
+      <description>When sorting by size, list smallest apps first instead of largest first.</description>
+    </key>
+    <key name="app-list-sort-name-ascending" type="b">
+      <default>true</default>
+      <summary>Sort by name ascending</summary>
+      <description>When sorting by name, list apps A-Z instead of Z-A.</description>
+    </key>
+    <key name="fuse-banner-dismissed" type="b">
+      <default>false</default>
+      <summary>FUSE warning banner dismissed</summary>
+      <description>When enabled, the banner warning about a missing FUSE installation is never shown again.</description>
+    </key>
+    <key name="github-token" type="s">
+      <default>''</default>
+      <summary>GitHub personal access token (legacy, no longer written)</summary>
+      <description>Legacy plaintext GitHub token key. Kept only so a token stored by an older version can be migrated into the keyring or the encrypted key below, and for downgrade safety. New versions never write here. See TokenStore.</description>
+    </key>
+    <key name="github-token-cipher" type="s">
+      <default>''</default>
+      <summary>Encrypted GitHub token (tier-2 fallback)</summary>
+      <description>Machine+user-bound AES-256-GCM blob holding the GitHub token, used only when no freedesktop Secret Service is available. Prefixed 'AMTC1:'. Useless off its origin machine. See TokenStore / crypto_shim.</description>
+    </key>
+  </schema>
+</schemalist>

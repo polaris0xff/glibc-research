@@ -1,0 +1,14 @@
+[package]
+name = "soar-events"
+version = "0.3.1"
+description = "Event system for soar package manager"
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+keywords.workspace = true
+readme.workspace = true
+categories.workspace = true
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }

@@ -1,0 +1,1496 @@
+using AppManager.Core;
+using AppManager.Utils;
+using GLib;
+using Gee;
+
+namespace AppManager {
+    public class Application : Adw.Application {
+        private MainWindow? main_window;
+        private InstallationRegistry registry;
+        private Installer installer;
+        private Settings settings;
+        private BackgroundUpdateService? bg_update_service;
+        private DirectoryMonitor? directory_monitor;
+        private PreferencesDialog? preferences_dialog;
+        // Track lock files owned by this instance to clean up on exit
+        private HashSet<string> owned_lock_files = new HashSet<string>();
+        // Stale self portable folders already flagged to the user (notice fires once per dir)
+        private HashSet<string> notified_stale_dirs = new HashSet<string>();
+        // Temp dirs holding appimg:// downloads, removed on shutdown
+        private HashSet<string> appimg_download_dirs = new HashSet<string>();
+        private static bool opt_version = false;
+        private static bool opt_help = false;
+        private static bool opt_background_update = false;
+        private static bool opt_update_all = false;
+        private static bool opt_update_check = false;
+        private static string? opt_install = null;
+        private static string? opt_uninstall = null;
+        private static string? opt_is_installed = null;
+        private static bool opt_keep_both = false;
+
+        private const OptionEntry[] options = {
+            { "help", 'h', 0, OptionArg.NONE, ref opt_help, "Show help options", null },
+            { "version", 0, 0, OptionArg.NONE, ref opt_version, "Display version number", null },
+            { "background-update", 0, 0, OptionArg.NONE, ref opt_background_update, "Run background update check", null },
+            { "update-all", 0, 0, OptionArg.NONE, ref opt_update_all, "Update all installed apps and exit", null },
+            { "update-check", 0, 0, OptionArg.NONE, ref opt_update_check, "List available updates and exit", null },
+            { "install", 0, OptionFlags.HIDDEN, OptionArg.FILENAME, ref opt_install, null, "PATH" },
+            { "keep-both", 0, 0, OptionArg.NONE, ref opt_keep_both, "With install: keep the existing app and install side by side", null },
+            { "uninstall", 0, OptionFlags.HIDDEN, OptionArg.STRING, ref opt_uninstall, null, "PATH" },
+            { "is-installed", 0, 0, OptionArg.FILENAME, ref opt_is_installed, "Check if an AppImage is installed", "PATH" },
+            { null }
+        };
+        
+        public Application() {
+            Object(application_id: Core.APPLICATION_ID,
+                flags: ApplicationFlags.HANDLES_OPEN | ApplicationFlags.HANDLES_COMMAND_LINE);
+            settings = new Settings(Core.APPLICATION_ID);
+            registry = new InstallationRegistry();
+            installer = new Installer(registry, settings);
+            
+            add_main_option_entries(options);
+            set_option_context_parameter_string("[FILE...]");
+            set_option_context_summary("AppImage Manager - Manage and update AppImages on your system");
+            set_option_context_description("""Commands:
+  install PATH                Install an AppImage from PATH
+  uninstall PATH              Uninstall an AppImage (by path or checksum)
+  update PATH                 Update an installed AppImage (by path or checksum)
+""");
+        }
+
+        protected override int handle_local_options(GLib.VariantDict options) {
+            if (opt_help) {
+                print("""Usage:
+  app-manager [OPTION...] [FILE...]
+
+Commands:
+  install PATH                Install an AppImage from PATH
+  uninstall PATH              Uninstall an AppImage (by path or checksum)
+  update PATH                 Update an installed AppImage (by path or checksum)
+
+Options:
+  -h, --help                  Show help options
+  --version                   Display version number
+  --background-update         Run background update check
+  --update-all                Update all installed apps and exit
+  --update-check              List available updates and exit
+  --is-installed PATH         Check if an AppImage is installed
+  --keep-both                 With install: keep the existing app and install side by side
+
+Examples:
+  app-manager                             Launch the GUI
+  app-manager app.AppImage                Open installer for app.AppImage
+  app-manager install app.AppImage        Install app.AppImage
+  app-manager install app.AppImage --keep-both   Install as a new copy next to the existing app
+  app-manager uninstall app.AppImage      Uninstall app.AppImage
+  app-manager update app.AppImage         Update app.AppImage
+  app-manager --update-all                Update all installed apps
+  app-manager --update-check              List available updates
+  app-manager --is-installed app.AppImage Check installation status
+  app-manager --background-update         Run background update check
+
+""");
+                return 0;
+            }
+            
+            if (opt_version) {
+                print("AppManager %s\n", Core.APPLICATION_VERSION);
+                return 0;
+            }
+
+            // Run background update daemon in this process (blocks with its own MainLoop).
+            // Handled locally so it never remotes to the primary GUI instance.
+            if (opt_background_update) {
+                if (!settings.get_boolean("auto-check-updates")) {
+                    debug("Auto-check updates disabled; exiting");
+                    return 0;
+                }
+                var bg_service = new BackgroundUpdateService(settings, registry, installer);
+                bg_service.run_daemon();
+                return 0;
+            }
+
+            if (opt_update_check) {
+                var updater = new Updater(registry, installer);
+                var probes = updater.probe_updates(null);
+                if (probes.size == 0) {
+                    print("No installed apps\n");
+                    return 0;
+                }
+                int available = 0;
+                foreach (var p in probes) {
+                    if (!p.has_update) continue;
+                    available++;
+                    var name = p.record.name ?? p.record.id;
+                    var current = p.record.version ?? "?";
+                    var latest = p.available_version ?? "?";
+                    print("%s: %s -> %s\n", name, current, latest);
+                }
+                if (available == 0) {
+                    print("All apps up to date\n");
+                }
+                return 0;
+            }
+
+            if (opt_update_all) {
+                var updater = new Updater(registry, installer);
+                updater.record_checking.connect((record) => {
+                    print("Checking %s\n", record.name ?? record.id);
+                });
+                updater.record_downloading.connect((record) => {
+                    print("Downloading %s\n", record.name ?? record.id);
+                });
+
+                var results = updater.update_all(null);
+                if (results.size == 0) {
+                    print("No installed apps to update\n");
+                    return 0;
+                }
+
+                int updated = 0, skipped = 0, failed = 0;
+                foreach (var r in results) {
+                    var name = r.record.name ?? r.record.id;
+                    switch (r.status) {
+                        case UpdateStatus.UPDATED:
+                            updated++;
+                            print("Updated %s: %s\n", name, r.message);
+                            break;
+                        case UpdateStatus.SKIPPED:
+                            skipped++;
+                            print("Skipped %s: %s\n", name, r.message);
+                            break;
+                        case UpdateStatus.FAILED:
+                            failed++;
+                            printerr("Failed %s: %s\n", name, r.message);
+                            break;
+                    }
+                }
+                print("Summary: %d updated, %d skipped, %d failed\n", updated, skipped, failed);
+                return failed > 0 ? 6 : 0;
+            }
+
+            return -1;  // Continue processing
+        }
+
+        protected override void startup() {
+            base.startup();
+
+            // Clean up any TLS symlinks we own that are stale from a prior
+            // crash. The TlsSession manages these on demand around active
+            // fetches; anything left over now is dead state. See
+            // src/core/tls_session.vala.
+            TlsSession.cleanup_stale();
+
+            // Add bundled icons to the theme search path so symbolic update icon is always available
+            var display = Gdk.Display.get_default();
+            if (display != null) {
+                var theme = Gtk.IconTheme.get_for_display(display);
+                // Register bundled icons (hicolor layout) from the resource bundle
+                theme.add_resource_path("/com/github/AppManager/icons/hicolor");
+            }
+
+            // Install symbolic icon to filesystem for external processes (notifications, panel)
+            Installer.install_symbolic_icon();
+
+            // Apply shared UI styles (cards/badges) once per app lifecycle.
+            UiUtils.ensure_app_card_styles();
+
+            bg_update_service = new BackgroundUpdateService(settings, registry, installer);
+            
+            // Initialize directory monitoring for manual deletions
+            directory_monitor = new DirectoryMonitor(registry);
+            directory_monitor.changes_detected.connect(() => {
+                // Skip if migration in progress
+                if (registry.is_migration_in_progress()) {
+                    return;
+                }
+                var orphaned = registry.reconcile_with_filesystem();
+                if (orphaned.size > 0) {
+                    debug("Reconciled %d orphaned installation(s)", orphaned.size);
+                }
+            });
+            directory_monitor.start();
+            
+            var quit_action = new GLib.SimpleAction("quit", null);
+            quit_action.activate.connect(() => this.quit());
+            this.add_action(quit_action);
+            string[] quit_accels = { "<Primary>q" };
+            this.set_accels_for_action("app.quit", quit_accels);
+
+            var shortcuts_action = new GLib.SimpleAction("show_shortcuts", null);
+            shortcuts_action.activate.connect(() => {
+                if (main_window != null) {
+                    main_window.present_shortcuts_dialog();
+                }
+            });
+            this.add_action(shortcuts_action);
+
+            var about_action = new GLib.SimpleAction("show_about", null);
+            about_action.activate.connect(() => {
+                if (main_window != null) {
+                    main_window.present_about_dialog();
+                }
+            });
+            this.add_action(about_action);
+
+            var preferences_action = new GLib.SimpleAction("show_preferences", null);
+            preferences_action.activate.connect(() => {
+                present_preferences();
+            });
+            this.add_action(preferences_action);
+
+            var close_action = new GLib.SimpleAction("close_window", null);
+            close_action.activate.connect(() => {
+                var active = this.get_active_window();
+                if (active != null) {
+                    active.close();
+                }
+            });
+            this.add_action(close_action);
+
+            string[] shortcut_accels = { "<Primary>question" };
+            string[] preferences_accels = { "<Primary>comma" };
+            string[] close_accels = { "<Primary>w" };
+            string[] search_accels = { "<Primary>f" };
+            string[] check_updates_accels = { "<Primary>u" };
+            string[] update_apps_accels = { "<Primary><Shift>u" };
+            string[] menu_accels = { "F10" };
+            string[] fullscreen_accels = { "F11" };
+            this.set_accels_for_action("app.show_shortcuts", shortcut_accels);
+            this.set_accels_for_action("app.show_preferences", preferences_accels);
+            this.set_accels_for_action("app.close_window", close_accels);
+            this.set_accels_for_action("win.toggle_search", search_accels);
+            this.set_accels_for_action("win.check_updates", check_updates_accels);
+            this.set_accels_for_action("win.update_apps", update_apps_accels);
+            this.set_accels_for_action("win.show_menu", menu_accels);
+            this.set_accels_for_action("win.toggle_fullscreen", fullscreen_accels);
+        }
+
+        protected override void shutdown() {
+            foreach (var dir in appimg_download_dirs) {
+                Utils.FileUtils.remove_dir_recursive(dir);
+            }
+            appimg_download_dirs.clear();
+            base.shutdown();
+        }
+
+        protected override void activate() {
+            // Check integrity on app launch to detect manual deletions while app was closed
+            // Skip during migration to prevent false uninstallation
+            if (!registry.is_migration_in_progress()) {
+                var orphaned = registry.reconcile_with_filesystem();
+                if (orphaned.size > 0) {
+                    debug("Found %d orphaned installation(s) on launch", orphaned.size);
+                }
+            }
+
+            // Remove or flag any leftover .home/.config folder next to AppManager's
+            // own AppImage, left behind by the pre-fix self-install loop (issue #140).
+            cleanup_stale_self_portable_dirs();
+
+            // Self-install: if running as AppImage and not yet installed, show installer
+            if (AppPaths.is_running_as_appimage && !is_self_installed()) {
+                show_self_install_window();
+                return;
+            }
+
+            if (main_window == null) {
+                main_window = new MainWindow(this, registry, installer, settings);
+            }
+            main_window.present();
+        }
+
+        protected override void open(GLib.File[] files, string hint) {
+            if (files.length == 0) {
+                activate();
+                return;
+            }
+            foreach (var file in files) {
+                // Browsers hand appimg:// deep links over as URIs, not paths.
+                if (file.get_uri_scheme() == APPIMG_URI_SCHEME) {
+                    handle_appimg_uri(file.get_uri());
+                    continue;
+                }
+                show_drop_window(file);
+            }
+        }
+
+        /**
+         * Handles an `appimg://install?url=…&sha256=…` link: download with
+         * integrity checks, then hand the file to the normal install flow.
+         */
+        private void handle_appimg_uri(string uri) {
+            // No activate(): a web install shows only the installer, never the app list.
+            AppimgLink link;
+            try {
+                link = AppimgLink.parse(uri);
+            } catch (Error e) {
+                present_appimg_error(_("Invalid install link"), e.message);
+                return;
+            }
+
+            string download_dir;
+            try {
+                download_dir = Utils.FileUtils.create_temp_dir("appimg-download-");
+            } catch (Error e) {
+                present_appimg_error(_("Download failed"), e.message);
+                return;
+            }
+            appimg_download_dirs.add(download_dir);
+
+            var cancellable = new GLib.Cancellable();
+            if (settings.get_boolean("skip-drop-window")) {
+                download_appimg_link_with_dialog(link, download_dir, cancellable);
+            } else {
+                download_appimg_link_in_drop_window(link, download_dir, cancellable);
+            }
+        }
+
+        /**
+         * Default path: the drag-and-drop installer opens right away and shows
+         * the download on the app icon.
+         */
+        private void download_appimg_link_in_drop_window(AppimgLink link, string download_dir,
+                                                          GLib.Cancellable cancellable) {
+            var destination = Path.build_filename(download_dir, link.filename);
+            var window = new DropWindow.for_download(this, registry, installer, settings,
+                destination, link.display_name);
+            window.download_cancel_requested.connect(() => cancellable.cancel());
+            window.present();
+
+            var progress_id = Timeout.add(200, () => {
+                window.set_download_progress(appimg_progress_fraction(link), appimg_progress_text(link));
+                return Source.CONTINUE;
+            });
+
+            this.hold();
+            run_appimg_download.begin(link, download_dir, cancellable, progress_id, window, null);
+        }
+
+        /**
+         * Used when the drop window is disabled: the simple install dialog with
+         * an icon and progress bar, which then becomes the install prompt.
+         */
+        private void download_appimg_link_with_dialog(AppimgLink link, string download_dir,
+                                                       GLib.Cancellable cancellable) {
+            var icon = new Gtk.Image.from_icon_name("application-x-executable");
+            icon.set_pixel_size(64);
+
+            // Progress overlays the lower edge of the icon and stays within it.
+            var progress_bar = new Gtk.ProgressBar();
+            progress_bar.add_css_class("download-progress");
+            progress_bar.halign = Gtk.Align.CENTER;
+            progress_bar.valign = Gtk.Align.END;
+            progress_bar.set_size_request(icon.pixel_size, -1);
+
+            var icon_overlay = new Gtk.Overlay();
+            icon_overlay.set_child(icon);
+            icon_overlay.halign = Gtk.Align.CENTER;
+            icon_overlay.add_overlay(progress_bar);
+
+            var dialog = new DialogWindow(this, this.get_active_window(), _("Downloading"), null);
+            dialog.append_body(icon_overlay);
+
+            var name_markup = "<b>%s</b>".printf(GLib.Markup.escape_text(link.display_name, -1));
+            dialog.append_body(UiUtils.create_wrapped_label(name_markup, true));
+
+            // Same buttons as the install prompt that follows, so the shape stays put.
+            var install_button = dialog.add_option("install", _("Install"));
+            install_button.set_sensitive(false);
+            dialog.add_option("cancel", _("Cancel"), true);
+            // Still connected once the window is re-used; cancelling a finished
+            // download is a no-op.
+            dialog.option_selected.connect((response) => {
+                if (response == "cancel") {
+                    cancellable.cancel();
+                }
+            });
+            dialog.present();
+
+            var progress_id = Timeout.add(200, () => {
+                var fraction = appimg_progress_fraction(link);
+                if (fraction >= 0.0) {
+                    progress_bar.fraction = fraction;
+                } else {
+                    progress_bar.pulse();
+                }
+                return Source.CONTINUE;
+            });
+
+            // The dialog may be the only window; do not quit mid-download.
+            this.hold();
+            run_appimg_download.begin(link, download_dir, cancellable, progress_id, null, dialog);
+        }
+
+        // The download thread only updates counters; the UI polls them.
+        private double appimg_progress_fraction(AppimgLink link) {
+            var total = link.total_bytes;
+            return total > 0 ? (double)link.received_bytes / (double)total : -1.0;
+        }
+
+        private string appimg_progress_text(AppimgLink link) {
+            var received = link.received_bytes;
+            var total = link.total_bytes;
+            if (total > 0) {
+                return _("Downloading %s of %s").printf(format_size(received), format_size(total));
+            }
+            if (received > 0) {
+                return _("Downloading %s").printf(format_size(received));
+            }
+            return _("Starting…");
+        }
+
+        private async void run_appimg_download(AppimgLink link, string download_dir,
+                                               GLib.Cancellable cancellable, uint progress_id,
+                                               DropWindow? window, DialogWindow? dialog) {
+            SourceFunc callback = run_appimg_download.callback;
+            string? downloaded_path = null;
+            Error? error = null;
+
+            new Thread<void>("appimg-download", () => {
+                try {
+                    downloaded_path = link.download(download_dir, cancellable);
+                } catch (Error e) {
+                    error = e;
+                }
+                Idle.add((owned) callback);
+            });
+
+            yield;
+
+            Source.remove(progress_id);
+
+            if (error != null || downloaded_path == null) {
+                if (dialog != null) {
+                    dialog.close();
+                }
+                Utils.FileUtils.remove_dir_recursive(download_dir);
+                appimg_download_dirs.remove(download_dir);
+                var cancelled = error != null && error is IOError.CANCELLED;
+                if (window != null) {
+                    // Cancelling means the window is already gone.
+                    if (!cancelled) {
+                        window.download_failed(error != null ? error.message : _("Download failed"));
+                    }
+                } else if (!cancelled) {
+                    present_appimg_error(_("Download failed"), error.message);
+                }
+            } else if (window != null) {
+                window.download_completed(downloaded_path, link.sha256 != null);
+            } else {
+                // The same window continues as the install prompt.
+                show_quick_install_dialog(downloaded_path, dialog);
+            }
+
+            this.release();
+        }
+
+        private void present_appimg_error(string title, string message) {
+            var dialog = new Adw.AlertDialog(title, message);
+            dialog.add_response("close", _("Close"));
+            dialog.set_close_response("close");
+            // A parentless dialog is not an application window, so hold the app.
+            this.hold();
+            dialog.closed.connect(() => this.release());
+            dialog.present(this.get_active_window());
+        }
+
+        private void show_drop_window(GLib.File file) {
+            var path = file.get_path();
+
+            // Prevent duplicate windows using file-based locking
+            if (!try_acquire_drop_window_lock(path)) {
+                debug("Drop window already open for %s (locked by another instance), ignoring", path);
+                return;
+            }
+
+            if (AppPaths.is_inside_applications_dir(path)) {
+                var err_dialog = new Adw.AlertDialog(
+                    _("Cannot install from this location"),
+                    _("This AppImage is already inside the install folder (%s). Move it elsewhere first to install it.").printf(AppPaths.applications_dir));
+                err_dialog.add_response("close", _("Close"));
+                err_dialog.present(this.get_active_window());
+                release_drop_window_lock(path);
+                return;
+            }
+
+            if (settings.get_boolean("skip-drop-window")) {
+                show_quick_install_dialog(path);
+                return;
+            }
+            
+            try {
+                debug("Opening drop window for %s", path);
+                var window = new DropWindow(this, registry, installer, settings, path);
+                window.close_request.connect(() => {
+                    release_drop_window_lock(path);
+                    return false;
+                });
+                window.present();
+            } catch (Error e) {
+                release_drop_window_lock(path);
+                critical("Failed to open drop window: %s", e.message);
+                this.activate();
+            }
+        }
+
+        /**
+         * Shows a direct install confirmation dialog, bypassing the drag-and-drop window.
+         */
+        private void show_quick_install_dialog(string appimage_path, DialogWindow? reuse = null) {
+            AppImageMetadata metadata;
+            try {
+                metadata = new AppImageMetadata(File.new_for_path(appimage_path));
+            } catch (Error e) {
+                release_drop_window_lock(appimage_path);
+                critical("Failed to read AppImage metadata: %s", e.message);
+                quick_install_present_error(_("Cannot read AppImage"), e.message, reuse);
+                return;
+            }
+
+            // Check compatibility
+            if (!AppImageAssets.check_compatibility(appimage_path)) {
+                quick_install_present_error(_("Incompatible AppImage"),
+                    _("This AppImage is incompatible or corrupted. Missing required files (AppRun, .desktop, or icon)."),
+                    reuse);
+                release_drop_window_lock(appimage_path);
+                return;
+            }
+
+            // Check architecture
+            if (!metadata.is_architecture_compatible()) {
+                var appimage_arch = metadata.architecture ?? _("unknown");
+                quick_install_present_error(_("Architecture Mismatch"),
+                    _("This app is built for %s and cannot run here").printf(appimage_arch),
+                    reuse);
+                release_drop_window_lock(appimage_path);
+                return;
+            }
+
+            // Extract app name and version from .desktop file
+            string resolved_name = metadata.display_name;
+            string? resolved_version = null;
+            string? temp_dir = null;
+            try {
+                temp_dir = Utils.FileUtils.create_temp_dir("appmgr-quick-");
+                var desktop_file = AppImageAssets.extract_desktop_entry(appimage_path, temp_dir);
+                if (desktop_file != null) {
+                    var desktop_info = AppImageAssets.parse_desktop_file(desktop_file);
+                    if (desktop_info.name != null && desktop_info.name.strip() != "") {
+                        resolved_name = desktop_info.name.strip();
+                    }
+                    if (desktop_info.appimage_version != null) {
+                        resolved_version = desktop_info.appimage_version;
+                    }
+                }
+            } catch (Error e) {
+                warning("Desktop file extraction error: %s", e.message);
+            } finally {
+                if (temp_dir != null) {
+                    Utils.FileUtils.remove_dir_recursive(temp_dir);
+                }
+            }
+
+            // Check for existing installation
+            var existing = registry.detect_existing(appimage_path, metadata.checksum, resolved_name);
+            if (existing != null) {
+                var relation = quick_install_version_relation(existing, resolved_version);
+                quick_install_present_replace(appimage_path, existing, resolved_version, relation, reuse);
+            } else {
+                quick_install_present_warning(appimage_path, resolved_name, reuse);
+            }
+        }
+
+        /**
+         * Reports a quick-install error in the re-used download window when
+         * there is one, otherwise as a plain alert.
+         */
+        private void quick_install_present_error(string title, string message, DialogWindow? reuse) {
+            if (reuse != null) {
+                var icon = new Gtk.Image.from_icon_name("dialog-error-symbolic");
+                icon.set_pixel_size(64);
+                icon.halign = Gtk.Align.CENTER;
+                reuse.reset(title, icon);
+                reuse.append_body(UiUtils.create_wrapped_label(GLib.Markup.escape_text(message, -1), true));
+                reuse.add_option("close", _("Close"));
+                return;
+            }
+            var dialog = new Adw.AlertDialog(title, message);
+            dialog.add_response("close", _("Close"));
+            dialog.set_close_response("close");
+            dialog.present(this.get_active_window());
+        }
+
+        /**
+         * Returns 1 if candidate is newer, -1 if installed is newer, 0 otherwise.
+         */
+        private int quick_install_version_relation(InstallationRecord record, string? candidate_version) {
+            if (record.version == null || candidate_version == null) {
+                return 0;
+            }
+            return VersionUtils.compare(record.version, candidate_version) < 0 ? 1 :
+                   VersionUtils.compare(record.version, candidate_version) > 0 ? -1 : 0;
+        }
+
+        private Gtk.Overlay quick_install_build_icon_with_badge(string appimage_path, InstallationRecord? record = null) {
+            var image = new Gtk.Image();
+            image.set_pixel_size(64);
+            image.halign = Gtk.Align.CENTER;
+
+            bool icon_set = false;
+            if (record != null) {
+                var record_icon = UiUtils.load_record_icon(record);
+                if (record_icon != null) {
+                    image.set_from_paintable(record_icon);
+                    icon_set = true;
+                }
+            }
+            if (!icon_set) {
+                var texture = UiUtils.load_icon_from_appimage(appimage_path);
+                if (texture != null) {
+                    image.set_from_paintable(texture);
+                } else {
+                    image.set_from_icon_name("application-x-executable");
+                }
+            }
+
+            var overlay = new Gtk.Overlay();
+            overlay.set_child(image);
+            overlay.halign = Gtk.Align.CENTER;
+            overlay.set_size_request(64, 64);
+
+            var badge = new Gtk.Image();
+            badge.set_pixel_size(20);
+            badge.halign = Gtk.Align.END;
+            badge.valign = Gtk.Align.END;
+            badge.set_from_icon_name("verify-warning");
+            overlay.add_overlay(badge);
+
+            return overlay;
+        }
+
+        private void quick_install_present_warning(string appimage_path, string app_name, DialogWindow? reuse = null) {
+            var title = _("Open %s?").printf(app_name);
+            var dialog = reuse ?? new DialogWindow(this, this.get_active_window(), title, null);
+            if (reuse != null) {
+                reuse.reset(title);
+            }
+
+            dialog.append_body(quick_install_build_icon_with_badge(appimage_path));
+
+            var warning_text = _("Origins of %s application can not be verified. Are you sure you want to open it?").printf(app_name);
+            var warning_markup = "<b>%s</b>".printf(GLib.Markup.escape_text(warning_text, -1));
+            dialog.append_body(UiUtils.create_wrapped_label(warning_markup, true));
+            dialog.append_body(UiUtils.create_wrapped_label(_("Install the AppImage to add it to your applications."), false, true));
+
+            dialog.add_option("install", _("Install"));
+            dialog.add_option("cancel", _("Cancel"), true);
+
+            dialog.close_request.connect(() => {
+                release_drop_window_lock(appimage_path);
+                return false;
+            });
+
+            dialog.option_selected.connect((response) => {
+                if (response == "install") {
+                    quick_install_run(appimage_path, InstallMode.PORTABLE, null);
+                }
+            });
+
+            dialog.present();
+        }
+
+        private void quick_install_present_replace(string appimage_path, InstallationRecord record, string? candidate_version, int relation, DialogWindow? reuse = null) {
+            var title = _("Replace %s?").printf(record.name);
+            var dialog = reuse ?? new DialogWindow(this, this.get_active_window(), title, null);
+            if (reuse != null) {
+                reuse.reset(title);
+            }
+
+            dialog.append_body(quick_install_build_icon_with_badge(appimage_path, record));
+
+            bool installed_newer = relation == -1;
+            string replace_text;
+            if (relation == 1) {
+                replace_text = _("An older item named \"%s\" already exists in this location. Do you want to replace it with newer one you're copying?").printf(record.name);
+            } else if (installed_newer) {
+                replace_text = _("A newer item named %s already exists in this location. Do you want to replace it with the older one you're copying?").printf(record.name);
+            } else {
+                replace_text = _("An item named %s already exists in this location. Do you want to replace it with one you're copying?").printf(record.name);
+            }
+            if (relation != 0 && record.version != null && candidate_version != null) {
+                var versions = _("Installed: %s | Incoming: %s").printf(record.version, candidate_version);
+                dialog.append_body(UiUtils.create_wrapped_label(GLib.Markup.escape_text(versions, -1), true, true));
+            }
+            dialog.append_body(UiUtils.create_wrapped_label(GLib.Markup.escape_text(replace_text, -1), true));
+
+            var replace_is_default = !installed_newer;
+            dialog.add_option("keep-both", _("Keep Both"));
+            dialog.add_option("stop", _("Stop"), !replace_is_default);
+            dialog.add_option("replace", _("Replace"), replace_is_default);
+
+            dialog.close_request.connect(() => {
+                release_drop_window_lock(appimage_path);
+                return false;
+            });
+
+            dialog.option_selected.connect((response) => {
+                if (response == "replace") {
+                    quick_install_run(appimage_path, record.mode, record);
+                } else if (response == "keep-both") {
+                    quick_install_run(appimage_path, InstallMode.PORTABLE, null);
+                }
+            });
+
+            dialog.present();
+        }
+
+        private void quick_install_run(string appimage_path, InstallMode mode, InstallationRecord? existing) {
+            // Stage a copy
+            string staged_path;
+            string staged_dir;
+            try {
+                staged_dir = Utils.FileUtils.create_temp_dir("appmgr-stage-");
+                staged_path = Path.build_filename(staged_dir, Path.get_basename(appimage_path));
+                Utils.FileUtils.file_copy(appimage_path, staged_path);
+            } catch (Error e) {
+                release_drop_window_lock(appimage_path);
+                quick_install_show_error(e.message);
+                return;
+            }
+
+            // Hold the application alive while the install runs in a background thread.
+            // Without this, the dialog closing (from DialogWindow.add_option) may leave
+            // zero windows, causing GtkApplication to quit before the thread finishes.
+            // For reinstalls this is catastrophic: uninstall completes but install never does.
+            this.hold();
+            quick_install_run_async.begin(appimage_path, staged_path, staged_dir, mode, existing);
+        }
+
+        private async void quick_install_run_async(string appimage_path, string staged_path, string staged_dir, InstallMode mode, InstallationRecord? existing) {
+            SourceFunc callback = quick_install_run_async.callback;
+            InstallationRecord? record = null;
+            Error? error = null;
+            bool upgraded = (existing != null);
+
+            new Thread<void>("appmgr-quick-install", () => {
+                try {
+                    if (existing != null) {
+                        record = installer.upgrade(staged_path, existing);
+                    } else {
+                        record = installer.install(staged_path, mode);
+                    }
+                } catch (Error e) {
+                    error = e;
+                }
+                Idle.add((owned) callback);
+            });
+
+            yield;
+
+            Utils.FileUtils.remove_dir_recursive(staged_dir);
+
+            // Delete source AppImage on success
+            if (error == null) {
+                try {
+                    var source = File.new_for_path(appimage_path);
+                    if (source.query_exists()) {
+                        source.delete(null);
+                    }
+                } catch (Error e) {
+                    warning("Failed to delete original AppImage: %s", e.message);
+                }
+            }
+
+            release_drop_window_lock(appimage_path);
+
+            if (error != null) {
+                quick_install_show_error(error.message);
+            } else if (record != null) {
+                quick_install_show_success(record, upgraded);
+            }
+
+            // Allow normal shutdown now that result dialog is presented
+            this.release();
+        }
+
+        private void quick_install_show_success(InstallationRecord record, bool upgraded) {
+            var parent = this.get_active_window();
+            var title = upgraded ? _("Successfully Updated") : _("Successfully Installed");
+
+            var image = new Gtk.Image();
+            image.set_pixel_size(64);
+            image.halign = Gtk.Align.CENTER;
+            var record_icon = UiUtils.load_record_icon(record);
+            if (record_icon != null) {
+                image.set_from_paintable(record_icon);
+            } else {
+                image.set_from_icon_name("application-x-executable");
+            }
+
+            var dialog = new DialogWindow(this, parent, title, image);
+            var app_name_markup = "<b>%s</b>".printf(GLib.Markup.escape_text(record.name, -1));
+            dialog.append_body(UiUtils.create_wrapped_label(app_name_markup, true));
+
+            var version_text = record.version ?? _("Unknown version");
+            var version_label = UiUtils.create_wrapped_label(_("Version %s").printf(version_text), false);
+            version_label.add_css_class("dim-label");
+            dialog.append_body(version_label);
+
+            dialog.add_option("open", _("Open"), true);
+            dialog.add_option("done", _("Done"));
+            dialog.option_selected.connect((response) => {
+                if (response == "open") {
+                    try {
+                        if (record.desktop_file != null && record.desktop_file.strip() != "") {
+                            var app_info = new DesktopAppInfo.from_filename(record.desktop_file);
+                            if (app_info != null) {
+                                app_info.launch(null, null);
+                            }
+                        }
+                    } catch (Error e) {
+                        warning("Launch error: %s", e.message);
+                    }
+                }
+            });
+
+            dialog.present();
+        }
+
+        private void quick_install_show_error(string message) {
+            var parent = this.get_active_window();
+            var error_icon = new Gtk.Image.from_icon_name("dialog-error-symbolic");
+            error_icon.set_pixel_size(64);
+            error_icon.halign = Gtk.Align.CENTER;
+
+            var dialog = new DialogWindow(this, parent, _("Installation failed"), error_icon);
+            dialog.append_body(UiUtils.create_wrapped_label(GLib.Markup.escape_text(message, -1), true));
+            dialog.add_option("dismiss", _("Dismiss"));
+            dialog.present();
+        }
+
+        /**
+         * Opens a drop window for the given file.
+         * Public method to allow MainWindow to trigger installs via drag & drop.
+         */
+        public void open_drop_window(GLib.File file) {
+            show_drop_window(file);
+        }
+
+        /**
+         * Checks if AppManager itself is installed (when running as AppImage).
+         */
+        private bool is_self_installed() {
+            var appimage = AppPaths.appimage_path;
+            if (appimage == null) {
+                return true; // Not an AppImage, consider "installed"
+            }
+            // If the AppImage file no longer exists at the original path,
+            // it was likely moved during installation - treat as installed
+            if (!GLib.FileUtils.test(appimage, FileTest.EXISTS)) {
+                debug("AppImage no longer at original path %s, assuming installed", appimage);
+                return true;
+            }
+            try {
+                var checksum = Utils.FileUtils.compute_checksum(appimage);
+                return registry.is_installed_checksum(checksum);
+            } catch (Error e) {
+                warning("Failed to compute checksum for self-install check: %s", e.message);
+                return true; // On error, don't block the user
+            }
+        }
+
+        /**
+         * Shows the installer window for self-installation.
+         */
+        private void show_self_install_window() {
+            var appimage = AppPaths.appimage_path;
+            if (appimage == null) {
+                activate();
+                return;
+            }
+            
+            // Prevent duplicate windows using file-based locking
+            if (!try_acquire_drop_window_lock(appimage)) {
+                debug("Self-install window already open for %s (locked by another instance), ignoring", appimage);
+                return;
+            }
+            
+            try {
+                debug("Opening self-install window for %s", appimage);
+                var window = new DropWindow(this, registry, installer, settings, appimage);
+                // After successful install, show the main window
+                window.close_request.connect(() => {
+                    release_drop_window_lock(appimage);
+                    // Check if we're now installed
+                    if (is_self_installed()) {
+                        // Re-activate to show main window
+                        Idle.add(() => {
+                            activate();
+                            return Source.REMOVE;
+                        });
+                    }
+                    return false; // Allow window to close
+                });
+                window.present();
+            } catch (Error e) {
+                release_drop_window_lock(appimage);
+                critical("Failed to open self-install window: %s", e.message);
+                // Fall back to main window
+                if (main_window == null) {
+                    main_window = new MainWindow(this, registry, installer, settings);
+                }
+                main_window.present();
+            }
+        }
+
+        /**
+         * Handles leftover .home/.config folders next to AppManager's own AppImage,
+         * created by the pre-fix self-install loop (issue #140). Empty scaffolding is
+         * removed silently; folders with real content (apps installed while HOME was
+         * redirected) are flagged to the user once instead of being deleted.
+         */
+        private void cleanup_stale_self_portable_dirs() {
+            var appimage = AppPaths.appimage_path;
+            if (appimage == null) {
+                return;
+            }
+            string[] stale = { appimage + ".home", appimage + ".config" };
+            foreach (var dir in stale) {
+                if (!GLib.FileUtils.test(dir, FileTest.IS_DIR)) {
+                    continue;
+                }
+                if (Utils.FileUtils.dir_is_effectively_empty(dir)) {
+                    // Only empty scaffolding left behind - remove silently.
+                    Utils.FileUtils.remove_dir_recursive(dir);
+                    debug("Removed stale portable folder %s", dir);
+                } else {
+                    // Contains real files (possibly apps installed while HOME was
+                    // redirected). Never delete silently - tell the user once.
+                    present_stale_portable_dir_notice(dir);
+                }
+            }
+        }
+
+        private void present_stale_portable_dir_notice(string dir) {
+            if (notified_stale_dirs.contains(dir)) {
+                return;
+            }
+            notified_stale_dirs.add(dir);
+            // Defer to idle so a window (main or self-install) exists to parent the dialog.
+            Idle.add(() => {
+                var dialog = new Adw.AlertDialog(
+                    _("Leftover portable folder found"),
+                    _("A leftover portable folder was found next to AppManager (%s). AppManager does not support portable mode for itself. The folder may contain apps installed while this bug was active — move anything you need out of it (e.g. AppImages under its Applications subfolder), then delete it.").printf(dir)
+                );
+                dialog.add_response("ignore", _("Ignore"));
+                dialog.add_response("trash", _("Move to Trash"));
+                dialog.set_response_appearance("trash", Adw.ResponseAppearance.DESTRUCTIVE);
+                dialog.set_close_response("ignore");
+                dialog.set_default_response("ignore");
+                dialog.response.connect((response) => {
+                    if (response == "trash") {
+                        try {
+                            File.new_for_path(dir).trash(null);
+                        } catch (Error e) {
+                            warning("Failed to move stale portable folder %s to trash: %s", dir, e.message);
+                        }
+                    }
+                });
+                dialog.present(this.get_active_window() ?? main_window);
+                return Source.REMOVE;
+            });
+        }
+
+        /**
+         * Anchor a command-line path to the directory the user typed it in. A remote invocation is
+         * executed by the running primary instance, whose own cwd is wherever the GUI was launched
+         * from (usually $HOME), so relative paths must be resolved against the caller's cwd that
+         * GLib passes along. Arguments that name no existing file are left alone, since uninstall
+         * and update also accept a checksum.
+         */
+        private static string resolve_cli_path(GLib.ApplicationCommandLine command_line, string path) {
+            if (Path.is_absolute(path)) {
+                return path;
+            }
+            var cwd = command_line.get_cwd();
+            if (cwd == null || cwd.strip() == "") {
+                return path;
+            }
+            var candidate = Path.build_filename(cwd, path);
+            return GLib.FileUtils.test(candidate, FileTest.EXISTS) ? candidate : path;
+        }
+
+        protected override int command_line(GLib.ApplicationCommandLine command_line) {
+            // Extract options from the command line (works for both local and remote invocations)
+            var opts = command_line.get_options_dict();
+            string? cmd_install = null;
+            string? cmd_uninstall = null;
+            string? cmd_update = null;
+            string? cmd_is_installed = null;
+
+            if (opts.contains("install")) {
+                cmd_install = opts.lookup_value("install", VariantType.BYTESTRING).get_bytestring();
+            }
+            if (opts.contains("uninstall")) {
+                cmd_uninstall = opts.lookup_value("uninstall", new VariantType("s")).get_string();
+            }
+            if (opts.contains("is-installed")) {
+                cmd_is_installed = opts.lookup_value("is-installed", VariantType.BYTESTRING).get_bytestring();
+            }
+
+            var file_list = new ArrayList<GLib.File>();
+
+            // Handle non-option arguments (file paths)
+            var args = command_line.get_arguments();
+
+            // appimg:// links arrive as a plain argument (Exec=… %u), so they are
+            // routed before the file handling below.
+            for (int i = 1; i < args.length; i++) {
+                if (args[i].has_prefix(APPIMG_URI_SCHEME + ":")) {
+                    handle_appimg_uri(args[i]);
+                    return 0;
+                }
+            }
+
+            // Support subcommand-style: app-manager install PATH / uninstall PATH / update PATH
+            // (--install/--uninstall flags are handled by GLib option parser as hidden options)
+            if (args.length > 1 && (args[1] == "install" || args[1] == "uninstall" || args[1] == "update")) {
+                if (args.length < 3) {
+                    command_line.printerr("Error: '%s' requires a PATH argument\n", args[1]);
+                    command_line.set_exit_status(7);
+                    return 7;
+                }
+                if (args[1] == "install" && cmd_install == null) {
+                    cmd_install = args[2];
+                } else if (args[1] == "uninstall" && cmd_uninstall == null) {
+                    cmd_uninstall = args[2];
+                } else if (args[1] == "update" && cmd_update == null) {
+                    cmd_update = args[2];
+                }
+            }
+
+            if (cmd_install != null) cmd_install = resolve_cli_path(command_line, cmd_install);
+            if (cmd_uninstall != null) cmd_uninstall = resolve_cli_path(command_line, cmd_uninstall);
+            if (cmd_update != null) cmd_update = resolve_cli_path(command_line, cmd_update);
+            if (cmd_is_installed != null) cmd_is_installed = resolve_cli_path(command_line, cmd_is_installed);
+            debug("command_line: got %u args", args.length);
+            for (int _k = 0; _k < args.length; _k++)
+                debug("command_line arg[%d] = %s", _k, args[_k]);
+            for (int i = 1; i < args.length; i++) {
+                var arg = args[i];
+                // Skip already-processed option arguments and subcommands
+                if (arg == "--install" || arg == "--uninstall" || arg == "--is-installed" ||
+                    arg == "--background-update" || arg == "--update-all" || arg == "--update-check" ||
+                    arg == "--help" || arg == "-h" || arg == "--version" ||
+                    arg == "install" || arg == "uninstall" || arg == "update") {
+                    if (arg == "--install" || arg == "--uninstall" || arg == "--is-installed" ||
+                        arg == "install" || arg == "uninstall" || arg == "update") {
+                        i++; // Skip the value
+                    }
+                    continue;
+                }
+                if (arg.length > 0 && arg[0] != '-') {
+                    if (arg.has_prefix("file://")) {
+                        file_list.add(File.new_for_uri(arg));
+                    } else {
+                        file_list.add(File.new_for_path(resolve_cli_path(command_line, arg)));
+                    }
+                }
+            }
+            if (file_list.size > 0) {
+                var arr = new GLib.File[file_list.size];
+                for (int k = 0; k < file_list.size; k++) arr[k] = file_list.get(k);
+                this.open(arr, "");
+                return 0;
+            }
+
+            if (cmd_install != null) {
+                try {
+                    bool is_upgrade;
+                    bool keep_both = opts.contains("keep-both");
+                    var record = installer.install_or_upgrade(cmd_install, out is_upgrade, keep_both);
+                    if (is_upgrade) {
+                        command_line.print("Updated %s\n", record.name);
+                    } else {
+                        command_line.print("Installed %s\n", record.name);
+                    }
+                    return 0;
+                } catch (Error e) {
+                    if (e is InstallerError.INCOMPATIBLE_ARCHITECTURE) {
+                        command_line.printerr("Install failed: This AppImage is built for %s and cannot run on this system\n", e.message);
+                    } else {
+                        command_line.printerr("Install failed: %s\n", e.message);
+                    }
+                    command_line.set_exit_status(2);
+                    return 2;
+                }
+            }
+
+            if (cmd_uninstall != null) {
+                try {
+                    var record = locate_record(cmd_uninstall);
+                    if (record == null) {
+                        command_line.printerr("No installation matches %s\n", cmd_uninstall);
+                        command_line.set_exit_status(3);
+                        return 3;
+                    }
+                    
+                    try {
+                        installer.uninstall(record, false, true);
+                    } catch (Error e) {
+                        if (e.message.has_prefix("TRASH_FAILED:")) {
+                            installer.uninstall(record, true, true);
+                        } else {
+                            throw e;
+                        }
+                    }
+
+                    command_line.print("Removed %s\n", record.name);
+                    return 0;
+                } catch (Error e) {
+                    command_line.printerr("Uninstall failed: %s\n", e.message);
+                    command_line.set_exit_status(4);
+                    return 4;
+                }
+            }
+
+            if (cmd_update != null) {
+                var record = locate_record(cmd_update);
+                if (record == null) {
+                    command_line.printerr("No installation matches %s\n", cmd_update);
+                    command_line.set_exit_status(3);
+                    return 3;
+                }
+                var updater = new Updater(registry, installer);
+                var result = updater.update_single(record, null);
+                var name = result.record.name ?? result.record.id;
+                switch (result.status) {
+                    case UpdateStatus.UPDATED:
+                        command_line.print("Updated %s: %s\n", name, result.message);
+                        return 0;
+                    case UpdateStatus.SKIPPED:
+                        command_line.print("Skipped %s: %s\n", name, result.message);
+                        return 0;
+                    case UpdateStatus.FAILED:
+                    default:
+                        command_line.printerr("Failed %s: %s\n", name, result.message);
+                        command_line.set_exit_status(6);
+                        return 6;
+                }
+            }
+
+            if (cmd_is_installed != null) {
+                try {
+                    var checksum = Utils.FileUtils.compute_checksum(cmd_is_installed);
+                    var installed = registry.is_installed_checksum(checksum);
+                    command_line.print(installed ? "installed\n" : "missing\n");
+                    if (!installed) command_line.set_exit_status(1);
+                    return installed ? 0 : 1;
+                } catch (Error e) {
+                    command_line.printerr("Query failed: %s\n", e.message);
+                    command_line.set_exit_status(5);
+                    return 5;
+                }
+            }
+
+            this.activate();
+            return 0;
+        }
+
+        public void uninstall_record(InstallationRecord record, Gtk.Window? parent_window, bool permanently = false, bool preserve_portable = false) {
+            uninstall_record_async.begin(record, parent_window, permanently, preserve_portable);
+        }
+
+        private async void uninstall_record_async(InstallationRecord record, Gtk.Window? parent_window, bool permanently, bool preserve_portable) {
+            SourceFunc callback = uninstall_record_async.callback;
+            Error? error = null;
+            bool trash_failed = false;
+            string? trash_path = null;
+            var installed_path = record.installed_path;
+            var app_name = record.name ?? Path.get_basename(installed_path);
+
+            new Thread<void>("appmgr-uninstall", () => {
+                try {
+                    installer.uninstall(record, permanently, preserve_portable);
+                    // After successful trash, find the file in trash for undo support
+                    if (!permanently) {
+                        trash_path = Utils.FileUtils.find_in_trash(installed_path);
+                    }
+                } catch (Error e) {
+                    error = e;
+                    // Check if trash specifically failed (not a permanent delete failure)
+                    if (!permanently && e.message.has_prefix("TRASH_FAILED:")) {
+                        trash_failed = true;
+                    }
+                }
+                Idle.add((owned) callback);
+            });
+
+            yield;
+
+            if (trash_failed) {
+                // Offer to delete permanently as fallback
+                var dialog = new Adw.AlertDialog(
+                    _("Cannot move to trash"),
+                    _("%s could not be moved to the trash. Do you want to delete it permanently instead?\n\nThis action cannot be undone.").printf(app_name)
+                );
+                dialog.add_response("cancel", _("Cancel"));
+                dialog.add_response("delete", _("Delete Permanently"));
+                dialog.set_response_appearance("delete", Adw.ResponseAppearance.DESTRUCTIVE);
+                dialog.set_close_response("cancel");
+                dialog.set_default_response("cancel");
+                dialog.response.connect((response) => {
+                    if (response == "delete") {
+                        uninstall_record(record, parent_window, true, preserve_portable);
+                    }
+                });
+                dialog.present(parent_window ?? main_window);
+            } else if (error != null) {
+                var dialog = new Adw.AlertDialog(
+                    _("Uninstall failed"),
+                    _("%s could not be removed: %s").printf(record.name, error.message)
+                );
+                dialog.add_response("close", _("Close"));
+                dialog.set_default_response("close");
+                dialog.present(parent_window ?? main_window);
+            } else {
+                if (parent_window != null && parent_window is MainWindow) {
+                    if (permanently) {
+                        ((MainWindow)parent_window).add_toast(_("Deleted permanently"));
+                    } else if (trash_path != null) {
+                        var trash_msg = _("%s moved to Trash").printf(app_name);
+                        var toast = ((MainWindow)parent_window).add_toast_with_button(trash_msg, _("Undo"));
+                        toast.button_clicked.connect(() => {
+                            restore_from_trash(trash_path, parent_window);
+                        });
+                    } else {
+                        ((MainWindow)parent_window).add_toast(_("%s moved to Trash").printf(app_name));
+                    }
+                }
+            }
+        }
+
+        private void restore_from_trash(string trash_path, Gtk.Window? parent_window) {
+            restore_from_trash_async.begin(trash_path, parent_window);
+        }
+
+        private async void restore_from_trash_async(string trash_path, Gtk.Window? parent_window) {
+            SourceFunc callback = restore_from_trash_async.callback;
+            Error? error = null;
+
+            new Thread<void>("appmgr-restore", () => {
+                try {
+                    var restored = installer.install(trash_path);
+                    var restored_path = restored.installed_path;
+                    if (restored_path != null && restored_path.strip() != "") {
+                        restore_trashed_portable_folder("%s.home".printf(restored_path));
+                        restore_trashed_portable_folder("%s.config".printf(restored_path));
+                    }
+                } catch (Error e) {
+                    error = e;
+                }
+                Idle.add((owned) callback);
+            });
+
+            yield;
+
+            if (parent_window != null && parent_window is MainWindow) {
+                if (error != null) {
+                    ((MainWindow)parent_window).add_toast(_("Undo failed"));
+                    warning("Restore from trash failed: %s", error.message);
+                } else {
+                    ((MainWindow)parent_window).add_toast(_("Restored"));
+                }
+            }
+        }
+
+        private void restore_trashed_portable_folder(string original_path) {
+            var trash_path = Utils.FileUtils.find_in_trash(original_path);
+            if (trash_path == null) {
+                return;
+            }
+            try {
+                File.new_for_path(trash_path).move(File.new_for_path(original_path), FileCopyFlags.NOFOLLOW_SYMLINKS);
+            } catch (Error e) {
+                warning("Failed to restore portable folder %s -> %s: %s", trash_path, original_path, e.message);
+            }
+        }
+
+        public void extract_installation(InstallationRecord record, Gtk.Window? parent_window) {
+            var source_path = record.installed_path ?? "";
+            if (record.mode != InstallMode.PORTABLE || source_path.strip() == "") {
+                present_extract_error(parent_window, record, _("Extraction is only available for portable installations."));
+                return;
+            }
+
+            extract_installation_async.begin(record, parent_window, source_path);
+        }
+
+        private async void extract_installation_async(InstallationRecord record, Gtk.Window? parent_window, string source_path) {
+            SourceFunc callback = extract_installation_async.callback;
+            InstallationRecord? new_record = null;
+            Error? error = null;
+            string? staging_dir = null;
+
+            new Thread<void>("appmgr-extract", () => {
+                string staged_path = "";
+                try {
+                    staging_dir = Utils.FileUtils.create_temp_dir("appmgr-extract-");
+                    staged_path = Path.build_filename(staging_dir, Path.get_basename(source_path));
+                    Utils.FileUtils.file_copy(source_path, staged_path);
+                    new_record = installer.reinstall(staged_path, record, InstallMode.EXTRACTED);
+                } catch (Error e) {
+                    error = e;
+                } finally {
+                    if (staging_dir != null) {
+                        Utils.FileUtils.remove_dir_recursive(staging_dir);
+                    }
+                }
+                Idle.add((owned) callback);
+            });
+
+            yield;
+
+            if (error != null) {
+                present_extract_error(parent_window, record, error.message);
+            } else if (new_record != null) {
+                if (parent_window != null && parent_window is MainWindow) {
+                    ((MainWindow)parent_window).add_toast(_("Extracted for faster launch"));
+                } else {
+                    var dialog = new Adw.AlertDialog(
+                        _("Extraction complete"),
+                        _("%s was extracted and will open faster.").printf(new_record.name)
+                    );
+                    dialog.add_response("close", _("Close"));
+                    dialog.set_close_response("close");
+                    dialog.present(parent_window ?? main_window);
+                }
+            }
+        }
+
+        private void present_extract_error(Gtk.Window? parent_window, InstallationRecord record, string message) {
+            var dialog = new Adw.AlertDialog(
+                _("Extraction failed"),
+                _("%s could not be extracted: %s").printf(record.name, message)
+            );
+            dialog.add_response("close", _("Close"));
+            dialog.set_close_response("close");
+            dialog.present(parent_window ?? main_window);
+        }
+
+        private InstallationRecord? locate_record(string target) {
+            var by_path = registry.lookup_by_installed_path(target) ?? registry.lookup_by_source(target);
+            if (by_path != null) {
+                return by_path;
+            }
+            try {
+                if (File.new_for_path(target).query_exists()) {
+                    var checksum = Utils.FileUtils.compute_checksum(target);
+                    var by_checksum = registry.lookup_by_checksum(checksum);
+                    if (by_checksum != null) {
+                        return by_checksum;
+                    }
+                }
+            } catch (Error e) {
+                warning("Failed to compute checksum for %s: %s", target, e.message);
+            }
+            return null;
+        }
+
+        private void present_preferences() {
+            Gtk.Widget? parent = this.get_active_window();
+            if (parent == null) {
+                parent = main_window;
+            }
+
+            if (parent == null) {
+                return;
+            }
+
+            if (preferences_dialog == null) {
+                preferences_dialog = new PreferencesDialog(settings, registry, directory_monitor);
+                preferences_dialog.closed.connect(() => {
+                    preferences_dialog = null;
+                });
+            }
+
+            preferences_dialog.present(parent);
+        }
+
+        /**
+         * Returns the path to the lock directory for drop window locks.
+         */
+        private string get_lock_dir() {
+            var dir = Path.build_filename(Environment.get_user_runtime_dir(), "app-manager-locks");
+            DirUtils.create_with_parents(dir, 0755);
+            return dir;
+        }
+
+        /**
+         * Returns the lock file path for a given AppImage path.
+         */
+        private string get_lock_file_path(string appimage_path) {
+            // Use checksum of the path to create a unique lock file name
+            var checksum = GLib.Checksum.compute_for_string(ChecksumType.MD5, appimage_path);
+            return Path.build_filename(get_lock_dir(), "drop-window-%s.lock".printf(checksum));
+        }
+
+        /**
+         * Tries to acquire an exclusive lock for opening a drop window.
+         * Returns true if the lock was acquired, false if already locked.
+         */
+        private bool try_acquire_drop_window_lock(string appimage_path) {
+            var lock_file_path = get_lock_file_path(appimage_path);
+            
+            // Check if lock file exists and is still valid (process still running)
+            if (GLib.FileUtils.test(lock_file_path, FileTest.EXISTS)) {
+                try {
+                    string contents;
+                    GLib.FileUtils.get_contents(lock_file_path, out contents);
+                    var pid = int.parse(contents.strip());
+                    
+                    // Check if the process is still running
+                    if (pid > 0 && Posix.kill(pid, 0) == 0) {
+                        // Process is still running, lock is valid
+                        return false;
+                    }
+                    // Process is dead, we can take over the lock
+                    debug("Stale lock file found for %s (pid %d is dead), taking over", appimage_path, pid);
+                } catch (Error e) {
+                    // Error reading lock file, try to remove and recreate
+                    debug("Error reading lock file: %s", e.message);
+                }
+            }
+            
+            // Create lock file with our PID
+            try {
+                var pid_str = "%d".printf(Posix.getpid());
+                GLib.FileUtils.set_contents(lock_file_path, pid_str);
+                owned_lock_files.add(lock_file_path);
+                return true;
+            } catch (Error e) {
+                warning("Failed to create lock file %s: %s", lock_file_path, e.message);
+                return false;
+            }
+        }
+
+        /**
+         * Releases the lock for a drop window.
+         */
+        private void release_drop_window_lock(string appimage_path) {
+            var lock_file_path = get_lock_file_path(appimage_path);
+            
+            if (owned_lock_files.contains(lock_file_path)) {
+                try {
+                    var file = File.new_for_path(lock_file_path);
+                    file.delete();
+                } catch (Error e) {
+                    debug("Failed to delete lock file %s: %s", lock_file_path, e.message);
+                }
+                owned_lock_files.remove(lock_file_path);
+            }
+        }
+
+    }
+}
