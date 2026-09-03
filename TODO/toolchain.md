@@ -975,16 +975,34 @@ the eight the paragraph above names, plus their `-c` (C API) variants, the
     nix-2.34.8.drv        inputDrvs 26, inputSrcs 2, env 36, outputs 4
     nix-store-2.34.8.drv  inputDrvs 15, inputSrcs 3, env 39, outputs 3
 
-⛔ **SO RUNG 1'S MISSING PIECE IS A TRANSITIVE `.drv` WALK, and that is a
-smaller thing than the entry implies.** What is fetched today is **one level**:
-the top derivation's inputs. Of the dependencies named as risks above, only
-`sqlite` (3 derivations) and `brotli` (1) are in that level; **boost, libgit2,
-libarchive, lowdown, editline, libsodium, toml11 and the AWS CRT are not** —
-not because they are absent, but because nothing has walked down to them.
-⭐ `pgb nix drv` is the primitive and `internal/nixx`'s dependency walk is the
-place; ⚠ nothing drives it end to end, and **this measurement did not walk the
-graph** — it observed what one `plan` left on disk, which is a weaker claim and
-is the one being made.
+⛔ **AND THE TRANSITIVE WALK IS NOT MISSING EITHER — I SAID IT WAS, AND THEN
+RAN IT.** The first version of this section concluded *"rung 1's missing piece
+is a transitive `.drv` walk"*, from the observation that one `plan` leaves only
+the top derivation's inputs on disk. ⚠ That inferred a gap in the tool from a
+gap in what one command happened to cache. `pgb nix cache closure` takes a
+`.drv` store path and does the whole walk:
+
+    pgb nix cache closure /nix/store/nxwqpdnn…-nix-2.34.8.drv
+      ⭐ 2,000 paths — 1,665 .drv and 335 sources
+
+⭐ **AND EVERY DEPENDENCY THIS ENTRY NAMED AS A RISK IS IN IT**, so the list
+above is confirmed rather than feared:
+
+    boost 6   libgit2 1   libarchive 1   lowdown 2   editline 1
+    sqlite 5  libsodium 1  brotli 1  toml11 1  aws-c-* 10  curl 5  openssl 5
+
+⚠ **2,000 is the real count, not a cap** — checked three ways, because a round
+number in a measurement deserves it: `Closure` has no limit (it is a BFS over
+`References` until nothing new), the list is 2,000 **unique** paths, the count
+is stable on a re-run, and a different nix derivation in the same closure gives
+**1,248**, so the number tracks its subject.
+
+⛔ **SO RUNG 1 IS NOT BLOCKED ON A TOOL. It is blocked on BUILDING 1,665
+derivations static-glibc**, which is the work the entry describes and the risk
+it names — *"any one of those can refuse `-static`"* — with boost, the AWS CRT
+and libgit2 as the ones to expect trouble from. ⭐ The dependency-by-dependency
+table rung 1 asks for can now be produced by walking that list; nothing has
+walked it **building**, and that is the arm.
 
 ⭐ **A cheaper second reading of the same goal, which the operator allowed:**
 *"or carries enough of one"*. `internal/nixx/fetch.go` already fetches

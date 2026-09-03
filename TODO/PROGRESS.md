@@ -513,10 +513,18 @@ is **costing route B**, which is where the size actually is.
               - ⭐ BUT they ARE reachable through the .drv graph, which the
                 tool already walks one level of: 24 nix component derivations
                 are on disk after one plan, and `pgb nix drv` reads them.
-            ⛔ So rung 1's missing piece is a TRANSITIVE .drv walk. Of the
-            named risks only sqlite and brotli are in the one level fetched;
-            boost, libgit2, libarchive, lowdown, editline, libsodium, toml11
-            and the AWS CRT are further down and nothing has walked there.
+            ⛔ AND THE WALK IS NOT MISSING EITHER -- I WROTE THAT IT WAS AND
+            THEN RAN IT. `pgb nix cache closure <drv>` does the whole thing:
+              ⭐ 2,000 paths -- 1,665 .drv and 335 sources
+              ⭐ and EVERY named risk is in it: boost 6, libgit2 1,
+                libarchive 1, lowdown 2, editline 1, sqlite 5, libsodium 1,
+                brotli 1, toml11 1, aws-c-* 10, curl 5, openssl 5
+            ⚠ 2,000 is real, not a cap: Closure has no limit, the paths are
+            unique, the count is stable on a re-run, and another nix drv in
+            the same closure gives 1,248.
+            ⛔ SO RUNG 1 IS NOT BLOCKED ON A TOOL. It is blocked on BUILDING
+            1,665 derivations static-glibc -- expect boost, the AWS CRT and
+            libgit2 to be the ones that refuse.
     T-054   rungs 3 (KF6) and 4 (kdenlive static)
     T-051   the no-compiler host
     T-012   pgb build <url-or-package>
