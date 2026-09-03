@@ -4,7 +4,7 @@
 the entries, and [`../HISTORY/`](../HISTORY/).
 
     STATE     2026-09-03d  ✅ COMPLETE
-    COUNTS    50 entries, 15 open, 35 done
+    COUNTS    56 entries, 21 open, 35 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN (one red push, caught and fixed — see below)
               selftests 546 pass, 1 could not run (no zstd)
@@ -77,6 +77,16 @@ is ours, which is far enough for now. ⚠ Do not spend the next session on
 another millisecond.
 
     ---- ⭐ THE NEXT SESSION'S TASK LIST, AND IT IS TWO GOALS ----
+
+    ⛔ EVERY ITEM BELOW IS A NUMBERED ENTRY. Read the entry, not this
+       summary: it carries the sources, the measurements and the traps.
+
+         G1.1 → T-078   the three-way parity matrix (runtime, P1, L)
+         G1.2 → T-079   enumerate the remainder BY SEARCH (runtime, P1, M)
+         G2.1 → T-080   the capability guarantee (research, P1, L)
+         G2.2 → T-081   the debloater/patcher (toolchain, P1, L)
+         F1   → T-082   vendor + patch + drift detection (toolchain, P2, XL)
+         F2   → T-083   desktop integration (toolchain, P2, M)
 
     G1  ⛔ GLIBC STATIC IS TRULY COMPLETE. "No edge cases exist, and our
         static glibc binary and a native musl static binary are at

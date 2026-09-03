@@ -38,3 +38,76 @@ rewrite path testable with no GPU and no Alpine.
 the full rewrite, and the table shows what changed on each of 11.
 
 📚 [detail](../HISTORY/entries/runtime-open.md)
+
+## T-078 — The three-way parity matrix: vanilla `gcc -static`, ours, native musl static
+
+**Source** ⭐ **operator, 2026-09-03d**: *"a markdown table covering 'vanilla'
+GLIBC static binaries vs 'Ours' static binaries vs native MUSL static binaries
+must be compared on all possible comparisons that they can be compared with"*.
+**Category** runtime · **Priority** P1 · **Effort** L · **Status** open
+
+**Problem.** The claim under test is the operator's: *"our static glibc binary
+and a native musl static binary are at feature/standalone parity. No buts and
+no ifs."* ⛔ Nothing in this tree states it as one comparison. The evidence is
+spread across `experiments/20-`, `30-`, `40-`, `60-`, `61-`, `71-`, `75-`,
+`76-`, `97-` and eleven POC result files, and **the musl column is inferred in
+most of it rather than run**.
+
+**What is left.** One matrix, three columns, every cell a measurement or a
+dash — [`../docs/comparison.md`](../docs/comparison.md)'s rule. Candidate rows,
+all of which this tree already has an instrument for:
+
+    runs / payload clean on the eleven      NSS            iconv / gconv
+    locale                                  terminfo       CA bundle
+    timezone                                dlopen: own plugins
+    dlopen: host objects                    throughput (malloc 1t/4t, qsort,
+    startup                                   str*, snprintf, math, memcpy)
+    peak RSS                                artefact size
+    what it writes to the filesystem        PT_INTERP / DT_NEEDED
+    what breaks it
+
+⛔ **Every row needs the musl column actually RUN.** `experiments/60-` and
+`61-` build musl arms already — start there rather than writing a new harness.
+⚠ **`musl-gcc` is absent on this machine**; install it before starting or the
+table has a hole in the column the operator named.
+
+⭐ **One row is already written by somebody else and should be cited, not
+re-derived**: the bundling camp's own account of glibc — `LOCPATH` not working
+with locale archives, a missing gconv plugin failing silently and randomly, and
+`ld-linux.so` needing a patch to stop it reading `/etc/ld.so.cache`.
+[`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md) §1.
+
+**Prove.** The matrix in `docs/comparison.md`, every cell a measurement or a
+dash, and each measurement's experiment named beside it.
+
+## T-079 — Enumerate the remaining glibc-static edge cases, by SEARCH
+
+**Source** ⭐ **operator, 2026-09-03d**: *"GLIBC static is truly complete, no
+edgecases exist ... No buts and no ifs."*
+**Category** runtime · **Priority** P1 · **Effort** M · **Status** open
+
+**Problem.** ⛔ **This exact question has been answered wrongly once.**
+[`../docs/REQUIREMENTS.md`](../docs/REQUIREMENTS.md) said of its list of nine
+host-data dependencies *"there is no unenumerated remainder"*. A **tenth** was
+found the next day — the timezone database — by somebody taking the question as
+one about completeness rather than about the list. `grep -rn zoneinfo` over the
+whole tree returned **nothing**, and the row that came out of looking fails on
+**four** environments, one of them glibc. `experiments/97-`, T-076.
+
+⭐ **The list is now TEN and nine are closed.** ⛔ That is not evidence that
+ten is the number.
+
+**What is left.** Ask again, and answer with a **search**, not a sentence. The
+tenth was found by asking *what else does glibc read from the host that a
+static link does not absorb* and then grepping for it. Named starting points:
+`nss`, `gconv`, `locale`, `terminfo`, CA bundles, `zoneinfo` — all closed —
+then what is NOT in that list: `/etc/services`, `/etc/protocols`,
+`/etc/resolv.conf` options, `iconv` aliases, `getpwnam` beyond NSS, `ld.so`
+config, and whatever the search turns up that this sentence did not predict.
+
+⚠ **The known-open one is host `dlopen` beyond `--host-dlopen`**, plus
+`--tls-reserve`'s ~1.15 MB cost on every such build. T-072.
+
+**Prove.** Either a new row in `REQUIREMENTS.md` with an experiment behind it,
+or the enumeration written down with the command that produced it and what it
+looked at — ⛔ never the bare sentence that failed last time.

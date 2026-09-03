@@ -325,3 +325,130 @@ on `jq`, because `-S18` costs +17.8% of a real payload.
 📚 [detail](../HISTORY/entries/toolchain-open.md) — the AppDir-vs-artefact
 ratio (7.5:1), the six runs, the debloat accounting and the contaminated-clock
 correction all live there.
+
+## T-081 — The debloater/patcher: every store path, without the regex cascade
+
+**Source** ⭐ **operator, 2026-09-03d**: *"Our nix debloater/patcher covers any
+and all cases including shebang lines or hardcoded paths in .desktop files or
+anything else in a nix bundle ... notice all the sed,awk,grep
+patching/fixing, all of those were necessary, our debloater must find a way to
+get better results without being so messy."*
+**Category** toolchain · **Priority** P1 · **Effort** L · **Status** open
+
+**Problem.** ⭐ **The field's method is mined and quoted at file and line** —
+[`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md).
+It is five overlapping `sed` regexes applied in sequence, each catching what
+the last missed, ending in *"replace any remaining store path with `/`"*, and
+applied to `*.sh` files or anything `file -i` does not call an executable.
+
+⛔ **They are guessing at the store-path SHAPE because the script does not know
+the closure.** `internal/nixx` does: it computes the exact set of store paths
+in the bundle.
+
+**What is left.**
+
+1. ⭐ **Rewrite by set membership, not by pattern.** Every occurrence of a path
+   that IS in the closure is rewritten; a path that is not is left alone and
+   **reported**. ⚠ The blunt fifth regex cannot make that distinction and
+   destroys any store-shaped string it finds, including inside data.
+2. ⛔ **A store path with no in-bundle target is a FINDING.** The cascade maps
+   it to `/usr/local/bin`, which is a bet that the host has the program.
+3. **Shebangs, `.desktop` entries, and the `usr/` symlink.** The rules the
+   field uses are in §5 of the sweep. ⚠ Three of them are worth taking and
+   one is not: `DBusActivatable` must go (a bundle cannot be D-Bus activated),
+   `Icon=` must be rewritten to the bundled name — and their **selection**
+   rules are accidents, not policy: one takes the first match (`-quit` makes
+   its sort dead code), another the shortest path. ⭐ **Ours must choose
+   deliberately and say what it chose.** For icons that means **≥128×128,
+   preferring 128 then 512 or 1024** — never a smaller bucket.
+4. ⚠ **Do not copy their locale pass.** Its first loop symlinks `fonts` and
+   `man` directories to `/usr/share/locale`. And host-symlinking at all is a
+   tier-4 mechanism [`../docs/design/host-fallback.md`](../docs/design/host-fallback.md)
+   already has a policy for: look first, carry a fallback, never prefer a
+   stale copy.
+
+**Prove.** A corpus run: the 13 active `nixappimage` recipes in
+`references/pkgforge__soarpkgs`, and the measure is **how many store paths each
+route leaves behind** — theirs against ours — with zero silent substitutions on
+our side.
+
+## T-082 — Vendor and patch the third-party runtime and tooling, with drift detection
+
+**Source** ⭐ **operator, 2026-09-03d**: *"Vendor & Patch as many third party
+runtime or tooling we use, because upstream has bugs/feature requests still
+sitting/stale, and also because we can now implement a much better & focused
+version only useful for us ... we must have a script/tool/bot auto wired into
+our dev cycle where upstream's new commits/changes auto detected and
+auto-diffed."*
+**Category** toolchain · **Priority** P2 · **Effort** XL · **Status** open
+
+**Problem.** ⛔ **The cost of not having this is measured, not hypothetical.**
+This project spent a session discovering that the field runs a `lite` uruntime
+and a different block size. Both were free wins sitting in somebody else's
+build flags, worth **0.69×** and **0.66×** of cold start, and nothing tracked
+them. ⚠ And the pkgforge builds are themselves forks, so we are two levels
+behind upstream, not one.
+
+⚠ **A second instance, same week:** `defaultSharunURL` is pinned to
+`releases/latest/download` in a constant block whose own comment says
+`latest/download` is the thing not to do — and `Anylinux-sharun` is a fork whose
+surface has already SHRUNK (it removed `lib4bin`, `sharun-aio`, `sharun-lite`,
+the `xdg-open` wrapper and `--with-wrappe`).
+
+**What is left.** All of these are already vendored and pinned in
+`references/`: `pkgforge-dev/Anylinux-AppImages`, `Anylinux-uruntime`,
+`Anylinux-sharun`, `appimagetool`, `archlinux-pkgs-debloated`,
+`userland-execve-rust`.
+
+⭐ **THE MODEL IS SPECIFIED AND HAS A WORKING INSTANCE.** The methodology is
+[`../docs/methodology/vendoring.md`](../docs/methodology/vendoring.md), already
+vendored and binding; the worked example is `references/Azathothas__bit-cli`,
+which runs it over three repositories and thirteen crates. Its shape, verbatim:
+
+> **The model: the tree is the truth.** The vendored tree is edited in place.
+> `patches/<upstream>/*.patch` is **derived** from it and is never applied.
+
+with a manifest recording the commit each tree was last **reconciled** against,
+a written record of every change made, and four scripts — sync (three-way merge
+a new release onto ours), diff (regenerate the series; **`-Check` fails when
+the series and the tree disagree**), ⭐ **scan (everything upstream has, ranked
+against our open entries)**, and status.
+
+**Prove.** A drift detector that runs in the dev cycle and reports what
+upstream has that we do not — and a first report from it.
+
+## T-083 — Native desktop integration: our bundles as ordinary AppImages
+
+**Source** ⭐ **operator, 2026-09-03d**: *"'Native' desktop integration &
+appimage 'compatibility' for our nix bundled packages, so third party package
+managers can use/integrate our bundles as native appimages."*
+**Category** toolchain · **Priority** P2 · **Effort** M · **Status** open
+
+**Problem.** ⭐ **The contract is measured, and we already meet most of it** —
+[`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md) §2.
+`gio info` reports our artefact as `application/vnd.appimage`, which is
+`gearlever`'s actual gate; `--appimage-mount` prints and holds a mountpoint,
+which is `AM`'s; `--appimage-extract` works; and `soar` reads dwarfs directly.
+
+⛔ **Two real gaps, both one line in `internal/bundle/appimage.go`:**
+
+1. **`X-AppImage-Version=`** is absent from our desktop entries and is read by
+   **two** of the four managers (`gearlever`, `AppManager`). The version is
+   already known — it is in the derivation.
+2. **`.DirIcon` is absent when the closure carries no icon**, and the generated
+   entry still says `Icon=<pkg>` — a dangling reference, which is worse than an
+   absent one. Either emit a fallback or omit the key.
+
+⚠ **And a third file the field treats as part of the contract**: AppStream
+metadata under `usr/share/metainfo/`, which `soar` looks for (`find_appstream`)
+and the `soarpkgs` recipe creates explicitly.
+
+**What is left.** Close the two gaps, decide on AppStream, then mine each
+manager for what it does with the result: `mijorus/gearlever`,
+`kem-a/AppManager`, `ivan-hc/AM`, `pkgforge/soar` — all four vendored.
+⚠ **Depends on T-081**: a bundle whose `.desktop` still names store paths
+integrates a broken launcher.
+
+**Prove.** Each of the four managers installs and launches a `pgb` bundle, with
+an icon and a working launcher, and the failure of any one named with its
+reason.

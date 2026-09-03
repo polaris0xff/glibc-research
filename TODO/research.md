@@ -175,3 +175,51 @@ code runs at all.
 renderer strings, plus the detection path exercised on the eleven that do not.
 
 📚 [detail](../HISTORY/entries/research-open.md)
+
+## T-080 — The nix-bundle capability guarantee: EGL, SDL, XCB, vulkan, NVIDIA
+
+**Source** ⭐ **operator, 2026-09-03d**: *"Write up on guarantee that only thing
+left unsolved in our nix 'appimage/bundle' are all related to
+tooling/size/performance not that nix can't do egl/sdl or can't load
+vulkan/nvidia etc. The anylinux's references must be studied extensively for
+this."*
+**Category** research · **Priority** P1 · **Effort** L · **Status** open
+
+**Problem.** The project can say *"`experiments/85-` runs EGL out of a closure,
+pass=10 fail=0"* and nothing more, and every row there is `swrast` and
+surfaceless. ⛔ That is not a guarantee, and the gap between it and one is
+exactly where a reader assumes the worst.
+
+⭐ **The corpus is mined, pinned and read** —
+[`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md).
+What it establishes: Mesa is *"Excellent"* and its **ICD files support library
+paths relative to the ICD file itself**, which is what makes Vulkan/OpenGL
+relocatable; SDL is *"Excellent"*; and **NVIDIA is not bundled at all** — the
+driver links against a +10-year-old glibc, so the host's is usable.
+
+⛔ **AND THE GRADES ARE NOT OURS TO QUOTE.** They were earned deploying **Arch
+packages** through `quick-sharun`, where a library's data files and plugin
+directories must be discovered by hand. A nix closure is the opposite — it is
+the exact set the derivation declared. ⚠ **The operator's counter-example:**
+*"in nixappimage for instance, python is easy and works, choose any python gui
+app and it works"* — against a **"Utter garbage"** grade. A grade that inverts
+on the pipeline is not evidence about ours.
+
+**What is left.**
+
+1. ⭐ **Re-derive every row against `pgb bundle appimage`**, and **move the
+   bottom ones up**: GTK, Wayland, Python, glibc, WebKit, p11kit and JACK2
+   should come out *Excellent or close* through a closure, or this project
+   must name the exact mechanism that stops each one.
+2. ⚠ **Say which claim is being made about GL.** *"The closure produces a
+   working EGL display offscreen"* is supported today; *"the GPU problem is
+   solved"* is not, and T-059 owns the hardware that would decide it.
+3. ⛔ **The honest baseline is higher than "nix cannot do GUI".** Of 16
+   `nixappimage` recipes in `references/pkgforge__soarpkgs`, **13 are active**
+   — chromium, brave, discord, telegram, helix — and three are disabled, one of
+   them *"Fails to create EGL Display"*.
+
+**Prove.** A write-up whose every capability claim names the experiment behind
+it, and whose remaining gaps are each labelled **tooling**, **size** or
+**performance** — with the ones that are not so labelled named as capability
+gaps rather than omitted.
