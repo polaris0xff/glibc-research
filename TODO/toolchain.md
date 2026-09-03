@@ -1745,6 +1745,66 @@ including objects that are themselves unreachable. So an unreachable
 fixpoint — only mentions from reachable objects count — is a real further lever
 and a real safety question, and it is named here rather than taken.
 
+### ⭐ 2026-09-03c: ROUTE B IS COSTED, AND IT IS FOUR TIMES CHEAPER THAN THIS ENTRY ASSUMED
+
+`experiments/95-`, `evidence/95-route-b-cost/RESULT.txt`. ⛔ **This entry's own
+words were *"forces a from-source build of every dependent path — the thing
+`pgb nix` exists to avoid"*, and *"cost unknown"*. The cost is now known and
+"every dependent path" is wrong.**
+
+**Subject:** `kdePackages.kdenlive` → `/nix/store/rybc03ip…-kdenlive-26.08.0`,
+resolved through hydra exactly as `appimage.go:resolveTarget` resolves it, so
+this is the closure the bundler actually builds. **676 store paths,
+2,941,485,288 B.** No rebuild, no AppDir — one hydra job and one closure walk.
+
+| a `-mini` rebuild of | paths forced from source | bytes | of the closure |
+|---|---|---|---|
+| `qtbase` (3 outputs) | **78** | 739,766,064 | 11.5% |
+| `mesa` (1 output) | **85** | 811,935,576 | 12.6% |
+| ⭐ **`qtbase` + `mesa`** | ⭐ **85** | 811,935,576 | ⭐ **12.6%** |
+| `icu` | 100 | 1,038,769,104 | 14.8% |
+| `libxml2` | 136 | 1,504,152,912 | 20.1% |
+| `opus` | 62 | 792,942,664 | 9.2% |
+| `gtk4` | 11 | 239,430,608 | 1.6% |
+| `gtk3`, `glycin` | ⚠ **NOT IN THIS CLOSURE** | — | — |
+| ⭐ **the whole `--add-common` set** | ⭐ **161** | 1,675,619,424 | ⭐ **23.8%** |
+
+⭐ **SO ROUTE B'S WORST CASE IS 161 OF 676 PATHS, AND 515 STILL COME FROM THE
+BINARY CACHE.** Applying *every* `-mini` recipe the corpus applies to kdenlive
+leaves **76.2% of the closure** fetched rather than built. The fear this entry
+recorded — that changing qtbase's options invalidates "kdenlive's entire KDE/Qt
+subtree" — is measured at **11.5%**.
+
+⭐ **AND `qtbase` IS FREE ONCE `mesa` IS PAID FOR.** Every path downstream of
+`qtbase` is also downstream of `mesa-libgbm` — `downstream of qtbase but NOT of
+mesa: 0` — so the two biggest recipes together cost exactly what `mesa` costs
+alone. ⚠ That is a property of *this* closure, not a law.
+
+⛔ **THE CONTROLS, because reverse reachability computed the wrong way round
+produces a perfectly plausible table.** They swap on an inverted graph:
+
+    downstream of kdenlive itself        1 of 676   (nothing is above the top)
+    downstream of glibc                635 of 676   (libc is under everything)
+
+⛔ **AND THE NUMBERS ARE A FLOOR, WHICH THE EXPERIMENT SAYS OUT LOUD.** The
+graph is the **runtime reference** graph, read from each narinfo's
+`References:`. nixpkgs propagates a rebuild along **build inputs**, of which
+runtime references are a subset. So the true rebuild set within this closure is
+**at least** these counts. ⭐ It is a floor on the right population, though: the
+bundle carries exactly these 676 paths.
+
+⚠ **AND `mesa` HERE IS ONLY `mesa-libgbm-26.1.3`.** kdenlive's nixpkgs closure
+carries no mesa driver stack at all — GL arrives through `libglvnd`, and the
+`libLLVM.so.21.1` that dominated route A's ceiling is in `mesa-demos`' closure,
+not this one. ⛔ **So the 218.5 MiB ceiling and these 161 paths are measured on
+two different closures and must not be subtracted from one another.**
+
+**What this changes, and what it does not.** Route B is affordable in *paths*.
+⚠ It is **not costed in WALL CLOCK**, which is the number that decides whether
+`pgb bundle appimage kdenlive` stays a one-command operation: one of those 161
+is qtbase itself, and Qt does not build in a minute. That measurement needs a
+rebuild and is the next rung, not this one.
+
 ### ⛔ 2026-09-03c: THE CONTROL WAS SHARING CODE WITH THE SUBJECT, AND FIXING THAT FOUND A SECOND ROOT-OF-ITSELF
 
 ⚠ **The `selfKeys` fix above was applied to the fast scan AND to

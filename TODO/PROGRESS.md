@@ -348,11 +348,17 @@ is **costing route B**, which is where the size actually is.
         two `-mini` rebuild edges are worth          23.3%   (218.5 MiB)
         the gap to the field on kdenlive             2.22x
 
-    B1  ⛔ COST ROUTE B FIRST, because the ceiling says A cannot finish the
-        job. The first measurement is cheap and needs no rebuild: how many
-        store paths in kdenlive's closure are DOWNSTREAM of qtbase and mesa?
-        That number is what a `-mini` derivation forces from source, and it
-        is the whole argument against route B.
+    B1  ✅ DONE 2026-09-03c — `experiments/95-`, pass=3 fail=0. ⭐ AND IT
+        OVERTURNS THE ARGUMENT AGAINST ROUTE B. kdenlive's closure is 676
+        paths; the whole `--add-common` -mini set forces 161 of them (23.8%)
+        from source and leaves 515 in the binary cache. qtbase alone is 78
+        (11.5%), not "the entire KDE/Qt subtree". ⭐ And qtbase is FREE once
+        mesa is paid for: `downstream of qtbase but NOT of mesa = 0`.
+        ⚠ A FLOOR (runtime references, not build inputs) and NOT costed in
+        wall clock, which is the number that decides whether the bundle stays
+        one command. gtk3 and glycin are NOT IN this closure.
+    B1b ⛔ NEXT: cost route B in WALL CLOCK. One of the 161 is qtbase and Qt
+        does not build in a minute. That needs a rebuild.
     B2  ⭐ THEN the allowlist, now bounded and worth building anyway.
     B3  ⚠ The fixpoint lever, named and not taken: the soname string scan
         counts mentions from EVERY object including unreachable ones, so an
