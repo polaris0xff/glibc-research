@@ -2054,6 +2054,26 @@ Debian release can be both the build environment and one of the eleven targets.
 Its control: a digest put back into the workflow makes the gate FAIL with the
 file and line, and removing it makes it pass.
 
+### ⭐ STEP 3 — the matrices, and CI confirms the move on a machine that is not this one
+
+| what was re-run at 2.41 | result |
+|---|---|
+| `experiments/73-` | ⭐ **independently reproduced arm 4's prediction** — class B 20 → 5, class C and E empty on all eleven, `debian-12` the one cost at 851 → 849 |
+| `experiments/21-`, with a **new third arm that follows the pin** | `none` at 2.41, with the 2.31 arm firing as the control. pass=3 fail=0 |
+| POCs 10, 20, 30, 40, 50, 60, 70, 90 | ⭐ **all pass**, and each `RESULT.txt` now opens with the environment, image, digest, gcc and glibc that built it |
+| ⭐ **CI, run `33699204833`** | ⭐ **16 of 16 jobs green** — the `build` job ran inside the derived `debian:13` container and the probe it produced ran correctly on **all eleven** target environments |
+
+⭐ **CI is the independent confirmation this move needed.** It builds on a
+GitHub runner, in a container resolved from `cfg.go` by the `matrix` job, and
+runs the result on eleven digest-pinned distributions with `docker run
+--entrypoint` — none of which shares anything with the chroot bed the local
+measurements used.
+
+⛔ **And CI was RED for seven pushes before that**, on a check that passed here
+and failed there: `check-docs.sh` asked whether a cited evidence path was on
+**disk**, and two of the paths are gitignored build products. Fixed to ask the
+**repository** instead. `docs/history/corrections.md` and the commit carry it.
+
 ---
 
 ## T-072 — the static TLS headroom is ~3,168 bytes and one real library wants 56,248
