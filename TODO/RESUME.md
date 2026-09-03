@@ -34,8 +34,21 @@ HEAD..origin/main` said **214**. Do this, in this order:
 
 ## In flight right now
 
-    ⭐ NOTHING RUNNING. Everything below is committed and pushed to main.
-    CI: green on 6831bd56 (the loader change). Two later runs in flight.
+    ⚠ ONE THING: a `mesa-demos` bundle building in the background for T-066
+      route A's ceiling measurement.
+        cache   /var/tmp/pgb-appimage-mesa   AppDir 1.2 GB, present
+        log     the AppDir is assembled; dwarfs packing is what is left
+      ⭐ THE APPDIR IS THE PART ROUTE A NEEDS -- the artefact is not.
+      Next command, once nothing is writing to it:
+
+        ./pgb bundle sweep /var/tmp/pgb-appimage-mesa/mesa-demos/AppDir
+        ./pgb bundle sweep ... --cut 'libgallium-*.so=>libLLVM.so.*'
+
+      ⛔ Resolve the real sonames first with `pgb elf needed` -- the recipe
+      names in TODO are Arch's, not nixpkgs'.
+
+    Everything else is committed and pushed. CI green on 6831bd56, d910a431
+    and efcdd740; c5e646c7 was in progress at the last check.
 
 ## ✅ THE OPERATOR REVIEW (cross-libc-dlopen #28 / PR 30) IS DONE, ALL FOUR
 
