@@ -1,17 +1,31 @@
-===============================================================
-90 - our kdenlive bundle against kdenlive-AppImage-Enhanced AND onelf
-===============================================================
--- conditions ------------------------------------------------
-date (UTC)   : 2026-09-03T13:00:37Z
-host kernel  : Linux 6.18.44-fc-v24
-host arch    : x86_64
-host distro  : Ubuntu 24.04.4 LTS
-host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
-cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
-ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
-evidence     : /home/user/glibc-research/evidence/90-kdenlive-vs-enhanced
---------------------------------------------------------------
+90 - our kdenlive bundle against pkgforge-dev/kdenlive-AppImage-Enhanced
 
--- the two artefacts ---------------------------------------------
-        fetching the competitor, pinned at 26.08.0-1@2026-09-01_1788277742
-        building ours (debloat=safe): ./pgb bundle appimage kdenlive --with-program melt
+competitor pinned at 26.08.0-1@2026-09-01_1788277742
+
+  ARTEFACT                                    BYTES
+  P  ours (one command, nixpkgs)          565332219
+  E  kdenlive-AppImage-Enhanced           191900604
+     ratio P/E                                2.95x
+  O  onelf (our payload, their packer)              0
+
+render (melt, a real MP4):
+  P 1140 ms, 4149 bytes of MP4
+  E 995 ms, 4162 bytes of MP4
+  O -1 ms, 0 bytes of MP4
+
+startup (melt -version):
+  ⭐ cold: median of 7, arms interleaved with a rotating start,
+     each sample preceded by a REAP of the live dwarfs mount and an
+     emptied XDG_CACHE_HOME. docs/history/corrections.md C24: the
+     protocol this replaces obtained "cold" by copying the file, and
+     uruntime keys its mount on CONTENT, so the copy reused the live
+     mount and the column reported a warm start.
+     A/A control: ratio 1.02, floor 1.06, resolves no (must be "no")
+  P 380.2 ms cold, 114 ms warm
+  E 513.9 ms cold, 33 ms warm
+  O -1 ms cold, -1 ms warm
+
+on the eleven: ours 11/11 rendered, 11/11 with zero host objects;
+               the competitor 11/11 rendered, 4/11 clean.
+
+conditions: 2026-09-03T13:31:41Z, Linux 6.18.44-fc-v24

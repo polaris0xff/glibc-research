@@ -237,8 +237,37 @@ render() {  # artefact tag -> ms, or -1
   [ -s "$WORK/$_t.mp4" ] || { printf '%s' -1; return; }
   printf '%s' $(( (_e - _s) / 1000000 ))
 }
-P_R=$(render "$OURS" ours)
-E_R=$(render "$ENH" enh)
+# ⛔ THE RENDER WAS ONE SAMPLE, AND IT IS A COLUMN THE OPERATOR NAMED.
+# `RENDER_ROUNDS` existed as a variable and was never read -- dead config,
+# which reads like a knob and is a comment. The render is now the median of N,
+# taken the same way the startup column is: `docs/history/corrections.md` C23
+# is about exactly this, one sample standing in for a distribution.
+# ⚠ Not interleaved with startup: a render is seconds and a start is
+# milliseconds, so putting them in one pass would let the render's own I/O
+# dominate the arm that followed it. They are separate passes and the A/A
+# control licenses the startup table only -- which is why the render row is
+# RECORDED and never asserted.
+render_median() {  # artefact tag -> median ms over RENDER_ROUNDS, or -1
+  _rm_i=0; _rm_f="$B/render-samples.$2"
+  : > "$_rm_f"
+  while [ "$_rm_i" -lt "$RENDER_ROUNDS" ]; do
+    reap_mounts
+    _rm_one=$(render "$1" "$2")
+    # ⛔ -1 IS THE SENTINEL AND MUST STAY -1. Scaling it to nanoseconds first
+    # would write -1000000, which `clk_median` treats as a perfectly good
+    # sample near zero -- a failed render reported as the fastest one.
+    if [ "$_rm_one" = -1 ]; then
+      printf -- '-1\n' >> "$_rm_f"
+    else
+      printf '%s\n' "$(( _rm_one * 1000000 ))" >> "$_rm_f"
+    fi
+    _rm_i=$((_rm_i + 1))
+  done
+  _rm_v=$(clk_median < "$_rm_f")
+  awk -v v="$_rm_v" 'BEGIN{ printf "%d", (v < 0) ? -1 : v/1000000 }'
+}
+P_R=$(render_median "$OURS" ours)
+E_R=$(render_median "$ENH" enh)
 P_MP4=$( [ -f "$WORK/ours.mp4" ] && wc -c < "$WORK/ours.mp4" || echo 0)
 E_MP4=$( [ -f "$WORK/enh.mp4" ] && wc -c < "$WORK/enh.mp4" || echo 0)
 printf '  %-34s %10s ms   %10s bytes of MP4\n' "P  ours" "$P_R" "$P_MP4"
@@ -345,6 +374,19 @@ measure_cold() {
   done
   return 0
 }
+
+# ⛔ THE CALL SITE, AND ITS ABSENCE COST A WHOLE RUN. A first attempt at this
+# edit replaced the two `printf ... ms cold ... ms warm` lines and silently
+# matched nothing, so `measure_cold` was DEFINED and never CALLED: the startup
+# section printed its header and no table, and the run died two hundred lines
+# later on `CLK_AA: parameter not set`. ⭐ `set -u` is why that was loud rather
+# than a column of blanks, which is the whole argument for it.
+P_COLD=-1; E_COLD=-1; CLK_AA=n/a; CLK_FLOOR=n/a
+measure_cold P E || exit 2
+P_WARM=$(warm_of "$OURS"); reap_mounts
+E_WARM=$(warm_of "$ENH");  reap_mounts
+printf '\n  %-34s %10s ms cold   %8s ms warm\n' "P  ours"     "$P_COLD" "$P_WARM"
+printf '  %-34s %10s ms cold   %8s ms warm\n'   "E  enhanced" "$E_COLD" "$E_WARM"
 
 # ---------------------------------------------------------------------------
 # arm O -- ⭐ onelf, the third packer

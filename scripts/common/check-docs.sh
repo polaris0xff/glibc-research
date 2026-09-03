@@ -62,7 +62,18 @@ strip_fences() { awk '/^ *```/ {f = !f; next} !f' "$1"; }
 # assertion.
 # ⚠ `tmp/START.md` is the OPERATOR'S BRIEF, quoted throughout this tree and not
 # this project's to edit; its paths are the ones it asked for, not ones we owe.
-OURS=$(git ls-files '*.md' | grep -vE '^(references|docs/methodology|tmp)/')
+# ⛔ TRACKED **AND** UNTRACKED, AND THE DIFFERENCE COST A RED CI RUN.
+# This was `git ls-files '*.md'`, which lists only files git already knows
+# about — so a BRAND NEW document was invisible to every check below until the
+# commit that added it, which is precisely the commit the gate exists to block.
+# ⚠ Measured on 2026-09-03d: `HISTORY/sessions/2026-09-03d.md` referenced
+# `experiments/92`, the local gate said "the documentation agrees with the
+# tree", and CI failed on the push. A gate that cannot see the file being added
+# is not a gate, it is a delay.
+# ⭐ `--others --exclude-standard` adds the untracked files that are NOT
+# gitignored, which is exactly the set a `git add -A` is about to stage.
+OURS=$(git ls-files --cached --others --exclude-standard '*.md' \
+       | grep -vE '^(references|docs/methodology|tmp)/' | sort -u)
 VENDORED=$(git ls-files 'docs/methodology/*.md')
 [ -n "$OURS" ] || { echo "check-docs: no markdown found (not a git tree?)" >&2; exit 2; }
 
