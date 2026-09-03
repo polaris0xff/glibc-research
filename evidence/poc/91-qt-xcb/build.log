@@ -735,3 +735,684 @@ dep have    xorgproto
 patches     0 applied (-p1)
 build system: pkg-config (configureFlags)
 round 1: configure 
+round 1: built
+dep ok      libx11 -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxext  (depth 1)
+dep have    libx11
+dep have    xorgproto
+dep have    xorgproto
+dep have    libxau
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxext -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxi  (depth 1)
+dep have    xorgproto
+dep have    libx11
+dep have    libxext
+dep build   libxfixes  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxfixes -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep have    xorgproto
+dep have    libx11
+dep have    libxext
+dep have    libxfixes
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxi -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxrender  (depth 1)
+dep have    xorgproto
+dep have    libx11
+dep have    xorgproto
+dep have    libx11
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxrender -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+
+built into  /var/tmp/pgb-poc/91-qt-xcb/prefix
+  ok    libpthread-stubs
+  ok    libx11
+  ok    libxau
+  ok    libxcb
+  ok    libxcb-cursor
+  ok    libxcb-image
+  ok    libxcb-keysyms
+  ok    libxcb-render-util
+  ok    libxcb-util
+  ok    libxcb-wm
+  ok    libxdmcp
+  ok    libxext
+  ok    libxfixes
+  ok    libxi
+  ok    libxkbcommon
+  ok    libxml2
+  ok    libxrender
+  ok    openssl
+  ok    xcb-proto
+  ok    xkeyboard-config
+  ok    xorgproto
+  ok    xtrans
+/var/tmp/pgb-poc/qt6-src/2h62s8fj35hf19kkxj6c9r2idrgzwdky-qtbase-everywhere-src-6.11.1.tar.xz
+/var/tmp/pgb-poc/qt6-src/biay1wyd969h2zqfdb2gm7aqbpwzl95d-derive-plugin-load-path-from-PATH.patch
+/var/tmp/pgb-poc/qt6-src/ymdnrvjhna3iglbb0nfgmlzslb44h82z-allow-translations-outside-prefix.patch
+/var/tmp/pgb-poc/qt6-src/nkrwfpr0n0azf3r93n83r582rp7ymzid-use-cmake-path.patch
+/var/tmp/pgb-poc/qt6-src/srssgmm0pj7rm6za0liav535l38yc1qa-qmake-always-use-libname.patch
+/var/tmp/pgb-poc/qt6-src/5n2ig92dalqiqidygnflmnq5xx224n2c-qmake-fix-includedir.patch
+/var/tmp/pgb-poc/qt6-src/cimykk4hahlxly61dssgz5jvpf1fkm0m-no-sbom.patch
+/var/tmp/pgb-poc/qt6-src/6w9gg7cxzvqd5xb9sm2dpn3rz7krn5zm-use-cmake-from-path.patch
+/var/tmp/pgb-poc/qt6-src/gscgv0zqch1w6akz8jncm392bnc3m1qf-find-qmlimportscanner.patch
+/var/tmp/pgb-poc/qt6-src/bi5fawz29k94bbxhhiqpywg5j48h23aq-qmlimportscanner-import-path.patch
+/var/tmp/pgb-poc/qt6-src/z2ypavkbp406dqa031qf3xng9504js86-skip-missing-qml-directory.patch
+/var/tmp/pgb-poc/qt6-src/y82wxvvf3rwdmq2v1hg3h5lqkp5shc6z-515cbbacfba9f4259c9c3b0714a31222c2b4c879.diff
+/usr/bin/ld: /var/tmp/pgb-poc/91-qt-xcb/prefix/lib/libxcb.a(xcb_util.o): in function `_xcb_open_tcp':
+/root/.local/state/pgb/nix-deps/1e773b4f/libxcb/build/libxcb-1.17.0/src/xcb_util.c:408:(.text+0x626): warning: Using 'getaddrinfo' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+'/usr/bin/cmake' '-DCMAKE_PREFIX_PATH=/var/tmp/pgb-poc/91-qt-xcb/prefix' '-DTEST_xcb_syslibs=ON' '-DCMAKE_C_STANDARD_LIBRARIES=-Wl,--start-group -lxcb -lXau -lXdmcp -lxcb-xkb -lxcb-util -lxcb-image -lxcb-keysyms -lxcb-render-util -lxcb-icccm -lxcb-cursor -lxcb-render -lxcb-shm -lxcb-shape -lxcb-randr -lxcb-xfixes -lxcb-sync -lxcb-xinerama -lxcb-dri3 -lxcb-present -lxcb-glx -lxcb-xinput -lxkbcommon -lxkbcommon-x11 -Wl,--end-group -lpthread -ldl -lm' '-DCMAKE_CXX_STANDARD_LIBRARIES=-Wl,--start-group -lxcb -lXau -lXdmcp -lxcb-xkb -lxcb-util -lxcb-image -lxcb-keysyms -lxcb-render-util -lxcb-icccm -lxcb-cursor -lxcb-render -lxcb-shm -lxcb-shape -lxcb-randr -lxcb-xfixes -lxcb-sync -lxcb-xinerama -lxcb-dri3 -lxcb-present -lxcb-glx -lxcb-xinput -lxkbcommon -lxkbcommon-x11 -Wl,--end-group -lpthread -ldl -lm' '-DQT_INTERNAL_CALLED_FROM_CONFIGURE:BOOL=TRUE' '-DFEATURE_testlib=OFF' '-DCMAKE_INSTALL_PREFIX=/var/tmp/pgb-poc/91-qt-xcb/inst' '-DQT_QPA_PLATFORMS=xcb' '-DQT_QPA_DEFAULT_PLATFORM=xcb' '-DBUILD_SHARED_LIBS=OFF' '-DQT_BUILD_EXAMPLES=FALSE' '-DQT_BUILD_TESTS=FALSE' '-DCMAKE_BUILD_TYPE=Release' '-DFEATURE_force_bundled_libs=ON' '-DFEATURE_xcb=ON' '-DFEATURE_xkbcommon=ON' '-DINPUT_bundled_xcb_xinput=yes' '-DINPUT_opengl=no' '-DFEATURE_dbus=OFF' '-DFEATURE_glib=OFF' '-DFEATURE_icu=OFF' '-DINPUT_openssl=linked' '-DFEATURE_sql_sqlite=ON' '-DFEATURE_system_sqlite=OFF' '-DFEATURE_cups=OFF' '-DFEATURE_fontconfig=OFF' '-DFEATURE_libudev=OFF' '-G' 'Ninja' '/var/tmp/pgb-poc/91-qt-xcb/qtbase'
+-- The CXX compiler identification is GNU 14.2.0
+-- The C compiler identification is GNU 14.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /root/.local/state/pgb/bin-15956377/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /root/.local/state/pgb/bin-15956377/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- The ASM compiler identification is GNU
+-- Found assembler: /root/.local/state/pgb/bin-15956377/cc
+-- CMAKE_BUILD_TYPE was already explicitly set to: 'Release'
+
+-- Configuration summary has been written to /var/tmp/pgb-poc/91-qt-xcb/build/config.summary
+
+Note: Using static linking will disable the use of dynamically loaded plugins. Make sure to import all needed static plugins, or compile needed modules into the library.
+Note: Disabling X11 Accessibility Bridge: D-Bus or AT-SPI is missing.
+
+-- 
+
+Qt is now configured for building. Just run 'cmake --build . --parallel'
+
+Once everything is built, you must run 'cmake --install .'
+Qt will be installed into '/var/tmp/pgb-poc/91-qt-xcb/inst'
+
+To configure and build other Qt modules, you can use the following convenience script:
+        /var/tmp/pgb-poc/91-qt-xcb/inst/bin/qt-configure-module
+
+If reconfiguration fails for some reason, try removing 'CMakeCache.txt' from the build directory
+Alternatively, you can add the --fresh flag to your CMake flags.
+
+-- Configuring done (33.9s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    CMAKE_C_STANDARD_LIBRARIES
+
+
+-- Generating done (1.0s)
+-- Build files have been written to: /var/tmp/pgb-poc/91-qt-xcb/build
+[1/1644] Generating ../../../mkspecs/modules/qt_ext_pcre2.pri
+[2/1644] Generating mkspecs/qmodule.pri
+[3/1644] Generating ../../mkspecs/modules/qt_lib_core_private.pri
+[4/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_chartables.c.o
+[5/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_chkdint.c.o
+[6/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile_cgroup.c.o
+[7/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_auto_possess.c.o
+[8/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_config.c.o
+[9/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_context.c.o
+[10/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile_class.c.o
+[11/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_error.c.o
+[12/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_extuni.c.o
+[13/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_find_bracket.c.o
+[14/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_dfa_match.c.o
+[15/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_maketables.c.o
+[16/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile.c.o
+[17/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match_data.c.o
+[18/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match_next.c.o
+[19/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_newline.c.o
+[20/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_ord2utf.c.o
+[21/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_pattern_info.c.o
+[22/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_script_run.c.o
+[23/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_serialize.c.o
+[24/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_string_utils.c.o
+[25/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_study.c.o
+[26/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_substitute.c.o
+[27/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_substring.c.o
+[28/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_tables.c.o
+[29/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_ucd.c.o
+[30/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_valid_utf.c.o
+[31/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_xclass.c.o
+[32/1644] Generating ../../../mkspecs/modules/qt_ext_libpng.pri
+[33/1644] Generating ../../../mkspecs/modules/qt_ext_freetype.pri
+[34/1644] Generating ../../../mkspecs/modules/qt_ext_harfbuzz.pri
+[35/1644] Generating ../../mkspecs/modules/qt_lib_gui_private.pri
+[36/1644] Generating ../../mkspecs/modules/qt_lib_sql_private.pri
+[37/1644] Generating ../../mkspecs/modules/qt_lib_network_private.pri
+[38/1644] Generating ../../mkspecs/modules/qt_lib_widgets_private.pri
+[39/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcapistd_16.c.o
+[40/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jccolor_16.c.o
+[41/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcdiffct_16.c.o
+[42/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jclossls_16.c.o
+[43/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcmainct_16.c.o
+[44/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcprepct_16.c.o
+[45/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jcsample_16.c.o
+[46/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match.c.o
+[47/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdapistd_16.c.o
+[48/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jddiffct_16.c.o
+[49/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdlossls_16.c.o
+[50/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdcolor_16.c.o
+[51/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdmainct_16.c.o
+[52/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdpostct_16.c.o
+[53/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jdsample_16.c.o
+[54/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg16bits.dir/jutils_16.c.o
+[55/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcapistd_12.c.o
+[56/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcdiffct_12.c.o
+[57/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jclossls_12.c.o
+[58/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jccolor_12.c.o
+[59/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcmainct_12.c.o
+[60/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcprepct_12.c.o
+[61/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcsample_12.c.o
+[62/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdapistd_12.c.o
+[63/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jddiffct_12.c.o
+[64/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdlossls_12.c.o
+[65/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdcolor_12.c.o
+[66/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdmainct_12.c.o
+[67/1644] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_jit_compile.c.o
+[68/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdpostct_12.c.o
+[69/1644] Linking C static library lib/libQt6BundledPcre2.a
+[70/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jutils_12.c.o
+[71/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdsample_12.c.o
+[72/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jccoefct_12.c.o
+[73/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jcdctmgr_12.c.o
+[74/1644] Building CXX object src/tools/syncqt/CMakeFiles/syncqt.dir/main.cpp.o
+[75/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jddctmgr_12.c.o
+[76/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jfdctfst_12.c.o
+[77/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdcoefct_12.c.o
+[78/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jfdctint_12.c.o
+[79/1644] Linking CXX executable libexec/syncqt
+[80/1644] Running syncqt.cpp for module: QtZlib
+[81/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctflt_12.c.o
+[82/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctfst_12.c.o
+[83/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jdmerge_12.c.o
+[84/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctred_12.c.o
+[85/1644] Running syncqt.cpp for module: QtCore
+[86/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jquant1_12.c.o
+[87/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qassert.cpp.o
+[88/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jquant2_12.c.o
+[89/1644] Building C object src/3rdparty/libjpeg/CMakeFiles/BundledLibjpeg12bits.dir/jidctint_12.c.o
+[90/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qalloc.cpp.o
+[91/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qabstractfileengine.cpp.o
+[92/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfile.cpp.o
+[93/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qtenvironmentvariables.cpp.o
+[94/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qdir.cpp.o
+[95/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfiledevice.cpp.o
+[96/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystemengine.cpp.o
+[97/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfileinfo.cpp.o
+[98/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystementry.cpp.o
+[99/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine.cpp.o
+[100/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine_iterator.cpp.o
+[101/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qiodevice.cpp.o
+[102/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qsystemerror.cpp.o
+[103/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qcborcommon.cpp.o
+[104/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qcoreapplication.cpp.o
+[105/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qmetatype.cpp.o
+[106/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qcborstreamwriter.cpp.o
+[107/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonarray.cpp.o
+[108/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsoncbor.cpp.o
+[109/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsondocument.cpp.o
+[110/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qcborvalue.cpp.o
+[111/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonobject.cpp.o
+[112/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonparser.cpp.o
+[113/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonwriter.cpp.o
+[114/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonvalue.cpp.o
+[115/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qtextstream.cpp.o
+[116/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qbytearraymatcher.cpp.o
+[117/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qbytearraylist.cpp.o
+[118/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qlatin1stringmatcher.cpp.o
+[119/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qbytearray.cpp.o
+[120/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qlocale_tools.cpp.o
+[121/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qregularexpression.cpp.o
+[122/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstringbuilder.cpp.o
+[123/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qlocale.cpp.o
+[124/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstringconverter.cpp.o
+[125/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstringlist.cpp.o
+[126/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qcalendar.cpp.o
+[127/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qgregoriancalendar.cpp.o
+[128/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qdatetime.cpp.o
+[129/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstring.cpp.o
+[130/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qlocaltime.cpp.o
+[131/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qtimezone.cpp.o
+[132/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qromancalendar.cpp.o
+[133/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qarraydata.cpp.o
+[134/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qcommandlineoption.cpp.o
+[135/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qringbuffer.cpp.o
+[136/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qhash.cpp.o
+[137/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qcommandlineparser.cpp.o
+[138/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystemengine_unix.cpp.o
+[139/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_auto_possess.c.o
+[140/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_chartables.c.o
+[141/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_chkdint.c.o
+[142/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystemiterator_unix.cpp.o
+[143/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_compile_cgroup.c.o
+[144/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qcore_unix.cpp.o
+[145/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_config.c.o
+[146/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_compile_class.c.o
+[147/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_context.c.o
+[148/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_error.c.o
+[149/1644] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine_unix.cpp.o
+[150/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_extuni.c.o
+[151/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_find_bracket.c.o
+[152/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_jit_compile.c.o
+[153/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_maketables.c.o
+[154/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_match_data.c.o
+[155/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_newline.c.o
+[156/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_ord2utf.c.o
+[157/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_pattern_info.c.o
+[158/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_script_run.c.o
+[159/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_serialize.c.o
+[160/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_string_utils.c.o
+[161/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_study.c.o
+[162/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_compile.c.o
+[163/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_dfa_match.c.o
+[164/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_tables.c.o
+[165/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_substring.c.o
+[166/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_valid_utf.c.o
+[167/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_substitute.c.o
+[168/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_ucd.c.o
+[169/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_xclass.c.o
+[170/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/collectjson.cpp.o
+[171/1644] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_match.c.o
+[172/1644] Linking CXX static library src/tools/bootstrap/libBootstrap.a
+[173/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/parser.cpp.o
+[174/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/generator.cpp.o
+[175/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/main.cpp.o
+[176/1644] Generating version linker script for target Core
+[177/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/token.cpp.o
+[178/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/adler32.c.o
+[179/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/compress.c.o
+[180/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/crc32.c.o
+[181/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/deflate.c.o
+[182/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/gzclose.c.o
+[183/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/gzlib.c.o
+[184/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/gzread.c.o
+[185/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/gzwrite.c.o
+[186/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/infback.c.o
+[187/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/inffast.c.o
+[188/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/inflate.c.o
+[189/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/inftrees.c.o
+[190/1644] Building CXX object src/tools/cmake_automoc_parser/CMakeFiles/cmake_automoc_parser.dir/main.cpp.o
+[191/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/uncompr.c.o
+[192/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/trees.c.o
+[193/1644] Building C object src/3rdparty/zlib/CMakeFiles/BundledZLIB.dir/src/zutil.c.o
+[194/1644] Linking C static library lib/libQt6BundledZLIB.a
+[195/1644] Linking CXX executable libexec/cmake_automoc_parser
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1e): warning: Using 'getgrgid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): note: the message above does not take linker garbage collection into account
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0x1e): warning: Using 'getpwuid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): note: the message above does not take linker garbage collection into account
+[196/1644] Running syncqt.cpp for module: QtGui
+[197/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/preprocessor.cpp.o
+[198/1644] Building CXX object src/tools/moc/CMakeFiles/moc.dir/moc.cpp.o
+[199/1644] Linking CXX executable libexec/moc
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveGroupName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine16resolveGroupNameEj+0x1e): warning: Using 'getgrgid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): note: the message above does not take linker garbage collection into account
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): in function `QFileSystemEngine::resolveUserName(unsigned int)':
+qfilesystemengine_unix.cpp:(.text._ZN17QFileSystemEngine15resolveUserNameEj+0x1e): warning: Using 'getpwuid' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking
+/usr/bin/ld: src/tools/bootstrap/libBootstrap.a(qfilesystemengine_unix.cpp.o): note: the message above does not take linker garbage collection into account
+[200/1644] Generating .rcc/qmimeprovider_database.cpp
+[201/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-aat-map.cc.o
+[202/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/hb-dummy.cc.o
+[203/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-blob.cc.o
+[204/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-buffer.cc.o
+[205/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-buffer-serialize.cc.o
+[206/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-buffer-verify.cc.o
+[207/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-draw.cc.o
+[208/1644] Automatic MOC for target Core
+[209/1644] Generating kernel/moc_qobject.cpp, kernel/moc_qobject.cpp.json
+[210/1644] Running AUTOMOC file extraction for target Core
+[211/1644] Running moc --collect-json for target Core
+[212/1644] Generating prl file for target Core
+[213/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-face-builder.cc.o
+[214/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-face.cc.o
+[215/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-aat-layout.cc.o
+[216/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qsimd.cpp.o
+[217/1644] Building C object src/corelib/CMakeFiles/Core.dir/io/forkfd_qt.c.o
+[218/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/png.c.o
+[219/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngerror.c.o
+[220/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/cmake_pch.hxx.gch
+[221/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngget.c.o
+[222/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsocketnotifier.cpp.o
+[223/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/archdetect.cpp.o
+[224/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/Core_autogen/mocs_compilation.cpp.o
+[225/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qalloc.cpp.o
+[226/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qassert.cpp.o
+[227/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qcompare.cpp.o
+[228/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/compat/removed_api.cpp.o
+[229/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qhash.cpp.o
+[230/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qhooks.cpp.o
+[231/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qendian.cpp.o
+[232/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qfloat16.cpp.o
+[233/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qmalloc.cpp.o
+[234/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qlibraryinfo.cpp.o
+[235/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qoperatingsystemversion.cpp.o
+[236/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qnumeric.cpp.o
+[237/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qsysinfo.cpp.o
+[238/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qlogging.cpp.o
+[239/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qtypes.cpp.o
+[240/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qrandom.cpp.o
+[241/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/q23utility.cpp.o
+[242/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qtenvironmentvariables.cpp.o
+[243/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsystemsemaphore.cpp.o
+[244/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsharedmemory.cpp.o
+[245/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qtipccommon.cpp.o
+[246/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qbuffer.cpp.o
+[247/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qglobal.cpp.o
+[248/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdataurl.cpp.o
+[249/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qabstractfileengine.cpp.o
+[250/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdebug.cpp.o
+[251/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdiriterator.cpp.o
+[252/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfile.cpp.o
+[253/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdirlisting.cpp.o
+[254/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfiledevice.cpp.o
+[255/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdir.cpp.o
+[256/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfileinfo.cpp.o
+[257/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemengine.cpp.o
+[258/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystementry.cpp.o
+[259/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfileselector.cpp.o
+[260/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfsfileengine_iterator.cpp.o
+[261/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfsfileengine.cpp.o
+[262/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qipaddress.cpp.o
+[263/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qloggingcategory.cpp.o
+[264/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qiodevice.cpp.o
+[265/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qlockfile.cpp.o
+[266/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qresource_iterator.cpp.o
+[267/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qnoncontiguousbytedevice.cpp.o
+[268/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qloggingregistry.cpp.o
+[269/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstandardpaths.cpp.o
+[270/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qsavefile.cpp.o
+[271/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstorageinfo.cpp.o
+[272/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qresource.cpp.o
+[273/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qtemporarydir.cpp.o
+[274/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qtemporaryfile.cpp.o
+[275/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurlquery.cpp.o
+[276/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurlidna.cpp.o
+[277/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurlrecode.cpp.o
+[278/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qabstractnativeeventfilter.cpp.o
+[279/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurl.cpp.o
+[280/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qassociativeiterable.cpp.o
+[281/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qabstracteventdispatcher.cpp.o
+[282/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qzip.cpp.o
+[283/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qbasictimer.cpp.o
+[284/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qchronotimer.cpp.o
+[285/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qcoreevent.cpp.o
+[286/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qelapsedtimer.cpp.o
+[287/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qdeadlinetimer.cpp.o
+[288/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qiterable.cpp.o
+[289/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmath.cpp.o
+[290/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetaassociation.cpp.o
+[291/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetacontainer.cpp.o
+[292/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qeventloop.cpp.o
+[293/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetasequence.cpp.o
+[294/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetaobject.cpp.o
+[295/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qcoreapplication.cpp.o
+[296/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetaobjectbuilder.cpp.o
+[297/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qobjectcleanuphandler.cpp.o
+[298/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmimedata.cpp.o
+[299/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsequentialiterable.cpp.o
+[300/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qproperty.cpp.o
+[301/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsignalmapper.cpp.o
+[302/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsystemerror.cpp.o
+[303/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsingleshottimer.cpp.o
+[304/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtestsupport_core.cpp.o
+[305/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtimer.cpp.o
+[306/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qobject.cpp.o
+[307/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qfactoryinterface.cpp.o
+[308/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtranslator.cpp.o
+[309/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetatype.cpp.o
+[310/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qpluginloader.cpp.o
+[311/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/quuid.cpp.o
+[312/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborcommon.cpp.o
+[313/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qvariant.cpp.o
+[314/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qdatastream.cpp.o
+[315/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qfactoryloader.cpp.o
+[316/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcbordiagnostic.cpp.o
+[317/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonarray.cpp.o
+[318/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsondocument.cpp.o
+[319/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonobject.cpp.o
+[320/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborvalue.cpp.o
+[321/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsoncbor.cpp.o
+[322/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonparser.cpp.o
+[323/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qxmlutils.cpp.o
+[324/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonwriter.cpp.o
+[325/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonvalue.cpp.o
+[326/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qanystringview.cpp.o
+[327/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qbytearraylist.cpp.o
+[328/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qbytearraymatcher.cpp.o
+[329/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlatin1stringmatcher.cpp.o
+[330/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qcollator.cpp.o
+[331/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qtextstream.cpp.o
+[332/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qbytearray.cpp.o
+[333/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlocale_tools.cpp.o
+[334/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringbuilder.cpp.o
+[335/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringlist.cpp.o
+[336/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringtokenizer.cpp.o
+[337/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringview.cpp.o
+[338/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qtextboundaryfinder.cpp.o
+[339/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringconverter.cpp.o
+[340/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qvsnprintf.cpp.o
+[341/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qatomicwait.cpp.o
+[342/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qunicodetools.cpp.o
+[343/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qrunnable.cpp.o
+[344/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthread.cpp.o
+[345/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlocale.cpp.o
+[346/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthreadpool.cpp.o
+[347/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qsemaphore.cpp.o
+[348/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstring.cpp.o
+[349/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qgregoriancalendar.cpp.o
+[350/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qcalendar.cpp.o
+[351/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qjuliancalendar.cpp.o
+[352/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qmilankoviccalendar.cpp.o
+[353/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qlocaltime.cpp.o
+[354/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qromancalendar.cpp.o
+[355/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qdatetime.cpp.o
+[356/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcontiguouscache.cpp.o
+[357/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qbitarray.cpp.o
+[358/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qarraydata.cpp.o
+[359/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qfreelist.cpp.o
+[360/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qfunctionaltools_impl.cpp.o
+[361/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qmargins.cpp.o
+[362/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezone.cpp.o
+[363/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qpoint.cpp.o
+[364/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qline.cpp.o
+[365/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qrect.cpp.o
+[366/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qrefcount.cpp.o
+[367/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qshareddata.cpp.o
+[368/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qsize.cpp.o
+[369/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qringbuffer.cpp.o
+[370/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qsharedpointer.cpp.o
+[371/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/quniquehandle_types.cpp.o
+[372/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qtyperevision.cpp.o
+[373/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qversiontagging.cpp.o
+[374/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qxmlstreamgrammar.cpp.o
+[375/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qversionnumber.cpp.o
+[376/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qanimationgroup.cpp.o
+[377/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qabstractanimation.cpp.o
+[378/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcryptographichash.cpp.o
+[379/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qpauseanimation.cpp.o
+[380/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qparallelanimationgroup.cpp.o
+[381/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qpropertyanimation.cpp.o
+[382/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qsequentialanimationgroup.cpp.o
+[383/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qvariantanimation.cpp.o
+[384/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qxmlstream.cpp.o
+[385/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qiooperation.cpp.o
+[386/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qrandomaccessasyncfile.cpp.o
+[387/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemiterator_unix.cpp.o
+[388/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemengine_unix.cpp.o
+[389/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfsfileengine_unix.cpp.o
+[390/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qlockfile_unix.cpp.o
+[391/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qcore_unix.cpp.o
+[392/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtimerinfo_unix.cpp.o
+[393/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthread_unix.cpp.o
+[394/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qrandomaccessasyncfile_threadpool.cpp.o
+[395/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qatomic.cpp.o
+[396/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qlatch.cpp.o
+[397/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qmutex.cpp.o
+[398/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qeventdispatcher_unix.cpp.o
+[399/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qreadwritelock.cpp.o
+[400/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qexception.cpp.o
+[401/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qwaitcondition_unix.cpp.o
+[402/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthreadstorage.cpp.o
+[403/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qfuturewatcher.cpp.o
+[404/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qresultstore.cpp.o
+[405/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcommandlineoption.cpp.o
+[406/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/bignum-dtoa.cc.o
+[407/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/cached-powers.cc.o
+[408/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/bignum.cc.o
+[409/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qfutureinterface.cpp.o
+[410/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/fast-dtoa.cc.o
+[411/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/fixed-dtoa.cc.o
+[412/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/double-to-string.cc.o
+[413/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/strtod.cc.o
+[414/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/string-to-double.cc.o
+[415/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcommandlineparser.cpp.o
+[416/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qeasingcurve.cpp.o
+[417/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qtimeline.cpp.o
+[418/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qcollator_posix.cpp.o
+[419/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlocale_unix.cpp.o
+[420/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qhijricalendar.cpp.o
+[421/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qislamiccivilcalendar.cpp.o
+[422/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qregularexpression.cpp.o
+[423/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qjalalicalendar.cpp.o
+[424/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezoneprivate.cpp.o
+[425/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemwatcher.cpp.o
+[426/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qdatetimeparser.cpp.o
+[427/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezoneprivate_tz.cpp.o
+[428/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemwatcher_polling.cpp.o
+[429/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezonelocale.cpp.o
+[430/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemwatcher_inotify.cpp.o
+[431/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qprocess_unix.cpp.o
+[432/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qprocess.cpp.o
+[433/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstandardpaths_unix.cpp.o
+[434/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstorageinfo_linux.cpp.o
+[435/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qitemselectionmodel.cpp.o
+[436/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qsettings.cpp.o
+[437/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qrangemodel.cpp.o
+[438/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qabstractitemmodel.cpp.o
+[439/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qabstractproxymodel.cpp.o
+[440/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qidentityproxymodel.cpp.o
+[441/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qconcatenatetablesproxymodel.cpp.o
+[442/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qtransposeproxymodel.cpp.o
+[443/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qstringlistmodel.cpp.o
+[444/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qelfparser_p.cpp.o
+[445/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsharedmemory_posix.cpp.o
+[446/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qlibrary.cpp.o
+[447/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qlibrary_unix.cpp.o
+[448/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsystemsemaphore_posix.cpp.o
+[449/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsharedmemory_systemv.cpp.o
+[450/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsystemsemaphore_systemv.cpp.o
+[451/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborstreamwriter.cpp.o
+[452/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborstreamreader.cpp.o
+[453/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qsortfilterproxymodel.cpp.o
+[454/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimeglobpattern.cpp.o
+[455/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimemagicrulematcher.cpp.o
+[456/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimemagicrule.cpp.o
+[457/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimedatabase.cpp.o
+[458/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimetype.cpp.o
+[459/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngmem.c.o
+[460/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qpermissions.cpp.o
+[461/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngpread.c.o
+[462/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngrio.c.o
+[463/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngread.c.o
+[464/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimetypeparser.cpp.o
+[465/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngrtran.c.o
+[466/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngset.c.o
+[467/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngwio.c.o
+[468/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngtrans.c.o
+[469/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngwtran.c.o
+[470/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngrutil.c.o
+[471/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/autofit/afadjust.c.o
+[472/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/autofit/afgsub.c.o
+[473/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngwrite.c.o
+[474/1644] Building C object src/3rdparty/libpng/CMakeFiles/BundledLibpng.dir/pngwutil.c.o
+[475/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftbbox.c.o
+[476/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftbdf.c.o
+[477/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftbitmap.c.o
+[478/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftcid.c.o
+[479/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftfstype.c.o
+[480/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftgasp.c.o
+[481/1644] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimeprovider.cpp.o
+[482/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftglyph.c.o
+[483/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftgxval.c.o
+[484/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftinit.c.o
+[485/1644] Linking CXX static library lib/libQt6Core.a
+[486/1644] Automatic MOC for target rcc
+[487/1644] Building CXX object src/tools/rcc/CMakeFiles/rcc.dir/rcc_autogen/mocs_compilation.cpp.o
+[488/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftmm.c.o
+[489/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/autofit/autofit.c.o
+[490/1644] Linking CXX static library lib/libQt6BundledLibpng.a
+[491/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftbase.c.o
+[492/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftpatent.c.o
+[493/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftotval.c.o
+[494/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftpfr.c.o
+[495/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftsynth.c.o
+[496/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/fttype1.c.o
+[497/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftwinfnt.c.o
+[498/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftstroke.c.o
+[499/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/bzip2/ftbzip2.c.o
+[500/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/bdf/bdf.c.o
+[501/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/cache/ftcache.c.o
+[502/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/cid/type1cid.c.o
+[503/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/gzip/ftgzip.c.o
+[504/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/lzw/ftlzw.c.o
+[505/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/cff/cff.c.o
+[506/1644] Building CXX object src/tools/rcc/CMakeFiles/rcc.dir/main.cpp.o
+[507/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/pcf/pcf.c.o
+[508/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/pfr/pfr.c.o
+[509/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/psnames/psnames.c.o
+[510/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/pshinter/pshinter.c.o
+[511/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/raster/raster.c.o
+[512/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/sdf/sdf.c.o
+[513/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/smooth/smooth.c.o
+[514/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/svg/svg.c.o
+[515/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/psaux/psaux.c.o
+[516/1644] Building CXX object src/tools/rcc/CMakeFiles/rcc.dir/rcc.cpp.o
+[517/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/type42/type42.c.o
+[518/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/winfonts/winfnt.c.o
+[519/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/type1/type1.c.o
+[520/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/base/ftdebug.c.o
+[521/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/builds/unix/ftsystem.c.o
+[522/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/sfnt/sfnt.c.o
+[523/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-fallback-shape.cc.o
+[524/1644] Building C object src/3rdparty/freetype/CMakeFiles/BundledFreetype.dir/src/truetype/truetype.c.o
+[525/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-map.cc.o
+[526/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-number.cc.o
+[527/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-outline.cc.o
+[528/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-paint-bounded.cc.o
+[529/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-paint.cc.o
+[530/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-font.cc.o
+[531/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-paint-extents.cc.o
+[532/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-shape.cc.o
+[533/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-set.cc.o
+[534/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-shape-plan.cc.o
+[535/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-shaper.cc.o
+[536/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-style.cc.o
+[537/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-cff-common.cc.o
+[538/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-input.cc.o
+[539/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-instancer-iup.cc.o
+[540/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-cff1.cc.o
+[541/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-instancer-solver.cc.o
+[542/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-cff2.cc.o
+[543/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset.cc.o
+[544/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-plan.cc.o
+[545/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-plan-layout.cc.o
+[546/1644] Building CXX object src/3rdparty/harfbuzz-ng/CMakeFiles/BundledHarfbuzz.dir/src/hb-subset-serialize.cc.o

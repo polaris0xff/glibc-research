@@ -15,7 +15,8 @@
 #       publishes -- so vendoring one more file is a one-line diff, not a
 #       forgotten paragraph
 #   2.  every repo path named in backticks resolves
-#   3.  every `evidence/...` path a doc cites exists
+#   3.  every `evidence/...` path a doc cites is TRACKED, or is a gitignored
+#       build product -- never merely present on this machine
 #   4.  every experiment and POC referenced by number exists
 #   5.  the entry counts quoted in prose agree with TODO/INDEX.md
 #   6.  every vendored methodology file named in PROVENANCE.md is on disk
@@ -234,20 +235,43 @@ rm -f "${TMPDIR:-/tmp}/check-docs.$$"
 # ---------------------------------------------------------------------------
 # ⭐ The same open-entry rule as (2), and for the same reason: an open entry
 # names the evidence file its `Prove` command WILL write.
-n=0; broken=0; planned=0
+#
+# ⛔ AND THE TEST IS THE REPOSITORY, NOT THE DISK, WHICH IS NOT THE SAME THING.
+# This check used to be `[ -e "$p" ]`, and that made it INSTRUMENT-DEPENDENT in
+# the one way that matters: a gitignored build product -- a POC's binary, an
+# extension it built -- is present on the machine that just ran the POC and
+# absent from CI's fresh clone. So the gate passed for whoever wrote the
+# document and failed for everyone else, which is the worst possible place to
+# put a disagreement. Measured 2026-09-03: docs/limitations.md cited
+# `evidence/poc/10-gawk/gawk` in a reproduction command, check-docs.sh was
+# green on the machine that produced it, and CI's probe-host job was red.
+#
+# Three outcomes now, and a build product is a legitimate citation:
+#
+#   tracked by git      the evidence is in the repository            ok
+#   gitignored          a BUILD PRODUCT; the document has to say how
+#                       to produce it, and citing one is how it does  ok, counted
+#   neither             nobody who clones this can see it            FAIL
+n=0; broken=0; planned=0; product=0
 for f in $OURS; do
   scan_severity "$f" 'evidence/[a-zA-Z0-9_./-]+'
 done > "${TMPDIR:-/tmp}/check-docs.$$"
 while IFS="$(printf '\t')" read -r f sev p; do
   case "$p" in *'*'*|*'...'*|*.) continue ;; esac
   n=$((n + 1))
-  [ -e "$p" ] && continue
+  if git ls-files --error-unmatch "$p" >/dev/null 2>&1; then
+    continue
+  fi
+  if git check-ignore -q "$p" 2>/dev/null; then
+    product=$((product + 1)); continue
+  fi
   if [ "$sev" = strict ]; then
-    bad "$f: cites evidence that is not on disk -> $p"; broken=$((broken + 1))
+    bad "$f: cites evidence that is neither tracked nor gitignored -> $p"
+    broken=$((broken + 1))
   else planned=$((planned + 1)); fi
 done < "${TMPDIR:-/tmp}/check-docs.$$"
 rm -f "${TMPDIR:-/tmp}/check-docs.$$"
-[ "$broken" -eq 0 ] && ok "cited evidence exists ($n checked, $planned named by open entries)"
+[ "$broken" -eq 0 ] && ok "cited evidence is in the repository ($n checked, $planned named by open entries, $product build products)"
 
 # ---------------------------------------------------------------------------
 # 4. experiments and POCs referenced by number exist
