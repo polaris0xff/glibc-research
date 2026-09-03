@@ -278,10 +278,15 @@ which described a build where `safe` also swept.
 ⭐ **Two pieces of real work are NAMED and are not entries**, because each is
 one clear fix inside T-063 arm S:
 
-    the static link-order problem   AC_SEARCH_LIBS probes -lreadline alone and
-                                    libreadline.a's ncurses references go
-                                    unresolved. poc/91-qt-xcb answered the same
-                                    class with -Wl,--start-group
+    the static link-order problem   ⚠ CORRECTED 2026-09-03 BY MEASURING IT.
+                                    -Wl,--start-group fixes ORDER (arm B,
+                                    rc=0) and CANNOT fix ABSENCE (arm C,
+                                    rc=1) -- and AC_SEARCH_LIBS -lreadline is
+                                    absence: libncursesw.a is never on the
+                                    probe's line. ⭐ The real fix is the SAME
+                                    SHAPE as the C++ one just landed: read the
+                                    archives' undefined symbols and append
+                                    what defines them. Not built.
     a C link that pulled a C++      ✅ FIXED 2026-09-03. elfx.NeedsCXXRuntime
     archive                         reads the link line's archives for an
                                     UNDEFINED operator new/delete or an

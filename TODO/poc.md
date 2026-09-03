@@ -626,9 +626,35 @@ features a distro plan enables reads as "this package cannot be built".
 
 1. ⛔ **readline is not missing.** `libreadline.a` and `libncursesw.a` are both
    in the prefix; `AC_SEARCH_LIBS` probes `-lreadline` alone and the archive's
-   ncurses references go unresolved. It is the **static link-order** problem
-   `poc/91-qt-xcb` answered with `-Wl,--start-group`. Dropping readline is a
-   workaround for a defect that has a real fix.
+   ncurses references go unresolved. Dropping readline is a workaround for a
+   defect that has a real fix.
+
+   ⚠ **CORRECTED 2026-09-03, BY MEASURING IT: `-Wl,--start-group` IS NOT THAT
+   FIX, and this row said it was.** Two archives, `libupper.a` calling into
+   `liblower.a`, built by the pinned environment:
+
+   | arm | link line | result |
+   |---|---|---|
+   | A | `cc m.c liblower.a libupper.a` — wrong order, no group | ⛔ **rc=1**, undefined reference |
+   | B | the same wrong order inside `--start-group` | ⭐ **rc=0** |
+   | C | `cc m.c -Wl,--start-group libupper.a -Wl,--end-group` — `liblower.a` **not on the line** | ⛔ **rc=1**, ``undefined reference to `lower_helper'`` |
+
+   ⭐ **Grouping fixes ORDER. It cannot fix ABSENCE**, and `AC_SEARCH_LIBS
+   -lreadline` is absence: `libncursesw.a` is never named on the probe's link
+   line, so no amount of grouping can resolve anything out of it.
+   `poc/91-qt-xcb`'s `--start-group` answered arm B's problem, which is a
+   different one.
+
+   ⭐ **AND THE REAL FIX IS THE SHAPE ITEM 2 ALREADY USES.** `libicuuc.a`
+   needing `operator delete` and `libreadline.a` needing `tputs` are the same
+   problem — *an archive on the link line has an undefined reference to
+   something no archive on the line defines* — and item 2's answer is to READ
+   the archives and append what they need. `elfx.NeedsCXXRuntime` is that
+   mechanism specialised to one target; generalising it needs a symbol index
+   over the candidate archives in the prefix, which is what
+   `elfx.DefinedExternalSymbols` already builds for `--wrap-dlopen`.
+   ⛔ Not built, and named here rather than guessed at: nothing has measured
+   what that costs on a real `configure` run.
 2. ✅ **ICU is C++ and postgres is C — FIXED 2026-09-03.** `libicuuc.a` needs
    `operator delete` and the `__cxxabiv1` vtables; a shared libicuuc carries
    `DT_NEEDED libstdc++.so.6` and an archive carries nothing. `internal/wrapper`
