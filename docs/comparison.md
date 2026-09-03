@@ -156,7 +156,9 @@ anylinux-appimages and onelf is acceptable as long as ours performs better and
 is that half of the bar, and it is the half `pgb` wins — **publish it**.
 ⭐ **And as of 2026-09-03d it wins the other half too on this subject**: `jq`
 cold start is **58.3 ms against the field's 58.4** across eleven environments,
-warm **8.5 against 9.3**, `experiments/86-`. ⛔ It read **2.07×** the same
+warm ⚠ **no difference measurable** (8.5 against 9.3, equal medians, and
+`86-`'s warm arithmetic is itself unverified — `TODO/research.md` T-057).
+⛔ Cold read **2.07×** the same
 morning; two constants in `internal/bundle/appimage.go` closed it — uruntime
 `full` → `lite` (`experiments/77-`, 1.28×) and the dwarfs block `-S26` → `-S18`
 (`experiments/81-`, 1.00×). ⚠ **Measured on a CLI and unmeasured on a GUI**:

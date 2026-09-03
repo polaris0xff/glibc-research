@@ -112,7 +112,7 @@ than the field* — and on the CLI subject that is now where it stands:
 | what the ruling now decides | ours | the field | |
 |---|---|---|---|
 | `jq` cold start — ⭐ **11 environments** (`experiments/86-`) | **58.3 ms** | 58.4 ms | ⭐ **1.00×**, ours faster on **6 of 11 rows** |
-| `jq` warm start, same method | 8.5 ms | 9.3 ms | ⭐ **0.92×** — ⚠ medians are equal; read it as *no difference measurable* |
+| `jq` warm start, same method | 8.5 ms | 9.3 ms | ⚠ **no difference measurable** — medians are equal, and `86-`'s warm arithmetic subtracts a cold run that is not in the series it divides (`../../TODO/research.md` T-057) |
 | kdenlive cold start (`TODO/toolchain.md` T-066) | 300 ms | 61 ms | ⛔ 4.92× ⚠ **one sample, and the wrong protocol** |
 | kdenlive render | 4,947 ms | 2,033 ms | ⛔ 2.43× ⚠ **one sample** |
 | ~~artefact size~~ | ~~1.70×~~ | | ⭐ **no longer counted** |

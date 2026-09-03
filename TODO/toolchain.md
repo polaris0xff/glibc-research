@@ -218,7 +218,7 @@ script"*. `../docs/design/toolchain.md` carries the amendment.
 | subject | ours | the field | | under the ruling |
 |---|---|---|---|---|
 | ⭐ **`jq` cold start** (`experiments/86-`, 11 environments) | **58.3 ms** | 58.4 ms | ⭐ **1.00×**, ours faster on 6 of 11 rows | ⭐ **MET** |
-| ⭐ **`jq` warm start** | 8.5 ms | 9.3 ms | ⭐ 0.92× — ⚠ medians equal, read as *no difference measurable* | ⭐ **MET** |
+| `jq` warm start | 8.5 ms | 9.3 ms | ⚠ **no difference measurable** — medians equal, and the column's arithmetic is unverified (T-057) | ⚠ not against us |
 | `jq` size | 6,806,407 B | 4,006,949 B | 1.70× | ⭐ struck from the bar |
 | kdenlive size (`experiments/90-`) | 471,033,944 B | 191,900,604 B | 2.45× | ⭐ acceptable |
 | kdenlive render | 4,947 ms | 2,033 ms | ⛔ 2.43× | ⛔ **binding, UNMEASURED since the levers** |

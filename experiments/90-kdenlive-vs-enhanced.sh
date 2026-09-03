@@ -160,9 +160,28 @@ if [ "$_rebuild" = yes ]; then
   mkdir -p "$CACHE/kdenlive"
   PGB_APPIMAGE_CACHE="$CACHE" "$BUNDLER" bundle appimage kdenlive \
     --with-program melt --with-program ffmpeg >"$B/build-ours.log" 2>&1 || true
-  # ⛔ Stamped only AFTER the artefact exists, so a build that died half way
-  # does not leave a stamp claiming those options were measured.
-  [ -s "$OURS" ] && printf '%s\n' "$_opts" > "$_stamp"
+  # ⛔ STAMPED ONLY AFTER THE ARTEFACT RUNS, NOT AFTER IT EXISTS.
+  #
+  # ⚠ MEASURED, BY BEING BURNED BY IT AGAIN on 2026-09-03d. This read
+  # `[ -s "$OURS" ]`, and "exists and is not empty" is not "is complete": a
+  # build interrupted part-way through `mkdwarfs` leaves a TRUNCATED AppImage
+  # and a stamp claiming those options were measured, and the next run reuses
+  # both. One was found at 99,571,958 bytes where a whole one is about
+  # 400 MB -- and nothing in the cache could tell the two apart.
+  #
+  # ⭐ The cheapest complete-artefact test is the artefact itself: an AppImage
+  # whose dwarfs image is truncated cannot mount, so it cannot answer. This is
+  # the same reasoning `poc/common.sh` uses -- a functional assertion rather
+  # than a file test.
+  if [ -s "$OURS" ]; then
+    chmod +x "$OURS" 2>/dev/null || :
+    if timeout -k 10 120 "$OURS" melt -version >/dev/null 2>&1; then
+      printf '%s\n' "$_opts" > "$_stamp"
+    else
+      exp_note "the artefact was written but does not run -- discarding it"
+      rm -f "$OURS" "$_stamp"
+    fi
+  fi
 fi
 exp_note "artefact built with: $(cat "$_stamp" 2>/dev/null || echo unknown)"
 [ -s "$OURS" ] || { exp_note "ours did not build; see $B/build-ours.log"; exit 2; }
@@ -306,9 +325,6 @@ warm_of() {  # artefact -> ms per run once the mount is warm
 # for the pair IS its floor here, today. `experiments/clock.sh`.
 TWIN="$WORK/twin/$(basename "$OURS")"
 mkdir -p "$WORK/twin"; cp -L "$OURS" "$TWIN"; chmod +x "$TWIN"
-clk_run_twin() { XDG_CACHE_HOME="$CLK_CACHE" clk_time_once \
-  timeout -k 10 "$RUN_TIMEOUT" "$TWIN" "$(sel_of "$TWIN")" -version; }
-
 # measure_cold ARM... -> fills P_COLD / E_COLD / O_COLD from ONE interleave.
 # ⛔ Called again when arm O exists, so O is never compared against a P
 # measured in a different pass -- the separation `experiments/99-` had to fix.

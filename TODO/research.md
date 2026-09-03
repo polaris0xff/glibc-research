@@ -53,6 +53,18 @@ environments × two arms (`evidence/86-bundler-vs-anylinux/per-environment.jq.tx
 medians are equal (9 ms both) and only the means separate; `docs/AGENTS.md`
 §10's noise floor applies to a difference this size.
 
+⛔ **AND THE WARM COLUMN'S ARITHMETIC IS UNVERIFIED — deep review, 2026-09-03d.**
+`86-` obtains warm as `(six invocations − cold) / 5`, which assumes the cold
+run is the first of the same series. ⚠ It is not: the cold sample is one
+chroot enter and the six-invocation total is a **second** enter, begun within
+the 4–6 s window `experiments/99-` measured for uruntime's mount reuse — so
+the first of the six is warm too, and the formula subtracts a cold run that is
+not in the series it divides. That is the same assumption class C24 is about,
+and it is why single-digit and near-zero warm figures appear in the table
+(2 ms on one row). ⭐ **The cold column is sound** — its reap is a whole-rootfs
+reap, which really does kill the mount. ⛔ Do not quote the warm figure as a
+magnitude; `experiments/clock.sh` is the shape to carry into `86-` next.
+
 ⛔ **How it got here, because the closure did not change and neither did the
 sweep.** Two constants in `internal/bundle/appimage.go`:
 

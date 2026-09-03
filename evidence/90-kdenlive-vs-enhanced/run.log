@@ -2,7 +2,7 @@
 90 - our kdenlive bundle against kdenlive-AppImage-Enhanced AND onelf
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-03T13:00:37Z
+date (UTC)   : 2026-09-03T13:04:42Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -13,5 +13,4 @@ evidence     : /home/user/glibc-research/evidence/90-kdenlive-vs-enhanced
 --------------------------------------------------------------
 
 -- the two artefacts ---------------------------------------------
-        fetching the competitor, pinned at 26.08.0-1@2026-09-01_1788277742
         building ours (debloat=safe): ./pgb bundle appimage kdenlive --with-program melt
