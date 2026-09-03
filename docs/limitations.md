@@ -265,12 +265,17 @@ it can load anything at all, and that is the cost `--host-dlopen` removes.
 Against a *dynamic* binary's `ld.so` on the host, in-process and same shape,
 ours is 84–105 µs to first load against 50–78 µs — the same order.
 
-⚠ **What it still does not do, measured on 904 host objects on the build
-host**, 818 of which load: 20 undefined symbols, 4 `TLSDESC` relocations, and 2
-objects wanting 56,248 bytes of static TLS against ~3,168 bytes of surplus
-HEADROOM -- `_dl_tls_static_size - _dl_tls_static_used`, and NOT
-`_dl_tls_static_size` itself, which includes the program's own PT_TLS and so
-moves with the binary.
+⚠ **What it still does not do, measured by `experiments/93-` on 1,527 host
+objects**, 628 of which load: **631 undefined symbols**, 3 `TLSDESC`
+relocations, 29 unfindable `DT_NEEDED`s, and one object the classifier still
+cannot name. ⭐ **Nothing crashes this loader that glibc's own loader loads**,
+and the 45 that do crash crash glibc too.
+
+⛔ **The static-TLS row is NOT among them, and that is a correction.** Every
+`.so` on this host was read for a `PT_TLS`; of the 71 that have one, **zero**
+are refused for an exhausted surplus at reserve 0. The 56,248-byte object the
+figure came from is `liblsan.so`, a sanitizer interposer the loader declines by
+name before TLS is ever considered. `TODO` T-072.
 
 ⭐ **The static-TLS row is now ADDRESSABLE, and it is `--tls-reserve N`.**
 glibc's surplus is a constant that padding the executable cannot enlarge --

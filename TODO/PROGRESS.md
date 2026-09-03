@@ -4,7 +4,7 @@
 and the entries.
 
     STATE     2026-09-02f / 2026-09-03
-    COUNTS    45 entries, 20 open, 25 done
+    COUNTS    45 entries, 19 open, 26 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN before this session; selftests 239 pass, 1 could not
               run (no zstd)
@@ -153,8 +153,8 @@ rests on the synthetic subject alone, and that is recorded.
     T-070   ⚠ P0. Steps 1 and 2 LANDED; step 3 is nearly done — 73-, 21- and
             six POCs re-run at 2.41 and committed. ⛔ 80-mlt at 2.41 through
             the normal POC path is what is left.
-    T-068   P1. ⭐ Two defects fixed. ⛔ experiments/93- re-run with BOTH is
-            the row that closes it; the control must be read, not assumed.
+    T-068   ✅ CLOSED. 93- green at pass=6 fail=0, and the control it passes
+            read 10, then 1, then 0 as each defect was fixed.
     T-072   P1. --tls-reserve is implemented. ⛔ experiments/76- with a
             non-zero reserve on the eleven is still owed.
 

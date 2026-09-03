@@ -140,7 +140,7 @@ tree can say about each:
 | their objection | measured here |
 |---|---|
 | the host mesa may be older than the app needs | ⭐ **agreed, and not a loader problem.** Nothing in T-064 changes which mesa is installed |
-| a statically linked LLVM against a host mesa's different LLVM | ⭐ **real, and `experiments/76-`'s residue shows the shape of it**: `libLLVM` is the one ordinary library that maps and relocates cleanly and then dies in its 605th static constructor. `TODO` T-068 |
+| a statically linked LLVM against a host mesa's different LLVM | ⭐ **real, and `experiments/76-`'s residue shows the shape of it**: `libLLVM` was the one ordinary library that mapped and relocated cleanly and then died in its 605th static constructor. ⭐ **It LOADS now** — the cause was a general-dynamic TLS pair whose two halves searched different sets of objects, so a cross-module thread-local bound to offset 0. `TODO` T-068, closed |
 | *"none of the solutions implement `dlmopen`, so you are likely to run into symbol collisions"* | ⛔ **true of `pgb-elfload.c` too and it is stated**: there is one namespace. `--wrap-dlopen` already gives each of a program's own plugins a private namespace with `objcopy --redefine-syms`; the loader does not do the equivalent for host objects |
 
 ⭐ **And upstream has since shipped the same idea**: `USE_HOST_DRIVERS_EXPERIMENTAL=1`

@@ -366,11 +366,25 @@ experiment; none has been shown to be unreachable.
    a machine that ships no glibc**, from one ordinary static ELF. ⭐ And it is
    **1,093 code lines** against `pg83/solo`'s 2,332 for the loader alone —
    solo's other 5,948 translate glibc onto musl, and a glibc host needs none
-   of it. T-064, **closed**. The residue — 86 of 904 host objects on the build
-   host — is **T-068**, and `limitations.md` §1 has it classified.
-   ⚠ **That 904 is an ad-hoc sweep nobody committed**, which is why
-   `experiments/93-` exists; ⛔ it has still not been run, so the residue is
-   quoted from a number with no command behind it.
+   of it. T-064, **closed**. ⭐ **The residue is T-068, and it is CLOSED too**,
+   with a committed harness behind every number: `experiments/93-` puts every
+   shared object on the host through the loader, one `timeout`ed fork each, and
+   asserts the right question — *nothing may crash this loader that glibc's own
+   loader loads*.
+
+   | `evidence/93-host-object-residue/` | 1,527 objects |
+   |---|---|
+   | loaded | **628** |
+   | refused by name or by shape | 122 |
+   | failed with a reason | 732 — 631 of them an undefined symbol |
+   | crashed | 45, and ⭐ **45 of 45 crash glibc's own `ld.so` too** |
+   | ⛔ crashes that glibc LOADS | ⭐ **0** |
+
+   ⚠ **That zero is earned rather than asserted.** It read **10**, then **1**,
+   then **0** across one session as two real loader defects were fixed — a weak
+   reference to `__wrap_iconv_open` that no archive member satisfied, and a
+   general-dynamic TLS pair whose two halves searched different sets of
+   objects. The first was HIDING the second.
    ⭐ **Two of the 86 are now addressable**: the objects wanting more static
    TLS than glibc's surplus are served by `pgb build --host-dlopen
    --tls-reserve N`, which allocates out of the binary's own `__thread` array
@@ -564,7 +578,7 @@ classes and the entry that owns each; it is not a second work order.
 | class | owner | where it stands |
 |---|---|---|
 | **`pgb build <url-or-package>`** — the toolchain the project is for | T-012 | the design and the static-first/bundle-last rule are in [`design/toolchain.md`](design/toolchain.md) |
-| ⭐ **host `dlopen`** — §7 item 1 | ✅ **T-064 CLOSED**, T-068 carries the residue | `pgb build --host-dlopen`. `experiments/76-`: 11 of 11 carried, zero host objects, a real host `.so` on 7 of 7 glibc rows, control 0 of 11. 1,093 code lines against solo's 2,332 |
+| ⭐ **host `dlopen`** — §7 item 1 | ✅ **T-064 CLOSED**, and ✅ **T-068 CLOSED** with it | `pgb build --host-dlopen`. `experiments/76-`: 11 of 11 carried, zero host objects, a real host `.so` on 7 of 7 glibc rows, control 0 of 11. 1,093 code lines against solo's 2,332 |
 | ⚠ **the bundle is bigger than the field** | ⛔ **T-066 (P0), advanced not met** | ⭐ **2.86× → 1.22× on `jq`** (`experiments/78-`): the reachability sweep now feeds debloat (277 objects, 12.0 MiB) and `share/i18n`, glibc's locale SOURCES, was 17 MiB of a 22 MiB bundle. ⛔ The rest is a **package-size** gap, not a bundler one |
 | ⭐ **what a bundle may take from the HOST** | ✅ **T-065 CLOSED** | four classes, the search order adopted from `Anylinux-sharun`, 29 offline assertions. [`design/host-fallback.md`](design/host-fallback.md) |
 | **a host with no compiler** | T-051, T-060 | `pgb nix` already works with no nix installed; the C toolchain is the last crutch |

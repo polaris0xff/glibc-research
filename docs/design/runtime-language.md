@@ -174,8 +174,22 @@ prohibition:
    gets to re-ask.
 
 ⚠ **What this document does NOT claim.** It does not claim the C is free of
-defects — `TODO` T-068 carries 86 host objects that do not load, and one of
-them, `libLLVM`, dies in its 605th static constructor for a reason nobody has
-found yet. It claims that the defects found so far are not defects a language
+defects. It claims that the defects found so far are not defects a language
 change would have prevented, and that the cost of the change is measured and
 the benefit is not.
+
+⭐ **Two more defects were found on 2026-09-03, and both test that claim
+rather than merely illustrating it.** `libLLVM`'s crash — cited here for a
+while as *"dies in its 605th static constructor for a reason nobody has
+found"* — is solved, and the cause is instructive:
+
+| defect | would a memory-safe language have prevented it? |
+|---|---|
+| `R_X86_64_DTPMOD64` searched every loaded object for the symbol; `R_X86_64_DTPOFF64` searched only one, so a cross-module thread-local bound to *(the right module, offset 0)* | ⛔ **No.** Two code paths answering one question differently is a logic error. Every individual access was in bounds; the *value* was wrong. Rust and zig write `if` the same way |
+| the provider table's **weak** `extern char iconv_open[]` was rewritten by `--wrap` to a `__wrap_` name that no archive member was pulled for, so the entry held NULL | ⛔ **No.** It is a property of the LINK, not of the language — `-Wl,--wrap` and archive member selection behave identically whatever compiles the objects |
+
+⚠ **Neither is a point in C's favour either.** They are points about where this
+codebase's defects actually come from, which is the question T-067 asked: the
+count of memory-safety findings over the sweep is still **zero**, and the count
+of logic and link-order findings keeps going up. ⭐ A language change would move
+the first number, which is already at its floor.

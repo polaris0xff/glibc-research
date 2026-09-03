@@ -477,7 +477,44 @@ The exception is `libLLVM`, which maps and relocates cleanly and dies in the
 
 **Source** the sweep in T-064: every shared object on the build host, 904 of
 them, one fork each, through `tool/runtime/pgb-elfload.c`.
-**Category** runtime · **Priority** P1 · **Effort** M · **Status** open
+**Category** runtime · **Priority** P1 · **Effort** M · **Status** ✅ done
+
+## ✅ CLOSED 2026-09-03 — the Prove, run, with the arc that earned the zero
+
+    sh experiments/93-host-object-residue.sh
+    ok=628 refused=122 failed=732 crash=45 hang=0
+    45 of 45 also crash glibc's own ld.so
+    ok  nothing crashes this loader that glibc's loader loads = 0
+    pass=6 fail=0 skip=0     VERDICT: matched expectation
+
+⭐ **`libLLVM-17.so.1` is `ok` in `per-object.txt`** — the Prove asked for it
+"either loading or its 605th constructor explained", and it loads.
+
+⛔ **THE ZERO IS EARNED, AND THE ARC IS WHY IT CAN BE BELIEVED.** One machine,
+one population of 1,527 objects, four builds:
+
+| build | ok | crash | ⛔ crashes that glibc LOADS |
+|---|---|---|---|
+| at session start | 406 | 45 | — |
+| **+ the iconv fix** | 620 | 55 | ⛔ **10** |
+| **+ the general-dynamic TLS fix** | 629 | 46 | ⛔ **1** |
+| **+ the structural interposer refusal** | **628** | **45** | ⭐ **0** |
+
+⚠ **The first `DIFFER = 0`, recorded 2026-09-02e, was not the loader being
+right** — the ten objects the control should have caught were failing earlier,
+on iconv, and never reached the code that crashes them. The assertion's
+falsifiability was demonstrated live this session: it read 10, then 1, then 0,
+as each defect was fixed.
+
+⚠ **`ok` is 628 and not 629 on purpose**: `gprofng/libgp-heap.so` is a lost
+`ok`, and it is the right answer — it "loaded" only because its constructor had
+not allocated yet.
+
+⛔ **What is NOT closed by this, and each has its own entry:** the 631
+`undefined` symbols (`experiments/73-` classifies them; joining the two
+harnesses is the work), the 3 `tlsdesc`, the 29 `missing-dep`, and the one
+object the classifier still cannot name. They are residue with a measured
+count, which is what this entry existed to produce.
 
 ⛔ **This exists so T-064's residue is carried as work rather than rounded off
 in a summary.** ⚠ **The title's `86 of 904` is the number this entry was

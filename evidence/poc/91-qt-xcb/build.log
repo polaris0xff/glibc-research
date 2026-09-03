@@ -324,3 +324,414 @@ dep build   libxfixes  (depth 2)
 patches     0 applied (-p1)
 build system: pkg-config (configureFlags)
 round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=nonnull... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=init-self... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=main... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=missing-braces... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=sequence-point... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=return-type... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=trigraphs... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=array-bounds... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=write-strings... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking for FIXESEXT... no
+  configure: error: Package requirements (xproto >= 7.0.22 fixesproto >= 6.0 xextproto x11 >= 1.6) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables FIXESEXT_CFLAGS
+  and FIXESEXT_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxfixes -- the parent will have to do without it
+dep have    xorgproto
+dep build   libx11  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking for sys/ioctl.h... yes
+  checking for sys/socket.h... yes
+  checking for __builtin_popcountl... yes
+  checking for strtol... yes
+  checking for seteuid... yes
+  checking for reallocarray... yes
+  checking whether issetugid is declared... no
+  checking for issetugid... no
+  checking for getresuid... yes
+  checking for shmat... yes
+  checking for launchd... no
+  checking for getpwuid_r in -lc... yes
+  checking for poll... yes
+  checking keysym definitions...  /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/keysymdef.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/XF86keysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/Sunkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/DECkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/HPkeysym.h
+  checking if XLOCALEDIR support should be enabled... yes
+  checking for BIGFONT... yes
+  checking for getpagesize... yes
+  checking for working mmap... yes
+  checking for nl_langinfo... yes
+  checking for X11... no
+  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+  
+  Package 'xcb', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables X11_CFLAGS
+  and X11_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libx11 -- the parent will have to do without it
+dep build   libxext  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking whether to build functional specifications... yes
+  checking for xmlto... no
+  configure: WARNING: xmlto not found - documentation targets will be skipped
+  checking for fop... no
+  configure: WARNING: fop not found - documentation targets will be skipped
+  checking for xsltproc... configure: WARNING: xsltproc not found - cannot transform XML documents
+  no
+  checking for X.Org SGML entities >= 1.8... no
+  checking whether to act as if malloc(0) can return NULL... yes
+  checking for XEXT... no
+  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.1.99) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables XEXT_CFLAGS
+  and XEXT_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxext -- the parent will have to do without it
+dep build   libxfixes  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=nonnull... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=init-self... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=main... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=missing-braces... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=sequence-point... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=return-type... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=trigraphs... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=array-bounds... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=write-strings... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking for FIXESEXT... no
+  configure: error: Package requirements (xproto >= 7.0.22 fixesproto >= 6.0 xextproto x11 >= 1.6) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables FIXESEXT_CFLAGS
+  and FIXESEXT_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxfixes -- the parent will have to do without it
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking whether to build documentation... yes
+  checking whether to build functional specifications... yes
+  checking for xmlto... no
+  configure: WARNING: xmlto not found - documentation targets will be skipped
+  checking for fop... configure: WARNING: fop not found - documentation targets will be skipped
+  no
+  checking for xsltproc... configure: WARNING: xsltproc not found - cannot transform XML documents
+  no
+  checking for X.Org SGML entities >= 1.8... no
+  checking for asciidoc... no
+  configure: WARNING: asciidoc not found - documentation targets will be skipped
+  checking whether to act as if malloc(0) can return NULL... yes
+  checking for xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.0.3 xext >= 1.0.99.1 inputproto >= 2.3.99.1... no
+  configure: error: Package requirements (xproto >= 7.0.13 x11 >= 1.6 xextproto >= 7.0.3 xext >= 1.0.99.1 inputproto >= 2.3.99.1) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  Package 'xext', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables XI_CFLAGS
+  and XI_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxi -- the parent will have to do without it
+dep build   libxrender  (depth 1)
+derivations 7 fetched and verified over HTTPS
+dep have    xorgproto
+dep build   libx11  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking for sys/ioctl.h... yes
+  checking for sys/socket.h... yes
+  checking for __builtin_popcountl... yes
+  checking for strtol... yes
+  checking for seteuid... yes
+  checking for reallocarray... yes
+  checking whether issetugid is declared... no
+  checking for issetugid... no
+  checking for getresuid... yes
+  checking for shmat... yes
+  checking for launchd... no
+  checking for getpwuid_r in -lc... yes
+  checking for poll... yes
+  checking keysym definitions...  /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/keysymdef.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/XF86keysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/Sunkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/DECkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/HPkeysym.h
+  checking if XLOCALEDIR support should be enabled... yes
+  checking for BIGFONT... yes
+  checking for getpagesize... yes
+  checking for working mmap... yes
+  checking for nl_langinfo... yes
+  checking for X11... no
+  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+  
+  Package 'xcb', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables X11_CFLAGS
+  and X11_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libx11 -- the parent will have to do without it
+dep have    xorgproto
+dep build   libx11  (depth 2)
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking for sys/ioctl.h... yes
+  checking for sys/socket.h... yes
+  checking for __builtin_popcountl... yes
+  checking for strtol... yes
+  checking for seteuid... yes
+  checking for reallocarray... yes
+  checking whether issetugid is declared... no
+  checking for issetugid... no
+  checking for getresuid... yes
+  checking for shmat... yes
+  checking for launchd... no
+  checking for getpwuid_r in -lc... yes
+  checking for poll... yes
+  checking keysym definitions...  /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/keysymdef.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/XF86keysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/Sunkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/DECkeysym.h /var/tmp/pgb-poc/91-qt-xcb/prefix/include/X11/HPkeysym.h
+  checking if XLOCALEDIR support should be enabled... yes
+  checking for BIGFONT... yes
+  checking for getpagesize... yes
+  checking for working mmap... yes
+  checking for nl_langinfo... yes
+  checking for X11... no
+  configure: error: Package requirements (xproto >= 7.0.25 xextproto xtrans xcb >= 1.11.1 kbproto inputproto) were not met:
+  
+  Package 'xcb', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables X11_CFLAGS
+  and X11_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libx11 -- the parent will have to do without it
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+
+pgb: the build failed and pgb has no adaptation for it. Last 30 lines:
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=init-self... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=main... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=missing-braces... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=sequence-point... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=return-type... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=trigraphs... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=array-bounds... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=write-strings... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=address... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=int-to-pointer-cast... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=pointer-to-int-cast... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -pedantic... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror... yes
+  checking if /root/.local/state/pgb/bin-15956377/cc supports -Werror=attributes... yes
+  Package xorg-macros was not found in the pkg-config search path.
+  Perhaps you should add the directory containing `xorg-macros.pc'
+  to the PKG_CONFIG_PATH environment variable
+  Package 'xorg-macros', required by 'virtual:world', not found
+  checking whether to act as if malloc(0) can return NULL... yes
+  checking for RENDER... no
+  configure: error: Package requirements (x11 >= 1.6 renderproto >= 0.9) were not met:
+  
+  Package 'x11', required by 'virtual:world', not found
+  
+  Consider adjusting the PKG_CONFIG_PATH environment variable if you
+  installed software in a non-standard prefix.
+  
+  Alternatively, you may set the environment variables RENDER_CFLAGS
+  and RENDER_LIBS to avoid the need to call pkg-config.
+  See the pkg-config man page for more details.
+pgb: dep FAILED  libxrender -- the parent will have to do without it
+dep build   libxcb  (depth 1)
+dep have    libpthread-stubs
+dep have    libxau
+dep build   libxdmcp  (depth 2)
+derivations 6 fetched and verified over HTTPS
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxdmcp -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   xcb-proto  (depth 2)
+derivations 6 fetched and verified over HTTPS
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      xcb-proto -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxkbcommon  (depth 1)
+dep build   xkeyboard-config  (depth 2)
+patches     0 applied (-p1)
+build system: meson ninja pkg-config (mesonFlags)
+round 1: configure -Dxorg-rules-symlinks=true
+round 1: built
+dep ok      xkeyboard-config -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep have    libxcb
+dep have    libxml2
+dep skip    wayland-1.26.0-dev (in the skip list)
+dep skip    wayland-protocols-1.49 (in the skip list)
+patches     0 applied (-p1)
+pgb: dropped store-path flag: -Dxkb-config-root=/nix/store/9ndc176kmp1fz9ja64zxwq5r2r3g6695-xkeyboard-config-2.48/etc/X11/xkb
+pgb: dropped store-path flag: -Dx-locale-root=/nix/store/62qx8cgv8h24cq4vgh5ipyflwg1naykl-libx11-1.8.13/share/X11/locale
+build system: meson ninja pkg-config (mesonFlags)
+round 1: configure -Dxkb-config-extra-path=/etc/xkb -Denable-docs=true -Denable-wayland=true
+round 1: FAILED -> add:-Denable-wayland=false
+round 2: configure -Dxkb-config-extra-path=/etc/xkb -Denable-docs=true -Denable-wayland=true -Denable-wayland=false
+round 2: FAILED -> add:-Denable-docs=false
+round 3: configure -Dxkb-config-extra-path=/etc/xkb -Denable-docs=true -Denable-wayland=true -Denable-wayland=false -Denable-docs=false
+round 3: built
+dep ok      libxkbcommon -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb-util  (depth 1)
+dep have    libxcb
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-util -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb-image  (depth 1)
+dep have    xorgproto
+dep have    libxcb
+dep have    libxcb-util
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-image -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb-keysyms  (depth 1)
+dep have    libxcb
+dep have    xorgproto
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-keysyms -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb-render-util  (depth 1)
+dep have    libxcb
+dep have    xorgproto
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-render-util -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep build   libxcb-wm  (depth 1)
+dep have    libxcb
+dep have    xorgproto
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-wm -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep have    libxdmcp
+dep skip    libxtst-1.2.5 (in the skip list)
+dep build   libxcb-cursor  (depth 1)
+dep have    libxcb
+dep have    libxcb-image
+dep have    libxcb-render-util
+dep have    xorgproto
+dep have    libxcb
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
+round 1: built
+dep ok      libxcb-cursor -> /var/tmp/pgb-poc/91-qt-xcb/prefix
+dep skip    libepoxy-1.5.10-dev (in the skip list)
+dep skip    cups-2.4.19-dev (in the skip list)
+dep skip    wayland-1.26.0-dev (in the skip list)
+dep skip    wayland-scanner-1.26.0-dev (in the skip list)
+dep retry   4 still missing, 10 landed this pass
+dep build   libx11  (depth 1)
+dep have    xorgproto
+dep have    libpthread-stubs
+dep have    libxcb
+dep have    xtrans
+dep have    xorgproto
+patches     0 applied (-p1)
+build system: pkg-config (configureFlags)
+round 1: configure 
