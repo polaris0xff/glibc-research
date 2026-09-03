@@ -64,24 +64,37 @@ pkgforge-dev/kdenlive-AppImage-Enhanced"*.
 `experiments/90-kdenlive-vs-enhanced.sh`, kdenlive 26.08.0 on both sides.
 ⛔ **The bar is NOT met.**
 
-| column | P — ours, one command | E — `kdenlive-AppImage-Enhanced` | | under the 2026-09-03c ruling |
+⭐ **RE-MEASURED 2026-09-03d** on the corrected cold protocol
+(`experiments/clock.sh`, median of 7, interleaved, A/A control 1.02 against a
+1.06 floor) and at the shipped runtime and block size:
+
+| column | P — ours, one command | E — `kdenlive-AppImage-Enhanced` | | under the rulings |
 |---|---|---|---|---|
-| size | 397,903,295 B | 191,900,604 B | 2.07× | ⭐ **acceptable** |
-| render (melt → a real MP4) | **3,625 ms** | 2,001 ms | ⛔ 1.81× | ⛔ **binding** |
-| start, cold | **3,344 ms** | 1,325 ms | ⛔ 2.52× | ⛔ **binding** |
-| start, warm | **139 ms** | 34 ms | ⛔ 4.1× | ⛔ **binding** |
+| ⭐ **start, cold** | **380.2 ms** | 513.9 ms | ⭐ **0.74× — OURS IS FASTER** | ⭐ **MET** |
+| start, warm | 114 ms | 33 ms | ⛔ 3.45× | ⛔ **binding, and UNEXPLAINED** |
+| render (melt → a real MP4) | 1,140 ms | 995 ms | ⚠ **direction NOT established** | ⚠ unresolved |
+| size | 565,332,219 B | 191,900,604 B | ⛔ 2.95× | ⭐ acceptable under 2026-09-03c, ⛔ **not under goal 3** |
+| ⭐ **host objects** | ⭐ **0 on 11 of 11** | 0 on **4** of 11 | ⭐ **ours is clean everywhere** | |
 | runs on the eleven | 11 of 11 | 11 of 11 | equal | |
 | the MP4 | 4,149 B, 48 frames, libx264 | 4,162 B | equal | |
 
-⛔ **THE MILLISECOND ROWS ARE FROM A SUPERSEDED EVIDENCE FILE — deep review 1,
-2026-09-03c.** They are `git show
-0d4a2a94:evidence/90-kdenlive-vs-enhanced/RESULT.txt`; the file at that path
-today is a later run saying 24,074 / 13,680 render and 5,941 / 1,183 cold.
-⚠ That run also shows **ours 4/11 clean on host objects**, which the
-multi-program-shell fix later took to 11/11 — so these are different
-configurations, not clock noise. ⛔ Four runs give cold-start ratios of 2.52×,
-3.48×, 4.92× and 5.02×, and warm exceeds cold in two of them.
-`../docs/history/corrections.md` C23.
+⛔ **THE COLD ROW FLIPPED, AND SO DID WHAT IT MEANS.** It read *300 vs 61 ms,
+4.92× against us* — one sample, taken with the protocol
+`../docs/history/corrections.md` **C24** disproves (a byte-identical copy
+reuses uruntime's live mount, so "cold" was warm), and before the two levers of
+2026-09-03d landed.
+
+⚠ **THE RENDER ROW IS REPORTED AS UNRESOLVED ON PURPOSE.** The run before this
+one gave 1,434 vs 1,973 (ours faster) from **one** sample; this one gives
+1,140 vs 995 (ours slower) from a median of three. Two runs disagreeing in
+DIRECTION is not a number.
+
+⚠ **AND THE WARM ROW IS NEW AND UNEXPLAINED**: 114 ms where a warm `jq` start
+costs 8. ⭐ First candidate, from
+[`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md) §1 —
+at 565 MB this artefact is over uruntime's 350 MB `MAX_EXTRACT_SELF_SIZE`, so
+it **extracts** where `jq` **mounts**. Different runtime path, different warm
+behaviour. ⛔ Unverified.
 
 ⭐ **What IS established, and it is the half T-054 could not reach**: a
 kdenlive that renders, produced by **one command from a package name**, on
@@ -91,10 +104,12 @@ one-command packaging is now half the bar and this meets it.
 
 **What is left, re-ordered by the ruling** (size struck, clock binding):
 
-1. ⛔ **The clock is the bar now.** Start and render are dominated by mounting
-   a 398 MB dwarfs image against a 192 MB one — **the size column IS the time
-   column here**, which is the one place the struck size work still scores.
-   ⚠ Nobody has measured that claim; it is an inference from the numbers.
+1. ⛔ **THAT INFERENCE IS MEASURED AND IT IS FALSE.** This item read *"start and
+   render are dominated by mounting a 398 MB dwarfs image against a 192 MB one
+   — the size column IS the time column here"*. `experiments/84-` measured
+   image size at **0.024–0.031 ms/MiB**, so the whole difference between the
+   two artefacts is about **5 ms** of a gap never observed below 129 ms.
+   ⭐ What moved the cold row was the runtime and the packer, not the bytes.
 2. **`--debloat aggressive`** is untried on this artefact and removes ~90 MiB
    of Vulkan ICDs for GPUs this architecture has (`experiments/89-`: 0.78× on
    a GL bundle).

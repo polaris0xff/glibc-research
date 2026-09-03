@@ -101,8 +101,10 @@ case 3:
     }
 ```
 
-⛔ **Our kdenlive bundle is 398 MB; the competitor's is 192 MB.** One is over
-the line and one is under it. ⚠ It is a default in one project, not a published
+⛔ **Our kdenlive bundle is 565,332,219 B as of 2026-09-03d** (398 MB before
+`-S18`); the competitor's is 192 MB. One is over the line and one is under it,
+and ⭐ **uruntime's own default is mode 3, so ours is ALREADY EXTRACTING** —
+[`nix-bundle-patching.md`](nix-bundle-patching.md) §1. ⚠ It is a default in one project, not a published
 benchmark.
 
 ⛔ **THIS PAGE SAID "a lever `pgb` does not have" AND THAT WAS WRONG, corrected

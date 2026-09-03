@@ -184,7 +184,8 @@ threshold:
         if cfg.elfFileSize < defaultSizeLimit { mount... } else { extract... }
 
 ⛔ **Above ~350 MB, somebody who ships this format for a living chooses
-EXTRACTION over FUSE mounting.** Our kdenlive bundle is **398 MB** — over the
+EXTRACTION over FUSE mounting.** ⚠ **Our kdenlive bundle is 565,332,219 B as
+of 2026-09-03d** (it was 398 MB before `-S18`) — well over the
 line. The competitor's is **192 MB** — under it.
 
 ⚠ **That is corroboration, not measurement**, and the threshold is a default in

@@ -94,10 +94,11 @@ differently under the operator's ruling of 2026-09-03c:
 | *"performs better"* | ⭐ **MET ON THIS SUBJECT** — cold **1.00×**, warm **0.92×**, eleven environments. ⚠ Parity is not "better"; the honest sentence is *"no difference measurable on cold, possibly ahead on warm"* |
 | size | ⭐ **struck from the bar**, and it went the other way: 1.70× |
 
-⛔ **THE SUBJECT IS `jq`, AND kdenlive IS NOT MEASURED.** Both levers are
-properties of the runtime and the packer rather than of the payload, so they
-should carry — ⚠ **and "should carry" is not a measurement.** `experiments/90-`
-owns kdenlive and still uses the cold protocol `corrections.md` C24 disproves.
+⭐ **AND THEY DO CARRY — kdenlive WAS re-measured, 2026-09-03d.** `90-` now
+uses the corrected protocol and its cold row went **4.92× against us → 0.74×
+FOR us** (380.2 vs 513.9 ms, A/A control 1.02 against a 1.06 floor), with host
+objects **0 of 11 against the competitor's 4 of 11**. ⛔ Its warm row is 3.45×
+against us and unexplained, and its render direction is unresolved. T-055.
 
 **What is left.**
 
@@ -113,8 +114,8 @@ owns kdenlive and still uses the cold protocol `corrections.md` C24 disproves.
    the 32-bit loader copy and the by-name warning all exist and now carry
    seven hermetic `elfClass` cases; **no 32-bit application has been put
    through it.**
-5. **Nothing is measured against a hand-built Anylinux AppImage for a GUI
-   subject.** `experiments/90-` does it for kdenlive; T-055 owns that.
+5. ✅ **A GUI subject IS measured against the competitor** — `experiments/90-`,
+   kdenlive, 2026-09-03d. T-055 carries the table.
 6. ⭐ **`xplshn/pelf` IS READ, 2026-09-03c** — findings in
    [`../docs/research/portable-nix.md`](../docs/research/portable-nix.md),
    mechanisms at file and line in
@@ -124,7 +125,8 @@ owns kdenlive and still uses the cold protocol `corrections.md` C24 disproves.
    startup than AppImage — which is the axis the operator just made binding.
    ⛔ **Nobody has run it here.** Three things it has and we do not:
    - a **size-thresholded startup policy** — mount below 350 MB, EXTRACT
-     above it. Our kdenlive bundle is 398 MB; the competitor's is 192 MB;
+     above it. Our kdenlive bundle is 565,332,219 B (398 MB before `-S18`);
+     the competitor's is 192 MB;
    - the parsed runtime config cached in an **extended attribute on the
      artefact itself**, so later starts skip re-parsing the ELF;
    - **live-mount reuse** across invocations, exposed as `REUSE_INSTANCES`.
