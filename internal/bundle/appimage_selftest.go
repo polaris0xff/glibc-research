@@ -44,7 +44,8 @@ func AppImageSelftest(c *cfg.Config) *selftest.Report {
 	b := &Builder{C: c, Root: dir}
 	got, err := b.resolveEntry(pkgDir, "prog", false)
 	r.Check("a wrapper script is followed to its ELF",
-		relOr(got, dir, err), "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-real/bin/prog")
+		relOr(got.ELF, dir, err), "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-real/bin/prog")
+	r.Check("and it is not reported as a script entry", got.Script, "")
 
 	_ = os.WriteFile(filepath.Join(pkgDir, "bin", "prog"),
 		[]byte("#!/bin/sh\nexec /nix/store/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-gone/bin/x\n"), 0o755)
@@ -62,7 +63,45 @@ func AppImageSelftest(c *cfg.Config) *selftest.Report {
 	r.CheckBool("--name naming no program is refused, not substituted", err != nil, true)
 
 	got, err = b.resolveEntry(pkgDir, "nosuchprog", false)
-	r.CheckBool("a DERIVED name that misses still falls back", err == nil && got != "", true)
+	r.CheckBool("a DERIVED name that misses still falls back", err == nil && got.ELF != "", true)
+
+	// ---- T-081's second blocker: a SCRIPT entry point ---------------------
+	//
+	// ⛔ WHAT THIS CATCHES, AND IT COST EVERY PYTHON GUI APPLICATION. A
+	// nixpkgs Python program is a script whose shebang names an interpreter in
+	// the closure. Asking for ONE path made the resolver scan the script's own
+	// text, land back on the wrapper that pointed at it, and report
+	// `no entry point` after five hops. The answer is a PAIR.
+	pyDir := filepath.Join(dir, "dddddddddddddddddddddddddddddddd-python3-3.14.7")
+	if err := os.MkdirAll(filepath.Join(pyDir, "bin"), 0o755); err != nil {
+		r.Fail("mkdir python", err.Error(), "created")
+		return r
+	}
+	_ = os.WriteFile(filepath.Join(pyDir, "bin", "python3"), []byte("\x7fELF py"), 0o755)
+	_ = os.WriteFile(filepath.Join(pkgDir, "bin", "pyprog"),
+		[]byte("#!/nix/store/dddddddddddddddddddddddddddddddd-python3-3.14.7/bin/python3\nimport sys\n"), 0o755)
+	got, err = b.resolveEntry(pkgDir, "pyprog", true)
+	r.Check("a script entry resolves to its INTERPRETER",
+		relOr(got.ELF, dir, err), "dddddddddddddddddddddddddddddddd-python3-3.14.7/bin/python3")
+	r.Check("and the script itself is the argument",
+		relOr(got.Script, dir, err), "pkg/bin/pyprog")
+
+	// `#!/nix/store/<coreutils>/bin/env python3` is the other shape nixpkgs
+	// writes, and the interpreter is then a NAME to find in the closure.
+	_ = os.WriteFile(filepath.Join(pkgDir, "bin", "envprog"),
+		[]byte("#!/nix/store/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee-coreutils/bin/env python3\nprint(1)\n"), 0o755)
+	got, err = b.resolveEntry(pkgDir, "envprog", true)
+	r.Check("an `env <interp>` shebang finds the interpreter in the closure",
+		relOr(got.ELF, dir, err), "dddddddddddddddddddddddddddddddd-python3-3.14.7/bin/python3")
+
+	// ⛔ AND A HOST INTERPRETER IS REFUSED, WHICH IS THE POINT. `#!/bin/sh`
+	// with nothing else to follow would put the HOST's interpreter and its
+	// libc in the process — measured at 1-4 host shared objects per glibc row
+	// in experiments/90-, and the one thing a bundle may not do.
+	_ = os.WriteFile(filepath.Join(pkgDir, "bin", "hostprog"),
+		[]byte("#!/bin/sh\necho hello\n"), 0o755)
+	_, err = b.resolveEntry(pkgDir, "hostprog", true)
+	r.CheckBool("a HOST-interpreter shebang is refused, not adopted", err != nil, true)
 
 	// The wrapper reader, on both shapes.
 	shell := filepath.Join(dir, "shellwrap")

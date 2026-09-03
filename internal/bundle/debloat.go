@@ -222,9 +222,15 @@ func containsString(list []string, want string) bool {
 // its own documentation disagreed about which level deletes files. The gate
 // and its reasoning live at the call site; this is a pointer to it.
 func (b *Builder) DropUnreachable() {
+	// ⛔ THE PRELOADED OBJECTS ARE ROOTS, and nothing else makes them one.
+	// `libpgb-storefix.so` is named in `.preload` and linked against by
+	// nothing, so a DT_NEEDED sweep sees an orphan and deletes the mechanism
+	// that makes a compiled-in store path resolve — leaving a bundle that
+	// builds, packs and draws nothing. storefix.go.
 	res, err := Sweep(SweepOptions{
-		Dir:      b.AppDir,
-		EnvFiles: []string{filepath.Join(b.AppDir, ".env")},
+		Dir:        b.AppDir,
+		EnvFiles:   []string{filepath.Join(b.AppDir, ".env")},
+		ExtraRoots: preloadNames(b.AppDir),
 	})
 	if err != nil {
 		// ⚠ Reported, not fatal, and NOTHING is deleted. A sweep that could

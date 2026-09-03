@@ -117,7 +117,12 @@ type AppImageOptions struct {
 	WithPrograms []string // extra programs, found anywhere in the closure
 	Extra        []string // extra attributes or store paths to pull in
 	NoGL         bool
-	Cache        string
+	// NoStorefix builds without the compiled-in-store-path mechanism. ⭐ It
+	// is the NEGATIVE CONTROL for T-081 and it is a shipped flag rather than
+	// a comment: a criterion that cannot be made to fail is not an
+	// instrument. storefix.go, and PROGRESS.md delivery rule 6.
+	NoStorefix bool
+	Cache      string
 }
 
 // Builder assembles one AppImage.
@@ -243,6 +248,13 @@ func (b *Builder) Build() error {
 		return err
 	}
 	if err := b.writeEnv(); err != nil {
+		return err
+	}
+	// ⛔ AFTER writeEnv, because carryBakedPaths has by then materialised the
+	// subtrees an override variable redirects, and those real directories must
+	// win over a symlink into the merged tree. BEFORE the sweep, so the
+	// interposer is present when reachability is computed. storefix.go.
+	if err := b.storefix(); err != nil {
 		return err
 	}
 	// ⛔ AFTER writeEnv, because the sweep reads `.env` to find the plugin
@@ -474,14 +486,27 @@ func (b *Builder) storeResolve(p string) string {
 	return ""
 }
 
-// resolveEntry finds the ELF a program name means, following a nixpkgs wrapper
-// to the real binary and keeping the environment it set.
+// Entry is what a program name resolves to.
+//
+// ⭐ IT IS A PAIR, NOT A PATH, AND THAT IS THE WHOLE OF T-081's SECOND BLOCKER.
+// A nixpkgs Python program is `bin/<name>`, a makeBinaryWrapper ELF, whose
+// target `bin/.<name>-wrapped` is a SCRIPT. A script entry point is
+// interpreter + script argument; asking for one path made `resolveEntry`
+// oscillate between the two shapes for five hops and then report
+// `no entry point`, so NO Python GUI application bundled at all.
+type Entry struct {
+	ELF    string // the executable to run: the program, or its interpreter
+	Script string // non-empty when ELF is an interpreter and this is its argument
+}
+
+// resolveEntry finds what a program name means, following a nixpkgs wrapper to
+// the real binary and keeping the environment it set.
 //
 // The wrapper test comes BEFORE the ELF test: nixpkgs' makeBinaryWrapper
 // output is a compiled C program, so asking "is this an ELF" first declares
 // the wrapper to be the program and packs a binary that then execs an absolute
 // store path the bundle does not have.
-func (b *Builder) resolveEntry(storeDir, prog string, nameWasAsked bool) (string, error) {
+func (b *Builder) resolveEntry(storeDir, prog string, nameWasAsked bool) (Entry, error) {
 	bin := filepath.Join(storeDir, "bin", prog)
 	if _, err := os.Lstat(bin); err != nil {
 		if nameWasAsked {
@@ -494,11 +519,11 @@ func (b *Builder) resolveEntry(storeDir, prog string, nameWasAsked bool) (string
 			sort.Strings(have)
 			logx.Warnf("--name %q names no program in %s/bin. What is there:\n             %s",
 				prog, filepath.Base(storeDir), strings.Join(have, " "))
-			return "", fmt.Errorf("no such program")
+			return Entry{}, fmt.Errorf("no such program")
 		}
 		entries, err := os.ReadDir(filepath.Join(storeDir, "bin"))
 		if err != nil {
-			return "", err
+			return Entry{}, err
 		}
 		bin = ""
 		for _, e := range entries {
@@ -508,7 +533,7 @@ func (b *Builder) resolveEntry(storeDir, prog string, nameWasAsked bool) (string
 			}
 		}
 		if bin == "" {
-			return "", fmt.Errorf("no program in %s/bin", storeDir)
+			return Entry{}, fmt.Errorf("no program in %s/bin", storeDir)
 		}
 		logx.Warnf("bin/%s does not exist; falling back to bin/%s", prog, filepath.Base(bin))
 	}
@@ -532,20 +557,81 @@ func (b *Builder) resolveEntry(storeDir, prog string, nameWasAsked bool) (string
 			}
 		}
 		if elfx.IsELF(bin) {
-			return bin, nil
+			return Entry{ELF: bin}, nil
+		}
+		// ⭐ A SHEBANG IS AN ANSWER, NOT A HOP. The interpreter it names is a
+		// store path, so it is in this closure and it is an ELF; the file
+		// itself is the argument. This is checked BEFORE the store-path scan
+		// below, which is what used to walk the script's text and resolve
+		// straight back to the wrapper that pointed here.
+		if interp := b.shebangInterpreter(bin); interp != "" {
+			logx.Warnf("bin/%s is a SCRIPT; its entry point is %s + the script itself",
+				prog, filepath.Base(interp))
+			return Entry{ELF: interp, Script: bin}, nil
 		}
 		// A wrapper shape the reader does not recognise: take the last store
 		// path it names that exists here, and say the environment was not read.
 		next := lastExistingStorePath(bin, b.Root)
 		if next == "" {
 			logx.Warnf("bin/%s is a script and no ELF in it could be resolved", prog)
-			return "", fmt.Errorf("unresolvable wrapper")
+			return Entry{}, fmt.Errorf("unresolvable wrapper")
 		}
 		logx.Warnf("bin/%s is a wrapper of a shape the reader does not know -> %s", prog, filepath.Base(next))
 		logx.Warnf("its ENVIRONMENT is NOT reproduced.")
 		bin = next
 	}
-	return "", fmt.Errorf("too many wrapper hops")
+	return Entry{}, fmt.Errorf("too many wrapper hops")
+}
+
+// shebangInterpreter reads a script's first line and resolves the interpreter
+// it names inside this closure, returning "" when the file is not a script or
+// the interpreter is not an ELF that is here.
+//
+// ⚠ `#!/nix/store/…/bin/env python3` IS HANDLED, because nixpkgs writes it:
+// the interpreter is then the second word, looked up in the closure's own
+// bin/ directories rather than on the host's PATH.
+func (b *Builder) shebangInterpreter(script string) string {
+	f, err := os.Open(script)
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	var head [512]byte
+	n, _ := f.Read(head[:])
+	if n < 3 || head[0] != '#' || head[1] != '!' {
+		return ""
+	}
+	line := string(head[2:n])
+	if i := strings.IndexAny(line, "\n\r"); i >= 0 {
+		line = line[:i]
+	}
+	words := strings.Fields(line)
+	if len(words) == 0 {
+		return ""
+	}
+	cand := words[0]
+	if filepath.Base(cand) == "env" && len(words) > 1 {
+		// `env python3` — the name is a program, not a path.
+		if p := b.findProgram(words[1]); p != "" && elfx.IsELF(p) {
+			return p
+		}
+		return ""
+	}
+	if strings.HasPrefix(cand, "/nix/store/") {
+		inside := filepath.Join(b.Root, strings.TrimPrefix(cand, "/nix/store/"))
+		if elfx.IsELF(inside) {
+			return inside
+		}
+		// A wrapper as the interpreter: follow it one hop.
+		if e, err := b.resolveEntry(filepath.Dir(filepath.Dir(inside)), filepath.Base(inside), false); err == nil && e.Script == "" {
+			return e.ELF
+		}
+		return ""
+	}
+	// An absolute host path (`#!/bin/sh`) is NOT resolved: running the host's
+	// interpreter puts the host's libc in the process, which is the one thing
+	// a bundle may not do. Reported by the caller as an unresolved entry.
+	return ""
 }
 
 var storeRefRe = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[^" ']*`)

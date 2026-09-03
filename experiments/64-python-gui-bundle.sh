@@ -1,8 +1,9 @@
 #!/bin/sh
 # THE QUESTION
 #
-#   Does a PYTHON GUI APPLICATION, bundled out of a nixpkgs closure by
-#   `pgb bundle appimage`, actually run on all eleven environments?
+#   Does a GUI application bundled out of a nixpkgs closure by
+#   `pgb bundle appimage` actually DRAW A WINDOW on all eleven environments —
+#   including the two shapes that could not, and which T-081 is about?
 #
 # ⛔ WHY THIS EXPERIMENT EXISTS, AND IT IS THE OPERATOR'S OWN COUNTER-EXAMPLE.
 # `Anylinux-AppImages`' `HALL-OF-FAME.md` grades **Python "Utter garbage"** and
@@ -16,20 +17,7 @@
 # directories must be discovered by hand. A nix closure is the opposite: it is
 # the exact set the derivation declared. ⛔ T-080's rule is that a row not run
 # through `pgb bundle appimage` is a **HYPOTHESIS**. This experiment converts
-# two of them — Python and GTK — into measurements, or fails trying.
-#
-# -- WHY meld ----------------------------------------------------------------
-#
-# ⭐ IT IS BOTH BOTTOM ROWS AT ONCE. `meld` is a Python 3 application whose UI
-# is GTK 3 reached through PyGObject, so one artefact exercises:
-#
-#   Python      an interpreter that must find its own stdlib, its site-packages
-#               and its compiled extension modules inside the bundle
-#   GTK         a typelib + introspection stack that must find its .typelib
-#               files, its loaders and its schemas inside the bundle
-#
-# ⚠ It is ONE application. It is not evidence about every Python or GTK
-# program, and §"what this does not establish" says so at the end.
+# them into measurements, or fails trying.
 #
 # -- ⛔ THE SUCCESS CRITERION, AND THE FIRST ONE WAS WRONG --------------------
 #
@@ -44,7 +32,7 @@
 # working bundle from a broken one — which is the only thing this experiment
 # is for.
 #
-# ⭐ SO THE DISPLAY IS REAL NOW. An `Xvfb` server is started on this host, its
+# ⭐ SO THE DISPLAY IS REAL. An `Xvfb` server is started on this host, its
 # socket is bound into each rootfs, and the criterion is EXTERNAL:
 #
 #   1. the program must NOT print `cannot open display` — it connected;
@@ -52,116 +40,84 @@
 #      -root -tree` from OUTSIDE the process. A program's own stdout cannot
 #      be the evidence that it drew something.
 #
-# ⛔ CRITERION 2 IS WHAT MAKES THIS FALSIFIABLE, and it immediately falsified
-# the green result: with a real display, galculator connects fine and the root
-# window still has **0 children**.
+# -- ⭐ THE FOUR ARMS, AND WHY EACH ONE IS HERE ------------------------------
 #
-# -- THE CONTROL -------------------------------------------------------------
+#   G  galculator  C + GTK 3, UI loaded from a FILE at a compiled-in absolute
+#                  store path. ⛔ THE SUBJECT T-081 EXISTS FOR: it drew 0 of 11
+#                  before the store-path mechanism.
+#   X  mousepad    C + GTK 3, UI compiled IN as a GResource. The regression
+#                  control: it drew 11 of 11 before and must still.
+#   P  meld        Python 3 + GTK 3 through PyGObject. ⛔ IT DID NOT BUILD AT
+#                  ALL before the script entry point resolved to
+#                  interpreter + script.
+#   N  galculator, built again with `--no-storefix`. ⭐ THE NEGATIVE CONTROL.
 #
-# ⭐ WITHOUT IT A GREEN ROW IS A PROGRAM PRINTING A STRING. The control is that
-# the target has no meld of its own: `command -v meld` must fail on every one
-# of the eleven, so the capability demonstrably came out of the bundle.
+# ⛔ ARM N IS DELIVERY RULE 6 MADE INTO A FLAG. "Check that your success
+# criterion can fail for the right reason" is not satisfied by a comment; arm N
+# builds the SAME bundle with the one mechanism absent and nothing else
+# changed. If arm N also drew windows, arm G's green would be measuring
+# something other than the mechanism.
+#
+# ⚠ ARM C — the old positive control, which bound the AppDir at the store path
+# with a mount namespace — IS RETIRED. It answered "is the store path the
+# cause"; arm G answering 11 of 11 with no bind answers it better, and arm N is
+# what keeps the instrument honest now. `history/corrections.md`.
 #
 # -- ⭐ PRE-REGISTERED EXPECTATION -------------------------------------------
 #
 # ⛔ COMMITTED BEFORE THE RUN. PROGRESS.md delivery rule 1.
 #
-#   R1  the bundle runs meld's own code on 11 of 11.
-#   R2  zero HOST shared objects on 11 of 11, by the `62-` classifier.
-#   R3  the trace shows libpython AND libgtk-3 opened FROM THE BUNDLE on
-#       every row — i.e. the stacks the field grades worst are the ones
-#       demonstrably loading.
-#   R4  no target has a meld of its own (the control), 11 of 11.
+#   E1  arm G draws a real window on 11 of 11, WITH NO BIND.
+#   E2  arm G loads zero HOST shared objects on 11 of 11.
+#   E3  ⭐ arm N draws 0 of 11 — the criterion still fails without the
+#       mechanism, so E1 is measuring the mechanism.
+#   E4  arm P (meld, Python GUI) produces an artefact AND draws on 11 of 11.
+#   E5  arm X still draws 11 of 11 — no regression from the changes E1 needed.
+#   E6  no target ships galculator, mousepad or meld of its own (the control).
 #
-# -- ⛔ WHAT ACTUALLY HAPPENED: R1-R3 NEVER GOT A CHANCE, AND THAT IS THE
-#       FINDING ---------------------------------------------------------------
+# -- THE CONTROL -------------------------------------------------------------
 #
-# ⛔ **THE meld BUNDLE DOES NOT BUILD**, and the cause is exact rather than
-# vague. `internal/bundle/appimage.go`'s `resolveEntry` OSCILLATES:
-#
-#   1. `bin/meld` is a nixpkgs `makeBinaryWrapper` — a compiled ELF. The
-#      reader recognises it and extracts its 10 environment records; its
-#      target is `bin/.meld-wrapped`. ✅ correct so far.
-#   2. `bin/.meld-wrapped` is a **Python script**, shebang
-#      `#!/nix/store/…-python3-3.14.7/bin/python3`. `ReadWrapper` returns
-#      nothing (it is not a wrapper) and `elfx.IsELF` is false, so the code
-#      falls to `lastExistingStorePath`, which scans the script's TEXT for the
-#      last executable store path it names — and that resolves back to
-#      `bin/meld`.
-#   3. → 1. Five hops, then `too many wrapper hops`, then
-#      `no entry point in …/bin` (`assemble.go:60`).
-#
-# ⭐ THE REAL FIX IS A FEATURE, NOT A PATCH, and it is worth stating why: the
-# bundle FLATTENS the closure — libraries into `lib/`, programs into
-# `shared/bin/` — instead of shipping a `/nix/store` tree. So the script
-# cannot simply be adopted as the entry point either: its shebang is an
-# absolute store path that will not exist at run time. A script entry point
-# has to become *interpreter + script argument*, which changes what
-# `resolveEntry` returns and how the launcher invokes it.
-#
-# ⛔ SO THE PYTHON ROW IS A **TOOLING** GAP, WHICH IS EXACTLY THE CATEGORY
-# T-080'S GUARANTEE IS ABOUT — not a statement that nix cannot do Python. The
-# closure fetched fine (136 store paths, mesa augmented); nothing about the
-# libraries failed. ⚠ And it is the STANDARD nixpkgs shape for a Python
-# application, so it is not a `meld` quirk.
-#
-# -- ⭐ ARM G, ADDED SO THE GTK ROW IS MEASURED RATHER THAN BLOCKED WITH IT ---
-#
-# `galculator` is C + GTK 3 with `gtk+3` as its only build input, and its
-# `bin/galculator` is a plain ELF, so it does not meet the wrapper defect.
-# ⭐ That separates the two questions the meld failure had entangled: GTK is
-# measured here, and Python is a named mechanism rather than an unknown.
-#
-#   S1  arm G connects to a REAL display on 11 of 11 (no "cannot open display")
-#   S2  arm G loads zero HOST shared objects on 11 of 11
-#   S3  arm G's trace shows libgtk-3 opened FROM THE BUNDLE on every row
-#   S4  no target has a galculator of its own
-#   S5  ⛔ arm P (meld) does NOT produce an artefact, for the reason above.
-#       This is asserted as a MEASUREMENT, not recorded as a skip: the build
-#       ran, fetched a complete closure, and failed at a named line.
-#   S6  ⛔ **a WINDOW appears on the X server**, checked externally.
-#
-# -- ⛔ AND S6 IS WHERE IT FAILS, WHICH IS THE POINT OF MEASURING IT ---------
-#
-# ⭐ WITH A REAL DISPLAY, GTK CONNECTS AND THE APPLICATION STILL DRAWS
-# NOTHING. galculator prints:
-#
-#   [galculator] Couldn't load /nix/store/<hash>-galculator-2.1.4/share/
-#                galculator/ui/main_frame.ui
-#
-# ⛔ AN ABSOLUTE STORE PATH, COMPILED INTO THE BINARY, TO A DATA FILE THAT IS
-# IN THE BUNDLE — `AppDir/share/galculator/ui/main_frame.ui` exists. The
-# bundle sets `XDG_DATA_DIRS` to its own `share`, which serves every app that
-# LOOKS UP its data; it cannot serve one that has the path baked in.
-#
-# ⭐ SO THE MECHANISM THAT STOPS THIS BUNDLE IS **TOOLING**, NOT CAPABILITY:
-# GTK loaded, GTK connected to a real X server, zero host objects. What failed
-# is a store path nothing rewrote — which is **T-081**'s entry text verbatim
-# (*"shebang lines, hardcoded paths, .desktop files"*). ⛔ T-081 is out of
-# scope this session and this experiment is where its cost is now measured.
-#
-# ⚠ TWO SUBJECTS, BECAUSE ONE WOULD NOT SEPARATE THE CASES. Arm X is
-# `mousepad`, a GTK 3 editor that carries its UI as a GResource compiled into
-# the binary rather than as a file on a path. If arm X draws a window and arm
-# G does not, the boundary is exactly "data reached by a baked-in absolute
-# path", and not GTK.
+# ⭐ WITHOUT IT A GREEN ROW IS A PROGRAM PRINTING A STRING. The control is that
+# the target has none of these programs of its own: `command -v <prog>` must
+# fail on every one of the eleven, so the capability demonstrably came out of
+# the bundle.
 #
 # Exit: 0 measured and matched, 1 measured and did not, 2 could not run.
 set -u
 . "$(cd "$(dirname "$0")" && pwd)/lib.sh"
 
-exp_begin "64 - GTK and Python out of a nixpkgs closure: one measured, one blocked by our own tooling"
+exp_begin "64 - GTK and Python out of a nixpkgs closure, with the compiled-in store path resolved"
 
 WORK="${PGB_EXP64_WORK:-/var/tmp/t080}"
 mkdir -p "$WORK" || exit 2
 GIMG="$WORK/galculator.AppImage"
 XIMG="$WORK/mousepad.AppImage"
-SUBJ=galculator
+NIMG="$WORK/galculator-nofix.AppImage"
 PYIMG="$WORK/meld.AppImage"
 RUN_TIMEOUT="${PGB_EXP64_TIMEOUT:-120}"
 WIN_WAIT="${PGB_EXP64_WIN_WAIT:-25}"   # seconds to wait for a window to appear
 
 command -v strace >/dev/null 2>&1 || { exp_note "no strace on PATH"; exit 2; }
+
+# ⛔ AN ARTEFACT OLDER THAN THE TOOL IS NOT A RESULT ABOUT THE TOOL, and this
+# is docs/AGENTS.md §6's `--rebuild` lesson reached from the other side: the
+# POC suite once reported ten green rows about a toolchain that had changed
+# under it. Here the check is derived rather than remembered.
+stale() { # image -> 0 when it must be rebuilt
+  [ ! -s "$1" ] && return 0
+  [ "$REPO_DIR/pgb" -nt "$1" ] && return 0
+  return 1
+}
+
+build_arm() { # image attribute name [extra pgb args...]
+  _img=$1; _attr=$2; _name=$3; shift 3
+  if stale "$_img"; then
+    exp_note "building $_name — several minutes"
+    rm -f "$_img"
+    PGB_APPIMAGE_CACHE="$WORK/${_name}cache" "$REPO_DIR/pgb" bundle appimage "$_attr" \
+      --out "$_img" --name "$_attr" "$@" >"$WORK/build-$_name.log" 2>&1 || true
+  fi
+}
 
 # ---------------------------------------------------------------------------
 # ⭐ A REAL DISPLAY, BECAUSE "cannot open display" IS NOT A RESULT.
@@ -202,6 +158,14 @@ windows_named() {  # name -> count of matching toplevel windows
     | grep -ci "$1" || true
 }
 
+# ⛔ THE DISPLAY MUST BE IDLE BEFORE A ROW IS SCORED. A window another arm left
+# behind is counted by the observer and nothing else in this harness would
+# catch it — RESUME.md carries this as a standing rule about the shared
+# resource, and here it is asserted instead of remembered.
+display_idle() { # name -> 0 when no window of that name is on the server
+  [ "$(windows_named "$1")" = 0 ]
+}
+
 # ⛔ REAP BY WHAT A PROCESS IS CHROOTED INTO, NOT BY ITS NAME. uruntime leaves
 # a dwarfs FUSE daemon behind on purpose — a mount that outlives the program is
 # what mount mode IS — and its comm is `memfd:dwarfs`, not the artefact's.
@@ -215,51 +179,6 @@ reap_in_root() { # rootfs-path
     case "$_rt" in "$_rr"|"$_rr"/*) kill -9 "$_pid" 2>/dev/null ;; esac
   done
 }
-
-# ---------------------------------------------------------------------------
-# ⛔ ARM P FIRST, BECAUSE ITS FAILURE IS THE FINDING AND NOT A PRELUDE.
-#
-# ⚠ THIS IS AN ASSERTION, NOT A SKIP. The build RAN: it resolved the
-# attribute, fetched a 136-path closure with its signatures checked, augmented
-# it with mesa, and then failed inside `resolveEntry`. A skip would say "could
-# not measure"; this measured a defect and names it.
-# ---------------------------------------------------------------------------
-printf -- '-- arm P: a PYTHON GUI application (meld) --------------------------\n'
-if [ ! -e "$WORK/build-meld.log" ]; then
-  exp_note "building arm P (meld) — expected to fail at resolveEntry"
-  PGB_APPIMAGE_CACHE="$WORK/cache" "$REPO_DIR/pgb" bundle appimage meld \
-    --out "$PYIMG" --name meld >"$WORK/build-meld.log" 2>&1 || true
-fi
-P_HOPS=$(grep -c 'shape the reader does not know' "$WORK/build-meld.log" 2>/dev/null || true)
-P_NOENTRY=$(grep -c 'no entry point in' "$WORK/build-meld.log" 2>/dev/null || true)
-P_CLOSURE=$(sed -n 's/^closure *\([0-9]*\) store paths after augmentation.*/\1/p' \
-  "$WORK/build-meld.log" 2>/dev/null | head -1)
-exp_check "arm P: the closure fetched completely" \
-  "$([ "${P_CLOSURE:-0}" -gt 100 ] && echo yes || echo no)" yes
-exp_note "arm P closure: ${P_CLOSURE:-unknown} store paths — nothing about the"
-exp_note "   LIBRARIES failed. The defect is downstream of the closure."
-exp_check "arm P: no artefact was produced"  "$([ -s "$PYIMG" ] && echo yes || echo no)" no
-exp_check "arm P: resolveEntry oscillated"   "$([ "$P_HOPS" -ge 2 ] && echo yes || echo no)" yes
-exp_check "arm P: and it ended in 'no entry point'" \
-  "$([ "$P_NOENTRY" -ge 1 ] && echo yes || echo no)" yes
-exp_note "⛔ THE MECHANISM, exactly: bin/meld is a makeBinaryWrapper ELF whose"
-exp_note "   target bin/.meld-wrapped is a PYTHON SCRIPT. ReadWrapper returns"
-exp_note "   nothing for a script and elfx.IsELF is false, so"
-exp_note "   lastExistingStorePath scans the script's text and resolves back"
-exp_note "   to bin/meld. Five hops, then no entry point (assemble.go:60)."
-exp_note "⭐ IT IS A TOOLING GAP, which is the category T-080 is about — NOT a"
-exp_note "   statement that nix cannot do Python."
-
-printf '\n'
-printf -- '-- arm G: a C + GTK 3 application (galculator) ---------------------\n'
-if [ ! -s "$GIMG" ]; then
-  exp_note "building arm G — several minutes, ~130 store paths"
-  PGB_APPIMAGE_CACHE="$WORK/gcache" "$REPO_DIR/pgb" bundle appimage galculator \
-    --out "$GIMG" --name galculator >"$WORK/build-gal.log" 2>&1 || true
-fi
-[ -s "$GIMG" ] || { exp_note "arm G did not build; see $WORK/build-gal.log"; exit 2; }
-exp_check "arm G: the GTK bundle built" "$([ -s "$GIMG" ] && echo yes || echo no)" yes
-exp_note "artefact: $GIMG, $(wc -c < "$GIMG") bytes"
 
 # ⭐ THE CLASSIFIER IS `experiments/62-`'s, DELIBERATELY. A bundle's trace must
 # NOT be attributed to one pid — uruntime forks, mounts and re-execs, so the
@@ -284,12 +203,11 @@ classify_trace() {  # tracefile /artefact
 
 ENVS=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt")
 
-# ⭐ ONE MATRIX, RUN PER SUBJECT. Two GTK applications go through exactly the
-# same instrument so the only thing that differs between them is the
-# application — which is what makes the comparison mean anything.
-run_matrix() {  # subject image-path [extra-bind]
-  SUBJ="$1"; IMG="$2"; XBIND="${3:-}"
-  RAN=0; CLEAN=0; PY=0; GTK=0; NOHOST=0; ROWS=0; WIN=0
+# ⭐ ONE MATRIX, RUN PER SUBJECT. Every application goes through exactly the
+# same instrument so the only thing that differs between arms is the arm.
+run_matrix() {  # window-name image-path program-name
+  SUBJ="$1"; IMG="$2"; PROG="${3:-$1}"
+  RAN=0; CLEAN=0; GTK=0; NOHOST=0; ROWS=0; WIN=0
 
 printf '\n'
 printf '  %-20s %-6s %-5s %-6s %-8s %-7s %s\n' \
@@ -300,10 +218,15 @@ for name in $ENVS; do
   ROWS=$((ROWS+1))
   libc=$(exp_rootfs_libc "$name")
 
-  # ⭐ THE CONTROL: the target must not have a galculator of its own, or a
+  # ⭐ THE CONTROL: the target must not have this program of its own, or a
   # green row says nothing about the bundle.
-  own=$("$REPO_DIR/pgb" rootfs run "$root" -- /bin/sh -c "command -v $SUBJ" 2>/dev/null | head -1)
+  own=$("$REPO_DIR/pgb" rootfs run "$root" -- /bin/sh -c "command -v $PROG" 2>/dev/null | head -1)
   [ -z "$own" ] && NOHOST=$((NOHOST+1))
+
+  # ⛔ AND THE SERVER MUST BE EMPTY BEFORE THE SUBJECT STARTS.
+  _q=0
+  while [ "$_q" -lt 10 ] && ! display_idle "$SUBJ"; do sleep 1; _q=$((_q+1)); done
+  display_idle "$SUBJ" || exp_note "⚠ $name: a $SUBJ window was ALREADY on $XDISP"
 
   rm -f "$root/subj64"; cp "$IMG" "$root/subj64" 2>/dev/null; chmod +x "$root/subj64"
   tr="$WORK/tr.$name"
@@ -318,7 +241,7 @@ for name in $ENVS; do
   # either way, and would score a working bundle exactly like a broken one.
   strace -f -e trace=openat,open,execve,clone,clone3,vfork -o "$tr" \
     timeout "$RUN_TIMEOUT" "$REPO_DIR/pgb" rootfs run "$root" \
-      --bind /tmp/.X11-unix:/tmp/.X11-unix ${XBIND:+--bind "$XBIND"} -- \
+      --bind /tmp/.X11-unix:/tmp/.X11-unix -- \
       /bin/sh -c "DISPLAY=$XDISP /subj64" \
     >"$WORK/out.$name" 2>"$WORK/err.$name" &
   _sp=$!
@@ -338,29 +261,16 @@ for name in $ENVS; do
   cls=$(classify_trace "$tr" /subj64)
   nhost=$(printf '%s\n' "$cls" | grep -c '^host ' || true)
   nbund=$(printf '%s\n' "$cls" | grep -c '^bundled ' || true)
-  haspy=$(printf '%s\n' "$cls"  | grep -c '^bundled .*libgdk' || true)
   hasgtk=$(printf '%s\n' "$cls" | grep -c '^bundled .*libgtk-3' || true)
 
-  # ⛔ "RUNS" IS GTK'S OWN OUTPUT, AND THAT IS A STRONGER TEST THAN --version.
-  #
-  # ⭐ galculator calls gtk_init() BEFORE it parses arguments, so it never
-  # reaches a --version string. What it prints instead is
-  #     (galculator:NNN): Gtk-WARNING **: cannot open display:
-  # which is emitted BY THE BUNDLED libgtk-3 ITSELF, after the library has
-  # loaded, initialised and got as far as connecting to a display server.
-  # ⚠ A --version string would only have proved the program's argument parser
-  # ran; this proves GTK ran. The failure that follows is the absence of a
-  # DISPLAY on this machine, which is a property of the machine and not of
-  # the bundle — §"what this does not establish".
-  # ⛔ `tr -d '\r' < f1 f2` REDIRECTS f1 AND PASSES f2 AS AN ARGUMENT, which
-  # tr rejects — so this read nothing and every row printed "<none>" while the
-  # trace beside it plainly showed GTK loading. Caught by the disagreement
-  # between the two, not by reading. `cat` both, THEN filter.
   # ⛔ TWO DIFFERENT QUESTIONS, AND CONFLATING THEM IS THE ERROR THIS
   # EXPERIMENT WAS CORRECTED FOR.
   #   CONNECTED  the bundled GTK reached the X server — no "cannot open
   #              display". This is necessary and NOWHERE NEAR sufficient.
   #   WINDOW     the X server actually has a window, observed from outside.
+  # ⛔ `tr -d '\r' < f1 f2` REDIRECTS f1 AND PASSES f2 AS AN ARGUMENT, which
+  # tr rejects — so this read nothing and every row printed "<none>" while the
+  # trace beside it plainly showed GTK loading. `cat` both, THEN filter.
   all=$(cat "$WORK/err.$name" "$WORK/out.$name" 2>/dev/null | tr -d '\r')
   if printf '%s' "$all" | grep -q 'cannot open display'; then
     runs=no
@@ -368,9 +278,8 @@ for name in $ENVS; do
     runs=yes; RAN=$((RAN+1))
   fi
   [ "$win" -gt 0 ] && WIN=$((WIN+1))
-  out=$(printf '%s' "$all" | grep -m1 "Couldn't load\|cannot open display\|error\|Error" || printf '%s' "$all" | head -1)
+  out=$(printf '%s' "$all" | grep -m1 "Couldn't load\|cannot open display\|Traceback\|error\|Error" || printf '%s' "$all" | head -1)
   [ "$nhost" = 0 ] && CLEAN=$((CLEAN+1))
-  [ "$haspy"  -gt 0 ] && PY=$((PY+1))
   [ "$hasgtk" -gt 0 ] && GTK=$((GTK+1))
 
   printf '  %-20s %-6s %-5s %-8s %-8s %-8s %s\n' \
@@ -386,18 +295,33 @@ printf '\n'
 # ARM G — galculator: GTK 3, and its UI is a FILE reached by a compiled-in path
 # ---------------------------------------------------------------------------
 printf '\n-- arm G: galculator (UI loaded from a file at a compiled-in path) --\n'
+build_arm "$GIMG" galculator gal
+[ -s "$GIMG" ] || { exp_note "arm G did not build; see $WORK/build-gal.log"; exit 2; }
+exp_note "artefact: $GIMG, $(wc -c < "$GIMG") bytes"
+G_STOREMAP=$(sed -n 's/^store map *\([0-9]*\) .*/\1/p' "$WORK/build-gal.log" 2>/dev/null | head -1)
+exp_note "store map: ${G_STOREMAP:-unknown} store paths resolve inside the bundle"
 run_matrix galculator "$GIMG"
 G_ROWS=$ROWS; G_CONN=$RAN; G_WIN=$WIN; G_CLEAN=$CLEAN; G_GTK=$GTK; G_NOHOST=$NOHOST
+
+# ---------------------------------------------------------------------------
+# ⭐ ARM N — THE NEGATIVE CONTROL. Same subject, same bundler, ONE mechanism
+# removed by a shipped flag.
+# ---------------------------------------------------------------------------
+printf '\n-- arm N: galculator with --no-storefix (the NEGATIVE CONTROL) -----\n'
+build_arm "$NIMG" galculator nofix --no-storefix
+if [ -s "$NIMG" ]; then
+  run_matrix galculator "$NIMG"
+  N_ROWS=$ROWS; N_WIN=$WIN
+else
+  exp_skip "arm N (--no-storefix)" "the bundle did not build; see $WORK/build-nofix.log"
+  N_ROWS=0; N_WIN=-1
+fi
 
 # ---------------------------------------------------------------------------
 # ARM X — mousepad: GTK 3, and its UI is a GResource COMPILED INTO the binary
 # ---------------------------------------------------------------------------
 printf '\n-- arm X: mousepad (UI compiled into the binary as a GResource) ----\n'
-if [ ! -s "$XIMG" ]; then
-  exp_note "building arm X — several minutes"
-  PGB_APPIMAGE_CACHE="$WORK/mcache" "$REPO_DIR/pgb" bundle appimage mousepad \
-    --out "$XIMG" --name mousepad >"$WORK/build-mousepad.log" 2>&1 || true
-fi
+build_arm "$XIMG" mousepad mousepad
 if [ -s "$XIMG" ]; then
   run_matrix mousepad "$XIMG"
   X_ROWS=$ROWS; X_CONN=$RAN; X_WIN=$WIN; X_CLEAN=$CLEAN; X_GTK=$GTK; X_NOHOST=$NOHOST
@@ -407,81 +331,59 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# ⭐ ARM C — THE POSITIVE CONTROL, AND IT IS WHAT TURNS THE DIAGNOSIS INTO A
-# MEASUREMENT.
-#
-# ⛔ WITHOUT IT, "galculator fails because of a hardcoded store path" is an
-# INFERENCE from an error message. Arm C runs the IDENTICAL artefact with one
-# thing changed — the store path it names is made to resolve, by binding the
-# bundle's own AppDir at that path — and asks whether it then draws.
-#
-# ⚠ THE BIND IS NOT A FIX AND IS NOT PROPOSED AS ONE. It is only available
-# because this harness is root and controls the mount namespace; a user
-# double-clicking an AppImage has neither. It exists to isolate the cause.
-# T-081 owns the real mechanism.
+# ARM P — meld: a PYTHON 3 + GTK 3 application. ⛔ It did not build at all
+# before a script entry point resolved to interpreter + script.
 # ---------------------------------------------------------------------------
-printf '\n-- arm C: galculator AGAIN, with the store path made to resolve ----\n'
-G_STORE=$(basename "$(find "$WORK/gcache" -maxdepth 3 -type d -name '*-galculator-*' 2>/dev/null | head -1)")
-G_APPDIR="$WORK/gcache/galculator/AppDir"
-if [ -n "$G_STORE" ] && [ -d "$G_APPDIR" ]; then
-  run_matrix galculator "$GIMG" "$G_APPDIR:/nix/store/$G_STORE"
-  C_ROWS=$ROWS; C_WIN=$WIN; C_CLEAN=$CLEAN
+printf '\n-- arm P: a PYTHON GUI application (meld) --------------------------\n'
+build_arm "$PYIMG" meld meld
+P_CLOSURE=$(sed -n 's/^closure *\([0-9]*\) store paths after augmentation.*/\1/p' \
+  "$WORK/build-meld.log" 2>/dev/null | head -1)
+exp_note "arm P closure: ${P_CLOSURE:-unknown} store paths"
+exp_check "arm P: an artefact was produced" "$([ -s "$PYIMG" ] && echo yes || echo no)" yes
+if [ -s "$PYIMG" ]; then
+  P_ENTRY=$(grep -m1 'static trampoline' "$WORK/build-meld.log" 2>/dev/null || true)
+  exp_note "arm P entry: ${P_ENTRY:-<not a script entry>}"
+  run_matrix meld "$PYIMG"
+  P_ROWS=$ROWS; P_CONN=$RAN; P_WIN=$WIN; P_CLEAN=$CLEAN; P_NOHOST=$NOHOST
 else
-  exp_skip "arm C (store path supplied)" "could not locate the AppDir or the store name"
-  C_ROWS=0; C_WIN=0; C_CLEAN=0
+  exp_skip "arm P (meld)" "the bundle did not build; see $WORK/build-meld.log"
+  P_ROWS=0; P_CONN=0; P_WIN=0; P_CLEAN=0; P_NOHOST=0
 fi
 
 printf '\n'
 printf -- '-- summary ---------------------------------------------------------\n'
-printf '  %-34s %12s %12s\n' AXIS 'G galculator' 'X mousepad'
-printf '  %-34s %12s %12s\n' 'rows measured'                "$G_ROWS"   "$X_ROWS"
-printf '  %-34s %12s %12s\n' 'GTK connected to a real X'    "$G_CONN"   "$X_CONN"
-printf '  %-34s %12s %12s\n' 'libgtk-3 loaded from bundle'  "$G_GTK"    "$X_GTK"
-printf '  %-34s %12s %12s\n' 'zero HOST shared objects'     "$G_CLEAN"  "$X_CLEAN"
-printf '  %-34s %12s %12s\n' '⭐ A WINDOW ON THE X SERVER'   "$G_WIN"    "$X_WIN"
-printf '\n  %-34s %12s\n' '⭐ arm C: galculator + store path' "$C_WIN of $C_ROWS"
+printf '  %-30s %10s %10s %10s\n' AXIS 'G galc' 'X mousep' 'P meld'
+printf '  %-30s %10s %10s %10s\n' 'rows measured'               "$G_ROWS"  "$X_ROWS"  "$P_ROWS"
+printf '  %-30s %10s %10s %10s\n' 'connected to a real X'       "$G_CONN"  "$X_CONN"  "$P_CONN"
+printf '  %-30s %10s %10s %10s\n' 'zero HOST shared objects'    "$G_CLEAN" "$X_CLEAN" "$P_CLEAN"
+printf '  %-30s %10s %10s %10s\n' '⭐ A WINDOW ON THE X SERVER'  "$G_WIN"   "$X_WIN"   "$P_WIN"
+printf '\n  %-30s %10s\n' '⭐ arm N: --no-storefix windows' "$N_WIN of $N_ROWS"
 
 printf '\n'
-exp_check "control: no target ships either program"      "$((G_NOHOST + X_NOHOST))" "$((G_ROWS + X_ROWS))"
+exp_check "control: no target ships these programs" \
+  "$((G_NOHOST + X_NOHOST + P_NOHOST))" "$((G_ROWS + X_ROWS + P_ROWS))"
 exp_check "G: GTK connected to a real display"           "$G_CONN"  "$G_ROWS"
 exp_check "G: libgtk-3 loaded FROM THE BUNDLE"           "$G_GTK"   "$G_ROWS"
-exp_check "G: host shared objects, rows with zero"       "$G_CLEAN" "$G_ROWS"
-exp_check "X: GTK connected to a real display"           "$X_CONN"  "$X_ROWS"
-exp_check "X: libgtk-3 loaded FROM THE BUNDLE"           "$X_GTK"   "$X_ROWS"
-exp_check "X: host shared objects, rows with zero"       "$X_CLEAN" "$X_ROWS"
+exp_check "E2  G: host shared objects, rows with zero"   "$G_CLEAN" "$G_ROWS"
+exp_check "E1  ⭐ G: a REAL WINDOW, with NO bind"         "$G_WIN"   "$G_ROWS"
+exp_check "E3  ⭐ N: --no-storefix still draws NOTHING"   "$N_WIN"   0
+exp_check "E5  X: a REAL WINDOW on the X server"         "$X_WIN"   "$X_ROWS"
+exp_check "E5  X: host shared objects, rows with zero"   "$X_CLEAN" "$X_ROWS"
+exp_check "E4  ⭐ P: a PYTHON GUI drew a REAL WINDOW"     "$P_WIN"   "$P_ROWS"
+exp_check "E4  P: host shared objects, rows with zero"   "$P_CLEAN" "$P_ROWS"
 
-# ⭐ THE PAIR THAT CARRIES THE WHOLE FINDING, and it is why there are two
-# subjects rather than one. Same bundler, same GTK, same eleven: the one whose
-# UI is COMPILED IN draws windows, and the one whose UI is a FILE behind an
-# absolute store path draws none.
-exp_check "⭐ X: a REAL WINDOW on the X server"           "$X_WIN" "$X_ROWS"
-exp_check "⛔ G: a real window on the X server"           "$G_WIN" 0
-# ⭐ THE CONTROL THAT PROVES THE DIAGNOSIS. Identical artefact, one variable.
-exp_check "⭐ C: the SAME bundle draws once the path resolves" "$C_WIN" "$C_ROWS"
-exp_check "C: and it still loaded zero host objects"      "$C_CLEAN" "$C_ROWS"
-
-exp_note "⭐ GTK IS NOT THE BLOCKER, AND THIS IS THE MEASUREMENT THAT SAYS SO."
-exp_note "   mousepad draws $X_WIN of $X_ROWS real toplevel windows on a real X"
-exp_note "   server, out of a nixpkgs closure, on distributions that ship no"
-exp_note "   GTK — with ZERO host shared objects. The field grades GTK"
-exp_note "   \"Garbage\"; through this pipeline, on this subject, it works."
-exp_note "⛔ WHAT BLOCKS galculator IS A HARDCODED ABSOLUTE STORE PATH:"
-exp_note "     Couldn't load /nix/store/<hash>-galculator-2.1.4/share/..."
-exp_note "   The file IS in the bundle. XDG_DATA_DIRS points at the bundle and"
-exp_note "   serves every app that LOOKS UP its data; it cannot serve one with"
-exp_note "   the path baked into its .rodata."
-exp_note "⭐ SO THE REMAINING GAP IS TOOLING, NOT CAPABILITY — T-081, whose"
-exp_note "   entry names \"hardcoded paths\" verbatim. That is the label"
-exp_note "   T-080's guarantee requires, and it is earned here rather than"
-exp_note "   asserted."
-exp_note "⛔ ARM P (meld, Python): still not measured, and still not a skip —"
-exp_note "   a named tooling defect in resolveEntry, asserted above."
-exp_note "⚠ AN EARLIER VERSION OF THIS EXPERIMENT SCORED galculator 11 of 11"
-exp_note "   GREEN by treating 'cannot open display' as proof GTK worked. The"
-exp_note "   operator rejected it: that message appears on real hardware WITH"
-exp_note "   a display too. A real display turned 11 green rows into 0."
-exp_note "⚠ NOT ESTABLISHED: anything about a GPU (every GL row here is"
-exp_note "   swrast, T-059 owns hardware), and anything about Python GUI apps,"
-exp_note "   which arm P could not build."
+exp_note "⭐ WHAT E1 AND E3 SAY TOGETHER. Arm G is the artefact whose UI is a"
+exp_note "   file at /nix/store/<hash>-galculator-2.1.4/share/... — a path that"
+exp_note "   does not exist on any of the eleven. Arm N is the SAME bundle with"
+exp_note "   --no-storefix. If G draws and N does not, the mechanism is what"
+exp_note "   drew it, and no reading of an error message is involved."
+exp_note "⛔ THE MECHANISM IS NOT A /tmp STORE. docs/design/store-paths.md §2"
+exp_note "   answers the security question the operator required first: a"
+exp_note "   fixed path under a world-writable directory is squattable, and the"
+exp_note "   tree it would serve is loadable code. It is an interposer, and the"
+exp_note "   rewrite is exact-match against the closure pgb already computes."
+exp_note "⚠ NOT ESTABLISHED HERE: anything about a GPU (every GL row is swrast,"
+exp_note "   T-059 owns hardware), and anything about a STATICALLY linked or"
+exp_note "   raw-syscall subject, which has no PLT for an interposer to win."
 
 exp_finish

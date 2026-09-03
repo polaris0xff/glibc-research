@@ -24,15 +24,13 @@ import (
 	"github.com/polaris0xff/glibc-research/internal/elfx"
 	"github.com/polaris0xff/glibc-research/internal/fail"
 	"github.com/polaris0xff/glibc-research/internal/logx"
+	"github.com/polaris0xff/glibc-research/internal/proc"
 )
 
-// libSubtrees are library trees that are directories and break when
-// flattened: each is found through a variable naming the DIRECTORY, so a
-// flattened copy is invisible to the loader that wants it.
-var libSubtrees = []string{
-	"dri", "gbm", "gtk-3.0", "gtk-4.0", "gdk-pixbuf-2.0",
-	"girepository-1.0", "pipewire-0.3", "spa-0.2", "vdpau",
-}
+// ⚠ THE NINE-NAME WHITELIST THAT USED TO BE HERE IS GONE, and history/
+// carries why: `copyLibraries` now takes every directory under any store
+// path's lib/, because a list of the ones somebody had hit is the same shape
+// as the regex cascade T-081 exists to replace. See copyLibraries.
 
 // reservedNames are layout entries a program must not overwrite.
 var reservedNames = map[string]bool{
@@ -59,9 +57,9 @@ func (b *Builder) assemble() error {
 	if err != nil {
 		return fail.Ran("no entry point in %s/bin", b.Base)
 	}
-	logx.Say("entry       %s", entry)
-	if err := copyResolved(entry, filepath.Join(b.AppDir, "shared", "bin", b.Prog), 0o755); err != nil {
-		return fail.Ran("could not copy the entry point: %v", err)
+	logx.Say("entry       %s", entry.ELF)
+	if err := b.installProgram(b.Prog, entry); err != nil {
+		return fail.Ran("could not install the entry point: %v", err)
 	}
 
 	// Every other program in the same bin/, because an application is often a
@@ -75,10 +73,10 @@ func (b *Builder) assemble() error {
 				continue
 			}
 			r, err := b.resolveEntry(entryDir, e.Name(), false)
-			if err != nil || r == "" {
+			if err != nil || r.ELF == "" {
 				continue
 			}
-			if copyResolved(r, filepath.Join(b.AppDir, "shared", "bin", e.Name()), 0o755) == nil {
+			if b.installProgram(e.Name(), r) == nil {
 				extra++
 			}
 		}
@@ -100,11 +98,11 @@ func (b *Builder) assemble() error {
 			continue
 		}
 		owner := filepath.Dir(filepath.Dir(p))
-		src := p
-		if r, err := b.resolveEntry(owner, w, false); err == nil && r != "" {
-			src = r
+		e := Entry{ELF: p}
+		if r, err := b.resolveEntry(owner, w, false); err == nil && r.ELF != "" {
+			e = r
 		}
-		if copyResolved(src, filepath.Join(b.AppDir, "shared", "bin", w), 0o755) != nil {
+		if b.installProgram(w, e) != nil {
 			continue
 		}
 		logx.Say("program     %s  <- %s", w, filepath.Base(owner))
@@ -137,6 +135,74 @@ func (b *Builder) assemble() error {
 		rewritten += len(res.Changed)
 	}
 	logx.Say("patched     %d absolute DT_NEEDED entries", rewritten)
+	return nil
+}
+
+// installProgram puts one program in shared/bin under the name the bundle
+// dispatches on.
+//
+// ⭐ A SCRIPT ENTRY POINT BECOMES THREE FILES, and this is T-081's second
+// blocker resolved: the interpreter (an ELF already in the closure) under its
+// own name so sharun can start it with the bundled library path, the script
+// under shared/script/, and a static trampoline at shared/bin/<name> that
+// joins them. ⛔ sharun reads shared/bin/<name> as an ELF and exits when it is
+// not one, so the trampoline is what makes the layout legal — there is no
+// arrangement of a script alone that sharun will start.
+func (b *Builder) installProgram(name string, e Entry) error {
+	dst := filepath.Join(b.AppDir, "shared", "bin", name)
+	if e.Script == "" {
+		return copyResolved(e.ELF, dst, 0o755)
+	}
+	interp := filepath.Base(e.ELF)
+	if interp == name {
+		// An interpreter that shares the program's name would be overwritten
+		// by its own trampoline.
+		interp = name + "-interp"
+	}
+	if err := copyResolved(e.ELF, filepath.Join(b.AppDir, "shared", "bin", interp), 0o755); err != nil {
+		return err
+	}
+	rel := filepath.Join("shared", "script", name)
+	if err := copyResolved(e.Script, filepath.Join(b.AppDir, rel), 0o755); err != nil {
+		return err
+	}
+	if err := b.buildTrampoline(dst, interp, rel); err != nil {
+		// ⚠ REPORTED, NOT SILENT. Without a trampoline this program cannot be
+		// started at all, and a bundle that quietly drops its entry point is
+		// the failure mode T-081 exists to end.
+		logx.Warnf("no trampoline could be built for the script entry %s: %v", name, err)
+		return err
+	}
+	logx.Say("script      %s = %s + %s (static trampoline)", name, interp, rel)
+	return nil
+}
+
+// buildTrampoline compiles pgb-exec.c with the interpreter and script baked in.
+func (b *Builder) buildTrampoline(out, interp, script string) error {
+	src, err := materialiseAppRunSource(b.C.RuntimeSrcDir())
+	if err != nil {
+		return err
+	}
+	src = filepath.Join(filepath.Dir(src), "pgb-exec.c")
+	r, err := (&proc.Cmd{Argv: []string{"cc", "-O2", "-static",
+		"-DPGB_EXEC_INTERP=\"" + interp + "\"",
+		"-DPGB_EXEC_SCRIPT=\"" + script + "\"",
+		"-o", out, src}, Subsys: "bundle"}).Output()
+	if err != nil {
+		return err
+	}
+	if r.Failed() {
+		return fmt.Errorf("cc exited %d", r.Code)
+	}
+	info, err := elfx.Inspect(out)
+	if err != nil {
+		return err
+	}
+	if info.Interp != "" {
+		// A dynamic trampoline would put the HOST's loader in the bundle.
+		_ = os.Remove(out)
+		return fmt.Errorf("the compiler produced a DYNAMIC trampoline")
+	}
 	return nil
 }
 
@@ -227,14 +293,29 @@ func (b *Builder) copyLibraries() error {
 		}
 	}
 
-	for _, sub := range libSubtrees {
-		matches, _ := filepath.Glob(filepath.Join(b.Root, "*", "lib", sub))
-		for _, d := range matches {
-			if fi, err := os.Stat(d); err != nil || !fi.IsDir() {
-				continue
-			}
-			_ = copyTreeNoClobber(d, filepath.Join(lib, sub))
+	// ⭐ EVERY DIRECTORY UNDER ANY STORE PATH'S lib/, NOT A WHITELIST OF NINE.
+	//
+	// ⛔ THE WHITELIST WAS A LIST OF THE ONES SOMEBODY HAD HIT. It is the same
+	// shape as the field's regex cascade — a pattern that grows one entry per
+	// bug report — and T-081's rule is that the closure decides, not a list.
+	// Two things it was silently missing: `lib/gconv`, which `.env` sets
+	// GCONV_PATH to and which therefore pointed at a directory that did not
+	// exist, and an interpreter's own library tree (`lib/python3.14`), without
+	// which a script entry point resolves and then finds no stdlib.
+	// ⚠ The cost is bounded: `include`, `pkgconfig`, `cmake` and `aclocal` are
+	// already dropped at `--debloat safe`, which is the default.
+	subdirs := map[string]bool{}
+	matches, _ := filepath.Glob(filepath.Join(b.Root, "*", "lib", "*"))
+	for _, d := range matches {
+		if fi, err := os.Stat(d); err != nil || !fi.IsDir() {
+			continue
 		}
+		name := filepath.Base(d)
+		subdirs[name] = true
+		_ = copyTreeNoClobber(d, filepath.Join(lib, name))
+	}
+	if len(subdirs) > 0 {
+		logx.Say("lib trees   %d directories under lib/ carried whole", len(subdirs))
 	}
 	entries, _ := os.ReadDir(lib)
 	logx.Say("libraries   %d from the closure", len(entries))
@@ -408,11 +489,13 @@ func rewriteManifestPaths(appDir string) int {
 }
 
 func (b *Builder) desktopAndIcon() error {
-	// Every share/ tree in the closure, merged.
-	matches, _ := filepath.Glob(filepath.Join(b.Root, "*", "share"))
-	for _, d := range matches {
-		_ = copyTreeNoClobber(d, filepath.Join(b.AppDir, "share"))
-	}
+	// Every share/, etc/ and libexec/ tree in the closure, merged.
+	//
+	// ⚠ IT WAS share/ ALONE UNTIL T-081. A store path's compiled-in reference
+	// to its own etc/ or libexec/ had nowhere in the bundle to resolve to, so
+	// the store map could not answer it — storefix.go's mergedFor is the table
+	// that says where each of these went, and it and this list are one rule.
+	b.copyClosureTrees()
 
 	// The manifests name an absolute store path, which is the last hop of the
 	// OpenGL problem: libglvnd finds the vendor file, opens the path it names

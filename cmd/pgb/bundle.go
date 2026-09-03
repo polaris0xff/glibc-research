@@ -235,6 +235,10 @@ func bundleAppImage(c *cfg.Config, args []string) error {
 			}
 		case "--no-gl":
 			o.NoGL = true
+		case "--no-storefix":
+			// ⭐ The negative control for T-081: the same bundle without the
+			// mechanism that resolves a compiled-in /nix/store path.
+			o.NoStorefix = true
 		case "--keep":
 			// accepted: the AppDir is always kept
 		default:
