@@ -518,6 +518,37 @@ one clear fix inside T-063 arm S:
 
 ⭐ **None blocking.**
 
+0. ⛔ **NEW 2026-09-03c, AND IT IS A PRODUCT DEFECT RATHER THAN A QUESTION:
+   `pgb build -- cc ...` BYPASSES THE WRAPPERS.** Found by walking into it
+   while building a fixture.
+
+   `buildx.Inner` puts the wrapper directory on `PATH` in the child's `Env`,
+   then runs `proc.Cmd{Argv: argv, Env: env}` → `exec.Command(argv[0], …)`.
+   ⛔ **`exec.Command` resolves the program against the PARENT process's PATH,
+   not against the `Env` set on the Cmd**, and the inner pgb's own PATH does
+   not contain the wrapper directory. Measured directly rather than reasoned:
+
+       parent PATH = .../real          child Env PATH = .../wrap:.../real
+       exec.Command("mytool")  ->  resolved Path=".../real/mytool"
+                                   output="I AM THE REAL ONE"
+
+   ⚠ **It does not bite the POCs or `pgb build -- make`**, which is why it has
+   survived. `poc_in_env` runs `build -- /bin/sh -c "…"`: an ABSOLUTE path, so
+   no lookup happens, and the shell then resolves `cc` using the environment it
+   was handed — which does have the wrapper directory. `make` resolves to the
+   real make, which is correct. ⛔ **It bites exactly when the command IS a
+   wrapped tool** — `cc`, `gcc`, `c++`, `g++`, `cpp` — which is a documented
+   use of `pgb build [--] CMD...`.
+
+   ⚠ **What is NOT yet established** is what the bypassed build produces. The
+   symptom seen was `cc: fatal error: cannot execute 'cc1'` with a malformed
+   `-iprefix /../lib/gcc/…`, so on this machine it FAILS rather than silently
+   producing a non-portable binary — which is the better of the two outcomes
+   and must not be assumed to hold elsewhere. ⛔ The fix is to resolve `argv[0]`
+   against the PATH being handed to the child (`exec.LookPath` with that PATH,
+   or set `cmd.Path` explicitly), and the test is that
+   `pgb build -- cc -o x x.c` produces a binary carrying `pgb-runtime`.
+
 1. ✅ **RESOLVED 2026-09-03.** The two harness-named branches this asked about
    are gone: `git ls-remote --heads origin` returns **`main` and nothing else**.
    ⚠ The harness named `claude/cross-libc-dlopen-review-ukfukq` this session
