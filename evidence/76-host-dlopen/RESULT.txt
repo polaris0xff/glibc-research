@@ -1,20 +1,20 @@
 experiment 76 - --host-dlopen across the pinned bed
-date (UTC)   : 2026-09-03T01:14:00Z
+date (UTC)   : 2026-09-03T02:23:16Z
 host kernel  : Linux 6.18.44-fc-v24
 subject      : 5734248 bytes, PT_INTERP=0 DT_NEEDED=0
 
-TARGET                 LIBC   CARRIED   NATIVE    CONTROL   HOST .so LOADED BY SUBJECT
-alpine-3.22            musl   ok        exit1     exit1     none
-alpine-3.20            musl   ok        exit1     exit1     none
-alpine-3.10            musl   ok        exit1     exit1     none
-voidlinux-musl         musl   ok        exit1     exit1     none
-debian-11              glibc  ok        ok        SIG6      none
-debian-12              glibc  ok        ok        SIG8      none
-ubuntu-20.04           glibc  ok        ok        SIG6      none
-rockylinux-8           glibc  ok        ok        SIG11     none
-opensuse-leap-15.6     glibc  ok        ok        SIG8      none
-fedora-42              glibc  ok        ok        SIG11     none
-archlinux-latest       glibc  ok        ok        SIG8      none
+TARGET                 LIBC   CARRIED   NATIVE    CONTROL   BIGTLS@0   BIGTLS@64K HOST .so LOADED BY SUBJECT
+alpine-3.22            musl   ok        exit1     exit1     exit1      ok         none
+alpine-3.20            musl   ok        exit1     exit1     exit1      ok         none
+alpine-3.10            musl   ok        exit1     exit1     exit1      ok         none
+voidlinux-musl         musl   ok        exit1     exit1     exit1      ok         none
+debian-11              glibc  ok        ok        SIG6      exit1      ok         none
+debian-12              glibc  ok        ok        SIG8      exit1      ok         none
+ubuntu-20.04           glibc  ok        ok        SIG6      exit1      ok         none
+rockylinux-8           glibc  ok        ok        SIG11     exit1      ok         none
+opensuse-leap-15.6     glibc  ok        ok        SIG8      exit1      ok         none
+fedora-42              glibc  ok        ok        SIG11     exit1      ok         none
+archlinux-latest       glibc  ok        ok        SIG8      exit1      ok         none
 
 carried  = dlopen a .so built by the PINNED glibc environment.
            On the four musl rows this is a GLIBC shared object
@@ -23,8 +23,16 @@ native   = dlopen a shared object already present on the target.
            Refused by design on musl: it needs musl.
 control  = the same source with no --host-dlopen. Reaches ld.so.
 
+BIGTLS@0 / BIGTLS@64K = TODO T-072. One shared object with 56,248
+           bytes of INITIAL-EXEC thread-local storage, loaded by the
+           same subject built two ways. glibc reserves ~3,168 bytes
+           of static TLS headroom and it does NOT scale with the
+           program, so reserve 0 must refuse and 65536 must load.
+           exit1 is a CLEAN refusal through dlerror(); a signal
+           would be the loader failing rather than declining.
+
 time to first symbol, debian-12, ns -- ONE SAMPLE EACH
-  ours    first=73707 second=53824 
+  ours    first=90031 second=405535 
   ld.so   no reading
   ⚠ one sample, and ours second > ours first in at least one run, so the
   per-load figures are at this instrument noise floor and must not be

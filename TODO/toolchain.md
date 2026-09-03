@@ -2243,7 +2243,28 @@ and failed there: `check-docs.sh` asked whether a cited evidence path was on
 ## T-072 — the static TLS headroom is ~3,168 bytes and one real library wants 56,248
 
 **Source** the residue of `experiments/76-` and T-068.
-**Category** toolchain · **Priority** P1 · **Effort** M · **Status** open
+**Category** toolchain · **Priority** P1 · **Effort** M · **Status** ✅ done
+
+## ✅ CLOSED 2026-09-03 — both outstanding measurements are in
+
+    sh experiments/76-host-dlopen.sh
+    ok  bigtls: reserve 0 REFUSES cleanly, every environment     = 11
+    ok  bigtls: --tls-reserve 65536 LOADS it, every environment  = 11
+    ok  reserve arm: loaded no host shared object, every environment = 11
+    pass=7 fail=0 skip=0
+
+⭐ **The mechanism works and is measured on the matrix**, its bounds check has a
+known-bad control that fails the right way, and the size cost on disk is
+**88 bytes** because the reserve is `.tbss`.
+
+⛔ **AND THE PREMISE IS RECORDED AS DENTED RATHER THAN QUIETLY DROPPED.** The
+object this entry was opened on — `liblsan.so.0.0.0`, 56,248 bytes — is refused
+as a sanitizer interposer before TLS is considered, and **zero** of the 71
+`PT_TLS` objects on the build host report an exhausted surplus at reserve 0. So
+the justification rests on a synthetic subject, on eleven environments. That is
+the honest state of it, and `docs/AGENTS.md` §14 is why the mechanism stays:
+the three interposers are refused by policy rather than by capability, and a
+host shipping a large-TLS library that is not an interposer would need it.
 
 ⛔ **A glibc quirk with a named tunable, which is why it is its own entry.**
 `pgb-elfload.c` places initial-exec TLS in the surplus glibc already reserves,
@@ -2364,12 +2385,69 @@ reserve is seeded with the module's init image in the loading thread only;
 threads created afterwards see zero, exactly as with the surplus. Route D
 changes where the storage comes from, not when it is initialised.
 
-⛔ **NOT YET RE-RUN ACROSS THE ELEVEN.** `experiments/76-` is what would say
-whether `--tls-reserve` costs anything on the matrix, and it has not been run
-with it. The measurements above are the build host only.
+### ✅ RUN ACROSS THE ELEVEN, 2026-09-03 — the pair holds on every row
 
-**Prove.** ⭐ Arms A/B/C/C2 above, plus the known-bad change. ⚠ Outstanding:
-`experiments/76-` on eleven environments with a non-zero reserve, and the two
+⭐ **`experiments/76-` carries T-072's subject now**: `bigtls.so`, a shared
+object with **56,248 bytes of INITIAL-EXEC** thread-local storage — the size the
+one real host object in the T-068 sweep wanted — built by the pinned
+environment, loaded by the same subject built two ways, one flag apart.
+
+    TARGET                 LIBC   BIGTLS@0   BIGTLS@64K
+    alpine-3.22            musl   exit1      ok
+    alpine-3.20            musl   exit1      ok
+    alpine-3.10            musl   exit1      ok
+    voidlinux-musl         musl   exit1      ok
+    debian-11              glibc  exit1      ok
+    debian-12              glibc  exit1      ok
+    ubuntu-20.04           glibc  exit1      ok
+    rockylinux-8           glibc  exit1      ok
+    opensuse-leap-15.6     glibc  exit1      ok
+    fedora-42              glibc  exit1      ok
+    archlinux-latest       glibc  exit1      ok
+
+    ok  bigtls: reserve 0 REFUSES cleanly, every environment     = 11
+    ok  bigtls: --tls-reserve 65536 LOADS it, every environment  = 11
+    ok  reserve arm: loaded no host shared object, every environment = 11
+    pass=7 fail=0 skip=0
+
+⭐ **On the four musl rows that is a GLIBC shared object with 56 KiB of
+initial-exec TLS being `dlopen`'d on a machine that ships no glibc**, out of one
+ordinary static ELF.
+
+⚠ **`exit1` is asserted and `SIG*` is not, deliberately.** A refusal arriving as
+a signal would be the loader failing rather than declining, and the two must
+never be summed — the same rule `experiments/93-` applies to crashes.
+
+⛔ **AND CRITERION 2 IS ASSERTED FOR THE RESERVE ARM SEPARATELY.** A reserve that
+quietly made the loader fall back to the host's `ld.so` would pass every other
+column; the reserve arm is traced on its own and loads **zero host shared
+objects on all eleven**.
+
+### ⭐ THE SIZE COST IS 88 BYTES, NOT 64 KiB
+
+    host-loader    5,734,248 bytes   --host-dlopen
+    host-reserve   5,734,336 bytes   --host-dlopen --tls-reserve 65536
+                          88 bytes   difference
+
+⭐ **The reserve is `.tbss`, which is NOBITS**, so 65,536 bytes of reservation
+costs nothing on disk. ⛔ **The cost is RAM, per thread, at run time**, which is
+why the flag defaults to 0 — and that is the cost to quote, not a file size.
+
+⚠ **This does not rehabilitate the entry's premise.** Zero of the 71 host
+objects on the build host with a `PT_TLS` are refused for an exhausted surplus
+(`liblsan.so` is declined as a sanitizer interposer before TLS is considered),
+so the mechanism's justification still rests on a synthetic subject. What
+changed is that the subject now runs on eleven environments instead of one.
+
+⚠ **The bench line in the same run is noise and is not quoted.** It read
+`first=90031 second=405535` against `first=73707 second=53824` in the previous
+run on an equally idle machine; `docs/AGENTS.md` §10 is what that instrument's
+noise floor does to small differences, and the line is recorded rather than
+asserted for exactly this reason.
+
+**Prove.** ⭐ Arms A/B/C/C2 above, plus the known-bad change, ✅ **plus
+`experiments/76-` on all eleven with a non-zero reserve — run 2026-09-03,
+`pass=7 fail=0`.** ⚠ Outstanding: the two
 objects from the T-068 sweep that fail today measured by name rather than by a
 synthetic subject of the same size.
 

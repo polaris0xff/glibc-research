@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 48  OPEN 17  DONE 31
+    TOTAL 48  OPEN 16  DONE 32
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 7 | 1 | 6 |
-| P1 | a documented capability does not work, or a flag does nothing | 32 | 11 | 21 |
+| P1 | a documented capability does not work, or a flag does nothing | 32 | 10 | 22 |
 | P2 | worth doing; nothing is wrong without it | 9 | 5 | 4 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -61,7 +61,7 @@ pretending to be one.
 | T-069 | P1 | S | done | research | ⭐ The supplied working paper, swept: useful, and it names the gap `experiments/76-` closed |
 | T-070 | P0 | M | done | toolchain | ⭐ The glibc pin MOVED, 2.36 → 2.41: four costs measured at zero, class B 20 → 5 |
 | T-071 | P0 | L | done | research | ⭐ EGL from a nixpkgs closure: four failures, all in DATA rather than code |
-| T-072 | P1 | M | open | toolchain | The static TLS headroom is ~3,168 bytes; one real library wants 56,248 |
+| T-072 | P1 | M | done | toolchain | ⭐ `--tls-reserve` on the eleven: reserve 0 refuses and 65536 loads, 11 of 11 |
 | T-073 | P1 | S | done | runtime | ⭐ The own-symbol table answered where one of its two names had to defer |
 | T-074 | P1 | S | done | research | ⭐ The host-policy selftest could not fail on the state it was written to catch |
 | T-075 | P2 | S | done | research | ⭐ LD_DEBUG=bindings on the control, because the subject cannot be asked |

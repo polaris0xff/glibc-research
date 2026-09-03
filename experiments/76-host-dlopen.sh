@@ -113,6 +113,28 @@ static int not_exported(void) { return 7; }
 int demo_uses_static(void) { return not_exported(); }
 EOF
 
+# ⭐ T-072'S SUBJECT, ON THE BED RATHER THAN ON THE BUILD HOST.
+#
+# 56,248 bytes of INITIAL-EXEC thread-local storage -- the size of the one real
+# host object in the T-068 sweep that wanted more than glibc's static TLS
+# surplus. The surplus is ~3,168 bytes of headroom and does NOT scale with the
+# program (route B, measured and refuted in the entry), so this object is
+# refusable by construction at reserve 0 and loadable at 65536.
+#
+# ⚠ `initial-exec` is the whole point. General-dynamic TLS is served by our own
+# __tls_get_addr out of the heap and never touches the surplus; only
+# initial-exec has to be placed at a fixed offset from the thread pointer.
+cat > "$WORK/bigtls.c" <<'EOF'
+__thread char bigtls_slab[56248] __attribute__((tls_model("initial-exec")));
+
+int bigtls_touch(int v)
+{
+    bigtls_slab[0] = (char)v;
+    bigtls_slab[sizeof bigtls_slab - 1] = (char)v;
+    return bigtls_slab[0] == bigtls_slab[sizeof bigtls_slab - 1];
+}
+EOF
+
 cat > "$WORK/host.c" <<'EOF'
 /* argv[1] is the object to load. Exit 0 only if every assertion holds. */
 #include <dlfcn.h>
@@ -255,19 +277,22 @@ printf -- '-- building --------------------------------------------------\n'
 
 BUILDDIR=/var/tmp/pgb-exp76
 rm -rf "$BUILDDIR"; mkdir -p "$BUILDDIR" || exit 2
-cp "$WORK/demo.c" "$WORK/host.c" "$BUILDDIR/" || exit 2
+cp "$WORK/demo.c" "$WORK/host.c" "$WORK/bigtls.c" "$BUILDDIR/" || exit 2
 
 # The carried object. `-shared` is passed through untouched by pgb's wrappers,
 # which is what lets a configure script's shared-library probes still work, and
 # is what makes this a genuine dynamic .so built by the PINNED glibc.
 if ! "$PGB" --engine chroot build --bind "$BUILDDIR" -- \
-        sh -c "cd $BUILDDIR && cc -shared -fPIC -o libdemo.so demo.c" \
+        sh -c "cd $BUILDDIR && cc -shared -fPIC -o libdemo.so demo.c \
+               && cc -shared -fPIC -o bigtls.so bigtls.c" \
         >"$WORK/build-so.log" 2>&1; then
   printf 'could not build the carried shared object\n'
   tail -5 "$WORK/build-so.log"
   exit 2
 fi
 printf '  built  libdemo.so       %s bytes\n' "$(wc -c < "$BUILDDIR/libdemo.so")"
+printf '  built  bigtls.so        %s bytes  (56,248 B initial-exec PT_TLS)\n' \
+  "$(wc -c < "$BUILDDIR/bigtls.so")"
 
 # The subject.
 if ! "$PGB" --engine chroot build --host-dlopen --bind "$BUILDDIR" -- \
@@ -280,6 +305,21 @@ fi
 printf '  built  host-loader      %s bytes  (--host-dlopen)\n' \
   "$(wc -c < "$BUILDDIR/host-loader")"
 
+# ⭐ T-072's ARM: the same subject with a non-zero static-TLS reserve. The
+# entry's arms A/B/C were measured on the BUILD HOST only and the entry says so
+# in capitals; this is the eleven-environment run it asks for.
+if ! "$PGB" --engine chroot build --host-dlopen --tls-reserve 65536 \
+        --bind "$BUILDDIR" -- \
+        sh -c "cd $BUILDDIR && cc -o host-reserve host.c" \
+        >"$WORK/build-reserve.log" 2>&1; then
+  printf '  note   the --tls-reserve arm did not build; its columns will read not-built\n'
+  tail -3 "$WORK/build-reserve.log"
+fi
+if [ -f "$BUILDDIR/host-reserve" ]; then
+  printf '  built  host-reserve     %s bytes  (--tls-reserve 65536)\n' \
+    "$(wc -c < "$BUILDDIR/host-reserve")"
+fi
+
 # The control: same source, no --host-dlopen, so dlopen reaches the host ld.so.
 if ! "$PGB" --engine chroot build --bind "$BUILDDIR" -- \
         sh -c "cd $BUILDDIR && cc -o host-plain host.c" \
@@ -290,7 +330,8 @@ fi
   printf '  built  host-plain       %s bytes  (control, host loader)\n' \
     "$(wc -c < "$BUILDDIR/host-plain")"
 
-cp "$BUILDDIR/libdemo.so" "$BUILDDIR/host-loader" "$WORK/" 2>/dev/null
+cp "$BUILDDIR/libdemo.so" "$BUILDDIR/bigtls.so" "$BUILDDIR/host-loader" "$WORK/" 2>/dev/null
+[ -f "$BUILDDIR/host-reserve" ] && cp "$BUILDDIR/host-reserve" "$WORK/"
 [ -f "$BUILDDIR/host-plain" ] && cp "$BUILDDIR/host-plain" "$WORK/"
 
 # ⛔ Assert the subject really is one ordinary static ELF. A binary that grew a
@@ -310,16 +351,20 @@ printf '\n'
   printf 'subject      : %s bytes, PT_INTERP=%s DT_NEEDED=%s\n' \
     "$(wc -c < "$WORK/host-loader")" "$interp" "$needed"
   printf '\n'
-  printf '%-22s %-6s %-9s %-9s %-9s %s\n' \
-    TARGET LIBC CARRIED NATIVE CONTROL 'HOST .so LOADED BY SUBJECT'
+  printf '%-22s %-6s %-9s %-9s %-9s %-10s %-10s %s\n' \
+    TARGET LIBC CARRIED NATIVE CONTROL 'BIGTLS@0' 'BIGTLS@64K' 'HOST .so LOADED BY SUBJECT'
 } > "$RESULT"
 
 printf -- '-- running ---------------------------------------------------\n'
-printf '%-22s %-6s %-9s %-9s %-9s %s\n' \
-  TARGET LIBC CARRIED NATIVE CONTROL 'HOST .so LOADED BY SUBJECT'
+printf '%-22s %-6s %-9s %-9s %-9s %-10s %-10s %s\n' \
+  TARGET LIBC CARRIED NATIVE CONTROL 'BIGTLS@0' 'BIGTLS@64K' 'HOST .so LOADED BY SUBJECT'
 
 n_t=0; n_carried=0; n_clean=0; n_native_glibc=0; n_glibc=0
 n_native_musl_clean=0; n_musl=0; n_control_ok=0
+# ⭐ T-072: the two big-TLS columns. n_big0_refused counts rows where reserve 0
+# declines CLEANLY (its own exit status, never a signal); n_big64_ok counts
+# rows where the 65536 reserve loads it and the symbol resolves.
+n_big0_refused=0; n_big64_ok=0; n_reserve_clean=0
 
 # Run one binary in a rootfs with an argument, echoing a cell.
 cell() { # rootfs binary arg
@@ -389,6 +434,21 @@ while read -r ref name libc digest; do
     c_control='not-built'
   fi
 
+  # -- ⭐ T-072: the same object at reserve 0 and at 65536 ------------------
+  # ⛔ THE PAIR IS THE MEASUREMENT. One column alone says nothing: a refusal at
+  # reserve 0 could be any of a dozen failures, and a load at 65536 could be a
+  # loader that never consulted the reserve at all. Same source, same loader,
+  # same object, one flag apart -- which is the shape arm A of the entry uses
+  # on the build host, run here on the bed.
+  cp "$WORK/bigtls.so" "$root/bigtls.so" 2>/dev/null
+  c_big0=$(cell3 "$root" "$WORK/host-loader" "/bigtls.so" "bigtls_touch")
+  if [ -f "$WORK/host-reserve" ]; then
+    c_big64=$(cell3 "$root" "$WORK/host-reserve" "/bigtls.so" "bigtls_touch")
+  else
+    c_big64='not-built'
+  fi
+  rm -f "$root/bigtls.so"
+
   # ⛔ Criterion 2 of docs/AGENTS.md §3, on the CARRIED arm: what did the
   # subject open? A loader that quietly reached the host's ld.so would show
   # up here and nowhere else.
@@ -397,8 +457,23 @@ while read -r ref name libc digest; do
          | grep -E '\.so(\.[0-9]+)*$' | grep -v '/libdemo\.so$' | tr '\n' ' ')
   rm -f "$root/host-loader" "$root/libdemo.so"
 
+  # ⛔ Criterion 2 for the RESERVE arm too. A reserve that quietly made the
+  # loader fall back to the host's ld.so would pass every column above.
+  if [ -f "$WORK/host-reserve" ]; then
+    cp "$WORK/host-reserve" "$root/host-reserve" 2>/dev/null
+    cp "$WORK/libdemo.so" "$root/libdemo.so" 2>/dev/null
+    rlibs=$(exp_trace_libs "$root" "/host-reserve" "$WORK/tr.$name" \
+            | grep -E '\.so(\.[0-9]+)*$' | grep -v '/libdemo\.so$' | tr '\n' ' ')
+    rm -f "$root/host-reserve" "$root/libdemo.so"
+    [ -z "$rlibs" ] && n_reserve_clean=$((n_reserve_clean+1))
+  fi
+
   [ "$c_carried" = ok ] && n_carried=$((n_carried+1))
   [ -z "$libs" ] && n_clean=$((n_clean+1))
+  # ⚠ A CLEAN refusal is `exit1` -- the subject reporting dlopen failed through
+  # dlerror(). A signal is the loader failing and must not be counted as one.
+  case "$c_big0" in exit*) n_big0_refused=$((n_big0_refused+1)) ;; esac
+  [ "$c_big64" = ok ] && n_big64_ok=$((n_big64_ok+1))
   [ "$c_control" = ok ] && n_control_ok=$((n_control_ok+1))
   if [ "$libc" = glibc ] && [ "$c_native" = ok ]; then
     n_native_glibc=$((n_native_glibc+1))
@@ -410,8 +485,9 @@ while read -r ref name libc digest; do
     musl:no-cand) n_native_musl_clean=$((n_native_musl_clean+1)) ;;
   esac
 
-  row=$(printf '%-22s %-6s %-9s %-9s %-9s %s' \
-        "$name" "$libc" "$c_carried" "$c_native" "$c_control" "${libs:-none}")
+  row=$(printf '%-22s %-6s %-9s %-9s %-9s %-10s %-10s %s' \
+        "$name" "$libc" "$c_carried" "$c_native" "$c_control" \
+        "$c_big0" "$c_big64" "${libs:-none}")
   printf '%s\n' "$row"
   printf '%s\n' "$row" >> "$RESULT"
 done < "$REPO_DIR/scripts/common/rootfs-images.txt"
@@ -470,6 +546,19 @@ exp_check "carried: nine assertions pass, every environment" "$n_carried" "$n_t"
 exp_check "carried: loaded no host shared object, every environment" "$n_clean" "$n_t"
 exp_check "native: loads a real host object on every glibc row" "$n_native_glibc" "$n_glibc"
 exp_check "native: refuses CLEANLY on every musl row, no signal" "$n_native_musl_clean" "$n_musl"
+# ⭐ T-072, THE PAIR. Reserve 0 must decline the 56,248-byte module and reserve
+# 65536 must load it -- same source, same loader, same object, one flag apart.
+exp_check "bigtls: reserve 0 REFUSES cleanly, every environment" \
+          "$n_big0_refused" "$n_t"
+if [ -f "$WORK/host-reserve" ]; then
+  exp_check "bigtls: --tls-reserve 65536 LOADS it, every environment" \
+            "$n_big64_ok" "$n_t"
+  exp_check "reserve arm: loaded no host shared object, every environment" \
+            "$n_reserve_clean" "$n_t"
+else
+  exp_skip "bigtls: --tls-reserve 65536" "the reserve arm did not build"
+  exp_skip "reserve arm: host objects" "the reserve arm did not build"
+fi
 printf '  --    %-46s = %s of %s\n' \
   "control arm ran (observed, not asserted)" "$n_control_ok" "$n_t"
 printf '\n'
@@ -480,6 +569,18 @@ exp_note ""
 exp_note "The musl rows of the NATIVE arm are a refusal by design: a host object"
 exp_note "there needs musl's libc, and mapping it into a glibc image is the"
 exp_note "second-libc outcome docs/limitations.md §1 calls worse than failing."
+exp_note ""
+exp_note "⭐ BIGTLS is TODO T-072's subject and the pair is the measurement."
+exp_note "56,248 bytes of INITIAL-EXEC thread-local storage against glibc's"
+exp_note "~3,168 bytes of surplus headroom -- a surplus that does NOT grow with"
+exp_note "the program, which route B measured and refuted. Reserve 0 must"
+exp_note "REFUSE and say so through dlerror(); 65536 must load it. A refusal"
+exp_note "that arrived as a SIGNAL would be the loader failing, not declining,"
+exp_note "so exit* is counted and SIG* is not."
+if [ -f "$WORK/host-reserve" ] && [ -f "$WORK/host-loader" ]; then
+  exp_note ""
+  exp_note "size cost of --tls-reserve 65536 on the binary: $(( $(wc -c < "$WORK/host-reserve") - $(wc -c < "$WORK/host-loader") )) bytes"
+fi
 printf '\n'
 
 {
@@ -490,6 +591,14 @@ printf '\n'
   printf 'native   = dlopen a shared object already present on the target.\n'
   printf '           Refused by design on musl: it needs musl.\n'
   printf 'control  = the same source with no --host-dlopen. Reaches ld.so.\n'
+  printf '\n'
+  printf 'BIGTLS@0 / BIGTLS@64K = TODO T-072. One shared object with 56,248\n'
+  printf '           bytes of INITIAL-EXEC thread-local storage, loaded by the\n'
+  printf '           same subject built two ways. glibc reserves ~3,168 bytes\n'
+  printf '           of static TLS headroom and it does NOT scale with the\n'
+  printf '           program, so reserve 0 must refuse and 65536 must load.\n'
+  printf '           exit1 is a CLEAN refusal through dlerror(); a signal\n'
+  printf '           would be the loader failing rather than declining.\n'
   printf '\n%s\n' "$bench_line"
 } >> "$RESULT"
 

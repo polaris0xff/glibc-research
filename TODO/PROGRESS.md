@@ -4,7 +4,7 @@
 and the entries.
 
     STATE     2026-09-03b
-    COUNTS    48 entries, 17 open, 31 done
+    COUNTS    48 entries, 16 open, 32 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN before this session; selftests 239 pass, 1 could not
               run (no zstd)
@@ -234,11 +234,13 @@ which described a build where `safe` also swept.
             (poc/10-gawk), and is the question worth asking in 62- where
             classify_trace already answers the load question.
 
-    T-072   P1. --tls-reserve is implemented, and ⛔ its motivating object
-            turned out to be REFUSED FOR A DIFFERENT REASON: liblsan.so is a
-            sanitizer interposer. Zero of 71 PT_TLS objects on this host are
-            refused for an exhausted surplus. experiments/76- with a non-zero
-            reserve on the eleven is still owed.
+    T-072   ✅ CLOSED. experiments/76- carries the pair now: a 56,248-byte
+            INITIAL-EXEC module refused cleanly at reserve 0 and loaded at
+            65536, 11 of 11, with the reserve arm traced separately for host
+            objects (zero). Size cost 88 bytes -- the reserve is .tbss.
+            ⛔ The premise stays DENTED and recorded: liblsan.so is refused as
+            an interposer before TLS is considered, and zero of 71 PT_TLS
+            objects on this host exhaust the surplus.
 
     ---- the bundle, and the one class that is all DATA ----
 
