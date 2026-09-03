@@ -784,8 +784,39 @@ container form of the same and needs a container.
 1. Push T-050 as far as it goes and measure exactly what is left.
 2. For what is left, a static `nix` binary from the cache, run against a store
    under `$HOME` with `--store`. ⚠ Unverified; it is the obvious first probe.
+   ⛔ **CORRECTED 2026-09-03c — THERE IS NO STATIC `nix` IN THE CACHE TO
+   FETCH.** See below.
 3. `nix-user-chroot` where namespaces are available, with the AppArmor case
    detected and named rather than hit.
+
+### ⛔ 2026-09-03c — STEP 2's PREMISE IS WRONG, AND IT MAKES THIS ENTRY T-060's OTHER HALF
+
+⚠ **Step 2 says "a static `nix` binary from the cache".** Fetched and looked
+at — `pgb nix cache fetch /nix/store/7vb637v8…-nix-2.34.8`, **64 store paths,
+163 MB, no nix and no root involved**:
+
+    bin/nix   ELF 64-bit LSB pie executable, dynamically linked
+              PT_INTERP 1        DT_NEEDED 11
+
+    libnixutil.so.2.34.8   libnixstore.so.2.34.8   libnixexpr.so.2.34.8
+    libnixfetchers.so.2.34.8   libnixflake.so.2.34.8   libnixmain.so.2.34.8
+    libnixcmd.so.2.34.8    libgc.so.1   libstdc++.so.6   libgcc_s.so.1
+    libc.so.6
+
+⛔ **nixpkgs ships no static nix**, so step 2 cannot begin with a fetch. ⭐ And
+**seven of those eleven are nix's own component libraries** — the very
+derivations T-060 rung 1 has to build. **So step 2 as written requires T-060
+rung 2**, and these two entries are the same work seen from two sides rather
+than two independent probes. Whichever is taken first should be taken knowing
+that.
+
+⭐ **What DOES hold is the entry's own cheaper reading.** The fetched closure is
+**self-contained**: all 11 `DT_NEEDED` resolve inside the 64 paths, and
+`ld-linux-x86-64.so.2` is among them — which is the configuration
+`experiments/80-` arm 5 already ran in a rootfs with no `/nix`. ⚠ **What is
+still unmeasured is the `--store` half**: whether that nix, so carried, will
+operate a store under `$HOME`. That needs a rootfs, because this build host has
+nix installed and testing it here would prove nothing.
 
 ⛔ **Not `curl | sh` as root.** That is what this environment did once, on the
 operator's explicit authorisation, and it is not the shape the entry is for.

@@ -593,7 +593,23 @@ is **costing route B**, which is where the size actually is.
             ⛔ AND THE PLAN NEEDED NIX: the nix-free route reaches `kdenlive`
             but not the dotted `kdePackages.` attribute, so it fell back to
             evaluation. That is the gap T-060 exists to close.
-    T-051   the no-compiler host
+    T-051   the no-compiler host.
+            ⛔ STEP 2's PREMISE IS WRONG, measured 2026-09-03c. It says "a
+            static nix binary from the cache". Fetched it -- 64 store paths,
+            163 MB, no nix and no root -- and:
+              bin/nix   dynamically linked, PT_INTERP 1, DT_NEEDED 11
+              and SEVEN of the eleven are nix's OWN component libraries
+              (libnixutil, libnixstore, libnixexpr, libnixfetchers,
+               libnixflake, libnixmain, libnixcmd)
+            ⭐ nixpkgs ships NO static nix, so step 2 cannot begin with a
+            fetch -- and those seven are exactly what T-060 rung 1 builds.
+            ⛔ SO T-051 STEP 2 REQUIRES T-060 RUNG 2: these are the same work
+            seen from two sides, not two independent probes.
+            ⭐ What DOES hold is the entry's cheaper reading: the closure is
+            SELF-CONTAINED -- all 11 DT_NEEDED resolve inside the 64 paths and
+            ld-linux-x86-64.so.2 is among them, which is what experiments/80-
+            arm 5 already ran with no /nix. ⚠ The `--store` half is still
+            unmeasured and needs a rootfs (this host has nix installed).
     T-012   pgb build <url-or-package>.
             ⭐ NARROWED 2026-09-03c: the entry says "split before starting"
             into spec resolution, build-system detection and the dependency
