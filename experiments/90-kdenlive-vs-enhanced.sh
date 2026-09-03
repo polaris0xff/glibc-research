@@ -31,6 +31,13 @@
 
 set -u
 . "$(dirname "$0")/lib.sh"
+# ⛔ THE CLOCK IS A LIBRARY NOW, AND THIS EXPERIMENT IS WHY.
+# `docs/history/corrections.md` C23 recorded that four runs of this comparison
+# gave cold-start ratios of 2.52x, 3.48x, 4.92x and 5.02x with warm ABOVE cold
+# in two of them; C24 found the mechanism -- the cold column below obtained
+# "cold" by copying the file, and uruntime keys its mount on CONTENT, so the
+# copy reused the live mount and the column reported a warm start.
+. "$(dirname "$0")/clock.sh"
 
 exp_begin "90 - our kdenlive bundle against kdenlive-AppImage-Enhanced AND onelf"
 
@@ -39,8 +46,29 @@ BUNDLER="$REPO_DIR/pgb"
 WORK="${PGB_KDEN_WORK:-/var/tmp/t055}"
 CACHE="${PGB_KDEN_CACHE:-/var/tmp/pgb-appimage-kden}"
 RUN_TIMEOUT="${PGB_KDEN_TIMEOUT:-300}"
-WARM_RUNS="${PGB_KDEN_WARM:-3}"
+WARM_RUNS="${PGB_KDEN_WARM:-5}"
+ROUNDS="${PGB_KDEN_ROUNDS:-7}"
+RENDER_ROUNDS="${PGB_KDEN_RENDER_ROUNDS:-3}"
 mkdir -p "$WORK" || exit 2
+
+# ⛔ THE INSTRUMENT MUST OWN $TMPDIR, because that is where uruntime puts its
+# mountpoint and reaping it is the whole of the corrected cold protocol. A
+# reap under a shared /tmp could take a mount belonging to something else.
+MTMP="$WORK/tmp"; mkdir -p "$MTMP" || exit 2
+TMPDIR="$MTMP"; export TMPDIR
+
+# ⛔ NOT `pkill -f` and NOT a process name: docs/AGENTS.md §14 -- the
+# artefact's path is in this runner's own command line. The handle that is
+# neither is the MOUNTPOINT PATH.
+reap_mounts() {
+  for _d in "$MTMP"/.mount_*; do
+    [ -e "$_d" ] || continue
+    case "$_d" in *.pid) continue ;; esac
+    fusermount3 -u "$_d" 2>/dev/null || fusermount -u "$_d" 2>/dev/null \
+      || umount -l "$_d" 2>/dev/null || :
+  done
+  rm -rf "$MTMP"/.mount_* 2>/dev/null || :
+}
 
 # ⛔ PINNED. The competitor publishes under a moving `latest` and a dated tag;
 # two runs a week apart would otherwise compare different artefacts with
@@ -218,36 +246,53 @@ start_ms() {  # artefact n -> total ms for n invocations
   _e=$(date +%s%N)
   printf '%s' $(( (_e - _s) / 1000000 ))
 }
-# ⛔ NOT `pkill -f`. `docs/AGENTS.md` §14: the artefact's path is in this
-# runner's own command line, so a full-command-line match kills the
-# experiment. ⭐ A cold mount is obtained WITHOUT killing anything, by giving
-# the cold run its own copy: uruntime keys its mount on the image, so a file
-# nothing has run before is cold by construction.
-# ⛔ AND THE COPY KEEPS THE NAME. A cold copy called `cold-melt` is dispatched
-# by onelf as "no entrypoint of that name" -- the same silent fallback as
-# above -- so the cold column would have timed kdenlive failing to find a
-# display. The copy goes into a fresh DIRECTORY and keeps its basename.
-# ⚠ `cp -L`: arm O is invoked through a symlink named after its entrypoint, and
-# copying the link would copy a dangling name.
-# ⚠ AND onelf IS NOT COLD JUST BECAUSE THE FILE IS NEW. uruntime keys its mount
-# on the image, so a fresh file is cold by construction; onelf keys its
-# extraction on a content hash, so the same bytes under a new name reuse the
-# same warm cache. `XDG_CACHE_HOME` is therefore pointed at an empty directory
-# too, which is cold for all three and unfair to none.
-cold_of() {  # artefact -> ms with a genuinely cold runtime
-  _d="$WORK/cold-run"; rm -rf "$_d"; mkdir -p "$_d/cache"
-  _c="$_d/$(basename "$1")"
-  cp -L "$1" "$_c"; chmod +x "$_c"
-  _r=$(XDG_CACHE_HOME="$_d/cache" start_ms "$_c" 1)
-  rm -rf "$_d"
-  printf '%s' "$_r"
+# ---------------------------------------------------------------------------
+# ⛔ THE COLD PROTOCOL, REPLACED. `docs/history/corrections.md` C24.
+#
+# This obtained "cold" by giving the run its own COPY of the artefact, on the
+# written reasoning that *"uruntime keys its mount on the image, so a file
+# nothing has run before is cold by construction"*. ⛔ THE MOUNT IS KEYED ON
+# CONTENT, NOT ON PATH, so a byte-identical copy reuses the live mount and the
+# cold column reported a warm start -- measured by `experiments/99-` at 1.02x
+# of warm, against 6.80x for the corrected protocol. That is the mechanism
+# behind C23's 20x spread and its warm-above-cold rows: the two columns were
+# measuring the SAME state, and noise has a sign.
+#
+# ⭐ COLD IS NOW OBTAINED BY REAPING THE LIVE MOUNT, and the mount lives under
+# a $TMPDIR this experiment owns. ⚠ The empty `XDG_CACHE_HOME` is KEPT and
+# still matters: onelf keys its extraction on a content hash rather than on a
+# mount, so clearing its cache is what makes arm O cold. Two runtimes, two
+# mechanisms, one prep that covers both.
+#
+# ⚠ And the copy trick is gone with the reasoning that motivated it, so its
+# two traps go too -- the basename onelf dispatches on, and the `cp -L` for a
+# symlinked arm. Nothing is copied any more.
+# ---------------------------------------------------------------------------
+CLK_CACHE="$WORK/cold-cache"
+clk_prep() {  # arm -> make the next run genuinely cold
+  reap_mounts
+  rm -rf "$CLK_CACHE"; mkdir -p "$CLK_CACHE"
 }
+clk_run() {   # arm -> one timed cold start
+  case "$1" in
+    P) _ca="$OURS" ;;
+    E) _ca="$ENH" ;;
+    O) _ca="$O_DIR/melt" ;;
+    twin) _ca="$TWIN" ;;
+    *) printf -- '-1'; return ;;
+  esac
+  # shellcheck disable=SC2086
+  XDG_CACHE_HOME="$CLK_CACHE" clk_time_once \
+    timeout -k 10 "$RUN_TIMEOUT" "$_ca" $(sel_of "$_ca") -version
+}
+
 # ⛔ THE WARM FIGURE IS MEASURED, NOT SUBTRACTED. `86-`'s arithmetic --
-# (n+1 runs − cold) / n -- assumes the cold run is part of the same series.
-# Here the cold run is deliberately a DIFFERENT FILE (see cold_of), so
-# subtracting it produced NEGATIVE warm times: -489 ms for ours and -298 ms
-# for the competitor, a number that cannot be a duration and was printed
-# anyway. Warm is now: one run to warm the mount, then N runs timed, divided.
+# (n+1 runs − cold) / n -- assumes the cold run is part of the same series,
+# and produced NEGATIVE warm times here (-489 ms and -298 ms, numbers that
+# cannot be durations and were printed anyway). Warm is one run to establish
+# the mount, then N timed runs inside the window it stays alive.
+# ⚠ `experiments/99-` measured that window at 4-6 s on this machine, so a warm
+# series must run back to back; a `sleep` between samples would measure cold.
 warm_of() {  # artefact -> ms per run once the mount is warm
   # shellcheck disable=SC2086
   "$1" $(sel_of "$1") -version >/dev/null 2>&1 || { printf '%s' -1; return; }
@@ -255,10 +300,35 @@ warm_of() {  # artefact -> ms per run once the mount is warm
   [ "$_t" = -1 ] && { printf '%s' -1; return; }
   printf '%s' $(( _t / WARM_RUNS ))
 }
-P_COLD=$(cold_of "$OURS"); P_WARM=$(warm_of "$OURS")
-E_COLD=$(cold_of "$ENH");  E_WARM=$(warm_of "$ENH")
-printf '  %-34s %10s ms cold   %8s ms warm\n' "P  ours"     "$P_COLD" "$P_WARM"
-printf '  %-34s %10s ms cold   %8s ms warm\n' "E  enhanced" "$E_COLD" "$E_WARM"
+
+# ⭐ THE A/A TWIN, a byte copy of arm P, riding the same interleave as every
+# arm it licenses. Its true ratio to P is 1.00, so what the instrument reports
+# for the pair IS its floor here, today. `experiments/clock.sh`.
+TWIN="$WORK/twin/$(basename "$OURS")"
+mkdir -p "$WORK/twin"; cp -L "$OURS" "$TWIN"; chmod +x "$TWIN"
+clk_run_twin() { XDG_CACHE_HOME="$CLK_CACHE" clk_time_once \
+  timeout -k 10 "$RUN_TIMEOUT" "$TWIN" "$(sel_of "$TWIN")" -version; }
+
+# measure_cold ARM... -> fills P_COLD / E_COLD / O_COLD from ONE interleave.
+# ⛔ Called again when arm O exists, so O is never compared against a P
+# measured in a different pass -- the separation `experiments/99-` had to fix.
+measure_cold() {
+  clk_init "$B/clk" || return 1
+  # shellcheck disable=SC2086
+  clk_interleave "$ROUNDS" "$@" twin
+  reap_mounts
+  clk_table
+  CLK_AA=$(clk_aa P twin)
+  CLK_FLOOR=$(clk_floor P twin "$CLK_AA")
+  printf '\n  A/A control (P vs its own copy): ratio %s, floor %s, resolves %s\n' \
+    "$CLK_AA" "$CLK_FLOOR" "$(clk_resolves "$CLK_AA" "$CLK_FLOOR")"
+  P_COLD=$(clk_ms "$(clk_stat P median)")
+  E_COLD=$(clk_ms "$(clk_stat E median)")
+  for _a in "$@"; do
+    [ "$_a" = O ] && O_COLD=$(clk_ms "$(clk_stat O median)")
+  done
+  return 0
+}
 
 # ---------------------------------------------------------------------------
 # arm O -- ⭐ onelf, the third packer
@@ -302,6 +372,7 @@ if [ ! -x "$ONELF_BIN" ]; then
       >>"$B/onelf-build.log" 2>&1 || true
 fi
 O_SZ=0; O_R=-1; O_COLD=-1; O_WARM=-1; O_MP4=0
+O_DIR="$WORK/onelf-argv0"
 if [ ! -x "$ONELF_BIN" ]; then
   # ⚠ The reason, not just the absence: three different things stop this build
   # and only one of them is about onelf.
@@ -357,7 +428,14 @@ else
     # It therefore lives in its own directory: see sel_of above.
     O_DIR="$WORK/onelf-argv0"; mkdir -p "$O_DIR"; ln -sf "$ONELF" "$O_DIR/melt"
     O_R=$(render "$O_DIR/melt" onelf); O_MP4=$( [ -f "$WORK/onelf.mp4" ] && wc -c < "$WORK/onelf.mp4" || echo 0)
-    O_COLD=$(cold_of "$O_DIR/melt"); O_WARM=$(warm_of "$O_DIR/melt")
+    # ⭐ RE-MEASURED WITH ALL THREE ARMS IN ONE INTERLEAVE. Arm O exists only
+    # here, after P and E have already been timed, so timing it on its own
+    # would compare it against a P measured in a different few seconds of this
+    # machine -- the separation `experiments/99-` had to fix. `measure_cold`
+    # re-runs the whole pass and overwrites P_COLD and E_COLD too, so all
+    # three rows come from one interleave under one A/A control.
+    measure_cold P E O || :
+    O_WARM=$(warm_of "$O_DIR/melt"); reap_mounts
     exp_check "onelf packed the same payload" "$([ "$O_SZ" -gt 1000 ] && echo yes || echo no)" yes
     exp_check "and it rendered a real MP4"    "$([ "${O_MP4:-0}" -gt 1000 ] && echo yes || echo no)" yes
     printf '  %-34s %14s   %8s ms render   %6s ms cold  %5s ms warm\n' \
@@ -450,6 +528,14 @@ while read -r ref name libc digest; do
 done < "$REPO_DIR/scripts/common/rootfs-images.txt"
 
 printf '\n'
+# ⛔ THE INSTRUMENT'S OWN NEGATIVE CONTROL, ASSERTED. Two copies of arm P
+# through the identical protocol have a true ratio of 1.00; if this instrument
+# can tell them apart, every millisecond in this file is unreadable and the run
+# must fail rather than publish. `experiments/clock.sh`, and
+# `docs/history/corrections.md` C23-C24 for what the absence of this cost.
+exp_check "the A/A pair is NOT resolvable (the control)" \
+  "$(clk_resolves "$CLK_AA" "$CLK_FLOOR")" "no"
+
 exp_check "environments measured"                  "$ENVS"    "11"
 exp_check "ours rendered on every environment"     "$P_RUNS"  "$ENVS"
 exp_check "the competitor did too"                 "$E_RUNS"  "$ENVS"
@@ -482,6 +568,14 @@ exp_note "⚠ both arms use a shell AppRun; the four musl rows are zero for both
   printf '  E %s ms, %s bytes of MP4\n' "$E_R" "$E_MP4"
   printf '  O %s ms, %s bytes of MP4\n' "${O_R:-skipped}" "${O_MP4:-0}"
   printf '\nstartup (melt -version):\n'
+  printf '  ⭐ cold: median of %s, arms interleaved with a rotating start,\n' "$ROUNDS"
+  printf '     each sample preceded by a REAP of the live dwarfs mount and an\n'
+  printf '     emptied XDG_CACHE_HOME. docs/history/corrections.md C24: the\n'
+  printf '     protocol this replaces obtained "cold" by copying the file, and\n'
+  printf '     uruntime keys its mount on CONTENT, so the copy reused the live\n'
+  printf '     mount and the column reported a warm start.\n'
+  printf '     A/A control: ratio %s, floor %s, resolves %s (must be "no")\n' \
+    "$CLK_AA" "$CLK_FLOOR" "$(clk_resolves "$CLK_AA" "$CLK_FLOOR")"
   printf '  P %s ms cold, %s ms warm\n' "$P_COLD" "$P_WARM"
   printf '  E %s ms cold, %s ms warm\n' "$E_COLD" "$E_WARM"
   printf '  O %s ms cold, %s ms warm\n' "${O_COLD:-skipped}" "${O_WARM:-skipped}"

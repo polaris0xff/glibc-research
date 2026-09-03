@@ -217,32 +217,51 @@ script"*. `../docs/design/toolchain.md` carries the amendment.
 
 | subject | ours | the field | | under the ruling |
 |---|---|---|---|---|
-| `jq` size (`experiments/86-`) | 11,471,610 B | 4,006,916 B | 2.86× | ⭐ acceptable |
+| ⭐ **`jq` cold start** (`experiments/86-`, 11 environments) | **58.3 ms** | 58.4 ms | ⭐ **1.00×**, ours faster on 6 of 11 rows | ⭐ **MET** |
+| ⭐ **`jq` warm start** | 8.5 ms | 9.3 ms | ⭐ 0.92× — ⚠ medians equal, read as *no difference measurable* | ⭐ **MET** |
+| `jq` size | 6,806,407 B | 4,006,949 B | 1.70× | ⭐ struck from the bar |
 | kdenlive size (`experiments/90-`) | 471,033,944 B | 191,900,604 B | 2.45× | ⭐ acceptable |
-| kdenlive render | 4,947 ms | 2,033 ms | ⛔ 2.43× | ⛔ **binding** |
-| kdenlive cold start | 300 ms | 61 ms | ⛔ 4.92× | ⛔ **binding, worst column** |
+| kdenlive render | 4,947 ms | 2,033 ms | ⛔ 2.43× | ⛔ **binding, UNMEASURED since the levers** |
+| kdenlive cold start | 300 ms | 61 ms | ⛔ 4.92× | ⛔ **binding, and the number is not trustworthy** |
 
-⛔ **THE TWO MILLISECOND ROWS ARE NOT RE-DERIVABLE FROM THE TREE — deep review
-1, 2026-09-03c.** They are from `git show
-68be1bcd:evidence/90-kdenlive-vs-enhanced/RESULT.txt`; the file at that path
-today is run 6, which says 24,074 / 13,680 and 5,941 / 1,183, and whose
-milliseconds this entry itself disclaims as contaminated. ⚠ **Four runs of the
-same comparison give cold-start ratios of 2.52×, 3.48×, 4.92× and 5.02×, and
-in two of them WARM IS SLOWER THAN COLD.** The direction survives — ours is
-slower on every run — the magnitude does not.
-`../docs/history/corrections.md` C23.
+⭐ **THE SPEED HALF OF THE BAR IS MET ON A CLI, 2026-09-03d, and the closure
+did not change.** Two constants in `internal/bundle/appimage.go` did:
+
+| jq cold, ours vs the field | what changed |
+|---|---|
+| 2.07× | — |
+| **1.28×** | uruntime v0.5.6 **full** → v0.5.9 **lite** — `experiments/77-`. ⚠ It is `lite` that pays; the *version* bump alone is 1.00× and does not resolve |
+| ⭐ **1.00×** | dwarfs block `-S26` (64 MiB) → `-S18` (256 KiB) — `experiments/81-`. dwarfs decompresses a whole block to serve any byte in it |
+
+⛔ **The bundler was being compared against a runtime it did not ship.**
+`experiments/86-` stages the competitor's toolchain from `references/`, and
+that toolchain is uruntime **lite**. Nothing in the record had noticed.
+
+⛔ **THE KDENLIVE ROWS ARE NOT RE-DERIVABLE, AND NOW FOR THREE REASONS.**
+They are from `git show 68be1bcd:evidence/90-kdenlive-vs-enhanced/RESULT.txt`;
+the file at that path is a different run, which this entry itself disclaims as
+contaminated. ⚠ Four runs of the same comparison give cold-start ratios of
+2.52×, 3.48×, 4.92× and 5.02×, with warm above cold in two.
+⭐ **C24 found why**: `90-`'s cold column obtained "cold" by COPYING the file,
+and uruntime keys its mount on CONTENT, so the copy reused the live mount and
+the column reported a warm start — 1.02× of warm, measured.
+⛔ **And all four rows predate both levers above.**
+`../docs/history/corrections.md` C23 and C24.
 
 **What is left, in the order the ruling puts it.**
 
-0. ⛔ **FIX THE INSTRUMENT BEFORE MEASURING ANYTHING WITH IT.** `90-` takes
-   **one sample per arm**; `86-` takes eleven environments × a mean of five,
-   with cold obtained by a fresh copy. Carry `86-`'s method into `90-`.
-   ⚠ Under the new bar an unpinned millisecond is worth less than none,
-   because it reads as measurement.
-1. ⛔ **RE-MEASURE THE LEVERS ON THE CLOCK.** `--cut`, `--fixpoint`, the
-   debloat rules, route A and route B were all costed in **bytes**. None was
-   measured in **milliseconds**, which is now the only thing that scores.
-   ⚠ Nothing is invalidated; everything is un-scored.
+0. ✅ **THE INSTRUMENT IS FIXED.** `experiments/clock.sh` — median of N, arms
+   interleaved with a rotating start, and an **A/A control** (one artefact
+   under two names) whose ratio is the floor below which no row may be
+   believed. `experiments/99-` stands it up and asserts it. ⭐ `90-` now uses
+   it: cold is obtained by REAPING the live mount, not by copying the file.
+1. ⛔ **RE-MEASURE kdenlive.** ⚠ This item used to read *"re-measure the levers
+   on the clock"* — that premise is **gone**: `experiments/84-` measured image
+   size at **0.024–0.031 ms/MiB**, so the byte levers (`--cut`, `--fixpoint`,
+   the debloat rules) cannot move the clock and re-measuring them is not
+   promising. ⭐ What IS left is the SUBJECT: the two levers that worked are
+   properties of the runtime and the packer, so they should carry to kdenlive
+   — and *should carry* is a reason to measure, not a substitute for it.
 2. ⭐ **Route B is costed and it overturns the argument against it**: the whole
    `-mini` set forces **161 of kdenlive's 676 closure paths (23.8%)** from
    source — not "the entire KDE/Qt subtree". On mesa-demos it is 8 of 111.
@@ -255,17 +274,35 @@ slower on every run — the magnitude does not.
    seven it drops.
 5. ⭐ **The `--fixpoint` lever landed as a measuring device**, not yet as a
    default.
-6. ⭐ **A LEVER WE DO NOT HAVE AT ALL, from the 2026-09-03c sweep**:
-   `xplshn/pelf` chooses **extraction over FUSE mounting above 350 MB**
-   (`appbundle-runtime.go:764`, mode 3). ⛔ **Our kdenlive bundle is 398 MB and
-   the competitor's is 192 MB** — one either side of somebody else's
-   production threshold, which is independent corroboration of the hypothesis
-   in step 0's N2. ⚠ It is a default in one project, not a benchmark.
+6. ⛔ **"A LEVER WE DO NOT HAVE AT ALL" WAS WRONG, corrected 2026-09-03d.**
+   This cell said `xplshn/pelf`'s extract-over-mount above 350 MB
+   (`appbundle-runtime.go:764`, mode 3) was a lever `pgb` lacks. ⭐ **uruntime,
+   which `pgb` already ships, exposes the same selector** — `URUNTIME_EXTRACT`,
+   `URUNTIME_MOUNT`, `URUNTIME_CLEANUP` and `REUSE_CHECK_DELAY` are in the
+   strings of the artefact `pgb bundle appimage` produces, with `=0`, `=2` and
+   `=3` among them. It is a lever `pgb` does not **set**.
+   ⚠ **And its motivation is gone**: `experiments/84-` rules out size as the
+   reason, and ⛔ **all four are ENVIRONMENT VARIABLES read at run time**, so
+   shipping a non-default needs something beside the artefact and the brief
+   refuses that. ⭐ The knob that IS shippable was the block size, and it is
+   taken: `experiments/81-`, `-S26` → `-S18`.
    [`../docs/research/portable-nix-mechanisms.md`](../docs/research/portable-nix-mechanisms.md) §3.
+7. ⭐ **WHAT NOBODY HAS TRIED, and it is now the top of the list**: the two
+   levers on **kdenlive**. Both are properties of the runtime and the packer,
+   not of the payload, so the 4.92× cold row should move the way `jq`'s did.
+   `experiments/90-` carries the corrected protocol; it needs a run.
 
 **Prove.** A CLI subject bundled by one command, with startup and run time
 **under** the field's on the same machine on the same day, and the eleven-row
 coverage column unchanged.
+⭐ **MET on `jq`, 2026-09-03d** — cold 1.00×, warm 0.92×, 11 of 11 both arms,
+zero host shared objects both arms (`experiments/86-`, `evidence/`). ⚠ Parity
+is not "under"; the honest sentence is *no difference measurable on cold,
+possibly ahead on warm*.
+⛔ **THE ENTRY STAYS OPEN because the operator named kdenlive**, and goal 3's
+three columns — *smaller, load faster, run faster* — are unmeasured since the
+levers landed. Size also moved the WRONG way to buy the speed: 1.44× → 1.70×
+on `jq`, because `-S18` costs +17.8% of a real payload.
 
 📚 [detail](../HISTORY/entries/toolchain-open.md) — the AppDir-vs-artefact
 ratio (7.5:1), the six runs, the debloat accounting and the contaminated-clock
