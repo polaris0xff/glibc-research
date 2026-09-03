@@ -1,7 +1,7 @@
 -- The CXX compiler identification is GNU 14.2.0
 -- Detecting CXX compiler ABI info
 -- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: /root/.local/state/pgb/bin-894478650/c++ - skipped
+-- Check for working CXX compiler: /root/.local/state/pgb/bin-522189967/c++ - skipped
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
@@ -31,7 +31,7 @@
 -- Found WrapFreetype: TRUE (found version "6.11.1")
 -- Using Qt bundled Jpeg.
 -- Found WrapJpeg: TRUE (found version "6.11.1")
--- Configuring done (1.8s)
+-- Configuring done (1.7s)
 -- Generating done (0.0s)
 -- Build files have been written to: /var/tmp/pgb-poc/90-qt/app/build
 [ 50%] Building CXX object CMakeFiles/qtprobe.dir/main.cpp.o

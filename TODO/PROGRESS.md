@@ -321,14 +321,17 @@ is **costing route B**, which is where the size actually is.
 
     ---- 0. ⛔ THE DEBT THIS SESSION TOOK ON. Do these FIRST. ----
 
-    R1  ⛔ RUN THE TEN POCs. The wrapper's link hot path changed (every link
-        now scans its .a/.o inputs) and the POC suite is this project's
-        acceptance harness. Five link shapes were checked by hand; that is
-        not ten real projects on eleven environments.
-          for p in poc/*/run.sh; do sh "$p" > /tmp/$(basename $(dirname $p)).log 2>&1; done
-        ⚠ Budget ~30 min for the first (OpenSSL + CPython build).
-        ⏳ 2026-09-03c IN FLIGHT — PGB_ENGINE=chroot, matching the engine every
-        committed RESULT.txt names.
+    R1  ✅ DONE 2026-09-03c. ⭐ TEN OF TEN, rc=0, fail=0 skip=0 on every one,
+        167 assertions, 55 minutes wall (03:52Z -> 04:48Z), PGB_ENGINE=chroot
+        to match the engine every committed RESULT.txt names.
+          10 13  20 13  30 13  40 13  50 13  60 13
+          70 20  80 21  90 21  91 27
+        ⭐ The debt is cleared: the wrapper's link hot path change
+        (elfx.NeedsCXXRuntime scanning every link's .a/.o inputs) is now
+        validated by the acceptance harness on ten real projects across
+        eleven environments, not by five link shapes checked by hand.
+        ⚠ Run against the pgb built at session start -- i.e. BEFORE this
+        session's own buildx/sweep changes, which is what R1 was for.
     R2  ✅ DONE 2026-09-03c, AND IT FOUND A SECOND ROOT-OF-ITSELF.
         `sonamesMentionedNaive` computes the self-set itself now, with
         `os.SameFile` (device+inode) against `selfKeys`'s path-string

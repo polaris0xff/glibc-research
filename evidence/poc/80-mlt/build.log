@@ -1225,6 +1225,7 @@ CC	libavformat/dfa.o
 CC	libavformat/dfpwmdec.o
 CC	libavformat/dhav.o
 CC	libavformat/diracdec.o
+CC	libavformat/dnxhddec.o
 libavformat/dashenc.c: In function 'flush_init_segment':
 libavformat/dashenc.c:594:49: warning: '%s' directive output may be truncated writing up to 1023 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
   594 |         snprintf(filename, sizeof(filename), "%s%s", c->dirname, os->initfile);
@@ -1232,7 +1233,6 @@ libavformat/dashenc.c:594:49: warning: '%s' directive output may be truncated wr
 libavformat/dashenc.c:594:9: note: 'snprintf' output between 1 and 2047 bytes into a destination of size 1024
   594 |         snprintf(filename, sizeof(filename), "%s%s", c->dirname, os->initfile);
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-CC	libavformat/dnxhddec.o
 libavformat/dashenc.c: In function 'write_hls_media_playlist':
 libavformat/dashenc.c:488:49: warning: 'media_' directive output may be truncated writing 6 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
   488 |         snprintf(playlist_name, string_size, "%smedia_%d.m3u8", base_url, id);
@@ -1255,7 +1255,6 @@ libavformat/dashenc.c:1957:63: warning: '%s' directive output may be truncated w
 libavformat/dashenc.c:1957:13: note: 'snprintf' output between 1 and 2047 bytes into a destination of size 1024
  1957 |             snprintf(os->full_path, sizeof(os->full_path), "%s%s", c->dirname, os->initfile);
       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-CC	libavformat/dump.o
 libavformat/dashenc.c: In function 'dash_write_trailer':
 libavformat/dashenc.c:488:49: warning: 'media_' directive output may be truncated writing 6 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
   488 |         snprintf(playlist_name, string_size, "%smedia_%d.m3u8", base_url, id);
@@ -1268,6 +1267,7 @@ libavformat/dashenc.c:488:46: note: directive argument in the range [0, 21474836
 libavformat/dashenc.c:488:9: note: 'snprintf' output between 13 and 1045 bytes into a destination of size 1024
   488 |         snprintf(playlist_name, string_size, "%smedia_%d.m3u8", base_url, id);
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CC	libavformat/dump.o
 CC	libavformat/dv.o
 libavformat/dashenc.c: In function 'dash_write_packet':
 libavformat/dashenc.c:2254:59: warning: '%s' directive output may be truncated writing up to 1023 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
@@ -1354,8 +1354,8 @@ CC	libavformat/idcin.o
 CC	libavformat/idroqdec.o
 CC	libavformat/idroqenc.o
 CC	libavformat/iff.o
-CC	libavformat/ilbc.o
 CC	libavformat/ifv.o
+CC	libavformat/ilbc.o
 CC	libavformat/img2.o
 CC	libavformat/img2_alias_pix.o
 CC	libavformat/img2_brender_pix.o
@@ -1416,8 +1416,9 @@ CC	libavformat/mlvdec.o
 CC	libavformat/mm.o
 CC	libavformat/mmf.o
 CC	libavformat/mms.o
-CC	libavformat/mmst.o
 CC	libavformat/mmsh.o
+CC	libavformat/mmst.o
+CC	libavformat/mods.o
 libavformat/matroskaenc.c: In function 'mkv_write_trailer':
 libavformat/matroskaenc.c:3341:79: warning: '%012.9f' directive output may be truncated writing between 12 and 320 bytes into a region of size between 8 and 14 [-Wformat-truncation=]
  3341 |                 snprintf(duration_string, sizeof(duration_string), "%02d:%02d:%012.9f",
@@ -1429,7 +1430,6 @@ libavformat/matroskaenc.c:3341:17: note: 'snprintf' output between 19 and 333 by
       |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  3343 |                          fmod(duration_sec, 60));
       |                          ~~~~~~~~~~~~~~~~~~~~~~~
-CC	libavformat/mods.o
 CC	libavformat/moflex.o
 CC	libavformat/mov.o
 CC	libavformat/mov_chan.o
@@ -1608,6 +1608,7 @@ CC	libavformat/scd.o
 CC	libavformat/sdns.o
 CC	libavformat/sdp.o
 CC	libavformat/sdr2.o
+CC	libavformat/sdsdec.o
 libavformat/rtsp.c: In function 'ff_rtsp_make_setup_request':
 libavformat/rtsp.c:1592:30: warning: '%s' directive output may be truncated writing up to 4095 bytes into a region of size 4085 [-Wformat-truncation=]
  1592 |                  "Transport: %s\r\n",
@@ -1621,7 +1622,6 @@ libavformat/rtsp.c:1591:9: note: 'snprintf' output between 14 and 4109 bytes int
       |                  ~~~~~~~~~~~~~~~~~~~~
  1593 |                  transport);
       |                  ~~~~~~~~~~
-CC	libavformat/sdsdec.o
 CC	libavformat/sdxdec.o
 CC	libavformat/seek.o
 CC	libavformat/segafilm.o
@@ -1642,6 +1642,7 @@ CC	libavformat/sol.o
 CC	libavformat/soxdec.o
 CC	libavformat/soxenc.o
 CC	libavformat/spdif.o
+CC	libavformat/spdifdec.o
 libavformat/smoothstreamingenc.c: In function 'ism_flush':
 libavformat/smoothstreamingenc.c:510:49: warning: '/temp' directive output may be truncated writing 5 bytes into a region of size between 1 and 1024 [-Wformat-truncation=]
   510 |         snprintf(filename, sizeof(filename), "%s/temp", os->dirname);
@@ -1667,7 +1668,6 @@ libavformat/smoothstreamingenc.c:546:63: warning: '/Fragments(' directive output
 libavformat/smoothstreamingenc.c:546:9: note: 'snprintf' output 15 or more bytes (assuming 1038) into a destination of size 1024
   546 |         snprintf(target_filename, sizeof(target_filename), "%s/Fragments(%s=%"PRIu64")", os->dirname, os->stream_type_tag, start_ts);
       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-CC	libavformat/spdifdec.o
 CC	libavformat/spdifenc.o
 CC	libavformat/srtdec.o
 CC	libavformat/srtenc.o
@@ -1720,7 +1720,6 @@ CC	libavformat/vocdec.o
 CC	libavformat/vocenc.o
 CC	libavformat/vorbiscomment.o
 CC	libavformat/vpcc.o
-CC	libavformat/vpk.o
 libavformat/vorbiscomment.c: In function 'ff_vorbiscomment_write':
 libavformat/vorbiscomment.c:103:63: warning: '%03d' directive output may be truncated writing between 3 and 10 bytes into a region of size 4 [-Wformat-truncation=]
   103 |             snprintf(chapter_number, sizeof(chapter_number), "%03d", i);
@@ -1741,6 +1740,7 @@ libavformat/vorbiscomment.c:104:58: note: directive argument in the range [-999,
 libavformat/vorbiscomment.c:104:13: note: 'snprintf' output between 13 and 21 bytes into a destination of size 13
   104 |             snprintf(chapter_time, sizeof(chapter_time), "%02d:%02d:%02d.%03d", h, m, s, ms);
       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+CC	libavformat/vpk.o
 CC	libavformat/vplayerdec.o
 CC	libavformat/vqf.o
 CC	libavformat/vvc.o
@@ -1884,17 +1884,6 @@ libavcodec/aacsbr_template.c:728:57: warning: writing 1 byte into a region of si
 libavcodec/sbr.h:106:24: note: at offset [-2147483647, -4] into destination object 't_env' of size 9
   106 |     uint8_t            t_env[9];
       |                        ^~~~~
-In file included from libavcodec/ac3dec_fixed.c:156:
-In function 'spx_strategy',
-    inlined from 'decode_audio_block' at libavcodec/ac3dec.c:1142:24:
-libavcodec/ac3dec.c:854:37: warning: writing 1 byte into a region of size 0 [-Wstringop-overflow=]
-  854 |             s->channel_uses_spx[ch] = get_bits1(bc);
-      |             ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
-In file included from libavcodec/ac3dec_fixed.c:51:
-libavcodec/ac3dec.h: In function 'decode_audio_block':
-libavcodec/ac3dec.h:144:13: note: at offset 7 into destination object 'channel_uses_spx' of size 7
-  144 |     uint8_t channel_uses_spx[AC3_MAX_CHANNELS]; ///< channel uses spectral extension        (chinspx)
-      |             ^~~~~~~~~~~~~~~~
 In file included from libavcodec/ac3dec_float.c:38:
 In function 'spx_strategy',
     inlined from 'decode_audio_block' at libavcodec/ac3dec.c:1142:24:
@@ -1902,6 +1891,17 @@ libavcodec/ac3dec.c:854:37: warning: writing 1 byte into a region of size 0 [-Ws
   854 |             s->channel_uses_spx[ch] = get_bits1(bc);
       |             ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
 In file included from libavcodec/ac3dec_float.c:34:
+libavcodec/ac3dec.h: In function 'decode_audio_block':
+libavcodec/ac3dec.h:144:13: note: at offset 7 into destination object 'channel_uses_spx' of size 7
+  144 |     uint8_t channel_uses_spx[AC3_MAX_CHANNELS]; ///< channel uses spectral extension        (chinspx)
+      |             ^~~~~~~~~~~~~~~~
+In file included from libavcodec/ac3dec_fixed.c:156:
+In function 'spx_strategy',
+    inlined from 'decode_audio_block' at libavcodec/ac3dec.c:1142:24:
+libavcodec/ac3dec.c:854:37: warning: writing 1 byte into a region of size 0 [-Wstringop-overflow=]
+  854 |             s->channel_uses_spx[ch] = get_bits1(bc);
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+In file included from libavcodec/ac3dec_fixed.c:51:
 libavcodec/ac3dec.h: In function 'decode_audio_block':
 libavcodec/ac3dec.h:144:13: note: at offset 7 into destination object 'channel_uses_spx' of size 7
   144 |     uint8_t channel_uses_spx[AC3_MAX_CHANNELS]; ///< channel uses spectral extension        (chinspx)
@@ -1943,8 +1943,8 @@ CC	libavcodec/apac.o
 CC	libavcodec/apedec.o
 CC	libavcodec/aptx.o
 CC	libavcodec/aptxdec.o
-CC	libavcodec/arbc.o
 CC	libavcodec/aptxenc.o
+CC	libavcodec/arbc.o
 CC	libavcodec/argo.o
 CC	libavcodec/ass.o
 CC	libavcodec/ass_split.o
@@ -2546,8 +2546,6 @@ CC	libavcodec/pcm-dvd.o
 CC	libavcodec/pcm-dvdenc.o
 CC	libavcodec/pcm.o
 CC	libavcodec/pcx.o
-CC	libavcodec/pcxenc.o
-CC	libavcodec/pgssubdec.o
 libavcodec/pcm.c: In function 'pcm_decode_init':
 libavcodec/pcm.c:287:5: warning: 'sample_fmts' is deprecated [-Wdeprecated-declarations]
   287 |     avctx->sample_fmt = avctx->codec->sample_fmts[0];
@@ -2557,6 +2555,8 @@ In file included from libavcodec/avcodec.h:41,
 libavcodec/codec.h:219:32: note: declared here
   219 |     const enum AVSampleFormat *sample_fmts; ///< @deprecated use avcodec_get_supported_config()
       |                                ^~~~~~~~~~~
+CC	libavcodec/pcxenc.o
+CC	libavcodec/pgssubdec.o
 CC	libavcodec/pgxdec.o
 CC	libavcodec/photocd.o
 CC	libavcodec/pictordec.o
@@ -2640,6 +2640,7 @@ CC	libavcodec/sbcdec_data.o
 CC	libavcodec/sbcdsp.o
 CC	libavcodec/sbcdsp_data.o
 CC	libavcodec/sbcenc.o
+CC	libavcodec/sbrdsp.o
 libavcodec/sbcenc.c: In function 'sbc_encode_init':
 libavcodec/sbcenc.c:263:5: warning: 'supported_samplerates' is deprecated [-Wdeprecated-declarations]
   263 |     for (int i = 0; avctx->codec->supported_samplerates[i]; i++)
@@ -2655,7 +2656,6 @@ libavcodec/sbcenc.c:264:9: warning: 'supported_samplerates' is deprecated [-Wdep
 libavcodec/codec.h:217:16: note: declared here
   217 |     const int *supported_samplerates;       ///< @deprecated use avcodec_get_supported_config()
       |                ^~~~~~~~~~~~~~~~~~~~~
-CC	libavcodec/sbrdsp.o
 CC	libavcodec/sbrdsp_fixed.o
 CC	libavcodec/scpr.o
 CC	libavcodec/sga.o
@@ -2940,8 +2940,8 @@ CC	libavcodec/x86/lpc_init.o
 CC	libavcodec/x86/me_cmp_init.o
 CC	libavcodec/x86/mlpdsp_init.o
 CC	libavcodec/x86/mpeg4videodsp.o
-CC	libavcodec/x86/mpegvideo.o
 CC	libavcodec/x86/mpegaudiodsp.o
+CC	libavcodec/x86/mpegvideo.o
 CC	libavcodec/x86/mpegvideoenc.o
 CC	libavcodec/x86/mpegvideoencdsp_init.o
 CC	libavcodec/x86/opusdsp_init.o
@@ -2954,8 +2954,8 @@ CC	libavcodec/x86/sbcdsp_init.o
 CC	libavcodec/x86/sbrdsp_init.o
 CC	libavcodec/x86/snowdsp.o
 CC	libavcodec/x86/svq1enc_init.o
-CC	libavcodec/x86/takdsp_init.o
 CC	libavcodec/x86/synth_filter_init.o
+CC	libavcodec/x86/takdsp_init.o
 CC	libavcodec/x86/ttadsp_init.o
 CC	libavcodec/x86/ttaencdsp_init.o
 CC	libavcodec/x86/utvideodsp_init.o
@@ -2997,8 +2997,8 @@ CC	libavcodec/y41penc.o
 CC	libavcodec/ylc.o
 CC	libavcodec/yop.o
 CC	libavcodec/yuv4dec.o
-GEN	libavcodec/libavcodec.pc
 CC	libavcodec/yuv4enc.o
+GEN	libavcodec/libavcodec.pc
 CC	libswresample/audioconvert.o
 CC	libswresample/dither.o
 CC	libswresample/options.o
@@ -3375,12 +3375,12 @@ INSTALL	libavutil/libavutil.pc
 -- The CXX compiler identification is GNU 14.2.0
 -- Detecting C compiler ABI info
 -- Detecting C compiler ABI info - done
--- Check for working C compiler: /root/.local/state/pgb/bin-348208858/cc - skipped
+-- Check for working C compiler: /root/.local/state/pgb/bin-522189967/cc - skipped
 -- Detecting C compile features
 -- Detecting C compile features - done
 -- Detecting CXX compiler ABI info
 -- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: /root/.local/state/pgb/bin-348208858/c++ - skipped
+-- Check for working CXX compiler: /root/.local/state/pgb/bin-522189967/c++ - skipped
 -- Detecting CXX compile features
 -- Detecting CXX compile features - done
 -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
@@ -3484,5 +3484,5 @@ INSTALL	libavutil/libavutil.pc
 -- Configuring done (1.6s)
 -- Generating done (0.1s)
 -- Build files have been written to: /var/tmp/pgb-poc/80-kdenlive/mlt/build
-/usr/bin/ld: /root/.local/state/pgb/runtime-x86_64-2218441320/pgb-dl-4-1-consumer_cbrts.c.o: in function `consumer_start':
+/usr/bin/ld: /root/.local/state/pgb/runtime-x86_64-1759451593/pgb-dl-4-1-consumer_cbrts.c.o: in function `consumer_start':
 consumer_cbrts.c:(.text+0xb26): warning: Using 'getaddrinfo' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking

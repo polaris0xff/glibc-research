@@ -6,7 +6,7 @@ version       : Qt 6.11.1 (qtbase)
 sha256        : d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac
 normal build  : ./configure -prefix ... && cmake --build . && cmake --install .
 stresses      : a very large C++ build system, static plugin import, QPA, raster paint, CLDR data
-date (UTC)    : 2026-09-02T23:49:41Z
+date (UTC)    : 2026-09-03T04:07:49Z
 evidence      : /home/user/glibc-research/evidence/poc/90-qt
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1

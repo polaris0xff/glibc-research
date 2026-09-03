@@ -6,7 +6,7 @@ version       : 8.2
 sha256        : d5ad07dd862facae03051c54c6535e54c7ed7407318783fcad1ad2d7076fffeb
 normal build  : ./configure && make (against the distro's libncursesw)
 stresses      : terminfo data, ncurses static dependency, iconv, locale, multibyte
-date (UTC)    : 2026-09-02T23:41:53Z
+date (UTC)    : 2026-09-03T03:53:13Z
 evidence      : /home/user/glibc-research/evidence/poc/20-nano
 build env     : /var/lib/pgb-rootfs/pgb-env-debian13
 build image   : debian:13 @ sha256:6788062a1b42ac281f053ac876170b79a3eaed5d61383b8ed7eaca6c6965f3b1
