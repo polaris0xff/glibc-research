@@ -640,7 +640,20 @@ func (b *Builder) pack() error {
 		out = filepath.Join(b.Work, fmt.Sprintf("%s-anylinux-%s.AppImage", b.Prog, b.Arch))
 	}
 	logx.Say("")
-	logx.Say("packing with uruntime + dwarfs")
+	// ⛔ THE RUNTIME IS NAMED, NOT JUST MENTIONED, AND THAT IS A GATE THIS
+	// PROJECT DOES NOT OTHERWISE HAVE. Moving the pins above silently
+	// invalidates the committed evidence of every bundle experiment -- 78-,
+	// 85-, 86-, 89-, 90- -- and NO gate can see it: `check-docs.sh` compares an
+	// experiment's script against its evidence, and the script did not change.
+	// It is `docs/history/corrections.md` C5's shape, "a committed evidence
+	// file described a build configuration that no longer exists", reached
+	// through the Go source instead of through the environment.
+	// ⭐ Printing the two versions puts them in every experiment's `run.log`,
+	// so a stale result says which runtime it describes instead of looking
+	// current.
+	logx.Say("packing with %s + %s",
+		filepath.Base(toolURL(defaultURuntimeURL, b.Arch)),
+		filepath.Base(toolURL(defaultDwarfsURL, b.Arch)))
 	logFile := filepath.Join(b.Work, "mkdwarfs.log")
 	lf, err := os.Create(logFile)
 	if err != nil {

@@ -64,26 +64,46 @@ is the failure. `corrections.md` C23 is why the old numbers cannot be quoted.
 
 ## In flight right now
 
-    ⚠ SESSION 2026-09-03d IS RUNNING. The scope the operator set is
-      PROGRESS.md N0–N6: the bundler, on the clock.
+    ⚠ SESSION 2026-09-03d. The operator scoped it to PROGRESS.md N0–N6:
+      the bundler, on the clock. ⭐ N0, N2 and N6 are DONE and SHIPPED.
 
-    STARTED   bootstrap --detach (nix + docker env + bed) — check with
-              `./pgb bootstrap --check`, log /var/tmp/pgb-bootstrap/.
-    NEXT      N0: experiments/90- takes ONE SAMPLE per arm. Carry 86-'s
-              method across (eleven environments, mean of five, cold by a
-              fresh copy) before any lever is measured.
+    RUNNING   experiments/86- (the jq head-to-head) against the NEW runtime.
+              ⛔ RE-RUN IT ONCE MORE BEFORE QUOTING IT: ./pgb was rebuilt
+              mid-run for a log-line change. The change is in pack(), which
+              ran before the rebuild, so it cannot have moved a number —
+              but "it cannot have mattered" is the reasoning this project
+              distrusts, and a result must not describe two binaries.
+    ⭐ EARLY   the first three rows already show the gap CLOSING:
+              alpine-3.22 P 68 ms vs A 67 ms, where the record says 2.07×.
+
+    ⛔ EVIDENCE THE RUNTIME CHANGE INVALIDATED, and NO GATE CAN SEE IT:
+       78-, 85-, 89-, 90- all build bundles and their committed evidence
+       describes the OLD runtime. `check-docs.sh` compares a script against
+       its evidence and none of those scripts changed. It is C5's shape
+       reached through the Go source. ⭐ `pgb bundle appimage` now PRINTS
+       the two runtime filenames, so a run.log says which it describes.
+       ⚠ 78- and 89- are cheap to re-run; 90- is not.
 
 ## ⛔ WHAT IS LEFT — READ PROGRESS.md, IT IS THE WORK ORDER
 
-    N0  fix the clock instrument           ⛔ first, nothing is scored without it
-    N1  re-measure the levers on the clock (bytes -> milliseconds)
-    N2  ⭐ the hypothesis: IS the size column the time column?
-    N3  route B, costed and not built
-    N4  --fixpoint behind its own flag, 89- as its control
+    N0  ✅ DONE. experiments/clock.sh + 99-. The cold column was measuring a
+        WARM start: uruntime keys its mount on CONTENT, so 90-'s "fresh copy
+        is cold by construction" reuses the live mount. corrections.md C24.
+    N1  ⛔ PREMISE GONE. It existed because the byte levers might score under
+        the new bar. N2 says they cannot.
+    N2  ✅ ANSWERED, NO. experiments/84-: 0.024–0.031 ms per MiB, so the whole
+        196 MiB between the two kdenlive bundles is ~5 ms of a gap never seen
+        below 129 ms. A 138× file count does not resolve at all.
+    N3  route B, costed and not built — untouched, and now lower value: it is
+        a SIZE lever.
+    N4  --fixpoint — same, a size lever.
     N5  ⛔ route A at path granularity is measured DEAD. Do not build it.
-    N6  pelf's lever: mount below 350 MB, EXTRACT above it. Ours is 398 MB,
-        the competitor's 192 MB — either side of somebody else's threshold.
-        docs/research/portable-nix-mechanisms.md §3-4.
+    N6  ✅ THE LEVER WAS THE RUNTIME AND IT IS SHIPPED. experiments/77-:
+        uruntime v0.5.6 FULL → v0.5.9 LITE is 0.76× cold, 11 of 11, and the
+        artefact loses 1.55 MB. The version bump alone buys nothing; it is
+        `lite`. ⚠ pelf's extract-above-350 MB is NOT a lever we lack —
+        uruntime exposes URUNTIME_EXTRACT and REUSE_CHECK_DELAY and we do
+        not set them. Unmeasured with clock.sh; that is the next probe.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 
