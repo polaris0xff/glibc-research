@@ -1,10 +1,10 @@
 # pkgforge-dev/cross-libc-dlopen
 
-Fetched 2026-09-01T05:20:35Z by `scripts/common/mine-repo.sh`.
+Fetched 2026-09-03T01:16:16Z by `scripts/common/mine-repo.sh`.
 
 | | |
 | --- | --- |
-| commit | `1cecf50ef603ed146dfcebda8553ff1558470965` |
+| commit | `793f3f3ff15955c73c719a2dbc15b3a1ec36a03f` |
 | route | proxy |
 | control | reachable (pkgforge-dev/reverse-proxies answered 200) |
 
@@ -31,9 +31,8 @@ A claim written a month ago describes a tree that has moved.
 
 ## Trim applied after the fetch
 
-  - `tree/docs/AGENTS.md` DELETED by this project, not absent upstream. It
-    exists at the commit above and can be read there. The vendoring
-    methodology forbids carrying a third party's agent instruction file into
-    this tree: a file with that name anywhere under a repository is read as
-    instructions by the tools working in it. Deleted, never moved, so every
-    other path citation stays valid.
+  - `tree/docs/AGENTS.md` DELETED by this project, not absent
+    upstream. It exists at the commit above and can be read there. The
+    vendoring methodology forbids carrying a third party's agent instruction
+    file into this tree: a file with that name anywhere under a repository is
+    read as instructions by the tools working in it.

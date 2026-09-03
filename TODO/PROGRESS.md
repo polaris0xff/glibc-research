@@ -3,8 +3,8 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log
 and the entries.
 
-    STATE     2026-09-02f / 2026-09-03
-    COUNTS    45 entries, 17 open, 28 done
+    STATE     2026-09-03b
+    COUNTS    46 entries, 17 open, 29 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN before this session; selftests 239 pass, 1 could not
               run (no zstd)

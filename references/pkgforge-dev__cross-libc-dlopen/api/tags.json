@@ -1,5 +1,15 @@
 [
  {
+  "name": "v0.2.1",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/cross-libc-dlopen/zipball/refs/tags/v0.2.1",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/cross-libc-dlopen/tarball/refs/tags/v0.2.1",
+  "commit": {
+   "sha": "793f3f3ff15955c73c719a2dbc15b3a1ec36a03f",
+   "url": "https://api.github.com/repos/pkgforge-dev/cross-libc-dlopen/commits/793f3f3ff15955c73c719a2dbc15b3a1ec36a03f"
+  },
+  "node_id": "REF_kwDOUEZXyrByZWZzL3RhZ3MvdjAuMi4x"
+ },
+ {
   "name": "v0.2.0",
   "zipball_url": "https://api.github.com/repos/pkgforge-dev/cross-libc-dlopen/zipball/refs/tags/v0.2.0",
   "tarball_url": "https://api.github.com/repos/pkgforge-dev/cross-libc-dlopen/tarball/refs/tags/v0.2.0",

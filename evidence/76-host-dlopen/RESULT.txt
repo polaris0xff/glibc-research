@@ -1,7 +1,7 @@
 experiment 76 - --host-dlopen across the pinned bed
-date (UTC)   : 2026-09-02T11:22:58Z
-host kernel  : Linux 6.18.44-fc-v22
-subject      : 4407984 bytes, PT_INTERP=0 DT_NEEDED=0
+date (UTC)   : 2026-09-03T01:14:00Z
+host kernel  : Linux 6.18.44-fc-v24
+subject      : 5734248 bytes, PT_INTERP=0 DT_NEEDED=0
 
 TARGET                 LIBC   CARRIED   NATIVE    CONTROL   HOST .so LOADED BY SUBJECT
 alpine-3.22            musl   ok        exit1     exit1     none
@@ -9,12 +9,12 @@ alpine-3.20            musl   ok        exit1     exit1     none
 alpine-3.10            musl   ok        exit1     exit1     none
 voidlinux-musl         musl   ok        exit1     exit1     none
 debian-11              glibc  ok        ok        SIG6      none
-debian-12              glibc  ok        ok        SIG11     none
+debian-12              glibc  ok        ok        SIG8      none
 ubuntu-20.04           glibc  ok        ok        SIG6      none
-rockylinux-8           glibc  ok        ok        SIG6      none
+rockylinux-8           glibc  ok        ok        SIG11     none
 opensuse-leap-15.6     glibc  ok        ok        SIG8      none
-fedora-42              glibc  ok        ok        SIG8      none
-archlinux-latest       glibc  ok        ok        SIG11     none
+fedora-42              glibc  ok        ok        SIG11     none
+archlinux-latest       glibc  ok        ok        SIG8      none
 
 carried  = dlopen a .so built by the PINNED glibc environment.
            On the four musl rows this is a GLIBC shared object
@@ -23,6 +23,11 @@ native   = dlopen a shared object already present on the target.
            Refused by design on musl: it needs musl.
 control  = the same source with no --host-dlopen. Reaches ld.so.
 
-time to first symbol, debian-12, ns
-  ours    first=147543 second=166220 
-  ld.so   first=711066 second=41430 
+time to first symbol, debian-12, ns -- ONE SAMPLE EACH
+  ours    first=73707 second=53824 
+  ld.so   no reading
+  ⚠ one sample, and ours second > ours first in at least one run, so the
+  per-load figures are at this instrument noise floor and must not be
+  quoted as a difference. What IS outside the noise is the FIRST column:
+  the control has to bring in the host ld.so and libc.so.6 before it can
+  load anything, and that is the cost --host-dlopen removes.

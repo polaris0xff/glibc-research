@@ -699,3 +699,95 @@ refused by name. Measured on the seven LLVM-family objects the control named:
    `lib/elf_loader.cpp` at `79451211` is the read. ⚠ It did not appear as a
    named reason in this run's classification, which is a statement about this
    host's objects and not about the relocation.
+
+---
+
+## T-073 — ⭐ the own-symbol table answered when one of its two names had to defer
+
+**Source** operator, 2026-09-03, on `pkgforge-dev/cross-libc-dlopen#28` / PR 30.
+**Category** runtime · **Priority** P1 · **Effort** S · **Status** ✅ done
+
+**Problem.** `el_provider()` in `tool/runtime/pgb-elfload.c` checked
+`el_own_syms[]` **first and unconditionally**. The table's two entries have
+**opposite** requirements and nothing in the code, the comments or the harness
+distinguished them:
+
+| name | requirement | why |
+|---|---|---|
+| `__tls_get_addr` | ⛔ **must WIN over everything** | the module ids it is handed are minted by this loader's own `R_X86_64_DTPMOD64` case; nothing else in the process can interpret them |
+| `_dl_mcount_wrapper_check` | ⛔ **must YIELD to any real definition** | it is a stand-in whose whole content is *do nothing*, so answering shadows a real one with a no-op |
+
+⭐ **One table cannot express both**, and the table was safe **by accident**:
+`el_resolve()` happens to call `el_provider()` last, which is right for
+`_dl_mcount_wrapper_check` and wrong for `__tls_get_addr`. ⛔ **Nothing
+asserted that ordering** and neither entry recorded that it depended on it.
+
+**Premise.** ⚠ Upstream's #28 is the same shape and is **not our bug** — it is
+an `LD_PRELOAD` interposition defect in a forwarding shim, `pgb` ships no
+preload shim and its output has no `PT_INTERP`, so interposition cannot reach
+it (`docs/AGENTS.md` §14 already refuses that route). What transfers is the
+**defect class**: a lookup that ANSWERS when it should DEFER. This tree has
+now paid for it four times — the weak `iconv_open` provider entry that held
+NULL, `R_X86_64_DTPOFF64` answering offset 0 (both T-068), upstream's 358
+zero-returning stubs, and this.
+
+### ✅ CLOSED 2026-09-03 — the Prove, run
+
+    sh experiments/94-own-symbol-order.sh
+    pass=16 fail=0 skip=0     VERDICT: matched expectation
+
+| arm | fixed loader | reversal (pre-T-073) |
+|---|---|---|
+| A `_dl_mcount_wrapper_check`, a loaded object defines it | `provider_calls=1` | `provider_calls=1` |
+| B the same, nothing else defines it | `standin_fire=1` | `standin_fire=1` |
+| C ⭐ `__tls_get_addr`, a loaded object defines it | ⭐ **`decoy_calls=0`** | ⛔ **`decoy_calls=2`** |
+| D the same, nothing else defines it | `tls=0x5eeded` | `tls=0x5eeded` |
+
+⭐ **11 of 11 on the bed**, both directions, including all four musl rows —
+a glibc `.so` `dlopen`'d on Alpine with its general-dynamic TLS binding to the
+compiled-in loader rather than to the decoy sitting in front of it.
+
+### ⛔ THE PART WORTH CARRYING: the round trip passes under the defect
+
+⚠ **`tls=0x5eeded` is correct in BOTH columns.** The decoy returns its own slab
+to every caller, so a thread-local written and read back through it is
+self-consistent and every value assertion is green. **Only the call count
+separates them.** An experiment written around the value — which is the obvious
+way to write it — would have measured nothing and reported a pass.
+
+⭐ That is why the entry is `done` and not "reviewed": the defect was **live**,
+it was **silent**, and the shape of the naive test hides it.
+
+### Is it reachable on a real host?
+
+⚠ **Measured, and the answer is "only through objects that are refused today"**
+— which is a reason it had not bitten, not a reason it was safe. Of 2,514
+shared objects on the build host, **four** define either name:
+
+    __tls_get_addr             ld-linux-x86-64.so.2 (GLOBAL), libasan.so.8 (WEAK),
+                               libtsan.so.2 (WEAK)
+    _dl_mcount_wrapper_check   libc.so.6 (GLOBAL)
+
+`libasan`/`libtsan` are refused by `el_refused_class()` as interposers, and
+`libc.so.6` is answered by `el_soname_served()` rather than opened. ⛔ **Every
+one of those refusals is for an unrelated reason and any of them could change**
+— the interposer list is edited whenever a new one is met, and the served-soname
+list follows the link. The ordering must not depend on them.
+
+**The fix.** Two tables, consulted at two points of `el_resolve()`:
+`el_own_syms_first` before the symbolic self-lookup, the loaded objects and the
+dependency closure; `el_own_syms_last` after the generated provider table.
+⭐ `_dl_mcount_wrapper_check` now also yields to **our own static glibc**, which
+the single table shadowed — it is not in `libc.a` today, so nothing moved, and
+if a pin move ever puts it there the real one wins instead of the no-op.
+
+**The control.** `PGB_T073_OWNSYMS_UNORDERED=1` merges the two tables back into
+`el_provider()`, reproducing the pre-T-073 shape exactly. ⭐ It is a **builder**
+knob, not a runtime one — `internal/wrapper` passes `-D` and names the object
+`pgb-elfload-unordered.o`, so a shipped binary carries no way to reach it and
+the mtime cache cannot serve the wrong object. Same shape as
+`SharedWrappers` for `experiments/87-`.
+
+**No regression.** `experiments/93-` re-run after the change:
+`ok=882 refused=122 failed=478 crash=45 hang=0` — identical to the pre-change
+baseline in every column. `experiments/76-` `pass=4 fail=0`.

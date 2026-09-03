@@ -1,0 +1,28 @@
+experiment 94 - the own-symbol table: what must win, what must yield
+date: 2026-09-03T01:13:47Z
+kernel: Linux 6.18.44-fc-v24
+environment: pgb-env-debian13
+
+THE QUESTION: el_own_syms[] was ONE table checked first and
+unconditionally inside el_provider(). Its two entries have opposite
+requirements and nothing distinguished them or asserted the ordering
+that made one of them safe.
+
+arm                                   fixed loader              reversal (pre-T-073)
+A yield  a loaded object defines it    provider_calls=1          provider_calls=1
+B standin nothing else defines it      standin_fire=1            standin_fire=1
+C win    a loaded object defines it    decoy_calls=0 tls=0x5eeded decoy_calls=2 tls=0x5eeded
+D own    nothing else defines it       tls=0x5eeded              tls=0x5eeded
+
+C IS THE DEFECT, and the value column is why it was never noticed:
+tls=0x5eeded is correct in BOTH. The decoy returns its own slab to
+every caller, so a round trip through it is self-consistent. Only
+decoy_calls -- 0 fixed, 2 reversed -- says which loader answered.
+
+the eleven: rows=11 yield-ok=11 win-ok=11
+
+reproduce:
+  sh experiments/94-own-symbol-order.sh
+the reversal alone:
+  PGB_T073_OWNSYMS_UNORDERED=1 ./pgb --engine chroot build \
+      --host-dlopen -- cc -o subject subject.c

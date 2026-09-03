@@ -336,6 +336,30 @@ done
 [ "$n" -gt 0 ] || bad "PROVENANCE.md's vendored table parsed as empty -- the format moved"
 [ "$broken" -eq 0 ] && [ "$n" -gt 0 ] && ok "vendored methodology files are on disk ($n checked)"
 
+# ---------------------------------------------------------------------------
+# 7. ⛔ no third party's agent instruction file is vendored under references/
+#
+# ⚠ THIS IS A GATE BECAUSE THE RULE WAS ALREADY BEING BROKEN. docs/AGENTS.md
+# §12 recorded "one deliberate deletion" -- a `tree/docs/AGENTS.md` removed by
+# hand from one reference on 2026-09-01. On 2026-09-03 a sweep of all 34 found
+# TWO MORE that had never been noticed, and re-mining the first put its copy
+# straight back. A rule applied to whichever repository somebody happened to
+# open is not a rule.
+#
+# ⭐ mine-repo.sh's trim_tree() now strips them at fetch time and records the
+# trim in PROVENANCE.md. This is the half that says so if that ever stops
+# working: the fetcher makes it not happen, the gate makes it visible.
+found=$(git ls-files -- 'references/*' \
+        | grep -E '(^|/)(AGENTS\.md|CLAUDE\.md|GEMINI\.md|\.cursorrules|\.clinerules|\.windsurfrules)$' \
+        || true)
+if [ -n "$found" ]; then
+  for f in $found; do
+    bad "a third party's agent instruction file is vendored: $f"
+  done
+else
+  ok "no third-party agent instruction file under references/"
+fi
+
 echo
 if [ "$fail" -eq 0 ]; then
   echo "VERDICT: the documentation agrees with the tree."

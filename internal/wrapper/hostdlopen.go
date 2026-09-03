@@ -140,8 +140,12 @@ func (b *Builder) buildProviderTable(rd, src string) error {
 	// second would silently get the first's reserve. That is the artefact-cache
 	// defect this tree has already paid for once; a distinct path per size
 	// makes the mtime rule correct instead of working around it.
+	elfArgs := []string{"-O2", fmt.Sprintf("-DPGB_TLS_RESERVE=%d", b.C.TLSReserve)}
+	if ownsymsUnordered() {
+		elfArgs = append(elfArgs, "-DPGB_ELFLOAD_OWNSYMS_UNORDERED=1")
+	}
 	if err := b.compileIfStale(src, "pgb-elfload.c", elfloadObj(rd, b.C.TLSReserve),
-		"-O2", fmt.Sprintf("-DPGB_TLS_RESERVE=%d", b.C.TLSReserve)); err != nil {
+		elfArgs...); err != nil {
 		return err
 	}
 	// pgb-dlopen.o carries the --wrap entry points and falls through to the
@@ -157,14 +161,36 @@ func (b *Builder) buildProviderTable(rd, src string) error {
 // libresolv.a, libanl.a and the rest, and a single-pass linker resolves each
 // archive where it appears. Without --start-group the first full table failed
 // the link on 40-odd sunrpc and resolver names.
+// ownsymsUnordered reports whether the loader is to be built with its two
+// own-symbol tables merged back into el_provider().
+//
+// ⭐ experiments/94-'s NEGATIVE CONTROL, and it is a BUILDER knob on purpose:
+// a shipped binary carries no way to reach it, because the loader decides the
+// question with #ifdef at compile time rather than by reading an environment
+// variable at run time. Nothing in pgb sets it — the same shape as
+// SharedWrappers, which experiments/87- uses for the same reason.
+//
+// ⛔ It reproduces the PRE-T-073 order: one table, checked first inside
+// el_provider(), which el_resolve() calls last. That is correct for
+// _dl_mcount_wrapper_check and wrong for __tls_get_addr, and arm 2 of
+// experiments/94- is what says so.
+func ownsymsUnordered() bool {
+	return os.Getenv("PGB_T073_OWNSYMS_UNORDERED") == "1"
+}
+
 // elfloadObj is where the loader object for one reserve size lives. The size is
 // part of the name so the mtime-based staleness check cannot serve an object
-// built for a different reserve.
+// built for a different reserve, and the own-symbol control is in the name for
+// exactly the same reason.
 func elfloadObj(rd string, reserve int) string {
-	if reserve == 0 {
-		return filepath.Join(rd, "pgb-elfload.o")
+	name := "pgb-elfload"
+	if reserve != 0 {
+		name += fmt.Sprintf("-tls%d", reserve)
 	}
-	return filepath.Join(rd, fmt.Sprintf("pgb-elfload-tls%d.o", reserve))
+	if ownsymsUnordered() {
+		name += "-unordered"
+	}
+	return filepath.Join(rd, name+".o")
 }
 
 func hostDlopenLinkFlags(rd string, reserve int) []string {

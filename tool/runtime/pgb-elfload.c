@@ -281,12 +281,75 @@ static void el_dl_mcount_wrapper_check(void *selfpc)
     (void)selfpc;
 }
 
-static const struct pgb_provider_sym el_own_syms[] = {
+/* ⛔ THE TWO NAMES ABOVE HAVE OPPOSITE REQUIREMENTS, so they are two tables
+ * consulted at two different points of el_resolve() rather than one table
+ * consulted once.
+ *
+ *   __tls_get_addr             MUST WIN over every loaded object. The module
+ *                              ids it is handed were written by THIS loader's
+ *                              R_X86_64_DTPMOD64 case out of el_tls_next_modid;
+ *                              no other implementation can interpret them, so
+ *                              a loaded object's copy answering instead reads
+ *                              and writes through a pointer derived from
+ *                              somebody else's bookkeeping.
+ *
+ *   _dl_mcount_wrapper_check   MUST YIELD to any real definition. It is a
+ *                              stand-in for something ld.so would have
+ *                              provided, and its whole content is `do
+ *                              nothing`. If a real one is in scope, answering
+ *                              from here would SHADOW it with a no-op.
+ *
+ * ⛔ ONE TABLE CANNOT EXPRESS BOTH, and the single table this replaced was
+ * checked FIRST and UNCONDITIONALLY inside el_provider(). That was safe only
+ * because el_resolve() happens to call el_provider() last -- an ordering
+ * nothing asserted, that neither entry named, and that was correct for one of
+ * the two names by accident. experiments/94- asserts both directions and
+ * carries the negative control that reproduces the single-table shape.
+ *
+ * ⚠ THE DEFECT CLASS, and it is the one this tree keeps paying for: a lookup
+ * that ANSWERS when it should DEFER. The weak `iconv_open` provider entry held
+ * NULL and shadowed the real one; R_X86_64_DTPOFF64 answered offset 0 rather
+ * than deferring to the defining module; pkgforge-dev/cross-libc-dlopen#28 is
+ * 358 zero-returning stubs shadowing a provider the process could still serve.
+ * TODO T-073, T-068. */
+static const struct pgb_provider_sym el_own_syms_first[] = {
     { "__tls_get_addr", (void *)(uintptr_t)&__tls_get_addr },
+    { NULL, NULL }
+};
+
+static const struct pgb_provider_sym el_own_syms_last[] = {
     { "_dl_mcount_wrapper_check",
       (void *)(uintptr_t)&el_dl_mcount_wrapper_check },
     { NULL, NULL }
 };
+
+static void *el_own_lookup(const struct pgb_provider_sym *tab, const char *name)
+{
+    for (; tab->name; tab++)
+        if (strcmp(tab->name, name) == 0)
+            return tab->addr;
+    return NULL;
+}
+
+/* ⭐ THE NEGATIVE CONTROL, and it is a BUILDER knob rather than a runtime one.
+ * PGB_T073_OWNSYMS_UNORDERED=1 makes internal/wrapper pass this define and
+ * name the object differently; a shipped binary has no way to reach it. Under
+ * it both tables move back inside el_provider(), which is the pre-T-073 shape
+ * exactly: one lookup, checked first, called last. experiments/94- arm 2 must
+ * FAIL under it and arm 1 must still pass. */
+#ifdef PGB_ELFLOAD_OWNSYMS_UNORDERED
+static void *el_own_first(const char *name) { (void)name; return NULL; }
+static void *el_own_last(const char *name)  { (void)name; return NULL; }
+#else
+static void *el_own_first(const char *name)
+{
+    return el_own_lookup(el_own_syms_first, name);
+}
+static void *el_own_last(const char *name)
+{
+    return el_own_lookup(el_own_syms_last, name);
+}
+#endif
 
 /* ⭐ THREAD-LOCAL symbols this image's own glibc defines, reached by ADDRESS
  * rather than by name. A TLS symbol cannot go in the generated provider table
@@ -342,11 +405,16 @@ static size_t el_provider_count(void)
 static void *el_provider(const char *name)
 {
     size_t lo = 0, hi;
-    const struct pgb_provider_sym *own;
 
-    for (own = el_own_syms; own->name; own++)
-        if (strcmp(own->name, name) == 0)
-            return own->addr;
+#ifdef PGB_ELFLOAD_OWNSYMS_UNORDERED
+    {
+        void *p = el_own_lookup(el_own_syms_first, name);
+        if (!p)
+            p = el_own_lookup(el_own_syms_last, name);
+        if (p)
+            return p;
+    }
+#endif
 
     if (&pgb_provider_syms[0] == NULL)
         return NULL;
@@ -800,15 +868,22 @@ static const char *el_refver(const struct el_obj *o, uint32_t si)
  * elf_loader.cpp:2034-2078). A loader that gets this wrong binds the right
  * name to the wrong definition and fails far from the cause.
  *
+ *   0. the names only THIS loader can answer          (el_own_syms_first)
  *   1. the requesting object itself, when it is DT_SYMBOLIC
  *   2. the global scope, in load order
  *   3. the requester's own dependency closure
  *   4. the compiled-in provider table -- OUR static glibc
+ *   5. the stand-ins for what ld.so would have provided (el_own_syms_last)
  *
- * ⚠ The provider table is LAST on purpose. A plugin that ships its own copy of
+ * ⚠ The provider table is LATE on purpose. A plugin that ships its own copy of
  * a symbol and a sibling that needs it must bind to each other, exactly as
  * they would under ld.so; falling to libc first would silently change which
  * definition wins.
+ *
+ * ⛔ STEPS 0 AND 5 ARE THE SAME TABLE SPLIT IN TWO, and the split is the whole
+ * point: step 0 is "nothing else may answer this", step 5 is "answer only if
+ * nothing else did". A single table can express one or the other, never both.
+ * See el_own_syms_first / el_own_syms_last above. TODO T-073.
  */
 static void *el_resolve(struct el_obj *req, const char *name, const char *ver,
                         int *found)
@@ -818,6 +893,10 @@ static void *el_resolve(struct el_obj *req, const char *name, const char *ver,
 
     *found = 0;
 
+    {
+        void *p = el_own_first(name);
+        if (p) { *found = 1; return p; }
+    }
     if (req && req->symbolic) {
         s = el_lookup_in(req, name, ver);
         if (s) { *found = 1; return req->base + s->st_value; }
@@ -834,6 +913,10 @@ static void *el_resolve(struct el_obj *req, const char *name, const char *ver,
     }
     {
         void *p = el_provider(name);
+        if (p) { *found = 1; return p; }
+    }
+    {
+        void *p = el_own_last(name);
         if (p) { *found = 1; return p; }
     }
     return NULL;

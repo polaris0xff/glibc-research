@@ -130,6 +130,54 @@ GAPS=""
 gap() { GAPS="$GAPS  - $1
 "; }
 
+# ⛔ A THIRD PARTY'S AGENT INSTRUCTION FILE IS NOT VENDORED, AND THE DELETION
+# BELONGS HERE RATHER THAN IN A SESSION'S MEMORY.
+#
+# ⚠ THE DEFECT THIS EXISTS TO CATCH, AND IT WAS MEASURED BY WALKING INTO IT.
+# `docs/AGENTS.md` §12 records ONE deliberate deletion in this tree --
+# `references/pkgforge-dev__cross-libc-dlopen/tree/docs/AGENTS.md`, removed by
+# hand on 2026-09-01 with a note in that repository's PROVENANCE.md. On
+# 2026-09-03 the same repository was re-mined at the post-PR-30 commit and the
+# file CAME BACK, and the PROVENANCE.md section recording its removal was
+# overwritten by the new one. The deletion was a session's action; nothing in
+# this script knew it had ever happened, so a re-fetch silently undid it and
+# the only record of the trim went with it.
+#
+# ⭐ So the fetcher applies it, and writes it into PROVENANCE.md itself. A file
+# with one of these names anywhere under a vendored tree is read as
+# instructions by the tools working in this repository -- whoever wrote it,
+# whatever it says, and whether or not anybody meant it that way.
+#
+# ⛔ DELETING, NEVER MOVING, so every other path citation into the tree stays
+# valid. The file still exists upstream at the commit PROVENANCE.md names and
+# can be read there.
+TRIMS=""
+trim_tree() {   # dir -- strip build output and any agent instruction file
+  [ -d "$1" ] || return 0
+  for _tt_junk in node_modules target build dist .next vendor/bundle .venv __pycache__; do
+    find "$1" -type d -name "$_tt_junk" -prune -exec rm -rf {} + 2>/dev/null || true
+  done
+  _tt_list="$1.agentfiles"
+  find "$1" -type f \( -name AGENTS.md -o -name CLAUDE.md -o -name GEMINI.md \
+       -o -name .cursorrules -o -name .clinerules -o -name .windsurfrules \) \
+       2>/dev/null | sort > "$_tt_list" || :
+  # ⚠ REDIRECTED FROM A FILE, NOT PIPED. A `while read` on the right of a pipe
+  # runs in a subshell and every TRIMS append would be discarded at the done --
+  # the run would delete the files and report no trim, which is the same
+  # silence this function exists to end.
+  while read -r _tt_f; do
+    [ -n "$_tt_f" ] || continue
+    rm -f "$_tt_f"
+    TRIMS="$TRIMS  - \`${_tt_f#"$DEST/"}\` DELETED by this project, not absent
+    upstream. It exists at the commit above and can be read there. The
+    vendoring methodology forbids carrying a third party's agent instruction
+    file into this tree: a file with that name anywhere under a repository is
+    read as instructions by the tools working in it.
+"
+  done < "$_tt_list"
+  rm -f "$_tt_list"
+}
+
 # ⛔ JOIN PAGES WITH A REAL PARSER. EACH PAGE IS ITS OWN DOCUMENT.
 #
 # -- THE DEFECT THIS FUNCTION EXISTS TO CATCH --------------------------------
@@ -578,9 +626,7 @@ if [ "$CLONE" = "1" ] && [ -n "$REF" ]; then
       *) gap "ref: --ref $REF resolved to $COMMIT. A tag or branch was asked for, so this commit is what the tree holds and the pin is not by sha." ;;
     esac
     rm -rf "$DEST/tree/.git"
-    for junk in node_modules target build dist .next vendor/bundle .venv __pycache__; do
-      find "$DEST/tree" -type d -name "$junk" -prune -exec rm -rf {} + 2>/dev/null || true
-    done
+    trim_tree "$DEST/tree"
   else
     rm -rf "$DEST/tree"
     gap "tree: the clone at --ref $REF failed, and NOTHING was kept. A tree at the wrong commit is worse than no tree, so HEAD was not substituted."
@@ -595,10 +641,9 @@ elif [ "$CLONE" = "1" ]; then
     say "  tree: $COMMIT"
     rm -rf "$DEST/tree/.git"
     # ⛔ DELETING, NEVER MOVING. Build output, dependency trees and binaries go;
-    # source, tests, docs and anything else relevant
-    for junk in node_modules target build dist .next vendor/bundle .venv __pycache__; do
-      find "$DEST/tree" -type d -name "$junk" -prune -exec rm -rf {} + 2>/dev/null || true
-    done
+    # source, tests, docs and anything else relevant stays. trim_tree also
+    # removes any agent instruction file -- see its header.
+    trim_tree "$DEST/tree"
   else
     gap "tree: the clone failed. Line citations from this reference cannot be verified."
     say "  tree: FAILED"
@@ -638,6 +683,11 @@ fi
   printf 'claim, then open the file at the commit above and check it.\n\n'
   printf -- '⚠ **The author being the maintainer, or the operator, does not exempt it.**\n'
   printf 'A claim written a month ago describes a tree that has moved.\n'
+  # ⛔ THE TRIM IS RECORDED IN THE FILE THE RE-MINE REWRITES, so it survives the
+  # next one. Written by trim_tree rather than by hand for exactly that reason.
+  if [ -n "$TRIMS" ]; then
+    printf '\n## Trim applied after the fetch\n\n%s' "$TRIMS"
+  fi
 } > "$DEST/PROVENANCE.md"
 
 NGAPS=$(printf '%s' "$GAPS" | grep -c '^  - ' || true)

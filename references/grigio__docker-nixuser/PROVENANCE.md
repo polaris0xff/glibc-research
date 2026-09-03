@@ -28,3 +28,11 @@ claim, then open the file at the commit above and check it.
 
 ⚠ **The author being the maintainer, or the operator, does not exempt it.**
 A claim written a month ago describes a tree that has moved.
+
+## Trim applied after the fetch
+
+  - `tree/AGENTS.md` DELETED by this project, not absent
+    upstream. It exists at the commit above and can be read there. The
+    vendoring methodology forbids carrying a third party's agent instruction
+    file into this tree: a file with that name anywhere under a repository is
+    read as instructions by the tools working in it.
