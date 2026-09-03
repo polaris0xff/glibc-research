@@ -199,7 +199,27 @@ measured no effect from the partial port. ⛔ Do not port the shim stack.
 ## T-033 — route D: compile an ELF loader in, resolve against our own static glibc
 
 **Source** `docs/research/solo.md`, the `pg83/solo` sweep, session of
-2026-09-01b. **Category** runtime · **Priority** P1 · **Effort** L · **Status** open
+2026-09-01b. **Category** runtime · **Priority** P1 · **Effort** L ·
+**Status** ✅ done — **SUPERSEDED BY T-064**
+
+## ⛔ CLOSED 2026-09-03 AS A DUPLICATE, and it had been open describing finished work
+
+⭐ **T-064 IS THIS ENTRY.** *"Route D: compile an ELF loader in, resolve against
+our own static glibc"* is what `pgb build --host-dlopen` does and what T-064
+closed — `tool/runtime/pgb-elfload.c`, `experiments/76-`, 11 of 11 carried with
+zero host shared objects, a real host `.so` on 7 of 7 glibc rows. `docs/AGENTS.md`
+§13 has recorded T-064 as closed since it landed.
+
+⛔ **AND IT COST SOMETHING TO LEAVE OPEN.** `docs/REQUIREMENTS.md` — the
+operator's binding acceptance bar — pointed its ONE remaining unmet issue at
+**this entry**, in a sentence naming no shipped mechanism, so the bar read as
+though nothing had been built for the host-plugin class. Both cells are
+corrected and now name T-064 and T-068. ⚠ The row itself stays **open** on that
+page: the issue is *host-dependence* and it persists.
+
+⚠ **Nothing here is re-closed on new evidence.** This is the record catching up
+with a measurement that was taken on 2026-09-02: `RULES.md` §"The record is part
+of the change" is the rule it broke.
 
 **Problem.** `docs/limitations.md` §1 is the project's one measured, unfixed
 failure and the reason `REQUIREMENTS.md` part 1 is not met: `dlopen` of a

@@ -5,7 +5,7 @@ it is not the work order: `PROGRESS.md` holds those and is read first anyway.
 This file exists only so a session that ends badly still hands over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03b, at session END
+    LAST WRITTEN   2026-09-03b, after four operator-ordered reviews
     TREE           main, clean, everything pushed
     BRANCH         ⛔ main. The harness named
                    `claude/cross-libc-dlopen-review-ukfukq`; RULES.md §Git
@@ -68,31 +68,24 @@ HEAD..origin/main` said **214**. Do this, in this order:
               says so. Two further placements stay open, each needing one
               measurement first.
 
-## ⛔ WHAT IS LEFT, IN ORDER
+## ⛔ WHAT IS LEFT — REPRIORITISED BY FOUR REVIEWS, READ PROGRESS.md
 
-    1  T-066 P0  ⛔ STILL THE LAST P0. Premise significantly advanced, not met.
-                 ⭐ Route A's CEILING IS MEASURED: 218.5 MiB of a 938.8 MiB
-                 mesa bundle (23.3%) is reachable ONLY through edges two
-                 `-mini` recipes delete, against 6.3% the sweep can prove
-                 dead. `pgb bundle sweep --cut FROM=>TO` is the instrument and
-                 it is validated against a known answer.
-                 ⛔ LEFT: build the allowlist (now bounded by that ceiling),
-                 and cost route B. ⚠ A kdenlive AppDir still does not exist.
-                 ⚠ ONE MORE LEVER NAMED AND NOT TAKEN: the soname string scan
-                 counts mentions from EVERY object including unreachable ones,
-                 so an unreachable libicui18n keeps libicuuc alive. Making it
-                 a fixpoint is a real lever AND a real safety question.
-    2  T-062 P1  THREE packages left: buildx, logx, proc. buildx shells out to
-                 a bed -- carry its parsing, not its run.
-    3  T-063 P1  arm S. ⭐ BOTH named blockers are now resolved or corrected:
-                 the C++-archive one is FIXED (elfx.NeedsCXXRuntime), and the
-                 readline one was CORRECTED -- --start-group fixes ORDER, not
-                 ABSENCE, measured in three arms. ⛔ NEXT: re-run arm S with
-                 `--without-icu` REMOVED and see what is actually left.
-                 The general fix for absence is the same shape as the C++ one:
-                 a symbol index over the prefix's archives.
-    4  T-054/T-055  kdenlive. ⛔ The bar is NOT met: 2.22x the size, and a
-                 same-day safe vs aggressive timing comparison is owed.
+    ---- 0. ⛔ THE DEBT THE LAST SESSION TOOK ON. FIRST. ----
+    R1  ⛔ RUN THE TEN POCs. The wrapper's link hot path changed and nothing
+        ran the acceptance harness against it.
+    R2  ⚠ `bundle-soname-scan`'s oracle now SHARES selfKeys() with the subject,
+        so their equivalence cannot catch a defect inside it.
+    R3  ⚠ T-063 arm S with `--without-icu` REMOVED -- the C++ fix is proved on
+        a synthetic subject, not on postgres.
+
+    ---- 1. T-066 P0, and the ROUTE ORDER CHANGED ----
+    ⭐ Route A's ceiling is MEASURED at 23.3% and the gap is 2.22x, so the
+    allowlist cannot finish the job. ⛔ COST ROUTE B FIRST: how many store
+    paths in kdenlive's closure are downstream of qtbase and mesa? That needs
+    only the closure, no rebuild, no AppDir.
+
+    ---- 2. then T-062 (buildx/logx/proc), T-075's two placements, T-057,
+            T-060, T-054, T-051, T-012 ----
 
 ## ⛔ Machine notes (carried forward, re-verify)
 

@@ -4,7 +4,7 @@
 and the entries.
 
     STATE     2026-09-03b
-    COUNTS    48 entries, 16 open, 32 done
+    COUNTS    48 entries, 15 open, 33 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: GREEN before this session; selftests 239 pass, 1 could not
               run (no zstd)
@@ -216,61 +216,156 @@ which described a build where `safe` also swept.
    failed build.
 
 
-## ⭐ Work order
+## ⛔ FOUR DEEP REVIEWS, RUN AT THE OPERATOR'S INSTRUCTION
 
-    ---- glibc's remaining quirks, and future-proofing ----
+⚠ **These were run AFTER the session record above was written, and two of them
+found things that change it.** The order is the four lenses this tree uses:
+does the claim hold when the command is run; what did the change stop
+measuring; what was deferred; and is the code right.
 
-    T-070   ✅ CLOSED. TEN of ten POCs pass at 2.41 through the normal POC
-            path, 73- and 21- re-run, CI green at debian:13 16 of 16.
-    T-068   ✅ CLOSED. 93- green at pass=6 fail=0, and the control it passes
-            read 10, then 1, then 0 as each defect was fixed.
-    T-073   ✅ CLOSED. experiments/94- pass=16 fail=0, 11 of 11 on the bed,
-            with the reversal planted and the exit code read unpiped.
-    T-074   ✅ CLOSED. pgb selftest 312 -> 314 cases; the instrument itself is
-            asserted and the product is byte-identical.
-    T-075   ✅ CLOSED. LD_DEBUG=bindings on 93-'s control. ⚠ Two further
-            placements stay open, each needing ONE measurement first:
-            does LD_DEBUG print anything when ld.so arrives as a library
-            (poc/10-gawk), and is the question worth asking in 62- where
-            classify_trace already answers the load question.
+### Review 1 — does every claim hold when the command is run?
 
-    T-072   ✅ CLOSED. experiments/76- carries the pair now: a 56,248-byte
-            INITIAL-EXEC module refused cleanly at reserve 0 and loaded at
-            65536, 11 of 11, with the reserve arm traced separately for host
-            objects (zero). Size cost 88 bytes -- the reserve is .tbss.
-            ⛔ The premise stays DENTED and recorded: liblsan.so is refused as
-            an interposer before TLS is considered, and zero of 71 PT_TLS
-            objects on this host exhaust the surplus.
+⭐ **Re-run, not re-read.** Every load-bearing number published this session was
+re-derived from the command:
 
-    ---- the bundle, and the one class that is all DATA ----
+| claim | re-run | verdict |
+|---|---|---|
+| T-066 ceiling **229,150,648 B = 218.5 MiB** | three sweeps of the mesa AppDir | ⭐ **reproduces exactly** |
+| `pgb selftest` **371 cases** | `./pgb selftest` | ⭐ 371 pass, 1 could not run |
+| `experiments/76-` `pass=7 fail=0` | re-run after the wrapper change | ⭐ still 7/0 |
+| `experiments/93-` `ok=882 crash=45` | re-run after the loader change | ⭐ identical in every column |
+| ⛔ *"`_dl_mcount_wrapper_check` is not in `libc.a`"* — quoted from a COMMENT | `nm --defined-only libc.a` | ⭐ **0**, and **0** in the generated provider table. The claim was true; it had not been measured by me |
 
-    T-071   ✅ CLOSED. experiments/85- RUN: pass=10 fail=0, and the
-            data-coherence arm's negative control fired. Item 3 is T-066's,
-            item 4's other half is T-059's.
-    T-066   ⚠ P0, STILL OPEN, premise significantly advanced.
-            ⭐ ROUTE A'S CEILING IS MEASURED: `pgb bundle sweep --cut` exists
-            and 218.5 MiB of a 938.8 MiB mesa bundle -- 23.3% -- is reachable
-            ONLY through edges two `-mini` recipes delete, against 6.3% the
-            sweep can prove dead. Subtractive cannot win, now measured on our
-            own bundle.
-            ⛔ WHAT IS LEFT: build the allowlist (bounded by that ceiling),
-            and cost route B. ⚠ The jq headline moved 1.22x -> 1.58x when a
-            stale pre-gating evidence file was re-run; the kdenlive AppDir
-            still does not exist.
+### Review 2 — what did these changes stop measuring?
 
-    ---- then, unchanged in relative order ----
+⛔ **THE REAL GAP, AND IT WAS OPEN WHEN THE SESSION RECORD WAS WRITTEN.** The
+`selfKeys` fix makes `DropUnreachable` delete MORE — versioned libraries it
+previously could never drop. ⚠ **`experiments/89-`, whose entire stated purpose
+is *"debloating, and the control that says nothing was lost"*, had not been
+run.** It has now:
 
-    T-063   the miniflux proof: arm S has a static postgres on Alpine;
-            src/interfaces does not build
-    T-062   ⭐ `verifyx` (29 cases) and `fail` (16) now have one too;
-            selftests went 307 -> 359. THREE packages left: buildx, logx,
-            proc. verifyx was the one that mattered -- pgb verify decides
-            criterion 2 from four pure functions and nothing asserted them.
-            The control is the historical `.so` substring defect, planted:
-            3 of 343 cases fail.
+    pass=10 fail=0 skip=0
+    ok  debloated arm AGREES with the undebloated one          = 11
+    ok  the AGGRESSIVE arm agrees too, on this OpenGL subject   = 11
+    ok  debloated arm loaded no host shared object             = 11
+
+⭐ **The control holds.** ⚠ And 89-'s own caveat now covers more ground than it
+did: the aggressive arm agrees **on an OpenGL subject**, and says nothing about
+a Vulkan application. My change widened what aggressive deletes, so that
+caveat is worth more than it was.
+
+⚠ **AND A CONTROL WAS WEAKENED, WHICH NOTHING WILL REPORT.**
+`sonamesMentionedNaive` is the oracle the fast soname scan is compared against.
+I applied the `selfKeys` fix to **both**, so they still agree exactly — but they
+now **share** the helper, and the equivalence assertion can no longer catch a
+defect inside `selfKeys` itself. ⛔ That is a real reduction in what
+`bundle-soname-scan` proves, and it is recorded here rather than left to be
+discovered.
+
+⛔ **AND THE POCs WERE NOT RUN.** The wrapper's link path changed — every
+`pgb build` link now scans its `.a`/`.o` inputs — and the ten POCs are this
+project's acceptance harness. `experiments/76-` covers the loader; **nothing
+covers the wrapper change against a real project build.** Five link shapes were
+checked by hand (C+C++ archive, that plus an explicit `-lstdc++`, a bare C++
+`.o`, a `c++` driver link, a plain C link) and `libc.a` — the biggest archive in
+the toolchain — correctly reports no C++ demand. ⚠ **That is not the same as
+ten real projects on eleven environments.**
+
+### Review 3 — what was deferred, named plainly
+
+1. ⛔ **The POC suite, after a change to the link hot path.** Above.
+2. ⚠ **T-075's other two placements.** `LD_DEBUG=bindings` went into 93-'s
+   control; `poc/10-gawk` and `experiments/62-` were left, each needing one
+   measurement first. The operator's item 4 named three places and one was done.
+3. ⚠ **T-066's fixpoint lever.** The soname scan counts mentions from EVERY
+   object including unreachable ones, so an unreachable `libicui18n` keeps
+   `libicuuc` alive. Named, not taken.
+4. ⚠ **T-063 arm S was never re-run** with `--without-icu` removed, so the C++
+   fix is proved on a synthetic subject and not on postgres.
+5. ⚠ **kdenlive untouched**, and the same-day `safe` vs `aggressive` timing
+   comparison is still owed.
+
+### Review 4 — is the code right, and what does the record say about it?
+
+⭐ **The link change was checked in five shapes** and the loader change in three
+experiments. ⛔ **But the review found a record defect on the most load-bearing
+page in the tree:**
+
+⛔ **`T-033` IS STILL `open` AND IT DESCRIBES WORK THAT IS DONE.** T-033 is
+*"route D: compile an ELF loader in, resolve against our own static glibc"* —
+which is exactly what **T-064** did and closed, 11 of 11, and what
+`docs/AGENTS.md` §13 records as closed. Two entries, one route, one of them
+stale.
+
+⛔ **AND `docs/REQUIREMENTS.md` — the operator's binding acceptance bar —
+points its ONE remaining unmet issue at T-033**, in a sentence that does not
+mention that `pgb build --host-dlopen` exists, ships, and is measured on eleven
+environments. A reader of the bar cannot tell that the mechanism was built.
+
+⚠ **The row is NOT closed and must not be marked so** — REQUIREMENTS' own text
+forbids softening it, and the measurement does not support closing it: a host
+`.so` loads on **7 of 7 glibc rows** and is **refused on all four musl rows**,
+and **882 of 1,527** host objects load on the build host. The issue *"dlopen of
+a host `.so` is host-dependent"* is **substantially served and still
+host-dependent**. ⭐ What is wrong is the POINTER and the omission, and fixing
+those is a status move backed by a measurement, which is the one edit that page
+permits.
+
+## ⭐ Work order — ⛔ REPRIORITISED 2026-09-03 BY THE FOUR REVIEWS
+
+⛔ **THE ORDERING CHANGED, AND A MEASUREMENT CHANGED IT.** The previous order
+put *"build the allowlist"* at the top of T-066. ⭐ **Route A's ceiling is now
+measured at 23.3% of a bundle's library tree, and the gap to close is 2.2×.**
+An allowlist cannot get there — so the next T-066 step is not the allowlist, it
+is **costing route B**, which is where the size actually is.
+
+    ---- 0. ⛔ THE DEBT THIS SESSION TOOK ON. Do these FIRST. ----
+
+    R1  ⛔ RUN THE TEN POCs. The wrapper's link hot path changed (every link
+        now scans its .a/.o inputs) and the POC suite is this project's
+        acceptance harness. Five link shapes were checked by hand; that is
+        not ten real projects on eleven environments.
+          for p in poc/*/run.sh; do sh "$p" > /tmp/$(basename $(dirname $p)).log 2>&1; done
+        ⚠ Budget ~30 min for the first (OpenSSL + CPython build).
+    R2  ⚠ RESTORE WHAT `bundle-soname-scan` PROVED. The fast scan and its
+        naive oracle now SHARE selfKeys(), so their equivalence can no longer
+        catch a defect inside it. Either give the oracle its own
+        implementation of the self-set, or add cases that pin selfKeys()
+        directly against a fixture with a SONAME symlink.
+    R3  ⚠ T-063 arm S with `--without-icu` REMOVED. The C++-archive fix is
+        proved on a synthetic subject; postgres is the real one.
+
+    ---- 1. T-066 P0, and the route order is now ARGUED rather than assumed ----
+
+    ⭐ The ceiling says an allowlist tops out around a quarter of the tree:
+
+        the sweep can PROVE dead                      6.3%
+        two `-mini` rebuild edges are worth          23.3%   (218.5 MiB)
+        the gap to the field on kdenlive             2.22x
+
+    B1  ⛔ COST ROUTE B FIRST, because the ceiling says A cannot finish the
+        job. The first measurement is cheap and needs no rebuild: how many
+        store paths in kdenlive's closure are DOWNSTREAM of qtbase and mesa?
+        That number is what a `-mini` derivation forces from source, and it
+        is the whole argument against route B.
+    B2  ⭐ THEN the allowlist, now bounded and worth building anyway.
+    B3  ⚠ The fixpoint lever, named and not taken: the soname string scan
+        counts mentions from EVERY object including unreachable ones, so an
+        unreachable libicui18n keeps libicuuc alive. It is a real lever AND a
+        real safety question -- 89- is the control it would have to pass.
+    B4  ⚠ A kdenlive AppDir does not exist. B1 needs only the closure.
+
+    ---- 2. then, by how foundational they are ----
+
+    T-062   THREE packages left: buildx, logx, proc. buildx shells out to a
+            bed -- carry its parsing, not its run.
+    T-075   the two LD_DEBUG placements left, each needing ONE measurement
+            first: does LD_DEBUG print anything when ld.so arrives as a
+            LIBRARY (poc/10-gawk), and is the question worth asking in 62-
+            where classify_trace already answers the load question.
+    T-057   item 2: a 32-bit application through the lib32 path
     T-060   rungs 2 and 3, the static nix
     T-054   rungs 3 (KF6) and 4 (kdenlive static)
-    T-057   item 2: a 32-bit application through the lib32 path
     T-051   the no-compiler host
     T-012   pgb build <url-or-package>
     then    P2 by category
@@ -284,9 +379,9 @@ one clear fix inside T-063 arm S:
                                     rc=1) -- and AC_SEARCH_LIBS -lreadline is
                                     absence: libncursesw.a is never on the
                                     probe's line. ⭐ The real fix is the SAME
-                                    SHAPE as the C++ one just landed: read the
-                                    archives' undefined symbols and append
-                                    what defines them. Not built.
+                                    SHAPE as the C++ one landed this session:
+                                    read the archives' undefined symbols and
+                                    append what defines them. Not built.
     a C link that pulled a C++      ✅ FIXED 2026-09-03. elfx.NeedsCXXRuntime
     archive                         reads the link line's archives for an
                                     UNDEFINED operator new/delete or an
@@ -294,8 +389,7 @@ one clear fix inside T-063 arm S:
                                     -lstdc++ -lm after the link flags. Fails
                                     before, passes after; carried as
                                     `cxx-runtime` with a negative control.
-                                    ⚠ It does not by itself build postgres
-                                    with ICU -- it removes the named blocker.
+                                    ⚠ Proved on a synthetic subject -- R3.
 
 ## Open questions for the operator
 

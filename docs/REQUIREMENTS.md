@@ -75,7 +75,7 @@ parts, and **both** are required:
    | C++ unwinding | no `PT_GNU_EH_FRAME` on any static link | ✅ **closed** — T-018 |
    | CA bundle | no compiled-in trust store; one path works on 5 of 11 | ✅ **closed** — opt-in `--embed-cacert`; POC 30 verifies real TLS on **11/11** with the harness's own CA variables unset. T-032 |
    | terminfo | host terminal database | ✅ **closed** — opt-in `--embed-terminfo`; POC 20's `setupterm(xterm-256color)` succeeds on **11/11** with `TERMINFO`/`TERMINFO_DIRS` unset. T-032 |
-   | **host plugins** | `dlopen` of a host `.so` is host-dependent | ⛔ **open** — T-033, and see part 1. ⭐ **The last one.** |
+   | **host plugins** | `dlopen` of a host `.so` is host-dependent | ⛔ **open, and now SERVED BY A SHIPPED MECHANISM rather than untouched** — `pgb build --host-dlopen`, T-064 ✅, T-068 ✅. A `.so` built by the pinned glibc loads on **11 of 11** with zero host objects; a **real host** `.so` loads on **7 of 7 glibc rows** and is refused by name on **4 of 4 musl rows**; **882 of 1,527** host objects on the build host load. ⛔ It stays OPEN because the row says *host-dependent* and it still is. ⭐ **The last one.** |
 
    ⚠ **The old text of this part is not deleted, it is superseded**, and the
    measurement it asked for was carried out: `experiments/60-`, `61-` and
@@ -106,7 +106,7 @@ rather than as unmeasured gaps.
 
 | part | state | why |
 |---|---|---|
-| **1. No known environment where it fails** | ⛔ **not met** | One measured, unfixed failure, and it is now the **only** one: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ **Four** routes to it, none exhausted — `AGENTS.md` §7. Route D is best-evidenced: `experiments/73-` measures 90.8%–99.3% of every glibc-versioned import of 6,007 real host shared objects as already definable by the pinned static glibc, with **zero** unexplained residue. T-033. ⭐ The two host **data** dependencies that used to sit on this row, terminfo and the TLS CA bundle, are **closed** as of 2026-09-01d. |
+| **1. No known environment where it fails** | ⛔ **not met** | One measured failure, and it is now the **only** one: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ **Route D was TAKEN and it SHIPPED** — `pgb build --host-dlopen`, an ELF loader compiled in (**T-064 ✅**, residue **T-068 ✅**), 11 of 11 carried with zero host objects and a real host `.so` on 7 of 7 glibc rows. ⚠ **Corrected 2026-09-03**: this cell used to point at **T-033**, an entry still marked open that describes the same route T-064 completed, and it named no shipped mechanism at all — so the bar read as though nothing had been built. ⛔ It remains not-met because the failure is *host-dependence*, and that persists: the four musl rows refuse a host object by design, and 645 of 1,527 host objects on the build host do not load (**374 of which glibc's own `ld.so` also fails** — plugins of a host program). |
 | **2. A static glibc binary with none of the issues** | ⛔ **not met, and now countable** | ⭐ **Eight of nine** enumerated issues are closed on all eleven environments — it was six of nine before 2026-09-01d. **One** is open: host plugins. The table above is the whole of it; there is no unenumerated remainder, so the distance to the bar is one named problem with four untried routes rather than an unknown quantity. |
 
 ### The head-to-head, which is now evidence rather than the test
@@ -149,7 +149,10 @@ is work, not a verdict — `AGENTS.md` §7 now has **four** routes, and
 **What would move part 2 to met**, under the amended text: the open rows of the
 issues table close, each on all eleven environments with the measurement
 recorded. ⭐ **T-032 closed two of them on 2026-09-01d** — the CA bundle and
-terminfo — so **one** row is left: **T-033, host plugins**.
+terminfo — so **one** row is left: **host plugins**, owned by T-064 (closed,
+the mechanism) with its residue in T-068 (closed) — ⚠ **not T-033, which this
+page pointed at until 2026-09-03 and which is a stale duplicate of the route
+T-064 took**.
 ⛔ **Eight of nine are closed and one is not, so this is a countable deficit
 and not a judgement.** Do not soften the one that remains: it is the hardest
 of the nine, and being last does not make it small.
