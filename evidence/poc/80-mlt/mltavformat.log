@@ -4,7 +4,7 @@
 /usr/bin/ld: /var/tmp/pgb-poc/80-kdenlive/inst/lib/libavcodec.a(cavsdsp.o): relocation R_X86_64_PC32 against symbol `ff_pw_5' can not be used when making a shared object; recompile with -fPIC
 /usr/bin/ld: final link failed: bad value
 collect2: error: ld returned 1 exit status
-make[3]: *** [src/modules/avformat/CMakeFiles/mltavformat.dir/build.make:298: out/lib/mlt/libmltavformat.so] Error 1
-make[2]: *** [CMakeFiles/Makefile2:500: src/modules/avformat/CMakeFiles/mltavformat.dir/all] Error 2
-make[1]: *** [CMakeFiles/Makefile2:507: src/modules/avformat/CMakeFiles/mltavformat.dir/rule] Error 2
+make[3]: *** [src/modules/avformat/CMakeFiles/mltavformat.dir/build.make:302: out/lib/mlt/libmltavformat.so] Error 1
+make[2]: *** [CMakeFiles/Makefile2:608: src/modules/avformat/CMakeFiles/mltavformat.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:615: src/modules/avformat/CMakeFiles/mltavformat.dir/rule] Error 2
 make: *** [Makefile:260: mltavformat] Error 2

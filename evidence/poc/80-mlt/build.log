@@ -3371,3 +3371,118 @@ INSTALL	libavutil/video_hint.h
 INSTALL	libavutil/avconfig.h
 INSTALL	libavutil/ffversion.h
 INSTALL	libavutil/libavutil.pc
+-- The C compiler identification is GNU 14.2.0
+-- The CXX compiler identification is GNU 14.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /root/.local/state/pgb/bin-348208858/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /root/.local/state/pgb/bin-348208858/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Found PkgConfig: /usr/bin/pkg-config (found version "1.8.1")
+-- Checking for module 'sdl2'
+--   Package 'sdl2', required by 'virtual:world', not found
+-- Checking for module 'fftw3'
+--   Package 'fftw3', required by 'virtual:world', not found
+-- Checking for module 'fftw'
+--   Package 'fftw', required by 'virtual:world', not found
+-- Checking for module 'libxml-2.0'
+--   Package 'libxml-2.0', required by 'virtual:world', not found
+-- Checking for module 'libavformat'
+--   Found libavformat, version 61.7.100
+-- Checking for module 'libswscale'
+--   Found libswscale, version 8.3.100
+-- Checking for module 'libavutil'
+--   Found libavutil, version 59.39.100
+-- Checking for module 'libavcodec'
+--   Found libavcodec, version 61.19.100
+-- Checking for module 'libavfilter'
+--   Found libavfilter, version 10.4.100
+-- Checking for module 'libavdevice'
+--   Found libavdevice, version 61.3.100
+-- Checking for module 'libswresample'
+--   Found libswresample, version 5.3.100
+-- Checking for module 'lilv-0'
+--   Package 'lilv-0', required by 'virtual:world', not found
+-- Checking for module 'libebur128'
+--   Package 'libebur128', required by 'virtual:world', not found
+-- Checking for module 'spatialaudio'
+--   Package 'spatialaudio', required by 'virtual:world', not found
+-- Checking for module 'vorbis'
+--   Package 'vorbis', required by 'virtual:world', not found
+-- Checking for module 'vorbisfile'
+--   Package 'vorbisfile', required by 'virtual:world', not found
+-- Could NOT find SWIG (missing: SWIG_EXECUTABLE SWIG_DIR) 
+-- Could NOT find ClangFormat (missing: CLANGFORMAT_EXECUTABLE CLANGFORMAT_VERSION) (Required is exact version "14")
+-- The following features have been enabled:
+
+ * GPLv2
+ * GPLv3
+ * Module: avformat
+ * Module: Kdenlive
+ * Module: Normalize
+ * Module: Oldfilm
+ * Module: Plus
+ * Module: PlusGPL
+ * Module: XINE
+ * vst2: VST2 Plugins support
+
+-- The following REQUIRED packages have been found:
+
+ * Threads
+ * PkgConfig
+
+-- The following features have been disabled:
+
+ * Tests
+ * Doxygen
+ * Clang Format
+ * Module: DeckLink
+ * Module: Frei0r
+ * Module: GDK
+ * Module: Glaxnimate (Qt5)
+ * Module: Glaxnimate (Qt6)
+ * Module: JACKRack
+ * Module: NDI
+ * Module: OpenCV
+ * Module: Movit
+ * Module: Qt (Qt5)
+ * Module: Qt6
+ * Module: Resample
+ * Module: RtAudio
+ * Module: Rubberband
+ * Module: SDL1
+ * Module: SDL2
+ * Module: SoX
+ * Module: SpatialAudio
+ * Module: vid.stab
+ * Module: Vorbis
+ * Module: XML
+ * SWIG: C#
+ * SWIG: Java
+ * SWIG: Lua
+ * SWIG: Node.js
+ * SWIG: Perl
+ * SWIG: PHP
+ * SWIG: Python
+ * SWIG: Ruby
+ * SWIG: Tcl
+ * lv2: LV2 Plugins support
+
+-- The following OPTIONAL packages have not been found:
+
+ * SWIG
+ * ClangFormat (required version == 14)
+
+-- Configuring done (1.6s)
+-- Generating done (0.1s)
+-- Build files have been written to: /var/tmp/pgb-poc/80-kdenlive/mlt/build
+/usr/bin/ld: /root/.local/state/pgb/runtime-x86_64-2218441320/pgb-dl-4-1-consumer_cbrts.c.o: in function `consumer_start':
+consumer_cbrts.c:(.text+0xb26): warning: Using 'getaddrinfo' in statically linked applications requires at runtime the shared libraries from the glibc version used for linking

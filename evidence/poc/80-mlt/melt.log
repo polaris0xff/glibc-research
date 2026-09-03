@@ -2,7 +2,7 @@
 [ 94%] Linking C executable ../../out/bin/melt
 /usr/bin/ld: attempted static link of dynamic object `../../out/lib/libmlt-7.so.7.30.0'
 collect2: error: ld returned 1 exit status
-make[3]: *** [src/melt/CMakeFiles/melt.dir/build.make:114: out/bin/melt] Error 1
-make[2]: *** [CMakeFiles/Makefile2:370: src/melt/CMakeFiles/melt.dir/all] Error 2
-make[1]: *** [CMakeFiles/Makefile2:377: src/melt/CMakeFiles/melt.dir/rule] Error 2
+make[3]: *** [src/melt/CMakeFiles/melt.dir/build.make:118: out/bin/melt] Error 1
+make[2]: *** [CMakeFiles/Makefile2:448: src/melt/CMakeFiles/melt.dir/all] Error 2
+make[1]: *** [CMakeFiles/Makefile2:455: src/melt/CMakeFiles/melt.dir/rule] Error 2
 make: *** [Makefile:195: melt] Error 2

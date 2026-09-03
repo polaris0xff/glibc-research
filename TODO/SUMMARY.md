@@ -1,123 +1,119 @@
-# SUMMARY.md — the session of 2026-09-02d
+# SUMMARY.md — the session of 2026-09-02f / 2026-09-03
 
 ⛔ **Overwritten every session.** The history is the git log.
 
-⭐ **The headline: kdenlive is validated, five runs after it was first asked
-for, and the three sweep fixes that had never been exercised now have their
-measurement.** Everything else in this session came out of getting there.
+⭐ **The headline: the glibc pin moved, and moving it turned over four real
+loader defects.** Host shared objects that `--host-dlopen` can load went
+**406 → 882 of 1,527** on one machine, one population, five builds — and the
+assertion that was supposed to catch two of those defects had been passing at
+zero *because of* a third.
 
 ## Before and after
 
 | | at start | at end |
 |---|---|---|
-| **kdenlive rendering** | ⛔ `ours rendered on 0 of 11`, four runs, four different causes | ⭐ **11 of 11, twice** — at `safe` and at `aggressive` |
-| **the three sweep fixes** | committed, **never exercised end to end** | ⭐ **proved**: 1,712 objects and 227.4 MiB deleted, and `melt` still rendered 4,149 bytes |
-| **the kdenlive size figure** | 1.39×, quoted from a bundle that **did not render** | ⭐ **2.45× at `safe`, 2.22× at `aggressive`**, both from runs that rendered |
-| **the artefact cache** | keyed on the bundler's mtime only | ⭐ keyed on the **build options** too — it caught its own case on the next run |
-| **the soname scan** | ⛔ quadratic: **838 s** on the real kdenlive AppDir | ⭐ **7.07 s — 118×**, and the two outputs are **byte-for-byte identical** on 1,633 real libraries |
-| **the glibc pin** | ⛔ 2.36, a floor set two releases above its own floor, ceiling widening yearly | ⭐ **three of four costs measured at zero**; the move is *indicated*, `cfg.go` untouched |
-| **class B** | 20 distinct symbols, 14 at `GLIBC_2.38` | ⭐ **5 at glibc 2.41**, all on the one rolling distribution |
-| **class C (what a move COSTS)** | unknown | ⭐ **empty on all 11 rows at both pins** |
-| **the manifest rewrite** | ⛔ half-fixed: the sweep knew 5 globs, the rewrite 3 | ⭐ one list, and a **build-time check that reads DATA**, passing on the real bundle |
-| **`__EGL_VENDOR_LIBRARY_FILENAMES`** | ⛔ never set; a host value silently wins | ⭐ set from the bundle's own vendors, released under `PGB_HOST_MESA` |
-| **T-068's 904-object sweep** | ⛔ ad-hoc, never committed, quoted in four places | ⭐ `experiments/93-`, written and its probe verified; **not yet run** |
-| **selftests** | 138 pass | **200 pass**, 1 could not run (no zstd) |
-| **Entries** | 45 / 20 open / 25 done | 45 / 20 open / 25 done |
+| **the glibc pin** | ⛔ 2.36, "the move is *indicated*, `cfg.go` untouched" | ⭐ **2.41, landed**, gcc 14.2.0, and **CI green at it, 16 of 16, on all eleven** |
+| **copies of the pin in code** | ⛔ **nine** of the name, **two** of the digest — one an `env.BUILD_IMAGE` nothing had ever read | ⭐ **three constants in `cfg.go`**, and `TODO/check.sh` fails on a copy |
+| **host objects `--host-dlopen` loads** | 406 of 1,527 | ⭐ **882** |
+| **`experiments/93-`'s own control** | `DIFFER = 0` | ⭐ **`DIFFER = 0`, and this one is earned** — it read 10, then 1, then 0 as defects were fixed |
+| **the residue that is actually ours** | ⛔ "86 of 904", from a sweep nobody committed | ⭐ **257 objects, SIX symbols; 254 of them load** |
+| **`libLLVM`** | ⛔ "dies in its 605th static constructor for a reason nobody has found" | ⭐ **loads** |
+| **`experiments/21-`** | labels typed as `"2.31"`/`"2.36"` | ⭐ a **third arm that follows `cfg.go`**, every label read from the environment |
+| **a POC's `RESULT.txt`** | said nothing about what built it | ⭐ environment, image, digest, gcc, glibc — and the binary's `.comment` **asserted** against it |
+| **`pgb selftest`** | 200 cases | ⭐ **307**, `wrapper` and `cfg` new |
+| **CI** | green | ⛔ **red for seven pushes**, then green — on a gate that passed here and failed there |
+| **Entries** | 45 / 20 open / 25 done | ⭐ **45 / 18 open / 27 done** — T-068 and T-071 closed |
 
 ## What was actually settled
 
 | | | |
 |---|---|---|
-| **T-055 / goal 3** | ⭐ **the comparison exists and is honest** | ours renders on 11 of 11 with **zero host shared objects**; the competitor renders on 11 of 11 with **4 of 11 clean**. ⛔ **The operator's bar — smaller, loads faster, runs faster — is NOT met**: 2.22× the size, and the timing columns of the run that would have settled them are contaminated |
-| **T-070** | ⚠ **advanced, open** | kernel floor unchanged (3.2.0 → 3.2.0 at glibc 2.41, two instruments); class B 20 → 5; class C empty at both pins; NSS floor holds with its below-floor control firing. ⛔ The ten POCs at 2.41 are the one row left |
-| **T-071** | ⚠ **advanced, open** | items 1, 2 and 5 done. Items 3 and 4 remain, and 4's untestable half is T-059's |
-| **T-066** | ⚠ **advanced, open** | ⭐ **the gap is the direction the pipeline runs in** — theirs is additive from an allowlist, ours subtractive from a closure — and deletion is worth **~1/8** on the packed artefact (7.5 : 1, corroborated two ways) |
-| **T-072** | ⚠ **advanced, open** | route B **refuted** by measurement, route D opened and costed, neither implemented |
-| **T-068** | ⚠ **advanced, open** | the harness exists; the sweep it was built on turned out to be unreproducible |
+| **T-070** | ⚠ **advanced, one row left** | the pin is `debian:13`/2.41. `73-` re-run independently reproduced the prediction, `21-` re-run with a pin-following arm, **nine of ten POCs** re-run through the normal path, CI green. ⛔ 80-mlt is the tenth and was still running at session end |
+| **T-068** | ✅ **CLOSED** | 93- green at `pass=6 fail=0`, with the arc that earned the zero |
+| **T-071** | ✅ **CLOSED** | 85- run at last — the data-coherence arm's negative control fired on a real bundle |
+| **T-072** | ⚠ **advanced, and its premise is dented** | the object it was opened on, `liblsan.so`, is refused as a **sanitizer interposer** before TLS is considered. Zero of 71 `PT_TLS` objects want more than the surplus |
+| **T-062** | ⚠ **advanced** | `wrapper` (55 cases) and `cfg` (37). Five packages left |
 
 ## ⛔ Findings, and not one came from reading code
 
-1. ⛔ **The artefact cache ignored the build options.** It rebuilt when the
-   *bundler* changed and not when the *invocation* did, and nothing in the
-   cache path mentions one — so the `aggressive` run would have re-measured the
-   `safe` bytes, silently, to the digit. That is run 2's defect in a new
-   costume. Found by asking what the next run would actually do.
-2. ⛔ **The soname scan was quadratic.** Found by watching `/proc/<pid>/io`
-   while it ran: `rchar` advancing 14 MiB per 5 s at 101% CPU.
-3. ⛔ **`__EGL_VENDOR_LIBRARY_FILENAMES` replaces `_DIRS` rather than adding to
-   it**, and setting it *empty* would leave the bundle with no EGL at all.
-   Found by reading libglvnd's own `LoadVendors()` instead of guessing.
-4. ⛔ **The pinned digest is the per-platform manifest digest, not the OCI index
-   digest**, and `docker pull` records the latter. Found by a control that
-   required the method to reproduce a digest this tree already pins.
-5. ⛔ **A registry 429 was being reported as "unresolved"** — indistinguishable
-   in the table from a tag that does not exist.
-6. ⛔ **My own NSS measurement printed `none` for every arm from an empty
-   pipeline**, because of an unquoted shell variable. Caught because
-   `experiments/21-` supplies an arm that must fail, and it fires.
-7. ⛔ **I contaminated run 6's clock** by running builds and selftests during a
-   wall-clock arm. Caught because the *competitor's fixed artefact* moved 6.7×.
-8. ⛔ **`_dl_tls_static_size` was being quoted as the static TLS surplus** in
-   four places. It includes the program's own `PT_TLS`, so it moves with the
-   binary — implying, backwards, that a bigger binary has more room.
-9. ⛔ **T-068's 904-object sweep was never committed**, so the entry's own
-   Prove could not be carried out.
-10. ⛔ **A `while read` loop whose child reads stdin truncates itself** —
-    demonstrated at 1 of 5 rather than asserted.
+1. ⛔ **`main` came up 18 commits behind** and `git switch` said *"up to date"* —
+   shallow clone, before the fetch.
+2. ⛔ **The record was 12 commits stale.** `TODO/runtime.md` said *"93- has not
+   been RUN yet"* twelve commits after it was run twice.
+3. ⛔ **`--host-dlopen` could not load anything using iconv.** The provider
+   table's **weak** `extern char iconv_open[]` was rewritten by `--wrap` to a
+   name no archive member was pulled for. Found by running **real host
+   objects**, which is what T-072's Prove asked for.
+4. ⛔ **A general-dynamic TLS pair's two halves searched different sets of
+   objects**, so a cross-module thread-local bound to *(right module, offset
+   0)* — one module writing into another's thread storage. Found by a SIGSEGV
+   handler, because `rip=0` names nothing.
+5. ⛔ **Defect 3 was HIDING defect 4.** Ten objects the control should have
+   caught were failing earlier, on iconv.
+6. ⛔ **The symbol lookup stopped at the first NAME match** and checked the
+   version after. A versioned table holds several entries per name.
+7. ⛔ **`_dl_mcount_wrapper_check` is in `libc.so.6` and not in `libc.a`** —
+   247 objects, refused for want of a symbol whose right implementation is to
+   do nothing.
+8. ⛔ **"Failed on 631 objects" was not a defect count.** glibc's own `ld.so`
+   fails **374** of them: plugins of a host *program*.
+9. ⛔ **CI was red for seven pushes** on a gate that asked the **disk** where
+   CI asks a fresh clone.
+10. ⛔ **`pgb rootfs run` mounts a tmpfs over `/tmp`** — a probe copied there
+    from outside is not there inside.
+11. ⛔ **A `$?` after a pipeline is the pipeline's status.** A sweep reported
+    `ok=1527 fail=0 crash=0` over a population containing 96 non-ELF files.
+12. ⛔ **`chmod 000` is not a control when you are root.**
+13. ⛔ **`docs/research/solo.md`'s "5,807 objects" disagreed with the table
+    printed beneath it**, by 200 — and its range missed its own maximum.
 
-## The review, three lenses, three distinct findings
+## The three deep reviews, three distinct findings
 
 ⭐ `docs/methodology/reviews.md`: *"A pass that reports nothing means that pass
-was too shallow."* Each pass names what it looked at that the others did not.
+was too shallow."*
 
-**1. The door sweep — "what other door reaches this code?"** `codegraph
-callers` on all six changed functions. ⚠ **Finding:** `rewriteManifestPaths` is
-reachable only through `desktopAndIcon` — a method named for something else —
-so the coupling is invisible to a reader. Verified it survives the gate that
-matters: `desktopAndIcon` is unconditional (`appimage.go:165`) while
-`debloat()` is skipped at `--debloat none`, so the rewrite still runs there,
-and `manifestIntegrity()` is unconditional too.
+**1. The door sweep — "what other door reaches this code?"** Ten call sites
+reach `el_lookup_in`; I had enumerated three. ⛔ **Finding: `el_defver()` and
+`el_refver()` read `o->versym[si]` with no bounds check.** `versym` is a
+*separate array* from `symtab`, and the walk only validates `symtab`. It was
+one call after the loop before; my own fix moved it **inside** the walk and
+multiplied it. Both guarded now.
 
-**2. The guard mutation — "can my new guard actually fail?"** ⛔ **The biggest
-finding of the session, and it was in my own new guard.** A whole-token-match
-regression was planted in the fast soname scan — `strings.Contains(r, n)`
-replaced with `n == r`, a genuinely different rule — and
-`bundle-soname-scan` **passed all seven cases**, including the one named *"a
-soname with name bytes either side is found"*.
+**2. The guard mutation — "can my new guard actually fail?"** ⛔ **Finding: my
+own measurement is thinner than my own fix.** Two mutations:
 
-⭐ **Why:** that fixture padded the needle with `xx`/`yy`, and **no needle in
-the fixture contains `x` or `y`**, so those bytes were not in the derived
-alphabet and acted as *separators*. The fast path never saw an adjacency case
-at all; it saw a bare `libtight.so`, and both implementations agreed by
-coincidence. ⚠ Exactly reviews.md's named shape: *a test whose name claims more
-than it checks*. Padding changed to `aa`/`bb`; with the same mutation planted
-the selftest now fails **2 of 7**, and reverting it returns 7 of 7.
+    el_accept ignores the version entirely   the motivating objects STILL LOAD
+    drop the unversioned fallback            254 of 257 -- IDENTICAL
+
+The version rule has three branches and this host's 1,527 objects exercise
+**one**. *A wrong version is never returned* holds by construction and is
+asserted by nothing. ⭐ Recorded rather than rounded up to "validated"; a
+synthetic versioned fixture would close it and is not written.
 
 **3. The claim audit — "which sentence is not backed by an artefact?"**
-⛔ **Two findings.** The AppDir-to-artefact ratio was published as "about a
-sixth" from a 250 MiB delta that **omitted `aggressive`'s extra Vulkan rules**;
-the delta is **319.6 MiB** and the ratio **7.5 : 1**, corroborated by summing
-the individual rules (91.1 MiB against 92.2 implied). The conclusion held, the
-denominator did not. ⛔ And the numbers behind it print to
-`evidence/*/build/build-ours.log`, which **`.gitignore:15` excludes** — so run
-5's copy is already gone and its `2.53 GiB → 2.16 GiB` is cited from a
-transcript rather than the tree. Run 6's is preserved as
-`run6-build-summary.txt`.
+⛔ **Finding: three documents quoted `ok=628` and `631 undefined` after the tree
+had moved to `882` and `376`.** `AGENTS.md` §7, `limitations.md` and
+`runtime.md`, all written a few commits before the last two fixes. ⚠ **No gate
+catches this and none can** — `check-docs.sh` asserts that a cited *path*
+exists, not that a quoted *number* is current. Corrected against the evidence
+file.
+
+⭐ **And a fourth, from the same lens applied to my own checks:** the `cfg`
+suite's container-argument case iterated `OptVars` and asked whether each was
+rendered — which `ContainerEnvArgs` also iterates. It was **theatre**, and
+dropping a variable from `OptVars` left it green. The binding direction has to
+be **derived**: diff the environment across `Export()`.
 
 ## ⛔ What the next session must not read as settled
 
-- **The operator's bar for kdenlive is not met**, and the run that would give
-  a same-day `safe` vs `aggressive` timing comparison has not been done.
-- **The pin has not moved.** `cfg.go` is untouched and the POC row is open.
-- **`experiments/91-`, `93-` and `85-`'s new arm are written and NOT RUN.**
-
-## ⭐ The loose end closed after the summary was first written
-
-    pgb bundle sweep <kdenlive AppDir> --env .env --list
-      naive   838 s     exit 0, 47 lines
-      fast      7.07 s  exit 0, 47 lines
-      diff    IDENTICAL
-
-⭐ **118×, with identical output on a real bundle** — 1,633 libraries, 1.49
-GiB, 2,586 roots — which is the control the fixture selftest cannot be.
-⚠ The naive arm carried concurrent load, so "about 100×" is the honest claim.
+- ⛔ **`poc/80-mlt` at glibc 2.41 was still running at session end** and is not
+  committed. It is the tenth POC and the last row of T-070.
+- ⛔ **The version-matching fix is under-measured** — see review 2.
+- ⛔ **`--tls-reserve`'s measured benefit on real host objects is zero
+  objects.** The mechanism is sound; its justification is not.
+- ⛔ **The operator's bar for kdenlive is still NOT met** (2.22× the size), and
+  a same-day `safe` vs `aggressive` timing comparison is still owed.
+- ⚠ **Three host objects still do not load**, each for its own reason:
+  `libnsl.so.1` (class S, sunrpc), `libmvec.so.1` (class A, `_rtld_global_ro`),
+  `libcuilo.so` (`more than 64 objects loaded` — a limit of this loader's
+  object table).
