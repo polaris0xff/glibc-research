@@ -120,7 +120,22 @@ another millisecond.
               Display"* (ghostty, citing NixOS/nixpkgs#9415). 13 of 16 are
               ACTIVE including chromium, brave, discord, telegram — so the
               baseline to beat is higher than "nix cannot do GUI".
-              📚 [`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md) §8.
+              ⛔ **AND THE FIELD'S GRADES ARE NOT OUR GRADES — OPERATOR,
+              2026-09-03d.** `HALL-OF-FAME.md`'s verdicts are subjective and
+              were earned deploying ARCH PACKAGES through quick-sharun, where
+              paths and plugin dirs must be discovered by hand. A nix closure
+              is the opposite. The operator's counter-example: *"in
+              nixappimage for instance, python is easy and works, choose any
+              python gui app and it works"* — against a **"Utter garbage"**
+              grade. ⛔ Re-derive every row against `pgb bundle appimage`
+              before quoting any of it.
+              ⭐ **AND THE GOAL IS TO MOVE THEM**: every "Garbage",
+              "Horrible" and "Utter garbage" row — GTK, Wayland, Python,
+              glibc, WebKit, p11kit, JACK2 — should come out **Excellent or
+              close** through a nix closure, or this project must name the
+              exact mechanism that stops it.
+              📚 [`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md),
+              [`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md) §8.
         G2.2  ⛔ THE DEBLOATER/PATCHER COVERS EVERY CASE — shebang lines,
               hardcoded paths, `.desktop` files, anything else in a bundle.
               ⭐ **The corpus is mined and read** (`nix-bundle-patching.md`):

@@ -22,6 +22,27 @@ useful document in the corpus for G2.1**, because it separates *"this library
 is hard to deploy"* from *"this cannot be deployed"* — and almost nothing is
 in the second category.
 
+⛔ **BUT EVERY VERDICT BELOW IS SUBJECTIVE AND IS ABOUT A DIFFERENT PIPELINE.
+DO NOT CARRY ANY OF IT ACROSS WITHOUT RE-DERIVING IT AGAINST nixappimage.**
+These grades were earned deploying **distribution packages** — Arch, through
+`quick-sharun` — where the deployer has to discover a library's data files,
+plugin directories and search paths by hand. ⭐ **A nix closure is the
+opposite**: it is the exact set the derivation declared, with the paths already
+correct, which is why `internal/bundle` can replace sharun's `ldd`-and-`strace`
+discovery entirely (`appimage.go`'s own header says so).
+
+⚠ **The operator's counter-example, and it is the right shape:** *"in
+nixappimage for instance, python is easy and works, choose any python gui app
+and it works"* — against a **"Utter garbage"** grade below. A grade that
+inverts on the pipeline is not evidence about the pipeline we use.
+
+⭐ **SO THE TABLE BELOW IS A LIST OF HYPOTHESES TO TEST, NOT A LIST OF
+FINDINGS**, and G2.1's job is to re-derive each one against `pgb bundle
+appimage` and **move the bottom rows up**. ⛔ The goal is explicit: every
+"Garbage", "Horrible" and "Utter garbage" row should come out **Excellent or
+close** through a nix closure, or this project should be able to say precisely
+which mechanism stops it.
+
 | verdict | libraries |
 |---|---|
 | **Excellent** | ⭐ **SDL**, iced/GLFW, Chromium/Electron, Flutter, ⭐ **Mesa** |
@@ -56,6 +77,7 @@ libs"* having to be present. ⚠ They also record their own discomfort —
 decided here with four permitted classes.
 
 ⛔ **Wayland is "Garbage" and GTK is "Garbage", but read what the entries say.**
+⚠ And read them as *their* pipeline's grades — see the caution above.
 The failures listed are compositor and driver defects — GNOME defaulting to a
 broken Vulkan renderer on Intel, mutter crashing the whole session, mutter not
 doing server-side decorations. ⚠ **Those are not bundling failures**, and a
@@ -106,14 +128,25 @@ the two it is claiming.**
 
 ## 2. ⭐ The package-manager contract, measured against our artefact
 
-⛔ **Measured, not read.** Every row below was run against
+⛔ **Measured, not read — with one exception, named in the table.** ⚠ A deep
+review of this page caught it claiming otherwise: the dwarfs row was a
+**reading** of `soar`'s `Cargo.toml` and `gearlever`'s probe, in a table whose
+preamble said every row was run. Neither `dwarfsck` nor `7zz` is on this host,
+so it cannot be run here. ⭐ What IS measured is `--appimage-offset` returning
+**1487344** — exactly the lite uruntime's size — so the payload begins
+immediately after the header, and it is a dwarfs image because our own packer
+wrote it with `mkdwarfs`. **A third-party reader has still not been pointed at
+it.**
+
+Every other row was run against
 `evidence/77-uruntime-header/build/field.AppImage` — a `pgb bundle appimage jq`
 at the shipped configuration — and, where it matters, against the competitor's
 `kdenlive-AppImage-Enhanced` for comparison.
 
 | what a manager needs | who needs it | ours | the competitor |
 |---|---|---|---|
-| AppImage **type-2 magic** `0x41 0x49 0x02` at offset 8 | `gearlever` (`AppImageProvider.py:480-491`) | ✅ `414902` | ✅ `414902` |
+| ⭐ **GIO content type in `supported_mimes`** — gearlever's ACTUAL gate (`AppImageProvider.py:78, 256`) | `gearlever` | ✅ `gio info` → **`application/vnd.appimage`** | ✅ same |
+| AppImage **type-2 magic** `0x41 0x49 0x02` at offset 8 | ⚠ **nothing checks it directly** — see below | ✅ `414902` | ✅ `414902` |
 | `--appimage-mount` prints a mountpoint and holds it | `AM` (`modules/management.am:310-320`) | ✅ | — |
 | `--appimage-extract` | `gearlever`, `AppManager`, `AM` | ✅ exit 0 | — |
 | `file` says `static` — **AM's fallback detector** | `AM` (`management.am:311`) | ✅ | ✅ |
@@ -121,7 +154,32 @@ at the shipped configuration — and, where it matters, against the competitor's
 | `.DirIcon` at the AppDir top level | all four | ⚠ kdenlive ✅, `jq` ⛔ | — |
 | a top-level `*.desktop` | all four | ✅ both | — |
 | `X-AppImage-Version=` in the desktop entry | `gearlever`, `AppManager` | ⛔ **absent** | — |
-| the image is readable as **dwarfs** | `soar` (`squishy` with the `dwarfs` feature), `gearlever` (probes `dwarfsck`) | ✅ | ✅ |
+| ⚠ the image is readable as **dwarfs** | `soar` (`squishy` with the `dwarfs` feature), `gearlever` (probes `dwarfsck`) | ⚠ **READ, NOT RUN** — see below | — |
+
+### ⛔ A correction this table needed, found by a deep review
+
+⚠ **An earlier version said gearlever "requires" the type-2 magic, citing
+`get_appimage_type` at `AppImageProvider.py:480-491`.** That function computes
+the type from bytes 8–10 — and is **defined and never called**. The real gate
+is `can_install_file`, one line:
+
+```python
+return get_giofile_content_type(file) in self.supported_mimes
+# ['application/x-iso9660-appimage', 'application/vnd.appimage',
+#  'application/x-appimage', 'application/vnd.efi.iso']
+```
+
+⭐ **So the magic is load-bearing after all, but INDIRECTLY**: it is what
+`shared-mime-info` keys on to classify the file, and GIO is what gearlever
+asks. ⚠ `file --mime-type` disagrees and returns `application/x-pie-executable`
+for **both** artefacts, so testing with `file(1)` would have said we fail.
+Measured with the tool that actually decides:
+
+```sh
+gio info -a standard::content-type <artefact>
+# standard::content-type: application/vnd.appimage      # ours
+# standard::content-type: application/vnd.appimage      # the competitor's
+```
 
 ### ⭐ What that adds up to
 

@@ -132,9 +132,10 @@ sed "s|/nix/store[^/ ]*/bin|/usr/local/bin|g"               # 4 the same, differ
 sed "s|/nix/store[^ \"']*|/|g"                              # 5 ⛔ everything else
 ```
 
-⚠ **Applied only to files that are not ELF executables**, selected with
-`file -i "$1" | grep -qiv "application/.*executable"`. So: text-patch scripts,
-leave binaries alone.
+⚠ **Applied to `*.sh` files OR files that are not executables** — the selector
+is `-name "*.sh" -o -exec sh -c 'file -i "$1" | grep -qiv
+"application/.*executable"'`, and that `-o` is an **or**, so an executable
+`.sh` is still patched. The intent is: text-patch scripts, leave ELFs alone.
 
 ⭐ **WHY WE CAN DO BETTER, AND IT IS NOT A MATTER OF WRITING NICER REGEXES.**
 Those patterns are guessing at the store-path *shape* because the script does
@@ -157,12 +158,55 @@ the host has the program. Naming them is the honest behaviour and is what
 way to automatically get these"*. From
 `soarpkgs/.../ghostty/nixappimage.nixpkgs.stable.yaml`:
 
-**Icon** — the smallest `.png`/`.svg` under `usr/`, *excluding* `favicon` and
-the small size buckets (`16x16` … `96x96`); if that fails, retry restricted to
-`128x128/apps` or `256x256` and matching the package name. Copy to
-`<pkg>.png` **and** `.DirIcon`.
+**Icon.** ⛔ **THE LOAD-BEARING PART IS THE EXCLUSION, AND AN EARLIER VERSION OF
+THIS PAGE INVERTED IT.** It said "the smallest `.png`/`.svg`", which is wrong
+twice — the operator caught it, and the source confirms both:
 
-**Desktop** — the smallest `*.desktop` under `usr/`, then three fixes:
+```sh
+find -L "./squashfs-root/usr" -type f,l -regex '.*\.\(png\|svg\)' \
+  -not -regex '.*\(favicon\|/\(16x16\|22x22\|24x24\|32x32\|36x36\|48x48\|64x64\|72x72\|96x96\)/\).*' \
+  | awk '{print length, $0}' | sort -n | awk 'NR==1 {print $2}'
+# fallback, when that produced nothing usable:
+find -L "./squashfs-root/usr" -regex ".*\(128x128/apps\|256x256\)/.*${PKG}.*\.\(png\|svg\)" ...
+```
+
+1. ⚠ `awk '{print length, $0}' | sort -n` sorts by the length of the **path
+   string**, not by file size. "Smallest file" was never what it did.
+2. ⛔ **And the intent is the opposite of small.** The `-not -regex` throws away
+   `16x16` through `96x96`, and the fallback targets **`128x128/apps` or
+   `256x256`** explicitly. The rule is *at least 128×128*.
+
+⭐ **What ours should do, and it is a preference order rather than a search
+trick**: prefer **128×128**, then **512×512** or **1024×1024**; ⛔ never take a
+bucket below 128 — a 48×48 icon scaled up is what a desktop entry looks bad
+with, and the exclusion list above exists for exactly that reason. Copy the
+result to `<pkg>.png` **and** `.DirIcon`.
+
+⚠ `Toolpacks`' `mpv.sh` agrees and is blunter about it —
+`find "." -path '*128x128/apps/*.png'`, nothing else considered.
+
+**Desktop.** ⛔ **AND "THE SMALLEST" IS WRONG HERE TOO, FOR A SECOND REASON:**
+
+```sh
+find -L "./squashfs-root/usr" -name "*.desktop" -printf "%s %p\n" -quit | sort -n | awk 'NR==1 {print $2}'
+```
+
+⚠ `-quit` is a `find` **action** that terminates the search at the first match,
+so `sort -n` receives exactly one line and sorts nothing. **It takes the first
+`.desktop` the traversal encounters**, and the `-printf "%s %p"`/`sort -n`
+around it is dead code that reads as a size policy. ⚠ The icon *fallback* above
+carries the same `-quit` and the same dead sort.
+
+⚠ `Toolpacks`' `mpv.sh` does something different again —
+`... | awk '{print length, $0}' | sort -n | head -n 1` with **no** `-quit` —
+which takes the **shortest path**, still not the smallest file. ⭐ Three
+selection rules across two repositories, none of them the one the code appears
+to state.
+
+⛔ **So there is no upstream policy here to copy, only accidents.** Ours has to
+choose one deliberately and say what it is.
+
+Then three fixes to whatever was chosen:
 
 ```sh
 sed '/.*DBusActivatable.*/I d'      # ⛔ D-Bus activation cannot work in a bundle
@@ -190,7 +234,7 @@ sweep.** From the same recipe:
 
 | class | action |
 |---|---|
-| `share/{locale,locales,fonts,man}` | ⛔ **deleted and replaced with a symlink to the HOST's `/usr/share/...`** |
+| `share/{locale,locales,fonts,man}` | ⛔ **deleted and replaced with a symlink to the HOST's `/usr/share/...`** — ⚠ **and the first of the two passes is buggy**: it matches `locale`, `locales`, `font`, `fonts` and `man`, then symlinks **every** match to `/usr/share/locale`, so a `share/fonts` directory becomes a link to the locale tree. A second loop then does it correctly per directory. Do not copy the first pass |
 | `*.a *.cmake *.jmod *.gz *.md *.mk *.prf *.rar *.tar *.xz *.zip` | deleted |
 | `LICENSE`, `LICENSE.md`, `Makefile` | deleted |
 | dirs `doc/share`, `include`, `nix-support`, `share/docs`, `share/man` | deleted |
@@ -361,6 +405,52 @@ number now has a reason behind it rather than being a bare measurement.
 ⛔ **And it is a SIZE lever**, so `experiments/84-` applies: it buys
 0.024–0.031 ms/MiB and cannot move the clock. Its value is size, which the
 2026-09-03c ruling struck and the 2026-09-03d ruling deprioritised further.
+
+## ⭐ 12. Why the upstream attempt failed, in its own code
+
+⛔ **The operator named `ralismark/nix-appimage` issue #18 and PR #26 and said
+the fix "was too naive & generic, didn't work 90% of the time".** Both are in
+`references/ralismark__nix-appimage/api/issues.json`, and the code PR #26
+shipped is `extra-files.sh` in the tree.
+
+**Issue #18** is Azathothas asking `nix-appimage` to conform to the AppImage
+format by carrying `.desktop` and icons, and quoting the very `mpv.sh` bash
+§4 above dissects — so the whole loop is one story: the bundler did not do it,
+the packager did it with `sed` and `awk`, and asked for it upstream.
+
+**PR #26** — *"Best-effort copying in of .desktop file and icons"* — closed it.
+Its own summary already concedes a gap: *".DirIcon most likely won't be a
+256x256 PNG, but that requirement's a SHOULD not a MUST."*
+
+⭐ **And two lines of `extra-files.sh` explain the 90%:**
+
+```sh
+drv="/nix/store/$hash"                          # the ENTRYPOINT'S OWN path
+for d in "$drv/share/applications/"*.desktop; do
+```
+
+⛔ **It searches ONE store path — the entrypoint's own derivation output.** In
+nixpkgs a program's `bin/` and its `share/` routinely live in different
+outputs or different derivations (multi-output `bin`/`out`/`man`, and wrapper
+derivations whose `bin/x` is a wrapper around a binary in another path
+entirely). ⚠ And the match is exact-or-bail:
+
+```sh
+# only a .desktop whose Exec= basename equals the entrypoint's basename,
+# and: "multiple .desktop entries found; giving up"
+```
+
+⭐ **So it fails whenever the desktop entry is not in the entrypoint's own
+output, whenever `Exec=` differs from the binary name, and whenever two
+entries match.** That is a single-derivation assumption, an exact-string
+match, and an abort on ambiguity — three ways to return nothing.
+
+⭐ **What ours must do instead, and `pgb` is already holding the thing that
+makes it possible**: search the **whole closure**, not one store path; **rank**
+candidates rather than bailing on ambiguity (the field takes the smallest
+match); and rewrite `Icon=` to the name actually shipped. §5 has the field's
+rules and [`bundle-capabilities.md`](bundle-capabilities.md) §2 has what the
+package managers then require of the result.
 
 ---
 

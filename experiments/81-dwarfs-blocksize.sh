@@ -20,11 +20,15 @@
 # to stay inside the range this sweep endorses. `-S26` remains the REFERENCE
 # arm because it is what the ratios are against.
 #
-# ⭐ AND UNLIKE THE RUNTIME'S OWN KNOBS THIS ONE IS SHIPPABLE. `URUNTIME_EXTRACT`
-# and `REUSE_CHECK_DELAY` -- the levers `docs/research/portable-nix-mechanisms.md`
-# §3-4 points at -- are ENVIRONMENT VARIABLES read at run time, so shipping a
-# non-default would need something beside the artefact, and the brief refuses
-# that. Block size is chosen when the image is PACKED and travels inside it.
+# ⚠ THIS BLOCK ONCE SAID THE RUNTIME'S OWN KNOBS WERE NOT SHIPPABLE, and that
+# was wrong -- corrected 2026-09-03d by reading the fork's source.
+# `URUNTIME_EXTRACT` and `REUSE_CHECK_DELAY` are COMPILE-TIME CONSTANTS laid out
+# as patchable ASCII (`const URUNTIME_EXTRACT: &str = "URUNTIME_EXTRACT=3"`,
+# read back through `.replace("URUNTIME_EXTRACT=", "=")`), and `strings -a`
+# finds them in the artefact this packs. Both are levers; this one is simply
+# the one that needs no patching at all, because the block size is chosen when
+# the image is PACKED and travels inside it.
+# `docs/research/nix-bundle-patching.md` §1.
 #
 # -- HOW IT IS ASKED --------------------------------------------------------
 #
@@ -286,12 +290,13 @@ fi
     "$AA" "$AA_FLOOR" "$(clk_resolves "$AA" "$AA_FLOOR")"
   printf '\n'
   printf 'WHY THIS KNOB AND NOT THE RUNTIME'"'"'S OWN\n'
-  printf '  URUNTIME_EXTRACT and REUSE_CHECK_DELAY -- the levers\n'
-  printf '  docs/research/portable-nix-mechanisms.md §3-4 points at -- are\n'
-  printf '  ENVIRONMENT VARIABLES read at run time. Shipping a non-default\n'
-  printf '  would need something beside the artefact, and the brief refuses\n'
-  printf '  that. The block size is chosen when the image is packed and\n'
-  printf '  travels inside it.\n'
+  printf '  The block size is chosen when the image is PACKED and travels\n'
+  printf '  inside it, so it needs no patching at all.\n'
+  printf '  ⚠ This block once said the runtime\'"'"'s own knobs -- URUNTIME_EXTRACT,\n'
+  printf '  REUSE_CHECK_DELAY -- were not shippable because they are read from\n'
+  printf '  the environment. Wrong: they are compile-time constants laid out as\n'
+  printf '  patchable ASCII and `strings -a` finds them in this artefact.\n'
+  printf '  docs/research/nix-bundle-patching.md §1.\n'
 } > "$RESULT"
 
 clk_save "$EXP_OUT/samples"
