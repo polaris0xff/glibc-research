@@ -1,0 +1,186 @@
+===============================================================
+82 - what else does glibc read from the host: the search, not the list
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-03T17:37:21Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/82-host-data-search
+--------------------------------------------------------------
+
+-- 1. the search: absolute paths in the pinned libc.a ---------------
+        archive : /var/lib/pgb-rootfs/pgb-env-debian13/usr/lib/x86_64-linux-gnu/libc.a
+        glibc   : stable release version 2.41
+        absolute paths found: 78
+
+  PATH                               BUCKET
+  /bin                               toolchain
+  /bin/csh                           RESIDUE
+  /bin/sh                            RESIDUE
+  /dev                               toolchain
+  /dev/console                       kernel
+  /dev/full                          kernel
+  /dev/log                           kernel
+  /dev/null                          kernel
+  /dev/ptmx                          kernel
+  /dev/ptsH                          kernel
+  /dev/random                        kernel
+  /dev/shm                           kernel
+  /dev/shm/sem.XXX                   kernel
+  /dev/tty                           kernel
+  /dev/urandom                       kernel
+  /etc/.pwd.lock                     covered-NSS
+  /etc/aliases                       RESIDUE
+  /etc/ethers                        RESIDUE
+  /etc/fstab                         RESIDUE
+  /etc/gai.conf                      covered-dns
+  /etc/group                         covered-NSS
+  /etc/gshadow                       covered-NSS
+  /etc/host.conf                     covered-dns
+  /etc/hostid                        RESIDUE
+  /etc/hosts                         covered-NSS
+  /etc/hosts.equiv                   covered-NSS
+  /etc/ld.so.cache                   toolchain
+  /etc/localtime                     covered-tz
+  /etc/mtab                          RESIDUE
+  /etc/netgroup                      covered-NSS
+  /etc/networks                      RESIDUE
+  /etc/nsswitch.conf                 covered-NSS
+  /etc/passwd                        covered-NSS
+  /etc/protocols                     RESIDUE
+  /etc/resolv.conf                   covered-dns
+  /etc/rpc                           RESIDUE
+  /etc/services                      RESIDUE
+  /etc/shadow                        covered-NSS
+  /etc/shells                        RESIDUE
+  /etc/ttys                          RESIDUE
+  /lib                               toolchain
+  /lib/x86_64-linux-gnu              toolchain
+  /proc/meminfo                      kernel
+  /proc/mounts                       kernel
+  /proc/se                           kernel
+  /proc/self/exe                     kernel
+  /proc/self/fd                      kernel
+  /proc/self/fdinf                   kernel
+  /proc/self/loginuid                kernel
+  /proc/self/maps                    kernel
+  /proc/self/task                    kernel
+  /proc/stat                         kernel
+  /proc/sys/kernel/ngroups_max       kernel
+  /proc/sys/kernel/rtsig-max         kernel
+  /proc/sys/vm/overcommit_memory     kernel
+  /sys/dev/block                     kernel
+  /sys/devices/system/cpu/online     kernel
+  /sys/devices/system/cpu/possible   kernel
+  /sys/fs/ext4                       kernel
+  /sys/kernel/mm/hugepages           kernel
+  /sys/kernel/mm/transparent_hugepage/enabled kernel
+  /sys/kernel/mm/transparent_hugepage/hpage_pmd_size kernel
+  /tmp                               toolchain
+  /usr/bin                           toolchain
+  /usr/lib                           toolchain
+  /usr/lib/getconf                   RESIDUE
+  /usr/lib/locale                    covered-locale
+  /usr/lib/locale/locale-archive     covered-locale
+  /usr/lib/x86_64-linux-gnu          toolchain
+  /usr/lib/x86_64-linux-gnu/gconv    covered-gconv
+  /usr/lib/x86_64-linux-gnu/gconv/gconv-modules.cache covered-gconv
+  /usr/share/locale                  covered-locale
+  /usr/share/zoneinfo                covered-tz
+  /var/log/wtmp                      RESIDUE
+  /var/log/wtmpx                     RESIDUE
+  /var/run/nscd/so                   RESIDUE
+  /var/run/utmp                      RESIDUE
+  /var/run/utmpx                     RESIDUE
+
+        ⛔ RESIDUE: 19 paths owned by NO row of the ten
+  ok    the search found paths at all                  = yes
+  ok    the residue is non-empty (P2)                  = yes
+
+-- 2. presence of each residue path across the eleven ---------------
+        environments fetched: 11
+
+  PATH                     PRESENT ON
+  /bin/csh                  0 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 rockylinux-8 opensuse-leap-15.6 fedora-42 archlinux-latest
+  /bin/sh                  11 of 11 
+  /etc/aliases              3 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 archlinux-latest
+  /etc/ethers               1 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 rockylinux-8 fedora-42 archlinux-latest
+  /etc/fstab                9 of 11   absent: rockylinux-8 opensuse-leap-15.6
+  /etc/hostid               0 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 rockylinux-8 opensuse-leap-15.6 fedora-42 archlinux-latest
+  /etc/mtab                 0 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 rockylinux-8 opensuse-leap-15.6 fedora-42 archlinux-latest
+  /etc/networks             4 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 archlinux-latest
+  /etc/protocols            8 of 11   absent: debian-11 debian-12 ubuntu-20.04
+  /etc/rpc                  4 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04
+  /etc/services             8 of 11   absent: debian-11 debian-12 ubuntu-20.04
+  /etc/shells              11 of 11 
+  /etc/ttys                 0 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 rockylinux-8 opensuse-leap-15.6 fedora-42 archlinux-latest
+  /usr/lib/getconf          2 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 rockylinux-8 fedora-42
+  /var/log/wtmp             4 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl opensuse-leap-15.6 fedora-42 archlinux-latest
+  /var/log/wtmpx            0 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 rockylinux-8 opensuse-leap-15.6 fedora-42 archlinux-latest
+  /var/run/nscd/so          0 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 rockylinux-8 opensuse-leap-15.6 fedora-42 archlinux-latest
+  /var/run/utmp             1 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 opensuse-leap-15.6 fedora-42 archlinux-latest
+  /var/run/utmpx            0 of 11   absent: alpine-3.22 alpine-3.20 alpine-3.10 voidlinux-musl debian-11 debian-12 ubuntu-20.04 rockylinux-8 opensuse-leap-15.6 fedora-42 archlinux-latest
+  ok    control: /bin/sh present on every environment  = 11
+        ⚠ this row is a CONTROL, not a finding: it exists because the first
+           version of this section resolved absolute symlinks against the
+           HOST and reported /bin/sh absent on the three Alpines.
+
+-- 3. the consequence: getservbyname / getprotobyname on the eleven --
+
+  ENVIRONMENT          LIBC   SERVICES  PRINTED   VERDICT
+  alpine-3.22          musl   yes       http/tcp=80 proto-tcp=6 ok
+                              └ net=NULL fstab=rows shells=ok hostid=0 utmp=empty system=7  [exit 0]
+  alpine-3.20          musl   yes       http/tcp=80 proto-tcp=6 ok
+                              └ net=NULL fstab=rows shells=ok hostid=0 utmp=empty system=7  [exit 0]
+  alpine-3.10          musl   yes       http/tcp=80 proto-tcp=6 ok
+                              └ net=NULL fstab=rows shells=ok hostid=0 utmp=empty system=7  [exit 0]
+  voidlinux-musl       musl   yes       http/tcp=80 proto-tcp=6 ok
+                              └ net=NULL fstab=rows shells=ok hostid=0 utmp=empty system=7  [exit 0]
+  debian-11            glibc  no        http/tcp=NULL proto-tcp=NULL ⛔ CANNOT RESOLVE
+                              └ net=NULL fstab=empty shells=ok hostid=0 utmp=empty system=7  [exit 0]
+  debian-12            glibc  no        http/tcp=NULL proto-tcp=NULL ⛔ CANNOT RESOLVE
+                              └ net=NULL fstab=empty shells=ok hostid=0 utmp=empty system=7  [exit 0]
+  ubuntu-20.04         glibc  no        http/tcp=NULL proto-tcp=NULL ⛔ CANNOT RESOLVE
+                              └ net=NULL fstab=empty shells=ok hostid=0 utmp=empty system=7  [exit 0]
+  rockylinux-8         glibc  yes       http/tcp=80 proto-tcp=6 ok
+                              └ net=ok fstab=NULL shells=ok hostid=0 utmp=empty system=7  [exit 0]
+  opensuse-leap-15.6   glibc  yes       http/tcp=80 proto-tcp=6 ok
+                              └ net=ok fstab=NULL shells=ok hostid=0 utmp=empty system=7  [exit 0]
+  fedora-42            glibc  yes       http/tcp=80 proto-tcp=6 ok
+                              └ net=ok fstab=empty shells=ok hostid=12583426 utmp=empty system=7  [exit 0]
+  archlinux-latest     glibc  yes       http/tcp=80 proto-tcp=6 ok
+                              └ net=NULL fstab=empty shells=ok  [exit 136]
+
+  ok    every fetched environment answered             = 11
+  ok    environments that CANNOT resolve http/tcp (P3) = 3
+  ok    and all of them are GLIBC rows (P3)            = 3
+  ok    the file listing agrees with the run           = 3
+        ⛔ THE ELEVENTH ROW. /etc/services is host data glibc reads, does
+           not carry, and none of the ten covers. NSS is closed for
+           DISPATCH — __nss_configure_lookup pins the services database to
+           `files` — and `files` still means /etc/services, which 3 of
+           11 environments do not have.
+        ⚠ AND IT IS NOT A MUSL STORY, it is the reverse: all four musl
+           environments SHIP the file and 3 glibc ones do not.
+        ⚠ The failure is a NULL return rather than a wrong number, so it is
+           louder than gconv's and timezone's. A caller that checks the
+           return value sees it; one that does not dereferences NULL.
+  ok    vanilla static rows that CRASHED outright      = 1
+        crashed: archlinux-latest(exit 136)
+        ⛔ exit 136 = 128 + 8 = SIGFPE, and the last answer printed is
+           `shells=ok`, so the call that dies is gethostid().
+        ⭐ gethostid() with no /etc/hostid (0 of 11 have one) resolves the
+           machine's own hostname — an NSS `hosts` lookup. On Arch that
+           dlopens libnss_mymachines and a second libc enters the process.
+        ⚠ THIS IS ROW 1 (NSS), NOT A NEW ROW. What is new is the REACH:
+           gethostid() had never been probed here. experiments/63- measures
+           whether __nss_configure_lookup covers it.
+
+-- result ----------------------------------------------------
+pass=8 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

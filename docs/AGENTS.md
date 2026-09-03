@@ -495,7 +495,7 @@ repeated here.
 | item | status |
 |---|---|
 | test bed, 11 environments | ✅ 11 of 11, digest-pinned |
-| all **37** experiments | ✅ every one measured. ⚠ **The count read 24 until 2026-09-03c**, when `ls experiments/[0-9]*-*.sh \| wc -l` was actually run against it. 36 write `evidence/<NN>-*/RESULT.txt`; `86-` writes one per subject (`RESULT.jq.txt`, `RESULT.mpv.txt`) because it runs against two. ⭐ `experiments/clock.sh` is a **library**, not an experiment — the wall-clock instrument, beside `lib.sh` |
+| all **38** experiments | ✅ every one measured. ⚠ **The count read 24 until 2026-09-03c**, when `ls experiments/[0-9]*-*.sh \| wc -l` was actually run against it. 37 write `evidence/<NN>-*/RESULT.txt`; `86-` writes one per subject (`RESULT.jq.txt`, `RESULT.mpv.txt`) because it runs against two. ⭐ `experiments/clock.sh` is a **library**, not an experiment — the wall-clock instrument, beside `lib.sh` |
 | all 10 POCs | ✅ 11 of 11 environments each, zero host shared objects. ⭐ **All ten re-run at the 2.41 pin on 2026-09-03**, and each `RESULT.txt` now names the environment, image, digest, gcc and glibc that built it |
 | NSS / iconv / locale / terminfo / CA-bundle mechanisms | ✅ 11 of 11 each |
 | `pgb` chroot and host engines | ✅ complete |

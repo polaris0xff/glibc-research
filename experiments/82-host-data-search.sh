@@ -191,19 +191,64 @@ ENVS=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt"
 NENV=0; for n in $ENVS; do [ -n "$(exp_rootfs "$n")" ] && NENV=$((NENV+1)); done
 exp_note "environments fetched: $NENV"
 
+# ⛔ AN ABSOLUTE SYMLINK INSIDE A ROOTFS POINTS AT THE ROOTFS'S ROOT, NOT THE
+# HOST'S — AND `[ -e "$r$p" ]` RESOLVES IT AGAINST THE HOST.
+#
+# ⚠ THIS IS A DEFECT THIS EXPERIMENT SHIPPED AND THEN CAUGHT, which is the
+# only reason it is written down. The first run reported `/bin/sh` ABSENT on
+# all three Alpines. It is not: Alpine's `/bin/sh` is a symlink to the
+# ABSOLUTE path `/bin/busybox`, the host running this experiment has no
+# `/bin/busybox`, so the test resolved the link outside the tree it was
+# asking about and answered about the wrong machine.
+#
+# ⭐ IT WAS CAUGHT BY DISAGREEMENT, NOT BY READING — section 3 runs a real
+# binary on the same eleven and its SERVICES column is derived independently.
+# `/etc/services` is a regular file so the headline result was never affected,
+# but `/bin/sh` and `/etc/mtab` (usually a link to `/proc/self/mounts`) were
+# both reported wrong. docs/history/corrections.md.
+path_in_rootfs() {  # rootfs-path in-root-path -> 0 when it exists INSIDE
+  _pr_r="$1"; _pr_p="$2"; _pr_n=0
+  while [ "$_pr_n" -lt 16 ]; do
+    if [ -L "$_pr_r$_pr_p" ]; then
+      _pr_t=$(readlink "$_pr_r$_pr_p")
+      case "$_pr_t" in
+        /*) _pr_p="$_pr_t" ;;
+        *)  _pr_p="$(dirname "$_pr_p")/$_pr_t" ;;
+      esac
+      _pr_n=$((_pr_n+1))
+      continue
+    fi
+    [ -e "$_pr_r$_pr_p" ] && return 0
+    return 1
+  done
+  return 1   # a symlink loop
+}
+
 printf '\n  %-24s %s\n' PATH 'PRESENT ON'
-SERVICES_MISSING=0; PROTOCOLS_MISSING=0
+SERVICES_MISSING=0; PROTOCOLS_MISSING=0; SH_PRESENT=0
 while IFS= read -r p; do
   have=0; miss=""
   for n in $ENVS; do
     r=$(exp_rootfs "$n"); [ -n "$r" ] || continue
-    if [ -e "$r$p" ]; then have=$((have+1)); else miss="$miss $n"; fi
+    if path_in_rootfs "$r" "$p"; then have=$((have+1)); else miss="$miss $n"; fi
   done
+  [ "$p" = /bin/sh ] && SH_PRESENT=$have
   [ "$p" = /etc/services ]  && SERVICES_MISSING=$((NENV-have))
   [ "$p" = /etc/protocols ] && PROTOCOLS_MISSING=$((NENV-have))
   printf '  %-24s %2s of %-3s%s\n' "$p" "$have" "$NENV" \
     "$([ -n "$miss" ] && printf '  absent:%s' "$miss")"
 done < "$RESIDUE"
+
+# ⭐ THE POSITIVE CONTROL FOR THE PRESENCE INSTRUMENT, and it is here because
+# WITHOUT IT THIS SECTION WAS WRONG AND SAID NOTHING. Every one of the eleven
+# environments has a working `/bin/sh` — three of them reach it through an
+# absolute symlink. A presence test that resolves links against the host
+# answers 8; one that resolves them against the rootfs answers 11.
+# ⛔ Assert 11, so the defect cannot come back quietly.
+exp_check "control: /bin/sh present on every environment" "$SH_PRESENT" "$NENV"
+exp_note "⚠ this row is a CONTROL, not a finding: it exists because the first"
+exp_note "   version of this section resolved absolute symlinks against the"
+exp_note "   HOST and reported /bin/sh absent on the three Alpines."
 
 # ---------------------------------------------------------------------------
 # 3. THE CONSEQUENCE — one static binary, the eleven, and what it prints.
@@ -219,19 +264,66 @@ printf '\n'
 printf -- '-- 3. the consequence: getservbyname / getprotobyname on the eleven --\n'
 
 cat > "$WORK/svc.c" <<'EOF'
-/* Ask glibc the three questions that read the residue files, and print what
-   it answered rather than whether it succeeded — a silent wrong answer and a
-   refusal must be distinguishable. */
+/* Ask glibc every question that reads a residue file, and print what it
+   ANSWERED rather than whether it succeeded — a silent wrong answer and a
+   refusal must be distinguishable, which is the whole lesson of the gconv
+   and timezone rows.
+
+   ⛔ EVERY RESIDUE PATH WITH A LIBC READER IS PROBED, so that the tail of
+   the list is MEASURED rather than assumed harmless. `docs/AGENTS.md`: do
+   not assert a limitation without measuring it — and an absence is not a
+   zero. */
 #include <stdio.h>
 #include <netdb.h>
+#include <mntent.h>
+#include <unistd.h>
+#include <utmp.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+
 int main(void) {
+  /* ⛔ UNBUFFERED, AND THIS IS NOT A STYLE CHOICE. stdout to a pipe is
+     block-buffered, so a crash ANYWHERE in this program discards every answer
+     it had already computed and the row reads "no output" — which localises
+     nothing. Measured: archlinux-latest printed nothing at all once the tail
+     probes were added, and with buffering off it prints its answers up to the
+     call that kills it. */
+  setvbuf(stdout, NULL, _IONBF, 0);
+
+  /* the headline pair: /etc/services and /etc/protocols */
   struct servent  *s = getservbyname("http", "tcp");
   struct protoent *p = getprotobyname("tcp");
   printf("http/tcp=%s proto-tcp=%s\n",
-         s ? "80" : "NULL",
-         p ? "6"  : "NULL");
+         s ? "80" : "NULL", p ? "6" : "NULL");
   if (s && ntohs((unsigned short)s->s_port) != 80) printf("WRONG-PORT\n");
   if (p && p->p_proto != 6)                        printf("WRONG-PROTO\n");
+
+  /* the tail, one token each, so the residue is measured and not asserted */
+  struct netent *n = getnetbyname("loopback");
+  printf("tail net=%s", n ? "ok" : "NULL");
+
+  FILE *m = setmntent("/etc/fstab", "r");
+  printf(" fstab=%s", m ? (getmntent(m) ? "rows" : "empty") : "NULL");
+  if (m) endmntent(m);
+
+  setusershell();
+  char *sh = getusershell();
+  printf(" shells=%s", sh ? "ok" : "NULL");
+  endusershell();
+
+  printf(" hostid=%ld", gethostid());
+
+  setutent();
+  printf(" utmp=%s", getutent() ? "rows" : "empty");
+  endutent();
+
+  /* /bin/sh, reached through system(): the one residue path that is not data.
+     ⛔ REPORT WEXITSTATUS, NOT "did it return -1". A missing /bin/sh does not
+     make system() fail — it forks, the exec fails, and the SHELL's 127 comes
+     back as a normal exit status. Comparing against -1 would call that a
+     working shell. */
+  int rc = system("exit 7");
+  printf(" system=%d\n", rc == -1 ? -1 : WEXITSTATUS(rc));
   return 0;
 }
 EOF
@@ -245,14 +337,22 @@ if ! "$CC" -static -O2 -o "$WORK/svc" "$WORK/svc.c" 2>"$WORK/cc.log"; then
 fi
 
 printf '\n  %-20s %-6s %-9s %-9s %s\n' ENVIRONMENT LIBC SERVICES PRINTED VERDICT
-S_OK=0; S_BAD=0; S_ROWS=0; S_BAD_GLIBC=0
+S_OK=0; S_BAD=0; S_ROWS=0; S_BAD_GLIBC=0; S_CRASH=0; S_CRASH_WHERE=""
 for name in $ENVS; do
   r=$(exp_rootfs "$name") || true
   [ -n "$r" ] || continue
   S_ROWS=$((S_ROWS+1))
   libc=$(exp_rootfs_libc "$name")
-  has=$( [ -e "$r/etc/services" ] && echo yes || echo no )
-  out=$("$REPO_DIR/pgb" rootfs run "$r" --copy "$WORK/svc:/svc" -- /svc 2>/dev/null | tr -d '\r' | head -1)
+  has=$( path_in_rootfs "$r" /etc/services && echo yes || echo no )
+  # ⛔ THE STATUS IS TAKEN UNPIPED. `$?` after a pipeline is the PIPELINE's
+  # status, so a crashed probe would read as a clean run. RESUME.md carries
+  # this as a standing machine note; it is enforced here rather than trusted.
+  "$REPO_DIR/pgb" rootfs run "$r" --copy "$WORK/svc:/svc" -- /svc \
+    > "$WORK/out.$name" 2>/dev/null
+  st=$?
+  both=$(tr -d '\r' < "$WORK/out.$name")
+  out=$(printf '%s\n' "$both" | head -1)
+  tail_out=$(printf '%s\n' "$both" | sed -n 's/^tail //p')
   case "$out" in
     *"http/tcp=80"*) v="ok"; S_OK=$((S_OK+1)) ;;
     *"http/tcp=NULL"*) v="⛔ CANNOT RESOLVE"; S_BAD=$((S_BAD+1))
@@ -260,6 +360,10 @@ for name in $ENVS; do
     *) v="⛔ NO OUTPUT" ;;
   esac
   printf '  %-20s %-6s %-9s %-9s %s\n' "$name" "$libc" "$has" "${out:-<none>}" "$v"
+  printf '  %-20s %-6s %s\n' "" "" "└ ${tail_out:-<none>}  [exit $st]"
+  if [ "$st" != 0 ]; then
+    S_CRASH=$((S_CRASH+1)); S_CRASH_WHERE="$S_CRASH_WHERE $name(exit $st)"
+  fi
 done
 
 printf '\n'
@@ -278,5 +382,35 @@ exp_note "   environments SHIP the file and $S_BAD_GLIBC glibc ones do not."
 exp_note "⚠ The failure is a NULL return rather than a wrong number, so it is"
 exp_note "   louder than gconv's and timezone's. A caller that checks the"
 exp_note "   return value sees it; one that does not dereferences NULL."
+
+# ---------------------------------------------------------------------------
+# ⭐ THE SECOND FINDING, AND IT CAME OUT OF PROBING THE TAIL RATHER THAN
+# ASSUMING IT WAS HARMLESS.
+#
+# `gethostid()` is not a name-service call to look at, and nothing in this
+# tree had ever called it. It is one: with no `/etc/hostid` — and NO
+# environment here has one, 0 of 11 — glibc falls back to resolving the
+# machine's own hostname, which is an NSS `hosts` lookup, which on Arch means
+# dlopen'ing `libnss_mymachines` and taking a second libc into the process.
+#
+# ⛔ MEASURED: archlinux-latest dies with exit 136 = 128 + 8 = SIGFPE,
+# immediately after `shells=ok` and before `hostid=`. That is the same
+# signature `docs/AGENTS.md` §2 records for plain `gcc -static` NSS on Arch
+# and openSUSE Leap, reached through a function nobody had probed.
+#
+# ⭐ SO THIS IS NOT AN ELEVENTH ROW — it is row 1 (NSS), and it is evidence
+# that row 1's reach was under-described rather than that a new class exists.
+# `pgb`'s `__nss_configure_lookup` is the fix and `experiments/63-` measures
+# whether it holds here.
+exp_check "vanilla static rows that CRASHED outright" "$S_CRASH" 1
+exp_note "crashed:$S_CRASH_WHERE"
+exp_note "⛔ exit 136 = 128 + 8 = SIGFPE, and the last answer printed is"
+exp_note "   \`shells=ok\`, so the call that dies is gethostid()."
+exp_note "⭐ gethostid() with no /etc/hostid (0 of 11 have one) resolves the"
+exp_note "   machine's own hostname — an NSS \`hosts\` lookup. On Arch that"
+exp_note "   dlopens libnss_mymachines and a second libc enters the process."
+exp_note "⚠ THIS IS ROW 1 (NSS), NOT A NEW ROW. What is new is the REACH:"
+exp_note "   gethostid() had never been probed here. experiments/63- measures"
+exp_note "   whether __nss_configure_lookup covers it."
 
 exp_finish
