@@ -1870,6 +1870,34 @@ negatives that stop the lever being "delete more": a library the program
 NEEDS, a plugin's own dependency, and the env-named library are all still
 reachable under it. 506 → **516 cases**.
 
+#### ⭐ THE TWO LEVERS ARE ADDITIVE, and the published delta REPRODUCES
+
+Same fresh `jq` AppDir, four sweeps:
+
+| arm | unreachable | delta on baseline |
+|---|---|---|
+| baseline | 262 files, 8,012,232 B | — |
+| `--cut '*=>libunistring.so.5'` | 263 files, 10,089,024 B | **2,076,792 B** |
+| `--fixpoint` | 269 files, 8,990,808 B | **978,576 B** |
+| ⭐ **both** | **270 files, 11,067,600 B** | ⭐ **3,055,368 B** |
+
+⭐ **2,076,792 + 978,576 = 3,055,368 exactly.** The rebuild-edge lever and the
+fixpoint lever touch **disjoint** sets on this bundle, so they add rather than
+overlap — which is what makes it worth having both.
+
+⭐ **AND THE 2,076,792 B IS A RE-DERIVATION, not a copy.** This AppDir was
+built today from a different nixpkgs revision than the one that produced the
+number above, and the cut delta came out byte-identical — still exactly the
+size of `libunistring.so.5.2.1`.
+
+⚠ **A trap worth writing down, because it cost a measurement here.** The `FROM`
+half of a cut is matched against the depending file's **exact base name**.
+`--cut 'libidn2=>libunistring.so.5'` — the spelling this entry uses in prose —
+reports `cut edges hit 0  ⛔ NOTHING MATCHED`, because the file is
+`libidn2.so.0.4.0`. ⭐ The instrument said so rather than returning a
+misleading zero delta, which is the guard working. Use `*` as FROM, or the
+full versioned file name.
+
 ### ⭐ 2026-09-03c: ROUTE B IS COSTED, AND IT IS FOUR TIMES CHEAPER THAN THIS ENTRY ASSUMED
 
 `experiments/95-`, `evidence/95-route-b-cost/RESULT.txt`. ⛔ **This entry's own
