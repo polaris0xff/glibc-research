@@ -355,10 +355,60 @@ patching/fixing, all of those were necessary, our debloater must find a way to
 get better results without being so messy."*
 **Category** toolchain · **Priority** P1 · **Effort** L · **Status** open
 
-⛔ **NOT THE NEXT SESSION — operator, 2026-09-03d.** That session is scoped
-to **T-078, T-079 and T-080** and nothing else. This entry is recorded now so
-it is not rediscovered; ⚠ it is not to be started, and not to be "just
-quickly" looked at. [`PROGRESS.md`](PROGRESS.md) carries the scope.
+⭐ **UNBLOCKED BY THE OPERATOR, 2026-09-03e** — *"you may take on T-081 as you
+go since it is required now to complete your own tasks"*. ⚠ The 2026-09-03d
+scope had excluded it; T-080 hit it head-on and it is now open work.
+
+## ⭐ ITS COST IS NO LONGER SPECULATIVE — MEASURED 2026-09-03e
+
+⛔ **THIS ENTRY IS WHAT STOPS A BUNDLED GUI APPLICATION FROM DRAWING**, and
+`experiments/64-` measures it on the eleven with a positive control:
+
+| arm | subject | window on a real X server |
+|---|---|---|
+| G | `galculator` — UI is a **file** at a compiled-in absolute store path | ⛔ **0 of 11** |
+| X | `mousepad` — UI is a **GResource compiled into the binary** | ✅ **11 of 11** |
+| ⭐ C | `galculator` **again**, with that store path made to resolve | ✅ **11 of 11** |
+
+⭐ **Arm C is the whole argument.** Identical artefact, one variable changed —
+the bundle's own `AppDir` bound at the `/nix/store/<hash>-galculator-2.1.4`
+the binary names — and it draws. ⛔ So *"a hardcoded store path is what stops
+it"* is a **measurement**, not a reading of an error message. ⚠ The bind is
+**not** the fix and is not proposed as one: it needs root and a mount
+namespace, which a user double-clicking an AppImage does not have.
+
+⚠ **`XDG_DATA_DIRS` already points at the bundle** and serves every application
+that *looks up* its data. It cannot serve one with the path baked into
+`.rodata`, which is why this needs a mechanism rather than another variable.
+
+## ⭐ A SECOND BLOCKER, SAME ENTRY: SCRIPT ENTRY POINTS
+
+⛔ **A Python GUI application never even builds.** `internal/bundle/appimage.go`'s
+`resolveEntry` oscillates on the standard nixpkgs shape: `bin/meld` is a
+`makeBinaryWrapper` **ELF** whose target `bin/.meld-wrapped` is a **Python
+script**; `ReadWrapper` returns nothing for a script and `elfx.IsELF` is false,
+so `lastExistingStorePath` scans the script's text and resolves back to
+`bin/meld`. Five hops, then `no entry point` (`assemble.go:60`).
+⚠ **This is not a `meld` quirk** — it is how nixpkgs wraps Python programs, and
+it is why the operator's own counter-example (*"in nixappimage python is easy
+and works"*) is currently unreachable through `pgb bundle appimage`.
+
+⭐ **A route for it**: a script entry point has to resolve to *interpreter +
+script argument*, which changes what `resolveEntry` returns and how the
+launcher invokes it. The interpreter is an ELF already in the closure.
+
+## ⭐ A CANDIDATE MECHANISM FOR THE PATHS, and why it is same-length
+
+⚠ **Rewriting a store path inside an ELF cannot lengthen it** — it is a
+NUL-terminated string in `.rodata` and everything around it is fixed. ⭐ But it
+does not have to: `/nix/store/` is **11 bytes**, and so is `/tmp/.pgbs/`. A
+same-length prefix substitution needs no relocation, no section resizing and no
+`patchelf`, and the launcher then makes that one directory resolve.
+⛔ **UNMEASURED, AND IT HAS A SECURITY QUESTION THAT MUST BE ANSWERED FIRST**: a
+fixed, predictable path under a world-writable `/tmp` is a symlink-attack
+surface, and [`../docs/design/host-fallback.md`](../docs/design/host-fallback.md)'s
+rule — never prefer a stale or attacker-controllable copy — applies. Answer
+that before building it.
 
 **Problem.** ⭐ **The field's method is mined and quoted at file and line** —
 [`../docs/research/nix-bundle-patching.md`](../docs/research/nix-bundle-patching.md).

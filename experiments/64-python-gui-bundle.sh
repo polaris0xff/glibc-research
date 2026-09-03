@@ -287,8 +287,8 @@ ENVS=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt"
 # ⭐ ONE MATRIX, RUN PER SUBJECT. Two GTK applications go through exactly the
 # same instrument so the only thing that differs between them is the
 # application — which is what makes the comparison mean anything.
-run_matrix() {  # subject image-path
-  SUBJ="$1"; IMG="$2"
+run_matrix() {  # subject image-path [extra-bind]
+  SUBJ="$1"; IMG="$2"; XBIND="${3:-}"
   RAN=0; CLEAN=0; PY=0; GTK=0; NOHOST=0; ROWS=0; WIN=0
 
 printf '\n'
@@ -318,7 +318,7 @@ for name in $ENVS; do
   # either way, and would score a working bundle exactly like a broken one.
   strace -f -e trace=openat,open,execve,clone,clone3,vfork -o "$tr" \
     timeout "$RUN_TIMEOUT" "$REPO_DIR/pgb" rootfs run "$root" \
-      --bind /tmp/.X11-unix:/tmp/.X11-unix -- \
+      --bind /tmp/.X11-unix:/tmp/.X11-unix ${XBIND:+--bind "$XBIND"} -- \
       /bin/sh -c "DISPLAY=$XDISP /subj64" \
     >"$WORK/out.$name" 2>"$WORK/err.$name" &
   _sp=$!
@@ -406,6 +406,31 @@ else
   X_ROWS=0; X_CONN=0; X_WIN=0; X_CLEAN=0; X_GTK=0; X_NOHOST=0
 fi
 
+# ---------------------------------------------------------------------------
+# ⭐ ARM C — THE POSITIVE CONTROL, AND IT IS WHAT TURNS THE DIAGNOSIS INTO A
+# MEASUREMENT.
+#
+# ⛔ WITHOUT IT, "galculator fails because of a hardcoded store path" is an
+# INFERENCE from an error message. Arm C runs the IDENTICAL artefact with one
+# thing changed — the store path it names is made to resolve, by binding the
+# bundle's own AppDir at that path — and asks whether it then draws.
+#
+# ⚠ THE BIND IS NOT A FIX AND IS NOT PROPOSED AS ONE. It is only available
+# because this harness is root and controls the mount namespace; a user
+# double-clicking an AppImage has neither. It exists to isolate the cause.
+# T-081 owns the real mechanism.
+# ---------------------------------------------------------------------------
+printf '\n-- arm C: galculator AGAIN, with the store path made to resolve ----\n'
+G_STORE=$(basename "$(find "$WORK/gcache" -maxdepth 3 -type d -name '*-galculator-*' 2>/dev/null | head -1)")
+G_APPDIR="$WORK/gcache/galculator/AppDir"
+if [ -n "$G_STORE" ] && [ -d "$G_APPDIR" ]; then
+  run_matrix galculator "$GIMG" "$G_APPDIR:/nix/store/$G_STORE"
+  C_ROWS=$ROWS; C_WIN=$WIN; C_CLEAN=$CLEAN
+else
+  exp_skip "arm C (store path supplied)" "could not locate the AppDir or the store name"
+  C_ROWS=0; C_WIN=0; C_CLEAN=0
+fi
+
 printf '\n'
 printf -- '-- summary ---------------------------------------------------------\n'
 printf '  %-34s %12s %12s\n' AXIS 'G galculator' 'X mousepad'
@@ -414,6 +439,7 @@ printf '  %-34s %12s %12s\n' 'GTK connected to a real X'    "$G_CONN"   "$X_CONN
 printf '  %-34s %12s %12s\n' 'libgtk-3 loaded from bundle'  "$G_GTK"    "$X_GTK"
 printf '  %-34s %12s %12s\n' 'zero HOST shared objects'     "$G_CLEAN"  "$X_CLEAN"
 printf '  %-34s %12s %12s\n' '⭐ A WINDOW ON THE X SERVER'   "$G_WIN"    "$X_WIN"
+printf '\n  %-34s %12s\n' '⭐ arm C: galculator + store path' "$C_WIN of $C_ROWS"
 
 printf '\n'
 exp_check "control: no target ships either program"      "$((G_NOHOST + X_NOHOST))" "$((G_ROWS + X_ROWS))"
@@ -430,6 +456,9 @@ exp_check "X: host shared objects, rows with zero"       "$X_CLEAN" "$X_ROWS"
 # absolute store path draws none.
 exp_check "⭐ X: a REAL WINDOW on the X server"           "$X_WIN" "$X_ROWS"
 exp_check "⛔ G: a real window on the X server"           "$G_WIN" 0
+# ⭐ THE CONTROL THAT PROVES THE DIAGNOSIS. Identical artefact, one variable.
+exp_check "⭐ C: the SAME bundle draws once the path resolves" "$C_WIN" "$C_ROWS"
+exp_check "C: and it still loaded zero host objects"      "$C_CLEAN" "$C_ROWS"
 
 exp_note "⭐ GTK IS NOT THE BLOCKER, AND THIS IS THE MEASUREMENT THAT SAYS SO."
 exp_note "   mousepad draws $X_WIN of $X_ROWS real toplevel windows on a real X"

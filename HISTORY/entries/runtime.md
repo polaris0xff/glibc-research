@@ -917,3 +917,107 @@ option was exported without being added to `cfg.OptVars` — T-019's defect
 class, caught in seconds instead of three jobs later. Two more cases pin the
 link line in both directions and were proved able to fail by disabling the
 branch.
+
+## T-078 — ⭐ the three-way parity matrix, and TWO of its seven predictions were wrong
+
+**Source** ⭐ **operator, 2026-09-03d**: *"a markdown table covering 'vanilla'
+GLIBC static binaries vs 'Ours' static binaries vs native MUSL static binaries
+must be compared on all possible comparisons that they can be compared with"*,
+against the claim *"our static glibc binary and a native musl static binary are
+at feature/standalone parity. No buts and no ifs."*
+**Category** runtime · **Priority** P1 · **Effort** L · **Status** ✅ done
+
+**Delivered.** The matrix is in [`../../docs/comparison.md`](../../docs/comparison.md),
+every cell a measurement or a dash, each naming its experiment.
+`experiments/63-` builds ONE probe four ways and runs it on the eleven —
+`pass=16 fail=0 skip=0`, **two runs with every cell identical**.
+
+⛔ **`skip=0` is the number the Prove line said to read first.** `60-` and
+`61-` skip arms they cannot build, so a missing musl toolchain yields a green
+run with an empty column. `musl-gcc` was installed at session start
+(`musl-tools` 1.2.4-2) and every arm built.
+
+| axis | vanilla | pgb | musl |
+|---|---|---|---|
+| rows with a crashed axis | ⛔ 5 / 11 | ✅ 0 | ✅ 0 |
+| NSS `getpwuid` / `gethostid` | 10 / 11, SIGFPE on Arch | ✅ 11 / 11 | ✅ 11 / 11 |
+| iconv encodings | 1 / 12, crashes on 3 | ✅ 12 / 12 | 10 / 12 |
+| locale, environment default | ⛔ 0 / 11 | ⛔ **0 / 11** | ⭐ **11 / 11** |
+| locale, when requested | 7 / 11 | ✅ 11 / 11 | 11 / 11 |
+| timezone | 7 / 11 | ✅ 11 / 11 | 7 / 11 |
+| `/etc/services` | 8 / 11 | ⛔ 8 / 11 | ⛔ 8 / 11 |
+| host `.so` loaded | 0 envs | 0 envs | 0 envs |
+| artefact size | 1,148,360 B | 2,722,968 B | **237,440 B** |
+| malloc, 4 threads | 8.40 ns | 6.25–12.32 ns on all 11 | 606–705 ns |
+
+⭐ **The vanilla arm is built INSIDE the pinned environment**, so it differs
+from `pgb` only by the injected mechanisms. A host-built arm is kept as a
+control and agrees on every capability axis.
+
+⛔ **TWO PREDICTIONS WERE WRONG AND ARE RECORDED RATHER THAN REWRITTEN.**
+
+- **Q3 falsified on both halves.** With no `LANG` set, native musl answers
+  **UTF-8 on 11 of 11** and every glibc arm — `pgb` included — answers
+  `ANSI_X3.4-1968` on 11 of 11. musl's minimal locale support does not mean a
+  poor codeset: its default charset *is* UTF-8. ⭐ **That is the one axis where
+  musl beats us**, which makes Q7 wrong as stated too. The axis was NOT
+  softened; the losing row is in the shipped table.
+- **Q1 was scored against the wrong number**, by this experiment's own defect:
+  the per-axis fork is what makes a crash survivable, so the parent always
+  exits 0 and the counter was reading the parent. It reported "crashed = 0" on
+  a run whose rows read `nss=SIG8`, `hostid=SIG8`, `iconv=SIG6`.
+
+⚠ **A third defect, caught only because the rule is two runs**: the UTF-8
+counter globbed the whole output line, so adding a second axis containing
+`UTF-8` moved the glibc arms 0 → 7 between two runs with no change to the
+subject. Tokens are extracted by name now; the zeros were true.
+
+⭐ **Verdict on the operator's claim**: level with or ahead of native musl on
+every axis except the environment-default codeset, and ahead on iconv, timezone
+and throughput. ⛔ *"No buts and no ifs"* is therefore **not yet true** — one
+measured "but" (unset-`LANG` codeset) and one measured "if" (`/etc/services`).
+
+## T-079 — ⭐ the list was TEN and it is ELEVEN: `/etc/services`, found by a search
+
+**Source** ⭐ **operator, 2026-09-03d**: *"GLIBC static is truly complete, no
+edgecases exist ... No buts and no ifs."*
+**Category** runtime · **Priority** P1 · **Effort** M · **Status** ✅ done
+
+⛔ **It is not complete.** `experiments/82-` answers with a **search**, which is
+what the entry demanded after the same question was answered wrongly once.
+
+**The method, and it is re-runnable.** Enumerate every absolute path the
+**pinned** `libc.a` names — **78** at glibc 2.41 — classify each against the
+ten known rows, and print the **19** no row owns. That is the generalisation of
+the one `strings` call that found the tenth.
+
+⭐ **THE ELEVENTH ROW: `/etc/services` and `/etc/protocols`.**
+`getservbyname("http","tcp")` and `getprotobyname("tcp")` return **NULL on 3 of
+11 — debian-11, debian-12 and ubuntu-20.04, and ALL THREE ARE GLIBC**, while
+all four musl environments ship the file. ⚠ That is the inverse of the
+intuitive direction, which is why it was run rather than reasoned about.
+
+⛔ **Not a restatement of NSS.** NSS is closed for **dispatch** —
+`__nss_configure_lookup` pins the `services` database to `files` — and that
+cannot conjure a `files` backing store the host does not have. ⭐ The failure is
+a **NULL return, not a wrong value**, so it is louder than gconv's and
+timezone's: a caller that checks sees it.
+
+⭐ **A second finding, from probing the tail instead of assuming it harmless**:
+`gethostid()` dies with **SIGFPE on Arch**. With no `/etc/hostid` — **0 of 11**
+have one — glibc falls back to resolving the machine's own hostname, an NSS
+`hosts` lookup. ⚠ **That is row 1, not a new row**; what was under-described is
+its reach, since nothing here had ever called `gethostid()`.
+
+⛔ **WHERE THE SEARCH CANNOT SEE, because an absence is not a zero**: paths
+assembled at run time from `%s/%s` and a variable; host data belonging to
+**other** static libraries — ⚠ terminfo (ncurses) and the CA bundle (OpenSSL)
+are invisible to it **by construction**; and anything reached through a host
+daemon rather than a file.
+
+⚠ **Two defects in the experiment's own instrument**, both found by
+disagreement and both now asserted against: presence was tested with
+`[ -e "$rootfs$path" ]`, which resolves an **absolute symlink against the
+HOST**, so Alpine's `/bin/sh -> /bin/busybox` read as absent on three rows
+(`/bin/sh` on 11 of 11 is now a positive control); and the probe buffered
+stdout to a pipe, so a crash discarded every answer already computed.

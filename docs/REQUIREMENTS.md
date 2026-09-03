@@ -98,7 +98,6 @@ parts, and **both** are required:
    | terminfo | host terminal database | ✅ **closed** — opt-in `--embed-terminfo`; POC 20's `setupterm(xterm-256color)` succeeds on **11/11** with `TERMINFO`/`TERMINFO_DIRS` unset. T-032 |
    | **host plugins** | `dlopen` of a host `.so` is host-dependent | ⛔ **open, and now SERVED BY A SHIPPED MECHANISM rather than untouched** — `pgb build --host-dlopen`, T-064 ✅, T-068 ✅. A `.so` built by the pinned glibc loads on **11 of 11** with zero host objects; a **real host** `.so` loads on **7 of 7 glibc rows** and is refused by name on **4 of 4 musl rows**; **882 of 1,527** host objects on the build host load. ⛔ It stays OPEN because the row says *host-dependent* and it still is. ⚠ **It was called "the last one" until 2026-09-03c**; see the row below |
    | ⭐ **timezone** | `tzset` reads the host's zone database; nothing is linked in | ✅ **closed, and it was found AND closed on 2026-09-03c** — opt-in `--embed-tzdata`; `experiments/97-` runs two arms, pass=13 fail=0. Arm A (plain `-static`) resolves `Europe/Berlin` on **7 of 11** and ⛔ **4 of 11 cannot and do not say so**, printing `Europe +0000` — the zone name **asked for**, at a UTC offset. Arm B resolves on **11 of 11** for **193,208 B** of carried zones. ⚠ A handful (20), not a database; a zone not carried is unchanged. T-076 |
-
    | ⛔ **network name databases** | `/etc/services`, `/etc/protocols`: `getservbyname`/`getprotobyname` read a host file that a static link does not absorb | ⛔ **OPEN, found 2026-09-03e by the search T-079 asked for.** `experiments/82-`: `getservbyname("http","tcp")` returns **NULL on 3 of 11 — debian-11, debian-12, ubuntu-20.04, and ALL THREE ARE GLIBC**; all four musl environments ship the file. ⚠ **Not a restatement of NSS**: NSS is closed for *dispatch* — `__nss_configure_lookup` pins the `services` database to `files` — and that cannot conjure a `files` backing store the host does not have. Dispatch and data are two failures and only one is closed. ⭐ The failure is a **NULL return, not a wrong value**, so it is louder than gconv's and timezone's: a caller that checks sees it. `experiments/63-` confirms all three columns fail it identically |
 
    ## ⛔ THE LIST WAS NINE, THEN TEN, AND IT IS NOW ELEVEN — 2026-09-03e
@@ -231,7 +230,7 @@ T-064 took**.
 it on 2026-09-03d — *"GLIBC static is truly complete, no edgecases exist ... No
 buts and no ifs."* ⛔ It is not: `experiments/82-` found an **eleventh** row,
 `/etc/services`, by the search the entry demanded rather than by the sentence
-that failed here. `../TODO/runtime.md` T-079.
+that failed here. `../HISTORY/entries/runtime.md` T-079, now closed.
 
 ⛔ **NINE of ELEVEN are closed and TWO are not, so this is a countable deficit
 and not a judgement.** Do not soften either: host plugins is the hardest of the

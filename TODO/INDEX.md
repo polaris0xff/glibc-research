@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 56  OPEN 21  DONE 35
+    TOTAL 56  OPEN 18  DONE 38
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 7 | 1 | 6 |
-| P1 | a documented capability does not work, or a flag does nothing | 38 | 13 | 25 |
+| P1 | a documented capability does not work, or a flag does nothing | 38 | 10 | 28 |
 | P2 | worth doing; nothing is wrong without it | 11 | 7 | 4 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -67,10 +67,10 @@ pretending to be one.
 | T-075 | P2 | S | done | research | ⭐ LD_DEBUG=bindings on the control, because the subject cannot be asked |
 | T-076 | P1 | M | done | runtime | ⭐ The TENTH quirk, found and CLOSED the same day: `--embed-tzdata`, 11 of 11 |
 | T-077 | P1 | M | open | ci | ⛔ The head-to-head was measured on the RETIRED glibc pin, and nobody re-ran it |
-| T-078 | P1 | L | open | runtime | The three-way parity matrix: vanilla `gcc -static`, ours, native musl static |
-| T-079 | P1 | M | open | runtime | Enumerate the remaining glibc-static edge cases, by SEARCH |
-| T-080 | P1 | L | open | research | The nix-bundle capability guarantee: EGL, SDL, XCB, vulkan, NVIDIA |
-| T-081 | P1 | L | open | toolchain | The debloater/patcher: every store path, without the regex cascade |
+| T-078 | P1 | L | done | runtime | ⭐ The three-way parity matrix, and TWO of its seven predictions were wrong |
+| T-079 | P1 | M | done | runtime | ⭐ The list was TEN and it is ELEVEN: `/etc/services`, found by a search |
+| T-080 | P1 | L | done | research | ⭐ The capability guarantee: GTK PROVEN on 11 of 11, and both gaps are OURS |
+| T-081 | P1 | L | open | toolchain | ⛔ The debloater/patcher — MEASURED as what stops a bundled GUI from drawing |
 | T-082 | P2 | XL | open | toolchain | Vendor and patch the third-party runtime and tooling, with drift detection |
 | T-083 | P2 | M | open | toolchain | Native desktop integration: our bundles as ordinary AppImages |
 
