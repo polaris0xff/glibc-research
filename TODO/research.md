@@ -23,6 +23,8 @@ bootstrap` installs it, so this is no longer the blocker it was.
 **Prove.** `evidence/64-nix-appimage/RESULT.txt` with the coverage and
 host-object columns filled, comparable to `60-` and `62-`.
 
+📚 [detail](../HISTORY/entries/research-open.md)
+
 ## T-057 — The bundler: a maintained nix-appimage descendant, on the Anylinux mechanisms
 
 **Source** ⭐ **operator, 2026-09-01c**, the second of three goals: *"make the
@@ -61,7 +63,7 @@ differently under the operator's ruling of 2026-09-03c:
 | half | state |
 |---|---|
 | *"produced by one command from a package name"* | ⭐ **MET, and now a REQUIREMENT** — the ruling asks for *"one command not a multiline shell script"*, and the competitor's route is five separately versioned binaries plus a 121 KB driver script, a `.desktop`, an icon and ~nine environment variables. **Publish this.** |
-| *"within measurable distance of one"* | ⛔ **not good enough on the clock** — "performs better" means **under 1.0×**, and cold start is 1.9× |
+| *"within measurable distance of one"* | ⛔ **not good enough on the clock** — "performs better" means **under 1.0×**, and cold start is **2.07×** |
 | size, 3.05× | ⭐ **struck from the bar** |
 
 **What is left.**
@@ -124,3 +126,5 @@ code runs at all.
 
 **Prove.** A row per environment for a machine that has a GPU, with vendor and
 renderer strings, plus the detection path exercised on the eleven that do not.
+
+📚 [detail](../HISTORY/entries/research-open.md)

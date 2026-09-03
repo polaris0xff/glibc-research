@@ -56,6 +56,8 @@ each route completes unattended.
 **Prove.** `sh experiments/63-developer-friction.sh` exits 0 and
 `evidence/63-developer-friction/RESULT.txt` carries the counts.
 
+📚 [detail](../HISTORY/entries/toolchain-open.md)
+
 ## T-015 — the OCI pull unpacks the filesystem and drops the image config
 
 **Source** found while cross-checking the two `pgb verify` arms (T-014).

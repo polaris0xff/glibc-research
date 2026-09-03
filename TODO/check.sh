@@ -95,6 +95,28 @@ else
   ok "no id carries two entries"
 fi
 
+# 4d. ⛔ AN OPEN ENTRY WHOSE DETAIL WAS RETIRED MUST SAY SO.
+#
+# The strip left every open entry short and put its measurements in
+# HISTORY/entries/<category>-open.md. An entry that does not link its own
+# detail is worse than one that never had any: the reader cannot tell that
+# the route in front of them was already costed. Deep review 2 found FOUR
+# entries in exactly that state within an hour of the move, which is how fast
+# an unchecked convention decays.
+n4d=0
+for id in $rows; do
+  det=$(grep -l "^## $id · retired detail" "$H"/*-open.md 2>/dev/null | head -1)
+  [ -n "$det" ] || continue
+  f=$(grep -rl "^## $id — " "$D"/*.md 2>/dev/null | head -1)
+  [ -n "$f" ] || continue          # closed entries are whole; 4b owns them
+  body=$(awk -v id="$id" '$0 ~ "^## "id" — " {f=1; next} /^## T-[0-9]+ — / {f=0} f' "$f")
+  case "$body" in
+    *"$(basename "$det")"*) n4d=$((n4d + 1)) ;;
+    *) bad "$id is open and its detail was retired to $(basename "$det"), but the entry does not link it" ;;
+  esac
+done
+ok "open entries link their retired detail ($n4d checked)"
+
 # 5. PROGRESS counts
 p_line=$(awk '/^ *COUNTS/ {print}' "$D/PROGRESS.md")
 case "$p_line" in
