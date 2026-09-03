@@ -602,6 +602,18 @@ one clear fix inside T-063 arm S:
    goes through. The suite running when it landed was validating the `-l`/`-L`
    fix against a pgb without it, so the suite must run once more with both.
 
+   ⭐ **AND THE EXPECTED RESULT IS "NO CHANGE", FOR A REASON WORTH WRITING
+   DOWN BEFORE THE RUN RATHER THAN AFTER.** The fix fires only when `cmd.Env`
+   is non-nil AND `argv[0]` has no path separator. Every POC reaches `proc`
+   through `poc_in_env`, which is `build -- /bin/sh -c "…"` — argv[0] is
+   `/bin/sh`, which **has** a separator, so `lookPathIn` declines and
+   `cmd.Path` is untouched. `enterContainer` passes `docker`/`podman` with no
+   `Env`, so `cmd.Env` is nil and it declines there too. ⚠ That is the same
+   argument that explains why the defect never bit the POCs, run backwards —
+   ⛔ **and it is a READING, which is what this tree distrusts**, so the suite
+   runs anyway. A green run confirms the argument; a red one means the
+   argument is wrong and that is worth more than the run cost.
+
 1. ✅ **RESOLVED 2026-09-03.** The two harness-named branches this asked about
    are gone: `git ls-remote --heads origin` returns **`main` and nothing else**.
    ⚠ The harness named `claude/cross-libc-dlopen-review-ukfukq` this session
