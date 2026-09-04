@@ -189,6 +189,11 @@ trap '[ -n "$XVFB_PID" ] && kill "$XVFB_PID" 2>/dev/null' EXIT INT TERM
 # both create tiny 1x1 and 10x10 helper toplevels that exist whether or not
 # the application ever draws, so counting "any child" would report a window
 # for a program that died in its first second.
+#
+# ⭐ CHECKED IN BOTH DIRECTIONS BEFORE THE RUN, against real `xwininfo` output:
+# meld's window tree — one 508x400 toplevel beside a 1x1 and two 10x10 helpers
+# — counts 1, and an empty root ("0 children.") counts 0. An instrument that
+# has only been checked on the passing case is half an instrument.
 windows_real() {
   DISPLAY="$XDISP" xwininfo -root -children 2>/dev/null | awk '
     /^ +0x[0-9a-f]+/ {
