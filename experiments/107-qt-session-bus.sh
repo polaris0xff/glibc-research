@@ -22,35 +22,52 @@
 #     execve("/bin/dbus-launch",  …)   ENOENT
 #
 # and having failed, falls back to running the launcher THROUGH A SHELL — so
-# the artefact execs the environment's `/bin/sh`, and on a glibc rootfs that
-# shell is dynamically linked and pulls in the HOST's `libc.so.6`. That object
-# is real, the classifier is right to count it, and it has nothing to do with
-# the bundle: it is a shell the subject spawned and did not bring.
+# the artefact execs the environment's `/bin/sh`, which is a dynamic PIE on all
+# eleven and therefore pulls in that environment's libc. That object is real,
+# the classifier is right to count it, and it has nothing to do with the
+# bundle: it is a shell the subject spawned and did not bring.
 #
 # -- ⛔ PRE-REGISTERED EXPECTATIONS ------------------------------------------
 #
-# ⚠ These are written before the run, and Q2 is the one that can fail for the
-# right reason: it is a PREDICTION about which four rows are clean, derived
-# from the mechanism, and the mechanism survives Q2 failing only if Q3 does
-# not also fail.
+# ⚠ These are written before the run. ⭐ Q3(b) is the one that can fail for
+# the right reason: if a dirty row spawned nothing, the residue is the
+# bundle's after all and the whole reading here is wrong. ⛔ Q1 is the gate —
+# a different number there means 107 and 65 are not measuring the same thing
+# and nothing below it can be read.
 #
 #   Q1  ⭐ THE CORPUS NUMBER REPRODUCES. Arm A is the subject built exactly as
 #       the corpus built it, and it must read clean on 4 of 11. ⛔ Without
 #       this the other three say nothing — a different number here would mean
 #       107 and 65 are not measuring the same thing.
-#   Q2  ⭐ THE FOUR CLEAN ROWS ARE THE FOUR musl ROWS. Alpine 3.22, 3.20, 3.10
-#       and Void musl ship a STATIC busybox as `/bin/sh`: exec'ing it loads no
-#       shared object at all, so the same failed autolaunch leaves no residue.
-#       The seven glibc rows have a dynamic `/bin/sh` and must be dirty.
-#   Q3  ⭐ AND THE RESIDUE IS THE SHELL'S, NOT Qt's. On every dirty row, each
-#       host object counted must be a libc-family object — the shell's — and
-#       NOT a Qt, X11 or GL library. ⛔ A host `libQt*` or `libX11*` would mean
-#       the bundle really is leaking and the DBus story is a coincidence.
+#   Q2  ⛔ NOT A PREDICTION — A REFUTATION, AND IT IS THIS FILE'S OWN. The
+#       first draft of 107- predicted the four clean rows would be the four
+#       musl ones, "because Alpine and Void ship a STATIC busybox as /bin/sh,
+#       so exec'ing it loads nothing". ⭐ THAT PREMISE IS FALSE, and asking
+#       `readelf -l` before running said so:
+#
+#           alpine-3.22  /bin/sh -> /bin/busybox
+#                        ELF 64-bit LSB pie, DYNAMICALLY LINKED,
+#                        interpreter /lib/ld-musl-x86_64.so.1
+#
+#       All eleven have a dynamic `/bin/sh`, so exec'ing it loads that
+#       environment's libc on every one of them and the split cannot be
+#       musl-versus-glibc. ⚠ The `sh` column is therefore printed as
+#       EVIDENCE for that refutation, and Q2 checks the only thing it can
+#       honestly assert: that the split is not the one that was guessed.
+#   Q3  ⭐ THE RESIDUE IS SPAWNED, NOT LOADED. Two halves, both checkable:
+#       (a) on every dirty row NO host object is a Qt, X11, GL or GTK library
+#           — ⛔ one of those would mean the bundle really is leaking and the
+#           DBus story is a coincidence; and
+#       (b) every dirty row shows an `execve` of a shell or a launcher, which
+#           is the positive observation that something WAS spawned. ⛔ Without
+#           (b), (a) is an absence and delivery rule 4 does not accept one.
 #   Q4  ⛔ THE FIX IS A BUILD FLAG AND IT MUST CLOSE THE ROW. Arm B carries the
-#       launcher out of its own closure — `--with-program dbus-daemon
-#       dbus-launch` — so Qt finds a `dbus-launch` on PATH, never reaches the
-#       shell fallback, and must read clean on ALL eleven while still opening
-#       its window on all eleven.
+#       launcher out of its own closure — `--extra dbus --with-program
+#       dbus-daemon dbus-launch` — so Qt finds a `dbus-launch`, never reaches
+#       the shell fallback, and must read clean on EVERY row it ran on while
+#       still opening its window on every one. ⚠ If Q4 fails, the kept traces
+#       say which paths Qt actually tried, because "it is there now" is only a
+#       fix if that is where it looks.
 #
 # ⚠ WHAT THE BED SUPPLIES AND WHAT IT DOES NOT. `dbus-daemon` insists on
 # reading `/etc/dbus-1/session.conf`, an absolute /etc path with no search
@@ -95,24 +112,51 @@ reap_in_root() {
 # classifier that drifted apart and carried the same defect five times.
 # ⚠ It takes the rootfs NAME, not its path.
 
-# ⭐ IS THE ROOTFS'S OWN /bin/sh DYNAMIC? This is the actual discriminator Q2
-# rests on, so it is MEASURED rather than inferred from the libc name: a
-# static shell cannot load a host object however the autolaunch fails.
+# ⭐ IS THE ROOTFS'S OWN /bin/sh DYNAMIC? Measured rather than inferred from
+# the libc name, because a STATIC shell would cost nothing to exec and would
+# explain a clean row — which is exactly the story this measurement kills.
+#
+# ⛔ AND THE SYMLINK MUST BE RESOLVED INSIDE THE ROOTFS, WHICH IS THE MISTAKE
+# THIS TREE HAS NOW MADE FOUR TIMES (corrections.md C42, C43, C47). Alpine's
+# `/bin/sh` is a symlink to `/bin/busybox` — an ABSOLUTE target, which `[ -e ]`
+# and `head` both resolve against the HOST. On a host without busybox that
+# reads "unknown"; on a host WITH one it would read the host's shell and say
+# nothing. So each link is followed by hand, re-rooted at every hop.
+# ⛔ AND IT IS READ WITH `readelf -l`, NOT BY GREPPING THE FIRST FEW KiB. The
+# first draft sniffed `head -c 4096 | grep ld-musl` and called fedora-42's bash
+# STATIC and alpine's busybox DYNAMIC on no better evidence than where the
+# string happened to land. ⭐ PT_INTERP is a program header; asking for it is
+# exact, and asking for it is what refuted this experiment's own first
+# prediction before it cost an hour of bed time.
 sh_dynamic() {
-  _p=$1/bin/sh
-  [ -e "$_p" ] || _p=$1/usr/bin/sh
-  [ -e "$_p" ] || { echo unknown; return; }
-  if head -c 4096 "$_p" 2>/dev/null | grep -aq 'ld-musl\|ld-linux'; then
-    echo yes
+  _root=$1; _p=/bin/sh; _hop=0
+  while [ "$_hop" -lt 10 ]; do
+    _hop=$((_hop+1))
+    [ -e "$_root$_p" ] || [ -L "$_root$_p" ] || { _p=/usr/bin/sh; [ "$_hop" = 1 ] && continue; echo unknown; return; }
+    _t=$(readlink "$_root$_p" 2>/dev/null) || _t=""
+    [ -n "$_t" ] || break
+    case "$_t" in
+      /*) _p=$_t ;;
+      *)  _p=$(dirname "$_p")/$_t ;;
+    esac
+  done
+  [ -f "$_root$_p" ] || { echo unknown; return; }
+  if readelf -l "$_root$_p" 2>/dev/null | grep -q 'program interpreter'; then
+    echo dynamic
   else
-    echo no
+    echo static
   fi
 }
 
 XDISP="${PGB_EXP107_DISPLAY:-:107}"
 start_x() {
   command -v Xvfb >/dev/null 2>&1 || return 1
-  pgrep -f "Xvfb $XDISP" >/dev/null 2>&1 && return 0
+  # ⛔ ASK THE SERVER, DO NOT `pgrep -f`. A `pgrep -f "Xvfb :107"` matches this
+  # script's OWN command line as readily as a server, so it can report a
+  # display that is not there and every row then fails for a reason the table
+  # does not show. ⚠ Same family as the `pkill -f` trap TODO/RESUME.md records,
+  # which kills the harness shell instead of the subject.
+  DISPLAY="$XDISP" xdpyinfo >/dev/null 2>&1 && return 0
   Xvfb "$XDISP" -screen 0 1280x800x24 -nolisten tcp >/dev/null 2>&1 &
   _n=0
   while [ "$_n" -lt 20 ]; do
@@ -186,8 +230,8 @@ printf -- '\n-- the eleven -----------------------------------------------------
 printf '  %-18s %-6s %-7s %-9s %-9s %-9s %s\n' \
     ENVIRONMENT LIBC 'sh dyn' 'A win' 'A host' 'B win' 'B host'
 
-rows=0; a_clean=0; b_clean=0; a_win=0; b_win=0
-musl_clean=0; musl_rows=0; glibc_dirty=0; glibc_rows=0; qtleak=0
+rows=0; b_rows=0; a_clean=0; b_clean=0; a_win=0; b_win=0
+musl_rows=0; glibc_rows=0; qtleak=0; dyn_sh=0; dirty=0; dirty_spawn=0
 for name in $ENVS; do
   root=$(exp_rootfs "$name") || true
   [ -n "$root" ] || { exp_skip "$name" "rootfs not fetched"; continue; }
@@ -208,6 +252,7 @@ for name in $ENVS; do
   fi
   rows=$((rows+1))
   [ "$libc" = musl ] && musl_rows=$((musl_rows+1)) || glibc_rows=$((glibc_rows+1))
+  [ "$shd" = dynamic ] && dyn_sh=$((dyn_sh+1))
 
   arm_run() {  # subject-path trace-out out-prefix -> prints "<win> <nhost>"
     _sp=$1; _tr=$2; _op=$3
@@ -242,6 +287,7 @@ for name in $ENVS; do
   if [ "$bhave" = yes ]; then
     set -- $(arm_run /subjB "$WORK/tr.B.$name" "$WORK/B.$name")
     bwin=$1; bhost=$2
+    b_rows=$((b_rows+1))
   fi
   rm -f "$root/subjA" "$root/subjB"
 
@@ -252,17 +298,26 @@ for name in $ENVS; do
   [ "$bwin" = yes ] && b_win=$((b_win+1))
   if [ "$ahost" = 0 ]; then
     a_clean=$((a_clean+1))
-    [ "$libc" = musl ] && musl_clean=$((musl_clean+1))
   else
-    [ "$libc" != musl ] && glibc_dirty=$((glibc_dirty+1))
-    # ⭐ Q3: WHAT the host objects ARE, not how many. A libc-family object is
-    # the shell's; a Qt/X11/GL one would be the bundle leaking, which is a
-    # different and much worse finding.
+    dirty=$((dirty+1))
+    # ⭐ Q3(a): WHAT the host objects ARE, not how many. A libc-family object
+    # is a spawned process's; a Qt/X11/GL one would be the bundle leaking,
+    # which is a different and much worse finding.
     objs=$(exp_classify_trace "$WORK/tr.A.$name" /subjA | sed -n 's/^host  *//p' \
            | sed 's|.*/||' | sort -u | tr '\n' ' ')
     exp_note "$(printf '   %s arm A host objects: %s' "$name" \
         "$(printf '%s' "$objs" | cut -c1-140)")"
     printf '%s' "$objs" | grep -qE 'libQt|libX11|libGL|libEGL|libgtk' && qtleak=$((qtleak+1))
+    # ⭐ Q3(b): THE POSITIVE OBSERVATION. Something was spawned -- a shell or a
+    # launcher -- and the exec is in the trace. ⛔ Delivery rule 4: "no Qt
+    # library was loaded" is an absence, and an absence needs a presence
+    # beside it or it is equally consistent with the subject never starting.
+    if grep -aqE 'execve\("[^"]*(dbus-launch|dbus-daemon|/sh|/bash|/dash|/busybox)"' \
+         "$WORK/tr.A.$name" 2>/dev/null; then
+      dirty_spawn=$((dirty_spawn+1))
+    else
+      exp_note "$(printf '   ⛔ %s is dirty but spawned NO shell or launcher' "$name")"
+    fi
   fi
   [ "$bhost" != - ] && [ "$bhost" = 0 ] && b_clean=$((b_clean+1))
   # ⛔ AND WHEN ARM B IS STILL DIRTY, SAY WITH WHAT — a Q4 failure with no
@@ -298,18 +353,32 @@ done
 printf '\n'
 exp_check "Q1  ⭐ arm A reproduces the corpus: clean on 4 of $rows" "$a_clean" 4
 exp_check "Q1  arm A opens a window on all $rows"                  "$a_win"   "$rows"
-exp_check "Q2  ⭐ every musl row is clean ($musl_rows musl)"        "$musl_clean" "$musl_rows"
-exp_check "Q2  ⭐ every glibc row is dirty ($glibc_rows glibc)"     "$glibc_dirty" "$glibc_rows"
-exp_check "Q3  ⛔ no row leaks a Qt/X11/GL host object"             "$qtleak"  0
-exp_check "Q4  ⭐ arm B is clean on all $rows"                      "$b_clean" "$rows"
-exp_check "Q4  arm B still opens a window on all $rows"             "$b_win"   "$rows"
+exp_check "Q2  ⛔ /bin/sh is DYNAMIC on all $rows (refutes the musl story)" \
+                                                                   "$dyn_sh"  "$rows"
+exp_check "Q3a ⛔ no row leaks a Qt/X11/GL host object"             "$qtleak"  0
+exp_check "Q3b ⭐ every dirty row spawned a shell or launcher"      "$dirty_spawn" "$dirty"
+# ⛔ Q4 IS CHECKED AGAINST THE ROWS ARM B ACTUALLY RAN ON, and when it ran on
+# NONE it is a SKIP rather than a zero. A control that was never staged and a
+# control that was staged and stayed dirty are different results, and scoring
+# the first as a failure of the second is the shape delivery rule 4 forbids.
+if [ "$b_rows" = 0 ]; then
+  exp_skip "Q4  ⭐ arm B is clean on all rows" "arm B never ran (not built or not staged)"
+  exp_skip "Q4  arm B still opens a window"    "arm B never ran"
+else
+  exp_check "Q4  ⭐ arm B is clean on all $b_rows"          "$b_clean" "$b_rows"
+  exp_check "Q4  arm B still opens a window on all $b_rows" "$b_win"   "$b_rows"
+fi
 
 exp_note "⭐ WHAT THE ROW MEANS ONCE THIS IS GREEN. qalculate-qt's 4-of-11 is"
 exp_note "   not the bundle leaking. Qt autolaunches a session bus, cannot find"
-exp_note "   dbus-launch at /sbin or /bin, falls back through a SHELL, and on"
-exp_note "   the seven glibc rows that shell is dynamic and loads the host"
-exp_note "   libc. The four clean rows are the musl ones, where /bin/sh is a"
-exp_note "   static busybox and the same failure costs nothing."
+exp_note "   dbus-launch at /sbin or /bin, and falls back through a SHELL the"
+exp_note "   environment supplies -- so the residue belongs to a process the"
+exp_note "   application asked for and the bundle never carried."
+exp_note "⛔ WHICH FOUR ROWS ARE CLEAN IS REPORTED, NOT PREDICTED. The obvious"
+exp_note "   story -- musl ships a static busybox, so the exec costs nothing --"
+exp_note "   is FALSE: readelf says /bin/sh is a dynamic PIE on all eleven,"
+exp_note "   alpine's busybox included. Q2 records that refutation so no"
+exp_note "   later session repeats the guess."
 exp_note "⛔ AND IT IS A BUILD FLAG, NOT A PATCH: --with-program dbus-daemon"
 exp_note "   dbus-launch puts the launcher in the artefact, the shell fallback"
 exp_note "   is never reached, and the row closes at 11/11."

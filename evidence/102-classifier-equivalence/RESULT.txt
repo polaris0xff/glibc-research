@@ -2,7 +2,7 @@
 102 - the trace classifier: the copies are gone, and what their removal changed
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T10:05:10Z
+date (UTC)   : 2026-09-04T16:33:15Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -70,8 +70,8 @@ evidence     : /home/user/glibc-research/evidence/102-classifier-equivalence
   ok    D5  ...and the child is not the payload        = 6
 
 -- R1: ⭐ how many times does a REAL trace exec the artefact? ------
-        trace   : /var/tmp/t065/tr.sdl-3.alpine-3.10
-        artefact: /subj65
+        trace   : /var/tmp/t101/tr.N.ubuntu-20.04
+        artefact: /subj101
   ok    R1  ⭐ execve("<artefact>") lines in a real trace = 1
         ⭐ ONE. The unconditional delete had nothing to delete there, so
            that shape's committed numbers stand -- as a MEASUREMENT.
