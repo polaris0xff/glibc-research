@@ -26,3 +26,4 @@ evidence     : /home/user/glibc-research/evidence/65-capability-corpus
   vulkan-1   Vulkan           vulkan-tools   cli  11/11   11/11   42 compiled in: 41 resol  (recorded)
   vulkan-2   Vulkan           vulkan-tools   gui  11/11   11/11   42 compiled in: 41 resol  (recorded)
   vulkan-3   Vulkan           vkmark         gui  0/11    11/11   43 compiled in: 42 resol Error: filesystem error: directory iterator cannot open directory: No  (recorded)
+  sdl-1      SDL              dosbox         gui  11/11   11/11   181 compiled in: 169 res 

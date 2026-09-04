@@ -14,7 +14,7 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
                    main, again. FIFTH session running.
     SCOPE          ⏳ T-080 finish experiments/65- (RESUMABLE). Then the arms
                    below that need the bed.
-    CI             ⭐ 335-341 all success. Read after every push.
+    CI             ⭐ 335-380 all success. Read after every push.
     GATES          both green at every commit.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
@@ -83,13 +83,23 @@ criterion fail *for the right reason*.
        `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
        ⛔ A row measured by a BROKEN instrument must be DELETED, not adjusted
        — that is what makes resumability safe.
-       ⭐ 9 of 26 in. GTK 3 and X11/XCB are CLOSED at 3 of 3 each.
+       ⭐ 17 of 26 in. THREE categories CLOSED at 3 of 3 and all passing —
+       GTK 3, X11/XCB, OpenGL/EGL. Vulkan is 3 of 3 with the third a BED
+       limit (`vkmark` needs `/dev/dri`, which exists nowhere here).
+       ⛔ STILL TO MEASURE: `sdl-1..3`, `qt-3`, `py-2`, `py-3`, `media-1`,
+       `field-1`, `field-2`.
        ⚠ ~35 minutes per subject serially — see the PARALLEL recipe above.
 
     ⭐ AT THE TIME OF WRITING TWO INSTANCES ARE RUNNING:
        the FULL one (`/var/lib/pgb-rootfs`, `:99`, `/var/tmp/t065`) and a
-       `field-*` one (`/var/lib/pgb-rootfs3`, `:97`, `/var/tmp/t065b`).
+       `qt-*` one (`/var/lib/pgb-rootfs3`, `:97`, `/var/tmp/t065b`).
        ⛔ If they are gone, just re-run the full one; the rows survive.
+
+    ⭐ 102- IS DONE — the CHEAP half of T-084, no bundle build at all.
+    It diffs the six hand copies of the trace classifier against the shared
+    one: 3 texts, 2 BEHAVIOURS, and TWO differences, not one (C38). ⛔ Its
+    arm S names the single committed number C38 reaches — `90-`'s, ours
+    included. T-084 step 2 is now "re-run 90-", not "re-run six".
 
     ⭐ 68-, 69- and 100- ARE DONE. Their numbers are in SUMMARY.md and in
     their `evidence/*/RESULT.txt`. Nothing there is waiting to be run.
@@ -150,9 +160,11 @@ why it is written down rather than left as an expectation.
                  Vulkan anything, and /dev/dri exists NOWHERE here. Not a
                  bundler failure. ⚠ The guess recorded earlier -- a
                  compiled-in data directory, the T-081 shape -- was WRONG.
-        glmark2  0/11, and no error line matched at all. ⛔ The vkmark guess
-                 was offered for this too and was wrong there; do not carry
-                 it over. Read its full error first.
+        glmark2  ✅ CLOSED at 11/11 and 11/11 CLEAN. It was C37, the same
+                 class as xterm: a nixpkgs SHELL wrapper execing a dot-named
+                 target by store path. ⚠ The vkmark guess -- a compiled-in
+                 data directory -- was offered for this too and was WRONG
+                 for both subjects.
         gl-1     ⭐ SOLVED -- TWO instrument defects, and the second was
         vulkan-1 hiding behind the first. C34: the cli criterion was
                  `exit 0 AND the assertion` and eglinfo exits 3 headless.
@@ -186,17 +198,16 @@ why it is written down rather than left as an expectation.
                  traceback is "Traceback (most recent call last):". Fix the
                  note to prefer the LAST line and keep >70 chars, then
                  re-measure: PGB_EXP65_ONLY='py-2'.
-        vulkan-1 ⛔ 0/11 AND THE CAPABILITY DEMONSTRABLY WORKS. Run by hand
-                 out of the vulkan-2 artefact: `vulkaninfo --summary` exits
-                 0 and enumerates GPU0 = llvmpipe, apiVersion 1.4.354 --
-                 twice, with and without DISPLAY. ⛔ NOT the C34 defect and
-                 NOT explained. The obvious unexamined difference: vulkan-1
-                 was built `--name vulkaninfo` and vulkan-2 `--name vkcube`,
-                 so the selector's DEFAULT differs. Delete the row and
-                 re-measure.
+        vulkan-1 ✅ CLOSED at 11/11 and 11/11 CLEAN. It was C36 -- the
+                 separator, not the selector default the note above
+                 suspected. Re-measured after the row was deleted, and its
+                 store paths went 12 -> 42 because `--extra mesa` had been
+                 failing to resolve as well.
 
-    ⛔ AND ONE THING IS BLOCKED ON 65- FOR A DIFFERENT REASON THAN THE ONE
-    THAT WAS WRITTEN HERE. T-084 changes `exp_classify_trace`'s signature.
+    ⛔ AND ONE THING IS STILL BLOCKED ON 65-, THOUGH LESS OF IT THAN WAS
+    WRITTEN HERE. ⭐ T-084's cheap half is DONE (`experiments/102-`) and its
+    expensive half is now ONE experiment, `90-`, not six. T-084 changes
+    `exp_classify_trace`'s signature.
     Editing the sourced `lib.sh` is SAFE while 65- runs (measured — the
     function is in memory). What is not safe is that 65- is **resumable**: a
     resumed run re-sources the new `lib.sh` and, calling it the old way,
