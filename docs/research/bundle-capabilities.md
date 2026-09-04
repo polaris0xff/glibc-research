@@ -491,6 +491,120 @@ exactly the error the operator caught the first time.
 
 ---
 
+## ⭐ THEIR HARD CASES, TAKEN ONE BY ONE — 2026-09-04c
+
+⛔ **Operator, 2026-09-04c**: *"Take on their 'can't fix', 'unfixable', 'hard'
+etc seriously one by one; the more the bundler is exercised the better it
+gets."* ⭐ This section is that pass, over the **vendored** `FAQ.md`,
+`HALL-OF-FAME.md` and the **825 issues / 1,000 comments** in `api/`. Each row
+quotes their claim, says what **we** measure against it, and says plainly when
+we have measured nothing.
+
+⚠ **Their claims are about a different pipeline** — a distro closure, sharun,
+`quick-sharun`'s string patching — so an answer of ours is a different
+artefact, not a refutation. What makes the exercise worth doing is that
+several of their rows land on our own corpus rows independently.
+
+### ⛔ *"Why not statically link everything? … a fully static binary is a very bad idea"*
+
+⭐ **This is the FAQ answering our project's thesis directly**, so it is worth
+taking apart claim by claim.
+
+| their claim | what we measure |
+|---|---|
+| *"That is super hard, some libraries are not meant to be statically linked … a ton of patches are needed"* | ⭐ **Ten POCs, stock tarballs, stock `./configure`, NO source patches** — up to Qt 6.11.1 and ffmpeg+MLT. ⚠ Two pass *configuration*, not patches (`docs/AGENTS.md` §12). It is hard; it is not "a ton of patches" |
+| *"we are not able to `dlopen` any library from the host, even optional ones"* | ⭐ **FALSIFIED for our artefact, and this is route D**: `pgb build --host-dlopen` compiles an ELF loader into the static binary. `experiments/76-`: **11 of 11**, zero host objects, a **real host `.so` on 7 of 7 glibc rows**. `experiments/93-`: **882 of 1,527** host objects on the build host load |
+| *"It means goodbye to the proprietary nvidia driver"* | ⚠ **We agree, and say so**: the driver is HOST-always and never bundled (`design/host-fallback.md`), and every GL row here is a software rasteriser. T-059 owns it |
+| ⛔ *"you are no longer able to use vulkan layers like mangohud"* | ⛔ **NOT MEASURED.** A Vulkan layer is a host `.so` loaded at run time, which is exactly what `--host-dlopen` is for — but nobody has pointed it at a layer. **A named next experiment, not an answer** |
+| *"you are forever stuck with the version of MESA that was statically linked"* | ⚠ **True of a static binary and we do not dispute it.** ⭐ Our *bundle* has the host-fallback classes instead (`design/host-fallback.md`), which is the same lever as their `SHARUN_ALLOW_SYS_VKICD` |
+
+### ⛔ *"Why not use solo or detour?"* — and their own UPDATE answers it
+
+⭐ **The FAQ dismisses the route this project took, and then its own UPDATE
+adopts it**: *"We now have a similar feature via **cross-libc-dlopen**, enabled
+via `USE_HOST_DRIVERS_EXPERIMENTAL=1`"* — the repository we have vendored, and
+whose approach `research/solo.md` compares against ours.
+
+| their objection | ours |
+|---|---|
+| *"What happens if my application needs OpenGL 4.6 but the host Mesa only supports 4.5?"* | ⚠ **Real, and it is an argument for bundling Mesa rather than against a loader.** We bundle it; `--host-dlopen` is opt-in per call site |
+| *"if I end up statically linking LLVM and the host's Mesa links to a different version"* | ⚠ Real. ⛔ **Not measured here** — no row has loaded a host Mesa into a binary carrying its own LLVM |
+| ⭐ *"it seems none of the solutions implement `dlmopen`, so you are likely to run into a lot of symbol collisions"* | ⭐ **Ours does not have that shape.** `tool/runtime/pgb-elfload.c` resolves each loaded object's undefined symbols **itself**, against the static glibc already linked in; nothing is added to a global search scope, so a second object cannot bind to the first by accident. ⛔ **That is read off the design, not measured** — the experiment is two host objects defining the same symbol name, and it has not been run |
+
+⚠ **And their three conditions for enabling it are worth copying rather than
+arguing with**: no recent OpenGL requirement, no hard Vulkan dependency, and a
+software-renderer fallback.
+
+### ⛔ *"Horrible — Glibc"*, and one of the three is a latent bug we checked for
+
+| their claim | ours |
+|---|---|
+| *"`LOCPATH` … doesn't work with locale archives"* | ⚠ Their problem is a **relocatable glibc**; ours is a **static** one. `--embed-locale` writes C.UTF-8 only when the host cannot answer, 11 of 11 |
+| *"we also have to set `GCONV_PATH` and good luck figuring out which gconv plugin your app needs … when the plugin is missing there is no error"* | ⭐ **The static path does not have this problem at all**: `--wrap=iconv_open` onto static GNU libiconv, so no gconv module is ever looked for. It is the one place our answer is structurally better than theirs, and it costs ~1.2 MiB on a binary that calls `iconv` |
+| ⛔ *"We also have to patch `ld-linux.so` to prevent it from reading `/etc/ld.so.cache` because otherwise it would segfault instantly on some systems"* | ⭐ **CHECKED, 2026-09-04c.** Traced on our `helix` artefact: `/etc/ld.so.cache` is opened **exactly once in the whole run**, and **not by the bundled loader** — it happens in sharun's own startup, before the loader is even read, and the loader is entered without a visible `execve` (userland-execve). ⚠ **One subject, one environment, and it does not prove the class is absent** — it says the read we do have is not the one their fix is about |
+
+### ⛔ *"Utter Garbage — Python"* — and their first bullet is our own corpus row
+
+⭐ **Their claim**: *"python apps are often written with a ton of hardcoded
+paths, **even more than GTK apps**, so a lot of manual patches are needed."*
+
+⭐ **Reached independently on our pipeline the same day**: `experiments/65-`
+`py-2` `pdfarranger` fails on **all eleven** with
+
+    FileNotFoundError: … '/usr/local/share/pdfarranger/pdfarranger.ui'
+
+⛔ **And their own mechanism does not cover it either, in their own words**
+(issue **#228**): *"we check for hardcoded paths in binaries and libraries and
+patch them away for a random path in `/tmp`, and this only works when you
+install the app to `/usr` … Very ideally apps should be installed to `/usr`
+and not `/usr/local`."* ⭐ `pdfarranger`'s path is `/usr/local/share/…`.
+
+⚠ **So the honest statement is that neither pipeline answers this row today**,
+and the two routes are different: theirs patches the ELF's strings to a
+**random `/tmp` path**, which [`../design/store-paths.md`](../design/store-paths.md)
+§2 refuses on security grounds in writing; ours rewrites at the syscall and
+only for `/nix/store`.
+
+⛔ **AND ONE MORE OF THEIRS IS A LATENT ROW OF OURS.** Issue **#4**: *"the
+ctypes library runs `/sbin/ldconfig -p` and this fails in alpine linux since it
+doesn't support the `-p` flag … that stops any further lookup."* ⚠ Our two
+passing Python subjects (`meld`, `virt-manager`) are **11/11 including the
+three Alpines**, so it did not bite them — but nobody has checked whether they
+call `ctypes.util.find_library` at all. **Not measured; a cheap next check.**
+
+### ⭐ *"if the application interacts with executables outside the appimage, there is no way to make them use the libraries in the appimage"*
+
+Issue **#171**, and they conclude *"for those cases it is better to just use a
+container like RunImage."*
+
+⭐ **We reached the same class twice, from two directions, before reading
+this:**
+
+| ours | |
+|---|---|
+| `experiments/65-` `x11-3` `xterm` | **11/11 pass, 4/11 clean** — and the dirty count was **pre-registered as C5**: xterm's job is to run the user's **shell**, a host program, so a host libc enters by construction |
+| `experiments/100-` arm L `lilipod` | the static ELF **executes on 11 of 11**; the **application completes on 2**, every failure naming `getsubids`, a host **program** |
+
+⭐ **Where we differ is what it means for a STATIC binary.** Their sentence is
+about libraries the child process loads; a `pgb` static binary has none to
+share either way. ⛔ What neither of us answers is a missing host **program** —
+and that is the sharper statement: *static linking answers "will this binary
+start"; it says nothing about "will this program find the tools it shells out
+to."*
+
+### ⚠ The rows we have nothing to say about yet
+
+| theirs | why it is open for us |
+|---|---|
+| *"Once `HOME` gets changed there is no way to roll it back"* (#12) | ⚠ We have an interposer and it does **not** touch `HOME`. Whether it should is undecided, and no row needs it yet |
+| **WebKit** *"hardcoded to load some binaries in `/usr/lib` … no way to override"* | ⛔ the same `/usr` class as `pdfarranger`; no WebKit subject in the corpus |
+| **p11-kit** *"You need to recompile the library to enable environment variables"* | ⛔ a compiled-in path with no variable. Ours answers it **only if** it is a `/nix/store` path |
+| **JACK2** *"needs matching versions between server and client"* | ⛔ a host-daemon protocol version; nothing a bundler or a linker reaches |
+| *"impossible to call it with the dynamic linker directly"* (#189, a `bun` binary) | ⚠ the same family as **C35** — our `neovim` row, where the closure's glibc 2.26 `ld.so` rejects `--argv0`. Theirs is a payload that cannot be *started* by the loader at all |
+| *"making PGO builds in the CI is basically impossible"* (#14) | ⚠ this is their `OPTIMIZE_LAUNCH` lever, which we have never tried — **T-066** |
+
+---
+
 ## 1. ⭐ The capability question, answered from the field's own record
 
 `pkgforge-dev/Anylinux-AppImages` keeps `HALL-OF-FAME.md`, a per-library
