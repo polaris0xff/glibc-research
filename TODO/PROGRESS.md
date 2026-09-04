@@ -231,16 +231,29 @@ dispatch table — the same set the selector chooses from. ⚠ It counts the ent
 store path's `bin/` only, so a helper in a dependency needs `--with-program`
 and is not in the number. T-088 puts the count in the corpus table.
 
-**4. Feature parity with anylinux AppImages?** ⚠ **Close, and two rows are
-theirs.** Level or ahead: coverage 11/11 both, payload clean 11/11 both, a
-static delivery path (no shell in ours), nothing written to the filesystem,
-`dlopen` of our own plugins, the compiled-in store path (T-081), a Python GUI
-(T-081), the seven host-data dependencies. ⛔ **Where they are ahead today**:
-  - **the sandbox** — they ship a namespaces hook and browsers; we cannot even
+**4. Feature parity with anylinux AppImages?** ⚠ **No — close on mechanism,
+behind on features, and the list is theirs not mine.** Level or ahead:
+coverage 11/11 both, payload clean 11/11 both, a static delivery path (no shell
+in ours), nothing written to the filesystem, `dlopen` of our own plugins, the
+compiled-in store path (T-081), a Python GUI (T-081), the seven host-data
+dependencies. ⭐ **And one row that is ours outright**: they run `strace` to
+guess a dependency set (`STRACE_MODE=1`); we are handed the exact one the
+derivation declared. ⛔ **Where they are ahead**, read off their own
+`HOW-TO-MAKE-THESE.md` variable list rather than inferred:
+  - **the sandbox** — a namespaces hook and shipped browsers; we cannot even
     measure it in this bed (T-090);
-  - **breadth** — they have shipped hundreds of applications and have a graded
-    per-toolkit record; our corpus is 26 subjects and running.
+  - ⭐ **`OPTIMIZE_LAUNCH`, a DWARFS *profile* image** — PGO for the mount. We
+    have `lite` and `-S18`, which are different levers. A named cold-start
+    lever we have never tried (T-066);
+  - **four capability-check hooks** (`x86-64-v3`/`v4`, `vulkan`, `wayland`)
+    that print a message where ours crashes silently;
+  - `GTK_CLASS_FIX` (the taskbar groups the window with its icon),
+    `self-updater`, `udev-installer`, and `QUICK_SHARUN_SKIP_DEPS_FOR`
+    (skip a dependency subtree **by name**, where `--debloat` is coarser);
+  - **breadth** — hundreds of applications and a graded per-toolkit record
+    against our 26-subject corpus.
   ⚠ Not parity questions: size and speed, which the operator has deferred.
+  ⭐ The full table is [`../docs/research/app-corpus.md`](../docs/research/app-corpus.md).
 
 ## Open questions for the operator
 

@@ -81,23 +81,49 @@ GNOME app under a non-English `LANG`, asserting a translated string, against the
 same bundle built `--no-storefix`. A window is not enough here — the window
 appears either way.
 
-⭐ **AND THE FIELD TRIED OUR ROUTE AND ABANDONED IT — this is the citation that
-makes the rung worth doing.** Their `quick-sharun` **patches the binary**:
-issue #45, *"the script is able to detect when you have a hardcode path to
-`/usr/share/locale` or `/usr/share/icons` and will patch just that"*. Issue #60
-records why they did **not** switch to an `LD_PRELOAD` path mapper —
-*"replace ld-preload-open for pathmap, drop relative path mapping"*, rejected
-because *"if I were to replace this for pathmap, **all libraries** would try
-to…"* — and it also names the mechanism they used instead: **relative symlinks
-in `/tmp`**, which is the route
+⭐ **AND THE FIELD CONSIDERED OUR ROUTE FOR THIS AND CHOSE ANOTHER — this is the
+citation that makes the rung worth doing.** Their `quick-sharun` **patches the
+binary**: issue #45, *"the script is able to detect when you have a hardcode
+path to `/usr/share/locale` or `/usr/share/icons` and will patch just that"*.
+Issue #60 is the decision — *"replace ld-preload-open for pathmap, drop relative
+path mapping"* — declined because *"if I were to replace this for pathmap,
+**all libraries** would try to…"*, and it names what they used instead:
+**relative symlinks in `/tmp`**, the route
 [`../design/store-paths.md`](../design/store-paths.md) §2 rejects on security
-grounds, in writing, before building anything.
+grounds, in writing, before anything was built.
+
+⚠ **NOT "they rejected LD_PRELOAD".** They ship one by default —
+`ANYLINUX_LIB=1`, *"preloads library that fixes several common issues that
+affect AppImage"* — and issue #393 moves their locale logic into its
+constructor. What they declined was using a preload for **path mapping**
+specifically. ⛔ Say it that way; the stronger version is not what the source
+says.
 
 ⚠ **And a convergence worth knowing about before reinventing it**: issue #393
 moved their locale handling into an `anylinux.so` **constructor** with the chain
 `setlocale(LC_ALL,"")` → `LOCPATH=$APPDIR/...` → `en_US.UTF-8` → `C.UTF-8` →
 `C`. That is `tool/runtime/pgb-locale.c` plus `--utf8-default`, arrived at
 independently. Read theirs before extending ours.
+
+## ⛔ Where they are ahead, from their own variable list — the parity answer
+
+Read off `HOW-TO-MAKE-THESE.md` "Configurable environment variables". ⭐ **These
+are features we do not have, and most are small.** They are not rungs; they are
+the honest half of the parity answer the operator asked for.
+
+| theirs | what it does | ours |
+|---|---|---|
+| ⭐ `OPTIMIZE_LAUNCH=1` | a **DWARFS profile image** — PGO for the mount, laying out blocks in access order | ⛔ **nothing.** We have `lite` and `-S18`, which are different levers. A named cold-start lever we have not tried — **T-066** |
+| `x86-64-v3-check`, `x86-64-v4-check`, `vulkan-check`, `wayland-is-broken` hooks | the bundle **detects** the condition and prints a message instead of crashing | ⛔ **nothing.** Ours crashes silently. Cheap, and it is what a user sees |
+| `GTK_CLASS_FIX=1` | a shim fixing `WM_CLASS` so the taskbar groups the window with its icon | ⛔ nothing — **T-083** territory |
+| `self-updater.hook`, `udev-installer.hook` | update in place; install udev rules | ⛔ nothing |
+| `QUICK_SHARUN_SKIP_DEPS_FOR` | skip a dependency subtree by name, e.g. `libqgtk3.so` so a Qt app does not drag GTK3 in | ⚠ `--debloat` is coarser and not by-name |
+| `DEPLOY_PYTHON`, `DEPLOY_LOCALE`, `DEPLOY_OPENGL`, `DEPLOY_VULKAN` | opt in/out of whole subsystems | ⚠ ours are implied by the closure, which is usually right and is not steerable |
+| `STRACE_MODE=1` | discover `dlopen`ed libraries by tracing | ⭐ **not needed** — the closure is the exact set the derivation declared |
+
+⭐ **The one row that goes the other way is the last one, and it is the
+project's whole thesis**: they trace to guess a dependency set; we are handed
+one.
 
 **Study.** `HALL-OF-FAME.md` "Garbage - GTK"; issues **#45, #60, #393, #616**
 in the vendored `api/issues.json`;
