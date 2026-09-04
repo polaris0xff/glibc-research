@@ -407,10 +407,20 @@ resolver at all, so a curl test using `localhost` measures curl, not NSS. POC
 
 ## 3. Data dependencies are not libc dependencies, and static linking does not touch them
 
-Five distinct ones found, each with its own per-distribution path convention.
-⭐ **This is the finding most likely to be underestimated**: three of the five
-have nothing to do with glibc at all, and static linking is silent about all of
-them.
+⛔ **SEVEN distinct ones found**, each with its own per-distribution path
+convention. ⚠ **This table read FIVE until 2026-09-03f** while `docs/AGENTS.md`
+§7 already said seven — the count moved twice (timezone on 2026-09-03c,
+the network databases on 2026-09-03e) and this page was not moved with it.
+⭐ **The finding most likely to be underestimated**: several of the seven have
+nothing to do with glibc's *code* at all, and static linking is silent about
+every one of them.
+
+⛔ **AND THE LIST IS NOT KNOWN TO BE COMPLETE.** `experiments/82-` is a
+re-runnable SEARCH — every absolute path the pinned `libc.a` names, classified
+against these rows — and it is what found the seventh. It cannot see
+runtime-assembled paths, another library's host data (terminfo and the CA
+bundle are invisible to it **by construction**) or anything behind a host
+daemon. It is a snapshot of a method, not a proof.
 
 | dependency | status | evidence |
 |---|---|---|
@@ -418,6 +428,8 @@ them.
 | **glibc locale** (`/usr/lib/locale`) | ✅ **solved, opt-in** — `--embed-locale`, materialised only when the host cannot answer | `experiments/30-` |
 | **terminfo** (`/usr/share/terminfo`) | ✅ **solved, opt-in** — `--embed-terminfo`, host database preferred | `experiments/75-`, POC 20 |
 | **TLS CA bundle** | ✅ **solved, opt-in** — `--embed-cacert`, nine known store locations probed first | `experiments/74-`, POC 30 |
+| **timezone** (`/usr/share/zoneinfo`) | ✅ **solved, opt-in** — `--embed-tzdata`; without it a plain `-static` binary answers `TZ=Europe/Berlin` with `Europe +0000` on 4 of 11 | `experiments/97-` |
+| **network name databases** (`/etc/services`, `/etc/protocols`) | ⚠ **mechanism written, `--embed-netdb`; the measurement is `experiments/66-` and this row says what it says only once that has run.** `getservbyname("http","tcp")` returns NULL on **3 of 11, all glibc** | `experiments/82-`, `66-` |
 | **a runtime's own library tree** (CPython's stdlib) | ⚠ **shipped, not solved** — 98 MiB beside a 46 MiB binary | POC 50 |
 
 **terminfo and the CA bundle, before and after.** ⭐ Both are now solved and
@@ -463,9 +475,15 @@ portability tool owning a terminal database by default is weak. `--embed-locale`
 `--embed-terminfo` and `--embed-cacert` are the three mechanisms that can touch
 the filesystem, which is why all three are asked for rather than assumed.
 
-⛔ **The one that is left is the fifth row**: a runtime's own library tree.
+⛔ **The one that is left is the LAST row**: a runtime's own library tree.
 CPython ships 98 MiB of stdlib beside a 46 MiB binary and nothing here reduces
 that. It is shipped, not solved, and it is the honest gap in this section.
+
+⚠ **And the sixth and seventh rows are the two that moved the count**, which is
+worth stating as a habit rather than as a fact about two files: both were found
+by somebody asking whether the LIST was complete rather than whether the known
+rows were closed. `experiments/82-` exists so that question has a command
+behind it.
 
 ---
 

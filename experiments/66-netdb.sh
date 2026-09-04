@@ -148,7 +148,7 @@ exp_check "...and tcp's protocol number" \
 printf '\n'
 printf -- '-- arm A: plain `gcc -static`, and what the host has ----------------\n'
 printf '  %-20s %-6s %-9s %-10s %-7s %s\n' ENVIRONMENT LIBC /etc/serv /etc/proto PRINTED VERDICT
-A_OK=0; A_MISS=0; ROWS=0
+A_OK=0; A_MISS=0; A_ODD=0; ROWS=0
 for name in $(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt"); do
   r=$(exp_rootfs "$name") || true
   [ -n "$r" ] || { exp_skip "$name" "not fetched"; continue; }
@@ -159,12 +159,21 @@ for name in $(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-imag
   out=$("$REPO_DIR/pgb" rootfs run "$r" --copy "$WORK/nd:/nd" -- /nd 2>/dev/null | tr -d '\r')
   port=$(printf '%s' "$out" | awk '{print $1}')
   if [ "$port" = 80 ]; then v="ok"; A_OK=$((A_OK+1)); else v="⛔ NULL"; A_MISS=$((A_MISS+1)); fi
+  # ⭐ THE TWO FACTS MUST AGREE, and asserting the AGREEMENT is stronger than
+  # asserting a count: a row that resolves without the file, or fails with it,
+  # means the diagnosis is wrong even if the totals happen to look right.
+  case "$hs:$v" in
+    yes:ok|no:"⛔ NULL") ;;
+    *) A_ODD=$((A_ODD+1)); v="$v ⚠ DISAGREES WITH /etc/services" ;;
+  esac
   printf '  %-20s %-6s %-9s %-10s %-7s %s\n' "$name" "$libc" "$hs" "$hp" "${out:-<none>}" "$v"
 done
 printf '\n'
 exp_check "every fetched environment answered"          "$((A_OK+A_MISS))" "$ROWS"
 exp_check "N1  environments that CANNOT resolve http/tcp" \
   "$([ "$A_MISS" -gt 0 ] && echo some || echo none)" some
+exp_check "N1  ...and the failures are EXACTLY the rows with no /etc/services" \
+  "$A_ODD" 0
 exp_note "arm A: $A_MISS of $ROWS answer NULL for getservbyname(\"http\",\"tcp\")."
 
 # -- 4. arm B, the same program built with --embed-netdb ---------------------

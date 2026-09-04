@@ -206,9 +206,13 @@ NENV=$(printf '%s\n' "$ENVS" | wc -l | tr -d ' ')
 
 TOTAL=0; BUILT=0; UNRESOLVED=0; FULL=0; CLEANALL=0
 
+show_row() { # id category subject mode pass clean paths note
+  printf '  %-10s %-16s %-14s %-4s %-7s %-7s %-9s %s\n' \
+    "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8"
+}
+
 printf '\n'
-printf '  %-10s %-14s %-14s %-4s %-7s %-7s %-8s %s\n' \
-  ID CATEGORY SUBJECT MODE 'PASS/N' 'CLEAN/N' 'PATHS' NOTE
+show_row ID CATEGORY SUBJECT MODE 'PASS/N' 'CLEAN/N' 'PATHS' NOTE
 
 # ⛔ `for line in $CORPUS` WORD-SPLITS ON SPACES and a category is
 # "OpenGL / EGL". Read line by line from a FILE on fd 3 instead: a pipeline
@@ -228,13 +232,31 @@ while IFS= read -r line <&3; do
   [ -n "$ONLY" ] && { case "$id" in $ONLY) ;; *) continue ;; esac; }
   TOTAL=$((TOTAL+1))
 
-  row="$ROWS/$id.txt"
+  # ⭐ A ROW IS STORED AS FIELDS, NOT AS THE TABLE LINE IT PRINTS.
+  #
+  # ⛔ THE FIRST VERSION STORED THE FORMATTED LINE AND COUNTED ONLY `BUILT`
+  # when it read one back, so a RESUMED run — the whole reason the rows exist —
+  # scored C1 as `FULL(0) != BUILT(n)` and reported a red corpus in which every
+  # subject had passed. ⚠ And parsing the line back was never going to work
+  # either: a category is "OpenGL / EGL", so the field positions move.
+  #
+  #     <id> TAB <pass> TAB <rows> TAB <clean> TAB <paths> TAB <note>
+  #
+  # `pass = -1` means UNRESOLVED: neither a pass nor a failure of the
+  # capability.
+  row="$ROWS/$id.tsv"
   if [ -s "$row" ]; then
-    # ⭐ RESUMABLE. A recorded row is not re-measured: this corpus is hours of
-    # closure fetches and a session that stops halfway must not lose them.
-    read_line=$(cat "$row")
-    printf '  %s   (recorded)\n' "$read_line"
-    case "$read_line" in *UNRESOLVED*) UNRESOLVED=$((UNRESOLVED+1)) ;; *) BUILT=$((BUILT+1)) ;; esac
+    pass=$(cut -f2 < "$row"); rows=$(cut -f3 < "$row")
+    clean=$(cut -f4 < "$row"); paths=$(cut -f5 < "$row"); note=$(cut -f6 < "$row")
+    if [ "$pass" = "-1" ]; then
+      UNRESOLVED=$((UNRESOLVED+1))
+      show_row "$id" "$cat_" "$attr" "$mode" "-" "-" "-" "$note (recorded)"
+    else
+      BUILT=$((BUILT+1))
+      [ "$pass" = "$rows" ] && [ "$rows" -gt 0 ] && FULL=$((FULL+1))
+      [ "$clean" = "$rows" ] && [ "$rows" -gt 0 ] && CLEANALL=$((CLEANALL+1))
+      show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" "$paths" "$note (recorded)"
+    fi
     continue
   fi
 
@@ -249,8 +271,9 @@ while IFS= read -r line <&3; do
   if [ ! -s "$img" ]; then
     # ⛔ C4: UNRESOLVED IS NOT A FAILURE OF THE CAPABILITY and is not a pass.
     why=$(grep -aoE "nixpkgs has no attribute [^ ]*|no entry point in [^ ]*|could not fetch the closure[^\"]*|--name [^ ]* names no program" "$blog" 2>/dev/null | head -1)
-    printf '  %-10s %-14s %-14s %-4s %-7s %-7s %-8s %s\n' \
-      "$id" "$cat_" "$attr" "$mode" "-" "-" "-" "UNRESOLVED: ${why:-see $blog}" | tee "$row"
+    note="UNRESOLVED: ${why:-see $blog}"
+    printf '%s\t-1\t0\t0\t-\t%s\n' "$id" "$note" > "$row"
+    show_row "$id" "$cat_" "$attr" "$mode" "-" "-" "-" "$note"
     UNRESOLVED=$((UNRESOLVED+1))
     rm -rf "$cache"
     continue
@@ -312,8 +335,9 @@ while IFS= read -r line <&3; do
   note=""
   [ "$pass" -lt "$rows" ] && note=$(cat "$WORK/err.$id."* 2>/dev/null | tr -d '\r' \
     | grep -m1 -E "Couldn't load|cannot open|Traceback|error while loading|not found|Error" | cut -c1-70)
-  printf '  %-10s %-14s %-14s %-4s %-7s %-7s %-8s %s\n' \
-    "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" "${paths:--}" "$note" | tee "$row"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$id" "$pass" "$rows" "$clean" "${paths:--}" "$note" > "$row"
+  show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" "${paths:--}" "$note"
   [ "$pass" = "$rows" ] && [ "$rows" -gt 0 ] && FULL=$((FULL+1))
   [ "$clean" = "$rows" ] && [ "$rows" -gt 0 ] && CLEANALL=$((CLEANALL+1))
 
