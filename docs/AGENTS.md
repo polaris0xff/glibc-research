@@ -297,6 +297,10 @@ scripts/common/
   rootfs-images.txt       the 11 environments, pinned by digest
   mine-repo.sh            reference-sweep fetcher, vendored    (--selftest)
   check-docs.sh           the documentation gate
+  bed-fixtures.sh         ⭐ state the minimal images do not ship — a locale,
+                          a GTK theme, a session-bus config. DATA ONLY, and
+                          the selftest asserts it adds no shared object.
+                          §8; the ruling it answers is in §0b   (--selftest)
   install-codegraph.sh    ⭐ the code-reading index, pinned and sha256-checked
 codegraph.json            what that index excludes and deprioritises
 experiments/lib.sh        conditions block, assertions, pid-attributed tracing
@@ -559,6 +563,21 @@ a tag without updating that file silently changes what every result describes;
 
 ⚠ Compatibility is claimed for these and nothing else. Eleven filesystems on
 one kernel is not "works on Linux".
+
+⛔ **AND SINCE 2026-09-04c THE BED CAN CARRY FIXTURES, WHICH MEANS A RESULT
+MUST SAY WHICH BED IT DESCRIBES.** `scripts/common/bed-fixtures.sh` adds state
+these minimal images do not ship — a compiled `de_DE.UTF-8` locale, a GTK and
+icon theme called `PgbFixture`, and `/etc/dbus-1/session.conf` — because the
+operator ruled that *"not measurable in this bed"* is a deferral rather than a
+finding (§0b). ⭐ **`--check` prints which rootfs have which**, so a run can
+state its bed instead of assuming one.
+
+⚠ **A fixture may add DATA ONLY, and that is what keeps it safe**: data cannot
+change a host-shared-object count, which is the number nearly every experiment
+here turns on, so installing one cannot silently move somebody else's result.
+⛔ The script's `--selftest` asserts it adds **no** shared object. ⚠ A fixture
+does **not** survive `pgb rootfs fetch`, which replaces the rootfs — re-install
+after one.
 
 ## 9. Status
 
