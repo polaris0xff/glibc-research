@@ -479,22 +479,40 @@ when a static program execs host programs, the host's libraries enter the
    | `powershell` | ⛔ dynamic PIE; fails on a run-time-assembled path instead |
    | ⛔ `pkgsStatic.file` | **unreachable by construction** — `pgb` turns a name into a store path with a regex over what the channel already **built**, and `pkgsStatic.*` is an unbuilt attribute. `experiments/83-` says so in its own header |
 
-   ⭐ **THE REACHABLE SUBJECT NOBODY HAS NAMED IS `pgb build`, NOT
-   `pgb bundle`.** This rung needs *a static application that needs a
-   compiled-in absolute path*, and the tree already builds static applications
-   from stock tarballs — that is what the ten POCs are. ⭐ `file`(1) is the
-   exact shape: without `magic.mgc` at its compiled-in path it does not
-   degrade, it says `could not find any valid magic files!` and exits
-   non-zero, and **[`experiments/105-`](../experiments/105-file-magic.sh) has
-   already measured the DYNAMIC half at 11/11 with a `--no-storefix` control
-   failing 11/11.** A `pgb build` of the same program is the same subject with
-   the PLT removed, so the two rows differ in exactly one variable.
+   ⛔ **AND A FIFTH ROUTE WAS PROPOSED HERE AND WITHDRAWN THE SAME DAY, which
+   belongs in the entry rather than in a deleted diff.** The proposal was
+   `pgb build` a static `file`(1) from a stock tarball —
+   **[`experiments/105-`](../experiments/105-file-magic.sh)** has already
+   measured the DYNAMIC half at 11/11 with a `--no-storefix` control failing
+   11/11, so a static build of the same program looked like the same subject
+   with the PLT removed.
 
-   ⛔ **PRE-REGISTER IT: the static one must FAIL to find its magic**, because
-   `LD_PRELOAD` cannot reach a program with no dynamic loader. That is arm P's
-   `-static` row (`no`, measured) with a real application behind it, which is
-   the only thing this entry still owes. ⚠ If it PASSES, the mechanism story
-   is wrong and the record must say so rather than be quietly corrected.
+   ⭐ **IT IS NOT, AND `internal/nixx/build.go` SAYS SO IN ITS OWN HEADER**:
+   *"What comes out is an ordinary statically linked glibc ELF: **no store**,
+   no …"*. A `pgb build` artefact carries a `--prefix` path, **not a
+   `/nix/store` path**, and `pgb-storefix.c`'s `fix()` rewrites nothing that
+   is not `/nix/store/`. ⛔ So that subject would exercise a static binary
+   with a compiled-in path the interposer was never meant to touch — a
+   different question wearing this one's clothes.
+
+   ⭐ **WHAT THAT LEAVES IS A BUNDLER QUESTION, NOT A SUBJECT HUNT.** A real
+   application on this rung must be *statically linked* **and** carry a
+   `/nix/store` path, which means a static build **from the ordinary nixpkgs
+   set** — and exactly one such subject is known: `lilipod`, which
+   `pgb bundle appimage` **refuses**. ⚠ Meanwhile
+   `internal/bundle/assemble.go` records that sharun *"skips the loader
+   invocation entirely for a static or already-patched payload
+   (`is_static_bin`, `is_patched_bin`)"*, i.e. the delivery path does handle
+   static payloads. ⛔ **So the next step is to read WHY the bundler refuses
+   `lilipod` and whether that refusal is correct** — not to look for a fifth
+   subject.
+
+   ⚠ **And the honest possibility must stay on the table**: if a static
+   nixpkgs application with a compiled-in store path cannot be bundled at all,
+   then the `-static` row has no real application behind it *by construction*,
+   and **that is the answer** rather than an open task. Arm P has already
+   measured the mechanism with a planted path (`-static` → `no`, as
+   pre-registered).
 
    ⚠ **And one thing the run establishes on the way**: `shared/script/pwsh`
    carries its `/nix/store` paths **as text, unrewritten** —
