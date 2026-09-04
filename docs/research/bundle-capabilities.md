@@ -71,9 +71,43 @@ failures are subject-specific and each needs its own reading.
 | row | what is known | ⛔ what is NOT yet known |
 |---|---|---|
 | `xterm` **0/11**, clean **11/11** | ⭐ **C5 predicted it would fail the HOST-OBJECT row and it did not** — it is clean on 11 of 11. ⚠ It also never drew, so the prediction is not so much falsified as **unevaluable**: a subject that does not start its shell never loads the shell's libc | why it does not draw |
-| `neovim` **0/11** | its entry is a **script**: `bin/nvim is a SCRIPT; its entry point is bash + the script itself`, laid out as `nvim = bash + shared/script/nvim (static trampoline)`. It fails with `--argv0: error while loading shared libraries: --argv0: cannot open sh` | ⛔ where `--argv0` is exec'd. `ReadWrapper` parses `--argv0` at BUILD time, so this is a RUN-time path. Read the extracted `shared/script/nvim`. Reproduce with `PGB_EXP65_ONLY='field-2'` |
+| ⭐ `neovim` **0/11** — **ROOT CAUSE FOUND** | the closure carries **glibc 2.26**. See below | — |
 | `helix` **0/11** | ⚠ the build warns that this closure's store paths carry **top-level `.so` files** (its ~200 tree-sitter grammars: `rust.so`, `python.so`, …), and `mergedFor` maps only `bin`/`lib`/`share`/`etc`/`libexec` — so the farm has nowhere to put them | whether that is the cause of the failure or an unrelated warning |
 | `eglinfo` **0/11** | — | ⛔ nothing; no error line matched. It needs one row run by hand with the output kept |
+
+### ⭐ `neovim`: one old glibc, two unrelated-looking messages
+
+⛔ **The corpus note was truncated at 70 characters and that hid the answer.**
+The full error is the **dynamic loader's**:
+
+    --argv0: error while loading shared libraries: --argv0: cannot open
+    shared object file: No such file or directory
+
+⭐ **Reproduced by hand, then diagnosed from the bundle it built.** The
+`neovim` closure carries `glibc-2.26-115`, and:
+
+| | |
+|---|---|
+| sharun starts a dynamic payload as | `<loader> --library-path <p> --argv0 <a> [--preload …] <bin> …` |
+| `ld.so` learned `--preload` in | glibc **2.30** |
+| `ld.so` learned `--argv0` in | glibc **2.33** |
+| the closure's loader | **`ld-2.26.so`** — it rejects even `--version` the same way |
+
+⛔ **A loader with no option parsing takes the first argument as the program**,
+so `--argv0` becomes the thing it tries to load. The bundle cannot start.
+
+⭐ **AND THE SAME OLD glibc EXPLAINS THE OTHER WARNING THAT BUILD PRINTED** —
+*"the store-path interposer was NOT installed: the bundle's libc does not
+define dladdr, dlsym"*. Measured on that `libc.so.6`: it exports **0** of the
+two. They lived in `libdl.so` until glibc **2.34**. ⚠ Two messages that look
+unrelated, one cause, and `pgb` already had the evidence in hand.
+
+⭐ **Landed**: `checkLoaderOptions` reads the loader's glibc version at build
+time and warns with **the exact runtime string** a reader will otherwise search
+for. ⚠ It warns rather than refusing, and the reason is not timidity: sharun
+skips the loader command line entirely for a **static or already-patched**
+payload, so such a closure still works. Five selftest cases, and the
+store-path one was checked against a planted regex.
 
 ⚠ **The count is `ls evidence/65-capability-corpus/rows/*.tsv`**, and each row
 is `<id> <pass> <rows> <clean> <store paths> <note>`.

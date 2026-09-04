@@ -9,6 +9,7 @@
 package bundle
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -381,6 +382,25 @@ func AppImageSelftest(c *cfg.Config) *selftest.Report {
 		envCase("${SHARUN_DIR}/store/gst-1.0"), "gst-1.0")
 	r.Check("a value naming no store path does not match",
 		envCase("${SHARUN_DIR}/lib/gconv"), "(no match)")
+
+	// ⭐ The loader-version read. ⛔ A closure with glibc < 2.33 produces a
+	// bundle that cannot start, because sharun passes `--argv0` and ld.so only
+	// learned options in 2.30/2.33 — measured on neovim (glibc 2.26).
+	gv := func(n string) string {
+		maj, min := glibcVersionFrom(n)
+		if maj == 0 {
+			return "none"
+		}
+		return fmt.Sprintf("%d.%d", maj, min)
+	}
+	r.Check("the loader's own name carries the version", gv("ld-2.26.so"), "2.26")
+	r.Check("so does libc's", gv("libc-2.41.so"), "2.41")
+	r.Check("and so does the store path",
+		gv("/nix/store/1zv5dwifxg5fh08gif8ld3h9f40y8czh-glibc-2.26-115/lib/ld-linux-x86-64.so.2"), "2.26")
+	// ⛔ THE TWO THAT MUST NOT MATCH, or every musl bundle gets a false warning
+	// and every unversioned loader gets a wrong number.
+	r.Check("⛔ a musl loader carries no glibc version", gv("ld-musl-x86_64.so.1"), "none")
+	r.Check("⛔ nor does an unversioned ld-linux name", gv("ld-linux-x86-64.so.2"), "none")
 	return r
 }
 

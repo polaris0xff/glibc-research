@@ -19,6 +19,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/polaris0xff/glibc-research/internal/elfx"
@@ -399,6 +400,87 @@ func (b *Builder) copyLibraries() error {
 
 // copyLoader takes the closure's own loader. A loader from a different glibc
 // than the libraries beside it is the exact pairing that fails.
+// glibcVerRe reads a glibc version out of the names the closure uses for it:
+// `ld-2.26.so`, `libc-2.26.so`, or the store path `…-glibc-2.26-115`.
+var glibcVerRe = regexp.MustCompile(`(?:^|/|-)(?:ld|libc|glibc)-([0-9]+)\.([0-9]+)`)
+
+// checkLoaderOptions warns when the closure's loader is too old for the
+// command line sharun builds for it.
+//
+// ⛔ THE SYMPTOM THIS EXISTS TO NAME, because it is unreadable otherwise.
+// sharun starts a dynamic payload as
+//
+//	<loader> --library-path <path> --argv0 <arg0> [--preload …] <bin> <args>
+//
+// and `ld.so` only learned to parse options in glibc 2.30 (`--preload`) and
+// 2.33 (`--argv0`). An OLDER loader has no option parsing at all and takes the
+// first argument as the program to run, so the bundle dies with
+//
+//	--argv0: error while loading shared libraries: --argv0: cannot open
+//	shared object file: No such file or directory
+//
+// ⭐ MEASURED on `neovim`, whose nixpkgs closure carries glibc 2.26: the
+// loader rejects even `--version` the same way. ⚠ The same closure also
+// triggers the interposer's "libc does not define dladdr, dlsym" warning, and
+// that is the SAME root cause — those symbols lived in `libdl.so` until glibc
+// 2.34. One old glibc, two unrelated-looking messages.
+//
+// ⚠ IT WARNS RATHER THAN REFUSING, and the reason is real rather than
+// timidity: sharun skips the loader invocation entirely for a static or
+// already-patched payload (`is_static_bin`, `is_patched_bin`), so a closure
+// with an old glibc and such an entry point still works. Refusing would be
+// wrong for those; saying nothing was wrong for this one.
+func (b *Builder) checkLoaderOptions(ld string) {
+	const needMajor, needMinor = 2, 33
+	// The loader's own name first (ld-linux-… is a symlink to ld-<ver>.so),
+	// then the full path, which carries the `glibc-<ver>` store path.
+	maj, min := glibcVersionFrom(filepath.Base(resolveLink(ld)))
+	if maj == 0 {
+		maj, min = glibcVersionFrom(ld)
+	}
+	if maj == 0 {
+		return // musl, or a name that carries no version: nothing to say
+	}
+	if maj > needMajor || (maj == needMajor && min >= needMinor) {
+		return
+	}
+	logx.Warnf("the closure's loader is glibc %d.%d, and sharun starts a dynamic", maj, min)
+	logx.Warnf("   payload with `--argv0`, which ld.so only understands from 2.33.")
+	logx.Warnf("   An older loader takes the first option as the PROGRAM, so this")
+	logx.Warnf("   bundle will very likely die with:")
+	logx.Warnf("     --argv0: error while loading shared libraries: --argv0: ...")
+	logx.Warnf("   ⚠ Unless its entry point is static or already patched, which")
+	logx.Warnf("   sharun starts without the loader command line.")
+}
+
+// glibcVersionFrom reads a glibc major.minor out of a name, or 0,0 when there
+// is none — which is the musl case and the case of a loader whose name carries
+// no version at all.
+func glibcVersionFrom(name string) (int, int) {
+	m := glibcVerRe.FindStringSubmatch(name)
+	if m == nil {
+		return 0, 0
+	}
+	maj, err1 := strconv.Atoi(m[1])
+	min, err2 := strconv.Atoi(m[2])
+	if err1 != nil || err2 != nil {
+		return 0, 0
+	}
+	return maj, min
+}
+
+// resolveLink follows one symlink hop, which is how a closure names its loader:
+// ld-linux-x86-64.so.2 -> ld-2.26.so.
+func resolveLink(p string) string {
+	if t, err := os.Readlink(p); err == nil {
+		if filepath.IsAbs(t) {
+			return t
+		}
+		return filepath.Join(filepath.Dir(p), t)
+	}
+	return p
+}
+
 func (b *Builder) copyLoader() error {
 	ld := b.findFile(func(name string) bool {
 		return strings.HasPrefix(name, "ld-linux-") && strings.Contains(name, ".so.") ||
@@ -411,6 +493,7 @@ func (b *Builder) copyLoader() error {
 		return err
 	}
 	logx.Say("loader      %s (the closure's own, never the host's)", filepath.Base(ld))
+	b.checkLoaderOptions(ld)
 
 	if fi, err := os.Stat(filepath.Join(b.AppDir, "lib32")); err == nil && fi.IsDir() {
 		// The 32-bit half needs its own loader, and it is a different file

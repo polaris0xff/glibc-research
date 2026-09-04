@@ -99,10 +99,13 @@ criterion fail *for the right reason*.
 
     ⛔ FOUR NAMED UNKNOWNS THE CORPUS HAS ALREADY PRODUCED, each with its
     reproduction (`PGB_EXP65_ONLY='<id>'`):
-        field-2  neovim dies with `--argv0: error while loading shared
-                 libraries`. Its entry is a SCRIPT (bash + the static
-                 trampoline). `ReadWrapper` handles `--argv0` at BUILD time,
-                 so this is a RUN-time path: read `shared/script/nvim`.
+        field-2  ⭐ SOLVED. The closure carries glibc 2.26; sharun passes
+                 `--argv0` to the loader and ld.so learned that in 2.33, so
+                 the loader takes it as the program. The SAME old glibc is
+                 why the interposer warned about dladdr/dlsym (they were in
+                 libdl.so until 2.34). `checkLoaderOptions` now says so at
+                 build time. ⛔ The bundle still cannot run — that is a
+                 nixpkgs-closure fact, not a bundler one.
         field-1  helix 0/11. Its closure carries ~200 TOP-LEVEL `.so`
                  grammars and `mergedFor` maps no such top level.
         gl-1     eglinfo 0/11 and NOTHING is known — no error line matched.
