@@ -269,19 +269,51 @@ exp_trace_libs() {   # rootfs in-root-path tracefile [extra args...]
 #     it. A committed NON-zero may be inflated. docs/history/corrections.md.
 #
 # Usage: exp_classify_trace <tracefile> <in-root artefact path>
+# exp_classify_trace <tracefile> <in-root-path> [payload|tree]
+#
+# ⛔ `mode` IS THE LAST ARGUMENT AND IT DEFAULTS, and that ordering is the
+# whole design. TODO/ci.md T-084 first said `mode` FIRST; with `mode` first a
+# caller that had not been updated would pass the TRACEFILE as the mode and
+# nothing as `want`, so no `execve` line would ever match, `inset` would stay
+# empty, and EVERY ROW WOULD REPORT ZERO HOST SHARED OBJECTS -- green, on the
+# one number the corpus exists to measure. ⚠ experiments/65- is RESUMABLE and
+# re-sources this file, so that caller really exists.
+#
+#   tree     count opens across the whole process set (the default, and what
+#            this function did before `mode` existed)
+#   payload  count only opens in the pid that last execve'd, clearing the set
+#            at each exec -- an object opened BEFORE the last exec is not
+#            mapped in the running program
+#
+# ⛔ An unknown mode is a LOUD ERROR, never a fallback to `tree`.
 exp_classify_trace() {
-  awk -v want="$2" '
+  _ct_mode=${3:-tree}
+  case "$_ct_mode" in
+    payload|tree) ;;
+    *) printf 'exp_classify_trace: unknown mode "%s" (payload|tree)\n' "$_ct_mode" >&2
+       return 2 ;;
+  esac
+  awk -v want="$2" -v mode="$_ct_mode" '
     function record(p) {
       if (p !~ /\.so(\.[0-9]+)*$/) return
       if (p ~ /^\/(usr\/)?(local\/)?lib(32|64)?\//) out["host " p] = 1
       else out["bundled " p] = 1
     }
     { pid = $1 }
-    $0 ~ ("execve\\(\"" want "\"") { inset[pid] = 1; next }
+    $0 ~ ("execve\\(\"" want "\"") { inset[pid] = 1; payload = pid
+                                    if (mode != "tree") delete out
+                                    next }
+    # ⚠ A LATER exec inside the set replaces what is mapped, in payload mode.
+    inset[pid] && /execve\(/ && !/ENOENT|= -1/ {
+      payload = pid
+      if (mode != "tree") delete out
+      next
+    }
     ($0 ~ /(clone|clone3|vfork|fork)\(/ || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) \
       && /= [0-9]+$/ { if (inset[pid]) inset[$NF] = 1; next }
     /open(at)?\(/ && /<unfinished \.\.\.>/ {
       if (!inset[pid]) next
+      if (mode != "tree" && pid != payload) next
       if (match($0, /"[^"]*"/) == 0) next
       pending[pid] = substr($0, RSTART + 1, RLENGTH - 2)
       next
@@ -292,6 +324,7 @@ exp_classify_trace() {
       next
     }
     inset[pid] && /open(at)?\(/ && !/ENOENT|= -1/ {
+      if (mode != "tree" && pid != payload) next
       if (match($0, /"[^"]*"/) == 0) next
       record(substr($0, RSTART + 1, RLENGTH - 2))
     }
@@ -317,3 +350,71 @@ exp_finish() {
   printf -- '--------------------------------------------------------------\n'
   exit 0
 }
+
+# ---------------------------------------------------------------------------
+# ⭐ THE CLASSIFIER'S SELFTEST. `sh experiments/lib.sh --selftest`
+#
+# ⛔ GUARDED ON $0, NOT ON $1 ALONE. This file is SOURCED by every experiment,
+# and an experiment invoked with `--selftest` as its own first argument would
+# otherwise run this instead of itself. When sourced, `$0` is the experiment.
+#
+# ⚠ The fixture is strace's real shape, including the one it exists for: a
+# split `openat( ... <unfinished ...>` carries the PATH and the FOLLOWING line
+# carries the RESULT, so a filter that only drops lines containing ENOENT keeps
+# the first half of a FAILED open and counts it as a load.
+# docs/history/corrections.md C25.
+# ---------------------------------------------------------------------------
+_ct_selftest() {
+  _d=$(mktemp -d) || return 2
+  _t="$_d/trace"
+  cat > "$_t" <<'TRACE'
+100 execve("/subj", ["/subj"], 0x7ffd) = 0
+100 openat(AT_FDCWD, "/usr/lib/x86_64-linux-gnu/libhost.so.6", O_RDONLY) = 3
+100 clone(child_stack=NULL) = 200
+200 openat(AT_FDCWD, "/tmp/mnt/lib/libbundled.so.1", O_RDONLY) = 4
+100 openat(AT_FDCWD, "/usr/lib/libfailed.so.1", O_RDONLY <unfinished ...>
+100 <... openat resumed>) = -1 ENOENT (No such file or directory)
+100 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY) = 6
+100 execve("/subj-stage2", ["/subj-stage2"], 0x7ffd) = 0
+100 openat(AT_FDCWD, "/usr/lib/libafter.so.2", O_RDONLY) = 7
+TRACE
+  _p=0; _f=0
+  _ck() {  # label got want
+    if [ "$2" = "$3" ]; then printf '  ok    %-52s = %s\n' "$1" "$2"; _p=$((_p+1))
+    else printf '  FAIL  %-52s = %s, expected %s\n' "$1" "$2" "$3"; _f=$((_f+1)); fi
+  }
+  _n() { exp_classify_trace "$_t" /subj "$2" | grep -c "^$1 " || true; }
+
+  printf '\n-- exp_classify_trace --selftest ---------------------------------\n'
+  # tree: the whole process set, and objects opened before the last exec count
+  _ck "tree: host objects across the process set"   "$(_n host tree)"    2
+  _ck "tree: the child pid's bundled object counts" "$(_n bundled tree)" 1
+  # payload: only the pid that last execve'd, cleared at each exec
+  _ck "payload: only what the last exec mapped"     "$(_n host payload)" 1
+  _ck "payload: ⛔ the child pid does NOT count"    "$(_n bundled payload)" 0
+  # ⛔ C25: the split FAILED open must not be counted, in either mode
+  _ck "⛔ a split FAILED open is not a load (tree)" \
+      "$(exp_classify_trace "$_t" /subj tree | grep -c 'libfailed' || true)" 0
+  _ck "⛔ ...nor in payload mode" \
+      "$(exp_classify_trace "$_t" /subj payload | grep -c 'libfailed' || true)" 0
+  # ⛔ /etc/ld.so.cache is an INDEX, not an object. docs/AGENTS.md §14.
+  _ck "⛔ /etc/ld.so.cache is not an object" \
+      "$(exp_classify_trace "$_t" /subj tree | grep -c 'ld.so.cache' || true)" 0
+  # ⭐ the default is `tree`, which is what every existing caller relies on
+  _ck "⭐ the default mode is tree (an old 2-arg call)" \
+      "$(exp_classify_trace "$_t" /subj | grep -c '^host ' || true)" 2
+  # ⛔ an unknown mode is an error, never a silent fallback
+  exp_classify_trace "$_t" /subj nonsense >/dev/null 2>&1
+  _ck "⛔ an unknown mode returns 2, not a fallback" "$?" 2
+  rm -rf "$_d"
+  printf '\nlib.sh --selftest: %d pass, %d fail\n' "$_p" "$_f"
+  [ "$_f" = 0 ]
+}
+
+case "$0" in
+  */lib.sh|lib.sh)
+    case "${1:-}" in
+      --selftest) _ct_selftest; exit $? ;;
+    esac
+    ;;
+esac

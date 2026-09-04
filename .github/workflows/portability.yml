@@ -426,6 +426,13 @@ jobs:
         run: |
           set -eux
           sh scripts/common/mine-repo.sh --selftest
+          sh scripts/common/watchdog.sh --selftest
+          # ⭐ The trace classifier, both modes. It is the one instrument every
+          # host-object count in this tree passes through, and it had SIX hand
+          # copies -- one of which counted a FAILED open as a load
+          # (corrections.md C25). A selftest that only CI runs is the only
+          # thing that stops the seventh copy.
+          sh experiments/lib.sh --selftest
           "./pgb" rootfs pull --selftest
           "./pgb" rootfs run --selftest || \
             echo "rootfs-run selftest could not run here (needs CAP_SYS_ADMIN); recorded, not asserted"

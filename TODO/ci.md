@@ -135,8 +135,22 @@ that opened this entry:
    behaviour instead. ⛔ Anything not in `{payload, tree}` must be a loud
    error, not a fallback.
 
-   Extend it that way, with a selftest for each mode, then convert the six.
-   ⚠ And `65-`, `68-`, `100-` and `101-` call the two-argument form today.
+   ⭐ **DONE, 2026-09-04b.** `exp_classify_trace <trace> <want> [mode]`, with
+   `mode` last and defaulting to `tree`, an unknown mode a **loud error**
+   rather than a fallback, and `sh experiments/lib.sh --selftest` — **9 cases,
+   both modes**, guarded on `$0` so a sourced experiment cannot trip it. ⛔
+   Verified against a planted C25 defect: **three** cases fail under it.
+   ⭐ It runs in CI, beside the other shell selftests, because a selftest
+   nothing runs is what let six copies drift in the first place.
+
+   ⚠ **The running `65-` was measured unaffected**: it calls the two-argument
+   form, which is `tree`, which is what the function did before.
+
+   ⛔ **Step 2 — converting the six — is NOT done, and the reason is not
+   timidity.** Changing an experiment without re-running it makes its
+   committed evidence stale, which the documentation gate correctly reports;
+   and `90-` and `86-` build kdenlive-scale bundles, which is the expensive
+   half this entry is `M` for. Convert and re-run together.
 
    ⛔ **The edit still waits for `65-` to finish**, and the reason is NOT the
    one that was written here. Measured, both directions:
