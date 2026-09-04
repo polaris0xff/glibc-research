@@ -151,6 +151,32 @@ cascade above silently maps such paths to `/usr/local/bin`, which is a bet that
 the host has the program. Naming them is the honest behaviour and is what
 `docs/AGENTS.md` §0b's *"an absence is not a zero"* asks for.
 
+### ⭐ AND THE FIELD ALREADY TAKES THE ROUTE WE TOOK — BY HAND, PER RECIPE
+
+⛔ **This was found by reading `quick-sharun.sh`, not by inventing a
+mechanism.** `_map_paths_ld_preload_open` builds `path-mapping.so` from
+`fritzw/ld-preload-open` and names it in `.preload`, driven by a
+`PATH_MAPPING` variable:
+
+```sh
+PATH_MAPPING=$(echo "$PATH_MAPPING" | tr '\n' ',' | ...)
+mv -v "$TMPDIR"/ld-preload-open/path-mapping.so "$DST_LIB_DIR"
+echo "path-mapping.so" >> "$APPDIR"/.preload
+echo "PATH_MAPPING=$PATH_MAPPING" >> "$APPENV"
+```
+
+⭐ **So an interposer is the field's answer too, and the difference is the
+whole of T-081: theirs is a mapping a packager WRITES, one recipe at a time.**
+Ours is derived from the closure — the exact, finite set — so there is no
+mapping to forget and a path outside the set is reported instead of guessed.
+[`../design/store-paths.md`](../design/store-paths.md) is the mechanism and
+⛔ opens with the security answer for the route we did NOT take.
+
+⚠ They also carry `_map_paths_binary_patch` behind `PATH_MAPPING_HARDCODED=1`,
+which patches the binaries themselves — the same-length rewrite
+`store-paths.md` §2 refuses on security grounds when its target is a fixed
+path under a world-writable directory.
+
 ## 5. The `.desktop` and icon rules, in one place
 
 ⭐ **This answers the operator's standing question** in
