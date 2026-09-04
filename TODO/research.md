@@ -394,19 +394,56 @@ easy and says nothing about the sandbox.
 
 ---
 
-## T-091 — GStreamer needs four variables and a scanner; we emit one
+## T-091 — GStreamer needs four variables and a scanner; NOTHING was setting them
 
 **Source** `HALL-OF-FAME.md` "Bad - GStreamer", read against
 `internal/bundle/sharun.go` `bakedOverride`.
 **Category** research · **Priority** P2 · **Effort** S · **Status** open
 
-`bakedOverride` emits `GST_PLUGIN_SYSTEM_PATH_1_0` and nothing else. The field
-names four plus the scanner: `GST_PLUGIN_PATH`, `GST_PLUGIN_SYSTEM_PATH`,
+`bakedOverride` emitted `GST_PLUGIN_SYSTEM_PATH_1_0` and nothing else. The
+field names four: `GST_PLUGIN_PATH`, `GST_PLUGIN_SYSTEM_PATH`,
 `GST_PLUGIN_SYSTEM_PATH_1_0`, `GST_PLUGIN_SCANNER`.
 
-⚠ **And it changes how a GStreamer subject may be measured at all**:
-`gst-plugin-scanner` *"opens every single gstreamer plugin on the system"*, so
-a host-object count taken on such a subject is counting the scanner, not the
-application. Any row for `lmms`, `handbrake` or `gnome-music` has to say which.
+## ⛔ THE ENTRY DESCRIBED THE WRONG LAYER, and reading the sources says so
 
-**Prove.** A media subject that plays, with its host-object count explained.
+⚠ **"We emit one of the four" implied sharun supplies the rest. It does not,
+and it cannot.** `Anylinux-sharun`'s `set_appdir_env.rs` sets **all four**
+itself — but only for a directory named `gstreamer-*` that it finds under its
+own `shared/lib`, and `copyLibraries` **flattens every shared object into a
+single `lib/`**. ⭐ **There is no such directory in our layout, so that branch
+never fires and sharun sets none of them.** The one variable we emitted was the
+only one being set at all.
+
+⭐ **And the fourth is a different kind of thing from the first three.** Three
+are directories, and the store farm already holds the original tree they point
+into. `GST_PLUGIN_SCANNER` names a **program** that GStreamer runs as a child
+process — and in nixpkgs it lives at `libexec/gstreamer-*/gst-plugin-scanner`,
+a different top-level directory from the plugins, which is why sharun's
+"beside the plugins" test could not have found it even with an unflattened
+`lib/`.
+
+⛔ **Naming the merged copy directly would have been the wrong fix.** That file
+is an ordinary dynamic ELF, so starting it brings up the **host loader and the
+host libc** — inside a bundle whose entire claim is that it does not. ⭐ The
+field reaches the same conclusion from the other side: `quick-sharun`'s
+`_handle_bins_scripts` **hardlinks sharun over every `gst-*` binary** and puts
+it in the gstreamer libdir.
+
+**Landed** (⛔ **UNMEASURED — see Prove**): `bakedOverride` emits the three
+path variables; `installGstScanner` installs the scanner as a bundle *program*,
+so `bin/gst-plugin-scanner` is a sharun hardlink; `writeEnv` names it, keyed on
+that program existing, exactly as every other line there is keyed. The name is
+one constant, `gstScannerName`, because two literals are two things that have
+to agree — the coupling class T-092 is about.
+
+⚠ **A consequence to expect in a corpus row**: a GStreamer subject now carries
+**two** programs, so it gets the static `pgb-apprun` selector rather than
+sharun-as-AppRun. That path is measured (`experiments/68-` arm S) but this
+*combination* is not.
+
+⛔ **Prove — and NOTHING ABOVE IS A RESULT UNTIL THIS RUNS.** A media subject
+that plays, with its host-object count explained: `gst-plugin-scanner` *"opens
+every single gstreamer plugin on the system"*, so a count taken on such a
+subject must say **which process** it counted. Any row for `lmms`, `handbrake`
+or `gnome-music` has to name that. The negative control is the same subject
+built without these variables.

@@ -80,7 +80,7 @@ pretending to be one.
 | T-088 | P1 | S | open | research | ⛔ Multi-entry dispatch is SHIPPED and has never been run |
 | T-089 | P1 | S | open | research | ⛔ The interposer row marked NOT MEASURED: a static or raw-syscall payload |
 | T-090 | P1 | M | open | research | ⛔ The sandbox rung needs a BED change, not a bundler change |
-| T-091 | P2 | S | open | research | GStreamer needs four variables and a scanner; we emit one |
+| T-091 | P2 | S | open | research | GStreamer needs four variables and a scanner; NOTHING was setting them |
 | T-092 | P2 | S | open | toolchain | The `.env` names a farm directory the farm may not have created |
 
 ## The argument behind the ordering

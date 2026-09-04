@@ -140,6 +140,11 @@ fi
 	return os.WriteFile(out, []byte(body), 0o755)
 }
 
+// gstScannerName is the one place the scanner's name is written.
+// installGstScanner puts it in shared/bin and writeEnv names it in
+// GST_PLUGIN_SCANNER; two literals would be two things that have to agree.
+const gstScannerName = "gst-plugin-scanner"
+
 // bakedOverride is the variable that redirects a program to a directory it had
 // compiled in. The directories are found rather than assumed; the variable
 // cannot be derived, so this is a small table, each row naming the project it
@@ -159,7 +164,30 @@ func bakedOverride(storeName, sub string) []string {
 	case strings.HasPrefix(sub, "lib/ladspa"):
 		return []string{fmt.Sprintf("LADSPA_PATH=${SHARUN_DIR}/store/%s/%s", storeName, sub)}
 	case strings.HasPrefix(sub, "lib/gstreamer-"):
-		return []string{fmt.Sprintf("GST_PLUGIN_SYSTEM_PATH_1_0=${SHARUN_DIR}/store/%s/%s", storeName, sub)}
+		// ⛔ GStreamer NEEDS FOUR VARIABLES AND WE EMITTED ONE. The other
+		// three are not decoration: which of the first three a plugin
+		// consults varies by GStreamer version, and the fourth names the
+		// scanner binary.
+		//
+		// ⚠ AND sharun CANNOT SUPPLY THEM FOR US, which is why they are here
+		// rather than left to it. Anylinux-sharun sets all four itself
+		// (`set_appdir_env.rs`, `dir.starts_with("gstreamer-")`) — but only
+		// for a directory it finds under its own `shared/lib`, and
+		// `copyLibraries` FLATTENS every shared object into `lib/`. There is
+		// no `gstreamer-1.0` directory in our layout for that branch to fire
+		// on, so it sets none of them. The store farm is what keeps the
+		// original tree, and these point at it.
+		//
+		// ⛔ GST_PLUGIN_SCANNER IS NOT HERE, and it is not an oversight: in
+		// nixpkgs the scanner is at `libexec/gstreamer-*/gst-plugin-scanner`,
+		// a different top-level directory from this `sub`, and running it
+		// straight out of the merged tree would start a dynamic ELF under the
+		// HOST loader. installGstScanner handles it as a program instead.
+		return []string{
+			fmt.Sprintf("GST_PLUGIN_PATH=${SHARUN_DIR}/store/%s/%s", storeName, sub),
+			fmt.Sprintf("GST_PLUGIN_SYSTEM_PATH=${SHARUN_DIR}/store/%s/%s", storeName, sub),
+			fmt.Sprintf("GST_PLUGIN_SYSTEM_PATH_1_0=${SHARUN_DIR}/store/%s/%s", storeName, sub),
+		}
 	case strings.HasPrefix(sub, "lib/babl-"):
 		return []string{fmt.Sprintf("BABL_PATH=${SHARUN_DIR}/store/%s/%s", storeName, sub)}
 	case strings.HasPrefix(sub, "lib/gegl-"):
@@ -250,6 +278,13 @@ func (b *Builder) writeEnv() error {
 	}
 	if have("lib/gbm") {
 		add("GBM_BACKENDS_PATH=${SHARUN_DIR}/lib/gbm")
+	}
+	// ⭐ The fourth GStreamer variable. The other three are store-farm paths
+	// and come out of carryBakedPaths; this one names a PROGRAM, so it is
+	// keyed on installGstScanner having put one in shared/bin -- and it points
+	// at bin/, the sharun hardlink, never at the raw payload beside it.
+	if have("shared/bin/" + gstScannerName) {
+		add("GST_PLUGIN_SCANNER=${SHARUN_DIR}/bin/%s", gstScannerName)
 	}
 
 	// ⭐ THE DRIVER AND FALLBACK CLASSES ARE THE POLICY'S, NOT THIS FUNCTION'S.

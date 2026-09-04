@@ -113,6 +113,22 @@ func (b *Builder) assemble() error {
 		logx.Say("program     %s  <- %s", w, filepath.Base(owner))
 		extra++
 	}
+	// ⭐ gst-plugin-scanner IS A PROGRAM, NOT A DATA FILE, and that is the
+	// whole reason it is installed here rather than pointed at in place.
+	// GStreamer runs it as a child process; the copy merged into the bundle's
+	// libexec/ is an ordinary dynamic ELF, so starting it directly would bring
+	// up the HOST loader and the host libc inside a bundle whose whole claim
+	// is that it does not. ⚠ It is also why a host-object count taken on a
+	// GStreamer subject has to say WHICH process it counted.
+	//
+	// ⭐ The field reaches the same answer from the other side: quick-sharun's
+	// `_handle_bins_scripts` hardlinks sharun over every `gst-*` binary and
+	// puts it in the gstreamer libdir, because sharun only sets
+	// GST_PLUGIN_SCANNER when the scanner sits beside the plugins.
+	if n := b.installGstScanner(); n > 0 {
+		extra += n
+	}
+
 	if extra > 0 {
 		logx.Say("programs    %s + %d more", b.Prog, extra)
 	}
@@ -141,6 +157,57 @@ func (b *Builder) assemble() error {
 	}
 	logx.Say("patched     %d absolute DT_NEEDED entries", rewritten)
 	return nil
+}
+
+// installGstScanner installs gst-plugin-scanner as a bundle program and names
+// it in GST_PLUGIN_SCANNER. It returns how many were installed (0 or 1), so a
+// closure with no GStreamer in it costs nothing and says nothing.
+//
+// ⛔ WHY THE SEARCH IS libexec/ AND NOT lib/. Anylinux-sharun sets this
+// variable itself, but only for `<library_path>/gstreamer-*/gst-plugin-scanner`
+// — the scanner sitting BESIDE the plugins. nixpkgs puts it in
+// `libexec/gstreamer-1.0/`, and `copyLibraries` flattens every shared object
+// into `lib/` anyway, so no such directory exists here for sharun's branch to
+// find. Nothing sets it unless this does.
+//
+// ⚠ THE VALUE POINTS AT bin/, NOT shared/bin/. `bin/<name>` is the sharun
+// hardlink that sets the library path and runs the bundled loader;
+// `shared/bin/<name>` is the raw payload, and naming that would reintroduce
+// exactly the host loader this function exists to keep out. It is the same
+// distinction pgb-apprun.c makes for the same reason.
+func (b *Builder) installGstScanner() int {
+	name := gstScannerName
+	if _, err := os.Stat(filepath.Join(b.AppDir, "shared", "bin", name)); err == nil {
+		return 0
+	}
+	// The merged libexec/ tree is searched first because that is where the
+	// bundle's own copy lands; the closure is the fallback for a layout that
+	// did not merge.
+	var found string
+	for _, root := range []string{filepath.Join(b.AppDir, "libexec"), b.Root} {
+		matches, _ := filepath.Glob(filepath.Join(root, "gstreamer-*", name))
+		if len(matches) == 0 {
+			matches, _ = filepath.Glob(filepath.Join(root, "*", "libexec", "gstreamer-*", name))
+		}
+		if len(matches) > 0 {
+			found = matches[0]
+			break
+		}
+	}
+	if found == "" {
+		return 0
+	}
+	if err := b.installProgram(name, Entry{ELF: found}); err != nil {
+		logx.Warnf("gst-plugin-scanner found at %s but not installed: %v", found, err)
+		return 0
+	}
+	// ⛔ THE VARIABLE IS NOT EMITTED HERE. writeEnv() names it, keyed on
+	// `shared/bin/<gstScannerName>` existing -- the same "set it only if the
+	// bundle actually has it" rule every other line there follows. Emitting it
+	// from this side would be a second place that has to agree about the name,
+	// which is the coupling class T-092 is about.
+	logx.Say("gstreamer   scanner installed as a program (GST_PLUGIN_SCANNER follows)")
+	return 1
 }
 
 // installProgram puts one program in shared/bin under the name the bundle
