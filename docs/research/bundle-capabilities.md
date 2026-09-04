@@ -592,6 +592,78 @@ and that is the sharper statement: *static linking answers "will this binary
 start"; it says nothing about "will this program find the tools it shells out
 to."*
 
+### ⭐ THE OPERATOR'S FOUR QUESTIONS, 2026-09-04c — answered where measured, named where not
+
+**1. Can the bundle integrate with the host — follow the system theme, let a
+user change values?**
+
+⭐ **Partly, and it is a property of the search order rather than a feature.**
+Read out of a real artefact's `.env`:
+
+    XDG_DATA_DIRS=${SHARUN_DIR}/share:${XDG_DATA_DIRS}:/usr/local/share/:/usr/share/
+
+⭐ **The host's `/usr/share` and `/usr/local/share` ARE searched, after the
+bundle's own** — so a host GTK theme, icon theme or `.desktop` database is
+reachable, and any variable a user sets (`GTK_THEME`, `QT_STYLE_OVERRIDE`,
+`XCURSOR_THEME`) reaches the payload because nothing in the artefact clears
+the environment. ⚠ That is the same order `design/host-fallback.md` adopted for
+libraries: bundled first, host as the lower-priority fallback.
+
+⛔ **What we do NOT have, read off their variable list rather than guessed**:
+`GTK_CLASS_FIX` (so the taskbar groups the window with its icon), a bundled
+`qt6ct`, their `qt-theme.hook` (`APPIMAGE_QT_THEME` + `-stylesheet`), and their
+`fix-gnome-csd.hook`. ⛔ **And nothing here is MEASURED**: no row has started a
+GTK subject under a non-default `GTK_THEME` and shown it opening a host theme
+file. **That is the experiment**, and it is small: a trace of `galculator`
+under `GTK_THEME=HighContrast` asserting an `openat` of a host
+`/usr/share/themes/…` path. T-083.
+
+**2. Can it pack `file`(1) without patching — no custom AppRun, no env var?**
+
+⭐ **`experiments/105-` is written and pre-registered for exactly this**, and
+`file` is the sharpest possible subject: with no magic database it does not
+degrade, it says `could not find any valid magic files!` and exits non-zero.
+Four rows — the artefact identifies a PNG on all eleven; the `.env` carries
+**no `MAGIC`**; the `AppRun` is byte-identical to the stock `sharun`; and the
+same closure built `--no-storefix` **fails**. ⛔ Not run yet.
+
+**3. Can it bundle something like `rpcs3` — anything nixpkgs builds?**
+
+⛔ **Not established, and the corpus is the evidence for what is.** 26 subjects,
+21 passing on all eleven, and the failures are named: the bed, the closure's
+own glibc, the subject's shape, and one path class. ⚠ **No emulator-scale Qt +
+Vulkan subject has been attempted**, and the honest position is that the
+corpus's largest closures (`dosbox` 181 store paths, `virt-manager` 239,
+`kdenlive`) are evidence about size and toolkit rather than about `rpcs3`.
+⭐ The claim the corpus does support is narrower and worth stating precisely:
+**every failure so far has had a named cause and four of them were bundler
+defects that are now fixed** — which is a statement about the tool improving
+under exercise, not a guarantee about the next package.
+
+**4. Can it bundle applications that run on the oldest kernels and the oldest
+glibc?**
+
+⭐ **The glibc half is answered by construction and measured across the bed.**
+A `pgb` static binary has **no host libc**; a `pgb` bundle **carries its own**.
+The bed already contains Rocky 8 (glibc 2.28, 2018), Ubuntu 20.04 (2.31),
+Debian 11 (2.31) and three Alpines with musl — and the corpus is 21 of 26
+passing on **all eleven**, so the host's glibc version is not a variable.
+
+⭐ **The kernel half has a MEASURED FLOOR and an unmeasured claim, and the
+difference matters.** `readelf -n`, 2026-09-04c:
+
+| artefact | its glibc's `NT_GNU_ABI_TAG` |
+|---|---|
+| a `pgb` **static** binary (pinned `debian:13`, glibc 2.41) | ⭐ **`OS: Linux, ABI: 3.2.0`** — Linux 3.2, 2012 |
+| a `pgb` **bundle** (nixpkgs glibc) | ⭐ **`OS: Linux, ABI: 3.10.0`** — Linux 3.10, 2013, the RHEL 7 floor |
+
+⛔ **That is a DECLARED floor, not a tested one.** [`../AGENTS.md`](../AGENTS.md)
+§7 item 6: the bed shares the host kernel (Linux 6.18.44), so nothing in this
+tree has ever run on an old kernel. ⚠ The number says what the libc was built
+to tolerate; only an old kernel says what the program does there.
+
+---
+
 ### ⭐⭐ THEIR OWN "CAN'T MAKE THEM WORK" LIST NAMES ONE DOMINANT CAUSE — AND IT IS THE CELL OUR MECHANISM OWNS
 
 ⭐ **Issue #460, open, titled *"appimages that can't make them work"*** — the

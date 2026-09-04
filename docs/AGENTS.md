@@ -543,7 +543,7 @@ repeated here.
 | item | status |
 |---|---|
 | test bed, 11 environments | ✅ 11 of 11, digest-pinned |
-| all **50** experiments | ⏳ **49 measured, one written and not yet run** — `104-`, pre-registered and committed before it runs. ⚠ The count is `ls experiments/[0-9]*-*.sh \| wc -l` and nothing else — `clock.sh` and `lib.sh` are **libraries**. `86-` writes one evidence file per subject (`RESULT.jq.txt`, `RESULT.mpv.txt`) because it runs against two |
+| all **51** experiments | ⏳ **49 measured, TWO written and not yet run** — `104-` (does our loader leak symbols between objects?) and `105-` (`file`(1) out of a bundle), both pre-registered and committed before they run. ⚠ The count is `ls experiments/[0-9]*-*.sh \| wc -l` and nothing else — `clock.sh` and `lib.sh` are **libraries**. `86-` writes one evidence file per subject (`RESULT.jq.txt`, `RESULT.mpv.txt`) because it runs against two |
 | all 10 POCs | ✅ 11 of 11 environments each, zero host shared objects, all at the 2.41 pin. Each `RESULT.txt` names the environment, image, digest, gcc and glibc that built it |
 | the **seven** host-data mechanisms | ✅ 11 of 11 each: NSS, iconv, locale, terminfo, CA bundle, `--embed-tzdata`, and ⭐ `--embed-netdb` (`/etc/services`, 2026-09-04). ⭐ Plus `--utf8-default`, which is not a repair but a change to a documented default — 11 of 11, with an explicit `LANG=C` still obeyed on 11 of 11. ⛔ One boundary stays open: `getaddrinfo` with a service name, 8 of 11 |
 | `pgb` chroot and host engines | ✅ complete |
