@@ -198,9 +198,33 @@ that opened this entry:
 
    ⭐ So `lib.sh` itself was never the hazard. `65-` is, because it is
    resumable *and* it is the file that would need its call sites changed;
-2. re-run all six, and compare the host counts before and after. ⚠ `90-` and
-   `86-` build kdenlive-scale bundles, so this is the expensive half and it is
-   why the entry is M rather than S;
+
+   ⭐ **THE CONVERSION IS DONE — 2026-09-04c.** All six hand copies are
+   deleted and every call site calls `exp_classify_trace`. ⛔ **`65-` was not
+   touched**: it already called the two-argument form, which is `tree`, which
+   is what the function does by default — the ordering decision in step 1 is
+   what made that safe while the corpus was executing.
+
+   | | before | after |
+   |---|---|---|
+   | files defining `classify_trace` | 6 | ⭐ **0**, and `experiments/102-` G1 is the standing guard |
+   | call sites | 10 | 10, all `exp_classify_trace`, modes unchanged |
+   | awk lines carried by hand | 151 | ⭐ **0** |
+
+   ⭐ **AND `102-` WAS REWRITTEN RATHER THAN DELETED, so the before/after the
+   Prove line asks for survives the copies it measured.** It reads the six
+   bodies back out of git at the pinned pre-conversion commit and runs them
+   against the shared classifier on the same five fixtures: `pass=20 fail=0
+   skip=0`, two runs identical. It also now asserts G1 (no copy comes back),
+   G2 (call-site drift), and G3 (every mode passed is one the classifier
+   implements, *and* that an unknown mode is a loud error rather than a
+   silent `tree`).
+2. re-run the ones whose numbers can have moved. ⛔ **`102-` arm S says that
+   is exactly ONE — `90-`** — because C38 fires only where the copy's
+   differing mode is called *and* the traced run invokes the artefact more
+   than once. The other five are latent and pinned in
+   `evidence/STALE-EVIDENCE.txt` with that reason; ⚠ **pinned is owed, not
+   settled.**
 3. if the competitor's count moves, `docs/comparison.md` and `docs/AGENTS.md`
    §9 change with it.
 

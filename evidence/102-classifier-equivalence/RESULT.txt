@@ -1,8 +1,8 @@
 ===============================================================
-102 - the trace classifier: where the six hand copies disagree with the shared one
+102 - the trace classifier: the copies are gone, and what their removal changed
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T08:54:31Z
+date (UTC)   : 2026-09-04T10:05:10Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -12,24 +12,31 @@ ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
 evidence     : /home/user/glibc-research/evidence/102-classifier-equivalence
 --------------------------------------------------------------
 
--- E: the copies -------------------------------------------------
-  ok    E2  every named hand copy extracted            = 6
-  ok    E1a ⛔ distinct TEXTS (the prediction said 2) = 3
-        60-versus-alternatives     44daf0e5
-        62-anylinux-appimage       204fda11
-        85-opengl                  204fda11
-        86-bundler-vs-anylinux     204fda11
-        89-debloat                 204fda11
-        90-kdenlive-vs-enhanced    8af4afa6
+-- G: ⭐ the copies are gone --------------------------------------
+  ok    G1  ⭐ files under experiments/ defining their own classifier = 0
+        EXPERIMENT                 MODE           CALLS  MODES SEEN
+        60-versus-alternatives     payload+tree   2      payload tree 
+        62-anylinux-appimage       payload+tree   2      payload tree 
+        85-opengl                  payload        1      payload 
+        86-bundler-vs-anylinux     payload        1      payload 
+        89-debloat                 payload        1      payload 
+        90-kdenlive-vs-enhanced    tree           2      tree 
+  ok    G2  no experiment drifted from its recorded call-site count = 0
+  ok    G3  every mode passed is one the classifier implements = 0
+  ok    G3  ...and an unknown mode is a LOUD error (status) = 2
+  ok    G3  ...with a message naming the modes         = 1
 
--- E1b: ⭐ distinct BEHAVIOURS, not distinct text -------------------
+-- H: ⭐ the copies as they were, read back out of git -------------
+  ok    H0  the six copies extract from b4e53f31       = 6
+
+-- H1: ⭐ distinct BEHAVIOURS, not distinct text -------------------
         60-versus-alternatives     behaviour c0ebb2fd
         62-anylinux-appimage       behaviour 5462c00c
         85-opengl                  behaviour 5462c00c
         86-bundler-vs-anylinux     behaviour 5462c00c
         89-debloat                 behaviour 5462c00c
         90-kdenlive-vs-enhanced    behaviour 5462c00c
-  ok    E1b ⭐ distinct BEHAVIOURS among the six      = 2
+  ok    H1  ⭐ distinct BEHAVIOURS among the six      = 2
 
 -- D1: ⭐ THE POSITIVE CONTROL, nothing pathological ---------------
         reference tree   : bundled /tmp/mnt/lib/libbundled.so.1 host /usr/lib/x86_64-linux-gnu/libhost.so.6 
@@ -39,12 +46,12 @@ evidence     : /home/user/glibc-research/evidence/102-classifier-equivalence
 
 -- D2: ⛔ C25, the SPLIT FAILED open --------------------------------
   ok    D2  the shared classifier does NOT count it    = 0
-  ok    D2  ⛔ every copy DOES count it (tree)        = 6
-  ok    D2  ⛔ every copy DOES count it (payload)     = 6
+  ok    D2  ⛔ every copy DID count it (tree)         = 6
+  ok    D2  ⛔ every copy DID count it (payload)      = 6
         ⭐ D2 is also the harness's control: agreement here would mean the
            copies are not being loaded at all.
 
--- D3: ⛔ THE ARTEFACT EXECD TWICE -- the row T-084 does not have ---
+-- D3: ⛔ C38, THE ARTEFACT EXECD TWICE ----------------------------
         reference tree   : host /usr/lib/libearly.so.1 host /usr/lib/liblate.so.2 
         reference payload: host /usr/lib/liblate.so.2 
         60-versus-alternatives     tree=[host /usr/lib/libearly.so.1 host /usr/lib/liblate.so.2 ] payload=[host /usr/lib/libearly.so.1 host /usr/lib/liblate.so.2 ]
@@ -53,51 +60,51 @@ evidence     : /home/user/glibc-research/evidence/102-classifier-equivalence
         86-bundler-vs-anylinux     tree=[host /usr/lib/liblate.so.2 ] payload=[host /usr/lib/liblate.so.2 ]
         89-debloat                 tree=[host /usr/lib/liblate.so.2 ] payload=[host /usr/lib/liblate.so.2 ]
         90-kdenlive-vs-enhanced    tree=[host /usr/lib/liblate.so.2 ] payload=[host /usr/lib/liblate.so.2 ]
-  ok    D3  ⛔ copies agreeing in TREE mode (5 must not) = 1
-  ok    D3  ⛔ copies agreeing in PAYLOAD mode (60- must not) = 5
+  ok    D3  ⛔ copies agreeing in TREE mode (5 did not) = 1
+  ok    D3  ⛔ copies agreeing in PAYLOAD mode (60- did not) = 5
 
 -- D4/D5: the two defects that were already fixed everywhere -------
   ok    D4  ld.so.cache is an index: reference counts 0 = 0
-  ok    D4  ...and no copy counts it either            = 0
+  ok    D4  ...and no copy counted it either           = 0
   ok    D5  a SPLIT clone is followed (tree)           = 6
   ok    D5  ...and the child is not the payload        = 6
 
 -- R1: ⭐ how many times does a REAL trace exec the artefact? ------
-        trace   : /var/tmp/t065/tr.sdl-1.fedora-42
+        trace   : /var/tmp/t065/tr.sdl-3.alpine-3.10
         artefact: /subj65
   ok    R1  ⭐ execve("<artefact>") lines in a real trace = 1
-        ⭐ ONE. The unconditional delete has nothing to delete, so the
-           committed numbers stand -- as a MEASUREMENT, not an argument.
-        ⛔ It is one delivery shape. A wrapper that re-execs the artefact
-           under its own name would make D3 fire, and nothing prevents one.
+        ⭐ ONE. The unconditional delete had nothing to delete there, so
+           that shape's committed numbers stand -- as a MEASUREMENT.
+        ⛔ It is one delivery shape. 90-'s test script invokes the
+           artefact TWICE, which is the shape that fires.
 
 -- S: ⭐ which committed number does C38 actually reach? ------------
-        EXPERIMENT                 MODE         SITES  INVOKE C38?
-        60-versus-alternatives     payload+tree 2      1      no
-        62-anylinux-appimage       payload+tree 3      1      no
-        85-opengl                  payload      1      1      no
-        86-bundler-vs-anylinux     payload      4      4      no
-        89-debloat                 payload      1      1      no
-        90-kdenlive-vs-enhanced    tree         2      2      YES
-  ok    S1  no experiment drifted from its recorded call sites = 0
-  ok    S2  ⛔ experiments C38 actually REACHES       = 1
+        EXPERIMENT                 MODE           INVOKE   C38?
+        60-versus-alternatives     payload+tree   1        no
+        62-anylinux-appimage       payload+tree   1        no
+        85-opengl                  payload        1        no
+        86-bundler-vs-anylinux     payload        4        no
+        89-debloat                 payload        1        no
+        90-kdenlive-vs-enhanced    tree           2        YES
+  ok    S1  ⛔ experiments C38 actually REACHED       = 1
         ⛔ and it is: 90-kdenlive-vs-enhanced -- the one T-084 already named
         ⛔ 90- calls TREE mode and its test script invokes the artefact TWICE
            (melt -version, then a real encode), so the unconditional clear
-           FIRES and its host counts describe only the SECOND invocation.
-        ⛔ THAT INCLUDES OUR OWN "0 of 11", not just the competitor's.
-        ⚠ How much it moves is NOT measured: the second invocation plausibly
-           loads a superset of the first. Plausibly is not measured.
+           FIRED and its committed host counts describe only the SECOND
+           invocation. ⛔ THAT INCLUDES OUR OWN "0 of 11".
+        ⭐ The conversion removes the clear; only re-running 90- says by how
+           much the numbers move.
 
 -- ⛔ what this does NOT establish ---------------------------------
-        ⛔ No committed number moved. Six experiments still carry a copy;
-           T-084 step 2 owes the conversion AND the re-run.
+        ⛔ No committed number moves here. This experiment builds nothing;
+           it gives the DIRECTION of every change and the one experiment
+           whose numbers can have moved.
         ⛔ R1 measures ONE trace from ONE delivery shape. It bounds D3 for
            that shape and for nothing else.
         ⚠ The fixtures are hand-written strace shapes, not captured output.
            They are the shapes C25 and the clone defect were found in.
 
 -- result ----------------------------------------------------
-pass=17 fail=0 skip=0
+pass=20 fail=0 skip=0
 VERDICT: matched expectation.
 --------------------------------------------------------------

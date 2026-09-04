@@ -239,38 +239,25 @@ printf '\n'
 # `tree` mode nothing is cleared, because "what did the machine have to load to
 # deliver this" is a different and also real question.
 #
-# ⚠ THE CLASSIFIER BELOW IS A HAND COPY AND IT CARRIES A KNOWN DEFECT.
-# 2026-09-03f: strace splits a long call across `openat(..., "path"
-# <unfinished ...>` and `<... openat resumed>) = -1 ENOENT`. The PATH is on
-# the first line and the RESULT on the second, so a filter that drops lines
-# containing ENOENT keeps the first half of a FAILED open and counts it as a
-# load. ⛔ THE ERROR ONLY RUNS ONE WAY -- it can turn a clean row dirty and
-# can never turn a dirty row clean -- so this experiment's committed ZEROS
-# stand; a committed NON-zero may be inflated. The corrected implementation is
-# `experiments/lib.sh`'s `exp_classify_trace`; converting this one and re-running
-# it is TODO T-084. docs/history/corrections.md.
-classify_trace() {  # tracefile /artefact payload|tree
-  awk -v want="$2" -v mode="$3" '
-    { pid = $1 }
-    $0 ~ ("execve\\(\"" want "\"") { inset[pid] = 1; payload = pid; delete cur; next }
-    ($0 ~ /(clone|clone3|vfork|fork)\(/ || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) \
-      && /= [0-9]+$/ { if (inset[pid]) inset[$NF] = 1; next }
-    inset[pid] && /execve\(/ && !/ENOENT|= -1/ {
-      payload = pid
-      if (mode != "tree") delete cur
-      next
-    }
-    inset[pid] && /open(at)?\(/ && !/ENOENT|= -1/ {
-      if (mode != "tree" && pid != payload) next
-      if (match($0, /"[^"]*"/) == 0) next
-      p = substr($0, RSTART + 1, RLENGTH - 2)
-      if (p !~ /\.so(\.[0-9]+)*$/) next
-      if (p ~ /^\/(usr\/)?(local\/)?lib(32|64)?\//) cur["host " p] = 1
-      else cur["bundled " p] = 1
-    }
-    END { for (k in cur) print k }
-  ' "$1" | sort -u
-}
+# ⭐ THE CLASSIFIER IS `experiments/lib.sh`'s `exp_classify_trace`, NOT A COPY.
+#
+# ⛔ SIX EXPERIMENTS CARRIED THE SAME awk BY HAND AND THEY COULD NOT BE
+# CORRECTED TOGETHER. Two defects, found a day apart, running in opposite
+# directions:
+#
+#   C25  strace splits a long call across `openat(..., "path" <unfinished ...>`
+#        and `<... openat resumed>) = -1 ENOENT`. The PATH is on the first line
+#        and the RESULT on the second, so a filter that drops lines containing
+#        ENOENT keeps the first half of a FAILED open and counts it as a load.
+#        ⛔ Turns a CLEAN row DIRTY.
+#   C38  five of the six cleared their result set on the artefact's own execve
+#        UNCONDITIONALLY, so in `tree` mode everything opened before the last
+#        invocation vanished. ⛔ Turns a DIRTY row CLEAN.
+#
+# ⭐ `exp_classify_trace <tracefile> <artefact> [payload|tree]` — `mode` LAST
+# with a default, so an un-updated caller keeps `tree` rather than silently
+# reporting zero. `sh experiments/lib.sh --selftest` asserts both defects.
+# TODO T-084; docs/history/corrections.md C25, C38.
 count() { n=$(grep -c . 2>/dev/null) || n=0; printf '%s' "$n"; }
 
 # ---------------------------------------------------------------------------
@@ -300,10 +287,10 @@ while read -r ref name libc digest; do
       -e trace=openat,open,execve,clone,clone3,vfork,fork -o "$B/tr.$name.$arm" \
       "$RR" rootfs run "$root" -- /vs-arm </dev/null >/dev/null 2>&1
     reap_rootfs "$root"
-    pl=$(classify_trace "$B/tr.$name.$arm" /vs-arm payload)
+    pl=$(exp_classify_trace "$B/tr.$name.$arm" /vs-arm payload)
     nh=$(printf '%s\n' "$pl" | grep '^host ' | count)
     nb=$(printf '%s\n' "$pl" | grep '^bundled ' | count)
-    tr=$(classify_trace "$B/tr.$name.$arm" /vs-arm tree)
+    tr=$(exp_classify_trace "$B/tr.$name.$arm" /vs-arm tree)
     th=$(printf '%s\n' "$tr" | sed -n 's/^host //p' | sed 's|.*/||' | tr '\n' ' ')
     if [ "$arm" = A ]; then
       [ "$res" = ok ] && A_RUNS=$((A_RUNS+1)); [ "$nh" = 0 ] && A_CLEAN=$((A_CLEAN+1)); A_TREE="$th"

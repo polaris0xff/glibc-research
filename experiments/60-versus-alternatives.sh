@@ -374,68 +374,32 @@ printf '\n'
 # See the header for both defects this replaces. Reads a trace file already on
 # disk and prints `host <path>` / `bundled <path>` lines.
 #
-#   classify_trace TRACEFILE /artefact payload|tree
+#   exp_classify_trace TRACEFILE /artefact payload|tree
 #
 # payload = only the pid running the innermost ELF, which is the process the
 #           two-libc hazard actually lives in;
 # tree    = every pid descended from the artefact, which is everything the
 #           machine was made to load in order to deliver it.
 #
-# ⚠ THE CLASSIFIER BELOW IS A HAND COPY AND IT CARRIES A KNOWN DEFECT.
-# 2026-09-03f: strace splits a long call across `openat(..., "path"
-# <unfinished ...>` and `<... openat resumed>) = -1 ENOENT`. The PATH is on
-# the first line and the RESULT on the second, so a filter that drops lines
-# containing ENOENT keeps the first half of a FAILED open and counts it as a
-# load. ⛔ THE ERROR ONLY RUNS ONE WAY -- it can turn a clean row dirty and
-# can never turn a dirty row clean -- so this experiment's committed ZEROS
-# stand; a committed NON-zero may be inflated. The corrected implementation is
-# `experiments/lib.sh`'s `exp_classify_trace`; converting this one and re-running
-# it is TODO T-084. docs/history/corrections.md.
-classify_trace() {
-  awk -v want="$2" -v mode="$3" '
-    { pid = $1 }
-    $0 ~ ("execve\\(\"" want "\"") { inset[pid] = 1; payload = pid; next }
-    # ⛔ A FORK IS TWO LINES WHEN strace INTERLEAVES, AND THE FIRST VERSION OF
-    # THIS MATCHED ONLY THE FIRST. strace writes `vfork( <unfinished ...>` and
-    # then `<... vfork resumed>) = 1234`; the child pid is only on the second
-    # line, and that line does not contain `vfork(`. Requiring both `vfork(`
-    # and a trailing `= N` therefore matched NOTHING, and every interleaved
-    # fork child was silently dropped from the set. experiments/62- is where
-    # it showed: an AppImage that ran and passed was recorded as having opened
-    # no objects at all, which is impossible.
-    ($0 ~ /(clone|clone3|vfork|fork)\(/ || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) \
-      && /= [0-9]+$/ { if (inset[pid]) inset[$NF] = 1; next }
-    # ⛔ execve REPLACES THE ADDRESS SPACE, so an object opened before the last
-    # exec is not mapped in the running program. A delivery mechanism that
-    # execs through a shell would otherwise have that shells libraries counted
-    # against the payload. In payload mode the set is cleared at each exec; in
-    # tree mode it is not, because that column asks what the machine had to
-    # load in total. docs/history/corrections.md.
-    inset[pid] && /execve\(/ && !/ENOENT|= -1/ {
-      payload = pid
-      if (mode != "tree") delete cur
-      next
-    }
-    inset[pid] && /open(at)?\(/ && !/ENOENT|= -1/ {
-      if (mode != "tree" && pid != payload) next
-      if (match($0, /"[^"]*"/) == 0) next
-      p = substr($0, RSTART + 1, RLENGTH - 2)
-      # ⛔ A SUBSTRING TEST FOR ".so" IS WRONG AND THIS SCRIPT FOUND IT THE
-      # EXPENSIVE WAY: it matches /etc/ld.so.cache, which is an index, not an
-      # object, and every arm that calls dlopen opens one. Counted as a load it
-      # would have put a phantom host object against arms that loaded none.
-      # A shared object ENDS in .so or .so.N[.N...].
-      if (p !~ /\.so(\.[0-9]+)*$/) next
-      # ⛔ THE CLASSIFICATION. A host object is one under the TARGET
-      # distributions own library directories. Anything else that is a .so
-      # came out of the artefact -- its mount point, its extraction directory,
-      # its cache -- and is the bundles own copy, not the hosts.
-      if (p ~ /^\/(usr\/)?(local\/)?lib(32|64)?\//) cur["host " p] = 1
-      else cur["bundled " p] = 1
-    }
-    END { for (k in cur) print k }
-  ' "$1" | sort -u
-}
+# ⭐ THE CLASSIFIER IS `experiments/lib.sh`'s `exp_classify_trace`, NOT A COPY.
+#
+# ⛔ SIX EXPERIMENTS CARRIED THE SAME awk BY HAND AND THEY COULD NOT BE
+# CORRECTED TOGETHER. Two defects, found a day apart, running in opposite
+# directions:
+#
+#   C25  strace splits a long call across `openat(..., "path" <unfinished ...>`
+#        and `<... openat resumed>) = -1 ENOENT`. The PATH is on the first line
+#        and the RESULT on the second, so a filter that drops lines containing
+#        ENOENT keeps the first half of a FAILED open and counts it as a load.
+#        ⛔ Turns a CLEAN row DIRTY.
+#   C38  five of the six cleared their result set on the artefact's own execve
+#        UNCONDITIONALLY, so in `tree` mode everything opened before the last
+#        invocation vanished. ⛔ Turns a DIRTY row CLEAN.
+#
+# ⭐ `exp_classify_trace <tracefile> <artefact> [payload|tree]` — `mode` LAST
+# with a default, so an un-updated caller keeps `tree` rather than silently
+# reporting zero. `sh experiments/lib.sh --selftest` asserts both defects.
+# TODO T-084; docs/history/corrections.md C25, C38.
 
 # ⛔ EVERY RUN IS TIME-LIMITED, AND THE AppImage ARM IS WHY. `strace -f` does
 # not return until every process it traced has exited, and the AppImage runtime
@@ -543,12 +507,12 @@ while read -r ref name libc digest; do
     esac
     # one trace, read twice
     tmode=$(trace_run "$root" /pgb-vs-arm "$B/tr.$name.$a")
-    pl=$(classify_trace "$B/tr.$name.$a" /pgb-vs-arm payload)
+    pl=$(exp_classify_trace "$B/tr.$name.$a" /pgb-vs-arm payload)
     nph=$(printf '%s\n' "$pl" | grep '^host ' | count)
     npb=$(printf '%s\n' "$pl" | grep '^bundled ' | count)
     [ "$nph" = 0 ] && eval "CLEAN_$a=\$((CLEAN_$a+1))"
     if [ "$tmode" = full ]; then
-      tr=$(classify_trace "$B/tr.$name.$a" /pgb-vs-arm tree)
+      tr=$(exp_classify_trace "$B/tr.$name.$a" /pgb-vs-arm tree)
       nth=$(printf '%s\n' "$tr" | grep '^host ' | count)
       eval "TREEMEAS_$a=\$((TREEMEAS_$a+1))"
       [ "$nth" = 0 ] && eval "TREECLEAN_$a=\$((TREECLEAN_$a+1))"
