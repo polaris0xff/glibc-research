@@ -72,6 +72,12 @@ criterion fail *for the right reason*.
 
 ## In flight right now
 
+    ⭐ **`./pgb` HAS BEEN REBUILT AND CARRIES C37.** The corpus was stopped a
+    third time to do it, five rows measured against the old tool were
+    DELETED (`gl-3`, `x11-3`, `py-2`, `py-3`, `field-2`), and both instances
+    restarted. ⛔ Anything measured before that point is not evidence about
+    the bundler.
+
     ⏳ `experiments/65-` — the T-080 corpus. RESUMABLE. A recorded row in
        `evidence/65-capability-corpus/rows/` is NEVER re-measured, so
        `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
@@ -106,12 +112,13 @@ shell-wrapper** entry point.
 
 ⭐ **C37 fixed one of those** (`xterm`, which now draws in 2 s) by installing
 the dot-named wrapper target and pointing the farm's `bin` at the sharun
-hardlinks. ⛔ **The fix is NOT in `./pgb`** — it was not rebuilt while the
-corpus ran.
+hardlinks. ⭐ **The fix IS in `./pgb` now** — rebuilt once the corpus was
+stopped, and the five affected rows deleted so they are re-measured against it.
 
 | after `make`, re-measured | predicted |
 |---|---|
 | `x11-3` `xterm` | ⭐ **passes** — measured by hand at 1 window in 2 s |
+| `gl-3` `glmark2` | ⭐ **passes** — also a shell wrapper; by hand it draws in 2 s and benchmarks at **360 FPS**. ⚠ Added after the table was first written, and said so |
 | `py-2` `pdfarranger` | ⚠ **still fails.** It dies with a Python **Traceback**, so it STARTED — C37's exec failure is not its problem |
 | `py-3` `virt-manager` | ⛔ **not predicted.** Nobody has read its error |
 | `field-2` `neovim` | ⛔ **still fails**, and not ours: the closure carries **glibc 2.26**, and `ld.so` learned `--argv0` in 2.33 |
@@ -157,7 +164,7 @@ why it is written down rather than left as an expectation.
                  deleted and re-measured. ⭐ Both capabilities WORK, measured
                  by hand: eglinfo matches its real assertion 30 times, and
                  vulkaninfo exits 0 with GPU0 = llvmpipe 1.4.354.
-        x11-3    ⭐ SOLVED AND FIXED, ⛔ NOT YET RE-MEASURED. xterm's
+        x11-3    ⭐ SOLVED AND FIXED; ⏳ re-measurement RUNNING. xterm's
                  nixpkgs `bin/xterm` is a SHELL wrapper that execs
                  `.xterm-wrapped` by store path. Two defects: the dot-named
                  target was never installed, AND the farm's `bin` resolved to
