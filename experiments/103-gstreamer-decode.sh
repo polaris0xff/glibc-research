@@ -175,7 +175,18 @@ for name in $ENVS; do
 
   hp=$(exp_classify_trace "$tr" /subj103 payload | grep -c '^host ' || true)
   ht=$(exp_classify_trace "$tr" /subj103 tree    | grep -c '^host ' || true)
-  [ "$hp" = 0 ] && d3=$((d3+1))
+  # ⛔ ZERO HOST OBJECTS IS ALSO WHAT A SUBJECT THAT NEVER STARTED REPORTS, and
+  # D3 used to count it. corrections.md C54, found in `65-` and swept here:
+  # `64-` already computed the bundled count, `68-` guards on `ran2`, and this
+  # was the one line left unguarded. ⚠ D1 and D2 would show a non-start as a
+  # visible failure beside it, but D3 is a criterion of its own and must stand
+  # on its own evidence.
+  hb=$(exp_classify_trace "$tr" /subj103 payload | grep -c '^bundled ' || true)
+  if [ "$hp" = 0 ] && [ "$hb" -gt 0 ]; then
+    d3=$((d3+1))
+  elif [ "$hp" = 0 ]; then
+    exp_note "⛔ $name: loaded NOTHING, host or bundled — the artefact never started, so D3 does not count this row"
+  fi
   sc=no
   grep -q 'execve("[^"]*gst-plugin-scanner' "$tr" 2>/dev/null && { sc=yes; scanner_seen=$((scanner_seen+1)); }
   printf '  %-22s %-6s %-6s %-9s %-9s %s\n' "$name" "$enc" "$dec" "$hp" "$ht" "$sc"

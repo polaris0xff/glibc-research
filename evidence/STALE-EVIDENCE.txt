@@ -135,3 +135,20 @@
 # simply re-run (neither touches the bed); `105-` needs all eleven, which
 # another experiment was holding.
 105-file-magic.sh 90ec8aaf7a65f38f38ab65c0e63bd3734a826489 ca5112a2e3bce2d1dede5366cde93c26fa134196 the 0\n0 sweep: one grep -c call site became exp_count; inert on a non-zero count, owed a re-run
+
+# ⛔ 2026-09-04c — C54, AND IT IS THE FIRST TIME `65-` HAS OWED A RE-RUN FOR A
+# REASON THAT CHANGES A NUMBER RATHER THAN AN INSTRUMENT DETAIL.
+#
+# The corpus counted a row CLEAN on `host == 0` alone, and zero host objects is
+# also what a subject that NEVER STARTED reports. `field-2` (neovim) is exactly
+# that: its closure's own glibc 2.26 rejects the loader invocation, nothing of
+# the artefact is ever mapped, and it was counted toward "24 of 26 clean on all
+# eleven". The guard is now `bundled > 0 AND host == 0`, with a NOSTART line in
+# the summary naming any row that loaded nothing at all.
+#
+# ⚠ The committed 24 stands in the record until the corpus is re-run. On the
+# evidence in corrections.md C54 at most ONE subject moves — but that is an
+# argument, and this ledger takes measurements.
+#
+# ⭐ ONE RE-RUN CLEARS BOTH THIS AND THE C49 BLOCK ABOVE.
+65-capability-corpus.sh 88be10cfe4850fd68c2363dc31f555cdd1cc30ab e48d88a811766af65ab50a79d82977a2303d7aac C54: clean now requires bundled>0; the committed 24 counted neovim, which never started

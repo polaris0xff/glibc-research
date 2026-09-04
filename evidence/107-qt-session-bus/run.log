@@ -32,3 +32,11 @@ evidence     : /home/user/glibc-research/evidence/107-qt-session-bus
   alpine-3.10        musl   dynamic yes       0         yes       0
            alpine-3.10 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001a0008 /* 139 vars
            alpine-3.10 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001dc008 /* 139 vars
+  voidlinux-musl     musl   dynamic yes       0         yes       0
+           voidlinux-musl arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001d6008 /* 139 vars
+           voidlinux-musl arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001e0008 /* 139 vars
+  debian-11          glibc  dynamic yes       1         yes       1
+           debian-11 arm A host objects: libc.so.6 
+           debian-11 arm B STILL dirty: libc.so.6 
+           debian-11 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000202008 /* 139 vars
+           debian-11 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001a0008 /* 139 vars
