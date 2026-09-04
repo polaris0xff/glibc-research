@@ -466,10 +466,15 @@ experiment; none has been shown to be unreachable.
 3. **SEVEN host *data* dependencies exist and static linking touches none of
    them.** ⚠ **It was FIVE until 2026-09-03c and SIX until 2026-09-03e** — each
    time because somebody asked whether the list was complete rather than
-   whether the known rows were closed. ⛔ **The seventh is the network name
+   whether the known rows were closed. ⭐ **The seventh is the network name
    databases** (`/etc/services`, `/etc/protocols`): `getservbyname("http","tcp")`
    returns **NULL on 3 of 11 — debian-11, debian-12 and ubuntu-20.04, all
-   glibc** — while all four musl environments ship the file.
+   glibc** — while all four musl environments ship the file. ⭐ **Closed
+   2026-09-04 by `--embed-netdb`, 11 of 11, two runs** (`experiments/66-`),
+   with ⛔ **one boundary that stays open and was pre-registered as a failure
+   before the run**: `getaddrinfo` with a *service name* is still 8 of 11,
+   because `--wrap` redirects the public symbol and glibc's `getaddrinfo`
+   calls its own internal `__getservbyname_r`.
    ⭐ **It was found by a re-runnable SEARCH rather than a guess**:
    `experiments/82-` enumerates every absolute path the pinned `libc.a` names
    (78 at glibc 2.41), classifies each against the known rows, and prints the
@@ -477,8 +482,8 @@ experiment; none has been shown to be unreachable.
    paths, other libraries' host data (terminfo and the CA bundle are invisible
    to it **by construction**) or anything behind a host daemon — so it is a
    snapshot of a method, not a proof of completeness. `REQUIREMENTS.md`, T-079.
-   ⭐ **Five are solved, one is shipped rather than solved, and the seventh is
-   OPEN with no mechanism**:
+   ⭐ **SIX are solved, one is shipped rather than solved, and none is open
+   without a mechanism** — the seventh was the last, and it closed 2026-09-04:
    gconv ✅ (static libiconv), locale ✅ (opt-in `--embed-locale`),
    terminfo ✅ (opt-in `--embed-terminfo`, `setupterm(xterm-256color)` on 11 of
    11 including three Alpines with no terminfo tree), CA bundle ✅ (opt-in
@@ -486,7 +491,10 @@ experiment; none has been shown to be unreachable.
    CA variables unset), ⭐ **timezone ✅ (opt-in `--embed-tzdata`,
    `TZ=Europe/Berlin` resolving to `CEST +0200` on 11 of 11 where a plain
    `-static` binary silently answers `Europe +0000` on four of them —
-   `experiments/97-`, T-076)**, a runtime's own library tree ⚠ shipped
+   `experiments/97-`, T-076)**, ⭐ **network name databases ✅ (opt-in
+   `--embed-netdb`, `getservbyname`/`getprotobyname` answering on 11 of 11
+   where a plain `-static` binary returns NULL on three — `experiments/66-`)**,
+   a runtime's own library tree ⚠ shipped
    (CPython's 98 MiB stdlib). `TODO` T-032 and T-076.
    ⭐ **The finding that shaped both opt-in mechanisms**: most failures were
    never *"this machine has no certificates"* — the data was there on a path

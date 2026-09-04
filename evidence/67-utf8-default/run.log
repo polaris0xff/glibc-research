@@ -1,0 +1,59 @@
+===============================================================
+67 - what an UNSET LANG means, and the one axis where native musl wins
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T01:43:20Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/67-utf8-default
+--------------------------------------------------------------
+
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T01:43:20Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/67-utf8-default
+--------------------------------------------------------------
+        build host, control, env scrubbed: ANSI_X3.4-1968
+  ok    the CONTROL reports a NON-UTF-8 codeset on a host that HAS C.UTF-8 = other
+
+  ENVIRONMENT          LIBC   A gcc -static    M musl -static   B pgb            C --utf8-default E C, LANG=C
+  alpine-3.22          musl   ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+  alpine-3.20          musl   ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+  alpine-3.10          musl   ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+  voidlinux-musl       musl   ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+  debian-11            glibc  ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+  debian-12            glibc  ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+  ubuntu-20.04         glibc  ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+  rockylinux-8         glibc  ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+  opensuse-leap-15.6   glibc  ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+  fedora-42            glibc  ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+  archlinux-latest     glibc  ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968   UTF-8            ANSI_X3.4-1968
+
+  ok    environments measured                          = some
+  ok    U1  A: a NON-UTF-8 codeset on every row        = 11
+  ok    U2  M: native musl reports UTF-8               = 11
+  ok    U3  B: --embed-locale alone does NOT move it   = 11
+  ok    U4  ⭐ C: --utf8-default reports UTF-8        = 11
+  ok    U5  ⛔ E: an EXPLICIT LANG=C is still obeyed  = 11
+        ⭐ WHAT U4 AND U5 SAY TOGETHER. U4 alone would also be scored green
+           by a mechanism that forced UTF-8 unconditionally, which would be
+           a bug: a program run under LANG=C asked for a single-byte locale
+           and must get one. U5 is the row that can fail for that reason.
+        ⚠ AND THE AXIS IS ONE AXIS. This closes the environment-default
+           codeset and says nothing about collation, message catalogues or
+           any other locale category: C.UTF-8 is the C locale with a UTF-8
+           charset, not a full locale.
+
+-- result ----------------------------------------------------
+pass=7 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

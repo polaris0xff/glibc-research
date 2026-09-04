@@ -40,10 +40,12 @@ capability axis, so the column does not depend on that choice.
 | NSS — `getpwuid(0)` | 10 / 11 | **11 / 11** | 11 / 11 | `63-` |
 | NSS — `gethostid()` | ⛔ **SIGFPE on Arch** | ✅ **11 / 11** | ✅ 11 / 11 | `63-`, `82-` |
 | iconv — encodings accepted | 1 / 12 on 8 rows, and it **CRASHES on 3** — SIGABRT on debian-11 and ubuntu-20.04, SIGFPE on debian-12 | ✅ **12 / 12** | 10 / 12 | `63-` |
-| locale — codeset **by environment** | ⛔ 0 / 11 | ⛔ **0 / 11** | ⭐ **11 / 11** | `63-` |
+| locale — codeset **by environment** | ⛔ 0 / 11 | ⛔ 0 / 11 by default, ✅ **11 / 11** with `--utf8-default` | ⭐ 11 / 11 | `63-`, `67-` |
 | locale — codeset **when requested** | 7 / 11 | ✅ **11 / 11** | 11 / 11 | `63-` |
+| ⭐ **an EXPLICIT `LANG=C` still obeyed** | 11 / 11 | ✅ **11 / 11** with `--utf8-default` | 11 / 11 | `67-` |
 | timezone — `TZ=Europe/Berlin` | 7 / 11 | ✅ **11 / 11** | 7 / 11 | `63-`, `97-` |
-| ⛔ **`/etc/services`** | ⛔ 8 / 11 | ⛔ **8 / 11** | ⛔ 8 / 11 | `63-`, `82-` |
+| **`/etc/services`, `/etc/protocols`** | ⛔ 8 / 11 | ⛔ 8 / 11 by default, ✅ **11 / 11** with `--embed-netdb` | ⛔ 8 / 11 | `63-`, `82-`, `66-` |
+| ⛔ **`getaddrinfo(NULL, "http")`** | ⛔ 8 / 11 | ⛔ **8 / 11 — `--wrap` cannot reach glibc's internal `__getservbyname_r`** | ⛔ 8 / 11 | `66-` |
 | terminfo | — | ✅ 11 / 11 (`--embed-terminfo`) | — | `75-` |
 | CA bundle | 5 / 11 | ✅ 11 / 11 (`--embed-cacert`) | — | `74-` |
 | `dlopen` of its OWN plugins | — | ✅ 11 / 11, zero host objects | — | `71-` |
@@ -57,36 +59,63 @@ capability axis, so the column does not depend on that choice.
 | startup, peak RSS | ⚠ **no difference measurable** | ⚠ same | 160 µs / — | `40-`, `60-` |
 | what it writes to the filesystem | nothing | nothing, unless an `--embed-*` fires | nothing | `63-`, `97-` |
 
-### ⛔ The two rows that come out against us, reported and not softened
+### ⛔ The two rows that came out against us — both now have a mechanism, and a NEW row does not
 
 ⭐ **T-078's own rule**: *"If a row comes out against us, that row IS the
-deliverable — report it, do not soften the axis until it passes."* There are
-two, and one of them **falsified a pre-registered prediction**.
+deliverable — report it, do not soften the axis until it passes."* Two rows
+came out against us on 2026-09-03e. ⭐ **On 2026-09-04 both have a mechanism,
+measured twice on eleven environments** — and the mechanisms produced a third
+row that is still against us, which is what this section is for.
 
-1. ⛔ **The environment-default codeset, and it is the one axis where native
-   musl beats BOTH glibc columns.** With no `LANG` set — what a program gets in
-   a bare container — musl answers **UTF-8 on 11 of 11** and every glibc arm,
-   `pgb` included, answers `ANSI_X3.4-1968` on **11 of 11**. musl's minimal
-   locale support does not mean a poor codeset: its default charset *is* UTF-8,
-   unconditionally. ⚠ `--embed-locale` answers a **request** for UTF-8 and does
-   not change what an unset `LANG` means; asked for `C.UTF-8` by name, `pgb`
-   answers UTF-8 on 11 of 11 against vanilla's 7. ⛔ The prediction registered
-   before the run said the opposite on both halves; it is recorded as wrong in
-   `experiments/63-`'s header rather than rewritten.
-2. ⛔ **`/etc/services`** — the **eleventh** host-data dependency, found by
-   `experiments/82-` and open. All three columns fail it on the same three
-   environments, so it is not a row `pgb` loses *to musl* — it is a row nobody
-   wins, and `pgb` claims to be the one that should. See
-   [`REQUIREMENTS.md`](REQUIREMENTS.md).
+1. ✅ **The environment-default codeset** — the one axis where native musl beat
+   BOTH glibc columns. With no `LANG` set, musl answers **UTF-8 on 11 of 11**
+   and every glibc arm answered `ANSI_X3.4-1968` on **11 of 11**. ⭐ `pgb
+   build --utf8-default` now answers **UTF-8 on 11 of 11** (`experiments/67-`,
+   `pass=7 fail=0 skip=0`, two runs identical). ⛔ **The row that makes that
+   result mean something is `LANG=C`**: a mechanism that forced UTF-8
+   unconditionally would score U4 green and be a *bug*, because a program run
+   under `LANG=C` asked for a single-byte locale. U5 measures exactly that and
+   is green on 11 of 11. ⚠ `--embed-locale` alone does **not** move the axis
+   (U3, 11 of 11) — the flags are separate on purpose, and `--utf8-default` is
+   opt-in because it changes what a program without `LANG` sees. ⚠ **One axis:**
+   `C.UTF-8` is the C locale with a UTF-8 charset, not a full locale, and this
+   says nothing about collation or message catalogues. ⛔ The prediction
+   registered before `63-` said the opposite on both halves; it is recorded as
+   wrong in `experiments/63-`'s header rather than rewritten.
+2. ✅ **`/etc/services` and `/etc/protocols`** — the **eleventh** host-data
+   dependency, found by `experiments/82-`. All three columns failed it on the
+   same three environments (debian-11, debian-12, ubuntu-20.04 — every one a
+   glibc row that ships no `/etc/services`), so it was a row nobody won and
+   `pgb` claimed to be the one that should. ⭐ `pgb build --embed-netdb` now
+   answers `http/tcp = 80` and `tcp = 6` on **11 of 11** (`experiments/66-`,
+   `pass=12 fail=0 skip=0`, two runs identical). ⭐ **The host still wins where
+   it has the file** — the wrappers call `__real_*` first — and a name *nobody*
+   carries still answers NULL on 11 of 11 (N3), so the mechanism is a fallback
+   and not an override. ⚠ Its tables cost **−7,280 B**: the arm B artefact is
+   *smaller* than arm A, so the size argument against carrying them does not
+   survive contact with the number.
+3. ⛔ **NEW, AND IT IS AGAINST US: `getaddrinfo` with a service name.**
+   `getaddrinfo(NULL, "http", …)` still resolves on only **8 of 11** with
+   `--embed-netdb` on. ⛔ **This is a boundary of the `--wrap` mechanism, not an
+   oversight**: `--wrap` redirects the *public* symbol, and glibc's
+   `getaddrinfo` reaches its own internal `__getservbyname_r`, which the linker
+   cannot interpose. It was **pre-registered as a failure before the run**
+   (`experiments/66-` N4) precisely so that a green result would have to be
+   explained rather than pocketed. A program that needs it must pass the port
+   number, or the mechanism has to change shape.
 
 ### What the matrix says about the parity claim
 
-⭐ **On every axis measured here except the environment-default codeset, `pgb`
-is level with or ahead of native musl static** — and it is ahead on iconv
-(12/12 vs 10/12), timezone (11 vs 7) and throughput (by 84× on contended
-malloc), at 11.5× the artefact size. ⛔ **The claim as stated — *"no buts and
-no ifs"* — is therefore not yet true**: there is one measured "but"
-(unset-`LANG` codeset) and one measured "if" (`/etc/services`).
+⭐ **On every axis measured here, `pgb` is now level with or ahead of native
+musl static** — ahead on iconv (12/12 vs 10/12), timezone (11 vs 7),
+`/etc/services` (11 vs 8) and throughput (by 84× on contended malloc), and
+level on the environment-default codeset once `--utf8-default` is passed, at
+11.5× the artefact size. ⛔ **The claim as stated — *"no buts and no ifs"* — is
+still not true, and the reasons have changed**: the two axes that were flatly
+lost are now **flags a developer has to pass**, not defaults; and
+`getaddrinfo` with a service name is a measured "but" that no flag closes. ⚠ A
+capability behind an opt-in flag is a capability the tool *has*; it is not
+parity with a libc that does it unconditionally.
 
 ## Who is actually in this race
 

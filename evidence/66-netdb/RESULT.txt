@@ -1,0 +1,82 @@
+===============================================================
+66 - /etc/services and /etc/protocols: the eleventh quirk, and a mechanism for it
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T01:43:16Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/66-netdb
+--------------------------------------------------------------
+
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T01:43:16Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/66-netdb
+--------------------------------------------------------------
+  ok    libc.a names /etc/services                     = yes
+  ok    libc.a names /etc/protocols                    = yes
+        so both are HOST data: nothing about them is linked in.
+  ok    the subject has no PT_INTERP                   = 0
+        build host: 80 6 null 80   (http/tcp, tcp, absent-name, getaddrinfo)
+  ok    the CONTROL resolves http/tcp on the build host = 80
+  ok    ...and tcp's protocol number                   = 6
+
+-- arm A: plain `gcc -static`, and what the host has ----------------
+  ENVIRONMENT          LIBC   /etc/serv /etc/proto PRINTED VERDICT
+  alpine-3.22          musl   yes       yes        80 6 null 80 ok
+  alpine-3.20          musl   yes       yes        80 6 null 80 ok
+  alpine-3.10          musl   yes       yes        80 6 null 80 ok
+  voidlinux-musl       musl   yes       yes        80 6 null 80 ok
+  debian-11            glibc  no        no         -1 -1 null -1 ⛔ NULL
+  debian-12            glibc  no        no         -1 -1 null -1 ⛔ NULL
+  ubuntu-20.04         glibc  no        no         -1 -1 null -1 ⛔ NULL
+  rockylinux-8         glibc  yes       yes        80 6 null 80 ok
+  opensuse-leap-15.6   glibc  yes       yes        80 6 null 80 ok
+  fedora-42            glibc  yes       yes        80 6 null 80 ok
+  archlinux-latest     glibc  yes       yes        80 6 null 80 ok
+
+  ok    every fetched environment answered             = 11
+  ok    N1  environments that CANNOT resolve http/tcp  = some
+  ok    N1  ...and the failures are EXACTLY the rows with no /etc/services = 0
+        arm A: 3 of 11 answer NULL for getservbyname("http","tcp").
+
+-- arm B: the same program, built with --embed-netdb ----------------
+  ENVIRONMENT          /etc/serv http/tcp proto   absent getaddrinfo
+  alpine-3.22          yes       80      6       null   80
+  alpine-3.20          yes       80      6       null   80
+  alpine-3.10          yes       80      6       null   80
+  voidlinux-musl       yes       80      6       null   80
+  debian-11            no        80      6       null   -1
+  debian-12            no        80      6       null   -1
+  ubuntu-20.04         no        80      6       null   -1
+  rockylinux-8         yes       80      6       null   80
+  opensuse-leap-15.6   yes       80      6       null   80
+  fedora-42            yes       80      6       null   80
+  archlinux-latest     yes       80      6       null   80
+
+  ok    N2  arm B: every environment resolves http/tcp = 11
+  ok    N2  arm B: and none failed                     = 0
+  ok    N3  arm B: a name NOBODY carries still answers NULL = 0
+  ok    arm A had rows that FAILED, so arm B is not vacuous = yes
+        arm A could not resolve on 3 of 11; arm B on 0.
+        ⛔ N4, the boundary: getaddrinfo(NULL,"http") resolved to 80 on
+           8 of 11 rows. --wrap redirects the PUBLIC symbol, and
+           glibc's getaddrinfo calls its own internal __getservbyname_r, so
+           a row where the host has no /etc/services is expected to stay
+           unfixed here. This is the mechanism's stated edge, not a defect
+           hidden in a footnote.
+        size: arm A 1053656 B, arm B 1046376 B -- the carried tables cost -7280 B
+
+-- result ----------------------------------------------------
+pass=12 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

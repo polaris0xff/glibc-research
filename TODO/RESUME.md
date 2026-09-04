@@ -6,19 +6,21 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03f, at the START; refreshed when arm G came
-                   back 11 of 11, and again when the instrument deadlocked.
+    LAST WRITTEN   2026-09-03f, at the START; refreshed when arm G came back
+                   11 of 11, when the instrument deadlocked, and again on
+                   2026-09-04 when T-081 CLOSED and 66-/67- landed.
                    Session IN PROGRESS.
     TREE           main, began at 820d899f (== origin/main at session start)
     BRANCH         ⛔ main. The harness named
                    `claude/t-081-bundle-capabilities-2c24c0` and THE OPERATOR
                    SAID main, again. Fourth session running.
-    SCOPE          ⭐ T-081 FIRST (the debloater/patcher), then REOPEN T-080
-                   and re-measure EVERY capability in
-                   docs/research/bundle-capabilities.md with THREE
-                   applications per category, simple -> complex. Then
-                   T-079's residue (/etc/services) and the codeset axis.
-    CI             302 success; 303 and 304 in flight, READ THEM.
+    SCOPE          ⭐ T-081 ✅ CLOSED (arm G 0/11 -> 11/11, twice).
+                   ⭐ T-085 ✅ /etc/services, T-086 ✅ the codeset axis.
+                   ⏳ T-080 REOPENED and IN FLIGHT: every capability in
+                   docs/research/bundle-capabilities.md re-measured with
+                   THREE applications per category, simple -> complex.
+    CI             ⭐ 323 success on 357c0346, the T-081 closure. 316-323 all
+                   success. READ THE NEXT ONE.
     GATES          both green at every commit so far.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
@@ -64,14 +66,35 @@ criterion fail *for the right reason*.
 
 ## In flight right now
 
-    ⛔ RUN 1 OF experiments/64- WAS DISCARDED, AND THE REASON IS A FINDING.
-    Arms G, N and X each completed 11 clean rows in it:
+    ⭐ DONE AND COMMITTED, both runs agreeing on every cell:
 
-        G  galculator, UI at a compiled-in store path   WINDOW 11/11, host 0
-        N  the SAME bundle, --no-storefix               WINDOW  0/11
-        X  mousepad, the regression control             WINDOW 11/11, host 0
+        64-  T-081's acceptance test.  pass=11 fail=0 skip=0, twice.
+             G galculator  compiled-in store path   WINDOW 11/11, host .so 0
+             N the SAME bundle, --no-storefix       WINDOW  0/11
+             X mousepad    GResource control        WINDOW 11/11, host .so 0
+             P meld        Python 3 + GTK 3         WINDOW 11/11, host .so 0
+        66-  --embed-netdb.    pass=12 fail=0 skip=0, twice.  8/11 -> 11/11.
+        67-  --utf8-default.   pass=7  fail=0 skip=0, twice.  0/11 -> 11/11,
+             and LANG=C still obeyed 11/11 (the row that makes it mean
+             something).
 
-    ⛔ THEN ARM P DEADLOCKED THE INSTRUMENT, for nineteen minutes:
+    ⏳ RUNNING NOW: `experiments/65-`, the T-080 REDO corpus — 26 subjects ×
+       11 environments, launched 01:43 UTC by `scratchpad/chain2.sh` (session
+       scheduling, not evidence). ⚠ HOURS. ⭐ RESUMABLE: a completed subject
+       writes a TAB-separated row into
+       `evidence/65-capability-corpus/rows/` and a recorded row is never
+       re-measured, so `sh scripts/common/run-experiment.sh 65` picks up
+       wherever it stopped.
+
+    ⛔ WHILE 65- RUNS, THE MACHINE IS NOT FREE.
+      - ⛔ Do not run another GUI experiment: 65- counts windows on `:99`,
+        and a second program's window there is a false positive nothing
+        else in the harness catches.
+      - ⛔ Do not `make`: 65- compares each artefact against `./pgb`.
+      - ⚠ Do not run bed-heavy experiments; the counts they take need the
+        bed idle and 65- is using it continuously.
+
+    ⛔ THE DEADLOCK THAT COST RUN 1 OF 64-, kept because it will recur:
 
         strace   D    folio_wait_bit_common
         dwarfs   Ssl  futex_do_wait        (the FUSE daemon for the mount)
@@ -81,25 +104,10 @@ criterion fail *for the right reason*.
     making progress the ptrace-stopped process could not make. ⛔ `kill`
     cannot end a process in D, so `wait` never returned. ⭐ THE FIX IS AN
     ORDERING — `reap_in_root` kills the FUSE daemon and must run BEFORE
-    `wait`, not after — plus a per-arm window budget, because a Python
-    interpreter importing its stack through ptrace is far slower than a C
-    program starting.
-
-    ⏳ RUNNING NOW: `scratchpad/chain2.sh`, which is session scheduling and
-       not evidence. In order:
-         64- run A, 64- run B     (both with the CURRENT ./pgb; artefacts
-                                   cleared first so they describe one tool)
-         66- twice                --embed-netdb, the ELEVENTH quirk
-         67- twice                --utf8-default, the codeset axis
-         65- once                 the T-080 REDO corpus, 26 subjects.
-                                  ⚠ HOURS, and RESUMABLE: rows land in
-                                  evidence/65-capability-corpus/rows and a
-                                  recorded row is never re-measured.
-
-    ⛔ DO NOT `make` WHILE experiments/64- IS RUNNING. Its stale() check
-    compares each artefact against ./pgb, so a rebuild mid-run makes later
-    arms describe a different tool than earlier ones. That happened once this
-    session and that run was discarded too.
+    `wait`, not after — plus `APPIMAGE_EXTRACT_AND_RUN=1`, which removes the
+    FUSE mount from the picture entirely and is why every 65- subject sets
+    it. The ordering fix also made every row ~10× faster, which means the
+    slow version had been paying the same cost in a milder form all along.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 

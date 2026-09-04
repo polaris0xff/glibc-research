@@ -4,7 +4,7 @@
 the entries, and [`../HISTORY/`](../HISTORY/).
 
     STATE     2026-09-03e  ✅ COMPLETE
-    COUNTS    57 entries, 19 open, 38 done
+    COUNTS    59 entries, 19 open, 40 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)
               musl-gcc INSTALLED — the blocker the last session recorded

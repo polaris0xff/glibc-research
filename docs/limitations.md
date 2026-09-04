@@ -429,7 +429,7 @@ daemon. It is a snapshot of a method, not a proof.
 | **terminfo** (`/usr/share/terminfo`) | ✅ **solved, opt-in** — `--embed-terminfo`, host database preferred | `experiments/75-`, POC 20 |
 | **TLS CA bundle** | ✅ **solved, opt-in** — `--embed-cacert`, nine known store locations probed first | `experiments/74-`, POC 30 |
 | **timezone** (`/usr/share/zoneinfo`) | ✅ **solved, opt-in** — `--embed-tzdata`; without it a plain `-static` binary answers `TZ=Europe/Berlin` with `Europe +0000` on 4 of 11 | `experiments/97-` |
-| **network name databases** (`/etc/services`, `/etc/protocols`) | ⚠ **mechanism written, `--embed-netdb`; the measurement is `experiments/66-` and this row says what it says only once that has run.** `getservbyname("http","tcp")` returns NULL on **3 of 11, all glibc** | `experiments/82-`, `66-` |
+| **network name databases** (`/etc/services`, `/etc/protocols`) | ✅ **solved, opt-in** — `--embed-netdb`; `getservbyname("http","tcp")` returns NULL on **3 of 11, all glibc** without it and resolves on **11 of 11** with it, host file preferred, a name nobody carries still NULL on 11 of 11. ⛔ **`getaddrinfo` with a service name is NOT fixed — 8 of 11**: `--wrap` redirects the public symbol and glibc's `getaddrinfo` calls its own internal `__getservbyname_r`. Pre-registered as a failure before the run | `experiments/82-`, `66-` |
 | **a runtime's own library tree** (CPython's stdlib) | ⚠ **shipped, not solved** — 98 MiB beside a 46 MiB binary | POC 50 |
 
 **terminfo and the CA bundle, before and after.** ⭐ Both are now solved and

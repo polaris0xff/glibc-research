@@ -1021,3 +1021,97 @@ disagreement and both now asserted against: presence was tested with
 HOST**, so Alpine's `/bin/sh -> /bin/busybox` read as absent on three rows
 (`/bin/sh` on 11 of 11 is now a positive control); and the probe buffered
 stdout to a pipe, so a crash discarded every answer already computed.
+
+## T-085 — ⭐ the ELEVENTH quirk CLOSED: `--embed-netdb`, and the boundary `--wrap` cannot cross
+
+**Source** ⭐ **operator, 2026-09-04**: *"the ELEVENTH glibc-static quirk
+(/etc/services, 3 of 11 fail, all glibc) has a measurement and NO mechanism —
+the precedent is --embed-tzdata, look first and carry a fallback."*
+**Category** runtime · **Priority** P1 · **Effort** S · **Status** ✅ done
+
+⭐ **Closed on all eleven: `experiments/66-`, `pass=12 fail=0 skip=0`, two runs
+byte-identical.** T-079 found the row; this entry is the mechanism.
+
+**The precedent did not transfer, and that is the interesting part.**
+`--embed-terminfo`, `--embed-cacert` and `--embed-tzdata` all point a **search
+variable** — `TERMINFO`, `SSL_CERT_FILE`, `TZDIR` — at carried data, so the
+library does its own lookup and finds ours. ⛔ `/etc/services` has **no such
+variable**: the path is compiled into glibc and there is nothing to redirect.
+So this mechanism wraps the **call** instead — `-Wl,--wrap` on eight symbols:
+`getservbyname`, `getservbyport`, `getservent`, `getprotobyname`,
+`getprotobynumber` and their `_r` forms.
+
+⭐ **The ORDER is the same order, and it is the security property**, stated in
+`AGENTS.md` §7 item 3: each wrapper calls `__real_*` **first**, so a host that
+maintains the file wins, and the carried table is a fallback. Two assertions
+hold it up rather than a comment: N3 measures that a name **nobody** carries
+still answers NULL on 11 of 11 (so the table is not answering blindly), and the
+arm A / arm B split measures that the three rows without the file are exactly
+the rows the table rescues.
+
+| | arm A `gcc -static` | arm B `--embed-netdb` |
+|---|---|---|
+| `getservbyname("http","tcp")` | 8 of 11 | **11 of 11** |
+| `getprotobyname("tcp")` | 8 of 11 | **11 of 11** |
+| a name nobody carries → NULL | 11 of 11 | **11 of 11** |
+| artefact | 1,053,656 B | **1,046,376 B** |
+
+⚠ **The size row is not a typo: the tables cost −7,280 B.** The arm with the
+embedded databases is *smaller* than the arm without them, so the size argument
+against carrying them does not survive contact with the number.
+
+⛔ **THE BOUNDARY, AND IT WAS PRE-REGISTERED AS A FAILURE BEFORE THE RUN.**
+`getaddrinfo(NULL, "http", …)` still resolves on only **8 of 11**. `--wrap`
+redirects the **public** symbol; glibc's `getaddrinfo` reaches its own internal
+`__getservbyname_r`, which the linker cannot interpose. ⚠ It is written into
+`experiments/66-`'s header as expectation N4 **precisely so that a green result
+would have to be explained rather than pocketed** — an experiment that only
+registers the outcomes it wants is an advertisement. A program that needs it
+must pass the port number, or the mechanism has to change shape (an
+`ld --defsym` alias, or building the tables into a private `libc.a` member).
+
+**Where this was looked for and where it was not.** `libc.a` names
+`/etc/services` and `/etc/protocols` — asserted, not assumed, as the first two
+checks of the run. What was **not** examined: `/etc/networks`, `/etc/ethers`,
+`/etc/rpc`, and the `getnetbyname`/`getrpcbyname` families that read them.
+They are the same shape and are untested here.
+
+## T-086 — ⭐ the ONE axis where native musl beat both glibc columns, closed: `--utf8-default`
+
+**Source** ⭐ **operator, 2026-09-04**: *"the environment-default codeset is the
+one axis where native musl beats both glibc columns 11-0. COMPLETE THIS TOO."*
+**Category** runtime · **Priority** P1 · **Effort** S · **Status** ✅ done
+
+⭐ **Closed on all eleven: `experiments/67-`, `pass=7 fail=0 skip=0`, two runs
+byte-identical.**
+
+⛔ **THIS IS A CHANGE TO A DOCUMENTED DEFAULT, NOT A REPAIR, and that is why it
+is a separate opt-in flag.** POSIX leaves the choice to the implementation when
+`setlocale(cat, "")` is called and the environment says nothing; glibc chooses
+`C` (`ANSI_X3.4-1968`) and musl chooses UTF-8, unconditionally. Neither is
+wrong. `--utf8-default` makes a `pgb` binary choose what musl chooses.
+
+| arm | what it is | codeset |
+|---|---|---|
+| A | `gcc -static` | `ANSI_X3.4-1968` on 11 |
+| M | native musl static | **UTF-8 on 11** |
+| B | `pgb build --embed-locale` | `ANSI_X3.4-1968` on 11 |
+| C | `pgb build --utf8-default` | **UTF-8 on 11** |
+| E | arm C under `LANG=C` | `ANSI_X3.4-1968` on 11 |
+
+⭐ **ARM E IS THE ROW THAT MAKES ARM C MEAN ANYTHING.** A mechanism that forced
+UTF-8 unconditionally would score arm C green and be a **bug**: a program run
+under `LANG=C` asked for a single-byte locale and must get one. Arm E is the row
+that can fail for that reason, and it is green on 11 of 11. ⛔ The substitution
+fires only when `LC_ALL`, `LC_CTYPE` **and** `LANG` are all unset.
+
+⚠ **`--embed-locale` cannot do this and arm B measures that it does not try.**
+That mechanism answers a **request** the host could not satisfy; here the host
+satisfied the request perfectly — the answer was `C`, which is what was asked
+for. Two different failures, two flags. `--utf8-default` implies
+`--embed-locale`, enforced in the flag parser and again in `cfg.Load`, because
+the substituted `C.UTF-8` has to come from somewhere.
+
+⚠ **ONE AXIS.** `C.UTF-8` is the C locale with a UTF-8 charset, not a full
+locale. This closes the environment-default **codeset** and says nothing about
+collation, message catalogues, or any other `LC_*` category.
