@@ -2,7 +2,7 @@
 65 - the capability corpus: three applications per category, simple to complex
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T07:31:02Z
+date (UTC)   : 2026-09-04T09:54:25Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -19,12 +19,12 @@ evidence     : /home/user/glibc-research/evidence/65-capability-corpus
   gtk3-3     GTK 3            geany          gui  11/11   11/11   90 compiled in: 87 resol  (recorded)
   x11-1      X11 / XCB        xorg.xeyes     gui  11/11   11/11   12 compiled in: 11 resol  (recorded)
   x11-2      X11 / XCB        xorg.xclock    gui  11/11   11/11   23 compiled in: 22 resol  (recorded)
-  x11-3      X11 / XCB        xterm          gui  11/11   4/11    26 compiled in: 25 resol 
+  x11-3      X11 / XCB        xterm          gui  11/11   4/11    26 compiled in: 25 resol  (recorded)
   gl-1       OpenGL / EGL     mesa-demos     cli  11/11   11/11   89 compiled in: 86 resol  (recorded)
   gl-2       OpenGL / EGL     mesa-demos     gui  11/11   11/11   89 compiled in: 86 resol  (recorded)
-  gl-3       OpenGL / EGL     glmark2        gui  11/11   11/11   45 compiled in: 44 resol 
+  gl-3       OpenGL / EGL     glmark2        gui  11/11   11/11   45 compiled in: 44 resol  (recorded)
   vulkan-1   Vulkan           vulkan-tools   cli  11/11   11/11   42 compiled in: 41 resol  (recorded)
   vulkan-2   Vulkan           vulkan-tools   gui  11/11   11/11   42 compiled in: 41 resol  (recorded)
   vulkan-3   Vulkan           vkmark         gui  0/11    11/11   43 compiled in: 42 resol Error: filesystem error: directory iterator cannot open directory: No  (recorded)
-  sdl-1      SDL              dosbox         gui  11/11   11/11   181 compiled in: 169 res 
-  sdl-2      SDL              stella         gui  11/11   11/11   179 compiled in: 167 res 
+  sdl-1      SDL              dosbox         gui  11/11   11/11   181 compiled in: 169 res  (recorded)
+  sdl-2      SDL              stella         gui  11/11   11/11   179 compiled in: 167 res  (recorded)
