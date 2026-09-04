@@ -1638,6 +1638,65 @@ paths, loader `ld-linux-x86-64.so.2` from the closure's own glibc.
 
 ---
 
+## C43 — a wrapper target can be a symlink into ANOTHER store path, and `os.Stat` asked the host
+
+**Found** 2026-09-04c. ⛔ `field-1` `helix` had read **0 / 11** with an
+**empty** row note for a whole session, and the emptiness was the clue nobody
+followed: the harness looks for six error signatures in the subject's stderr
+and matched none, because **the program printed nothing at all**.
+
+Measured on the host, so the bed is not in it:
+
+    $ ./helix.AppImage --version ; echo $?
+    255
+
+⛔ **No stdout. No stderr. Exit 255.** `LD_DEBUG=libs` says the bundle is fine:
+libc, `libpgb-storefix.so` and the program are all loaded from the extraction
+directory, initialisers run, and control is transferred. `strace` says what
+happens next:
+
+    execve(".../store/helix-25.07.1/bin/.hx-wrapped", …) = -1 ENOENT
+    exit_group(-1)
+
+⭐ **The interposer did its job** — the compiled-in `/nix/store` path was
+rewritten to the bundle's farm. The target simply was not there.
+
+⭐ **THE CAUSE IS A FOURTH ENTRY-POINT SHAPE.** `bin/hx` is a makeCWrapper
+**ELF** that execs `bin/.hx-wrapped`, and `.hx-wrapped` is itself a **symlink
+naming an absolute path in a DIFFERENT store path**:
+
+    .hx-wrapped -> /nix/store/8c63…-helix-unwrapped-25.07.1/bin/hx
+
+The resolver tested it with `os.Stat`, which **follows** the link — against the
+**host** root, where there is no `/nix/store`. It reported ENOENT, the wrapper
+was not resolved, and the makeCWrapper ELF was installed as the entry point.
+
+⚠ **The build log said so and nobody read it that way.** For `flameshot` it
+prints `bin/flameshot is a nixpkgs wrapper -> .flameshot-wrapped`; for `helix`
+that line is **absent** and only `wrapper env 1 variable(s) lifted` appears.
+⭐ The presence or absence of the arrow is the diagnostic.
+
+⭐ **The fix is `b.storeResolve`, the same resolver C42 needed** — it re-roots
+`/nix/store/…` at the fetched closure. Following through to the real file is
+also better than stopping at the link, because what then gets installed is the
+**unwrapped program itself**:
+
+    entry  …/store/8c63…-helix-unwrapped-25.07.1/bin/hx
+
+**MEASURED**, same subject, same environment, one changed line:
+
+| | before | after |
+|---|---|---|
+| `hx --version` | ⛔ exit **255**, no output | ⭐ `helix 25.07.1`, exit **0** |
+
+⛔ **AND THE PATTERN ACROSS C42 AND C43 IS ONE THING**: an absolute
+`/nix/store` symlink inside a fetched closure must be resolved against the
+**closure**, never against the machine doing the bundling. Two different code
+paths made the same mistake, and the resolver that gets it right already
+existed in the same file.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

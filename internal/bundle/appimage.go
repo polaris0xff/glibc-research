@@ -532,10 +532,34 @@ func (b *Builder) resolveEntry(storeDir, prog string, nameWasAsked bool) (Entry,
 			}
 			if target != "" {
 				inside := filepath.Join(b.Root, strings.TrimPrefix(target, "/nix/store/"))
-				if _, err := os.Stat(inside); err == nil {
+				// ⛔ `os.Stat` HERE ANSWERED THE WRONG QUESTION, AND IT COST A
+				// WHOLE ENTRY SHAPE. A wrapper's target can itself be a
+				// SYMLINK naming an ABSOLUTE path in ANOTHER store path —
+				// `helix`'s is
+				//
+				//   bin/.hx-wrapped -> /nix/store/8c63…-helix-unwrapped/bin/hx
+				//
+				// and `os.Stat` follows that link against the HOST root, where
+				// there is no `/nix/store`. So it reported ENOENT, the wrapper
+				// was NOT resolved, and the makeCWrapper ELF was installed as
+				// the entry point. At run time it execs `.hx-wrapped`, the
+				// interposer rewrites the store path correctly, and the target
+				// is not in the bundle: `execve(…) = -1 ENOENT`,
+				// `exit_group(-1)`.
+				//
+				// ⛔ THE FAILURE IS SILENT — exit 255 and NOT ONE BYTE on
+				// stdout or stderr — which is why `field-1` sat unexplained
+				// with an EMPTY row note for a session.
+				//
+				// ⭐ `storeResolve` is the same resolver C42 needed for the
+				// loader: it re-roots `/nix/store/…` at the fetched closure
+				// instead of at the host. Following to the real file is also
+				// better than stopping at the link, because the ELF that gets
+				// installed is then the unwrapped program itself.
+				if real := b.storeResolve(inside); real != "" {
 					logx.Warnf("bin/%s is a nixpkgs wrapper -> %s", prog, filepath.Base(target))
 					logx.Warnf("   its environment is read out of it: %d record(s)", len(recs))
-					bin = inside
+					bin = real
 					continue
 				}
 			}

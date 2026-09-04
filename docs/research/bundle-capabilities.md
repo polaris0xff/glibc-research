@@ -78,7 +78,7 @@ reason it is not.
 | ⭐ **SDL** | ⭐ **3 of 3 — CLOSED, all clean** | `dosbox` **11/11** (**181** store paths compiled in, 169 resolving — the largest closure in the corpus), `stella` **11/11** (179/167), `scummvm` **11/11** (180/168) |
 | ⭐ **media / codecs** | **1 of 3 in, and it passes** | ⭐ `mpv` **11/11, clean 11/11**, 151 store paths compiled in — the row that read **0/11** until **C39**, a subject that had answered completely against an assertion that could not match it. ⛔ The row runs `--version`, so it does **not** close T-091: nothing decodes |
 | **Python GUI** | 1 of 3 passing | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⛔ `pdfarranger` **0/11** and `virt-manager` **0/11**, and ⭐ **the two are NOT the same failure** — see the row-note table below |
-| **the field's recipes** | ⛔ 0 of 4 passing, and ⭐ **three of the four are now explained** | `neovim` **0/11** — the closure's own glibc 2.26 (C35). `flameshot` **0/11** — ⭐ **not a bundler failure**: it is a tray application with no toplevel, and this bed has no session bus. `gearlever` — was UNRESOLVED, ⭐ **C42 makes it build**. `helix` **0/11** — ⛔ still unexplained, and its note is **empty** |
+| **the field's recipes** | ⛔ 0 of 4 passing as recorded, and ⭐ **ALL FOUR are now explained, two of them by a shipped fix** | `neovim` **0/11** — the closure's own glibc 2.26 (C35), not ours. `flameshot` **0/11** — ⭐ **not a bundler failure**: a tray application with no toplevel, and no session bus in this bed. `gearlever` — was UNRESOLVED, ⭐ **C42 makes it build**. ⭐ `helix` **0/11** — **C43, a real bundler defect and a FOURTH entry-point shape**: by hand, `hx --version` now answers `helix 25.07.1` and exits 0 |
 
 ⭐ **THE THREE ZEROS THAT ARE NOT OURS, each measured rather than argued:**
 
@@ -126,17 +126,18 @@ says is sharper than three passes would have been: **software Vulkan works
 everywhere, and a benchmark that needs a real DRM device cannot run here at
 all.**
 
-## ⭐ THE ENTRY-POINT SHAPE PREDICTS THE RESULT, and C37 fixes a CLASS
+## ⭐ THE ENTRY-POINT SHAPE PREDICTS THE RESULT — and there are FOUR
 
-Every subject's build log names its entry shape, and there are **three**, not
-two — a distinction the first version of this table did not make and that
-turns out to be the whole predictor:
+Every subject's build log names its entry shape. ⚠ The count went two → three
+→ **four**, each time because a zero was run down rather than assumed, and the
+fourth was found on 2026-09-04c:
 
 | shape | what the build log says | subjects | result |
 |---|---|---|---|
 | **plain ELF** | `entry …/bin/<name>` | `dosbox`, `vkmark`, `xeyes`, … | ⭐ pass. The one failure is `vkmark`, and that is the **missing GPU** |
 | ⭐ **nixpkgs wrapper, RESOLVED at build time** | `bin/<n> is a nixpkgs wrapper -> .<n>-wrapped`, and the entry becomes the **dot-named ELF** | `mousepad`, `meld`, `flameshot` | ⭐ **works** — the wrapper is consumed, its environment lifted into `.env`, and no shell is left in the path |
 | ⛔ **generic SCRIPT** | `bin/<n> is a SCRIPT; its entry point is bash + the script itself`, and the entry becomes **bash** | `xterm`, `glmark2` | ⛔ **both were `0/11`** → ⭐ **both `11/11` after C37** |
+| ⛔ **nixpkgs wrapper, NOT resolved** — its target is a **symlink into another store path** | ⛔ **the arrow line is ABSENT**; only `wrapper env N variable(s) lifted` appears | `helix` | ⛔ **`0/11`, silently** — exit 255 with not one byte of output → ⭐ `helix 25.07.1`, exit 0 after **C43** |
 
 ⭐ **THE PREDICTOR IS THE THIRD SHAPE AND NOTHING ELSE.** It is not "a script
 entry" — `meld` hits **both** wrapper handlers (`nixpkgs wrapper -> .meld-wrapped`,
@@ -145,11 +146,19 @@ then `.meld-wrapped is a SCRIPT; its entry point is python3`) and passes
 **11/11**. It is **bash running a generic script that `exec`s a dot-named ELF
 by absolute store path**, which is exactly what C37 describes.
 
-⭐ **AND THAT SETTLES A SUSPICION ABOUT `flameshot`.** Its build log says
+⭐ **AND THAT SETTLED A SUSPICION ABOUT `flameshot`.** Its build log says
 *`bin/flameshot is a nixpkgs wrapper -> .flameshot-wrapped`* — the **resolved**
 shape, the same handler `mousepad` passes through. ⛔ So its `0/11` is **not**
-C37, its row was correctly left out of the five that were deleted, and the
-zero is still **unexplained**.
+C37, and it is not the bundler at all: `flameshot` is a tray application that
+draws no toplevel, measured by hand 2026-09-04c.
+
+⭐ **THE ARROW IS THE DIAGNOSTIC, AND ITS ABSENCE IS THE FOURTH SHAPE.**
+`helix`'s log carries `wrapper env 1 variable(s) lifted` and **no arrow**: the
+resolver tested the wrapper's target with `os.Stat`, which follows an absolute
+`/nix/store` symlink against the **host** root, so `.hx-wrapped ->
+/nix/store/…-helix-unwrapped/bin/hx` read as ENOENT and the makeCWrapper ELF
+was installed instead of the program. `docs/history/corrections.md` C43 — and
+it is the **same** root cause as C42's loader, in a different code path.
 
 ⭐ **AND THE FIX IS NOW CONFIRMED IN THE CORPUS ITSELF, ON BOTH SUBJECTS.**
 It was first measured by hand — `xterm` drawing in 2 s, `glmark2` drawing in
