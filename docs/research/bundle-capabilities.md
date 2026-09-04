@@ -57,7 +57,7 @@ per subject, and a recorded row is never re-measured:
 |---|---|---|
 | **GTK 3** | ⭐ **3 of 3 — CLOSED** | `galculator`, `mousepad`, `geany`, all **11/11 pass and 11/11 clean** |
 | ⭐ **X11 / XCB** | **3 of 3, all passing** | `xeyes` **11/11**, `xclock` **11/11**, ⭐ `xterm` **11/11** once C37 was fixed. ⛔ `xterm`'s **clean** count is **4/11**, and that is **C5 coming true** — see below |
-| ⭐ **OpenGL / EGL** | **3 of 3** | ⭐ `eglinfo` **11/11**, `glxgears` **11/11** — both clean 11/11. ⛔ `glmark2` **0/11** |
+| ⭐ **OpenGL / EGL** | ⭐ **3 of 3 — CLOSED, all passing, all clean** | `eglinfo` **11/11**, `glxgears` **11/11**, `glmark2` **11/11** — **11/11 clean each** |
 | ⭐ **Vulkan** | **3 of 3, and the third is the BED** | `vulkaninfo` **11/11**, `vkcube` **11/11** — both clean 11/11. ⭐ `vkmark` **0/11 because there is no GPU**: it dies with `directory iterator cannot open directory … [/dev/dri]`, and `/dev/dri` exists **nowhere** here. The bundle carries `lvp_icd` (lavapipe) and the other two subjects use it |
 | **Python GUI** | 1 of 3 in | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⏳ `pdfarranger` and `virt-manager` re-queued against the C37 `pgb` |
 | **Qt** | 1 of 3 | ⭐ `qalculate-qt` **11/11**, clean **4/11** |
@@ -91,10 +91,15 @@ Every subject's build log says whether its entry is a plain ELF or a
 | **plain ELF** | 9 | ⭐ **8 pass at 11/11.** The one failure is `vkmark`, and that is the **missing GPU** (`/dev/dri`) |
 | ⛔ **script / shell wrapper** | 6 measured | ⛔ **5 fail.** `gl-3`, `x11-3`, `py-2`, `py-3`, `field-2` |
 
-⭐ **AND THE FIX IS MEASURED ON TWO OF THEM, BY HAND.** With C37's fix in
-place, `xterm` draws in **2 s** and `glmark2` draws in **2 s** and benchmarks
-at **360 FPS** — both scored **0 of 11** by the corpus, which is running a
-`./pgb` built before the fix.
+⭐ **AND THE FIX IS NOW CONFIRMED IN THE CORPUS ITSELF, ON BOTH SUBJECTS.**
+It was first measured by hand — `xterm` drawing in 2 s, `glmark2` drawing in
+2 s and benchmarking at **360 FPS**. Then `./pgb` was rebuilt, the affected
+rows deleted, and both re-measured:
+
+| | before C37 | after |
+|---|---|---|
+| `x11-3` `xterm` | **0 / 11** | ⭐ **11 / 11** (clean **4/11** — that is C5, below) |
+| `gl-3` `glmark2` | **0 / 11** | ⭐ **11 / 11**, clean **11 / 11** |
 
 ⚠ **`meld` is the counter-example that keeps this honest**: it is a script
 entry and it passes **11/11**. ⭐ So the broken thing is not "a script entry" —
