@@ -70,6 +70,19 @@
 # ~17 GiB free with a 2.3 GiB cache per subject. ⚠ An absence is not a zero:
 # what is measured here is four of thirteen, and the four are the small ones.
 #
+# -- ⚠ THE ATTRIBUTES WERE PROBED BEFORE THE RUN ----------------------------
+#
+# ⭐ `pgb nix plan <attr>` resolves an attribute without building anything, and
+# all twenty-one non-obvious ones in the corpus resolved on 2026-09-03f. That
+# is worth an hour: a corpus that spends twenty minutes discovering a typo per
+# subject measures the typo.
+#
+# ⛔ IT IS NOT A GUARANTEE THAT THE SUBJECT WILL BUILD. Resolution says the
+# attribute exists; the closure still has to fetch, the entry point still has
+# to resolve, and `--name` still has to match a program in `bin/`. Each of
+# those failures is reported as UNRESOLVED with its own reason, and the reason
+# for the last one is a list of what IS in `bin/`.
+#
 # -- ⛔ WHAT THIS COSTS, SO THE NEXT SESSION DOES NOT RE-RUN IT BY ACCIDENT ---
 #
 # Each subject is a closure fetch, an AppDir, a dwarfs pack and eleven chroot
