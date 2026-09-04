@@ -3,15 +3,20 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log,
 the entries, and [`../HISTORY/`](../HISTORY/).
 
-    STATE     2026-09-04c. ⭐ T-080's CORPUS IS COMPLETE — 26 of 26 subjects,
-              every row a count out of eleven, no blanks and no "not run".
-              ⭐ SIX categories CLOSED at three subjects each: GTK 3,
-              X11/XCB, OpenGL/EGL, Qt, SDL — and Python GUI is 2 of 3 with
-              the third not reachable by our mechanism. ⛔ Every remaining
-              zero is NAMED: the BED (vkmark, no /dev/dri), the CLOSURE
-              (neovim, glibc 2.26), the SUBJECT'S SHAPE (flameshot, a tray
-              application with no toplevel) and ONE path class we do not
-              reach (pdfarranger, /usr/local).
+    STATE     2026-09-04c, at the END. ⭐ The capability corpus is COMPLETE
+              (26 of 26) and all three of its unexplained rows are explained
+              — the last, `qalculate-qt`, by `experiments/107-`: it spawns
+              GNUPLOT through the host's /bin/sh, so the residue is a shell
+              the application asked for and the bundle never carried (C55).
+              ⛔ THE SESSION'S REAL YIELD WAS INSTRUMENT DEFECTS. Five
+              separate criteria in this tree COULD NOT FIRE and no gate could
+              see any of them, because a SKIP is not a failure and a ZERO
+              looks like a result: C48, C50, C52, C54, C56.
+              ⭐ Two of the corrections can move a committed number (C49, C54)
+              and ONE re-run of `65-` clears both. ⭐ One (C56) turned a claim
+              that had never been measured — `--wrap=iconv` — into a
+              measurement: 1 encoding of 12 and a crash, against 12 of 12
+              with a byte-exact round trip on all eleven.
     COUNTS    67 entries, 23 open, 44 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)
