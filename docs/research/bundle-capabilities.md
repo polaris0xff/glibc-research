@@ -80,14 +80,31 @@ says is sharper than three passes would have been: **software Vulkan works
 everywhere, and a benchmark that needs a real DRM device cannot run here at
 all.**
 
-⚠ **The pattern in the zeros is worth stating before it is over-read.** Of the
-eleven rows at 11/11, every one is a subject whose entry point is a plain ELF.
-Of the seven zeros, `neovim`, `xterm`, `pdfarranger` and `virt-manager` all
-have a **script or shell-wrapper entry point** — the shape T-081 added support
-for and C37 found still broken in a second way. ⛔ **That is a correlation, not
-a diagnosis**: `neovim` is the closure's glibc, `xterm` is C37, `pdfarranger`
-is a Python traceback nobody has read, and `virt-manager`, `flameshot`,
-`glmark2` and `vkmark` have no explanation at all.
+## ⭐ THE ENTRY-POINT SHAPE PREDICTS THE RESULT, and C37 fixes a CLASS
+
+Every subject's build log says whether its entry is a plain ELF or a
+**script/shell wrapper**. Read against its row:
+
+| entry shape | rows | result |
+|---|---|---|
+| **plain ELF** | 9 | ⭐ **8 pass at 11/11.** The one failure is `vkmark`, and that is the **missing GPU** (`/dev/dri`) |
+| ⛔ **script / shell wrapper** | 6 measured | ⛔ **5 fail.** `gl-3`, `x11-3`, `py-2`, `py-3`, `field-2` |
+
+⭐ **AND THE FIX IS MEASURED ON TWO OF THEM, BY HAND.** With C37's fix in
+place, `xterm` draws in **2 s** and `glmark2` draws in **2 s** and benchmarks
+at **360 FPS** — both scored **0 of 11** by the corpus, which is running a
+`./pgb` built before the fix.
+
+⚠ **`meld` is the counter-example that keeps this honest**: it is a script
+entry and it passes **11/11**. ⭐ So the broken thing is not "a script entry" —
+it is specifically **a wrapper that `exec`s a dot-named ELF target by absolute
+store path**, which is what C37 describes. `meld`'s interpreter *reads* its
+script; nothing dot-named is exec'd.
+
+⛔ **`field-2` (`neovim`) is in the failing column and is NOT C37**: its
+closure carries glibc 2.26 and `ld.so` learned `--argv0` in 2.33 — diagnosed
+independently, by hand. ⚠ It is re-measured anyway, because a row measured
+against a tool with a known fixed defect is not evidence about anything else.
 
 ⛔ **A NOTE-FIELD DEFECT WORTH FIXING BEFORE THE NEXT PASS.** A row's note is
 the **first** line matching `Couldn't load|cannot open|Traceback|…`, cut to 70
