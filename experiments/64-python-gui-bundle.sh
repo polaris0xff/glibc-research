@@ -72,8 +72,32 @@
 #   E3  ⭐ arm N draws 0 of 11 — the criterion still fails without the
 #       mechanism, so E1 is measuring the mechanism.
 #   E4  arm P (meld, Python GUI) produces an artefact AND draws on 11 of 11.
+#       ⚠ Its window budget is PGB_EXP64_PY_WIN_WAIT (150s by default) rather
+#       than the 25s the other arms use — see the deadlock note below. A
+#       longer budget can only make a NEGATIVE result stronger, and arm N,
+#       which must draw NOTHING, keeps the short one.
 #   E5  arm X still draws 11 of 11 — no regression from the changes E1 needed.
 #   E6  no target ships galculator, mousepad or meld of its own (the control).
+#
+# -- ⛔ AND THE INSTRUMENT DEADLOCKED ONCE, WHICH IS WHY THE ORDER MATTERS ----
+#
+# ⛔ Measured 2026-09-03f, on arm P's first row, after arms G, N and X had each
+# completed 11 rows: `strace` sat in state **D** on `folio_wait_bit_common`
+# for nineteen minutes. The dwarfs FUSE daemon it was reading through sat in
+# `futex_do_wait`; the traced `python3` sat in `ptrace_stop`. strace was
+# blocked on a page the FUSE daemon could only serve by making progress the
+# ptrace-stopped process could not make.
+#
+# ⚠ `kill` CANNOT END A PROCESS IN D, so `wait` never returned and the run
+# stopped dead. ⭐ The fix is an ORDERING: `reap_in_root` kills the FUSE
+# daemon, the blocked read fails, and only then can strace be reaped. It now
+# runs BEFORE `wait` instead of after.
+#
+# ⚠ AND THE SUBJECT MATTERS: a Python interpreter importing its whole stack
+# through ptrace is orders of magnitude slower than a C program starting, which
+# is why arm P's window budget is separate and long. A budget that is too short
+# scores a working bundle as a broken one, which is this experiment's own
+# original sin in a new place.
 #
 # -- THE CONTROL -------------------------------------------------------------
 #
@@ -193,8 +217,15 @@ ENVS=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt"
 
 # ⭐ ONE MATRIX, RUN PER SUBJECT. Every application goes through exactly the
 # same instrument so the only thing that differs between arms is the arm.
-run_matrix() {  # window-name image-path program-name
-  SUBJ="$1"; IMG="$2"; PROG="${3:-$1}"
+# ⚠ THE WINDOW BUDGET IS PER ARM, and that is a statement rather than a
+# convenience. The criterion is "a window appeared"; the budget is how long we
+# waited for one. A LONGER budget can only make a NEGATIVE result stronger, so
+# arm N — which must draw nothing — keeps the short one, and arm P, whose
+# subject is a Python interpreter importing its whole stack THROUGH ptrace,
+# gets a long one. Arms G and X draw in about two seconds and the loop breaks
+# early, so their budget is not what their rows cost.
+run_matrix() {  # window-name image-path program-name [window-budget]
+  SUBJ="$1"; IMG="$2"; PROG="${3:-$1}"; WAIT_FOR="${4:-$WIN_WAIT}"
   RAN=0; CLEAN=0; GTK=0; NOHOST=0; ROWS=0; WIN=0
 
 printf '\n'
@@ -234,16 +265,30 @@ for name in $ENVS; do
     >"$WORK/out.$name" 2>"$WORK/err.$name" &
   _sp=$!
   _n=0; win=0
-  while [ "$_n" -lt "$WIN_WAIT" ]; do
+  while [ "$_n" -lt "$WAIT_FOR" ]; do
     sleep 1; _n=$((_n+1))
     win=$(windows_named "$SUBJ")
     [ "$win" -gt 0 ] && break
     kill -0 "$_sp" 2>/dev/null || break
   done
+  # ⛔ REAP BEFORE `wait`, AND THE ORDER IS THE WHOLE OF A DEADLOCK.
+  #
+  # Measured 2026-09-03f on arm P: `strace` sat in state D on
+  # `folio_wait_bit_common` for nineteen minutes, the dwarfs FUSE daemon it
+  # was reading through sat in `futex_do_wait`, and the traced `python3` sat
+  # in `ptrace_stop`. strace was blocked reading a page the FUSE daemon could
+  # only serve by making progress the ptrace-stopped process could not make.
+  # ⛔ `kill` cannot end a process in D, so `wait` never returned and the
+  # experiment hung — after arms G, N and X had each run 11 rows without it.
+  #
+  # ⭐ `reap_in_root` kills the FUSE daemon (it is chrooted into the same
+  # rootfs, which is why it reaps by /proc/PID/root rather than by name), the
+  # blocked read fails, and strace becomes reapable. Doing that BEFORE `wait`
+  # is the fix; doing it after is where the run stopped.
   kill "$_sp" 2>/dev/null
+  reap_in_root "$root"
   wait "$_sp" 2>/dev/null
   st=$?
-  reap_in_root "$root"
   rm -f "$root/subj64"
 
   cls=$(exp_classify_trace "$tr" /subj64)
@@ -286,7 +331,8 @@ printf '\n-- arm G: galculator (UI loaded from a file at a compiled-in path) --\
 build_arm "$GIMG" galculator gal
 [ -s "$GIMG" ] || { exp_note "arm G did not build; see $WORK/build-gal.log"; exit 2; }
 exp_note "artefact: $GIMG, $(wc -c < "$GIMG") bytes"
-G_STOREMAP=$(sed -n 's/^store map *\([0-9]*\) .*/\1/p' "$WORK/build-gal.log" 2>/dev/null | head -1)
+G_STOREMAP=$(tr -d '\000' < "$WORK/build-gal.log" 2>/dev/null \
+  | sed -n 's/^store map *\([0-9]*\) .*/\1/p' | head -1)
 exp_note "store map: ${G_STOREMAP:-unknown} store paths resolve inside the bundle"
 run_matrix galculator "$GIMG"
 G_ROWS=$ROWS; G_CONN=$RAN; G_WIN=$WIN; G_CLEAN=$CLEAN; G_GTK=$GTK; G_NOHOST=$NOHOST
@@ -324,14 +370,19 @@ fi
 # ---------------------------------------------------------------------------
 printf '\n-- arm P: a PYTHON GUI application (meld) --------------------------\n'
 build_arm "$PYIMG" meld meld
-P_CLOSURE=$(sed -n 's/^closure *\([0-9]*\) store paths after augmentation.*/\1/p' \
-  "$WORK/build-meld.log" 2>/dev/null | head -1)
+# ⚠ `-a`/`-a`-equivalent: a build log carries bytes `grep` and `sed` call
+# binary, and without it both of these printed nothing while the log plainly
+# said otherwise. It cost two notes, not a measurement — but a note that says
+# "<not a script entry>" about a bundle whose log says
+# "script meld = python3 + ... (static trampoline)" is worse than no note.
+P_CLOSURE=$(tr -d '\000' < "$WORK/build-meld.log" 2>/dev/null \
+  | sed -n 's/^closure *\([0-9]*\) store paths after augmentation.*/\1/p' | head -1)
 exp_note "arm P closure: ${P_CLOSURE:-unknown} store paths"
 exp_check "arm P: an artefact was produced" "$([ -s "$PYIMG" ] && echo yes || echo no)" yes
 if [ -s "$PYIMG" ]; then
-  P_ENTRY=$(grep -m1 'static trampoline' "$WORK/build-meld.log" 2>/dev/null || true)
+  P_ENTRY=$(grep -a -m1 'static trampoline' "$WORK/build-meld.log" 2>/dev/null || true)
   exp_note "arm P entry: ${P_ENTRY:-<not a script entry>}"
-  run_matrix meld "$PYIMG"
+  run_matrix meld "$PYIMG" meld "${PGB_EXP64_PY_WIN_WAIT:-150}"
   P_ROWS=$ROWS; P_CONN=$RAN; P_WIN=$WIN; P_CLEAN=$CLEAN; P_NOHOST=$NOHOST
 else
   exp_skip "arm P (meld)" "the bundle did not build; see $WORK/build-meld.log"
