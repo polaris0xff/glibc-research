@@ -32,6 +32,23 @@
 # the process tree, matching `.so`/`.so.N` at the END of a path rather than
 # anywhere in it, and pairing a split `openat` with its own result line.
 #
+# -- ⛔ EVERY SUBJECT RUNS IN EXTRACT MODE, AND IT IS NOT A PREFERENCE -------
+#
+# ⛔ `strace` DEADLOCKS ON A dwarfs FUSE MOUNT. Measured on `experiments/64-`
+# arm P, twice: strace reads a path argument out of the tracee's address
+# space, that page is backed by the mount, and the only process that can serve
+# it is the FUSE daemon — which strace has itself ptrace-STOPPED. strace ends
+# up in state D, `kill` cannot end a process in D, and the row freezes.
+#
+# ⭐ `APPIMAGE_EXTRACT_AND_RUN=1` removes the daemon: uruntime unpacks to a
+# tmpfs and runs from there. ⚠ IT IS APPLIED TO EVERY SUBJECT rather than to
+# the ones that were seen to hang, because "the ones somebody hit" is the
+# shape of list T-081 exists to replace. Mount and extract are two DELIVERY
+# modes of the same artefact and neither criterion here depends on which is
+# used — the window is the X server's fact, the host objects are the process
+# tree's. ⚠ It costs about a gigabyte of tmpfs and ten to twenty seconds per
+# row, and this machine has 16 GiB.
+#
 # -- ⭐ PRE-REGISTERED EXPECTATION -------------------------------------------
 #
 # ⛔ COMMITTED BEFORE THE RUN. PROGRESS.md delivery rule 1.
@@ -325,7 +342,7 @@ while IFS= read -r line <&3; do
     strace -f -e trace=openat,open,execve,clone,clone3,vfork -o "$tr" \
       timeout "$RUN_TIMEOUT" "$REPO_DIR/pgb" rootfs run "$root" \
         --bind /tmp/.X11-unix:/tmp/.X11-unix -- \
-        /bin/sh -c "DISPLAY=$XDISP /subj65 $args" \
+        /bin/sh -c "DISPLAY=$XDISP APPIMAGE_EXTRACT_AND_RUN=1 /subj65 $args" \
       >"$WORK/out.$id.$name" 2>"$WORK/err.$id.$name" &
     _sp=$!
     win=0; _n=0

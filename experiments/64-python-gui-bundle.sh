@@ -93,11 +93,28 @@
 # daemon, the blocked read fails, and only then can strace be reaped. It now
 # runs BEFORE `wait` instead of after.
 #
-# ⚠ AND THE SUBJECT MATTERS: a Python interpreter importing its whole stack
-# through ptrace is orders of magnitude slower than a C program starting, which
-# is why arm P's window budget is separate and long. A budget that is too short
-# scores a working bundle as a broken one, which is this experiment's own
-# original sin in a new place.
+# ⛔ AND THE ORDERING FIX WAS NOT ENOUGH — THE SECOND RUN DEADLOCKED AGAIN,
+# with the daemon now in `ptrace_stop` rather than `futex_do_wait`, which names
+# the cause exactly: **strace had STOPPED the FUSE daemon itself**. strace
+# reads a path argument out of the tracee's address space; that page is backed
+# by the dwarfs mount; the only process that can serve it is the daemon strace
+# is holding stopped. ⚠ `reap_in_root` still recovers the row, but only after
+# the whole window budget has expired with the subject frozen — so the row
+# reads 0 and the reason is the instrument.
+#
+# ⭐ SO ARM P RUNS IN **EXTRACT** MODE (`APPIMAGE_EXTRACT_AND_RUN=1`), which
+# removes the daemon from the picture: uruntime unpacks to a tmpfs and runs
+# from there. Mount and extract are two DELIVERY modes of the same artefact and
+# neither criterion depends on which is used — the window is the X server's
+# fact, the host objects are the process tree's. ⚠ The arms that do not
+# deadlock keep mount mode, so their rows are unchanged and comparable with
+# every earlier run.
+#
+# ⚠ AND THE SUBJECT MATTERS FOR TIME TOO: a Python interpreter importing its
+# whole stack through ptrace is orders of magnitude slower than a C program
+# starting, which is why arm P's window budget is separate and long. A budget
+# that is too short scores a working bundle as a broken one, which is this
+# experiment's own original sin in a new place.
 #
 # -- THE CONTROL -------------------------------------------------------------
 #
@@ -224,8 +241,20 @@ ENVS=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt"
 # subject is a Python interpreter importing its whole stack THROUGH ptrace,
 # gets a long one. Arms G and X draw in about two seconds and the loop breaks
 # early, so their budget is not what their rows cost.
-run_matrix() {  # window-name image-path program-name [window-budget]
+run_matrix() {  # window-name image-path program-name [window-budget] [extract]
   SUBJ="$1"; IMG="$2"; PROG="${3:-$1}"; WAIT_FOR="${4:-$WIN_WAIT}"
+  # ⛔ EXTRACT MODE IS NOT A PREFERENCE, IT IS THE ONLY WAY TO TRACE THIS ONE.
+  # See the deadlock note above: `strace` reads a path argument out of the
+  # tracee's address space, that page is backed by the dwarfs FUSE mount, and
+  # strace has ptrace-STOPPED the FUSE daemon that would have to serve it.
+  # ⭐ `APPIMAGE_EXTRACT_AND_RUN=1` removes the daemon from the picture
+  # entirely — uruntime unpacks to a tmpfs and runs from there — so there is no
+  # process for strace to stop and then wait on.
+  # ⚠ Mount and extract are two DELIVERY modes of the same artefact. Neither
+  # criterion here depends on which is used: the window is the X server's fact
+  # and the host objects are the process tree's. The arms that do NOT deadlock
+  # keep mount mode so their rows are unchanged.
+  EXTRACT="${5:-}"
   RAN=0; CLEAN=0; GTK=0; NOHOST=0; ROWS=0; WIN=0
 
 printf '\n'
@@ -261,7 +290,7 @@ for name in $ENVS; do
   strace -f -e trace=openat,open,execve,clone,clone3,vfork -o "$tr" \
     timeout "$RUN_TIMEOUT" "$REPO_DIR/pgb" rootfs run "$root" \
       --bind /tmp/.X11-unix:/tmp/.X11-unix -- \
-      /bin/sh -c "DISPLAY=$XDISP /subj64" \
+      /bin/sh -c "DISPLAY=$XDISP ${EXTRACT:+APPIMAGE_EXTRACT_AND_RUN=1 }/subj64" \
     >"$WORK/out.$name" 2>"$WORK/err.$name" &
   _sp=$!
   _n=0; win=0
@@ -382,7 +411,7 @@ exp_check "arm P: an artefact was produced" "$([ -s "$PYIMG" ] && echo yes || ec
 if [ -s "$PYIMG" ]; then
   P_ENTRY=$(grep -a -m1 'static trampoline' "$WORK/build-meld.log" 2>/dev/null || true)
   exp_note "arm P entry: ${P_ENTRY:-<not a script entry>}"
-  run_matrix meld "$PYIMG" meld "${PGB_EXP64_PY_WIN_WAIT:-150}"
+  run_matrix meld "$PYIMG" meld "${PGB_EXP64_PY_WIN_WAIT:-150}" extract
   P_ROWS=$ROWS; P_CONN=$RAN; P_WIN=$WIN; P_CLEAN=$CLEAN; P_NOHOST=$NOHOST
 else
   exp_skip "arm P (meld)" "the bundle did not build; see $WORK/build-meld.log"
