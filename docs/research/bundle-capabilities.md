@@ -56,10 +56,11 @@ per subject, and a recorded row is never re-measured:
 | category | subjects in | verdict so far |
 |---|---|---|
 | **GTK 3** | ⭐ **3 of 3 — CLOSED** | `galculator`, `mousepad`, `geany`, all **11/11 pass and 11/11 clean** |
-| **X11 / XCB** | ⭐ **3 of 3** | `xeyes` **11/11**, `xclock` **11/11**, ⛔ `xterm` **0/11** — see below |
+| ⭐ **X11 / XCB** | **3 of 3, all passing** | `xeyes` **11/11**, `xclock` **11/11**, ⭐ `xterm` **11/11** once C37 was fixed. ⛔ `xterm`'s **clean** count is **4/11**, and that is **C5 coming true** — see below |
 | ⭐ **OpenGL / EGL** | **3 of 3** | ⭐ `eglinfo` **11/11**, `glxgears` **11/11** — both clean 11/11. ⛔ `glmark2` **0/11** |
 | ⭐ **Vulkan** | **3 of 3, and the third is the BED** | `vulkaninfo` **11/11**, `vkcube` **11/11** — both clean 11/11. ⭐ `vkmark` **0/11 because there is no GPU**: it dies with `directory iterator cannot open directory … [/dev/dri]`, and `/dev/dri` exists **nowhere** here. The bundle carries `lvp_icd` (lavapipe) and the other two subjects use it |
-| **Python GUI** | **3 of 3** | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⛔ `pdfarranger` **0/11**, `virt-manager` **0/11** |
+| **Python GUI** | 1 of 3 in | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⏳ `pdfarranger` and `virt-manager` re-queued against the C37 `pgb` |
+| **Qt** | 1 of 3 | ⭐ `qalculate-qt` **11/11**, clean **4/11** |
 | **the field's recipes** | 3 of 4 | ⛔ `neovim` **0/11** (glibc 2.26, below), `flameshot` **0/11**, `gearlever` UNRESOLVED. `helix` re-queued |
 | SDL, Qt, media | 0 | ⏳ running |
 
@@ -162,6 +163,33 @@ useful result.
 ⚠ **One thing WAS fixed**: the warning called them *"directories"*.
 `topLevelNames` returns files too, and every one of these is a file — the word
 sent a reader looking for the wrong thing.
+
+### ⭐ `xterm`: BOTH pre-registered predictions about it are now settled
+
+⛔ **C5 was pre-registered before the corpus ever ran**: *"`xterm` is expected
+to FAIL C2 … xterm's whole job is to run the user's SHELL, which is a HOST
+program, so a host libc enters the process by construction."*
+
+⚠ **For most of this session that prediction was UNEVALUABLE**, and the record
+said so: `xterm` scored `0/11` and `11/11 clean`, because a subject that never
+starts never loads anything. ⭐ **C37 made it start**, and both predictions
+resolved at once:
+
+| | before C37 | after |
+|---|---|---|
+| passes | ⛔ **0 / 11** | ⭐ **11 / 11** |
+| host-object clean | 11 / 11 — ⚠ *because it was dead* | ⭐ **4 / 11** |
+
+⭐ **So C5 is CONFIRMED, on its own terms**: `xterm` runs and it is not clean.
+⚠ That is the application, not the bundler, and it is the one row in this
+corpus where a dirty count is the **expected** answer.
+
+⛔ **AND IT WAS CHECKED AGAINST A REGRESSION**, because `qt-1` came back
+`11/11` passing and `4/11` clean in the same pass, and before C37 every passing
+subject was clean on 11 of 11. ⭐ `galculator` — the T-081 acceptance subject —
+rebuilt with the C37 `pgb` and traced: **zero host shared objects**. So the
+change introduced no host loading, and those `4/11` counts belong to their
+subjects.
 
 ### ⛔ `eglinfo` and `vulkan-1`: TWO defects, and the second was hiding behind the first
 

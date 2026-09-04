@@ -117,7 +117,7 @@ stopped, and the five affected rows deleted so they are re-measured against it.
 
 | after `make`, re-measured | predicted |
 |---|---|
-| `x11-3` `xterm` | ⭐ **passes** — measured by hand at 1 window in 2 s |
+| `x11-3` `xterm` | ⭐ **passes** — measured by hand at 1 window in 2 s. ✅ **SETTLED: 11/11.** And its CLEAN count is **4/11**, which is C5's other pre-registered prediction confirmed |
 | `gl-3` `glmark2` | ⭐ **passes** — also a shell wrapper; by hand it draws in 2 s and benchmarks at **360 FPS**. ⚠ Added after the table was first written, and said so |
 | `py-2` `pdfarranger` | ⚠ **still fails.** It dies with a Python **Traceback**, so it STARTED — C37's exec failure is not its problem |
 | `py-3` `virt-manager` | ⛔ **not predicted.** Nobody has read its error |
@@ -164,7 +164,11 @@ why it is written down rather than left as an expectation.
                  deleted and re-measured. ⭐ Both capabilities WORK, measured
                  by hand: eglinfo matches its real assertion 30 times, and
                  vulkaninfo exits 0 with GPU0 = llvmpipe 1.4.354.
-        x11-3    ⭐ SOLVED AND FIXED; ⏳ re-measurement RUNNING. xterm's
+        x11-3    ✅ CLOSED. 11/11 pass after C37, and 4/11 CLEAN -- which
+                 is C5's pre-registered prediction confirmed: xterm runs the
+                 user's SHELL, a HOST program, so a host libc enters by
+                 construction. ⚠ It is the one row where a dirty count is
+                 the EXPECTED answer. xterm's
                  nixpkgs `bin/xterm` is a SHELL wrapper that execs
                  `.xterm-wrapped` by store path. Two defects: the dot-named
                  target was never installed, AND the farm's `bin` resolved to
