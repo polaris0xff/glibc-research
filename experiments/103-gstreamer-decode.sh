@@ -103,8 +103,13 @@ build() {  # out-image env-copy extra-flag...
     PGB_APPIMAGE_CACHE="$WORK/cache" "$REPO_DIR/pgb" bundle appimage "$ATTR" \
       --out "$_img" --name "$PROG" \
       --extra gst_all_1.gst-plugins-base "$@" >"$_img.log" 2>&1 || true
+    # ⛔ ONLY AFTER A BUILD WE ACTUALLY DID. Both bundles share one cache and
+    # one `--name`, so the AppDir on disk is whichever was built LAST — and on
+    # a CACHED run neither was built, so copying now would give the subject
+    # the control's `.env`. ⚠ That is not hypothetical: it made B3 report a
+    # false failure on the second run of this experiment.
+    cp "$WORK/cache/$PROG/AppDir/.env" "$_envout" 2>/dev/null || : > "$_envout"
   fi
-  cp "$WORK/cache/$PROG/AppDir/.env" "$_envout" 2>/dev/null || : > "$_envout"
   [ -s "$_img" ]
 }
 

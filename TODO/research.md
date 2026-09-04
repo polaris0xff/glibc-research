@@ -608,7 +608,74 @@ cannot discriminate — the row would be green and mean nothing. ⚠ Fixing C39'
 assertion made `media-1` a valid *corpus* row — **11/11 pass, 11/11 clean,
 2026-09-04c** — and it did **not** make it T-091's.
 
-## ⭐ THE ROW IS WRITTEN AND PRE-REGISTERED — `experiments/103-`, 2026-09-04c
+## ⭐⭐ MEASURED — `experiments/103-`, `pass=7 fail=0 skip=0`, TWO runs identical
+
+⭐ **A bundled GStreamer application ENCODES and DECODES on all eleven, with
+ZERO host shared objects in the payload AND in the whole process tree**, and
+`gst-plugin-scanner` is **exec'd on 11 of 11** — so the scanner is not a
+hypothetical here, it runs, and the tree count is still zero.
+
+| | |
+|---|---|
+| **D1** the encode leg — `audiotestsrc → vorbisenc → oggmux → file` | ⭐ **11 / 11** |
+| **D2** ⭐ the decode leg — `filesrc → oggdemux → vorbisdec → audioconvert → file`, PCM **larger** than the Ogg it came from | ⭐ **11 / 11** |
+| **D3** host shared objects in the payload | ⭐ **0 on 11 / 11** |
+| **D4** ⭐ `gst-plugin-scanner` `execve` seen | **11 / 11** — and `HOST(tree)` is **0** anyway |
+| **C0** the control ran | **11 / 11** |
+| **C1** ⛔ the control failed | **0 of 11** — it did **not** fail |
+
+## ⛔ AND THE ANSWER IS THE BRANCH THE SCRIPT PRE-REGISTERED AS THE OTHER ONE
+
+⭐ **The four variables are REDUNDANT on this subject**, and that is a finding
+about the **interposer's reach** rather than a failure of the entry. The
+control is a shipped flag (`--no-plugin-env`) and it was **verified to differ**
+before the rows were read — `B3`: the subject carries **one** `GST_*` variable
+and the control **zero** — and the pipeline works either way.
+
+⛔ **So GStreamer is finding its plugins through its compiled-in default
+directory, which is a `/nix/store` path, which `pgb-storefix.c` answers.**
+⭐ That is the same mechanism `experiments/105-` measures on `file`(1), reached
+from a completely different subject.
+
+⚠ **What that does NOT mean.** It does not mean the variables are wrong to
+emit: a closure whose plugin directory is *not* a compiled-in default — or a
+subject that consults `GST_PLUGIN_SYSTEM_PATH` before its own default — would
+need them, and none has been measured. ⛔ It means the entry may **not** claim
+the variables are what makes GStreamer work here, because on the one subject
+measured they are not.
+
+## ⭐ AND THE RUN FOUND A REAL DEFECT ON THE WAY — a shell fragment lifted as a value
+
+⛔ Run 1's control could not be told from its subject, and the reason was a
+bundler bug rather than a harness one. `bin/gst-launch-1.0` is a nixpkgs
+wrapper whose `GST_PLUGIN_SYSTEM_PATH_1_0` value is the GStreamer
+**setup-hook's shell fragment**:
+
+    $(unset _tmp; for profile in $NIX_PROFILES; do
+        _tmp="$profile/lib/gstreamer-1.0…"; done; printf %s "$_tmp")
+
+⛔ The wrapper reader lifted it verbatim into `.env`. There is no
+`$NIX_PROFILES` in a bundle and nothing expands `$( )`, so the variable held
+literal garbage **and shadowed** whatever else would have set the path — in
+the subject and the control alike. ⭐ **Fixed**: a wrapper value containing
+`$(` or naming `$NIX_PROFILES` is not a path and is not lifted, and the build
+says so. ⚠ The test is deliberately narrow — a bare `$` is ordinary in a path
+list and `${VAR}` is how `OpPrefix` composes.
+
+## ⚠ Two defects in run 1 were MINE, and both are recorded rather than smoothed
+
+- the decode leg ended `! wavenc !`, and `wavenc` is in **gst-plugins-good**,
+  which this closure does not carry — so it read **0/11** on a bundle that had
+  just encoded on **11/11**. ⛔ The fourth criterion-not-subject defect in this
+  tree and the first written here;
+- `B3` read the wrong `.env`: both bundles share one cache and one `--name`, so
+  the AppDir on disk is whichever built **last**. ⚠ And the first fix was
+  incomplete — on a **cached** run neither is built, so the copy has to happen
+  only after a build that actually ran.
+
+---
+
+## ⭐ THE ROW AS PRE-REGISTERED — `experiments/103-`, 2026-09-04c
 
 ⛔ **Committed before it runs**, delivery rule 1, and it answers the three
 questions `media-1` cannot:
