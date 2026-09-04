@@ -1037,9 +1037,14 @@ byte-identical.** T-079 found the row; this entry is the mechanism.
 variable** — `TERMINFO`, `SSL_CERT_FILE`, `TZDIR` — at carried data, so the
 library does its own lookup and finds ours. ⛔ `/etc/services` has **no such
 variable**: the path is compiled into glibc and there is nothing to redirect.
-So this mechanism wraps the **call** instead — `-Wl,--wrap` on eight symbols:
-`getservbyname`, `getservbyport`, `getservent`, `getprotobyname`,
-`getprotobynumber` and their `_r` forms.
+So this mechanism wraps the **call** instead — `-Wl,--wrap` on **eight**
+symbols: `getservbyname`, `getservbyport`, `getprotobyname`,
+`getprotobynumber`, and the `_r` form of each. ⚠ **Checked against
+`internal/wrapper/flags.go` and `tool/runtime/pgb-netdb.c` rather than written
+from memory, and the first draft of this paragraph was wrong**: it listed
+`getservent` among them, which is not wrapped. The `*ent` iteration family
+(`setservent`/`getservent`/`endservent`) is untouched, so a program that walks
+the database rather than looking a name up is **not** served.
 
 ⭐ **The ORDER is the same order, and it is the security property**, stated in
 `AGENTS.md` §7 item 3: each wrapper calls `__real_*` **first**, so a host that

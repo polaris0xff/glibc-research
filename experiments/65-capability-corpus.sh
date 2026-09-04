@@ -46,8 +46,12 @@
 # shape of list T-081 exists to replace. Mount and extract are two DELIVERY
 # modes of the same artefact and neither criterion here depends on which is
 # used — the window is the X server's fact, the host objects are the process
-# tree's. ⚠ It costs about a gigabyte of tmpfs and ten to twenty seconds per
-# row, and this machine has 16 GiB.
+# tree's. ⚠ It costs about a gigabyte of tmpfs per row, and this machine has
+# 16 GiB. ⛔ AND IT COSTS TIME, WHICH IS THE PART THAT WAS GUESSED AT AND WAS
+# WRONG: this comment said "ten to twenty seconds" and the window budget was
+# set from that guess. MEASURED 2026-09-04, machine otherwise idle: mousepad's
+# bundle put its first toplevel on the X server at **t+21s** on alpine-3.22 —
+# unpack included, under strace. See the budget block below and C26.
 #
 # -- ⭐ PRE-REGISTERED EXPECTATION -------------------------------------------
 #
@@ -67,6 +71,21 @@
 #       construction. It is in the corpus BECAUSE of that — it is what
 #       "complex" means on the X11 row. ⚠ If it passes, the prediction was
 #       wrong and the record says so rather than quietly dropping it.
+#   C6  ⭐ THE POSITIVE CONTROL, AND THE FIRST VERSION OF THIS FILE HAD NONE.
+#       THREE of the twenty-six subjects have already been measured at 11 of
+#       11 by a DIFFERENT experiment, twice each: `gtk3-1` (galculator) and
+#       `gtk3-2` (mousepad) are `experiments/64-` arms G and X, and `py-1`
+#       (meld) is arm P. ⛔ If any of the three comes back BELOW 11 of 11
+#       here, the disagreement is with a known-good measurement, so the
+#       INSTRUMENT is the first suspect and this run's other rows cannot be
+#       read as capability results. That is what C6 asserts, and it is the
+#       assertion that would have caught the 25-second budget on the first
+#       run instead of after eleven rows.
+#
+# ⚠ C6 IS NOT CIRCULAR. It does not assert that the corpus passes; it asserts
+# that three subjects an independent experiment measured green come back green
+# through this instrument. A run where C6 fails and C1 passes is a run whose
+# greens mean nothing.
 #
 # ⚠ C3 IS PRE-REGISTERED AS A LIMIT RATHER THAN A RESULT, deliberately: it is
 # the sentence T-080's guarantee has to keep saying, and writing it here before
@@ -117,13 +136,30 @@ exp_begin "65 - the capability corpus: three applications per category, simple t
 WORK="${PGB_EXP65_WORK:-/var/tmp/t065}"
 ROWS="${PGB_EXP65_ROWS:-$REPO_DIR/evidence/65-capability-corpus/rows}"
 mkdir -p "$WORK" "$ROWS" || exit 2
-# ⚠ 90s IS A BOUND, NOT A GUESS AT HOW LONG A PROGRAM TAKES. A `cli` subject
-# is waited for rather than killed, so a hanging one costs this many seconds
-# ELEVEN times; a `gui` subject is killed as soon as a window appears or
-# WIN_WAIT expires and rarely reaches it. A subject that genuinely needs
-# longer than 90s to print its version is a finding, not a timeout to raise.
-RUN_TIMEOUT="${PGB_EXP65_TIMEOUT:-90}"
-WIN_WAIT="${PGB_EXP65_WIN_WAIT:-25}"
+# ⚠ THE TIMEOUT IS A BOUND, NOT A GUESS AT HOW LONG A PROGRAM TAKES. A `cli`
+# subject is waited for rather than killed, so a hanging one costs this many
+# seconds ELEVEN times; a `gui` subject is killed as soon as a window appears.
+# A subject that genuinely needs longer than this to print its version is a
+# finding, not a timeout to raise.
+#
+# ⛔ THE FIRST VERSION OF THIS FILE CARRIED experiments/64-'s 25-SECOND WINDOW
+# BUDGET ACROSS A CHANGE THAT INVALIDATED IT, AND THE RUN SCORED galculator
+# 0 OF 11 — a subject `experiments/64-` had measured at 11 of 11, TWICE.
+# 64- uses 25s for the arms it runs in MOUNT mode, where a program starts in
+# about two seconds, and 150s for the ONE arm it runs in EXTRACT mode. This
+# experiment runs EVERY subject in extract mode (strace deadlocks on the FUSE
+# mount) and kept the mount-mode number. ⭐ MEASURED, 2026-09-04, machine
+# otherwise idle: mousepad's bundle put its first toplevel on the X server at
+# t+21s on alpine-3.22 — four seconds inside a budget that had to absorb a
+# 195 MB unpack as well. docs/history/corrections.md C26.
+#
+# ⭐ SO THE WINDOW BUDGET IS NOT A CONSTANT ANY MORE, IT IS THE RUN BUDGET.
+# The poll ends when a window appears, when the process exits, or when
+# `timeout` kills it — never on a number chosen separately from the thing it
+# is timing. A failing gui row therefore costs RUN_TIMEOUT and a passing one
+# costs the subject's start time.
+RUN_TIMEOUT="${PGB_EXP65_TIMEOUT:-150}"
+WIN_WAIT="${PGB_EXP65_WIN_WAIT:-$RUN_TIMEOUT}"
 ONLY="${PGB_EXP65_ONLY:-}"          # run only subjects whose id matches this
 
 command -v strace >/dev/null 2>&1 || { exp_note "no strace on PATH"; exit 2; }
@@ -246,6 +282,22 @@ NENV=$(printf '%s\n' "$ENVS" | wc -l | tr -d ' ')
 
 TOTAL=0; BUILT=0; UNRESOLVED=0; FULL=0; CLEANALL=0
 
+# ⭐ C6, THE POSITIVE CONTROL. These three ids are `experiments/64-` arms G, X
+# and P, each measured at 11 of 11 on these same eleven environments, twice.
+# ⛔ They are named here rather than inferred, so that renaming a corpus id
+# silently drops the control instead of silently passing it: CTRL_SEEN counts
+# how many of them this run actually measured, and the check below compares it
+# against the list.
+CONTROLS="gtk3-1 gtk3-2 py-1"
+NCONTROLS=$(printf '%s\n' $CONTROLS | wc -l | tr -d ' ')
+CTRL_SEEN=0; CTRL_OK=0
+note_control() {   # id pass rows
+  case " $CONTROLS " in *" $1 "*) ;; *) return 0 ;; esac
+  CTRL_SEEN=$((CTRL_SEEN+1))
+  [ "$2" = "$3" ] && [ "$3" -gt 0 ] && CTRL_OK=$((CTRL_OK+1))
+  return 0
+}
+
 show_row() { # id category subject mode pass clean paths note
   printf '  %-10s %-16s %-14s %-4s %-7s %-7s %-9s %s\n' \
     "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8"
@@ -298,6 +350,7 @@ while IFS= read -r line <&3; do
       BUILT=$((BUILT+1))
       [ "$pass" = "$rows" ] && [ "$rows" -gt 0 ] && FULL=$((FULL+1))
       [ "$clean" = "$rows" ] && [ "$rows" -gt 0 ] && CLEANALL=$((CLEANALL+1))
+      note_control "$id" "$pass" "$rows"
       show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" "$paths" "$note (recorded)"
     fi
     continue
@@ -336,6 +389,15 @@ while IFS= read -r line <&3; do
     # by the previous row is counted as this one's.
     _q=0
     while [ "$_q" -lt 10 ] && [ "$(windows_real)" != 0 ]; do sleep 1; _q=$((_q+1)); done
+    # ⛔ AND WHEN IT DOES NOT GO IDLE, THE WAIT GAVE UP AND MEASURED ANYWAY.
+    # That is the false positive the operator named — "a second program's
+    # windows become a false positive nothing else catches" — and a loop that
+    # proceeds after ten seconds is exactly how it gets in. ⭐ So the criterion
+    # is a DELTA against what was already on the server, not a count: a
+    # leftover window can no longer make this row pass, and a row is not
+    # thrown away for something the previous subject left behind.
+    base=$(windows_real)
+    [ "$base" != 0 ] && exp_note "⚠ $id/$name: display not idle at launch ($base window(s)); counting the DELTA"
 
     rm -f "$root/subj65"; cp "$img" "$root/subj65" 2>/dev/null; chmod +x "$root/subj65"
     tr="$WORK/tr.$id.$name"
@@ -350,7 +412,11 @@ while IFS= read -r line <&3; do
       while [ "$_n" -lt "$WIN_WAIT" ]; do
         sleep 1; _n=$((_n+1))
         win=$(windows_real)
-        [ "$win" -gt 0 ] && break
+        [ "$win" -gt "$base" ] && break
+        # ⭐ AND THE LOOP ENDS WITH THE PROCESS, NOT ON A NUMBER OF ITS OWN.
+        # A gui program that WORKS does not exit, so this is the branch that
+        # ends a FAILING row early: `timeout` kills the tree at RUN_TIMEOUT
+        # and the poll notices.
         kill -0 "$_sp" 2>/dev/null || break
       done
       kill "$_sp" 2>/dev/null
@@ -363,7 +429,7 @@ while IFS= read -r line <&3; do
     all=$(cat "$WORK/err.$id.$name" "$WORK/out.$id.$name" 2>/dev/null | tr -d '\r')
     ok=no
     if [ "$mode" = gui ]; then
-      [ "$win" -gt 0 ] && ok=yes
+      [ "$win" -gt "$base" ] && ok=yes
     else
       [ "$st" = 0 ] && ok=yes
     fi
@@ -386,6 +452,7 @@ while IFS= read -r line <&3; do
   show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" "${paths:--}" "$note"
   [ "$pass" = "$rows" ] && [ "$rows" -gt 0 ] && FULL=$((FULL+1))
   [ "$clean" = "$rows" ] && [ "$rows" -gt 0 ] && CLEANALL=$((CLEANALL+1))
+  note_control "$id" "$pass" "$rows"
 
   # ⛔ RECLAIM IMMEDIATELY. A cache is ~2.3 GiB; twenty-six of them is far
   # more disk than this machine has, and a run that dies on ENOSPC halfway
@@ -412,6 +479,25 @@ printf '\n'
 # is the worst answer this codebase can give — docs/AGENTS.md §0b.
 exp_check "at least one subject produced an artefact" \
   "$([ "$BUILT" -gt 0 ] && echo yes || echo no)" yes
+
+# ⭐ C6 IS CHECKED BEFORE C1 AND C2 ON PURPOSE. If the instrument disagrees
+# with a measurement another experiment took twice, nothing below it can be
+# read as a capability result — so the control is the first line of the
+# verdict, not a footnote under it.
+exp_check "C6  ⭐ control subjects MEASURED ($CONTROLS)" "$CTRL_SEEN" "$NCONTROLS"
+exp_check "C6  ⭐ control subjects at $NENV of $NENV, as 64- measured them" \
+  "$CTRL_OK" "$CTRL_SEEN"
+if [ "$CTRL_SEEN" -gt 0 ] && [ "$CTRL_OK" != "$CTRL_SEEN" ]; then
+  exp_note "⛔ A CONTROL FAILED, SO THE INSTRUMENT IS THE FIRST SUSPECT."
+  exp_note "   experiments/64- measured galculator, mousepad and meld at"
+  exp_note "   $NENV of $NENV each, TWICE, on these same environments. A row"
+  exp_note "   below $NENV here is a disagreement with that, and the rest of"
+  exp_note "   this table cannot be read as capability results until it is"
+  exp_note "   explained. docs/history/corrections.md C26 is the last time"
+  exp_note "   this fired: a window budget carried across a change of"
+  exp_note "   delivery mode."
+fi
+
 exp_check "C1  every subject that BUILT passes on all $NENV" "$FULL"     "$BUILT"
 exp_check "C2  every subject that BUILT is clean on all $NENV" "$CLEANALL" "$BUILT"
 exp_note "⛔ C3 IS A LIMIT AND IT IS NOT MEASURED AWAY BY A GREEN TABLE."

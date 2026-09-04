@@ -914,6 +914,59 @@ so the shared function has to grow it before anything can be deleted.
 
 ---
 
+## C26 — a window budget carried across a change of delivery mode, and a corpus with no positive control
+
+⛔ **`experiments/65-` scored `galculator` 0 of 11 on 2026-09-04. Two days
+earlier `experiments/64-` had measured the same subject, the same bundler and
+the same eleven environments at 11 of 11, twice.** The corpus was stopped after
+its first row rather than allowed to produce twenty-five more.
+
+**The mechanism, and it is a copied constant.** `experiments/64-` waits
+`WIN_WAIT=25` seconds for a window in **mount** mode, where a bundle starts in
+about two seconds, and **150** seconds for the one arm it runs in **extract**
+mode. `experiments/65-` runs **every** subject in extract mode — `strace`
+deadlocks on the dwarfs FUSE mount, `experiments/64-` arm P measured that
+twice — and kept the mount-mode 25.
+
+⭐ **MEASURED RATHER THAN REASONED ABOUT.** With the machine otherwise idle,
+`mousepad`'s bundle put its first toplevel on the X server at **t+21 s** on
+`alpine-3.22`, unpack included, under `strace`. That is **four seconds** inside
+a budget the row also had to share with a 195 MB copy into the rootfs and the
+teardown of the row before it.
+
+⛔ **The header comment had the number and nobody believed it enough to act on
+it**: it estimated extract mode at *"ten to twenty seconds per row"* — beside a
+25-second budget. An estimate written next to a constant it invalidates is a
+correction waiting to be made by a measurement.
+
+⭐ **The fix is to stop timing with a constant.** The window poll now ends when
+a window appears, when the process exits, or when `timeout` kills the tree — so
+the budget is the run budget, and a number chosen separately from the thing it
+times cannot drift away from it again.
+
+⭐ **AND THE REAL DEFECT IS THE MISSING CONTROL, WHICH IS WHY THIS IS A
+CORRECTION AND NOT A TUNING NOTE.** The corpus pre-registered five expectations
+and none of them was a positive control, so a broken instrument produced a
+publishable-looking table: `0/11` in the pass column beside `11/11` in the
+clean column, no error text, and a store-path report that proved the bundle had
+run. ⛔ **Nothing in the experiment could tell a broken subject from a broken
+instrument** — which is `AGENTS.md` §0b's rule, applied to the harness instead
+of to the code.
+
+**C6 was added and both of its failure modes were planted before it was
+believed**: a control row at 0 of 11 turns the verdict red and names the
+instrument as the first suspect; a control id that no corpus row carries turns
+it red for the other reason, so renaming a subject cannot silently drop the
+control. The controls are `gtk3-1`, `gtk3-2` and `py-1` — `experiments/64-`
+arms G, X and P, each measured at 11 of 11 twice by an experiment that shares
+no code with this one but the classifier.
+
+⚠ **The one row this cost is retracted, not corrected**: `gtk3-1`'s recorded
+row was deleted, because a row measured with an instrument that cannot fail for
+the right reason is not a datum to adjust.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

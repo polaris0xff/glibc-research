@@ -114,19 +114,29 @@ and then a second subject showed the blocker was the data path rather than GTK.
 ⭐ **This is why the deliverable is three arms and not one.** Same bundler,
 same GTK, same eleven environments:
 
-| arm | subject | window on a real X server |
-|---|---|---|
-| G | `galculator` — UI is a **file** at a compiled-in absolute store path | ⛔ **0 / 11** |
-| X | `mousepad` — UI is a **GResource compiled into the binary** | ✅ **11 / 11** |
-| ⭐ C | `galculator` **again**, with that store path made to resolve | ✅ **11 / 11** |
+⛔ **THIS TABLE IS THE STATE OF 2026-09-03e AND IT IS SUPERSEDED. IT IS KEPT
+BECAUSE IT IS THE "BEFORE" THE OPERATOR'S ACCEPTANCE TEST NAMES** — *"arm G
+must go 0 of 11 → 11 of 11 WITHOUT the bind arm C uses"*. The current numbers
+are the four-arm table at the top of this section.
 
-⭐ **Arm C is what makes this a measurement rather than a reading of an error
-message.** It runs the **identical artefact** with one variable changed — the
+| arm | subject | window on a real X server | ⭐ 2026-09-04, after T-081 |
+|---|---|---|---|
+| G | `galculator` — UI is a **file** at a compiled-in absolute store path | ⛔ **0 / 11** | ⭐ **11 / 11, and no bind** |
+| X | `mousepad` — UI is a **GResource compiled into the binary** | ✅ **11 / 11** | ✅ 11 / 11 |
+| ⭐ C | `galculator` **again**, with that store path made to resolve **by a bind mount** | ✅ **11 / 11** | ⛔ **retired** — replaced by the shipped mechanism, and by arm N, which is the same bundle with that mechanism switched off |
+
+⭐ **Arm C is what made this a measurement rather than a reading of an error
+message.** It ran the **identical artefact** with one variable changed — the
 bundle's own `AppDir` bound at the `/nix/store/<hash>-galculator-2.1.4` the
-binary names — and it draws, on all eleven, still with **zero host shared
-objects**. ⚠ **The bind is not a fix and is not proposed as one**: it needs
-root and a mount namespace, which a user double-clicking an AppImage has
-neither of. It exists to isolate the cause, and it does.
+binary names — and it drew, on all eleven, still with **zero host shared
+objects**. ⚠ **The bind was never a fix and was never proposed as one**: it
+needs root and a mount namespace, which a user double-clicking an AppImage has
+neither of. It existed to isolate the cause, and it did.
+
+⭐ **T-081 replaced it with something a user actually gets**: an interposer in
+the bundle, no bind, no root, no namespace — and arm C's job as a control
+passed to **arm N**, which is stronger, because a negative control built from a
+shipped flag (`--no-storefix`) tests the mechanism rather than the diagnosis.
 
 ⛔ **So the sentence "the remaining gap is tooling, not capability" is earned.**
 Without arm C it would have been an inference from a log line — which is
