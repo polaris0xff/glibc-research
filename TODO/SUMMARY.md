@@ -1,109 +1,117 @@
-# SUMMARY.md — the session of 2026-09-03e
+# SUMMARY.md — the session of 2026-09-04
 
 ⛔ **Overwritten every session.** The work order is
 [`PROGRESS.md`](PROGRESS.md); the closed entries are
 [`../HISTORY/entries/`](../HISTORY/entries/).
 
-    SCOPE     three entries and nothing else, set by the operator on
-              2026-09-03d: T-078 the three-way parity matrix, T-079
-              enumerate the remaining glibc-static edge cases BY SEARCH,
-              T-080 the nix-bundle capability guarantee.
-              ⭐ MID-SESSION the operator added two things: a correction
-              to T-080's success criterion, and permission to take on
-              T-081 because it turned out to be the blocker.
-    RESULT    ⭐ ALL THREE CLOSED. Two of them came out AGAINST US, which
-              is the outcome each entry's Prove line said to report
-              rather than soften.
+    SCOPE     T-081 first, with its acceptance test named BEFORE the work
+              by the operator: experiments/64- arm G must go 0 of 11 ->
+              11 of 11 WITHOUT the bind arm C used. Then T-080 reopened
+              and re-measured with three applications per category. Plus
+              two axes flagged as "also open, neither blocking":
+              /etc/services and the environment-default codeset.
+              ⭐ MID-SESSION the operator added a 40+ application
+              battle-test list, four questions, and a tooling ask.
+    RESULT    ⭐ T-081 CLOSED (twice), T-085 and T-086 CLOSED, the four
+              questions answered from source, the app list classified.
+              ⛔ T-080 IS STILL RUNNING and that is the honest state.
+              THREE corrections, all about instruments.
 
 ## ⭐ What moved
 
 | | before | after |
 |---|---|---|
-| `musl-gcc` | ⛔ **absent** — the blocker the last session recorded | ✅ installed; `experiments/61-` arm A and `63-` arm M now RUN instead of skipping |
-| the parity matrix | evidence spread over ten experiments, musl column mostly **inferred** | ⭐ one table, every cell run, `skip=0` |
-| the glibc-static quirk list | 10 found, 9 closed | ⛔ **11 found, 9 closed** — `/etc/services` |
-| GTK out of a nix closure | a hypothesis, graded *"Garbage"* by the field on a different pipeline | ⭐ **11 of 11 real windows on a real X server**, zero host objects |
-| T-081's cost | a plan | ⭐ a measurement with a positive control |
+| a compiled-in `/nix/store` path | ⛔ the bundle drew **0 of 11** | ⭐ **11 of 11, no bind**, twice; `--no-storefix` still 0 of 11 |
+| a Python GUI application | ⛔ **no artefact at all** — `resolveEntry` oscillated five hops | ⭐ `meld` draws on **11 of 11**, zero host objects |
+| `/etc/services` | measured, **no mechanism** | ⭐ `--embed-netdb`, 8/11 → **11 of 11**, host file still wins |
+| the environment-default codeset | ⛔ the one axis musl beat both glibc columns **11-0** | ⭐ `--utf8-default`, **11 of 11**, and `LANG=C` still obeyed |
+| the eleven glibc-static issues | 9 closed, 2 open | **10 closed, 1 open** (host `dlopen`) |
+| the 40+ application list | a list | ⭐ eight rungs ordered **by mechanism** — [`../docs/research/app-corpus.md`](../docs/research/app-corpus.md) |
+| a long bundle run | died silently on ENOSPC or a stray FUSE mount | `scripts/common/watchdog.sh`, with a `--selftest` |
 
-## ⛔ The two rows that came out against us
+## ⛔ THREE CORRECTIONS, AND ALL THREE ARE ABOUT INSTRUMENTS
 
-⭐ **Both are in the shipped table. Neither axis was softened until it passed.**
+⭐ **None was found by reading the code that contained it.** Two came from a
+disagreement, one from a build log.
 
-1. **The environment-default codeset.** With no `LANG` set, native musl static
-   answers **UTF-8 on 11 of 11** and every glibc arm — `pgb` included —
-   answers `ANSI_X3.4-1968` on **11 of 11**. ⛔ **The prediction registered
-   before the run said the opposite on both halves.** musl's minimal locale
-   support does not mean a poor codeset: its default charset *is* UTF-8.
-   Asked for `C.UTF-8` **by name**, `pgb` answers UTF-8 on 11 of 11 against
-   vanilla's 7 — but that is a different question, and it is now a separate row.
-2. **`/etc/services`** — the eleventh host-data dependency. All three columns
-   fail it on the same three environments, so it is not a row `pgb` loses *to
-   musl*; it is one nobody wins and `pgb` claims it should.
+**C26 — the corpus had no positive control.** `experiments/65-` scored
+`galculator` **0 of 11**; `experiments/64-` had measured the same subject at
+**11 of 11, twice**, two days earlier. The mechanism was a copied constant:
+`64-` waits 25 s for a window in **mount** mode, where a bundle starts in about
+two seconds, and **150 s** for the one arm it runs in **extract** mode — and
+`65-` runs *every* subject in extract mode and kept the 25. ⭐ Measured: a
+bundle puts its first toplevel on the X server at **t+21 s**, unpack included.
+⛔ **The budget was the symptom.** The defect was that five pre-registered
+expectations contained **no control**, so nothing in the experiment could tell a
+broken subject from a broken instrument. C6 now asserts that `gtk3-1`, `gtk3-2`
+and `py-1` — `64-`'s arms G, X and P — come back 11 of 11, and both of its
+failure modes were planted before it was believed.
 
-## ⭐ The operator corrected the instrument, and it cost eleven green rows
+**C27 — our own regex had the boundary defect we accused the field of.**
+T-081's write-up said the field's `[^ \"']*` *"does not stop at `<`"*.
+`storeRefRe` was `[^" ']*`. In a binary the match ran through the terminating
+NUL, and three of the six paths a bundle reported as unresolvable were the
+scanner rather than the bundle. Re-measured on the same AppDir: **13 of 13**
+distinct text-file store paths are in the closure and **0** are not — the one
+that "was not" was `…-dejavu-fonts-minimal-2.37<`. ⭐ **The argument survives
+and is stronger**: the field's regex *substitutes* on a mis-bounded match; this
+route never substitutes on a match it cannot resolve, so the worst a bad
+boundary could do was **report** a path it should have rewritten.
 
-⛔ **`experiments/64-` first scored GTK 11 of 11 GREEN.** Its criterion was
-that the program printed `Gtk-WARNING **: cannot open display:`, on the
-reasoning that the message is emitted by the *bundled* libgtk-3 and therefore
-proves it loaded.
+**C28 — a review's own hypothesis, falsified by the plant it wrote.** The
+review predicted `StoreRefToBundle` was the dangerous pattern because it
+substitutes without asking the closure. With the old class restored, both cases
+written to prove corruption **passed**: the substitution is `"store/" + name`,
+so an over-captured name is reproduced verbatim. ⭐ What the review found
+instead is a coupling nothing checks — the name must be the farm directory
+`buildStoreFarm` created, and **no check reads a `.env` value back against the
+tree**. T-092.
 
-> *"you may be measuring the wrong success criteria. Previously nixappimage
-> bundled apps showed the same error on real hw with display, confirm it
-> properly by feeding it a fake/emulated display"*
+## The measurements, each with its verdict line
 
-⭐ **Right, and decisive.** The message does not discriminate: it is identical
-when there is no display and when the bundle's own X stack is broken, which is
-the only distinction the experiment exists to make. Feeding it a real display
-(`Xvfb`, socket bound into each rootfs) and asking the **X server** for a
-window — from outside the process — turned **11 green rows into 0**.
-
-⭐ **A second subject then separated the causes**, and that pair is the whole
-T-080 deliverable:
-
-| arm | subject | window on a real X server |
+| | verdict | runs |
 |---|---|---|
-| G | `galculator` — UI is a **file** at a compiled-in store path | ⛔ **0 / 11** |
-| X | `mousepad` — UI is a **GResource compiled into the binary** | ✅ **11 / 11** |
-| ⭐ C | `galculator` **again**, with that store path made to resolve | ✅ **11 / 11** |
+| `experiments/64-` — T-081's acceptance test, four arms | `pass=11 fail=0 skip=0` | **two**, every cell identical |
+| `experiments/66-` — `--embed-netdb` | `pass=12 fail=0 skip=0` | **two**, identical |
+| `experiments/67-` — `--utf8-default` | `pass=7 fail=0 skip=0` | **two**, identical |
+| `experiments/65-` — the T-080 corpus, 26 subjects | ⏳ **RUNNING** | restarted twice, both times because the tool changed under it |
 
-⭐ **Arm C is the argument**: identical artefact, one variable changed, and it
-draws. So *"a hardcoded store path is what stops it"* is a **measurement**, not
-a reading of an error message — which is what licenses the guarantee's
-sentence, *the remaining gap is tooling, not capability*.
+⛔ **The corpus is the unfinished half of the session and the record says so.**
+It is resumable — a recorded row is never re-measured — and
+[`RESUME.md`](RESUME.md) carries the state.
 
-## The five defects this session found in its own instruments
+## ⭐ The operator's four questions, answered
 
-⭐ **Every one was found by something disagreeing, none by reading.**
+Full answers with their evidence are in [`PROGRESS.md`](PROGRESS.md).
 
-| what | how it was caught |
-|---|---|
-| `[ -e "$rootfs$path" ]` resolves an **absolute symlink against the HOST**, so Alpine's `/bin/sh -> /bin/busybox` read as absent on three rows | the file listing disagreed with a binary that ran fine |
-| the probe **buffered stdout to a pipe**, so a crash discarded every answer already computed and a row read "no output" | Arch printed nothing while its neighbours printed everything |
-| the crash counter read the **parent's** exit status, and the per-axis fork is what makes a crash survivable — it reported `crashed = 0` on a run whose rows read `SIG8` | the summary disagreed with the rows above it |
-| the UTF-8 counter **globbed the whole line**, so adding a second axis containing `UTF-8` moved the glibc arms 0 → 7 between two runs | the two-runs rule |
-| `tr -d '\r' < f1 f2` redirects `f1` and passes `f2` as an argument, so every row printed `<none>` | the trace beside it plainly showed GTK loading |
+1. **Is the glibc-static work complete?** ⛔ **No.** Ten of eleven closed, one
+   open (host `dlopen`, host-dependent by nature); a boundary *inside* the
+   eleventh (`getaddrinfo` with a service name, 8 of 11); four of the ten closed
+   only behind an opt-in flag; and the list grew **nine → ten → eleven on three
+   consecutive days**.
+2. **Multi-binary applications, and does renaming the bundle work?** ⭐ **Yes,
+   by construction** — a static `ARGV0`/`argv[0]`/`$1` selector and automatic
+   enumeration of the entry `bin/` — ⛔ **and it has never been run.** T-088.
+3. **Can the walker count entry points?** ⭐ **It already prints the number**:
+   `programs <prog> + N more`.
+4. **Feature parity with anylinux?** Level or ahead on everything measured here;
+   ⛔ they are ahead on **the sandbox** (which this bed cannot measure) and on
+   **breadth**.
 
-⚠ **And two in the write-up itself**, caught by checking it against the
-evidence: `comparison.md` said vanilla iconv gives *"SIGABRT on 3"* when it is
-SIGABRT on two and SIGFPE on one; and a throughput figure was quoted from a
-first run whose `RESULT.txt` the second had already overwritten.
+## What the next session inherits
 
-## What is NOT claimed
+⭐ **The work order is now ordered BY MECHANISM**, on the operator's rule
+*"what will auto fix/complete what, not easy first"*. Rungs 1–3 of
+[`../docs/research/app-corpus.md`](../docs/research/app-corpus.md) decide about
+twenty of the forty subjects.
 
-⛔ **Said in the sentence, not in a footnote**, because overclaiming is the
-failure T-080 names first.
+    T-080  ⏳ finish the corpus. RESUMABLE.
+    T-088  rung 1 — multi-entry dispatch, shipped and never run.
+    T-089  rung 2 — the one row store-paths.md marks NOT MEASURED.
+    T-087  rungs 3+ — the battle-test corpus. ⚠ RULE 3 SUSPENDED HERE.
+    T-090  rung 5 is a BED problem, not a bundler problem.
+    T-084  six hand copies of the trace classifier, and lib.sh's shared
+           version needs the `mode` argument before any can be deleted.
 
-- **Vulkan and NVIDIA are not measured.** Every GL row in this tree is
-  `swrast` and surfaceless. The supported sentence is *"the closure produces a
-  working EGL display offscreen"*. **T-059** owns real hardware.
-- **SDL was never run through `pgb bundle appimage`** and stays a hypothesis.
-- **No Python GUI application bundles at all**, so the operator's own
-  counter-example is still unreached — `resolveEntry` oscillates on the
-  standard nixpkgs wrapper shape.
-- **GTK is proved on one subject**, not on GTK in general.
-- **The eleventh quirk has no mechanism yet**, only a measurement.
-
-## ⭐ Next
-
-⛔ **T-081, and its acceptance test already exists**: `experiments/64-` arm G
-must go **0 of 11 → 11 of 11** without the bind arm C uses.
+⚠ **Delivery rules 7 and 8 are new and each was paid for by a discarded run**:
+check that a criterion can *finish*, and carry a **positive control**.

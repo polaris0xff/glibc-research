@@ -102,17 +102,20 @@ criterion fail *for the right reason*.
     `gtk3-2` and `py-1` are `64-`'s arms G, X and P and must come back
     11 of 11 or the instrument, not the capability, is the finding.
 
-    ⏳ RUNNING NOW: `experiments/65-`, relaunched **02:28 UTC** by
-       `scratchpad/chain3.sh` (session scheduling, not evidence) with the
-       corrected instrument AND the corrected `storeRefRe` (C27) — it was
-       started at 02:16 and stopped again nine minutes later, because
-       C27 changed the bundler and rows built by two different tools may
-       not sit in one table. 26 subjects × 11 environments. ⚠ HOURS.
+    ⏳ RUNNING NOW: `experiments/65-`, relaunched **02:53 UTC** at commit
+       b46c4334 by `scratchpad/chain3.sh` (session scheduling, not
+       evidence). 26 subjects × 11 environments. ⚠ HOURS.
        ⭐ RESUMABLE: a completed subject writes a TAB-separated row into
        `evidence/65-capability-corpus/rows/` and a recorded row is never
        re-measured, so `sh scripts/common/run-experiment.sh 65` picks up
        wherever it stopped. ⛔ A row measured by a broken instrument must be
        DELETED, not adjusted — that is what makes resumability safe.
+
+    ⛔ IT WAS RESTARTED TWICE AND BOTH TIMES FOR THE SAME REASON: `make`.
+    Each subject's bundle is built by `$REPO_DIR/pgb`, so a rebuild mid-run
+    puts rows from two different tools in one table. C26 forced the first
+    restart (the instrument); C28 forced the second (the tool). ⭐ THE RULE
+    IS SIMPLE AND IT IS NOT IN ANY GATE: while 65- runs, do not `make`.
 
     ⛔ WHILE 65- RUNS, THE MACHINE IS NOT FREE.
       - ⛔ Do not run another GUI experiment: 65- counts windows on `:99`,
