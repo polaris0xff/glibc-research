@@ -257,19 +257,71 @@ loaders. `steam` additionally bootstraps itself into `$HOME` and updates in
 place, which is a different problem again — it is not a bundling question but a
 question about what the bundle is allowed to write.
 
-**Study.** `https://github.com/VHSgunzo/lux-wine` and
-`https://github.com/VHSgunzo/lw-runtime` (the operator's links; **not
-vendored** — fetch before relying on either);
-`https://github.com/ivan-hc/Steam-appimage`.
+⭐ **AND THE FIELD'S SHIPPED ANSWER TO THIS RUNG IS A CONTAINER, NOT A
+BUNDLE** — read 2026-09-04b from the now-vendored trees, and it reframes the
+rung. `lux-wine` (176 stars) runs Windows applications *"using a specially
+configured Wine/Proton and **RunImage container**"*, with its own *"portable
+`lwrun` container with isolation from the host system"* and ArchLinux/Chaotic-AUR
+repositories connected inside it; `lw-runtime` is not a runtime in our sense at
+all but a **tarball of Wine libraries** (`PKGBUILD`, one `runtime.tar.zst`
+source). `ivan-hc/Steam-appimage` (132 stars) is likewise *"built using
+Runimage"*.
 
-### Rung 7 · Container tooling. ⭐ THE ROW THE FIELD IS ON RECORD FAILING
+⛔ **So nobody in the corpus solves 32-bit-plus-64-bit with a sharun-style
+bundle**; they solve it by shipping a distribution. That is the same conclusion
+[`nix-appimage.md`](nix-appimage.md) reaches from the other direction — *why a
+bundler ends up shipping a container* — and it means a green row here would be
+a genuinely different artefact, not a re-run of theirs. ⚠ It also means their
+trees are weak evidence about `assemble.go`'s `lib32` path: they are not doing
+the thing we would be doing.
+
+**Study.** `references/VHSgunzo__lux-wine/` and `references/VHSgunzo__lw-runtime/`
+and `references/ivan-hc__Steam-appimage/` — **all vendored**. Read them for the
+container boundary, not for a two-loader bundle: none of them has one.
+
+### Rung 7 · Container tooling. ⭐ THE FIELD DID ATTEMPT IT, AND LABELS IT "VERY BROKEN"
 
 `distrobox`, `podman`, `docker`, `lilipod`.
 
-⛔ **The operator's framing is the right one**: *"AnyLinux's AppImage fail to
-pack this, can we?"* — so this is the only rung where a green row is a claim the
-field cannot match. The Prove bar the operator set is deliberately low: **at
-least one of distrobox/podman works, rootless is fine.**
+⛔ **CORRECTED 2026-09-04b, and the correction is the useful part.** This page
+said *"the vendored issue set contains no attempt to package it"* and called
+this *"the row the field is on record failing"*. Both were artefacts of not
+having fetched the repository. `pkgforge-dev/distrobox-AppImage` **is now
+vendored**, and it is a real, sharun-built distrobox+podman AppImage:
+
+| | |
+|---|---|
+| releases | **2**, `1.8.2.3-1`, x86_64 **and** aarch64, with download counts |
+| what it packs | `distrobox*`, `podman*`, `/usr/lib/podman`, `conmon`, `crun`, `krun`, `criu` |
+| ⛔ its own repository description | **`WIP (VERY BROKEN!)`** |
+
+⭐ **So the honest sentence is not "they failed" and not "they succeeded": they
+shipped it and call it very broken.** What makes the rung worth doing is that
+their build script names **three costs in its own comments**, and each is a bar
+we can be measured against:
+
+1. ⛔ **The bundle writes itself outside the mount to work.**
+   `AppDir/bin/run-outside.src.hook`: *"for some reason this fails to work when
+   FUSE or unshare is in use: `Error: default OCI runtime "crun" not found`…
+   so we will have to copy the binaries outside FUSE before running them"* —
+   into `$XDG_CACHE_HOME/distrobox-appimage`. ⭐ **Nothing written to the
+   filesystem is one of our measured parity rows**; this route gives it up.
+2. ⛔ **`crun` is `patchelf --set-interpreter`'d to `/tmp/<random>`**, and a
+   generated shell wrapper copies the loader there at run time. Their comment:
+   *"crun gets broken when used with sharun … we will have to do some hacks"*.
+   ⚠ The random name is generated at **build** time and baked into the wrapper,
+   so it is a fixed path per artefact — ⛔ **the `/tmp` route
+   [`../design/store-paths.md`](../design/store-paths.md) §2 rejects on
+   security grounds, holding the dynamic loader, which is loadable code.**
+3. ⚠ **It needs `PATH_MAPPING`** — `'/usr/bin/distrobox*:${SHARUN_DIR}/bin/distrobox*'`
+   — which is a path-mapping mechanism they do have, and worth reading against
+   ours before the rung is attempted.
+
+⭐ **That turns the Prove bar into something sharper than "can we do it at
+all"**: at least one of distrobox/podman working, rootless, **without writing
+outside the artefact and without a `/tmp` loader copy**. The operator's bar
+(*"rootless is fine"*) stands; these two are what would make it a result rather
+than a re-run of theirs.
 
 **What it actually needs**, and each is a separate finding:
 - `newuidmap`/`newgidmap` are **setuid host binaries**; a rootless podman
@@ -279,14 +331,17 @@ least one of distrobox/podman works, rootless is fine.**
 - `lilipod` is a **static Go binary** — so it is also a rung-2 subject, and it
   is the last resort precisely because it asks the least of us.
 
-⭐ **THE VENDORED ISSUE SET CONTAINS NO ATTEMPT TO PACKAGE IT**, which is
-weaker evidence than "they failed" and is what can honestly be said: every one
-of the ~40 `distrobox` mentions in `api/issues.json` is distrobox used as a
-**test environment** (*"tested on distrobox alpine"*), never as a subject.
+⚠ **The Anylinux issue set is still silent on it** — every one of the ~40
+`distrobox` mentions in `api/issues.json` is distrobox used as a **test
+environment** (*"tested on distrobox alpine"*), never as a subject. ⛔ That
+absence is now known to mean the work happened **in its own repository**, which
+is why an absence is not a zero: it was evidence about where to look, and this
+page read it as evidence about whether the work existed.
 
-**Study.** `https://github.com/pkgforge-dev/distrobox-AppImage` (**not
-vendored** — fetch it, and read what it says it cannot do before claiming we
-can).
+**Study.** `references/pkgforge-dev__distrobox-AppImage/` — **vendored**.
+`make-appimage.sh` (the `crun` hack, the `quick-sharun` list, `PATH_MAPPING`)
+and `AppDir/bin/run-outside.src.hook` (the copy-outside-FUSE workaround, with
+their reason in the first comment).
 
 ### Rung 8 · The heavy tail
 
@@ -366,11 +421,29 @@ AppImage recipes — ⭐ the fastest way to see what a toolkit needs), and
 which is where the per-application knowledge actually is. ⚠ Search that JSON;
 the operator is right that the specific issue comments are the best source.
 
-⚠ **Named by the operator and NOT vendored** — fetch before relying on them:
-`github.com/ivan-hc` (AM, Steam-appimage), `pkgforge-dev/distrobox-AppImage`,
-`flatimage/flatimage`, `gameimage/gameimage`, `flatroot/flatroot`,
-`VHSgunzo/lux-wine`, `VHSgunzo/runimage-nvidia-drivers`, `VHSgunzo/lw-runtime`,
-`VHSgunzo/Run-wrapper`.
+⭐ **NOW VENDORED, 2026-09-04b** — six of the nine the operator named:
+`pkgforge-dev/distrobox-AppImage` (rung 7), `VHSgunzo/lux-wine` and
+`VHSgunzo/lw-runtime` and `ivan-hc/Steam-appimage` (rung 6),
+`VHSgunzo/runimage-nvidia-drivers` (T-059), `VHSgunzo/Run-wrapper` (rung 1).
+`ivan-hc/AM` was already here. `references/` is **52** trees
+(`ls references/ | wc -l`).
+
+⚠ **Still NOT vendored**: `flatimage`, `flatroot`, `gameimage`. ⛔ The owner
+names this page carries — `flatimage/flatimage`, `flatroot/flatroot`,
+`gameimage/gameimage` — are **guesses that were never resolved**, and
+`mine-repo.sh` reports a 404 beside a known-public control precisely so a
+wrong owner is not read as a missing repository. Find the real owners before
+recording either.
+
+⭐ **What the six that arrived actually said**, so the next session does not
+re-read them for the same answer:
+
+| tree | what it is | what it changes here |
+|---|---|---|
+| `distrobox-AppImage` | a real sharun distrobox+podman AppImage, 2 releases | ⛔ rung 7 rewritten: they attempted it, and call it `WIP (VERY BROKEN!)` |
+| `lux-wine`, `lw-runtime`, `Steam-appimage` | **RunImage containers**, plus a Wine library tarball | ⛔ rung 6 rewritten: the field's 32-bit answer is a container, not a bundle |
+| `runimage-nvidia-drivers` | builds a driver **image per NVIDIA version** from the vendor `.run`, placed beside the container | ⚠ T-059: it is per-version and host-matched, which is what [`../design/host-fallback.md`](../design/host-fallback.md) already says a driver must be |
+| `Run-wrapper` | a 2-star Rust ELF wrapper that dispatches argv into RunImage's `Run.sh` | ⚠ rung 1: the same job as `pgb-apprun.c`, for a **shell script** target. Ours is static C with the dispatch table measured (`experiments/68-`); there is nothing here we need |
 
 ⭐ **What to look for in the four unvendored runtime projects**, so the reading
 has a question: all four solve *"a program that expects a root filesystem"* —
