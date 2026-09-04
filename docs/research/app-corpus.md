@@ -60,24 +60,16 @@ a real bundle** — that is `68-` arm B, which needs the bed.
 `tool/runtime/pgb-apprun.c` (130 lines, and it is the answer);
 `experiments/68-` arm S for what each rule actually does.
 
-**Study.** `internal/bundle/assemble.go` `installProgram`;
-`tool/runtime/pgb-apprun.c` (the whole file is 130 lines and it is the answer).
-
-### Rung 2 · A static or raw-syscall binary. ⭐ THE ONE ROW `store-paths.md` MARKS "NOT MEASURED"
+### Rung 2 · A static or raw-syscall binary. ⭐ THE MECHANISM IS MEASURED; THE APPLICATION IS NOT
 
 `syncthing` (Go), `powershell` (.NET), `lilipod` (Go).
 
-⛔ **This is not a low-priority "easy" row, it is a named hole in a shipped
-claim.** [`../design/store-paths.md`](../design/store-paths.md) §3's comparison
-table has one row marked **NOT MEASURED**: the interposer *"works for a static
-binary, or one issuing raw syscalls — **no**"*, because there is no PLT to win.
-A Go program from the closure with a store path compiled in is exactly that
-shape, and `pgb` itself is one. Until a Go subject is bundled and run, that row
-is reasoning.
+⛔ **This was a named hole in a shipped claim**, not a low-priority "easy" row:
+[`../design/store-paths.md`](../design/store-paths.md) §3 carried one row marked
+**NOT MEASURED** — the interposer *"works for a static binary, or one issuing
+raw syscalls — **no**"* — because there is no PLT to win.
 
-**Expect it to FAIL, and pre-register that.** The honest outcome is that the
-build **reports** the compiled-in path and the program cannot resolve it. If it
-passes, the reasoning was wrong and the record says so.
+**The failure was pre-registered as a failure** before the run, and it held.
 
 ⭐ **THE MECHANISM HALF IS NOW MEASURED — `experiments/100-` arm P, two runs
 identical — AND IT SPLIT THE ROW IN TWO.** A planted store path that does not
