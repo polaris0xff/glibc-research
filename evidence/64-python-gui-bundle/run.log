@@ -2,7 +2,7 @@
 64 - GTK and Python out of a nixpkgs closure, with the compiled-in store path resolved
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-03T23:50:58Z
+date (UTC)   : 2026-09-04T01:27:32Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -16,32 +16,32 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
 
 -- arm G: galculator (UI loaded from a file at a compiled-in path) --
         building gal — several minutes
-        artefact: /var/tmp/t080/galculator.AppImage, 177519292 bytes
+        artefact: /var/tmp/t080/galculator.AppImage, 177586718 bytes
         store map: 130 store paths resolve inside the bundle
 
   ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
-  alpine-3.22          musl   yes   1        0        yes      3409
-      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
-  alpine-3.20          musl   yes   1        0        yes      3409
-      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
-  alpine-3.10          musl   yes   1        0        yes      3409
-      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
-  voidlinux-musl       musl   yes   1        0        yes      3409
-      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
-  debian-11            glibc  yes   1        0        yes      3409
-      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
-  debian-12            glibc  yes   1        0        yes      3409
-      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
-  ubuntu-20.04         glibc  yes   1        0        yes      3409
-      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
-  rockylinux-8         glibc  yes   1        0        yes      3409
-      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
-  opensuse-leap-15.6   glibc  yes   1        0        yes      3409
-      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
-  fedora-42            glibc  yes   1        0        yes      3409
-      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
-  archlinux-latest     glibc  yes   1        0        yes      3409
-      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
+  alpine-3.22          musl   yes   1        0        yes      403
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  alpine-3.20          musl   yes   1        0        yes      357
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  alpine-3.10          musl   yes   1        0        yes      385
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  voidlinux-musl       musl   yes   1        0        yes      401
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  debian-11            glibc  yes   1        0        yes      416
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  debian-12            glibc  yes   1        0        yes      393
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  ubuntu-20.04         glibc  yes   1        0        yes      380
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  rockylinux-8         glibc  yes   1        0        yes      399
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  opensuse-leap-15.6   glibc  yes   1        0        yes      397
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  fedora-42            glibc  yes   1        0        yes      374
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  archlinux-latest     glibc  yes   1        0        yes      391
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
 
 
 -- arm N: galculator with --no-storefix (the NEGATIVE CONTROL) -----
@@ -76,34 +76,29 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
         building mousepad — several minutes
 
   ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
-  alpine-3.22          musl   yes   1        0        yes      3822
-      out: <none>  [exit 124]
-  alpine-3.20          musl   yes   1        0        yes      3822
-      out: <none>  [exit 124]
-  alpine-3.10          musl   yes   1        0        yes      3822
-      out: <none>  [exit 124]
-  voidlinux-musl       musl   yes   1        0        yes      3822
-      out: <none>  [exit 124]
-  debian-11            glibc  yes   1        0        yes      3822
-      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
-  debian-12            glibc  yes   1        0        yes      3822
-      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
-  ubuntu-20.04         glibc  yes   1        0        yes      3822
-      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
-  rockylinux-8         glibc  yes   1        0        yes      3822
-      out: <none>  [exit 124]
-  opensuse-leap-15.6   glibc  yes   1        0        yes      3822
-      out: <none>  [exit 124]
-  fedora-42            glibc  yes   1        0        yes      3822
-      out: <none>  [exit 124]
-  archlinux-latest     glibc  yes   1        0        yes      3822
-      out: <none>  [exit 124]
+  alpine-3.22          musl   yes   1        0        yes      240
+      out: <none>  [exit 137]
+  alpine-3.20          musl   yes   1        0        yes      217
+      out: <none>  [exit 137]
+  alpine-3.10          musl   yes   1        0        yes      224
+      out: <none>  [exit 137]
+  voidlinux-musl       musl   yes   1        0        yes      225
+      out: <none>  [exit 137]
+  debian-11            glibc  yes   1        0        yes      228
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  debian-12            glibc  yes   1        0        yes      214
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  ubuntu-20.04         glibc  yes   1        0        yes      263
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  rockylinux-8         glibc  yes   1        0        yes      214
+      out: <none>  [exit 137]
+  opensuse-leap-15.6   glibc  yes   1        0        yes      241
+      out: <none>  [exit 137]
+  fedora-42            glibc  yes   1        0        yes      246
+      out: <none>  [exit 137]
+  archlinux-latest     glibc  yes   1        0        yes      227
+      out: <none>  [exit 137]
 
 
 -- arm P: a PYTHON GUI application (meld) --------------------------
         building meld — several minutes
-        arm P closure: unknown store paths
-  ok    arm P: an artefact was produced                = yes
-        arm P entry: <not a script entry>
-
-  ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so

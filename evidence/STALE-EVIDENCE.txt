@@ -55,4 +55,4 @@
 # last commit against that directory's and sees the script as newer, which is
 # true and means nothing here. ⛔ The line goes inert the moment the corpus
 # runs and writes a row, which is the first thing the next session should do.
-65-capability-corpus.sh 5b345cf9f9936285c3ba1fdb6dce5349785bbc95 7f56ed65ad3c257c5da222eb1b4855978155840c NOT A DEBT: the experiment has never been run; the directory holds only its README
+65-capability-corpus.sh a2af0124ab013ac390fa99ab61aa8ef2ffe55871 7f56ed65ad3c257c5da222eb1b4855978155840c NOT A DEBT: the experiment has never been run; the directory holds only its README
