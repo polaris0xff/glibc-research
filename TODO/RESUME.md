@@ -103,17 +103,36 @@ pattern is fixed. **C7** is checked before C1 and C2 and fails the run.
        `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
        ⛔ A row measured by a BROKEN instrument must be DELETED, not adjusted
        — that is what makes resumability safe.
-       ⭐ 20 of 26 in at session start. FOUR categories CLOSED at 3 of 3 and
-       all passing — GTK 3, X11/XCB, OpenGL/EGL, Qt. Vulkan is 3 of 3 with
-       the third a BED limit (`vkmark` needs `/dev/dri`, which exists nowhere
-       here). SDL is 2 of 3 and both rows pass 11/11, clean 11/11.
-       ⛔ STILL TO MEASURE: `sdl-3`, `py-2`, `py-3`, `media-1`,
-       `field-1`, `field-2`.
+       ⭐ 22 of 26 in. FIVE categories CLOSED at 3 of 3, every subject
+       passing and clean — GTK 3, X11/XCB, OpenGL/EGL, Qt, ⭐ **SDL**.
+       Vulkan is 3 of 3 with the third a BED limit (`vkmark` needs
+       `/dev/dri`, which exists nowhere here).
+       ⛔ STILL TO MEASURE: `py-2`, `py-3`, `media-1`, `field-2`.
        ⚠ ~35 minutes per subject serially — see the PARALLEL recipe below.
 
     ⭐ C39 IS FIXED and so is the defect class behind it. `media-1`'s
     assertion is `mpv v[0-9]`; the harness check above is what stops the
     next one. Both landed BEFORE 65- was restarted.
+
+    ⛔⛔ AND ONE INSTANCE WAS EDITED OUT FROM UNDER ITSELF. The 2026-09-04b
+    corpus instance (started 07:31) was STILL RUNNING when
+    `experiments/65-capability-corpus.sh` was rewritten at **10:04** to fix
+    C39. That is the hazard this tree documents in `docs/AGENTS.md` §0b and
+    `TODO/ci.md` T-084 — `sh` re-reads a script from a BYTE OFFSET, so a
+    rewrite mid-run makes it re-enter at a shifted position, and the run
+    log shows it re-printing the run header, which is what re-executing the
+    tail looks like. ⭐ **It was killed before it wrote another row**, and
+    the 22 rows on disk are all accounted for: nothing was recorded after
+    the edit. ⚠ If a future row looks impossible, check whether its
+    instance outlived an edit to the harness.
+
+    ⛔ AND THE `pkill -f` SELF-MATCH TRAP HAS A SECOND FORM THE RECORDED
+    WORKAROUND DOES NOT COVER. The documented fix is the bracket trick
+    (`grep '[6]5-capability'`), which stops grep matching its own pattern.
+    ⚠ It does NOT help when the harness wraps the command in a `bash -c`
+    whose command line CONTAINS the pattern text — the wrapper matched, and
+    killing it killed the shell issuing the kill. ⭐ Kill by explicit PID
+    read in a separate, earlier command.
 
     ⭐ AND THE ROW NOTE IS FIXED. It was the FIRST matching line of the
     concatenated stderr cut to 70 characters, which is useless for a Python
