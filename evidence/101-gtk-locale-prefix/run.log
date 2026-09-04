@@ -23,3 +23,4 @@ evidence     : /home/user/glibc-research/evidence/101-gtk-locale-prefix
   ubuntu-20.04     43       0        0         1/1      0
   rockylinux-8     43       0        0         1/1      0
   opensuse-leap-15.6 43       0        0         1/1      0
+  fedora-42        43       0        0         1/1      0
