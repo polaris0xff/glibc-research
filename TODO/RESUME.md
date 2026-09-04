@@ -177,9 +177,8 @@ why it is written down rather than left as an expectation.
                  ENOENT FOR THE INTERPRETER and the shell printed it against
                  the program. Both fixed; xterm now DRAWS in 2 s, with
                  galculator as an unchanged regression control.
-                 ⛔ THE FIX IS NOT IN ./pgb: it was not rebuilt while 65- ran.
-                 AFTER `make`, DELETE the x11-3 row and re-measure.
-                 corrections.md C37.
+                 ⭐ THE FIX IS IN ./pgb, the row was deleted and re-measured,
+                 and xterm now passes 11/11. corrections.md C37.
         py-2     pdfarranger 0/11. Its entry is a SCRIPT (python3.14 + the
                  static trampoline) and it dies with a Python Traceback --
                  ⛔ NOT the C37 exec failure. ⚠ The row's note is USELESS

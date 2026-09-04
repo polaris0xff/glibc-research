@@ -129,9 +129,9 @@ number not move. ⚠ Read a zero as a question, never as a result.
            instrument (C34, C36), one was a bundler bug with a shipped fix
            (C37, xterm), one is the closure's own glibc (C35, neovim).
            ⛔ helix and flameshot and glmark2 are still open.
-    ⛔ AND `make` IS OWED. C37's fix is committed and NOT in ./pgb, because
-       the corpus was running. After `make`: delete the `x11-3` row and
-       re-measure it, and any other shell-wrapped subject.
+    ⭐ `make` IS DONE and `./pgb` carries C37. Five rows measured against
+       the old tool were deleted and re-taken; `x11-3` and `gl-3` both
+       came back **11/11** from **0/11**.
     T-091  landed and UNMEASURED. A media subject whose host-object count
            says WHICH PROCESS it counted.
     T-084  now unblocked reasoning, still blocked on 65- finishing.

@@ -1408,10 +1408,30 @@ what the entry warned about.
 
 ⭐ **AND THE HAZARD IS LATENT IN THE DELIVERY SHAPE MEASURED.** `102-` arm R1
 counts `execve("<artefact>")` lines in a real corpus trace: **one**. With one
-exec the unconditional clear has nothing to clear, so the committed numbers
-stand — as a measurement, not as an argument. ⛔ It is one delivery shape; a
-wrapper that re-execs the artefact under its own name would make it fire, and
-nothing prevents one.
+exec the unconditional clear has nothing to clear. ⛔ It is one delivery shape;
+a wrapper that re-execs the artefact under its own name would make it fire.
+
+⛔ **AND ONE OF THE SIX IS EXACTLY THAT SHAPE.** `102-` arm S asks, per
+experiment, which mode it calls and how many times its **traced** run invokes
+the artefact — the two facts that decide whether C38 can reach it:
+
+| experiment | mode | invocations | C38 reaches it |
+|---|---|---|---|
+| `60-` | payload + tree | 1 | no |
+| `62-` | payload + tree | 1 | no |
+| `85-` | payload | 1 | no |
+| `86-` | payload | 4 | no — its copy differs only in **tree** mode |
+| `89-` | payload | 1 | no |
+| ⛔ `90-` | **tree** | **2** | ⛔ **YES** |
+
+⛔ **`90-`'s test script runs the artefact twice** — `melt -version`, then a
+real encode — and every one of its eleven rows recorded `P=ok E=ok`, so both
+invocations ran on every row. Its host counts therefore describe only the
+**second** invocation. ⛔ **That includes our own `0 of 11`, not only the
+competitor's `4 of 11`** — being wrong in our own favour is the case the
+delivery rules exist to catch. ⚠ How much it moves is **not measured**: the
+second invocation plausibly loads a superset of the first, and *plausibly* is
+not a measurement. `90-` must be re-run — T-084 step 2.
 
 ⛔ **A SECOND CORRECTION, IN THIS EXPERIMENT'S OWN PRE-REGISTRATION.** `102-`
 predicted *"six files, **two** implementations"*, measured by hashing the

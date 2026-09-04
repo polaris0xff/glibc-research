@@ -146,6 +146,15 @@ opened no host shared object.
 ⚠ **"Clean" is not "passed"** — a binary that cannot start loads nothing and
 scores clean. Read the two columns together.
 
+⭐ **These rows are NOT affected by the classifier defects, and that is
+measured rather than assumed.** `60-` and `62-` each carry a hand copy of the
+trace classifier with two known differences from the shared one (C25 and C38).
+`experiments/102-` arm S checks every experiment that carries a copy against
+the mode it calls and the number of times its traced run invokes the artefact:
+⛔ **only `experiments/90-` is reached** — it calls `tree` mode *and* invokes
+the artefact twice. `60-` and `62-` invoke it once, so both defects are latent
+there. ⚠ C25 can still inflate a **non-zero** in any of them.
+
 ⚠ **Flatpak and snap were built here and cannot run on any target**: 0 of 11
 images ship `flatpak`, 0 of 11 ship `snap`. Their deliverables are ~4 KB
 because the weight is on the host — 623 MB of runtime, or a daemon needing

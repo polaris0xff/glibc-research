@@ -12,8 +12,8 @@ field already knows about it, and — where one has been taken — the number.
 
 | rung | state |
 |---|---|
-| 1 · multi-entry dispatch | ⭐ the **dispatch table** is measured (`experiments/68-` arm S, 18 of 18). ⛔ No second program has yet come out of a real bundle — arm B |
-| 2 · static / raw-syscall payload | ⭐ the **mechanism** is measured (`experiments/100-` arm P, two runs) and it split into two. ⛔ No real application of either shape — arm G |
+| 1 · multi-entry dispatch | ⭐ **BOTH HALVES MEASURED** (`experiments/68-`, `pass=24`, two runs identical): the **dispatch table** (arm S, 18 of 18) and a **second program out of a real bundle** — `mkvextract`, by its own name, **11/11**, and **zero host objects on 11/11** (arm B). ⛔ Still open: `--with-program` is not exercised, and arm B measures **one** closure and two names of five |
+| 2 · static / raw-syscall payload | ⭐ the **mechanism** is measured (`experiments/100-` arm P, two runs) and it split into two. ⭐ A **genuinely static application** then moved the question off the linker entirely (arm L, `lilipod`): the **ELF executes on 11/11**, the **application completes on 2** — every failure names a missing **host program**, `getsubids`. ⛔ Still open: a static application that needs a compiled-in **path** (`powershell`) |
 | 3 · GTK's locale prefix | ⛔ **the locale half is NOT MEASURABLE in this bed** — no environment has a non-C locale, so no catalogue is opened by either arm. ⭐ The mechanism claim holds on a different discriminator, now with two subjects |
 | 5 · namespaces | ⭐ the **cause** is isolated and a route exists (`experiments/69-`, `pass=9`). ⛔ No browser has been bundled |
 | 4, 6, 7, 8 | research. Rungs 6 and 7 were **corrected** against the vendored trees |
@@ -30,7 +30,7 @@ The ladder below is that order.
 
 ## The ladder — do these in this order
 
-### Rung 1 · Multi-entry dispatch. ⭐ SHIPPED, NEVER MEASURED
+### Rung 1 · Multi-entry dispatch. ⭐ MEASURED, BOTH HALVES — and the shipped order was wrong
 
 `rnote`+`rnote-cli`, `nicotine`+`nicotine-plus`, `mkvtoolnix`+`mkvtoolnix-cli`,
 `stirling-pdf`+`stirling-pdf-desktop`, `imagemagick` (`magick`, `convert`,
@@ -87,7 +87,7 @@ measurement, not a repeat of this one.
 `tool/runtime/pgb-apprun.c` (130 lines, and it is the answer);
 `experiments/68-` arm S for what each rule actually does.
 
-### Rung 2 · A static or raw-syscall binary. ⭐ THE MECHANISM IS MEASURED; THE APPLICATION IS NOT
+### Rung 2 · A static or raw-syscall binary. ⭐ MECHANISM MEASURED, AND ONE STATIC APPLICATION MOVED THE QUESTION
 
 `syncthing` (Go), `powershell` (.NET), `lilipod` (Go).
 

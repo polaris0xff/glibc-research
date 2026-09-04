@@ -281,6 +281,75 @@ else
   exp_skip "R1  ⭐ execve(\"<artefact>\") lines in a real trace" "no trace on disk"
 fi
 
+# ---------------------------------------------------------------------------
+# S: ⭐ WHICH COMMITTED NUMBER DOES C38 ACTUALLY REACH?
+#
+# D3 says the copies differ from the shared classifier when the artefact is
+# exec'd a SECOND time. R1 says the corpus's shape execs it once. ⛔ Neither
+# says anything about the six experiments that CARRY a copy -- and that is the
+# only question with a committed number behind it.
+#
+# Two facts decide it per experiment, and both are read out of the experiment:
+#
+#   1. WHICH MODE it calls. The 62-family clears unconditionally, so it can
+#      only differ from the shared classifier in TREE mode; `60-` never clears
+#      there, so it can only differ in PAYLOAD mode.
+#   2. HOW MANY TIMES its traced run invokes the artefact. With one invocation
+#      there is nothing to clear and both defects are latent.
+#
+# ⚠ The site count is a grep and it is an UPPER BOUND on invocations -- a site
+# inside a loop is one line and many runs. It is asserted anyway, because its
+# job here is DRIFT DETECTION: if someone edits one of these six, the count
+# moves and this row fails rather than the verdict below going quietly stale.
+# ---------------------------------------------------------------------------
+printf '\n-- S: ⭐ which committed number does C38 actually reach? ------------\n'
+
+# name : artefact : modes it calls : call sites : invocations in the TRACED run
+S_TABLE='60-versus-alternatives:/pgb-vs-arm:payload+tree:2:1
+62-anylinux-appimage:/vs-arm:payload+tree:3:1
+85-opengl:/gl-arm:payload:1:1
+86-bundler-vs-anylinux:/vs-arm:payload:4:4
+89-debloat:/gl-arm:payload:1:1
+90-kdenlive-vs-enhanced:/kd-arm:tree:2:2'
+
+sites_of() {  # file artefact -> non-comment, non-plumbing mentions
+  grep -n -- "$2" "$SRC/$1.sh" \
+    | grep -v 'classify_trace\|cp "\|rm -f\|chmod\|^[0-9]*:#\|^[0-9]*: *#' \
+    | grep -c . || true
+}
+
+s_drift=0; s_fires=''
+printf '        %-26s %-12s %-6s %-6s %s\n' EXPERIMENT MODE SITES INVOKE 'C38?'
+for row in $S_TABLE; do
+  f=$(printf '%s' "$row" | cut -d: -f1)
+  art=$(printf '%s' "$row" | cut -d: -f2)
+  mds=$(printf '%s' "$row" | cut -d: -f3)
+  exp_sites=$(printf '%s' "$row" | cut -d: -f4)
+  inv=$(printf '%s' "$row" | cut -d: -f5)
+  got=$(sites_of "$f" "$art")
+  [ "$got" = "$exp_sites" ] || s_drift=$((s_drift+1))
+  # C38 reaches an experiment only if it calls the mode its copy differs in
+  # AND its traced run execs the artefact more than once.
+  case "$f" in
+    60-*) diffmode=payload ;;
+    *)    diffmode=tree ;;
+  esac
+  fires=no
+  case "$mds" in *"$diffmode"*) [ "$inv" -gt 1 ] && fires=YES ;; esac
+  [ "$fires" = YES ] && s_fires="$s_fires $f"
+  printf '        %-26s %-12s %-6s %-6s %s\n' "$f" "$mds" "$got" "$inv" "$fires"
+done
+exp_check "S1  no experiment drifted from its recorded call sites" "$s_drift" 0
+exp_check "S2  ⛔ experiments C38 actually REACHES" \
+    "$(printf '%s' "$s_fires" | wc -w)" 1
+exp_note "$(printf '⛔ and it is:%s -- the one T-084 already named' "$s_fires")"
+exp_note "⛔ 90- calls TREE mode and its test script invokes the artefact TWICE"
+exp_note "   (melt -version, then a real encode), so the unconditional clear"
+exp_note "   FIRES and its host counts describe only the SECOND invocation."
+exp_note "⛔ THAT INCLUDES OUR OWN \"0 of 11\", not just the competitor's."
+exp_note "⚠ How much it moves is NOT measured: the second invocation plausibly"
+exp_note "   loads a superset of the first. Plausibly is not measured."
+
 printf '\n-- ⛔ what this does NOT establish ---------------------------------\n'
 exp_note "⛔ No committed number moved. Six experiments still carry a copy;"
 exp_note "   T-084 step 2 owes the conversion AND the re-run."

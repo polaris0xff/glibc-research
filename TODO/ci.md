@@ -173,11 +173,20 @@ that opened this entry:
    | positive control (a clean fixture) | all six agree with the shared one, both modes |
    | ⛔ C25, the split failed open | all six count it; the shared one does not |
    | ⛔ the artefact exec'd **twice** | **C38** — they disagree in *opposite* modes |
-   | ⭐ a real trace's `execve("<artefact>")` count | **1**, so C38 is latent in this shape |
+   | ⭐ a real trace's `execve("<artefact>")` count | **1**, so C38 is latent in that shape |
+   | ⛔ **which of the six C38 REACHES** (arm S) | ⛔ **exactly one — `90-`** |
 
-   ⛔ **So step 2's re-run is no longer a fishing trip.** It has one number to
-   watch (`90-`'s competitor count, which is `tree` mode and therefore C38's
-   direction) and a bound on the rest.
+   ⛔ **AND `90-` IS THE ONE THIS ENTRY ALREADY NAMED.** It calls `tree` mode
+   *and* its test script invokes the artefact **twice** (`melt -version`, then
+   a real encode), and all eleven of its rows recorded `P=ok E=ok`, so both
+   invocations ran everywhere. ⛔ Its host counts describe only the **second**
+   invocation — **ours as well as the competitor's**.
+
+   ⭐ **So step 2's re-run is no longer a fishing trip: it is `90-`.** The
+   other five are latent — `60-` and `62-` invoke the artefact once, `85-` and
+   `89-` once, and `86-` invokes it four times but calls only `payload`, the
+   mode its copy agrees in. They still need converting; they do not need
+   re-running to defend a committed number.
 
    ⛔ **The edit still waits for `65-` to finish**, and the reason is NOT the
    one that was written here. Measured, both directions:
