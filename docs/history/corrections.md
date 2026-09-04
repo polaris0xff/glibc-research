@@ -1866,6 +1866,57 @@ side has `-L`.
 
 ---
 
+## C48 — the locale criterion could never fire, and the bed was never the reason
+
+**Found** 2026-09-04c, by acting on the ruling in `docs/AGENTS.md` §0b instead
+of accepting a recorded limit.
+
+`experiments/101-` — T-087 rung 3's differentiator, *"a `.mo` catalogue opened
+under the bundle, against the same bundle built `--no-storefix`"* — was
+**stopped**, and both this file and `app-corpus.md` recorded the reason:
+
+> *"no environment has a non-C locale compiled, so `setlocale` fails,
+> `LC_MESSAGES` stays `C`, and gettext never consults `LANGUAGE`."*
+
+⭐ **That was true, and it was not the cause.** `scripts/common/bed-fixtures.sh`
+gave the bed a compiled `de_DE.UTF-8` — `experiments/106-` measures
+`setlocale` succeeding on **7 of 7** glibc rows with the locale in effect — and
+`101-` was re-run. ⛔ **It still read `0` in BOTH arms**, including the
+control's *"tries `/nix/store`, opens none"* row, which says the subject never
+attempted a catalogue open at all.
+
+⭐ **The artefact had no catalogues in it.** Counted:
+
+| | |
+|---|---|
+| `.mo` files in the built AppDir | ⛔ **0** |
+| locale directories in `mousepad`'s own store path | ⭐ **54** |
+| what the build log had been saying all along | `locale catalogues (kept: none)` |
+
+⛔ **`internal/bundle/debloat.go` drops every directory under `share/locale`
+unless `--keep-locales` names one, and the default is empty.** The code says so
+in a comment — *"Locales are a real trade and it is stated as one: the
+application's own translations go with them"* — so this is a **documented
+default nobody connected to the experiment**, not a hidden bug.
+
+⚠ **And the trade is real**, which is why the default is not simply wrong:
+measured on `qalculate-qt`'s closure, `share/locale` is **113 MiB** across 30
+store paths — `gtk+3` 28 MiB, `iso-codes` 22 MiB, `glib` 11 MiB — against a
+238 MiB artefact. ⭐ Note also that `qalculate-qt`'s **own** store path ships
+no catalogues at all, so "keep the application's own" would have been free
+there and would have changed nothing.
+
+⭐ **The fix for the EXPERIMENT is one flag**: `--keep-locales de` in both
+arms, which is now in `101-` with this correction beside it.
+
+⛔ **THE LESSON, AND IT IS THE THIRD TIME TODAY.** A zero was explained by the
+first plausible cause somebody found — and the explanation was *checkable* and
+was never checked. C39 blamed the subject when it was the assertion; C44
+blamed the subject when it was a failed `cp`; C48 blamed the bed when the
+build log had been printing `kept: none` on every run.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

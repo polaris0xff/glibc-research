@@ -135,8 +135,23 @@ build_arm() {  # tag extra-flags...
   _tag=$1; shift
   _img="$WORK/$_tag.AppImage"
   [ -s "$_img" ] && { printf '%s' "$_img"; return 0; }
+  # ⛔⛔ `--keep-locales de` IS NOT AN OPTIMISATION, IT IS WHY THIS EXPERIMENT
+  # HAS A CRITERION AT ALL. Found 2026-09-04c, and it corrects this file's own
+  # recorded conclusion: `internal/bundle/debloat.go` drops EVERY directory
+  # under `share/locale` unless `--keep-locales` names it, and the default is
+  # empty — the build log says `locale catalogues (kept: none)`.
+  #
+  # ⭐ So both arms shipped ZERO `.mo` files, and no locale, bed or mechanism
+  # could ever have made one open. Measured: `mousepad`'s own store path
+  # carries **54** locale directories and the AppDir carried **0**.
+  #
+  # ⚠ THIS FILE PREVIOUSLY BLAMED THE BED — "no environment has a non-C locale
+  # compiled" — and that was true and not the cause. `scripts/common/bed-
+  # fixtures.sh` gave the bed a locale, this experiment still read 0, and the
+  # zero survived because the catalogues were never in the artefact.
   PGB_APPIMAGE_CACHE="$WORK/cache" "$REPO_DIR/pgb" bundle appimage "$ATTR" \
-    --out "$_img" --name "$PROG" "$@" >"$WORK/build-$_tag.log" 2>&1 || true
+    --out "$_img" --name "$PROG" --keep-locales de \
+    "$@" >"$WORK/build-$_tag.log" 2>&1 || true
   [ -s "$_img" ] && printf '%s' "$_img"
 }
 
