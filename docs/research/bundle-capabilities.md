@@ -56,10 +56,17 @@ per subject, and a recorded row is never re-measured:
 | category | subjects in | verdict so far |
 |---|---|---|
 | **GTK 3** | ⭐ **3 of 3 — CLOSED** | `galculator`, `mousepad`, `geany`, all **11/11 pass and 11/11 clean** |
-| **X11 / XCB** | ⭐ **3 of 3** | `xeyes` **11/11**, `xclock` **11/11**, ⛔ `xterm` **0/11** — and see below |
-| **OpenGL / EGL** | 1 of 3 | ⛔ `eglinfo` (`mesa-demos`) **0/11**, clean 11/11 |
-| **the field's recipes** | 2 of 4 | ⛔ `helix` **0/11**, `neovim` **0/11** — both clean 11/11 |
-| Vulkan, SDL, Qt, Python GUI, media | 0 | ⏳ running |
+| **X11 / XCB** | ⭐ **3 of 3** | `xeyes` **11/11**, `xclock` **11/11**, ⛔ `xterm` **0/11** — see below |
+| ⭐ **OpenGL / EGL** | **3 of 3** | ⭐ `eglinfo` **11/11**, `glxgears` **11/11** — both clean 11/11. ⛔ `glmark2` **0/11** |
+| **Vulkan** | 1 of 3 | ⭐ `vulkaninfo` **11/11**, clean **11/11** |
+| **the field's recipes** | 3 of 4 | ⛔ `neovim` **0/11** (glibc 2.26, below), `flameshot` **0/11**, `gearlever` UNRESOLVED. `helix` re-queued |
+| SDL, Qt, Python GUI, media | 0 | ⏳ running |
+
+⭐ **`eglinfo` and `vulkaninfo` each went `0/11` → `11/11` when C34 and C36
+were fixed.** ⚠ Their store-path counts moved too — `vulkan-1` from `12
+compiled in` to **42** — because `--extra mesa` had been mangled to `Mesa` and
+was failing to resolve. ⛔ **That is how much a separator collision was
+costing**, and it is why the two rows are re-measured rather than annotated.
 
 ⛔ **THE ZEROS ARE REAL ROWS AND THEY ARE NOT AN INSTRUMENT DEFECT.** Every
 `cli` subject has failed and every `gui` subject except `xterm` has passed,
@@ -239,9 +246,9 @@ is `<id> <pass> <rows> <clean> <store paths> <note>`.
 |---|---|---|
 | ⭐ **GTK 3** | ✅ **CLOSED, THREE SUBJECTS, SIMPLE → COMPLEX.** `galculator` **11/11**, `mousepad` **11/11**, `geany` **11/11** — each a real toplevel window on a real X server, each with **zero host shared objects on 11 of 11**. ⭐ Store paths compiled in / resolving: 88/85, 104/101, 90/87 | `65-` `gtk3-1..3`; `64-` arms G and X |
 | ⭐ **XCB / X11 client stack** | ⏳ **1 of 3 subjects in.** `xeyes` **11/11**, clean **11/11**, 12 store paths compiled in and 11 resolving — ⭐ a pure Xlib/XCB client with no toolkit above it. `xclock` and `xterm` are still running; ⛔ **`xterm` is pre-registered to FAIL the host-object row** and the reason is the application, not the bundler: its job is to run the user's shell, which is a host program | `65-` `x11-1..3` |
-| **EGL** | ⚠ **offscreen only.** *"The closure produces a working EGL display offscreen"* — `pass=10 fail=0`, every row **`swrast` and surfaceless** | `85-` |
-| **OpenGL driver stack** | ⚠ same. The bundle carries mesa and points libglvnd at itself; the negative control (`--no-gl`) cannot produce a vendor string on any row | `85-` |
-| ⭐ **Vulkan** | ✅ **MEASURED — and on ONE environment, by hand, which is the honest size of the claim.** A bundled `vulkaninfo --summary` out of the `vulkan-tools` closure enumerates a device: `apiVersion 1.4.354`, `deviceName llvmpipe (LLVM 21.1.8, 256 bits)`, `driverName llvmpipe`. Exit **0**, with and without `DISPLAY`. ⛔ **C3's limit stands and is the whole point**: that is a **software rasteriser**, and this says nothing about a real GPU or NVIDIA. ⚠ Its corpus row read **0/11** for a reason that was **the corpus file, not the bundle** — C36 below | by hand, from the `vulkan-2` artefact |
+| ⭐ **EGL** | ✅ **11 / 11, and clean on 11 / 11.** `eglinfo` out of the `mesa-demos` closure enumerates EGL configs on every environment, naming `llvmpipe`. ⛔ Every row is a **software rasteriser** — C3, and T-059 owns hardware | `65-` `gl-1`; `85-` |
+| ⭐ **OpenGL driver stack** | ✅ `glxgears` draws a real window on **11 / 11**, clean **11 / 11**. The bundle carries mesa and points libglvnd at itself; `85-`'s negative control (`--no-gl`) produces no vendor string on any row | `65-` `gl-2`; `85-` |
+| ⭐ **Vulkan** | ✅ **11 / 11, and clean on 11 / 11** — `vulkaninfo --summary` enumerates a device on every environment: `apiVersion 1.4.354`, `deviceName llvmpipe (LLVM 21.1.8, 256 bits)`. ⛔ **C3's limit is the whole point**: a **software rasteriser**, saying nothing about a real GPU or NVIDIA | `65-` `vulkan-1` |
 | **NVIDIA** | ⛔ **NOT MEASURED, and not bundled by design.** The driver is taken from the HOST; `design/host-fallback.md` governs it. T-059 owns the hardware | — |
 | **SDL** | ⛔ **NOT RUN through our pipeline.** A hypothesis, graded *Excellent* by the field | §1 |
 | ⭐ **Python GUI** | ✅ **MEASURED, AND IT WORKS.** `meld` — Python 3 + GTK 3 through PyGObject — draws a real toplevel window on **11 of 11** with **zero host shared objects**, on eleven distributions of which four ship no glibc and none ship Python or GTK. ⛔ It produced **no artefact at all** before T-081 | `64-` arm P |
