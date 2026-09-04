@@ -177,6 +177,31 @@ which patches the binaries themselves — the same-length rewrite
 `store-paths.md` §2 refuses on security grounds when its target is a fixed
 path under a world-writable directory.
 
+### ⭐ AND THE DIFFERENCE IS MEASURED, ON ONE BUNDLE
+
+⛔ **Regex 5 destroys a string that is not a path, and here is one.** Scanning
+a `pgb bundle appimage galculator` AppDir's TEXT files — `share/`, `etc/`,
+`.env` and the desktop entry — for store-shaped strings:
+
+| | |
+|---|---|
+| occurrences | **117** |
+| distinct store paths | **12** |
+| of those, IN this bundle's closure | **11** — resolved |
+| of those, NOT in the closure | ⭐ **1** |
+
+⭐ **The one that is not is the whole argument**:
+`…-dejavu-fonts-minimal-2.37<`. Its trailing `<` is an **XML markup
+boundary** — the match is a path followed by the start of the next tag,
+because `[^ \"']*` does not stop at `<`. ⛔ `s|/nix/store[^ \"']*|/|g`
+rewrites it **and eats the boundary with it**, silently, in a data file.
+⭐ Exact match against the closure reports it and changes nothing.
+
+⚠ **ONE SUBJECT**, not the thirteen recipes T-081's Prove line names.
+`experiments/65-`'s `field` rows pay four of those thirteen; the other nine
+are chromium/brave/discord/telegram-class and their closures do not fit this
+machine.
+
 ## 5. The `.desktop` and icon rules, in one place
 
 ⭐ **This answers the operator's standing question** in
