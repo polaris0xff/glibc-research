@@ -612,11 +612,24 @@ libraries: bundled first, host as the lower-priority fallback.
 ⛔ **What we do NOT have, read off their variable list rather than guessed**:
 `GTK_CLASS_FIX` (so the taskbar groups the window with its icon), a bundled
 `qt6ct`, their `qt-theme.hook` (`APPIMAGE_QT_THEME` + `-stylesheet`), and their
-`fix-gnome-csd.hook`. ⛔ **And nothing here is MEASURED**: no row has started a
-GTK subject under a non-default `GTK_THEME` and shown it opening a host theme
-file. **That is the experiment**, and it is small: a trace of `galculator`
-under `GTK_THEME=HighContrast` asserting an `openat` of a host
-`/usr/share/themes/…` path. T-083.
+`fix-gnome-csd.hook`.
+
+⛔ **AND THE QUESTION SPLITS IN TWO, because one half is not measurable in this
+bed and saying so is the honest answer.** Counted 2026-09-04c:
+
+| | |
+|---|---|
+| rootfs carrying anything under `usr/share/themes` or `usr/share/icons` | ⛔ **0 of 11** |
+
+⚠ **So *"does the bundle follow the system theme"* cannot fire here** — there
+is nothing on any of the eleven to follow, the same shape as rung 3's locale
+criterion in [`app-corpus.md`](app-corpus.md). ⭐ **The other half is
+measurable and is a different question**: does the bundle *ask* the host? The
+search order says it should, and the **build host** does carry themes
+(`Adwaita`, `Humanity`), so the experiment is a trace of a GTK subject there
+under `GTK_THEME=Adwaita:dark`, asserting an `openat` under
+`/usr/share/themes/`. ⛔ **Not run.** One environment, and it would say the
+bundle looks — not that it follows. T-083.
 
 **2. Can it pack `file`(1) without patching — no custom AppRun, no env var?**
 
@@ -642,16 +655,36 @@ path it would **not** reach, by construction.
 
 **3. Can it bundle something like `rpcs3` — anything nixpkgs builds?**
 
-⛔ **Not established, and the corpus is the evidence for what is.** 26 subjects,
-21 passing on all eleven, and the failures are named: the bed, the closure's
-own glibc, the subject's shape, and one path class. ⚠ **No emulator-scale Qt +
-Vulkan subject has been attempted**, and the honest position is that the
-corpus's largest closures (`dosbox` 181 store paths, `virt-manager` 239,
-`kdenlive`) are evidence about size and toolkit rather than about `rpcs3`.
-⭐ The claim the corpus does support is narrower and worth stating precisely:
-**every failure so far has had a named cause and four of them were bundler
-defects that are now fixed** — which is a statement about the tool improving
-under exercise, not a guarantee about the next package.
+⭐⭐ **`rpcs3` WAS ATTEMPTED, 2026-09-04c, AND IT WORKS.** One command,
+`pgb bundle appimage rpcs3`, no flags, no hooks, no `.desktop` to author:
+
+| | |
+|---|---|
+| closure | 376 store paths → **436 after augmentation**, **3,813 libraries** |
+| entry | `bin/.rpcs3-wrapped` — the resolved nixpkgs-wrapper shape |
+| programs | `rpcs3 + 1 more` |
+| artefact | **411.6 MiB** |
+| runs | ⭐ **exit 0**, and it prints its own `[TSC calibration]` banner and *"Found AppImage path: /subjrp"* |
+| ⭐ **draws** | ⭐ **a real 706×350 toplevel on a real X server**, seen from outside with `xwininfo`, at **t+110 s** |
+| ⭐ **host shared objects** | ⭐ **0 in the payload and 0 in the whole process tree**, against **10,161** bundled object opens |
+
+⚠ **ONE environment (`debian-12`), by hand.** The corpus's bar is the eleven,
+and this is not that. ⭐ What it does establish is that an emulator-scale
+Qt 6 + Vulkan subject — a package upstream is known to be hard to build — goes
+through the pipeline **unmodified** and puts a window on a screen with no host
+library in the process.
+
+⚠ **And it took 110 seconds to draw**, which is longer than `experiments/65-`'s
+150 s row budget leaves comfortable — a subject like this needs its own budget,
+which is exactly the class of defect **C26** was about (a constant carried
+across a change of subject).
+
+⛔ **Two observations recorded rather than chased.** 21 of 260 compiled-in store
+paths do not resolve inside the bundle, and three of the names the scanner
+produced are malformed — `gtk4k4-4.20.3`, `glib-glib-2.86.3`,
+`gst-plugins-bad-1.2626.11` — which look like overlapping matches in the
+string scan rather than real references. Several others carry an all-`e` hash
+(`eeeeeeee…`), which is a scrubbed placeholder in the binary, not a path.
 
 **4. Can it bundle applications that run on the oldest kernels and the oldest
 glibc?**

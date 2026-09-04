@@ -78,6 +78,27 @@ something else; block on the job's own output, not on a timer.
 - **Commit as work lands and push.** ⛔ Never one commit at the end.
 - ⛔ **Never edit a shell script while it is running** — `sh` re-reads from a
   byte offset.
+- ⛔⛔ **"NOT MEASURABLE IN THIS BED" IS ALMOST ALWAYS FALSE, AND IT IS A
+  DEFERRAL WEARING A FINDING'S CLOTHES.** ⭐ **Operator ruling, 2026-09-04c**,
+  and it settles the question for every future session:
+
+  > *"You keep deferring stuff as 'unmeasurable' on this host when you very
+  > well could create a script that can create a less 'minimal' image. You
+  > will never have access to real hw, so keep stalling and deferring — use
+  > fixtures, seams, emulators, dummies whenever a 'real' hardware is
+  > required."*
+
+  ⛔ **The bed is a thing this repository BUILDS, not a thing it is given.**
+  A rootfs with no locale can be given one (`localedef`); a rootfs with no
+  GTK theme can be given one (a directory and an `index.theme`); a bed with
+  no session bus can be given one (`dbus-daemon`, and the bundle can carry
+  it — `--with-program`, measured). ⭐ **Build the fixture, then measure.**
+  ⚠ **The one honest exception is hardware**, and even there the answer is a
+  stub with its limit stated — `Xvfb`, `llvmpipe`/`lavapipe`, a dummy audio
+  sink — never a deferral. ⛔ **Do not re-litigate this**: three criteria were
+  parked as "the bed cannot answer it" before this ruling — a non-C locale
+  (T-087 rung 3), a host theme, and a session DBus — and every one of them is
+  a fixture somebody could have written.
 
 ⚠ **§14 carries the rest**: the rules on language and on superseding a finding,
 and the list of things measured once that must not be redone.
