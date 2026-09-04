@@ -17,7 +17,7 @@ the entries, and [`../HISTORY/`](../HISTORY/).
               that had never been measured — `--wrap=iconv` — into a
               measurement: 1 encoding of 12 and a crash, against 12 of 12
               with a byte-exact round trip on all eleven.
-    COUNTS    67 entries, 23 open, 44 done
+    COUNTS    68 entries, 24 open, 44 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)
               throughput: glibc 8.40 ns/op vs musl 704.79 (malloc, 4 threads)

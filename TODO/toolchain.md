@@ -489,3 +489,38 @@ changed format string in `bakedOverride` (it fails) and the naming regression
 here carries two builds of one package. What changed is that the divergence is
 now impossible to reintroduce silently — one rule, a gate on the slice, and a
 check that reads `.env` back.
+
+## T-095 — ⛔ CI's libiconv fetch is one host with no mirror and no retry, and its timeout skips the matrix
+
+**Source** CI run **437** (`38740c80`), read 2026-09-04c.
+**Category** toolchain · **Priority** P2 · **Effort** S · **Status** open
+
+⛔ **A DOCUMENTATION-ONLY COMMIT FAILED CI**, and the reason is external:
+
+    fetching https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.18.tar.gz
+    pgb: cannot fetch libiconv: Get "https://ftp.gnu.org/…":
+         dial tcp 209.51.188.20:443: i/o timeout
+
+⭐ The next commit passed the same step, so it is transient — but the shape is
+not. `internal/envx/libiconv.go` builds **one** URL:
+
+```go
+url := fmt.Sprintf("https://ftp.gnu.org/pub/gnu/libiconv/libiconv-%s.tar.gz", version)
+```
+
+⛔ **No mirror, no retry.** And the cost is out of proportion: the fetch is in
+the `build` job, so its failure **skips `run-matrix` and `verify-docker`
+entirely** — an unrelated upstream timeout turns a green tree red and measures
+nothing.
+
+⚠ **This will keep happening.** `ftp.gnu.org` is not a CDN, and this project
+now depends on it for the mechanism `experiments/30-` just measured at
+**12 of 12 encodings** (**C56**) — so the dependency matters more than it did
+when it was added.
+
+**Prove.** A retry with backoff **and** at least one alternate source
+(`mirrors.kernel.org/gnu/libiconv/`, or the GNU mirror redirector), with the
+existing checksum check unchanged — the checksum is what makes an alternate
+source safe, and it is already there. ⛔ A retry alone is not enough: the
+observed failure was a **two-minute** connect timeout, so three retries against
+the same dead host costs six minutes and still fails.
