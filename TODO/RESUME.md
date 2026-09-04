@@ -9,7 +9,7 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
     LAST WRITTEN   2026-09-04b, at the START, refreshed as each piece
                    landed, and again at the END.
                    ⛔ THE SESSION ENDED WITH `experiments/65-` STILL
-                   RUNNING. That is not a failure — it is resumable and 20
+                   RUNNING. That is not a failure — it is resumable and 21
                    of its 26 rows are recorded and committed. Re-run it.
     TREE           main, began at 4f652df4 (== origin/main at session start)
     BRANCH         ⛔ main. The harness named
@@ -86,16 +86,24 @@ criterion fail *for the right reason*.
        `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
        ⛔ A row measured by a BROKEN instrument must be DELETED, not adjusted
        — that is what makes resumability safe.
-       ⭐ 20 of 26 in. FOUR categories CLOSED at 3 of 3 and all passing —
-       GTK 3, X11/XCB, OpenGL/EGL, Qt. Vulkan is 3 of 3 with the third a
-       BED limit (`vkmark` needs `/dev/dri`, which exists nowhere here).
-       SDL is 2 of 3 and both rows pass 11/11, clean 11/11.
-       ⛔ STILL TO MEASURE: `sdl-3`, `py-2`, `py-3`, `media-1`,
-       `field-1`, `field-2`.
+       ⭐ 21 of 26 in. FIVE categories CLOSED at 3 of 3, all passing —
+       GTK 3, X11/XCB, OpenGL/EGL, Qt, SDL. Vulkan is 3 of 3 with the
+       third a BED limit (`vkmark` needs `/dev/dri`, nowhere here).
+       ⛔ STILL TO MEASURE: `py-2`, `py-3`, `media-1`, `field-1`,
+       `field-2`.
        ⚠ ~35 minutes per subject serially — see the PARALLEL recipe above.
 
+    ⛔⛔ FIRST, BEFORE ANYTHING ELSE: IF `rows/media-1.tsv` EXISTS, DELETE
+    IT AND DO NOT READ IT AS A RESULT. The corpus instance was still
+    running when this session ended and its queue still reaches `media-1`
+    with C39's broken assertion in place, so it may have written another
+    false zero after the last commit. ⚠ A row is normally never
+    re-measured — that rule is what makes resumability safe, and it is
+    exactly why a row from a known-broken criterion has to be removed by
+    hand rather than left to be trusted.
+
     ⛔ AND FIX C39 BEFORE RE-RUNNING `media-1` — it is ONE CHARACTER, and
-    the row has already been DELETED so it will be re-measured:
+    the row was DELETED once already so it will be re-measured:
 
         experiments/65-capability-corpus.sh line 225
         media-1;media / codecs;mpv;mpv;cli;mpv [0-9];mesa;--version
