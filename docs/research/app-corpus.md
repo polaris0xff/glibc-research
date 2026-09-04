@@ -81,11 +81,29 @@ GNOME app under a non-English `LANG`, asserting a translated string, against the
 same bundle built `--no-storefix`. A window is not enough here — the window
 appears either way.
 
-**Study.** `HALL-OF-FAME.md` "Garbage - GTK";
-`references/pkgforge-dev__Anylinux-AppImages/tree/useful-tools/hooks/fix-gnome-csd.hook`
-(GNOME draws no server-side decorations, so a GNOME app must draw its own —
-a bundle that gets this wrong shows a window with no titlebar, which the
-geometry criterion still counts).
+⭐ **AND THE FIELD TRIED OUR ROUTE AND ABANDONED IT — this is the citation that
+makes the rung worth doing.** Their `quick-sharun` **patches the binary**:
+issue #45, *"the script is able to detect when you have a hardcode path to
+`/usr/share/locale` or `/usr/share/icons` and will patch just that"*. Issue #60
+records why they did **not** switch to an `LD_PRELOAD` path mapper —
+*"replace ld-preload-open for pathmap, drop relative path mapping"*, rejected
+because *"if I were to replace this for pathmap, **all libraries** would try
+to…"* — and it also names the mechanism they used instead: **relative symlinks
+in `/tmp`**, which is the route
+[`../design/store-paths.md`](../design/store-paths.md) §2 rejects on security
+grounds, in writing, before building anything.
+
+⚠ **And a convergence worth knowing about before reinventing it**: issue #393
+moved their locale handling into an `anylinux.so` **constructor** with the chain
+`setlocale(LC_ALL,"")` → `LOCPATH=$APPDIR/...` → `en_US.UTF-8` → `C.UTF-8` →
+`C`. That is `tool/runtime/pgb-locale.c` plus `--utf8-default`, arrived at
+independently. Read theirs before extending ours.
+
+**Study.** `HALL-OF-FAME.md` "Garbage - GTK"; issues **#45, #60, #393, #616**
+in the vendored `api/issues.json`;
+`tree/useful-tools/hooks/fix-gnome-csd.hook` (GNOME draws no server-side
+decorations, so a GNOME app must draw its own — a bundle that gets this wrong
+shows a window with no titlebar, which the geometry criterion still counts).
 
 ### Rung 4 · Plugin trees found by scanning, not by linking
 
@@ -134,11 +152,21 @@ a `pkexec` hook that asks the user to turn it off. ⛔ We should not copy that
 hook — it asks for a root password — but we must **detect and report** the
 condition rather than showing a crash.
 
+⭐ **DETECT-AND-REPORT IS AN OPEN ISSUE ON THEIR SIDE**, which makes it
+available: issue **#438**, still open — *"If unprivileged user-namespaces are
+detected as missing, use `--no-sandbox`… A warning message about this would be
+good."* Their shipped answer is the `pkexec` hook that asks the user to disable
+the restriction. ⛔ Do not copy that; ship the detection they have not.
+
+⚠ Issue **#795** is the second half of the same problem and it is about *their*
+artefacts: an Electron sandbox refuses to launch an AppImage built in Electron,
+and `--no-sandbox` from the CLI works.
+
 **Study.**
 `references/pkgforge-dev__Anylinux-AppImages/tree/useful-tools/hooks/fix-namespaces.md`
-(vendored; the operator's link) and `fix-namespaces.hook` beside it;
-`HALL-OF-FAME.md` "Excellent - Chromium/Electron" — the toolkit is easy, the
-sandbox is not.
+(vendored; the operator's link) and `fix-namespaces.hook` beside it; issues
+**#438** and **#795**; `HALL-OF-FAME.md` "Excellent - Chromium/Electron" — the
+toolkit is easy, the sandbox is not.
 
 ### Rung 6 · 32-bit and a second architecture in one bundle
 
@@ -172,8 +200,14 @@ least one of distrobox/podman works, rootless is fine.**
 - `lilipod` is a **static Go binary** — so it is also a rung-2 subject, and it
   is the last resort precisely because it asks the least of us.
 
+⭐ **THE VENDORED ISSUE SET CONTAINS NO ATTEMPT TO PACKAGE IT**, which is
+weaker evidence than "they failed" and is what can honestly be said: every one
+of the ~40 `distrobox` mentions in `api/issues.json` is distrobox used as a
+**test environment** (*"tested on distrobox alpine"*), never as a subject.
+
 **Study.** `https://github.com/pkgforge-dev/distrobox-AppImage` (**not
-vendored**).
+vendored** — fetch it, and read what it says it cannot do before claiming we
+can).
 
 ### Rung 8 · The heavy tail
 
