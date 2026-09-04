@@ -301,7 +301,15 @@ fi
 printf '\n-- R1: ⭐ how many times does a REAL trace exec the artefact? ------\n'
 TR="${PGB_EXP102_TRACE:-}"
 if [ -z "$TR" ]; then
-  TR=$(ls -1t /var/tmp/t065/tr.* /var/tmp/t065b/tr.* 2>/dev/null | head -1)
+  # ⛔ THIS USED TO NAME /var/tmp/t065 AND NOTHING ELSE, AND SO IT ALWAYS
+  # SKIPPED. `experiments/65-` DELETES each trace the moment it has counted it
+  # -- disk is that experiment's binding constraint -- so the one directory R1
+  # looked in is empty by construction and R1 could only ever report "no trace
+  # on disk". ⭐ A check that cannot fire is not a check.
+  # ⚠ Any experiment work directory will do: the artefact name is taken from
+  # the trace itself below, not assumed, so a `/subjA` from 107- reads the same
+  # as a `/subj65` from 65-. `keep.tr.*` is 107-'s deliberately retained pair.
+  TR=$(ls -1t /var/tmp/t*/keep.tr.* /var/tmp/t*/tr.* 2>/dev/null | head -1)
 fi
 if [ -n "$TR" ] && [ -f "$TR" ]; then
   # the corpus plants its subject at /subj65; take the artefact from the trace

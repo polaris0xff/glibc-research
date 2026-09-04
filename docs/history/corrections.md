@@ -1917,6 +1917,94 @@ build log had been printing `kept: none` on every run.
 
 ---
 
+## C49 — "host" was a prefix list, and `/usr/bin/ld.so` fell outside it
+
+⛔ **This one runs in the DANGEROUS direction.** C25 can only turn a clean row
+dirty; a committed **zero** survives it. C49 turns a *dirty* row **clean**, and
+a committed zero does not survive that.
+
+`exp_classify_trace` splits every loaded shared object into `host` and
+`bundled`. The test was a single prefix pattern, and **`bundled` was its
+complement**:
+
+```awk
+if (p ~ /^\/(usr\/)?(local\/)?lib(32|64)?\//) out["host " p] = 1
+else                                          out["bundled " p] = 1
+```
+
+⭐ So an object anywhere the pattern did not name was scored as *the
+artefact's own* — the safe-looking answer — with nothing said.
+
+⚠ **Measured, not argued.** Every `.so`/`.so.N` on all eleven pinned rootfs
+that the old pattern missed, in full — this is the complete set, not a sample:
+
+| path | on how many of the eleven | loaded by |
+|---|---|---|
+| `/usr/libexec/coreutils/libstdbuf.so` | 10 | `stdbuf(1)`, via `LD_PRELOAD` |
+| `/usr/libexec/sudo/*.so` (8 files) | 1 (fedora-42) | `sudo` |
+| ⛔ `/usr/bin/ld.so` | 4 (arch, fedora-42, debian-12, debian-13) | anything that runs it |
+
+⛔ **THE THIRD ROW IS THE FINDING.** `/usr/bin/ld.so` is **the host's dynamic
+loader**, shipped in bindir by Arch and Fedora. An artefact that ran the host
+loader is the precise failure this whole tree exists to detect — and under the
+old predicate that row scored `bundled` and the experiment printed **CLEAN**.
+
+⭐ **THE FIX** extends the host test to the directories the bed actually uses,
+and it is one line beside the first:
+
+```awk
+if (p ~ /^\/(usr\/)?(s?bin|libexec|opt)\//) { out["host " p] = 1; return }
+```
+
+⚠ **Why extending the list is safe rather than a whack-a-mole.** Nothing
+bundled ever lands in those directories: uruntime extracts under `/tmp`
+(`appimage_extracted_*`), `--extract` writes `./squashfs-root`, and the
+artefact is staged at `/subj*`. So the change can only move a row from clean
+to dirty — the same one-way direction as C25 — and never the reverse.
+
+⛔ **WHAT IS AND IS NOT RE-MEASURED.** The committed corpus numbers were taken
+under the old predicate and have **not** been re-measured under the new one.
+The argument that none of them moves is not a measurement: it is that all
+thirteen files are reachable only by running `stdbuf`, `sudo`, or the host
+loader by that path, and no corpus subject does any of those. ⚠ Pinned in
+`evidence/STALE-EVIDENCE.txt` until a corpus re-run says so directly.
+
+⭐ Covered by two new rows in `sh experiments/lib.sh --selftest` (11 pass),
+using the two real paths above as fixtures rather than invented ones.
+
+---
+
+## C50 — a check in `102-` that could never fire, for the reason `65-` is resumable
+
+`experiments/102-`'s **R1** asks the question the whole C38 re-run rested on:
+*does a real trace exec the artefact once, or twice?* It looked for a trace in
+one place:
+
+```sh
+TR=$(ls -1t /var/tmp/t065/tr.* /var/tmp/t065b/tr.* 2>/dev/null | head -1)
+```
+
+⛔ **And `experiments/65-` deletes each trace the moment it has counted it** —
+disk is that experiment's binding constraint and its own header says so. The
+one directory R1 looked in is therefore empty *by construction*, so R1 could
+only ever report `no trace on disk`.
+
+⚠ It did not read as a defect because a **skip is not a failure**: `102-` ran
+`pass=20 fail=0 skip=0` on a machine that still had leftovers, and
+`pass=19 fail=0 skip=1` on a clean one. Both look fine.
+
+⭐ **THE FIX** is to search any experiment work directory, which costs nothing
+because R1 already takes the artefact name *out of the trace* instead of
+assuming it — a `/subjA` from `107-` reads exactly like a `/subj65` from
+`65-`. `experiments/107-` now deliberately keeps the first environment's pair
+as `keep.tr.*`, so there is a trace on disk for R1 to find.
+
+⛔ **THE LESSON.** A skip that is structural is a check that does not exist.
+Neither gate can tell the two apart, so the only thing that catches it is
+asking, of each skip, *what would have to be true for this to fire?*
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

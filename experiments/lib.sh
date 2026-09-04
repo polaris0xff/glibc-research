@@ -296,8 +296,34 @@ exp_classify_trace() {
   awk -v want="$2" -v mode="$_ct_mode" '
     function record(p) {
       if (p !~ /\.so(\.[0-9]+)*$/) return
-      if (p ~ /^\/(usr\/)?(local\/)?lib(32|64)?\//) out["host " p] = 1
-      else out["bundled " p] = 1
+      if (p ~ /^\/(usr\/)?(local\/)?lib(32|64)?\//) { out["host " p] = 1; return }
+      # ⛔ "host" IS NOT ONLY /lib AND /usr/lib, AND THE PREFIX LIST WAS THE
+      # WHOLE TEST. `bundled` is the COMPLEMENT here -- anything the first
+      # pattern misses is scored as the artefact own -- so a host object in
+      # an unlisted directory reads CLEAN. ⚠ That is the DANGEROUS direction:
+      # C25 can only turn a clean row dirty, this one turns a dirty row clean,
+      # which is the error a committed zero cannot survive.
+      #
+      # ⭐ MEASURED ACROSS ALL ELEVEN rather than guessed. Every `.so` on every
+      # pinned rootfs that the first pattern misses, in full:
+      #
+      #     /usr/libexec/coreutils/libstdbuf.so   10 of 11 (the LD_PRELOAD stdbuf uses)
+      #     /usr/libexec/sudo/*.so                fedora-42 only, 8 files
+      #     /usr/bin/ld.so                        arch, fedora, debian 12 + 13
+      #
+      # ⛔ THE THIRD ONE IS WHY THIS MATTERS. `/usr/bin/ld.so` is the HOST
+      # LOADER, shipped in bindir by Arch and Fedora. An artefact that ran the
+      # host LOADER is the exact failure this whole tree exists to detect,
+      # and under the old predicate that row scored `bundled` and reported
+      # CLEAN.
+      #
+      # ⚠ WHY EXTENDING THE LIST IS SAFE. Nothing bundled ever lands in these
+      # directories: uruntime extracts under /tmp (`appimage_extracted_*`),
+      # `--extract` writes ./squashfs-root, and the artefact itself is staged
+      # at /subj*. So this can only move a row from clean to dirty -- the same
+      # one-way direction as C25 -- and never the reverse.
+      if (p ~ /^\/(usr\/)?(s?bin|libexec|opt)\//) { out["host " p] = 1; return }
+      out["bundled " p] = 1
     }
     { pid = $1 }
     $0 ~ ("execve\\(\"" want "\"") { inset[pid] = 1; payload = pid
@@ -375,6 +401,8 @@ _ct_selftest() {
 100 openat(AT_FDCWD, "/usr/lib/libfailed.so.1", O_RDONLY <unfinished ...>
 100 <... openat resumed>) = -1 ENOENT (No such file or directory)
 100 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY) = 6
+100 openat(AT_FDCWD, "/usr/bin/ld.so", O_RDONLY) = 8
+100 openat(AT_FDCWD, "/usr/libexec/coreutils/libstdbuf.so", O_RDONLY) = 9
 100 execve("/subj-stage2", ["/subj-stage2"], 0x7ffd) = 0
 100 openat(AT_FDCWD, "/usr/lib/libafter.so.2", O_RDONLY) = 7
 TRACE
@@ -387,8 +415,16 @@ TRACE
 
   printf '\n-- exp_classify_trace --selftest ---------------------------------\n'
   # tree: the whole process set, and objects opened before the last exec count
-  _ck "tree: host objects across the process set"   "$(_n host tree)"    2
+  _ck "tree: host objects across the process set"   "$(_n host tree)"    4
   _ck "tree: the child pid's bundled object counts" "$(_n bundled tree)" 1
+  # ⛔ HOST IS NOT ONLY /lib AND /usr/lib. Both of these are real files on the
+  # pinned bed -- `/usr/bin/ld.so` is the host LOADER on Arch and Fedora -- and
+  # under the original prefix-only predicate both scored `bundled`, so a row
+  # that ran the host's loader reported CLEAN.
+  _ck "⛔ /usr/bin/ld.so is the HOST loader, not bundled" \
+      "$(exp_classify_trace "$_t" /subj tree | grep -c '^host /usr/bin/ld.so' || true)" 1
+  _ck "⛔ /usr/libexec/.../libstdbuf.so is host, not bundled" \
+      "$(exp_classify_trace "$_t" /subj tree | grep -c '^host /usr/libexec/' || true)" 1
   # payload: only the pid that last execve'd, cleared at each exec
   _ck "payload: only what the last exec mapped"     "$(_n host payload)" 1
   _ck "payload: ⛔ the child pid does NOT count"    "$(_n bundled payload)" 0
@@ -402,7 +438,7 @@ TRACE
       "$(exp_classify_trace "$_t" /subj tree | grep -c 'ld.so.cache' || true)" 0
   # ⭐ the default is `tree`, which is what every existing caller relies on
   _ck "⭐ the default mode is tree (an old 2-arg call)" \
-      "$(exp_classify_trace "$_t" /subj | grep -c '^host ' || true)" 2
+      "$(exp_classify_trace "$_t" /subj | grep -c '^host ' || true)" 4
   # ⛔ an unknown mode is an error, never a silent fallback
   exp_classify_trace "$_t" /subj nonsense >/dev/null 2>&1
   _ck "⛔ an unknown mode returns 2, not a fallback" "$?" 2
