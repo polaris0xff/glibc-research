@@ -64,6 +64,22 @@
 # particular application's own gettext call is well formed. It shows the path
 # resolves and the catalogue is read.
 #
+# -- ⛔ WHY THE SUBJECT IS mousepad AND NOT A GNOME APP ----------------------
+#
+# ⭐ THE SUBJECT MUST DRAW IN BOTH ARMS, or L3 cannot be satisfied and L1
+# cannot be read. `gnome-chess` was tried first and is the wrong shape: on
+# 4 of 4 rows before the run was stopped, arm T drew and arm N did NOT
+# (`WINDOWS 1/0`). ⚠ That is a real finding about `gnome-chess` -- a second
+# instance of the `experiments/64-` arm G/N result, on a different subject:
+# a compiled-in store path decides whether the application draws at all --
+# but it makes the LOCALE difference unmeasurable, because the control dies
+# before it can show one.
+#
+# ⭐ `mousepad` is `experiments/64-` arm X, measured drawing on 11 of 11, and
+# its UI is a GResource compiled into the binary rather than a file at a store
+# path -- so it should draw with the interposer and without it, leaving the
+# locale path as the only difference between the arms.
+#
 # Exit: 0 measured and matched, 1 measured and did not, 2 could not run.
 set -u
 . "$(cd "$(dirname "$0")" && pwd)/lib.sh"
@@ -73,8 +89,8 @@ exp_begin "101 - rung 3: GTK's compiled-in locale prefix, with and without the i
 WORK="${PGB_EXP101_WORK:-/var/tmp/t101}"
 RUN_TIMEOUT="${PGB_EXP101_TIMEOUT:-150}"
 XDISP="${PGB_EXP101_DISPLAY:-:98}"     # ⛔ NOT :99 -- experiments/65- counts there
-ATTR="${PGB_EXP101_ATTR:-gnome-chess}"
-PROG="${PGB_EXP101_PROG:-gnome-chess}"
+ATTR="${PGB_EXP101_ATTR:-mousepad}"
+PROG="${PGB_EXP101_PROG:-mousepad}"
 LANGV="${PGB_EXP101_LANG:-de_DE.UTF-8}"
 rm -rf "$WORK"; mkdir -p "$WORK" || exit 2
 
@@ -144,13 +160,28 @@ NENV=$(printf '%s\n' "$ENVS" | wc -l | tr -d ' ')
 # a filter that only drops lines containing ENOENT keeps the first half of a
 # FAILED open and counts it as a success. That is corrections.md C25, and it is
 # why the result is required to be a non-negative fd on the SAME line.
-mo_opened() {
+# ⛔ THE FILTER IS "NOT ON THE HOST", NOT "UNDER A KNOWN PREFIX", AND THE
+# FIRST VERSION GOT THAT WRONG. It matched `/tmp/.mount_`, which is the MOUNT
+# mode path -- and every row here runs in EXTRACT mode, where uruntime unpacks
+# to `appimage_extracted_<name><hash>` instead (its own source, `src/`). So the
+# filter could never match and every row read `T .mo = 0`. ⭐ That is a broken
+# instrument reporting a capability result, which is corrections.md C26 again;
+# it was caught by asking where uruntime actually extracts rather than by
+# reading the zeros.
+#
+# ⭐ Anchoring on what the path is NOT survives a change of delivery mode: a
+# catalogue under the bundle is one that is neither the host's nor an
+# unrewritten store path.
+mo_opened() {   # trace -> .mo opens that SUCCEEDED and were NOT on the host
   grep -aE 'openat\(.*\.mo"' "$1" 2>/dev/null \
-    | grep -aF "$2" \
     | grep -avE '= -1' \
-    | grep -acE '= [0-9]+' || true
+    | grep -aE '= [0-9]+' \
+    | grep -avE '"(/usr/|/nix/store/|/etc/)' \
+    | grep -ac . || true
 }
-mo_attempted() { grep -acE "openat\(.*$2.*\.mo\"" "$1" 2>/dev/null || true; }
+mo_attempted() {  # trace prefix -> .mo opens naming that prefix, success or not
+  grep -acE "openat\(.*\"$2[^\"]*\.mo\"" "$1" 2>/dev/null || true
+}
 
 printf '\n  %-16s %-8s %-8s %-9s %-8s %s\n' \
   ENVIRONMENT 'T .mo' 'N .mo' 'N /nix' 'WINDOWS' 'T host .so'
@@ -186,12 +217,10 @@ for name in $ENVS; do
     got=0; [ "$win" -gt "$base" ] && got=1
     if [ "$arm" = T ]; then
       # ⭐ the catalogue must be opened under the BUNDLE, not merely opened.
-      tmoT=$(mo_opened "$tr" "/tmp/.mount_"); wT=$got
-      [ "$tmoT" = 0 ] && tmoT=$(mo_opened "$tr" "/subj101")
+      tmoT=$(mo_opened "$tr"); wT=$got
       nhost=$(exp_classify_trace "$tr" /subj101 | grep -c '^host ' || true)
     else
-      tmoN=$(mo_opened "$tr" "/tmp/.mount_"); wN=$got
-      [ "$tmoN" = 0 ] && tmoN=$(mo_opened "$tr" "/subj101")
+      tmoN=$(mo_opened "$tr"); wN=$got
       # ⭐ L2's SECOND HALF, and the first version of this file computed it and
       # never read it. "Opened nothing under the bundle" is also what a control
       # that never started reports, so the control has to be seen ATTEMPTING
