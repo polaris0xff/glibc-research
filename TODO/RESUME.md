@@ -98,103 +98,72 @@ pattern is fixed. **C7** is checked before C1 and C2 and fails the run.
 
 ## In flight right now
 
-    ⏳ `experiments/65-` — the T-080 corpus. RESUMABLE. A recorded row in
-       `evidence/65-capability-corpus/rows/` is NEVER re-measured, so
-       `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
-       ⛔ A row measured by a BROKEN instrument must be DELETED, not adjusted
-       — that is what makes resumability safe.
-       ⭐ 22 of 26 in. FIVE categories CLOSED at 3 of 3, every subject
-       passing and clean — GTK 3, X11/XCB, OpenGL/EGL, Qt, ⭐ **SDL**.
-       Vulkan is 3 of 3 with the third a BED limit (`vkmark` needs
-       `/dev/dri`, which exists nowhere here).
-       ⛔ STILL TO MEASURE: `py-2`, `py-3`, `media-1`, `field-2`.
-       ⚠ ~35 minutes per subject serially — see the PARALLEL recipe below.
+    ⭐ THE CORPUS IS COMPLETE — 26 of 26, 0 UNRESOLVED, 0 INSTRUMENT, 21
+      passing on all eleven and 24 clean on all eleven. Nothing about
+      `experiments/65-` is owed. Its remaining non-eleven rows are named in
+      PROGRESS.md and only ONE of them is ours (pdfarranger's /usr/local).
 
-    ⭐ C39 IS FIXED and so is the defect class behind it. `media-1`'s
-    assertion is `mpv v[0-9]`; the harness check above is what stops the
-    next one. Both landed BEFORE 65- was restarted.
+    ⭐ EVERYTHING ELSE THIS SESSION STARTED IS FINISHED, TWO RUNS EACH:
+      90-   T-084's owed re-run. ours 11/11 clean, competitor 4/11 — both
+            committed numbers stand, per-row counts are new.
+      102-  the classifier copies read back out of git. pass=20.
+      103-  T-091. encode AND decode on 11/11, zero host objects in payload
+            and tree, gst-plugin-scanner exec'd 11/11. pass=7.
+      104-  C46. our loader vs ld.so in both scopes. pass=8.
+      105-  file(1) with no MAGIC variable and no custom AppRun. pass=6.
+      106-  the two "unmeasurable" criteria, against a fixture. pass=8.
+      76-   pass=7, the regression suite for C46.
+      93-   887 of 1,532 host objects — C46 moved nothing.
 
-    ⛔⛔ AND ONE INSTANCE WAS EDITED OUT FROM UNDER ITSELF. The 2026-09-04b
-    corpus instance (started 07:31) was STILL RUNNING when
-    `experiments/65-capability-corpus.sh` was rewritten at **10:04** to fix
-    C39. That is the hazard this tree documents in `docs/AGENTS.md` §0b and
-    `TODO/ci.md` T-084 — `sh` re-reads a script from a BYTE OFFSET, so a
-    rewrite mid-run makes it re-enter at a shifted position, and the run
-    log shows it re-printing the run header, which is what re-executing the
-    tail looks like. ⭐ **It was killed before it wrote another row**, and
-    the 22 rows on disk are all accounted for: nothing was recorded after
-    the edit. ⚠ If a future row looks impossible, check whether its
-    instance outlived an edit to the harness.
+    ⛔ NOTHING IS MID-RUN AS THIS IS WRITTEN except `101-`, which is being
+      re-run because the fixture below makes its criterion able to fire.
 
-    ⛔ AND THE `pkill -f` SELF-MATCH TRAP HAS A SECOND FORM THE RECORDED
-    WORKAROUND DOES NOT COVER. The documented fix is the bracket trick
-    (`grep '[6]5-capability'`), which stops grep matching its own pattern.
-    ⚠ It does NOT help when the harness wraps the command in a `bash -c`
-    whose command line CONTAINS the pattern text — the wrapper matched, and
-    killing it killed the shell issuing the kill. ⭐ Kill by explicit PID
-    read in a separate, earlier command.
+## ⛔⛔ THE RULING THAT MATTERS MOST TO THE NEXT SESSION
 
-    ⭐ AND THE ROW NOTE IS FIXED. It was the FIRST matching line of the
-    concatenated stderr cut to 70 characters, which is useless for a Python
-    traceback (whose first line is always `Traceback (most recent call
-    last):`) and truncated two real answers. It is now the LAST matching
-    line of the FIRST environment that has one, at 180 characters.
+⛔ **Operator, 2026-09-04c** — and it overturned three recorded "limits" in
+one afternoon:
 
-    ⛔ THE INSTANCES DO NOT SURVIVE THE SESSION — the container is wiped.
-       Just re-run the full one; every recorded row is committed and is
-       never re-measured.
+> *"You keep deferring stuff as 'unmeasurable' on this host when you very well
+> could create a script that can create a less 'minimal' image. You will never
+> have access to real hw, so keep stalling and deferring — use fixtures,
+> seams, emulators, dummies whenever a 'real' hardware is required."*
 
-    ⭐ 102- IS DONE — the CHEAP half of T-084, no bundle build at all.
-    It diffs the six hand copies of the trace classifier against the shared
-    one: 3 texts, 2 BEHAVIOURS, and TWO differences, not one (C38). ⛔ Its
-    arm S names the single committed number C38 reaches — `90-`'s, ours
-    included. T-084 step 2 is now "re-run 90-", not "re-run six".
+⭐ **`scripts/common/bed-fixtures.sh` is the answer**: `--install`, `--check`,
+`--remove`, `--selftest`. It compiles a `de_DE.UTF-8` locale, installs a GTK +
+icon theme called `PgbFixture`, and writes `/etc/dbus-1/session.conf`.
 
-    ⭐ 68-, 69- and 100- ARE DONE. Their numbers are in SUMMARY.md and in
-    their `evidence/*/RESULT.txt`. Nothing there is waiting to be run.
+| what was "not measurable" | now |
+|---|---|
+| a non-C **locale** | ⭐ `setlocale` succeeds **7/7** glibc rows, in effect (`CODESET=UTF-8`, decimal `,`), control fails 7/7 |
+| a host **theme** | ⭐ a bundled GTK app opens the host's `gtk.css` **11/11** when told, **0/11** when not |
+| a session **DBus** | ⭐ the bundle carries `dbus-daemon` (`--with-program`), the bed carries the config file; the connect error is **gone** |
 
-    ⛔ 101- IS STOPPED AND HAS NO RESULT, DELIBERATELY. Its criterion — a
-    `.mo` catalogue opened under the bundle — CANNOT FIRE in this bed: no
-    environment has a non-C locale compiled, so `setlocale` fails,
-    `LC_MESSAGES` stays `C`, and gettext never consults `LANGUAGE`. ⚠ Six of
-    the eleven DO carry `share/locale/de` catalogues, which is what makes the
-    missing locale look like a bundler failure. Do not re-run it expecting a
-    different answer; either give an environment a real locale, or measure
-    the mechanism the way `64-` arms G/N do (does the app DRAW).
+⛔ **A fixture may add DATA ONLY** — data cannot change a host-shared-object
+count, which is the number every experiment here depends on. The selftest
+asserts it adds no `.so`. ⛔ **Re-install after a bed re-fetch**: `pgb rootfs
+fetch` replaces the rootfs and the fixtures go with it.
 
-## ⭐ A PRE-REGISTERED PREDICTION, COMMITTED BEFORE THE RUN THAT SETTLES IT
+## ⛔ THE THREE UNEXPLAINED ROWS — ⭐ ALL THREE ARE EXPLAINED NOW
 
-⛔ **C41 changes `./pgb` in a way that can only affect Python subjects, and the
-corpus measured both of them with the OLD tool.** Their rows must be deleted
-and re-measured after `make` — the same rule C37's five rows were given. ⭐ The
-row note (C40) is what makes the two distinguishable at all: before this
-session both said `Traceback (most recent call last):`.
-
-| row | the note the corpus recorded | predicted after `make` |
-|---|---|---|
-| `py-3` `virt-manager` | `ModuleNotFoundError: No module named 'virtManager'` | ⭐ **MOVES.** Byte-for-byte C41's signature — the same failure gearlever gave before the `stat64` family was added, and gearlever's import resolved after it |
-| `py-2` `pdfarranger` | `FileNotFoundError: [Errno 2] No such file or directory: '/usr/local/share/pdfarranger/pdfarranger.ui'` | ⛔ **DOES NOT MOVE.** `/usr/local`, not `/nix/store` — `pgb-storefix.c`'s `fix()` returns a path unchanged unless it begins with `/nix/store/`, so no interposer change can touch it |
-| `field-4` `gearlever` | `UNRESOLVED` | ⭐ **BUILDS** (C42, measured by hand: 907.6 MiB, 542 store paths). ⚠ Whether it DRAWS is not predicted — by hand it reaches a libadwaita `GType` error that is not established as ours |
-
-⭐ **`py-2` is the more interesting row if the prediction holds**, because it is
-the field's own *"Garbage — GTK"* class arriving on OUR pipeline:
-`docs/research/app-corpus.md` rung 3 says a nixpkgs-built application compiles
-in *its own store path* rather than `/usr/share`, and this one compiles in
-neither — it asks Python at run time and Python answers `/usr/local`.
-
-## ⛔ THE THREE UNEXPLAINED ROWS, each with its reproduction
-
-    field-3  flameshot 0/11. ⭐ MEASURED NOT TO BE C37: its build log says
-             `bin/flameshot is a nixpkgs wrapper -> .flameshot-wrapped`,
-             the RESOLVED shape, which is mousepad's handler and mousepad
-             passes 11/11. ⛔ Nobody has read its actual error.
-             PGB_EXP65_ONLY='field-3'
-    field-4  gearlever UNRESOLVED — it produced no artefact at all. The
-             reason is in its build log and nobody has read it.
-             PGB_EXP65_ONLY='field-4'
-    qt-1     qalculate-qt 11/11 PASS but 4/11 CLEAN. ⛔ NOT a C37
-             regression — galculator rebuilt with the same pgb traces to
-             ZERO host objects. Which four environments, and which object?
+    field-1  helix     ⭐ C43, a real bundler defect and a FOURTH entry-point
+             shape: a wrapper target that is an ABSOLUTE SYMLINK into another
+             store path, resolved by `os.Stat` against the HOST. It failed
+             SILENTLY — exit 255, no output. Now 11/11 pass, 11/11 clean.
+    field-3  flameshot ⭐ NOT the bundler: a tray application with no toplevel
+             by design (its only window is a 3x3 Qt Selection Owner). Its
+             session-bus half is FIXED by the fixture; what remains is that
+             `flameshot full` cannot capture under Xvfb — its closure carries
+             `grim`, which is Wayland-only. ⭐ The route: `--extra
+             xdg-desktop-portal` and a backend, run beside the bus. Untried.
+    field-4  gearlever ⭐ C42 makes it BUILD and C41 gets it past its own
+             Python imports. It now fails on all eleven with one reproducible
+             line — `RuntimeError: could not create new GType:
+             gearlever+preferences+Preferences (subclass of void)`, a
+             libadwaita question NOT established as ours. Clean 11/11.
+    qt-1     qalculate-qt 11/11 PASS but 4/11 CLEAN. ⛔ STILL UNEXPLAINED, and
+             it is the only one left. Which four environments, and which
+             object? The corpus deletes its traces, so this needs a hand run:
+             build the bundle, trace one dirty row, read the host paths.
 
 ## ⭐ THE CORPUS CAN BE RUN IN PARALLEL, AND THIS IS THE RECIPE
 
