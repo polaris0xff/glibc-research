@@ -236,6 +236,40 @@ else
   ok "the store-name slice lives only in shortStoreName"
 fi
 
+# 10. ⛔ EVERY tool/runtime/*.c MUST AT LEAST PARSE, and the reason is a silent
+# fallback rather than a build failure.
+#
+# These files are EMBEDDED as strings and compiled by `cc` at BUILD or BUNDLE
+# time, not by `make` -- so `go build` succeeds on a C file that cannot
+# compile, and nothing here noticed. Worse, `buildStaticAppRun` catches a
+# compile failure and falls back to writing a SHELL AppRun, which runs under
+# the HOST's interpreter and loads the HOST's libc. That is the exact thing
+# pgb-apprun.c exists to avoid, and it would have shipped as a warning in a
+# build log.
+#
+# ⭐ IT REALLY HAPPENED, in a COMMENT. A revision quoting Anylinux's AppRun
+# rule verbatim contained a shell parameter expansion whose `*/` ended the C
+# block comment. experiments/68- arm S caught it; this is what catches it
+# without running an experiment.
+#
+# ⚠ -fsyntax-only, not a link: these have wildly different link requirements
+# (one is -shared, one -static, one needs -Wl,--wrap) and parsing is the
+# property that was broken.
+if command -v cc >/dev/null 2>&1; then
+  nc=0; badc=0
+  for f in "$D"/../tool/runtime/*.c; do
+    [ -f "$f" ] || continue
+    nc=$((nc + 1))
+    if ! cc -fsyntax-only -D_GNU_SOURCE -DPGB_APPRUN_DEFAULT='"x"' "$f" 2>/dev/null; then
+      bad "tool/runtime/$(basename "$f") does not parse (cc -fsyntax-only)"
+      badc=$((badc + 1))
+    fi
+  done
+  [ "$badc" = 0 ] && ok "every tool/runtime/*.c parses ($nc checked)"
+else
+  note "no cc; tool/runtime/*.c not syntax-checked"
+fi
+
 fail=$(grep -c . "$FAILS")
 printf '\n'
 if [ "$fail" -gt 0 ]; then printf 'VERDICT: the record disagrees with itself (%s).\n' "$fail"; exit 1; fi

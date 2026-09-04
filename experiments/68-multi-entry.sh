@@ -65,8 +65,9 @@
 #   E10 arm B: the build PRINTS the entry-point count (`programs <p> + N
 #       more`). That is the operator's question 3 answered by a number the
 #       tool emits rather than by a reading of assemble.go.
-#   E11 arm B: the second program loads ZERO host shared objects on 11 of 11,
-#       exactly as the first one must.
+#   E11 arm B: the second program RUNS AND loads zero host shared objects on
+#       11 of 11. ⛔ The two halves are one check on purpose: zero host objects
+#       is also what a bundle that never started reports.
 #
 # ⚠ E9 AND E11 ARE THE ONES THAT NEED THE BED. Everything else is arm S.
 #
@@ -324,11 +325,16 @@ case "$ONLY" in *B*)
       done
       out2=$(cat "$WORK/out.second.$name" "$WORK/err.second.$name" 2>/dev/null)
       # E9 -- the SECOND program's own identity, not a shared version string.
+      ran2=no
       if [ "$st2" = 0 ] && printf '%s' "$out2" | grep -qE "^$SECOND v?[0-9]"; then
-        ok2=$((ok2+1))
+        ok2=$((ok2+1)); ran2=yes
       fi
+      # ⛔ A ROW IS CLEAN ONLY IF IT ALSO RAN. Zero host shared objects is what
+      # a bundle that never started reports too, so counting `nh = 0` on its
+      # own would print E11 as 11/11 green on a completely dead subject --
+      # a criterion that cannot fail for the right reason, delivery rule 6.
       nh=$(exp_classify_trace "$tr2" "/$SECOND" | grep -c '^host ' || true)
-      [ "$nh" = 0 ] && clean2=$((clean2+1))
+      [ "$ran2" = yes ] && [ "$nh" = 0 ] && clean2=$((clean2+1))
       rm -f "$tr2"
 
       # the ENTRY point, through the same artefact, as the within-row control:
@@ -349,7 +355,7 @@ case "$ONLY" in *B*)
     exp_note "rows measured: $rows of $NENV"
     exp_check "E9  ⭐ the SECOND program ($SECOND) runs, by its OWN name" "$ok2" "$rows"
     exp_check "E9  the ENTRY program ($ENTRY) still runs (within-row control)" "$ok1" "$rows"
-    exp_check "E11 the second program loads ZERO host shared objects" "$clean2" "$rows"
+    exp_check "E11 the second program RAN and loaded ZERO host objects" "$clean2" "$rows"
     rm -f "$IMG"; rm -rf "$WORK/cache"
   fi
   ;;

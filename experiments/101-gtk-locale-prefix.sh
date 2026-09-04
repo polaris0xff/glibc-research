@@ -41,15 +41,20 @@
 #
 #   L1  ⭐ arm T: the application opens a locale catalogue under the BUNDLE's
 #       own directory, on 11 of 11.
-#   L2  ⭐ arm N, THE NEGATIVE CONTROL: the same bundle built `--no-storefix`
-#       opens no catalogue under the bundle on any row, and is seen attempting
-#       `/nix/store/...` instead. ⛔ Without L2, L1 could be satisfied by a
-#       path that resolved for some other reason.
+#   L2  ⭐ arm N, THE NEGATIVE CONTROL, AND IT TAKES THREE OBSERVATIONS, NOT
+#       ONE: the same bundle built `--no-storefix` (a) opens no catalogue under
+#       the bundle, (b) IS SEEN ATTEMPTING `/nix/store/...`, and (c) still
+#       draws its window. ⛔ (a) ALONE IS ALSO WHAT A CONTROL THAT NEVER
+#       STARTED REPORTS -- an absence is not a zero (delivery rule 4), and a
+#       control that passes because it could see nothing is corrections.md
+#       C29's third defect. (b) is the positive observation that separates
+#       them.
 #   L3  the window still appears in BOTH arms -- which is the sentence that
 #       makes this rung worth measuring separately. A row where arm N loses
 #       its window is measuring something else and L1 cannot be read as a
 #       locale result.
-#   L4  arm T loads zero host shared objects on 11 of 11.
+#   L4  arm T DRAWS AND loads zero host shared objects on 11 of 11 -- one
+#       check, because zero is also what a dead subject reports.
 #   L5  ⚠ REPORTED, NOT PREDICTED: whether the process actually renders a
 #       translated string. That needs the environment to have locale support,
 #       and four of the eleven ship none -- so a failure there is the
@@ -147,7 +152,8 @@ mo_opened() {
 }
 mo_attempted() { grep -acE "openat\(.*$2.*\.mo\"" "$1" 2>/dev/null || true; }
 
-printf '\n  %-16s %-10s %-10s %-8s %s\n' ENVIRONMENT 'T .mo' 'N .mo' 'WINDOWS' 'T host .so'
+printf '\n  %-16s %-8s %-8s %-9s %-8s %s\n' \
+  ENVIRONMENT 'T .mo' 'N .mo' 'N /nix' 'WINDOWS' 'T host .so'
 
 okT=0; okN=0; winBoth=0; cleanT=0; rows=0
 for name in $ENVS; do
@@ -186,22 +192,35 @@ for name in $ENVS; do
     else
       tmoN=$(mo_opened "$tr" "/tmp/.mount_"); wN=$got
       [ "$tmoN" = 0 ] && tmoN=$(mo_opened "$tr" "/subj101")
+      # ⭐ L2's SECOND HALF, and the first version of this file computed it and
+      # never read it. "Opened nothing under the bundle" is also what a control
+      # that never started reports, so the control has to be seen ATTEMPTING
+      # the unrewritten /nix/store path -- a positive observation, not an
+      # absence. Delivery rule 4.
       nstore=$(mo_attempted "$tr" "/nix/store")
     fi
     rm -f "$tr"
   done
-  printf '  %-16s %-10s %-10s %-8s %s\n' "$name" "$tmoT" "$tmoN" "$wT/$wN" "$nhost"
+  printf '  %-16s %-8s %-8s %-9s %-8s %s\n' \
+    "$name" "$tmoT" "$tmoN" "$nstore" "$wT/$wN" "$nhost"
   [ "$tmoT" -gt 0 ] && okT=$((okT+1))
-  [ "$tmoN" = 0 ] && okN=$((okN+1))
+  # ⛔ THREE CONDITIONS, AND THE FIRST VERSION HAD ONE. A control scores only
+  # when it opened nothing under the bundle AND was seen trying /nix/store AND
+  # actually drew -- otherwise a control that died at startup passes, which is
+  # corrections.md C29's third defect wearing different clothes.
+  [ "$tmoN" = 0 ] && [ "$nstore" -gt 0 ] && [ "$wN" = 1 ] && okN=$((okN+1))
   [ "$wT" = 1 ] && [ "$wN" = 1 ] && winBoth=$((winBoth+1))
-  [ "$nhost" = 0 ] && cleanT=$((cleanT+1))
+  # ⛔ Same rule as arm N above and as experiments/68- E11: zero host objects
+  # is also what a subject that never started reports, so the row must have
+  # DRAWN before its cleanliness counts for anything.
+  [ "$wT" = 1 ] && [ "$nhost" = 0 ] && cleanT=$((cleanT+1))
 done
 
 printf '\n'
 exp_check "L1  ⭐ arm T opens a catalogue INSIDE the bundle" "$okT" "$rows"
-exp_check "L2  ⭐ CONTROL: --no-storefix opens none"          "$okN" "$rows"
+exp_check "L2  ⭐ CONTROL: --no-storefix tries /nix/store, opens none" "$okN" "$rows"
 exp_check "L3  the window appears in BOTH arms"               "$winBoth" "$rows"
-exp_check "L4  arm T loads zero host shared objects"          "$cleanT" "$rows"
+exp_check "L4  arm T DREW and loaded zero host objects"       "$cleanT" "$rows"
 exp_note "⚠ L5 IS REPORTED, NOT CHECKED: whether a translated string is"
 exp_note "  actually rendered depends on the environment having locale"
 exp_note "  support, and four of the eleven ship none. Counting it would"

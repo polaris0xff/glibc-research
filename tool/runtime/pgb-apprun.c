@@ -30,8 +30,16 @@
  * through argv[1]; it is passed through to the default untouched. And a name
  * must exist in BOTH shared/bin and bin/ -- shared/bin alone is not enough.
  *
- * Anylinux's AppRun.sh is `ARG0="${ARGV0:-$0}"` -> bin/${ARG0##*/} -> bin/$1
- * -> MAIN_BIN. ⚠ Same order, and ours is a SUPERSET: theirs collapses ARGV0
+ * ⛔ NOTHING IN THIS COMMENT MAY CONTAIN A STAR FOLLOWED BY A SLASH. An
+ * earlier revision wrote Anylinux's rule out verbatim, and the shell
+ * parameter expansion in it ends a C block comment -- the file stopped
+ * compiling, and `buildStaticAppRun` FALLS BACK TO A SHELL AppRun on a
+ * compile failure, which is the host interpreter this file exists to avoid.
+ * experiments/68- arm S is what caught it.
+ *
+ * Anylinux's AppRun.sh takes ARGV0 or $0, strips the directory, and looks for
+ * that name in bin/; then tries $1 the same way; then MAIN_BIN.
+ * ⚠ Same order, and ours is a SUPERSET: theirs collapses ARGV0
  * and $0 into one test, so it never re-checks $0 once ARGV0 is set but
  * unmatched, where rule 3 above does. ⛔ An earlier version of this comment
  * put argv[0] FIRST and named ARGV0 nowhere. experiments/68- E2 is what
