@@ -71,7 +71,10 @@
 85-opengl.sh 775172d72fa22a7d243eadb71882e874485d4859 d79949c4e77f523c04528e7f37e4e4f1d250ccae T-084 step 2: classifier converted; calls payload only and invokes the artefact once, so C38 is latent (102- arm S)
 86-bundler-vs-anylinux.sh 775172d72fa22a7d243eadb71882e874485d4859 403a0943a396734f821626e51b5580225e18048b T-084 step 2: classifier converted; calls payload only, so C38 is latent (102- arm S); builds kdenlive-scale bundles
 89-debloat.sh 775172d72fa22a7d243eadb71882e874485d4859 44b6a1c89fe011e4988acfcc5ffc9189afac5bbe T-084 step 2: classifier converted; calls payload only and invokes the artefact once, so C38 is latent (102- arm S)
-90-kdenlive-vs-enhanced.sh 775172d72fa22a7d243eadb71882e874485d4859 88e41e4e294a1c2cf285ebea0475b2d3adb42bb9 T-084 step 2: ⛔ THE ONE C38 REACHES — re-run OWED this session; pinned only while the corpus holds the machine
+# ⭐ 90- WAS HERE AND IS GONE, 2026-09-04c. It was the ONE experiment C38
+# reached, so it was the one the conversion actually owed a re-run — and the
+# re-run happened: ours 11/11 clean, the competitor 4/11, both column totals
+# unchanged and every per-row count now describing BOTH invocations.
 
 # ⭐ AND ONE LINE WAS DELETED HERE, 2026-09-04c, WHICH IS THE POINT OF THE
 # FORMAT. `65-capability-corpus.sh` was pinned as "NOT A DEBT: the experiment

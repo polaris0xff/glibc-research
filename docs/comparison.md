@@ -281,6 +281,28 @@ morning; two constants in `internal/bundle/appimage.go` closed it — uruntime
 kdenlive's figures predate both levers and were taken with the cold protocol
 [`history/corrections.md`](history/corrections.md) C24 disproves.
 
+⭐ **kdenlive RE-MEASURED 2026-09-04c** — `experiments/90-`, the run T-084 owed
+after the trace classifier was converted from a hand copy to
+`experiments/lib.sh`'s shared one:
+
+| | ours | kdenlive-AppImage-Enhanced |
+|---|---|---|
+| size | 575,831,871 B | 191,900,604 B — ⛔ **3.00× against us** |
+| cold start (`melt -version`) | ⭐ **638.7 ms** | 785.3 ms — **0.81×, ours faster** |
+| warm start | ⛔ **224 ms** | 42 ms — **5.3× against us**, and unexplained |
+| render, a real MP4 | 2179 ms | 1494 ms — ⛔ against us |
+| ⭐ **host shared objects in the payload** | ⭐ **0 on all eleven** | **3–10 on each of the seven glibc rows**, 0 on the four musl ones |
+| ⭐ **payload clean** | ⭐ **11 / 11** | **4 / 11** |
+
+⭐ **THE CLEANLINESS COLUMNS SURVIVED THE CONVERSION**, which is what the
+re-run was for: the hand copy cleared its result set on the artefact's own
+`execve` (**C38**) and `90-`'s test script invokes the artefact twice, so both
+counts had described only the **second** invocation. ⚠ The per-row counts are
+new information; the column totals are unchanged.
+
+⛔ **Speed comparisons are DEFERRED by the operator** (2026-09-03d), so the
+clock rows above are recorded rather than pursued.
+
 ⛔ **Everything above compares artefacts. `pgb` is a toolchain, so the axis it
 is actually developed along is what a developer has to know and assemble** —
 and ⚠ **no experiment measures it yet**, which matters more now than it did
