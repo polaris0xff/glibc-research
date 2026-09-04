@@ -199,8 +199,14 @@ demonstrate it. Data reads are reported in their own column, never asserted.
 
 ## 4. How it works
 
-Four mechanisms, no application source changed by any of them. The first three
-are on by default; the last two are opt-in:
+⭐ **TWO are on by default and every other one is asked for.** ⚠ This section
+said *"four mechanisms ... the first three are on by default"* over a table of
+five, of which two were on by default — it had not been recounted since
+`--embed-locale` became opt-in. The rule is simple and it is a rule rather
+than a list: **a mechanism that can touch the filesystem, or that changes what
+a program means, is opt-in.**
+
+⛔ **No application source is changed by any of them.**
 
 | | mechanism | file |
 |---|---|---|
@@ -209,6 +215,8 @@ are on by default; the last two are opt-in:
 | **locale** (opt-in `--embed-locale`) | `-Wl,--wrap=setlocale`; C.UTF-8 embedded, written out only when the host cannot answer a UTF-8 request. The only mechanism that touches the filesystem, hence opt-in. | [`../tool/runtime/pgb-locale.c`](../tool/runtime/pgb-locale.c) |
 | **host plugins** (opt-in `--host-dlopen`) | ⭐ **an ELF loader compiled IN.** Maps the object, walks `DT_NEEDED`, relocates (`DT_RELR` included), honours versioning, runs the initialisers, and binds imports to the static glibc already linked. A `DT_NEEDED` the image already satisfies is ANSWERED, not opened, so no second libc enters; a libc it does not provide is REFUSED, which is the right answer on musl. 11 of 11, zero host objects, `experiments/76-` | [`../tool/runtime/pgb-elfload.c`](../tool/runtime/pgb-elfload.c) |
 | **own plugins** (opt-in `--wrap-dlopen`) | `-Wl,--wrap=dlopen,--wrap=dlsym,--wrap=dlclose,--wrap=dlerror` onto a table `pgb` **generates** with `nm` from the objects the build produced. ⭐ A program loading its *own* plugins never needs a loader — the code is in the link and `dlopen` is only doing a name lookup. Nothing is mapped, so no second libc can enter. 11 of 11, zero host objects, +544 B. ⚠ Not for **host** plugins — §7. | [`../tool/runtime/pgb-dlopen.c`](../tool/runtime/pgb-dlopen.c) |
+| **host data** (opt-in, one flag each) | ⭐ **five of the seven host-data dependencies §7 item 3 enumerates**, each with the same order: LOOK AT THE HOST FIRST, carry a fallback, never prefer the stale copy. `--embed-terminfo`, `--embed-cacert`, `--embed-tzdata` point a search variable (`TERMINFO`, `SSL_CERT_FILE`, `TZDIR`) at carried data. ⛔ `--embed-netdb` cannot: `/etc/services` has no such variable, so it wraps the CALL — `getservbyname` and seven more — and asks glibc first. | [`../tool/runtime/pgb-terminfo.c`](../tool/runtime/pgb-terminfo.c), [`pgb-cacert.c`](../tool/runtime/pgb-cacert.c), [`pgb-tzdata.c`](../tool/runtime/pgb-tzdata.c), [`pgb-netdb.c`](../tool/runtime/pgb-netdb.c) |
+| **an unset `LANG`** (opt-in `--utf8-default`) | ⛔ **a change to a DOCUMENTED DEFAULT, not a repair**, and separately opt-in for that reason. POSIX leaves the choice to the implementation when the environment says nothing; glibc chooses `C` and this chooses `C.UTF-8`, which is what musl does unconditionally. ⭐ It is the one axis where native musl beats both glibc columns 11-0 (`experiments/63-`), and `--embed-locale` cannot move it because that mechanism answers a REQUEST the host could not satisfy — here the host satisfied it. ⚠ An environment that names anything at all still wins. | [`../tool/runtime/pgb-locale.c`](../tool/runtime/pgb-locale.c) |
 
 **Delivery:** compiler wrappers on `PATH` plus `CC`/`CXX`. autotools, CMake,
 meson and make pick them up unmodified. Each wrapper reads its own argv:
@@ -254,8 +262,13 @@ internal/bootstrapx       `pgb bootstrap`: a fresh machine, in parallel
 internal/selftest         the shape every carried-in selftest reports in
 assets.go                 the C runtime sources and the pinned target list,
                           EMBEDDED, so a distributed pgb carries them
-tool/runtime/*.c          the five mechanisms, and pgb-trace.c, the carried-in
-                          tracer `pgb verify` uses where strace cannot follow.
+tool/runtime/*.c          every mechanism in §4, plus three that are not
+                          linked into a user's binary at all: pgb-trace.c (the
+                          carried-in tracer `pgb verify` uses where strace
+                          cannot follow), pgb-apprun.c and pgb-exec.c (the
+                          BUNDLE's static selector and its script-entry
+                          trampoline), and pgb-storefix.c (the bundle's
+                          store-path interposer, docs/design/store-paths.md).
                           pgb-elfload.c is the compiled-in ELF loader
 internal/bundle           the bundler: uruntime+dwarfs+sharun, the
                           reachability sweep, the nixpkgs wrapper reader

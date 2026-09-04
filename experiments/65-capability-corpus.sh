@@ -87,7 +87,12 @@ exp_begin "65 - the capability corpus: three applications per category, simple t
 WORK="${PGB_EXP65_WORK:-/var/tmp/t065}"
 ROWS="${PGB_EXP65_ROWS:-$REPO_DIR/evidence/65-capability-corpus/rows}"
 mkdir -p "$WORK" "$ROWS" || exit 2
-RUN_TIMEOUT="${PGB_EXP65_TIMEOUT:-180}"
+# ⚠ 90s IS A BOUND, NOT A GUESS AT HOW LONG A PROGRAM TAKES. A `cli` subject
+# is waited for rather than killed, so a hanging one costs this many seconds
+# ELEVEN times; a `gui` subject is killed as soon as a window appears or
+# WIN_WAIT expires and rarely reaches it. A subject that genuinely needs
+# longer than 90s to print its version is a finding, not a timeout to raise.
+RUN_TIMEOUT="${PGB_EXP65_TIMEOUT:-90}"
 WIN_WAIT="${PGB_EXP65_WIN_WAIT:-25}"
 ONLY="${PGB_EXP65_ONLY:-}"          # run only subjects whose id matches this
 
