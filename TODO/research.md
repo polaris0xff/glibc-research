@@ -468,6 +468,34 @@ when a static program execs host programs, the host's libraries enter the
    of the two the apphost consults before it builds that string** — not
    another subject.
 
+2. ⛔ **THE SEARCH FOR A STATIC SUBJECT IS NOW ENUMERATED, AND THE OBVIOUS
+   ROUTE IS CLOSED.** Four candidates have been tried and every one failed for
+   a different reason:
+
+   | candidate | why it is not this rung |
+   |---|---|
+   | `syncthing` | ⛔ nixpkgs builds it **dynamic** — the entry's own premise, falsified by arm G3 |
+   | `lilipod` | genuinely static, but ⛔ `pgb bundle appimage` **refuses** it |
+   | `powershell` | ⛔ dynamic PIE; fails on a run-time-assembled path instead |
+   | ⛔ `pkgsStatic.file` | **unreachable by construction** — `pgb` turns a name into a store path with a regex over what the channel already **built**, and `pkgsStatic.*` is an unbuilt attribute. `experiments/83-` says so in its own header |
+
+   ⭐ **THE REACHABLE SUBJECT NOBODY HAS NAMED IS `pgb build`, NOT
+   `pgb bundle`.** This rung needs *a static application that needs a
+   compiled-in absolute path*, and the tree already builds static applications
+   from stock tarballs — that is what the ten POCs are. ⭐ `file`(1) is the
+   exact shape: without `magic.mgc` at its compiled-in path it does not
+   degrade, it says `could not find any valid magic files!` and exits
+   non-zero, and **[`experiments/105-`](../experiments/105-file-magic.sh) has
+   already measured the DYNAMIC half at 11/11 with a `--no-storefix` control
+   failing 11/11.** A `pgb build` of the same program is the same subject with
+   the PLT removed, so the two rows differ in exactly one variable.
+
+   ⛔ **PRE-REGISTER IT: the static one must FAIL to find its magic**, because
+   `LD_PRELOAD` cannot reach a program with no dynamic loader. That is arm P's
+   `-static` row (`no`, measured) with a real application behind it, which is
+   the only thing this entry still owes. ⚠ If it PASSES, the mechanism story
+   is wrong and the record must say so rather than be quietly corrected.
+
    ⚠ **And one thing the run establishes on the way**: `shared/script/pwsh`
    carries its `/nix/store` paths **as text, unrewritten** —
    `exec -a "$0" "/nix/store/3sn7g1s…/.pwsh-wrapped"` and an
