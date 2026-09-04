@@ -88,7 +88,7 @@
 # gst-plugins-good and is not in the closure, and the control could not be
 # told from its subject. ⭐ Run 2 is what removes this line; it needs the bed,
 # which the corpus was holding when the fix landed.
-103-gstreamer-decode.sh ce91364c817cbee71494c75f573f6977232b1d9f 82a66bf6c2746701d9c3a0614dccd1cb134364fc T-091: run 1 is committed; run 2 is owed after the two criterion fixes it exposed
+103-gstreamer-decode.sh 2c39d939b91d5a6aa1027efe591772aae9f3f013 8ad59e99eaa7a15f7541a32a40465a86ec06c778 T-091: run 1 is committed; run 2 is owed after the two criterion fixes it exposed AND the C54 start-guard on D3
 
 # ⛔ C49, 2026-09-04c — AND THIS ONE IS A COMMENT AND NOT A PINNED LINE, ON
 # PURPOSE. The classifier that produces the host-object count for EVERY

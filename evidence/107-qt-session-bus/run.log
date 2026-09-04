@@ -40,3 +40,8 @@ evidence     : /home/user/glibc-research/evidence/107-qt-session-bus
            debian-11 arm B STILL dirty: libc.so.6 
            debian-11 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000202008 /* 139 vars
            debian-11 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001a0008 /* 139 vars
+  debian-12          glibc  dynamic yes       1         yes       1
+           debian-12 arm A host objects: libc.so.6 
+           debian-12 arm B STILL dirty: libc.so.6 
+           debian-12 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0000b2008 /* 139 vars
+           debian-12 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000162008 /* 139 vars

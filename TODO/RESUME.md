@@ -141,8 +141,26 @@ pattern is fixed. **C7** is checked before C1 and C2 and fails the run.
       76-   pass=7, the regression suite for C46.
       93-   887 of 1,532 host objects — C46 moved nothing.
 
-    ⛔ NOTHING IS MID-RUN AS THIS IS WRITTEN except `101-`, which is being
-      re-run because the fixture below makes its criterion able to fire.
+    ⛔ WHAT IS MID-RUN OR OWED AS THIS IS WRITTEN:
+      107-  RUNNING. qalculate-qt's 4-of-11. ⭐ Its own first prediction was
+            refuted before it ran (readelf: /bin/sh is a dynamic PIE on ALL
+            eleven, alpine's busybox included), and its second — that
+            --with-program dbus-launch closes the row — is FAILING on the
+            glibc rows, for a reason the trace names: qalculate-qt spawns
+            GNUPLOT through `/bin/sh -c -- /nix/store/…-gnuplot-6.0.5/…`.
+            ⭐ On musl that exec dies `+++ exited with 127 +++` having loaded
+            nothing; on glibc the shell RUNS and loads the host libc.so.6.
+            That, and not dbus, is the 4-versus-7 split.
+      101-  OWED A CLEAN RE-RUN. Its committed RESULT.txt is a FAIL (L2), and
+            L2 is fixed but unverified end-to-end: the fixed run reached 7 of
+            11 rows — all showing `N failed` 33-34, so L2 fires — and was then
+            lost (see the setsid note above).
+      108-  pre-registered, NOT YET RUN.
+      65-   ⛔ OWES A CORPUS RE-RUN for TWO reasons now, C49 and C54, both
+            pinned. One re-run clears both.
+      POCs  `sh poc/run-all.sh --rebuild` NOT run this session, and
+            tool/runtime/pgb-storefix.c changed (C53). ⚠ `make` is also owed:
+            ./pgb still embeds the pre-C53 interposer.
 
 ## ⛔⛔ THE RULING THAT MATTERS MOST TO THE NEXT SESSION
 
