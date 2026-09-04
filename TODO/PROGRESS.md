@@ -35,6 +35,34 @@ the entries, and [`../HISTORY/`](../HISTORY/).
               gst-plugin-scanner is exec'd on 11/11.
               ⛔ THREE CORRECTIONS TO OUR OWN INSTRUMENTS: C39 (the
               assertion), C40 (the row note), C44 (a silent `cp`).
+              ⭐⭐ AND FIVE MORE FROM THE DEEP-REVIEW PASS, of which C49 and
+              C53 are the two that could have moved a committed number:
+                C49 ⛔ "host" was a PREFIX LIST and `bundled` was its
+                    complement, so a host object outside /lib and /usr/lib
+                    read CLEAN. Measured across all eleven: 13 such files,
+                    and one of them is `/usr/bin/ld.so` — THE HOST LOADER,
+                    on arch, fedora-42 and both Debians. Runs in the
+                    DANGEROUS direction (dirty → clean), unlike C25.
+                C50 `102-`'s R1 looked for a trace only in the directory
+                    `65-` deletes traces from, so it could never fire — and
+                    a SKIP is not a failure, so both gates stayed green over
+                    a check that did not exist. It fires now: 20/0/0.
+                C51 `T .mo = 43` is 43 catalogue FILES read, not 43
+                    translations. The CONTROL is what makes it a result:
+                    258 lookups against 0, from the same artefact.
+                C52 `101-`'s L2 demanded a syscall its own mechanism
+                    prevents — the third criterion that could not fire.
+                C53 ⛔ `pgb-storefix.c` had a LOADED AND INERT state that
+                    looked exactly like working: no AppDir or no `.storemap`
+                    meant it rewrote nothing and said NOTHING. One line,
+                    once, unconditionally — verified four ways.
+              ⭐ THE `-static` ROW IS ANSWERED, from evidence already in the
+              tree: a fully static closure carries no loader, so the bundler
+              REFUSES it and there is no artefact to ask the question of —
+              and the refusal is correct (arm L: the raw binary, no bundle,
+              11/11 with 0 host objects).
+              ⭐ RUNG 3'S LOCALE CRITERION FIRES AT LAST — 11/11 — after two
+              recorded causes that were both wrong (C48).
 
 ## ⛔ READ THIS FIRST
 
