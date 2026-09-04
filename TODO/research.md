@@ -443,10 +443,43 @@ when a static program execs host programs, the host's libraries enter the
 
 ## ⛔ What is still owed
 
-1. **The `-static` row still has no application behind it.** Arm P is a
-   mechanism result; arm L never got to ask the question because the bundler
-   refused. A static subject that *does* need a compiled-in path is still
-   wanted — `powershell` is the remaining named candidate.
+1. ⭐ **`powershell` WAS ATTEMPTED, 2026-09-04c, and it did NOT turn out to be
+   this rung's shape at all — which is the useful part.** It bundles in one
+   command (34 store paths, 95.4 MiB) and starts; `pwsh -NoProfile -Command`
+   then exits **127**, and the trace says exactly where:
+
+       2858 execve(".../store/powershell-7.6.5/share/powershell/
+                    .pwsh-wrapped", …)                 ⭐ TRANSLATED, and it RAN
+       2858 newfstatat(".../store/…/.pwsh-wrapped", {st_mode=…})  translated ×2
+       2858 newfstatat("/nix/store/3sn7g1s…/.pwsh-wrapped", …)
+                                        ⛔ UNTRANSLATED, ENOENT ×2
+       2858 +++ exited with 127 +++
+
+   ⛔ **Nothing here is static.** `.pwsh-wrapped` is a dynamic PIE, it imports
+   `stat`/`lstat`/`faccessat`/`eaccess` — the **unsuffixed** names the
+   interposer defines — and `strings` finds **no** `/nix/store/3sn7g1s…` in
+   it. ⭐ It is the **.NET apphost**: its strings carry `/proc/self/exe`,
+   `/proc/self/maps`, `DOTNET_ROOT` and `/usr/share/dotnet`.
+
+   ⭐ **So the path is ASSEMBLED AT RUN TIME from something the interposer does
+   not mediate**, and that is a different failure from the one this entry was
+   written for. ⚠ Two candidates and neither is measured: `/proc/self/exe`,
+   and `/proc/self/maps`. **The next step is one traced row that reads which
+   of the two the apphost consults before it builds that string** — not
+   another subject.
+
+   ⚠ **And one thing the run establishes on the way**: `shared/script/pwsh`
+   carries its `/nix/store` paths **as text, unrewritten** —
+   `exec -a "$0" "/nix/store/3sn7g1s…/.pwsh-wrapped"` and an
+   `LD_LIBRARY_PATH='/nix/store/…-curl-8.21.0/lib'`. ⭐ The interposer caught
+   the `exec` (the trace proves it) — which is the run-time-rewrite cell of
+   the grid in [`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md)
+   working on a real subject.
+
+   ⛔ **The `-static` row therefore STILL has no application behind it.**
+   `syncthing` was dynamic, `lilipod` was refused, and `powershell` is dynamic
+   too. A genuinely static subject that needs a compiled-in path has not been
+   found.
 2. ⚠ **An open question arm G raised rather than settled.** Go issues raw
    syscalls for much of its file I/O even when dynamic, so S3 predicts the
    interposer loses — yet 7 of 8 paths resolved. Build-time **text** rewriting,
