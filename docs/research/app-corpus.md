@@ -238,41 +238,66 @@ GNOME app under a non-English `LANG`, asserting a translated string, against the
 same bundle built `--no-storefix`. A window is not enough here — the window
 appears either way.
 
-## ⛔ AND THE LOCALE HALF IS NOT MEASURABLE IN THIS BED — measured, not assumed
+## ⭐ THE LOCALE HALF IS MEASURED — and "not measurable in this bed" was wrong twice
 
-⭐ **`experiments/101-` was written, run twice with two subjects, and stopped.**
-Every row reported *no catalogue opened*, in **both** arms. The cause is the
-bed, and it was found by asking what locales the eleven environments actually
-have rather than by reading the zeros:
+⛔ **This section used to say the opposite, and the wrong reason was recorded
+with confidence both times.** It is kept as a heading rather than deleted
+because the two mistakes are the lesson.
 
-| | |
+**The first reason given was the bed.** `experiments/101-` was written, run
+twice, and stopped; every row reported *no catalogue opened* in **both** arms,
+and the cause was recorded as *"0 of 11 environments have a `de_DE` locale
+compiled"*. ⭐ That fact is TRUE and was NOT the cause —
+`scripts/common/bed-fixtures.sh` compiles one and installs it, and the rows
+still read zero (**C48**).
+
+**The second reason was the artefact, and it was in the build log all along.**
+`internal/bundle/debloat.go` drops every directory under `share/locale` unless
+`--keep-locales` names one, and the default is empty; the log had been printing
+`locale catalogues (kept: none)` on every run. ⭐ With `--keep-locales de` in
+both arms the criterion fires.
+
+⭐ **MEASURED, `mousepad`, eleven environments, two runs:**
+
+| check | result |
 |---|---|
-| environments with a `de_DE` locale **compiled** | ⛔ **0 of 11** |
-| what they do have | `C.UTF-8` / `C.utf8` on 7; **nothing at all** on the three Alpines and Void |
-| environments carrying `share/locale/de` **message catalogues** | 6 of 11 — ⚠ the *translations* are there, the *locale* is not |
+| **L1** arm T opens a catalogue INSIDE the bundle | ⭐ **11 / 11** |
+| **L3** the window appears in BOTH arms | ⭐ **11 / 11** |
+| **L4** arm T drew AND loaded zero host objects | ⭐ **11 / 11** |
 
-⛔ **So `setlocale(LC_ALL, "de_DE.UTF-8")` fails, `LC_MESSAGES` stays `C`, and
-glibc's gettext then does not consult `LANGUAGE` — no `.mo` is ever opened, by
-either arm.** The criterion cannot fire, so it cannot discriminate, so it is
-not an instrument. ⚠ This sits beside the sandbox row: a **bed** limitation,
-not a bundler result.
+⛔ **AND THE NUMBER MUST BE READ CORRECTLY**, which took a kept trace to
+establish (**C51**). Arm T reads **43** `.mo` files — *exactly* the number the
+bundle carries — and the domains include `acl.mo`, `elfutils.mo` and `gdbm.mo`,
+which no GTK text editor binds. ⚠ **So it is 43 catalogue FILES read, not 43
+translations resolved.** What makes it a result is the control:
 
-⭐ **THE MECHANISM CLAIM SURVIVES ON A DIFFERENT DISCRIMINATOR, AND IT NOW HAS
-TWO SUBJECTS.** What rung 3 is really about — a compiled-in absolute path with
-no search variable — is already measured by whether the application **draws**:
+| | arm T (interposer) | arm N (`--no-storefix`) |
+|---|---|---|
+| trace lines | 244,968 | 72,954 |
+| ⭐ `openat` catalogue **lookups** | **258** | ⛔ **0** |
+| extraction **writes** (both arms extract) | 43 | 43 |
+| ⭐ unrewritten `/nix/store` opens **refused** | — | **33** |
+| catalogues read from the **host** under `/usr` | ⭐ 0 | ⭐ 0 |
+
+⛔ **Both arms extract identically; only the subject ever LOOKS UP a
+catalogue.** Without the interposer the run fails *above* gettext — 33 store
+paths refused, glibc's own locale data among them — so no catalogue path is
+ever built. That is the rung's claim, measured.
+
+⭐ **AND THE RUNG HAS A SECOND DISCRIMINATOR BESIDE THE LOCALE ONE.** What it
+is really about — a compiled-in absolute path with no search variable — is also
+measured by whether the application **draws**:
 
 | subject | with the interposer | `--no-storefix` |
 |---|---|---|
 | `galculator` (`64-` arms G / N) | ⭐ **11 / 11** | ⛔ **0 / 11** |
-| `gnome-chess` (`101-`, 4 rows before it was stopped) | drew | ⛔ **did not draw** |
+| `gnome-chess` (`101-`, 4 rows before the subject was changed) | drew | ⛔ **did not draw** |
 
 ⚠ `mousepad` is the counter-example that makes those mean something: it draws
 in **both** arms (`WINDOWS 1/1`), because its UI is a GResource compiled into
-the binary rather than a file at a store path.
-
-⛔ **What is still owed for the locale instance specifically**: an environment
-with a real non-C locale, or a bundle that carries one and points `LOCPATH` at
-it. Neither exists here today.
+the binary rather than a file at a store path. ⭐ **That is precisely why it is
+the right subject for the locale half** — the window cannot carry the result,
+so the catalogue lookups have to.
 
 ⭐ **AND THE FIELD CONSIDERED OUR ROUTE FOR THIS AND CHOSE ANOTHER — this is the
 citation that makes the rung worth doing.** Their `quick-sharun` **patches the
@@ -580,7 +605,7 @@ emulated/dummy stubs for hw gaps."*
 |---|---|
 | a real GPU, NVIDIA | no device on this machine — ⭐ **`/dev/dri` does not exist**, on the host or in any of the eleven rootfs. Measured when `vkmark` died with `directory iterator cannot open directory … [/dev/dri]`. T-059 |
 | an unprivileged user namespace | ⭐ **the cause is `chroot`, not the bed** — `experiments/69-`: the same rootfs entered by `pivot_root` permits it. Until that change is taken and its isolation measured, a browser row measures `--no-sandbox`. Rung 5 |
-| ⛔ ~~**a non-C locale**~~ ⭐ **ANSWERED — it was a fixture, not a limit** | ⛔ **This row was wrong, and it is kept struck through rather than deleted because the mistake is the lesson.** It said 0 of 11 environments have a non-C locale compiled and concluded rung 3's criterion could not fire. ⭐ **2026-09-04c**: `scripts/common/bed-fixtures.sh` compiles one and installs it, and `experiments/106-` measures `setlocale(de_DE.UTF-8)` succeeding on **7 of 7** glibc rows with the locale in effect — a `pgb` **static** binary doing the reading, so it is our own glibc 2.41. ⚠ The 4 musl rows stay `n/a`: musl implements only C and C.UTF-8, which is a property of musl |
+| ⛔ ~~**a non-C locale**~~ ⭐ **ANSWERED — it was a fixture, not a limit** | ⛔ **This row was wrong, and it is kept struck through rather than deleted because the mistake is the lesson.** It said 0 of 11 environments have a non-C locale compiled and concluded rung 3's criterion could not fire. ⭐ **2026-09-04c**: `scripts/common/bed-fixtures.sh` compiles one and installs it, and `experiments/106-` measures `setlocale(de_DE.UTF-8)` succeeding on **7 of 7** glibc rows with the locale in effect — a `pgb` **static** binary doing the reading, so it is our own glibc 2.41. ⚠ The 4 musl rows stay `n/a`: musl implements only C and C.UTF-8, which is a property of musl. ⛔ **AND THE FIXTURE WAS STILL NOT THE WHOLE STORY** — with it installed, `101-` *still* read zero, because the bundler's `--keep-locales` default had been dropping every catalogue out of the artefact (**C48**). Rung 3's locale criterion now reads **11 / 11** with `--keep-locales de` in both arms; the fixture was necessary and was not sufficient |
 | ⛔ **a host program a subject shells out to** | `experiments/100-` arm L: `lilipod` needs `getsubids`, which **2 of 11** carry. Neither static linking nor bundling supplies another program — rungs 2 and 7 |
 | ⛔ ~~**a HOST GTK/icon THEME**~~ ⭐ **ANSWERED — a fixture again** | ⛔ **Also wrong, also kept.** `0 of 11` rootfs carried anything under `usr/share/themes`, and that was read as a limit. ⭐ `bed-fixtures.sh` installs a theme named `PgbFixture` — deliberately not a real theme name, so nothing can pass because the host already had it — and `experiments/106-` measures a bundled GTK application **opening the host's `gtk.css` on 11 of 11 when told `GTK_THEME=PgbFixture`, and on 0 of 11 when not told**. ⚠ It says the bundle READS the host theme, not that the window LOOKS different |
 | ⛔ ~~**a session DBus**~~ ⭐ **ANSWERED — the third fixture** | ⛔ **Also wrong, also kept.** No rootfs runs a session bus, so a tray application printed `Unable to connect via DBus`, and that was read as a limit. ⭐ **It is two pieces and both exist**: the bundle carries the DAEMON out of its own closure (`--with-program dbus-daemon dbus-run-session` → `programs flameshot + 2 more`), and the bed supplies the FILE the daemon insists on reading from an absolute `/etc` path — `bed-fixtures.sh --install dbus`, written out rather than copied because nixpkgs' own `session.conf` delegates its `<listen>` to an include the bundle does not carry. **Measured 2026-09-04c**: with both, the connect error is **gone**. ⚠ flameshot then fails on `Unable to capture screen`, which is a different thing |
