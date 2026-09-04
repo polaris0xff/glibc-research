@@ -163,7 +163,10 @@ that nothing has confirmed the consequence.
 
 ## 5. The build-time half, which is the part that must not guess
 
-Three rewrites happen at build time, all against the same closure set:
+**Four** rewrites happen at build time, all against the same closure set.
+⚠ This sentence said *three* over a list of four until 2026-09-04; the count
+was checked against the list rather than against the tree, which is the same
+mistake in miniature that `AGENTS.md` §4 and `limitations.md` §3 each carried:
 
 1. **A script entry point becomes interpreter + script.** The shebang is
    resolved against the closure at build time, so the script's own text needs

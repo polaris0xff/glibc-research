@@ -634,7 +634,34 @@ func (b *Builder) shebangInterpreter(script string) string {
 	return ""
 }
 
-var storeRefRe = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[^" ']*`)
+// storeRefRe finds a candidate store reference. ⛔ IT DOES NOT DECIDE
+// ANYTHING: every caller cuts the match at the first `/`, looks the base up in
+// the closure, and leaves the text alone when it is not there. The regex only
+// says where a candidate might START and END.
+//
+// ⛔ THE END WAS WRONG AND A BUILD LOG SHOWED IT. The class was `[^" ']*` —
+// three excluded characters — so in a BINARY the match ran through the
+// terminating NUL into whatever `.rodata` came next, and in XML it ran through
+// the closing `<`. Measured on the galculator bundle, 2026-09-04:
+//
+//	python3-3.14.7\0\0\0\0\0\0Exception        NUL is not a boundary
+//	glibc-2.42-84\0\0\0\0\0\0\0                 …so the base never matched
+//	dejavu-fonts-minimal-2.37<                  nor is `<`
+//
+// Three of the six paths that bundle reported as "does not resolve inside the
+// bundle" were this, not a real finding — an instrument that over-reports is
+// a weaker argument than the one T-081 claims to make.
+//
+// ⭐ THE CLASS IS A BLACKLIST AND THAT DIRECTION IS DELIBERATE. Nix does not
+// constrain the names of files INSIDE a store path, so a whitelist would
+// TRUNCATE a legitimate tail — and a truncated tail is the dangerous failure:
+// `rewriteTextStorePaths` would rewrite the head and leave the remainder
+// behind, corrupting the file. Over-capture fails safe: the base does not
+// match the closure, nothing is rewritten, and the path is REPORTED.
+// So: exclude what cannot be in a path here — every control character and
+// space (a C string ends at NUL), quotes, and the XML and shell delimiters
+// that end a path in the file formats a bundle actually carries.
+var storeRefRe = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[^\x00-\x20"'` + "`" + `<>|;,()\\]*`)
 
 func lastExistingStorePath(file, root string) string {
 	b, err := os.ReadFile(file)

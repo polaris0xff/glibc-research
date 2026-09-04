@@ -128,6 +128,41 @@ func AppImageSelftest(c *cfg.Config) *selftest.Report {
 		StoreRefToBundle("/nix/store/cccccccccccccccccccccccccccccccc-a-1/x:/usr/share:/nix/store/dddddddddddddddddddddddddddddddd-b-2/y"),
 		"${SHARUN_DIR}/store/a-1/x:/usr/share:${SHARUN_DIR}/store/b-2/y")
 
+	// ⛔ WHERE A STORE REFERENCE ENDS, WHICH THE REGEX GOT WRONG UNTIL A BUILD
+	// LOG SHOWED IT. The class was `[^" ']*` — three excluded characters — so
+	// in a BINARY the match ran through the terminating NUL into the next
+	// string, and in XML through the closing `<`. THREE of the six paths the
+	// galculator bundle reported as "does not resolve inside the bundle" on
+	// 2026-09-04 were that, not a real finding.
+	// docs/design/store-paths.md §3.
+	r.Check("a store reference ends at the C string's NUL",
+		storeRefRe.FindString("/nix/store/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-python3-3.14.7\x00\x00Exception"),
+		"/nix/store/bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb-python3-3.14.7")
+	r.Check("...and at an XML markup boundary",
+		storeRefRe.FindString("<dir>/nix/store/cccccccccccccccccccccccccccccccc-dejavu-fonts-minimal-2.37</dir>"),
+		"/nix/store/cccccccccccccccccccccccccccccccc-dejavu-fonts-minimal-2.37")
+	// ⭐ AND OVER-CAPTURE OF THE TAIL IS THE SAFE DIRECTION, SO THE CLASS IS A
+	// BLACKLIST. Every rewrite copies the tail verbatim after substituting the
+	// prefix, so an over-captured tail comes out unchanged; a TRUNCATED tail
+	// would be written back short and corrupt the file. Nix does not constrain
+	// the names of files inside a store path, so a whitelist would truncate.
+	r.Check("...but a legitimate path tail is not truncated",
+		storeRefRe.FindString("/nix/store/cccccccccccccccccccccccccccccccc-a-1/share/x.ui:/usr/share"),
+		"/nix/store/cccccccccccccccccccccccccccccccc-a-1/share/x.ui:/usr/share")
+	// ⭐ AND THE BASE IS THE VALUE THAT DECIDES EVERYTHING. Each caller cuts
+	// the match at the first `/` and looks the result up in the closure, so a
+	// boundary error does not merely widen a string — it produces a base no
+	// closure can contain, which is reported as "does not resolve" and left
+	// unrewritten. ⚠ The first draft of this block asserted on
+	// StoreRefToBundle instead, which does not use this regex at all and
+	// passed under the defect: a case that cannot fail for the reason it names
+	// is worse than no case.
+	xmlBase, _, _ := strings.Cut(strings.TrimPrefix(storeRefRe.FindString(
+		"<dir>/nix/store/cccccccccccccccccccccccccccccccc-dejavu-fonts-minimal-2.37</dir>"),
+		"/nix/store/"), "/")
+	r.Check("...and the BASE every caller looks up carries no markup",
+		xmlBase, "cccccccccccccccccccccccccccccccc-dejavu-fonts-minimal-2.37")
+
 	// The wrapper reader, on both shapes.
 	shell := filepath.Join(dir, "shellwrap")
 	_ = os.WriteFile(shell, []byte("#!/bin/sh\nexport QT_PLUGIN_PATH='/nix/store/cccccccccccccccccccccccccccccccc-qt/plugins':$QT_PLUGIN_PATH\n"+

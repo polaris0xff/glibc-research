@@ -20,7 +20,8 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
                    docs/research/bundle-capabilities.md re-measured with
                    THREE applications per category, simple -> complex.
     CI             ⭐ 323 success on 357c0346, the T-081 closure. 316-323 all
-                   success. READ THE NEXT ONE.
+                   success. ⚠ 324-326 (c4fa93cf, ef6a55f9, 68c923e6) NOT YET
+                   READ — READ THEM.
     GATES          both green at every commit so far.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
@@ -78,13 +79,25 @@ criterion fail *for the right reason*.
              and LANG=C still obeyed 11/11 (the row that makes it mean
              something).
 
-    ⏳ RUNNING NOW: `experiments/65-`, the T-080 REDO corpus — 26 subjects ×
-       11 environments, launched 01:43 UTC by `scratchpad/chain2.sh` (session
-       scheduling, not evidence). ⚠ HOURS. ⭐ RESUMABLE: a completed subject
-       writes a TAB-separated row into
+    ⛔ THE CORPUS'S FIRST RUN WAS STOPPED AFTER ONE ROW AND THE ROW WAS
+    RETRACTED — docs/history/corrections.md C26. It scored `galculator`
+    0 of 11, a subject `experiments/64-` had measured at 11 of 11 TWICE.
+    ⭐ The cause was a 25-second window budget copied out of `64-`, which
+    uses 25s only for its MOUNT-mode arms and 150s for the one EXTRACT-mode
+    arm — and `65-` runs EVERY subject in extract mode. Measured: a bundle
+    puts its first window on the X server at t+21s, unpack included.
+    ⭐ THE REAL DEFECT WAS THE MISSING POSITIVE CONTROL, now C6: `gtk3-1`,
+    `gtk3-2` and `py-1` are `64-`'s arms G, X and P and must come back
+    11 of 11 or the instrument, not the capability, is the finding.
+
+    ⏳ RUNNING NOW: `experiments/65-`, relaunched 02:16 UTC by
+       `scratchpad/chain3.sh` (session scheduling, not evidence) with the
+       corrected instrument. 26 subjects × 11 environments. ⚠ HOURS.
+       ⭐ RESUMABLE: a completed subject writes a TAB-separated row into
        `evidence/65-capability-corpus/rows/` and a recorded row is never
        re-measured, so `sh scripts/common/run-experiment.sh 65` picks up
-       wherever it stopped.
+       wherever it stopped. ⛔ A row measured by a broken instrument must be
+       DELETED, not adjusted — that is what makes resumability safe.
 
     ⛔ WHILE 65- RUNS, THE MACHINE IS NOT FREE.
       - ⛔ Do not run another GUI experiment: 65- counts windows on `:99`,
