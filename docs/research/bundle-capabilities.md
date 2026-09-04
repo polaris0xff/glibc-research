@@ -25,21 +25,42 @@ pipeline.** What is new is that some of those rows have now been **run through
 > a `pgb` nix bundle today, **everything measured is tooling** — a path our
 > patcher does not rewrite, an entry-point shape our reader does not resolve.
 > ⛔ **No measured failure is "nix cannot do EGL/SDL/XCB" and none is "nix
-> cannot load vulkan or nvidia".** ⚠ And two capability questions are **not
-> measured at all** rather than measured green: anything requiring a **GPU**,
-> and **Python GUI applications**, which our own tooling cannot yet bundle.
+> cannot load vulkan or nvidia".** ⚠ And one capability question is **not
+> measured at all** rather than measured green: anything requiring a **GPU**.
+
+⭐ **THE TWO TOOLING BLOCKERS THIS SECTION NAMED ARE CLOSED — T-081**, and both
+were closed by a mechanism rather than by a workaround. `experiments/64-`,
+**two runs**, `pass=11 fail=0 skip=0` each:
+
+| arm | subject | window on a real X server | host `.so` |
+|---|---|---|---|
+| **G** | `galculator` — UI is a file at a compiled-in absolute store path | ⭐ **11 / 11**, and no bind | **0 / 11** |
+| **N** | ⭐ the SAME bundle, built `--no-storefix` | ⛔ **0 / 11** | — |
+| **X** | `mousepad` — the regression control | ✅ **11 / 11** | **0 / 11** |
+| **P** | `meld` — ⭐ **Python 3 + GTK 3, a SCRIPT entry point** | ⭐ **11 / 11** | **0 / 11** |
+
+⭐ **Arm N is why arm G means anything**: the negative control is a shipped
+flag, the same subject and the same bundler with one mechanism absent, and it
+draws nothing anywhere. ⭐ **Arm P is the operator's own counter-example
+reached** — *"in nixappimage python is easy and works"* — on an application
+that produced no artefact at all a day earlier.
+
+⛔ **THE TABLE BELOW IS STILL BEING RE-MEASURED.** T-080 is REOPENED: every row
+must be re-derived with **three applications per category, simple to complex**
+(`experiments/65-`), because one subject measures a subject. ⚠ A row that still
+says *hypothesis* or *not measured* means exactly that.
 
 | capability | status **for our pipeline** | evidence |
 |---|---|---|
-| ⭐ **GTK 3** | ✅ **MEASURED, AND IT WORKS.** `mousepad` draws real toplevel windows on a real X server, on 11 of 11, with **zero host shared objects** | `64-` arm X |
+| ⭐ **GTK 3** | ✅ **MEASURED, AND IT WORKS.** `mousepad` AND `galculator` each draw real toplevel windows on a real X server, on 11 of 11, with **zero host shared objects** | `64-` arms X and G |
 | ⭐ **XCB / X11 client stack** | ✅ **MEASURED.** The bundled GTK connects to a real X display on 11 of 11 — both subjects, including the one that then fails for another reason | `64-` |
 | **EGL** | ⚠ **offscreen only.** *"The closure produces a working EGL display offscreen"* — `pass=10 fail=0`, every row **`swrast` and surfaceless** | `85-` |
 | **OpenGL driver stack** | ⚠ same. The bundle carries mesa and points libglvnd at itself; the negative control (`--no-gl`) cannot produce a vendor string on any row | `85-` |
 | **Vulkan** | ⛔ **NOT MEASURED. NOT CLAIMED.** The ICD mechanism is relocatable by design (§1) and the bundler writes `VK_DRIVER_FILES`, but no Vulkan call has been made here | — |
 | **NVIDIA** | ⛔ **NOT MEASURED, and not bundled by design.** The driver is taken from the HOST; `design/host-fallback.md` governs it. T-059 owns the hardware | — |
 | **SDL** | ⛔ **NOT RUN through our pipeline.** A hypothesis, graded *Excellent* by the field | §1 |
-| ⛔ **Python GUI** | ⛔ **BLOCKED BY OUR TOOLING**, and the closure is not at fault | `64-` arm P |
-| ⛔ **apps with a compiled-in data path** | ⛔ **BLOCKED BY OUR TOOLING** | `64-` arm G |
+| ⭐ **Python GUI** | ✅ **MEASURED, AND IT WORKS.** `meld` — Python 3 + GTK 3 through PyGObject — draws a real toplevel window on **11 of 11** with **zero host shared objects**, on eleven distributions of which four ship no glibc and none ship Python or GTK. ⛔ It produced **no artefact at all** before T-081 | `64-` arm P |
+| ⭐ **apps with a compiled-in data path** | ✅ **MEASURED, AND IT WORKS.** `galculator` draws on **11 of 11** with **no bind**, against **0 of 11** for the same bundle built `--no-storefix` | `64-` arms G and N |
 
 ### ⭐ The two blockers were ours, and BOTH ARE CLOSED — T-081
 

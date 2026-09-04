@@ -1,8 +1,8 @@
 ===============================================================
-64 - GTK and Python out of a nixpkgs closure: one measured, one blocked by our own tooling
+64 - GTK and Python out of a nixpkgs closure, with the compiled-in store path resolved
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-03T18:54:10Z
+date (UTC)   : 2026-09-04T01:37:10Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -13,152 +13,154 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
 --------------------------------------------------------------
 
         display: :99 (The X.Org Foundation)
--- arm P: a PYTHON GUI application (meld) --------------------------
-  ok    arm P: the closure fetched completely          = yes
-        arm P closure: 136 store paths — nothing about the
-           LIBRARIES failed. The defect is downstream of the closure.
-  ok    arm P: no artefact was produced                = no
-  ok    arm P: resolveEntry oscillated                 = yes
-  ok    arm P: and it ended in 'no entry point'        = yes
-        ⛔ THE MECHANISM, exactly: bin/meld is a makeBinaryWrapper ELF whose
-           target bin/.meld-wrapped is a PYTHON SCRIPT. ReadWrapper returns
-           nothing for a script and elfx.IsELF is false, so
-           lastExistingStorePath scans the script's text and resolves back
-           to bin/meld. Five hops, then no entry point (assemble.go:60).
-        ⭐ IT IS A TOOLING GAP, which is the category T-080 is about — NOT a
-           statement that nix cannot do Python.
-
--- arm G: a C + GTK 3 application (galculator) ---------------------
-  ok    arm G: the GTK bundle built                    = yes
-        artefact: /var/tmp/t080/galculator.AppImage, 163454389 bytes
 
 -- arm G: galculator (UI loaded from a file at a compiled-in path) --
+        artefact: /var/tmp/t080/galculator.AppImage, 177586718 bytes
+        store map: 130 store paths resolve inside the bundle
+
+  ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
+  alpine-3.22          musl   yes   1        0        yes      407
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  alpine-3.20          musl   yes   1        0        yes      400
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  alpine-3.10          musl   yes   1        0        yes      408
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  voidlinux-musl       musl   yes   1        0        yes      419
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  debian-11            glibc  yes   1        0        yes      414
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  debian-12            glibc  yes   1        0        yes      419
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  ubuntu-20.04         glibc  yes   1        0        yes      406
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  rockylinux-8         glibc  yes   1        0        yes      413
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  opensuse-leap-15.6   glibc  yes   1        0        yes      413
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  fedora-42            glibc  yes   1        0        yes      418
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+  archlinux-latest     glibc  yes   1        0        yes      403
+      out: [galculator] configuration file: couldn't open configuration file /root/.config/galculator/galculator.conf for reading. Nothing to worry about if you are starting galculator for the first time. Using defaults.  [exit 137]
+
+
+-- arm N: galculator with --no-storefix (the NEGATIVE CONTROL) -----
 
   ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
   alpine-3.22          musl   yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
   alpine-3.20          musl   yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
   alpine-3.10          musl   yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
   voidlinux-musl       musl   yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
   debian-11            glibc  yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
   debian-12            glibc  yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
   ubuntu-20.04         glibc  yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
   rockylinux-8         glibc  yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
   opensuse-leap-15.6   glibc  yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
   fedora-42            glibc  yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
   archlinux-latest     glibc  yes   0        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 1]
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
 
 
 -- arm X: mousepad (UI compiled into the binary as a GResource) ----
 
   ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
-  alpine-3.22          musl   yes   1        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  alpine-3.20          musl   yes   1        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  alpine-3.10          musl   yes   1        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  voidlinux-musl       musl   yes   1        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  debian-11            glibc  yes   2        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  debian-12            glibc  yes   1        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  ubuntu-20.04         glibc  yes   1        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  rockylinux-8         glibc  yes   2        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  opensuse-leap-15.6   glibc  yes   1        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  fedora-42            glibc  yes   2        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  archlinux-latest     glibc  yes   2        0        yes      94
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  alpine-3.22          musl   yes   1        0        yes      227
+      out: <none>  [exit 137]
+  alpine-3.20          musl   yes   1        0        yes      233
+      out: <none>  [exit 137]
+  alpine-3.10          musl   yes   1        0        yes      236
+      out: <none>  [exit 137]
+  voidlinux-musl       musl   yes   1        0        yes      230
+      out: <none>  [exit 137]
+  debian-11            glibc  yes   1        0        yes      219
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  debian-12            glibc  yes   1        0        yes      218
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  ubuntu-20.04         glibc  yes   1        0        yes      222
+      out: WARNING: Cannot find CA Certificates in host!  [exit 137]
+  rockylinux-8         glibc  yes   1        0        yes      240
+      out: <none>  [exit 137]
+  opensuse-leap-15.6   glibc  yes   1        0        yes      260
+      out: <none>  [exit 137]
+  fedora-42            glibc  yes   1        0        yes      329
+      out: <none>  [exit 137]
+  archlinux-latest     glibc  yes   1        0        yes      313
+      out: <none>  [exit 137]
 
 
--- arm C: galculator AGAIN, with the store path made to resolve ----
+-- arm P: a PYTHON GUI application (meld) --------------------------
+        arm P closure: unknown store paths
+  ok    arm P: an artefact was produced                = yes
+        arm P entry: script      meld = python3 + shared/script/meld (static trampoline)
 
   ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
-  alpine-3.22          musl   yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  alpine-3.20          musl   yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  alpine-3.10          musl   yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  voidlinux-musl       musl   yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  debian-11            glibc  yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  debian-12            glibc  yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  ubuntu-20.04         glibc  yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  rockylinux-8         glibc  yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  opensuse-leap-15.6   glibc  yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  fedora-42            glibc  yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
-  archlinux-latest     glibc  yes   2        0        yes      93
-      out: Fontconfig error: Cannot load default config file: File not found  [exit 124]
+  alpine-3.22          musl   yes   1        0        yes      242
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%3%8%12%16%18%19%19%19%20%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%23%24%25%25%25%26%26%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%31%31%31%31%31%32%34%36%38%40%43%44%46%48%50%53%56%58%61%64%67%70%73%76%77%78%79%80%80%81%82%83%83%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%89%89%89%89%89%90%91%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%93%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%96%97%97%97%98%98%98%98%99%99%99%99%99%99%99%99%100%100%100%100%100%  [exit 137]
+  alpine-3.20          musl   yes   1        0        yes      842
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%4%9%11%12%15%17%18%18%18%18%18%18%18%19%19%19%19%19%19%19%19%19%20%20%20%20%20%20%20%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%24%24%25%25%25%25%26%26%26%26%26%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%31%31%31%33%35%38%41%44%46%48%52%54%58%61%64%66%70%72%76%77%78%79%80%82%83%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%86%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%89%89%89%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%93%94%94%94%94%94%94%94%94%94%94%94%97%97%97%97%98%98%98%98%98%98%98%98%99%99%99%99%99%99%99%99%99%100%100%100%100%100%100%100%  [exit 0]
+  alpine-3.10          musl   yes   1        0        yes      391
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%5%11%15%18%19%19%19%19%19%19%19%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%24%24%25%25%25%25%26%26%26%26%26%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%31%31%31%34%36%38%40%43%44%46%48%50%53%57%59%64%68%70%74%76%79%80%80%81%82%83%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%87%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%89%89%89%90%91%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%94%94%94%94%94%94%94%94%94%94%94%94%94%94%95%97%97%97%97%98%98%98%98%98%98%98%98%99%99%99%99%99%99%99%99%99%100%100%100%100%100%100%  [exit 0]
+  voidlinux-musl       musl   yes   1        0        yes      118
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%2%6%8%10%11%12%14%14%15%15%17%18%18%18%18%19%19%19%19%19%19%19%19%19%19%19%19%19%19%19%19%20%20%20%20%20%20%20%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%23%24%24%25%25%25%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%34%36%38%39%41%43%46%47%49%52%54%58%60%64%66%70%74%76%79%81%82%82%83%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%87%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%89%91%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%93%94%94%94%94%94%94%94%94%94%94%94%94%97%97%97%97%98%98%98%98%98%98%98%98%99%99%99%99%99%99%99%99%99%99%100%100%  [exit 0]
+  debian-11            glibc  yes   1        0        yes      1186
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%1%5%12%18%18%18%19%19%19%19%19%19%19%19%19%19%19%19%19%19%19%20%20%20%20%20%20%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%24%24%25%25%25%26%26%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%31%31%31%31%31%32%34%36%38%40%43%44%46%48%50%53%57%59%64%65%70%72%76%78%80%81%82%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%86%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%90%91%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%93%93%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%97%97%97%97%97%97%98%98%98%98%98%98%98%98%98%99%99%99%99%99%99%99%99%99%99%99%100%100%100%100%100%100%  [exit 137]
+  debian-12            glibc  yes   1        0        yes      839
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%2%7%10%12%13%14%14%15%15%18%18%18%19%19%19%19%19%19%19%19%19%19%19%19%19%19%20%20%20%20%20%20%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%23%24%25%25%25%26%26%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%31%31%31%31%31%34%35%38%38%40%43%44%46%48%51%53%57%59%64%66%70%70%71%72%76%78%82%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%86%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%89%89%89%89%89%89%91%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%93%93%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%97%97%97%97%97%98%98%98%98%98%98%98%98%98%98%99%99%99%99%99%99%99%99%99%99%99%99%100%100%100%100%100%100%  [exit 137]
+  ubuntu-20.04         glibc  yes   1        0        yes      557
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%2%8%12%14%17%19%19%19%19%19%19%19%20%20%20%20%20%20%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%24%24%25%25%25%26%26%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%31%31%31%31%31%34%35%38%39%41%43%44%46%48%51%53%58%59%64%66%70%72%76%79%82%82%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%87%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%89%89%89%89%89%90%91%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%93%93%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%97%97%97%97%97%98%98%98%98%98%98%98%98%98%99%99%99%99%99%99%99%99%99%99%99%99%99%100%100%100%100%100%100%  [exit 137]
+  rockylinux-8         glibc  yes   1        0        yes      842
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%2%8%12%16%19%19%19%19%20%20%20%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%23%24%24%25%25%26%26%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%31%31%31%31%31%32%34%36%38%40%43%44%46%48%50%53%56%59%63%65%70%71%74%75%76%77%80%82%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%87%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%89%89%89%89%89%89%91%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%93%93%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%97%97%97%97%97%97%98%98%98%98%98%98%98%98%98%99%99%99%99%99%99%99%99%99%99%99%99%99%100%100%100%100%100%100%  [exit 137]
+  opensuse-leap-15.6   glibc  yes   1        0        yes      311
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%1%7%13%15%15%15%16%18%18%18%19%19%19%19%19%19%19%19%19%19%19%19%19%19%19%20%20%20%20%20%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%24%24%25%25%25%26%26%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%31%31%31%31%32%34%36%38%40%43%44%46%48%52%53%58%60%64%66%70%72%76%80%82%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%86%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%89%89%89%89%89%91%91%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%93%93%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%96%97%97%97%97%97%98%98%98%98%98%98%98%98%98%99%99%99%99%99%99%99%99%99%99%99%99%100%100%100%100%100%100%  [exit 137]
+  fedora-42            glibc  yes   1        0        yes      475
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%2%7%12%14%15%15%17%19%19%19%19%19%19%19%19%19%19%19%19%20%20%20%20%20%20%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%24%24%25%25%25%26%26%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%31%31%31%31%32%34%37%38%40%43%44%46%48%50%53%57%59%64%65%70%72%76%79%82%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%89%89%89%89%89%90%91%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%93%93%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%96%97%97%97%97%97%98%98%98%98%98%98%98%98%98%99%99%99%99%99%99%99%99%99%99%99%99%100%100%100%100%100%100%  [exit 137]
+  archlinux-latest     glibc  yes   1        0        yes      1179
+      out: 0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%0%4%9%15%18%18%19%19%19%20%20%20%20%20%20%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%21%22%24%24%25%25%25%26%26%26%26%26%26%26%26%26%26%26%27%27%27%27%27%27%27%27%27%27%27%27%28%28%28%28%28%28%28%28%28%28%28%28%28%28%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%29%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%30%31%31%31%31%31%31%31%31%31%31%34%35%38%39%41%43%45%47%48%52%54%58%61%64%67%70%71%73%76%79%82%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%84%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%85%87%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%88%89%89%89%89%89%89%89%89%89%89%89%89%89%89%89%91%91%91%91%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%92%93%93%93%93%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%94%96%97%97%97%97%97%98%98%98%98%98%98%98%98%98%99%99%99%99%99%99%99%99%99%99%99%99%100%100%100%100%100%100%  [exit 137]
 
 
 -- summary ---------------------------------------------------------
-  AXIS                               G galculator   X mousepad
-  rows measured                                11           11
-  GTK connected to a real X                    11           11
-  libgtk-3 loaded from bundle                  11           11
-  zero HOST shared objects                     11           11
-  ⭐ A WINDOW ON THE X SERVER                  0           11
+  AXIS                               G galc   X mousep     P meld
+  rows measured                          11         11         11
+  connected to a real X                  11         11         11
+  zero HOST shared objects               11         11         11
+  ⭐ A WINDOW ON THE X SERVER           11         11         11
 
-  ⭐ arm C: galculator + store path     11 of 11
+  ⭐ arm N: --no-storefix windows    0 of 11
 
-  ok    control: no target ships either program        = 22
+  ok    control: no target ships these programs        = 33
   ok    G: GTK connected to a real display             = 11
   ok    G: libgtk-3 loaded FROM THE BUNDLE             = 11
-  ok    G: host shared objects, rows with zero         = 11
-  ok    X: GTK connected to a real display             = 11
-  ok    X: libgtk-3 loaded FROM THE BUNDLE             = 11
-  ok    X: host shared objects, rows with zero         = 11
-  ok    ⭐ X: a REAL WINDOW on the X server           = 11
-  ok    ⛔ G: a real window on the X server           = 0
-  ok    ⭐ C: the SAME bundle draws once the path resolves = 11
-  ok    C: and it still loaded zero host objects       = 11
-        ⭐ GTK IS NOT THE BLOCKER, AND THIS IS THE MEASUREMENT THAT SAYS SO.
-           mousepad draws 11 of 11 real toplevel windows on a real X
-           server, out of a nixpkgs closure, on distributions that ship no
-           GTK — with ZERO host shared objects. The field grades GTK
-           "Garbage"; through this pipeline, on this subject, it works.
-        ⛔ WHAT BLOCKS galculator IS A HARDCODED ABSOLUTE STORE PATH:
-             Couldn't load /nix/store/<hash>-galculator-2.1.4/share/...
-           The file IS in the bundle. XDG_DATA_DIRS points at the bundle and
-           serves every app that LOOKS UP its data; it cannot serve one with
-           the path baked into its .rodata.
-        ⭐ SO THE REMAINING GAP IS TOOLING, NOT CAPABILITY — T-081, whose
-           entry names "hardcoded paths" verbatim. That is the label
-           T-080's guarantee requires, and it is earned here rather than
-           asserted.
-        ⛔ ARM P (meld, Python): still not measured, and still not a skip —
-           a named tooling defect in resolveEntry, asserted above.
-        ⚠ AN EARLIER VERSION OF THIS EXPERIMENT SCORED galculator 11 of 11
-           GREEN by treating 'cannot open display' as proof GTK worked. The
-           operator rejected it: that message appears on real hardware WITH
-           a display too. A real display turned 11 green rows into 0.
-        ⚠ NOT ESTABLISHED: anything about a GPU (every GL row here is
-           swrast, T-059 owns hardware), and anything about Python GUI apps,
-           which arm P could not build.
+  ok    E2  G: host shared objects, rows with zero     = 11
+  ok    E1  ⭐ G: a REAL WINDOW, with NO bind         = 11
+  ok    E3  ⭐ N: --no-storefix still draws NOTHING   = 0
+  ok    E5  X: a REAL WINDOW on the X server           = 11
+  ok    E5  X: host shared objects, rows with zero     = 11
+  ok    E4  ⭐ P: a PYTHON GUI drew a REAL WINDOW     = 11
+  ok    E4  P: host shared objects, rows with zero     = 11
+        ⭐ WHAT E1 AND E3 SAY TOGETHER. Arm G is the artefact whose UI is a
+           file at /nix/store/<hash>-galculator-2.1.4/share/... — a path that
+           does not exist on any of the eleven. Arm N is the SAME bundle with
+           --no-storefix. If G draws and N does not, the mechanism is what
+           drew it, and no reading of an error message is involved.
+        ⛔ THE MECHANISM IS NOT A /tmp STORE. docs/design/store-paths.md §2
+           answers the security question the operator required first: a
+           fixed path under a world-writable directory is squattable, and the
+           tree it would serve is loadable code. It is an interposer, and the
+           rewrite is exact-match against the closure pgb already computes.
+        ⚠ NOT ESTABLISHED HERE: anything about a GPU (every GL row is swrast,
+           T-059 owns hardware), and anything about a STATICALLY linked or
+           raw-syscall subject, which has no PLT for an interposer to win.
 
 -- result ----------------------------------------------------
-pass=16 fail=0 skip=0
+pass=11 fail=0 skip=0
 VERDICT: matched expectation.
 --------------------------------------------------------------
