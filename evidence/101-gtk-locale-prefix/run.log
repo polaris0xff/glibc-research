@@ -17,3 +17,4 @@ evidence     : /home/user/glibc-research/evidence/101-gtk-locale-prefix
   alpine-3.22      0        0        0         1/0      0
   alpine-3.20      0        0        0         1/0      0
   alpine-3.10      0        0        0         1/0      0
+  voidlinux-musl   0        0        0         1/0      0

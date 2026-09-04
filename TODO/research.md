@@ -357,6 +357,69 @@ being quietly corrected.
 `docs/design/store-paths.md` §3's row changed from NOT MEASURED to whatever
 came out.
 
+## ⭐ MEASURED — `experiments/100-`, three arms, `pass=13 fail=3`
+
+⛔ **The three failures are the findings and none of them is the one that was
+pre-registered.**
+
+**Arm P — the mechanism** (planted store path, real interposer, real
+`.storemap`, same source built three ways; **two runs identical**). ⭐ **The one
+row split into two, failing for different reasons:**
+
+| probe | our object mapped | resolves |
+|---|---|---|
+| ⭐ dynamic through the PLT — the positive control | yes | ✅ yes |
+| ⛔ `-static` | **no** | no |
+| ⛔ `syscall(SYS_openat, …)` | **yes** | no |
+| ⭐ dynamic, no preload — the negative control | no | no |
+
+⛔ Only the first is about linking. **A subject can be fully dynamic and still
+defeat the interposer.**
+
+**Arm G — `syncthing`.** ⛔ **G3 falsified the entry's own premise**: nixpkgs'
+build is **dynamic**, not static, so the subject named here for the static row
+was the wrong shape. It ran **11 of 11**, clean **11 of 11**, 8 store paths
+compiled in and 7 resolving.
+
+**Arm L — `lilipod`, genuinely static.** ⛔ **`pgb bundle appimage` REFUSES a
+loader-less closure**, so the interposer question never arises — there is no
+artefact. The raw binary, no bundle at all:
+
+| | |
+|---|---|
+| ⭐ **the static ELF EXECUTES** | ✅ **11 / 11** |
+| ⛔ **the APPLICATION completes** | **2 / 11** |
+| zero host shared objects | **1 / 11** |
+
+⭐ **Nine failures, one cause, named by the program itself**: *"failed to find
+dependency `getsubids`, can't recover"* — a **host program on `$PATH`**.
+Exactly two rootfs carry it (`archlinux-latest`, `opensuse-leap-15.6`) and
+those are exactly the two that completed. ⚠ One of them also needed the
+**network**: openSUSE has no `tar`, so it downloaded busybox at run time.
+
+⭐ **THE AXIS MOVED.** A statically linked **ELF** is portable — that is what
+static linking buys, and it is 11 of 11. A statically linked **application**
+need not be, and nothing a linker, loader or bundler does addresses a
+dependency that is **another program**. ⚠ It also explains the host-object row:
+when a static program execs host programs, the host's libraries enter the
+**process tree** — the same mechanism `experiments/65-` pre-registers for
+`xterm` (C5), reached independently on a different subject.
+
+## ⛔ What is still owed
+
+1. **The `-static` row still has no application behind it.** Arm P is a
+   mechanism result; arm L never got to ask the question because the bundler
+   refused. A static subject that *does* need a compiled-in path is still
+   wanted — `powershell` is the remaining named candidate.
+2. ⚠ **An open question arm G raised rather than settled.** Go issues raw
+   syscalls for much of its file I/O even when dynamic, so S3 predicts the
+   interposer loses — yet 7 of 8 paths resolved. Build-time **text** rewriting,
+   the program never opening them, or those opens routing through libc are all
+   consistent. `LD_DEBUG` plus one traced row separates them.
+3. ⭐ **The refusal message sends the reader to the wrong problem.** It names a
+   missing **loader**; the useful sentence is that a payload which already
+   starts everywhere does not need bundling.
+
 ---
 
 ## T-090 — ⛔ the sandbox rung needs a BED change, not a bundler change

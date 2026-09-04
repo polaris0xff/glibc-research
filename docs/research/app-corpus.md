@@ -442,6 +442,13 @@ than a re-run of theirs.
 **What it actually needs**, and each is a separate finding:
 - `newuidmap`/`newgidmap` are **setuid host binaries**; a rootless podman
   without them is limited to a single uid. A bundle cannot ship setuid.
+  ⭐ **AND THIS CLASS IS NOW MEASURED, on `lilipod`** — `experiments/100-` arm
+  L. The static binary **executed on 11 of 11** and the **application
+  completed on 2**, every failure naming *"failed to find dependency
+  `getsubids`"*, a shadow-utils **host program**. Exactly the two rootfs that
+  carry `getsubids` are the two that completed. ⛔ So for this rung the blocker
+  is confirmed to be host **programs**, not host libraries — which is the one
+  thing neither static linking nor bundling addresses.
 - `distrobox` is a **shell script suite**, so rung 1's script entry point and
   the `PATH` it assembles are the whole problem.
 - `lilipod` is a **static Go binary** — so it is also a rung-2 subject, and it
