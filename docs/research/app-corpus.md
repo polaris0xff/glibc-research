@@ -14,7 +14,7 @@ field already knows about it, and — where one has been taken — the number.
 |---|---|
 | 1 · multi-entry dispatch | ⭐ the **dispatch table** is measured (`experiments/68-` arm S, 18 of 18). ⛔ No second program has yet come out of a real bundle — arm B |
 | 2 · static / raw-syscall payload | ⭐ the **mechanism** is measured (`experiments/100-` arm P, two runs) and it split into two. ⛔ No real application of either shape — arm G |
-| 3 · GTK's locale prefix | ⛔ pre-registered, not run (`experiments/101-`) |
+| 3 · GTK's locale prefix | ⛔ **the locale half is NOT MEASURABLE in this bed** — no environment has a non-C locale, so no catalogue is opened by either arm. ⭐ The mechanism claim holds on a different discriminator, now with two subjects |
 | 5 · namespaces | ⭐ the **cause** is isolated and a route exists (`experiments/69-`, `pass=9`). ⛔ No browser has been bundled |
 | 4, 6, 7, 8 | research. Rungs 6 and 7 were **corrected** against the vendored trees |
 
@@ -221,6 +221,42 @@ would.
 GNOME app under a non-English `LANG`, asserting a translated string, against the
 same bundle built `--no-storefix`. A window is not enough here — the window
 appears either way.
+
+## ⛔ AND THE LOCALE HALF IS NOT MEASURABLE IN THIS BED — measured, not assumed
+
+⭐ **`experiments/101-` was written, run twice with two subjects, and stopped.**
+Every row reported *no catalogue opened*, in **both** arms. The cause is the
+bed, and it was found by asking what locales the eleven environments actually
+have rather than by reading the zeros:
+
+| | |
+|---|---|
+| environments with a `de_DE` locale **compiled** | ⛔ **0 of 11** |
+| what they do have | `C.UTF-8` / `C.utf8` on 7; **nothing at all** on the three Alpines and Void |
+| environments carrying `share/locale/de` **message catalogues** | 6 of 11 — ⚠ the *translations* are there, the *locale* is not |
+
+⛔ **So `setlocale(LC_ALL, "de_DE.UTF-8")` fails, `LC_MESSAGES` stays `C`, and
+glibc's gettext then does not consult `LANGUAGE` — no `.mo` is ever opened, by
+either arm.** The criterion cannot fire, so it cannot discriminate, so it is
+not an instrument. ⚠ This sits beside the sandbox row: a **bed** limitation,
+not a bundler result.
+
+⭐ **THE MECHANISM CLAIM SURVIVES ON A DIFFERENT DISCRIMINATOR, AND IT NOW HAS
+TWO SUBJECTS.** What rung 3 is really about — a compiled-in absolute path with
+no search variable — is already measured by whether the application **draws**:
+
+| subject | with the interposer | `--no-storefix` |
+|---|---|---|
+| `galculator` (`64-` arms G / N) | ⭐ **11 / 11** | ⛔ **0 / 11** |
+| `gnome-chess` (`101-`, 4 rows before it was stopped) | drew | ⛔ **did not draw** |
+
+⚠ `mousepad` is the counter-example that makes those mean something: it draws
+in **both** arms (`WINDOWS 1/1`), because its UI is a GResource compiled into
+the binary rather than a file at a store path.
+
+⛔ **What is still owed for the locale instance specifically**: an environment
+with a real non-C locale, or a bundle that carries one and points `LOCPATH` at
+it. Neither exists here today.
 
 ⭐ **AND THE FIELD CONSIDERED OUR ROUTE FOR THIS AND CHOSE ANOTHER — this is the
 citation that makes the rung worth doing.** Their `quick-sharun` **patches the
@@ -528,6 +564,8 @@ emulated/dummy stubs for hw gaps."*
 |---|---|
 | a real GPU, NVIDIA | no device on this machine. T-059 |
 | an unprivileged user namespace | ⭐ **the cause is `chroot`, not the bed** — `experiments/69-`: the same rootfs entered by `pivot_root` permits it. Until that change is taken and its isolation measured, a browser row measures `--no-sandbox`. Rung 5 |
+| ⛔ **a non-C locale** | **0 of 11** environments have one compiled — only `C.UTF-8`, and the three Alpines and Void have nothing at all. So `setlocale` fails, `LC_MESSAGES` stays `C`, and gettext opens no catalogue: rung 3's locale criterion cannot fire. ⚠ Six of the eleven *do* carry `share/locale/de` message catalogues, which is what makes the absence easy to miss |
+| ⛔ **a host program a subject shells out to** | `experiments/100-` arm L: `lilipod` needs `getsubids`, which **2 of 11** carry. Neither static linking nor bundling supplies another program — rungs 2 and 7 |
 | a kernel module (`virtualbox`) | the bundle cannot supply one, ever |
 | Wayland-only behaviour | no compositor here; `Xvfb` is X11 |
 | a setuid helper (`newuidmap`) | a bundle cannot ship setuid — rung 7 |
