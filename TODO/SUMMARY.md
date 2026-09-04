@@ -24,8 +24,8 @@
 | **T-090** the sandbox | *"EPERM in the chroot bed"*, no cause | ⭐ the cause is **`chroot`**, isolated in three arms, and **`pivot_root` permits the call** |
 | **T-091** GStreamer | *"we emit one of four"* | ⛔ the entry described the **wrong layer**; all four emitted, the scanner installed as a program. **Unmeasured, and it says so** |
 | **T-092** the `.env` coupling | a known divergence, no check | ⭐ one naming rule, the missing check, and a **gate that found two more** hand-slices on its first run |
-| **T-087** rung 3 | pre-registered | ⛔ **not measurable in this bed** — no environment has a non-C locale. Measured, not assumed |
-| the corpus | 1 of 26 rows | **9 of 26**, and ⭐ **two categories closed**: GTK 3 and X11/XCB |
+| **T-087** rung 3 | pre-registered | ⛔ the **locale** half is **not measurable in this bed** — no environment has a non-C locale. ⭐ The mechanism claim holds on a different discriminator, now with two subjects |
+| the corpus | 1 of 26 rows | **13 of 26**, ⭐ **three categories closed** (GTK 3, X11/XCB, OpenGL/EGL), and four zeros run down to root cause |
 | `references/` | 46 trees, text said 34 | **55**, and rungs 6 and 7 rewritten against what arrived |
 
 ## ⭐ The measurements, each with its verdict line
@@ -36,7 +36,7 @@
 | `69-` user namespaces | `pass=9 fail=0 skip=0` | **three** on `debian-12`; `pass=8 skip=1` on `alpine-3.22` |
 | `100-` static payload, arms P, G, L | `pass=13 fail=3` | arm P **two**, arm G **two** |
 | `101-` rung 3 | ⛔ **stopped, no result recorded** | the criterion cannot fire in this bed |
-| `65-` the corpus | ⏳ **9 of 26** | resumable; a recorded row is never re-measured |
+| `65-` the corpus | ⏳ **13 of 26** | resumable; a recorded row is never re-measured, and a row from a broken instrument is DELETED |
 
 ## ⛔ Three findings that changed what a question means
 
@@ -65,7 +65,7 @@ Its build script names three costs in its own comments — it copies itself
 `/tmp/<random>` path holding **the loader**, and needs `PATH_MAPPING`. Two of
 those are things this project refuses in writing.
 
-## ⛔ Seven corrections — and THREE were in this session's own work
+## ⛔ NINE corrections — and THREE were in this session's own work
 
 ⭐ **None was found by reading the code that contained it.**
 
@@ -89,6 +89,16 @@ those are things this project refuses in writing.
 - ⛔ **T-084's step 1 said `mode` FIRST**, which is the one ordering that fails
   silently: a resumed `65-` calling the old way would report **every row zero
   host objects**. It goes last, with a default.
+- **C34** the corpus's `cli` criterion was `exit 0 AND the assertion`, so a
+  program that answered completely and exited 3 scored zero.
+- **C35** `neovim`'s closure carries **glibc 2.26**; `ld.so` learned `--argv0`
+  in 2.33. One old glibc, two unrelated-looking messages.
+- ⭐ **C36** the corpus separator was `|` and the assertions **alternate**. It
+  hid behind C34 and only surfaced because fixing C34 did **not** move the
+  number.
+- ⭐ **C37** a shell-wrapped nixpkgs application could not start at all: the
+  farm's `bin` resolved to the raw payloads, whose `PT_INTERP` names a loader
+  the bundle lacks.
 
 ## ⭐ The corpus stopped being a scoreboard and became an instrument
 
@@ -107,9 +117,11 @@ one of those rows is a **software rasteriser**.
 
 ## ⚠ What the next session inherits
 
-⭐ **The corpus is the unfinished half and it is resumable.** Two categories
-are closed; the zeros so far are **subject-specific, not an instrument defect**,
-and that was checked rather than assumed.
+⭐ **The corpus is the unfinished half and it is resumable.** Three categories
+are closed. ⛔ **And "the zeros are subject-specific, not an instrument defect"
+— which this page said earlier in the session — was WRONG**: two of the four
+were the instrument, and finding that took fixing one defect and watching the
+number not move. ⚠ Read a zero as a question, never as a result.
 
     T-080  finish 65-. ⭐ It can be run in PARALLEL -- RESUME.md has the
            recipe, and the machine is 99% idle while it runs.
