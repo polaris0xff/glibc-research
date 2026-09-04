@@ -3,19 +3,29 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log,
 the entries, and [`../HISTORY/`](../HISTORY/).
 
-    STATE     2026-09-04.  ⏳ T-080 IN FLIGHT — experiments/65- is running.
+    STATE     2026-09-04b. ⏳ T-080 STILL IN FLIGHT — experiments/65- is
+              running and RESUMABLE. 3 of 26 rows in, and ⭐ the GTK 3
+              category is COMPLETE: galculator, mousepad, geany, all
+              11/11 pass and 11/11 clean.
     COUNTS    65 entries, 25 open, 40 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)
               throughput: glibc 8.40 ns/op vs musl 704.79 (malloc, 4 threads)
-    NEW       ⭐ T-081 CLOSED: a compiled-in /nix/store path and a SCRIPT
-              entry point both resolve, so galculator draws 11/11 without
-              a bind and meld — Python 3 + GTK 3 — bundles at all.
-              ⭐ T-085 /etc/services 11/11, T-086 the codeset axis 11/11.
-              ⛔ THREE CORRECTIONS, ALL INSTRUMENTS: C26 the corpus had no
-              positive control, C27 our store-path regex had the boundary
-              defect we accused the field of, C28 a review's own hypothesis
-              falsified by its own plant.
+    NEW       ⭐ T-090's CAUSE IS ISOLATED AND THERE IS A ROUTE: the sandbox
+              EPERM is CHROOT's, not the bed's — chroot alone reproduces it,
+              unshare --mount alone does not, and pivot_root permits the
+              call. experiments/69-, pass=9, three runs.
+              ⭐ T-088 rung 1: the dispatch table MEASURED, 18 of 18, and
+              the source's own header stated the order wrongly.
+              ⭐ T-089 rung 2: store-paths.md's ONE "NOT MEASURED" row is
+              measured and it was TWO mechanisms — static fails with
+              NOTHING OF OURS MAPPED, raw-syscall fails WITH IT LOADED.
+              ⭐ T-091 and T-092 landed, both UNMEASURED and both saying so.
+              ⛔ FIVE CORRECTIONS: C29 three instrument defects, C30 the
+              dispatch order in our own comment, C31 a comment that broke
+              pgb-apprun.c behind a SILENT FALLBACK to a shell AppRun,
+              C32 a wrong claim read from half a function, C33 three
+              controls that would have passed on a dead subject.
 
 ## ⛔ READ THIS FIRST
 
@@ -101,29 +111,46 @@ evidence that it drew something.
        is docs/research/app-corpus.md and its EIGHT RUNGS are the task
        list; rungs 1-3 decide about twenty of the forty subjects.
 
-    T-088  ⛔ RUNG 1. Multi-entry dispatch is SHIPPED and has NEVER been
-        run. pgb-apprun.c is a static ARGV0/argv[0]/$1 selector and
-        assemble.go installs every program in the entry bin/, so
-        rnote/rnote-cli works by construction -- and no experiment has
-        ever run a second program out of a bundle. One day, and it turns
-        a source reading into a result.
-    T-089  ⛔ RUNG 2. store-paths.md §3 marks ONE row NOT MEASURED: a
-        static or raw-syscall payload has no PLT for the interposer to
-        win. `syncthing` is that subject. PRE-REGISTER THE FAILURE.
-    T-087  ⭐ RUNG 3 ONWARD: the battle-test corpus, 40+ applications.
+    ⛔ FOUR EXPERIMENTS ARE WRITTEN, PRE-REGISTERED AND COMMITTED. Three
+       have an arm that needed no bed and it has RUN; the arms that need
+       the bed are waiting for 65- and are the first thing to do when it
+       finishes. RUN THEM, do not rewrite them.
+
+    T-088  ⭐ RUNG 1. experiments/68-. Arm S (the selector, no bed) is
+        DONE: 18 of 18, and it corrected the source's own header --
+        the order is $ARGV0 -> argv[1] (dropped) -> argv[0] -> default,
+        and ARGV0 was named nowhere. ⛔ ARM B IS NOT RUN: a SECOND
+        program out of a real bundle on eleven. Subject mkvtoolnix,
+        because mkvmerge/mkvextract print their OWN names in --version
+        and a dispatch that ran the default would FAIL.
+    T-089  ⭐ RUNG 2. experiments/100-. Arm P (the mechanism, no bed) is
+        DONE, two runs: static fails with NOTHING OF OURS MAPPED,
+        raw-syscall fails WITH IT LOADED -- one row in store-paths.md
+        was two mechanisms. ⛔ ARM G IS NOT RUN: syncthing on eleven,
+        and it is REPORTED not predicted.
+    T-087  ⛔ RUNG 3. experiments/101- is written and pre-registered and
+        HAS NOT RUN. Its criterion is NOT a window -- the window appears
+        either way -- it is the .mo catalogue being opened under the
+        bundle, against the same bundle built --no-storefix.
         ⚠ THE MEASURE-TWICE RULE IS SUSPENDED FOR THIS ENTRY, by the
         operator; every other delivery rule holds.
-    T-090  ⛔ RUNG 5 is a BED problem: unshare(CLONE_NEWUSER) is EPERM
-        here, so a browser row measures --no-sandbox unless the bed
-        changes. Do not merge "carries a browser" with "the sandbox
-        works".
+    T-090  ⭐ RUNG 5. experiments/69- ANSWERED THE GATING QUESTION: the
+        refusal is CHROOT's, and pivot_root permits the call. ⛔ THREE
+        THINGS STAY UNMEASURED and none follows from it -- whether the
+        bed still isolates under pivot_root, whether teardown stays
+        clean, and whether a bundled browser then sandboxes. Until one
+        is taken, a browser row measures --no-sandbox.
     T-084  ⛔ the trace classifier is SIX hand copies and one counted
         FAILED opens as loads. lib.sh's shared version needs the `mode`
         argument first -- it is not the deletion the entry first said.
         The competitor's "4 of 11" in comparison.md may be inflated.
-    T-091  GStreamer: four variables and a scanner; bakedOverride emits
-        one. Also decides whether a media subject's host-object count is
-        measuring the app or the plugin scanner.
+        ⛔ BLOCKED WHILE 65- RUNS: it edits experiments/lib.sh, and a
+        running sh re-reads from a byte offset.
+    T-091  ⭐ LANDED, ⛔ UNMEASURED. All four GStreamer variables, and
+        gst-plugin-scanner installed as a bundle PROGRAM so it runs
+        through sharun rather than the host loader. The Prove line is a
+        media subject whose host-object count says WHICH PROCESS it
+        counted.
     T-059  a real GPU. ⛔ Every GL row is still swrast and surfaceless.
     T-066  ⛔ still the only open P0, and its remaining column is SIZE,
         which the operator struck on 2026-09-03c and deferred on

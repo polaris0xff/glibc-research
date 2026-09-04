@@ -6,16 +6,16 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-04b, at the START. Session IN PROGRESS.
+    LAST WRITTEN   2026-09-04b, at the START; refreshed as each piece landed.
+                   Session IN PROGRESS.
     TREE           main, began at 4f652df4 (== origin/main at session start)
     BRANCH         ⛔ main. The harness named
                    `claude/app-corpus-research-34c2el` and THE OPERATOR SAID
                    main, again. FIFTH session running.
-    SCOPE          ⏳ T-080 finish experiments/65- (RESUMABLE, 1 of 26 rows in).
-                   Then, BY MECHANISM: T-088 rung 1, T-089 rung 2, T-087
-                   rungs 3+, T-090 rung 5, then T-084 / T-091 / T-092.
-    CI             ⚠ runs after 4f652df4 NOT YET READ — READ THEM.
-    GATES          not yet run this session.
+    SCOPE          ⏳ T-080 finish experiments/65- (RESUMABLE). Then the arms
+                   below that need the bed.
+    CI             ⭐ 335-341 all success. Read after every push.
+    GATES          both green at every commit.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
 
@@ -72,18 +72,39 @@ criterion fail *for the right reason*.
 
 ## In flight right now
 
-    ⏳ `experiments/65-` — the T-080 corpus. RESUMABLE and 1 of 26 rows in
-       (`gtk3-1`, the C6 control, 11/11 pass 11/11 clean). A recorded row in
+    ⏳ `experiments/65-` — the T-080 corpus. RESUMABLE. A recorded row in
        `evidence/65-capability-corpus/rows/` is NEVER re-measured, so
        `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
        ⛔ A row measured by a BROKEN instrument must be DELETED, not adjusted
        — that is what makes resumability safe.
+       ⭐ 3 of 26 in, and the GTK 3 category is COMPLETE:
+       galculator, mousepad and geany all 11/11 pass, 11/11 clean.
+       ⚠ ~35 minutes per subject measured, so the remaining 23 are ~13 hours.
+
+    ⛔ FOUR EXPERIMENTS ARE WRITTEN AND PRE-REGISTERED. RUN THEM, DO NOT
+    REWRITE THEM. The bed-free arms have already run; these are what is left,
+    and each needs 65- to finish first:
+
+        68- arm B   a SECOND program out of a real bundle, eleven rows.
+                    `sh scripts/common/run-experiment.sh 68`
+        100- arm G  syncthing, eleven rows. REPORTED, not predicted.
+                    `sh scripts/common/run-experiment.sh 100`
+        101-        rung 3, the GTK locale prefix, T vs --no-storefix.
+                    ⛔ It uses DISPLAY :98 on purpose; 65- owns :99.
+                    `sh scripts/common/run-experiment.sh 101`
+        69-         DONE (pass=9, three runs) — nothing left to run.
+
+    ⛔ AND ONE THING IS BLOCKED ON 65- FOR A DIFFERENT REASON: T-084 edits
+    `experiments/lib.sh`, which 65- sourced. A running `sh` re-reads from a
+    byte offset. Do it after.
 
     ⛔ WHILE 65- RUNS, THE MACHINE IS NOT FREE.
       - ⛔ Do not `make`: each subject's bundle is built by `$REPO_DIR/pgb`, so
         a rebuild mid-run puts rows from TWO tools in one table. It forced two
         restarts and NO GATE CATCHES IT. Typecheck with
-        `go build -o /tmp/x ./cmd/pgb` instead.
+        `go build -o /tmp/x ./cmd/pgb` instead — ⭐ and RUN a selftest from
+        that binary too (`/tmp/x bundle appimage --selftest`), which needs no
+        rebuild of `./pgb` at all.
       - ⛔ Do not run another GUI experiment on `:99`: 65- counts windows
         there, and a second program's window is a false positive nothing else
         in the harness catches. A different display (`:98`) is safe.
@@ -122,6 +143,13 @@ criterion fail *for the right reason*.
   it to finish finds no windows either way and scores a working bundle exactly
   like a broken one.
 - ⛔ **`make` depends on `tool/runtime/*.c`.** Rebuild after touching the loader.
+- ⛔ **`make` does NOT compile `tool/runtime/*.c`** — they are embedded as
+  strings and compiled by `cc` at build or bundle time, so a C file that cannot
+  compile still builds a green `./pgb`. `TODO/check.sh` check 10 is what
+  catches that now; `history/corrections.md` C31 is what it cost.
+- ⚠ **`codegraph status` reports the index STALE right after a Go edit**, and
+  the record gate fails on it. Run `codegraph sync .` before the gate, not
+  after reading the failure.
 - ⛔ **DISK IS BINDING.** Safe to reclaim, in this order:
   `/root/.local/state/pgb/nix-deps/<hash>` (biggest, one per option set — `ls`
   it first), `nix-build`, `nix-prefix`, `/var/tmp/pgb-appimage-*`,
