@@ -190,9 +190,19 @@ instance reads them back and counts C6 from them (`note_control` runs on the
 recorded-row branch too). ⛔ So quote the FULL run's verdict, never a filtered
 one's.
 
-⚠ Disk is the binding constraint, not CPU: each instance holds a ~2.5 GiB
-cache and each bed copy is 2.1 GiB. Watch `df`, and the watchdog's floor is
-6 GiB.
+⛔ **TWO INSTANCES IS THE CEILING ON THIS MACHINE, measured.** With one the
+machine reads **99% idle** (load 0.48 on 4 cores); with two it reads **51%
+idle** (load 3.79). ⚠ A third would put the GUI rows into CPU contention, and
+their window budget was measured on an idle machine — which is exactly the
+class of defect `corrections.md` C26 is about. Do not add a third to go faster.
+
+⚠ Disk is the other constraint: each instance holds a ~2.5 GiB cache and each
+bed copy is 2.1 GiB. Watch `df`; the watchdog's floor is 6 GiB.
+
+⛔ **AND CLEAN UP AFTER A KILLED RUN.** A stopped instance leaves its
+`subj65`/`subj101` copies (up to 187 MiB each) in every rootfs it touched, and
+they are not reclaimed by anything:
+`find /var/lib/pgb-rootfs* -maxdepth 2 -name 'subj*' -delete`.
 
     ⛔ WHILE 65- RUNS, THE MACHINE IS NOT FREE.
       - ⛔ Do not `make`: each subject's bundle is built by `$REPO_DIR/pgb`, so
