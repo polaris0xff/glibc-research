@@ -4,10 +4,22 @@
 and prove our bundler is best in class"*, with the instruction to **sort the
 tasks by what will auto-fix or complete what — not easy first**.
 
-⚠ **This page is research, not results.** Nothing here has been bundled. Each
-row says which mechanism a subject exercises and what the field already knows
-about it; the measurement is [`TODO/research.md`](../../TODO/research.md) T-087
-and the sessions after it. `experiments/65-` is the harness.
+⚠ **This page was research when it was written, and three rungs now carry
+measurements.** Each row says which mechanism a subject exercises, what the
+field already knows about it, and — where one has been taken — the number.
+⛔ **Read the rung, not this header**: a rung that still says *hypothesis*,
+*not measured* or *read off the source* means exactly that.
+
+| rung | state |
+|---|---|
+| 1 · multi-entry dispatch | ⭐ the **dispatch table** is measured (`experiments/68-` arm S, 18 of 18). ⛔ No second program has yet come out of a real bundle — arm B |
+| 2 · static / raw-syscall payload | ⭐ the **mechanism** is measured (`experiments/100-` arm P, two runs) and it split into two. ⛔ No real application of either shape — arm G |
+| 3 · GTK's locale prefix | ⛔ pre-registered, not run (`experiments/101-`) |
+| 5 · namespaces | ⭐ the **cause** is isolated and a route exists (`experiments/69-`, `pass=9`). ⛔ No browser has been bundled |
+| 4, 6, 7, 8 | research. Rungs 6 and 7 were **corrected** against the vendored trees |
+
+`experiments/65-` is the harness for the capability corpus;
+[`TODO/research.md`](../../TODO/research.md) T-087 owns the rest.
 
 ⭐ **The ordering rule.** A subject is not hard or easy — a **mechanism** is
 present or missing. Ordering by app difficulty re-measures the same mechanism
@@ -185,7 +197,14 @@ shows a window with no titlebar, which the geometry criterion still counts).
 ⛔ **What is missing, and the field names it.** GStreamer needs **four**
 variables and a fifth pointing at the scanner binary: `GST_PLUGIN_PATH`,
 `GST_PLUGIN_SYSTEM_PATH`, `GST_PLUGIN_SYSTEM_PATH_1_0`, `GST_PLUGIN_SCANNER`.
-We emit one of the four and none of the scanner. And *"`gst-plugin-scanner`
+⭐ **CORRECTED 2026-09-04b — see [`TODO/research.md`](../../TODO/research.md)
+T-091.** We emitted one; the other three may or may not be supplied by sharun's
+own `dir.starts_with("gstreamer-")` branch, which **can** fire here because
+`copyLibraries` carries `lib/` subdirectories whole. ⛔ **`GST_PLUGIN_SCANNER`
+is the one that is definitely missing**: sharun sets it only when the scanner
+sits beside the plugins and nixpkgs puts it in `libexec/`. All four are emitted
+now, the scanner installed as a bundle *program* so it runs through sharun —
+⛔ **unmeasured.** And *"`gst-plugin-scanner`
 opens every single gstreamer plugin on the system, so we cannot easily determine
 using `strace` what plugin an application needs"* — which also means a
 host-object count taken on a GStreamer subject is measuring the scanner, not the

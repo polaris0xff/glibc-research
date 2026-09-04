@@ -1134,6 +1134,84 @@ re-checks `$0` once `ARGV0` is set but unmatched.
 
 ---
 
+## C31 — a COMMENT broke `pgb-apprun.c`, and the fallback would have shipped a shell AppRun
+
+⛔ **The worst shape a defect can have in this tree: it makes the build
+succeed and the artefact worse.**
+
+A revision of `tool/runtime/pgb-apprun.c`'s header quoted Anylinux's dispatch
+rule verbatim — `ARG0="${ARGV0:-$0}"` → `bin/${ARG0##*/}` → `bin/$1` →
+`MAIN_BIN`. ⭐ **`${ARG0##*/}` contains `*/`, which ends a C block comment.**
+Everything after it parsed as code and the file stopped compiling.
+
+⛔ **Three things had to line up for that to be invisible, and they did:**
+
+1. `tool/runtime/*.c` are **embedded as strings** and compiled by `cc` at build
+   or bundle time, so `go build` and `make` both succeed on a C file that
+   cannot compile;
+2. `buildStaticAppRun` **catches** a compile failure and falls back to
+   `writeShellAppRun` — a shell AppRun, run by the **host's** interpreter,
+   loading the **host's** libc. That is exactly what the file exists to avoid,
+   measured at 1–4 host objects per glibc row in `experiments/90-`;
+3. the fallback announces itself as a **warning in a build log**, not an error.
+
+⭐ **What caught it was `experiments/68-` arm S** — an experiment written the
+same session, which compiles the real source rather than reading it. Nothing
+else in the tree would have.
+
+**Landed**: the comment no longer quotes the expansion and says in one line why
+it must not; ⭐ `TODO/check.sh` **check 10** requires every `tool/runtime/*.c`
+to pass `cc -fsyntax-only` (13 checked, all pass, verified to fail on the
+planted defect). The other twelve files were already fine.
+
+---
+
+## C32 — "copyLibraries flattens everything", read from half a function
+
+⚠ **A wrong claim about our own code, caught by a deep review before it was
+measured, and it had already been written into an entry and two comments.**
+
+T-091's first version argued that Anylinux-sharun's GStreamer branch — which
+sets all four `GST_PLUGIN_*` variables for a `gstreamer-*` directory under
+`shared/lib` — **cannot fire here**, because *"`copyLibraries` flattens every
+shared object into a single `lib/`, so there is no such directory"*.
+
+⛔ **It flattens loose objects and it also carries every directory under a
+store path's `lib/` WHOLE** — `copyTreeNoClobber`, logged as
+`lib trees N directories under lib/ carried whole` — and `assemble.go`
+symlinks `shared/lib` → `../lib`. ⭐ **So `shared/lib/gstreamer-1.0` exists and
+that branch can fire.** Whether it does is still unmeasured, and the entry now
+says so instead of asserting the opposite.
+
+⭐ **What survives is the part that mattered**: `GST_PLUGIN_SCANNER` is
+definitely not set. sharun sets it only when the scanner sits *beside* the
+plugins, and nixpkgs puts it in `libexec/gstreamer-*/`, so that test cannot
+succeed on a nixpkgs closure however the plugin directory is laid out.
+
+⚠ **The reading error is the lesson**: the head comment of `copyLibraries` says
+what it does; the second half of the function says what *else* it does. Nothing
+measured this wrong — nothing had measured it at all.
+
+---
+
+## C33 — three controls that would have passed on a dead subject
+
+⭐ **C29's third defect, found again in three new places in one review**, all
+in experiments written this session, none yet run against a subject.
+
+| where | what it counted | why that is not a measurement |
+|---|---|---|
+| `101-` **L2** | arm N opened no catalogue under the bundle | ⛔ also what a control that **never started** reports. It now takes three observations: opened none, **was seen attempting `/nix/store`**, and still drew. ⚠ The `/nix/store` count was already being computed and **never read** — the pre-registration promised an observation the script did not make |
+| `101-` **L4** | arm T loaded zero host shared objects | ⛔ a corpse loads zero too. Gated on the row having drawn |
+| `68-` **E11** | the second program loaded zero host objects | ⛔ same. Gated on the row having run |
+
+⛔ **"An absence is not a zero" (delivery rule 4) applies to controls, not only
+to searches.** A control passes only when it is seen doing the thing that
+distinguishes it from a failure — a positive observation, never the lack of a
+negative one.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |
