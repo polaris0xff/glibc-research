@@ -2296,6 +2296,44 @@ shell** and be found first. Not implemented, not measured; see
 
 ---
 
+## C56 — the `--wrap=iconv` claim had never been measured, because its arm was skipped every run
+
+⛔ **`docs/research/bundle-capabilities.md` calls this "the one place our answer
+is structurally better than theirs".** It was reasoning, not a result: the arm
+that measures it had been **SKIPPED on every run of `experiments/30-`**, and a
+skip is not a failure so both gates stayed green over it.
+
+`pgb` builds GNU libiconv **inside the build environment**, so the archive is
+at `<env root>/opt/pgb-libiconv/lib/libiconv.a` — `cmd/pgb/doctor.go` looks for
+it exactly there. `experiments/30-` looked at `/opt/pgb-libiconv` on the
+**HOST**, where it has never been:
+
+    SKIP  arm B (static libiconv)  (no libiconv.a at /opt/pgb-libiconv …)
+
+⭐ **Same family as C48, C50 and C52** — an instrument looking where the thing
+never is, made invisible by a skip. The fix tries both paths, host first,
+**reports which one it used**, and separates *"the archive is not there"* from
+*"it is there and the link failed"*, which the old message could not.
+
+## ⭐ AND THE RESULT IS LARGE
+
+`pass=24 fail=0 skip=0`, up from 23 pass and 1 skip — **zero skips remain in
+the committed evidence of the whole tree.**
+
+| | arm A: `-static`, plain glibc `iconv` | arm B: `--wrap=iconv` → static GNU libiconv |
+|---|---|---|
+| the four musl rows | `opened=1 failed=11 roundtrip=0` | ⭐ `opened=12 failed=0 roundtrip=1` |
+| the seven glibc rows | ⛔ `<no output>` — **it crashes** | ⭐ `opened=12 failed=0 roundtrip=1` |
+
+⭐ **So the shipped mechanism takes a static binary from one encoding of twelve
+— and a crash on every glibc host — to twelve of twelve with a byte-exact round
+trip, on all eleven environments.** It cost ~1.9 MiB on the probe.
+
+⚠ The claim was true. It was simply never checked, and "true and unchecked" is
+what this file exists to catch.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

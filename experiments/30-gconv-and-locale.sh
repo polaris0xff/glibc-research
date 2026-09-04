@@ -60,7 +60,29 @@ exp_begin "30 - gconv and locale: what a static glibc binary loses off a glibc h
 B="$EXP_OUT/build"
 rm -rf "$B"; mkdir -p "$B" || exit 2
 
-ICONV_PREFIX="${PGB_LIBICONV_PREFIX:-/opt/pgb-libiconv}"
+# ⛔ ARM B — THE CANDIDATE FIX, AND THE WHOLE POINT OF THIS EXPERIMENT — HAD
+# BEEN SKIPPED ON EVERY RUN, AND A SKIP IS NOT A FAILURE SO BOTH GATES STAYED
+# GREEN OVER IT.
+#
+# `pgb` builds GNU libiconv INSIDE the build environment, so the archive lives
+# at `<env root>/opt/pgb-libiconv/lib/libiconv.a` — `cmd/pgb/doctor.go` looks
+# for it exactly there. This file looked at `/opt/pgb-libiconv` on the HOST,
+# where it has never been, and reported
+#
+#     SKIP  arm B (static libiconv)  (no libiconv.a at /opt/pgb-libiconv …)
+#
+# ⭐ Same family as corrections.md C48, C50 and C52: an instrument looking in
+# a place the thing is never in, made invisible by a skip. 2026-09-04c.
+#
+# ⚠ BOTH are tried, host first, and the one actually used is REPORTED — a run
+# on a machine that really does have it at the host path must stay valid.
+ICONV_PREFIX="${PGB_LIBICONV_PREFIX:-}"
+if [ -z "$ICONV_PREFIX" ]; then
+  for _ip in /opt/pgb-libiconv "$ENV_ROOT/opt/pgb-libiconv"; do
+    [ -f "$_ip/lib/libiconv.a" ] && { ICONV_PREFIX=$_ip; break; }
+  done
+  ICONV_PREFIX="${ICONV_PREFIX:-/opt/pgb-libiconv}"
+fi
 
 cat > "$B/gconv-probe.c" <<'EOF'
 #define _GNU_SOURCE
@@ -126,7 +148,18 @@ if [ -f "$ICONV_PREFIX/lib/libiconv.a" ]; then
   fi
 fi
 if [ "$HAVE_ICONV" = 0 ]; then
-  exp_skip "arm B (static libiconv)" "no libiconv.a at $ICONV_PREFIX -- run pgb env create"
+  # ⛔ AND THE TWO REASONS ARE DIFFERENT. "The archive is not there" is an
+  # environment gap; "it is there and the link failed" is a FINDING, and the
+  # old message could not tell them apart.
+  if [ -f "$ICONV_PREFIX/lib/libiconv.a" ]; then
+    exp_skip "arm B (static libiconv)" \
+      "libiconv.a IS at $ICONV_PREFIX but the link failed: $(tr -d '\n' < "$B/shim-link.log" 2>/dev/null | cut -c1-110)"
+  else
+    exp_skip "arm B (static libiconv)" \
+      "no libiconv.a at /opt/pgb-libiconv nor $ENV_ROOT/opt/pgb-libiconv -- run pgb env create"
+  fi
+else
+  exp_note "$(printf 'arm B linked against %s/lib/libiconv.a' "$ICONV_PREFIX")"
 fi
 
 exp_note "arm A size: $(wc -c < "$B/gconv-plain") bytes"

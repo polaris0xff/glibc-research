@@ -2,7 +2,7 @@
 30 - gconv and locale: what a static glibc binary loses off a glibc host
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-03T09:38:20Z
+date (UTC)   : 2026-09-04T19:06:56Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -12,22 +12,39 @@ ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
 evidence     : /home/user/glibc-research/evidence/30-gconv-and-locale
 --------------------------------------------------------------
 
-  SKIP  arm B (static libiconv)                        (no libiconv.a at /opt/pgb-libiconv -- run pgb env create)
+        arm B linked against /var/lib/pgb-rootfs/pgb-env-debian13/opt/pgb-libiconv/lib/libiconv.a
         arm A size: 785480 bytes
+        arm B size: 1937352 bytes
 
   iconv, 12 encodings, opened/failed and one byte-exact round trip:
     ENVIRONMENT          LIBC   A plain -static            B +static libiconv
-    alpine-3.22          musl   opened=1 failed=11 roundtrip=0 (skipped)
-    alpine-3.20          musl   opened=1 failed=11 roundtrip=0 (skipped)
-    alpine-3.10          musl   opened=1 failed=11 roundtrip=0 (skipped)
-    voidlinux-musl       musl   opened=1 failed=11 roundtrip=0 (skipped)
-    debian-11            glibc  <no output>                (skipped)
-    debian-12            glibc  <no output>                (skipped)
-    ubuntu-20.04         glibc  <no output>                (skipped)
-    rockylinux-8         glibc  opened=1 failed=11 roundtrip=0 (skipped)
-    opensuse-leap-15.6   glibc  opened=1 failed=11 roundtrip=0 (skipped)
-    fedora-42            glibc  opened=1 failed=11 roundtrip=0 (skipped)
-    archlinux-latest     glibc  opened=1 failed=11 roundtrip=0 (skipped)
+    alpine-3.22          musl   opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    alpine-3.22: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    alpine-3.20          musl   opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    alpine-3.20: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    alpine-3.10          musl   opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    alpine-3.10: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    voidlinux-musl       musl   opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    voidlinux-musl: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    debian-11            glibc  <no output>                opened=12 failed=0 roundtrip=1
+  ok    debian-11: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    debian-12            glibc  <no output>                opened=12 failed=0 roundtrip=1
+  ok    debian-12: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    ubuntu-20.04         glibc  <no output>                opened=12 failed=0 roundtrip=1
+  ok    ubuntu-20.04: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    rockylinux-8         glibc  opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    rockylinux-8: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    opensuse-leap-15.6   glibc  opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    opensuse-leap-15.6: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    fedora-42            glibc  opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    fedora-42: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+    archlinux-latest     glibc  opened=1 failed=11 roundtrip=0 opened=12 failed=0 roundtrip=1
+  ok    archlinux-latest: B opens all 12 encodings + round trip = opened=12 failed=0 roundtrip=1
+
+  what each arm touches on Alpine 3.22 (musl):
+  ok    A: gconv lookups (the positive control)        = some
+        A tried 3 gconv paths, every one ENOENT -- this is the loss
+  ok    B: files opened by the process at all          = 0
 
   locale: does setlocale(C.UTF-8) give a UTF-8 codeset?
     ENVIRONMENT          LIBC   plain -static                      with bundled locale + LOCPATH
@@ -56,6 +73,6 @@ evidence     : /home/user/glibc-research/evidence/30-gconv-and-locale
         C.utf8 costs 408 KiB, of which LC_CTYPE is nearly all
 
 -- result ----------------------------------------------------
-pass=11 fail=0 skip=1
+pass=24 fail=0 skip=0
 VERDICT: matched expectation.
 --------------------------------------------------------------
