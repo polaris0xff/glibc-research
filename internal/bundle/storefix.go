@@ -493,7 +493,7 @@ func (b *Builder) fixDesktopEntries(byBase map[string]string) {
 			continue
 		}
 		var out []string
-		dropped, left := 0, 0
+		dropped, left, inClosure := 0, 0, 0
 		for _, l := range strings.Split(string(data), "\n") {
 			switch {
 			case strings.HasPrefix(l, "DBusActivatable="):
@@ -506,11 +506,19 @@ func (b *Builder) fixDesktopEntries(byBase map[string]string) {
 				out = append(out, "Icon="+icon)
 				continue
 			}
+			// ⛔ THE TWO CASES ARE DIFFERENT FINDINGS. A store path that IS
+			// in the closure means the bundler should have rewritten this
+			// key and did not; one that is NOT means the entry points off
+			// the bundle entirely. Reporting them as one number would hide
+			// the first behind the second.
 			if strings.Contains(l, "/nix/store/") {
 				for _, m := range storeRefRe.FindAllString(l, -1) {
 					base, _, _ := strings.Cut(strings.TrimPrefix(m, "/nix/store/"), "/")
-					_ = byBase[base]
-					left++
+					if _, ok := byBase[base]; ok {
+						inClosure++
+					} else {
+						left++
+					}
 				}
 			}
 			out = append(out, l)
@@ -520,8 +528,12 @@ func (b *Builder) fixDesktopEntries(byBase map[string]string) {
 			logx.Say("desktop     %s: DBusActivatable removed (a bundle cannot be activated)",
 				filepath.Base(f))
 		}
+		if inClosure > 0 {
+			logx.Warnf("%s names %d store path(s) that ARE in this bundle and were not rewritten",
+				filepath.Base(f), inClosure)
+		}
 		if left > 0 {
-			logx.Warnf("%s still names %d /nix/store path(s); a desktop entry expands nothing",
+			logx.Warnf("%s names %d store path(s) that are NOT in this bundle at all",
 				filepath.Base(f), left)
 		}
 	}
@@ -529,21 +541,34 @@ func (b *Builder) fixDesktopEntries(byBase map[string]string) {
 
 // bundledIconName is the icon the bundle actually carries at its top level,
 // which is the only name a package manager can resolve.
+//
+// ⚠ THE PROGRAM'S OWN NAME WINS. Taking the first top-level image would be a
+// proxy for nothing — the same mistake `findIcon`'s comment calls out about
+// choosing an icon by path length — and a bundle can legitimately carry more
+// than one.
 func (b *Builder) bundledIconName() string {
 	entries, err := os.ReadDir(b.AppDir)
 	if err != nil {
 		return ""
 	}
+	first := ""
 	for _, e := range entries {
 		n := e.Name()
 		if n == ".DirIcon" || e.IsDir() {
 			continue
 		}
-		if strings.HasSuffix(n, ".png") || strings.HasSuffix(n, ".svg") {
-			return strings.TrimSuffix(strings.TrimSuffix(n, ".png"), ".svg")
+		if !strings.HasSuffix(n, ".png") && !strings.HasSuffix(n, ".svg") {
+			continue
+		}
+		stem := strings.TrimSuffix(strings.TrimSuffix(n, ".png"), ".svg")
+		if stem == b.Prog {
+			return stem
+		}
+		if first == "" {
+			first = stem
 		}
 	}
-	return ""
+	return first
 }
 
 func globAll(dir string, pats ...string) []string {

@@ -321,8 +321,15 @@ func (b *Builder) buildCacertData(rd, src string) error {
 }
 
 func (b *Builder) buildLocaleData(rd, src string) error {
+	// ⛔ THE FLAG IS PART OF THE CACHE KEY, and leaving it out would be
+	// `download`'s defect in another place: an object built once without
+	// --utf8-default would be reused by a build that asked for it, silently.
+	stamp := filepath.Join(rd, "pgb-locale-data.flags")
+	want := fmt.Sprintf("utf8_default=%d\n", b2i(b.C.UTF8Default))
 	if exists(filepath.Join(rd, "pgb-locale.o")) && exists(filepath.Join(rd, "pgb-locale-data.o")) {
-		return nil
+		if got, err := os.ReadFile(stamp); err == nil && string(got) == want {
+			return nil
+		}
 	}
 	var dir string
 	for _, c := range []string{"/usr/lib/locale/C.utf8", "/usr/lib/locale/C.UTF-8"} {
@@ -379,6 +386,10 @@ func (b *Builder) buildLocaleData(rd, src string) error {
 	buf.WriteString("};\n")
 	fmt.Fprintf(&buf, "const unsigned pgb_locale_nfiles = %d;\n", len(files))
 	fmt.Fprintf(&buf, "const char pgb_locale_name[] = \"%s\";\n", filepath.Base(dir))
+	// ⭐ --utf8-default: what an UNSET LANG means. experiments/63- measured
+	// this as the one axis where native musl beats both glibc columns 11-0,
+	// and pgb-locale.c says why --embed-locale alone cannot move it.
+	fmt.Fprintf(&buf, "const int pgb_utf8_default = %d;\n", b2i(b.C.UTF8Default))
 
 	gen := filepath.Join(rd, "pgb-locale-data.c")
 	if err := os.WriteFile(gen, buf.Bytes(), 0o644); err != nil {
@@ -387,7 +398,17 @@ func (b *Builder) buildLocaleData(rd, src string) error {
 	if err := b.compile(gen, filepath.Join(rd, "pgb-locale-data.o"), "-O0"); err != nil {
 		return err
 	}
-	return b.compile(filepath.Join(src, "pgb-locale.c"), filepath.Join(rd, "pgb-locale.o"), "-O2")
+	if err := b.compile(filepath.Join(src, "pgb-locale.c"), filepath.Join(rd, "pgb-locale.o"), "-O2"); err != nil {
+		return err
+	}
+	return os.WriteFile(stamp, []byte(want), 0o644)
+}
+
+func b2i(v bool) int {
+	if v {
+		return 1
+	}
+	return 0
 }
 
 // writeBytes emits a comma-separated decimal byte list.

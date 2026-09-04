@@ -51,6 +51,7 @@
 #include <errno.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -210,6 +211,7 @@ static int pgb_pack(char *buf, size_t len, const char *a, const char *b,
                     char **outa, char **outb, char ***aliases)
 {
     size_t na = strlen(a) + 1, nb = b ? strlen(b) + 1 : 0, off;
+    uintptr_t addr;
     char *p = buf;
     if (na + nb + sizeof(char *) * 2 > len)
         return ERANGE;
@@ -223,8 +225,14 @@ static int pgb_pack(char *buf, size_t len, const char *a, const char *b,
     } else if (outb) {
         *outb = 0;
     }
-    off = (size_t)(p - buf);
-    off = (off + sizeof(char *) - 1) & ~(sizeof(char *) - 1);
+    /* ⛔ ALIGN THE ABSOLUTE ADDRESS, NOT THE OFFSET INTO THE BUFFER. The
+     * caller's buffer is a char array and nothing promises it starts on a
+     * pointer boundary, so rounding the OFFSET up leaves the alias vector
+     * misaligned whenever `buf` itself is. x86_64 tolerates that and several
+     * architectures this project intends to reach do not. */
+    addr = (uintptr_t)p;
+    addr = (addr + sizeof(char *) - 1) & ~(uintptr_t)(sizeof(char *) - 1);
+    off = (size_t)(addr - (uintptr_t)buf);
     if (off + sizeof(char *) > len)
         return ERANGE;
     *aliases = (char **)(buf + off);

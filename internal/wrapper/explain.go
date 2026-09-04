@@ -121,6 +121,18 @@ LINK FLAGS
                                  and ubuntu-20.04, ALL GLIBC. T-079
 `)
 	}
+	if c.UTF8Default {
+		w.WriteString(`  (--utf8-default)               an UNSET LANG means C.UTF-8, not C. ⛔ A
+                                 change to a DOCUMENTED DEFAULT, not a repair:
+                                 POSIX leaves the choice to the implementation
+                                 when the environment is silent, glibc picks
+                                 "C" and this picks "C.UTF-8". It is the one
+                                 axis where native musl beats both glibc
+                                 columns 11-0 (experiments/63-). ⚠ A program
+                                 that assumed a single-byte default now sees a
+                                 multibyte one
+`)
+	}
 	if c.EmbedLocale {
 		w.WriteString(`  -Wl,--wrap=setlocale           embedded C.UTF-8, materialised ONLY when the
   <pgb-locale-data.o>            host cannot answer a UTF-8 setlocale. A

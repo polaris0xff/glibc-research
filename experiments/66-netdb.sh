@@ -98,22 +98,33 @@ cat > "$WORK/nd.c" <<'EOF'
 #include <string.h>
 #include <sys/socket.h>
 int main(void) {
-    struct servent *s = getservbyname("http", "tcp");
-    struct protoent *p = getprotobyname("tcp");
-    struct servent *n = getservbyname("z-pgb-absent", "tcp");
+    /* ⛔ READ THE VALUE IMMEDIATELY, DO NOT HOLD THE POINTER. getservbyname
+       returns a pointer into ONE static struct, so a later call overwrites
+       what an earlier one returned. The first version of this probe held
+       three pointers and printed them at the end, and the http row came out
+       as 60179 -- the tail of a completely different entry. It was caught by
+       the number being obviously wrong on the BUILD HOST, which is the row
+       that exists to catch exactly this. */
+    int sport = -1, pnum = -1, leak = 0, gaport = -1;
+    struct servent *s;
+    struct protoent *p;
     struct addrinfo hints, *ai = 0;
-    int gaport = -1;
+
+    s = getservbyname("http", "tcp");
+    if (s) sport = ntohs((unsigned short)s->s_port);
+    p = getprotobyname("tcp");
+    if (p) pnum = p->p_proto;
+    s = getservbyname("z-pgb-absent", "tcp");
+    if (s) leak = 1;
+
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
     if (getaddrinfo(0, "http", &hints, &ai) == 0 && ai)
         gaport = ntohs(((struct sockaddr_in *)ai->ai_addr)->sin_port);
-    printf("%d %d %s %d\n",
-           s ? ntohs((unsigned short)s->s_port) : -1,
-           p ? p->p_proto : -1,
-           n ? "LEAK" : "null",
-           gaport);
+
+    printf("%d %d %s %d\n", sport, pnum, leak ? "LEAK" : "null", gaport);
     return 0;
 }
 EOF

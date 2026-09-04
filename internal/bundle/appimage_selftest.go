@@ -11,6 +11,7 @@ package bundle
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/polaris0xff/glibc-research/internal/cfg"
 	"github.com/polaris0xff/glibc-research/internal/selftest"
@@ -160,6 +161,56 @@ func AppImageSelftest(c *cfg.Config) *selftest.Report {
 	r.Check("a repeated path component is dropped, first position kept",
 		firstLineFor(string(folded), "QT_PLUGIN_PATH"),
 		"QT_PLUGIN_PATH=/a:/b:${QT_PLUGIN_PATH}")
+
+	// ⛔ A WRAPPER'S `--set` REPLACES, AND THE BUNDLE'S OWN DIRECTORY HAS TO
+	// SURVIVE IT. nixpkgs wraps meld with `--set XDG_DATA_DIRS <its own>`, so
+	// the bundler's earlier line -- the one naming ${SHARUN_DIR}/share, the
+	// merged tree holding every icon theme and schema in the closure -- was
+	// resolved away. writeEnv now puts it back at the front AFTER the lift.
+	env2 := filepath.Join(dir, ".env2")
+	_ = os.WriteFile(env2, []byte(
+		"XDG_DATA_DIRS=${SHARUN_DIR}/share:${XDG_DATA_DIRS}:/usr/share\n"+
+			"XDG_DATA_DIRS=${SHARUN_DIR}/store/meld/share\n"+
+			"XDG_DATA_DIRS=${SHARUN_DIR}/share:${XDG_DATA_DIRS}\n"), 0o644)
+	if _, _, _, err := FoldEnv(env2); err != nil {
+		r.Fail("fold the second env file", err.Error(), "no error")
+		return r
+	}
+	folded2, _ := os.ReadFile(env2)
+	r.Check("the bundle's own share survives a wrapper's --set",
+		firstLineFor(string(folded2), "XDG_DATA_DIRS"),
+		"XDG_DATA_DIRS=${SHARUN_DIR}/share:${SHARUN_DIR}/store/meld/share")
+
+	// ---- the desktop-entry rules T-081 names, all pure logic --------------
+	//
+	// ⛔ THE ICON POLICY IS ASSERTED BECAUSE IT IS A POLICY. T-081: "≥128×128,
+	// preferring 128 then 512 or 1024 — never a smaller bucket". The previous
+	// rule was "biggest wins", which puts a 1024×1024 icon in a 48-pixel
+	// panel, and the field's own selectors are accidents (first match; then
+	// shortest path).
+	r.CheckInt("128 is the best bucket", iconRank("/x/128x128/a.png", 128), 0)
+	r.CheckInt("512 is next", iconRank("/x/512x512/a.png", 512), 1)
+	r.CheckInt("then 1024", iconRank("/x/1024x1024/a.png", 1024), 2)
+	r.CheckInt("another size above 128 comes after those",
+		iconRank("/x/256x256/a.png", 256), 3)
+	r.CheckInt("scalable is below every declared size above 128",
+		iconRank("/x/scalable/apps/a.svg", 0), 4)
+	r.CheckBool("⛔ a bucket BELOW 128 ranks worse than scalable",
+		iconRank("/x/48x48/a.png", 48) > iconRank("/x/scalable/a.svg", 0), true)
+
+	// X-AppImage-Version: two of the four managers read it and we emitted none.
+	r.Check("the version comes out of the store path",
+		storeVersion("ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4"), "2.1.4")
+	r.Check("...including a name that itself contains a dash",
+		storeVersion("ls8wzmc3wrwwi01czkihav804jgr68zq-gtk+3-3.24.52"), "3.24.52")
+	r.Check("a store path with no version yields none",
+		storeVersion("ls8wzmc3wrwwi01czkihav804jgr68zq-hello"), "")
+	got2 := withAppImageVersion([]string{"[Desktop Entry]", "Name=X"}, "1.2")
+	r.Check("the key lands inside [Desktop Entry], not at the end",
+		strings.Join(got2, "|"), "[Desktop Entry]|X-AppImage-Version=1.2|Name=X")
+	got2 = withAppImageVersion([]string{"[Desktop Entry]", "X-AppImage-Version=9"}, "1.2")
+	r.Check("an entry that already has one is left alone",
+		strings.Join(got2, "|"), "[Desktop Entry]|X-AppImage-Version=9")
 
 	// ---- elfClass: the decision that keeps lib32 apart from lib ----------
 	//

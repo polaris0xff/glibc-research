@@ -117,11 +117,16 @@ type Config struct {
 	EmbedTerminfo bool
 	EmbedTzdata   bool
 	EmbedNetdb    bool
-	UseIconv      bool
-	ArchBaseline  string
-	ExtraBinds    []string
-	WrapDlopen    []string
-	HostDlopen    bool
+	// UTF8Default changes what an UNSET LANG means: C.UTF-8 instead of C.
+	// ⛔ It is a change to a DOCUMENTED DEFAULT rather than a repair, which is
+	// why it is separate from EmbedLocale and off unless asked for.
+	// tool/runtime/pgb-locale.c, experiments/63-.
+	UTF8Default  bool
+	UseIconv     bool
+	ArchBaseline string
+	ExtraBinds   []string
+	WrapDlopen   []string
+	HostDlopen   bool
 
 	// TLSReserve is --tls-reserve: bytes of the executable's OWN thread-local
 	// storage set aside for initial-exec TLS in objects --host-dlopen loads.
@@ -158,6 +163,7 @@ func Load(self string) *Config {
 		EmbedTerminfo: logx.EnvBool("PGB_OPT_EMBED_TERMINFO", false),
 		EmbedTzdata:   logx.EnvBool("PGB_OPT_EMBED_TZDATA", false),
 		EmbedNetdb:    logx.EnvBool("PGB_OPT_EMBED_NETDB", false),
+		UTF8Default:   logx.EnvBool("PGB_OPT_UTF8_DEFAULT", false),
 		UseIconv:      logx.EnvBool("PGB_OPT_USE_ICONV", true),
 		ArchBaseline:  os.Getenv("PGB_OPT_BASELINE"),
 		ExtraBinds:    strings.Fields(os.Getenv("PGB_OPT_BINDS")),
@@ -180,6 +186,14 @@ func Load(self string) *Config {
 	if e := os.Getenv("PGB_ENGINE"); e != "" {
 		_ = c.SetEngine(e)
 	}
+	// ⛔ --utf8-default NEEDS THE EMBEDDED LOCALE TO FALL BACK ON, and the
+	// implication is enforced HERE as well as at the flag: a build re-entered
+	// across an engine boundary reads PGB_OPT_* out of the environment, and
+	// setting only the one variable would link an object referencing
+	// pgb_utf8_default with nothing defining it.
+	if c.UTF8Default {
+		c.EmbedLocale = true
+	}
 	return c
 }
 
@@ -188,6 +202,7 @@ func Load(self string) *Config {
 var OptVars = []string{
 	"PGB_OPT_VERBOSE", "PGB_OPT_EMBED_LOCALE", "PGB_OPT_EMBED_CACERT",
 	"PGB_OPT_EMBED_TERMINFO", "PGB_OPT_EMBED_TZDATA", "PGB_OPT_EMBED_NETDB",
+	"PGB_OPT_UTF8_DEFAULT",
 	"PGB_OPT_USE_ICONV", "PGB_OPT_BASELINE",
 	"PGB_OPT_BINDS", "PGB_OPT_WRAP_DLOPEN", "PGB_OPT_HOST_DLOPEN",
 	"PGB_OPT_TLS_RESERVE",
@@ -205,6 +220,7 @@ func (c *Config) Export() {
 	set("PGB_OPT_EMBED_TERMINFO", bit(c.EmbedTerminfo))
 	set("PGB_OPT_EMBED_TZDATA", bit(c.EmbedTzdata))
 	set("PGB_OPT_EMBED_NETDB", bit(c.EmbedNetdb))
+	set("PGB_OPT_UTF8_DEFAULT", bit(c.UTF8Default))
 	set("PGB_OPT_USE_ICONV", bit(c.UseIconv))
 	set("PGB_OPT_BASELINE", c.ArchBaseline)
 	set("PGB_OPT_BINDS", strings.Join(c.ExtraBinds, " "))

@@ -175,6 +175,11 @@ static int pgb_materialise(void)
     return 0;
 }
 
+/* pgb_utf8_default is set by the generated data object when the build asked
+ * for --utf8-default, so this file needs no compile-time define and the same
+ * object serves both flags. */
+extern const int pgb_utf8_default;
+
 /* Does this locale name ask for UTF-8? "" means "read it out of the
  * environment", so that case looks at the same variables glibc would. */
 static int pgb_wants_utf8(const char *locale)
@@ -190,9 +195,68 @@ static int pgb_wants_utf8(const char *locale)
            strstr(s, "UTF8")  != NULL || strstr(s, "utf-8") != NULL;
 }
 
+/* Is the environment SILENT about the locale? "" means "read it out of the
+ * environment"; if none of the three variables says anything, the answer is
+ * the implementation's choice and glibc chooses "C". */
+static int pgb_env_silent(void)
+{
+    const char *s = getenv("LC_ALL");
+    if (s && *s) return 0;
+    s = getenv("LC_CTYPE");
+    if (s && *s) return 0;
+    s = getenv("LANG");
+    return !(s && *s);
+}
+
+/* ⭐ THE ONE AXIS WHERE NATIVE musl BEATS BOTH GLIBC COLUMNS, 11-0.
+ *
+ * `experiments/63-` measured the three-way parity matrix and found exactly one
+ * row against us: with NO locale variable set at all, `setlocale(LC_ALL, "")`
+ * followed by `nl_langinfo(CODESET)` answers
+ *
+ *     glibc   ANSI_X3.4-1968      musl   UTF-8
+ *
+ * on eleven of eleven. ⛔ `--embed-locale` alone cannot move it, and the
+ * reason is precise rather than incidental: that mechanism answers a REQUEST
+ * the host could not satisfy, and here the host satisfied the request. glibc
+ * returned "C" successfully. Nothing failed.
+ *
+ * ⚠ SO THIS IS A SEPARATE, SEPARATELY OPT-IN CHANGE, and it is a change to a
+ * DOCUMENTED DEFAULT rather than a repair: POSIX leaves the implementation to
+ * choose when the environment is silent, glibc chooses "C", and this chooses
+ * "C.UTF-8" -- which is what musl does unconditionally and what several
+ * distributions now do by policy. A program that assumed a single-byte
+ * default sees a multibyte one. It is off unless `--utf8-default` asks for it,
+ * and `pgb explain` prints it.
+ *
+ * ⛔ IT STILL NEVER OVERRIDES AN ANSWER THE ENVIRONMENT GAVE. If LC_ALL,
+ * LC_CTYPE or LANG names anything at all, this does nothing. */
+static int pgb_utf8_default_wanted(const char *locale)
+{
+    if (!pgb_utf8_default) return 0;
+    if (!locale || *locale) return 0;   /* only setlocale(cat, "") */
+    return pgb_env_silent();
+}
+
 char *__wrap_setlocale(int category, const char *locale)
 {
     char *r = __real_setlocale(category, locale);
+
+    if (r != NULL && pgb_utf8_default_wanted(locale)) {
+        char *u = __real_setlocale(category, "C.UTF-8");
+        if (u) return u;
+        if (pgb_locale_ready == 0)
+            pgb_locale_ready = (pgb_materialise() == 0) ? 1 : -1;
+        if (pgb_locale_ready == 1) {
+            u = __real_setlocale(category, "C.UTF-8");
+            if (u) return u;
+            u = __real_setlocale(category, pgb_locale_name);
+            if (u) return u;
+        }
+        /* ⚠ Nothing worked: put back what the caller would have got. A
+         * half-applied locale change is worse than none. */
+        return __real_setlocale(category, locale);
+    }
 
     /* ⛔ THE HOST WINS WHEN THE HOST CAN ANSWER. Only a genuine failure on a
      * request that wanted UTF-8 reaches the embedded copy. Pre-empting a

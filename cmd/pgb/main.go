@@ -64,6 +64,10 @@ OPTIONS (build)
                              and carry a copy for hosts that have none
   --embed-terminfo           carry a handful of terminal descriptions, used
                              only when the host cannot describe $TERM
+  --utf8-default             make an UNSET LANG mean C.UTF-8 rather than C.
+                             ⛔ a change to a DOCUMENTED DEFAULT, not a repair:
+                             the one axis where native musl beats glibc 11-0.
+                             Implies --embed-locale
   --embed-netdb              carry /etc/services and /etc/protocols, used only
                              where the host has neither. getservbyname("http",
                              "tcp") answers NULL on 3 of the 11 targets, all
@@ -192,6 +196,10 @@ func (p *parser) option(a string) (bool, error) {
 		p.c.EmbedTerminfo = true
 	case "--embed-netdb":
 		p.c.EmbedNetdb = true
+	case "--utf8-default":
+		// ⛔ It needs the embedded locale to fall back on, so it implies it.
+		p.c.UTF8Default = true
+		p.c.EmbedLocale = true
 	case "--embed-tzdata":
 		p.c.EmbedTzdata = true
 	case "--no-iconv":

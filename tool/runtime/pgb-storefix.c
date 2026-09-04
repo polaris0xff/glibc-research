@@ -93,31 +93,38 @@ static int         appdir_len;
 static int         ready;      /* 1 once the map has been read (or found absent) */
 static int         debug_on;   /* PGB_STOREFIX_DEBUG=1 */
 
-/* ⛔ A MISS IS REPORTED, NOT SUBSTITUTED. Reported once per distinct store
- * path, because a GUI application stats its data files in a loop and an
- * unbounded warning stream is how a real finding gets scrolled away. */
-#define MISS_MAX 32
+/* ⛔ A MISS IS REPORTED, NOT SUBSTITUTED, AND THE REPORT IS NOT BEHIND A
+ * DEBUG FLAG. The design says a store path that is not in the bundle is a
+ * FINDING; a finding nobody sees unless they knew to set a variable is not
+ * one. ⚠ It is reported ONCE PER DISTINCT PATH and at most MISS_MAX times,
+ * because a GUI application stats its data files in a loop and an unbounded
+ * warning stream is how a real finding gets scrolled away. The cap is stated
+ * in the last line so a reader knows the list was truncated. */
+#define MISS_MAX 8
 static char *misses[MISS_MAX];
 static int   nmisses;
 
 static void note_miss(const char *base, int blen)
 {
     int i;
-    if (!debug_on)
-        return;
     for (i = 0; i < nmisses; i++)
         if ((int)strlen(misses[i]) == blen && memcmp(misses[i], base, blen) == 0)
             return;
-    if (nmisses < MISS_MAX) {
-        char *copy = malloc(blen + 1);
-        if (copy) {
-            memcpy(copy, base, blen);
-            copy[blen] = '\0';
-            misses[nmisses++] = copy;
-        }
+    if (nmisses >= MISS_MAX)
+        return;
+    {
+        char *copy = malloc((size_t)blen + 1);
+        if (!copy)
+            return;
+        memcpy(copy, base, (size_t)blen);
+        copy[blen] = '\0';
+        misses[nmisses++] = copy;
     }
     fprintf(stderr, "pgb-storefix: NOT IN THIS BUNDLE: %s%.*s\n",
             STORE_PREFIX, blen, base);
+    if (nmisses == MISS_MAX)
+        fprintf(stderr, "pgb-storefix: %d distinct store paths reported; "
+                        "further ones are silent\n", MISS_MAX);
 }
 
 /* where_am_i finds the AppDir. SHARUN_DIR is what sharun exports and is the
