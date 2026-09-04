@@ -72,6 +72,35 @@
 #   G3  the payload really is static / has no PT_INTERP, so G2 is about the
 #       shape this experiment claims it is about.
 #
+# -- ⭐ ARM L, ADDED AFTER ARM G FALSIFIED ITS OWN SUBJECT -------------------
+#
+# ⚠ HOW THIS ARM CAME ABOUT, stated because rule 1 is about not passing a
+# hypothesis off as a prediction. Arm G bundled `syncthing` expecting a static
+# payload and its G3 check reported `dynamic`. The obvious second subject,
+# `lilipod`, was then tried -- and `pgb bundle appimage` REFUSED it:
+#
+#     closure     4 store paths
+#     libraries   0 from the closure
+#     pgb: the closure carries no dynamic loader
+#
+# ⛔ SO THE INTERPOSER QUESTION NEVER ARISES FOR A FULLY STATIC PAYLOAD: there
+# is no artefact to ask it of. That refusal is ALREADY OBSERVED and L1 below
+# records it rather than predicting it.
+#
+#   L1  ⚠ RECORDED, NOT PREDICTED (it was seen before this arm was written):
+#       `pgb bundle appimage` refuses a closure with no dynamic loader.
+#   L2  the payload really is static -- no PT_INTERP, no dynamic section.
+#   L3  ⭐ THE ACTUAL PREDICTION, AND IT IS COMMITTED BEFORE THE RUN: the raw
+#       binary, with NO BUNDLE AT ALL, runs on 11 of 11 -- because a static
+#       Go program depends on no libc, which is this project's whole thesis
+#       arriving from someone else's compiler.
+#   L4  ⭐ and it loads ZERO host shared objects on 11 of 11, for the same
+#       reason: it has no loader to load any.
+#
+# ⭐ IF L3 HOLDS, THE REFUSAL IS THE RIGHT ANSWER BADLY EXPLAINED: a payload
+# that already runs everywhere does not need bundling, and the message should
+# say so instead of naming a missing loader.
+#
 # ⭐ WHAT A PASS ON S2 OR S3 WOULD MEAN: the reasoning in store-paths.md §3 was
 # wrong and the row should be rewritten, not the run repeated.
 #
@@ -82,7 +111,7 @@ set -u
 exp_begin "100 - the interposer against a STATIC and a RAW-SYSCALL payload"
 
 WORK="${PGB_EXP100_WORK:-/var/tmp/t100}"
-ONLY="${PGB_EXP100_ONLY:-PG}"
+ONLY="${PGB_EXP100_ONLY:-PGL}"
 RUN_TIMEOUT="${PGB_EXP100_TIMEOUT:-150}"
 rm -rf "$WORK"; mkdir -p "$WORK" || exit 2
 command -v cc >/dev/null 2>&1 || { exp_note "no cc on PATH"; exit 2; }
@@ -297,9 +326,77 @@ case "$ONLY" in *G*)
   ;;
 esac
 
+# ===========================================================================
+# ARM L -- a FULLY static payload: does it even need a bundle?
+# ===========================================================================
+LATTR="${PGB_EXP100_LATTR:-lilipod}"
+LPROG="${PGB_EXP100_LPROG:-lilipod}"
+
+case "$ONLY" in *L*)
+  ARMS_RUN="$ARMS_RUN L"
+  printf '\n-- arm L: a fully static payload ---------------------------------\n'
+  LC="$WORK/lcache"; LLOG="$WORK/build-l.log"
+  PGB_APPIMAGE_CACHE="$LC" "$REPO_DIR/pgb" bundle appimage "$LATTR" \
+    --out "$WORK/l.AppImage" --name "$LPROG" >"$LLOG" 2>&1 || true
+
+  # L1 -- RECORDED, not predicted.
+  if grep -qa 'carries no dynamic loader' "$LLOG"; then lrefuse=yes; else lrefuse=no; fi
+  exp_check "L1  ⚠ RECORDED: the bundler refuses a loader-less closure" "$lrefuse" yes
+
+  BIN=$(ls "$LC"/*/store/*/bin/"$LPROG" 2>/dev/null | head -1)
+  if [ -z "$BIN" ]; then
+    exp_note "⛔ the closure did not fetch; arm L cannot run. See $LLOG"
+    ARMS_RUN=$(printf '%s' "$ARMS_RUN" | sed 's/ L//')
+  else
+    # L2 -- is it really static? Asked of the ELF, not of the build log.
+    if "$REPO_DIR/pgb" --version >/dev/null 2>&1 && command -v readelf >/dev/null 2>&1; then
+      if readelf -l "$BIN" 2>/dev/null | grep -qi 'INTERP'; then lstatic=no; else lstatic=yes; fi
+    else
+      lstatic=unknown
+    fi
+    exp_check "L2  the payload has no PT_INTERP" "$lstatic" yes
+
+    ENVS2=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt")
+    lok=0; lclean=0; lrows=0
+    for name in $ENVS2; do
+      root=$(exp_rootfs "$name") || true
+      [ -n "$root" ] || { exp_skip "L/$name" "rootfs not fetched"; continue; }
+      lrows=$((lrows+1))
+      rm -f "$root/lstatic"; cp "$BIN" "$root/lstatic"; chmod +x "$root/lstatic"
+      tr="$WORK/tr.l.$name"
+      strace -f -e trace=openat,open,execve,clone,clone3,vfork -o "$tr" \
+        timeout "$RUN_TIMEOUT" "$REPO_DIR/pgb" rootfs run "$root" -- \
+          /bin/sh -c "/lstatic --help" >"$WORK/out.l.$name" 2>"$WORK/err.l.$name"
+      lst=$?
+      for _p in /proc/[0-9]*; do
+        _pid=${_p#/proc/}; _rt=$(readlink "/proc/$_pid/root" 2>/dev/null) || continue
+        case "$_rt" in "$root"|"$root"/*) kill -9 "$_pid" 2>/dev/null ;; esac
+      done
+      lall=$(cat "$WORK/out.l.$name" "$WORK/err.l.$name" 2>/dev/null)
+      lran=no
+      # ⚠ --help exits non-zero on some CLIs, so the criterion is the
+      # program's own output, not its status alone.
+      printf '%s' "$lall" | grep -qiE "usage|command|$LPROG" && lran=yes
+      [ "$lran" = yes ] && lok=$((lok+1))
+      nh=$(exp_classify_trace "$tr" /lstatic | grep -c '^host ' || true)
+      # ⛔ clean counts only where it RAN -- a corpse loads nothing either.
+      [ "$lran" = yes ] && [ "$nh" = 0 ] && lclean=$((lclean+1))
+      rm -f "$tr" "$root/lstatic"
+    done
+    exp_check "L3  ⭐ the RAW static binary runs, NO BUNDLE AT ALL" "$lok" "$lrows"
+    exp_check "L4  ⭐ ...and loads ZERO host shared objects" "$lclean" "$lrows"
+    exp_note "⭐ If L3 and L4 hold, the refusal in L1 is the RIGHT answer badly"
+    exp_note "  explained: a payload that already runs everywhere does not need"
+    exp_note "  bundling, and the message should say that instead of naming a"
+    exp_note "  missing loader."
+    rm -rf "$LC" "$WORK/l.AppImage"
+  fi
+  ;;
+esac
+
 printf '\n'
-exp_check "both arms ran (P = the mechanism, G = a real Go subject)" \
-  "$(printf '%s' "$ARMS_RUN" | tr -d ' ')" "PG"
+exp_check "all three arms ran (P mechanism, G a Go subject, L a static one)" \
+  "$(printf '%s' "$ARMS_RUN" | tr -d ' ')" "PGL"
 exp_note "⚠ Arm P measures ONE interposer against THREE call shapes on the"
 exp_note "  build host. It says nothing about other architectures, and nothing"
 exp_note "  about a payload that mixes shapes -- which a real Go binary does."
