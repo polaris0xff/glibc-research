@@ -592,6 +592,53 @@ and that is the sharper statement: *static linking answers "will this binary
 start"; it says nothing about "will this program find the tools it shells out
 to."*
 
+### ⭐⭐ THEIR OWN "CAN'T MAKE THEM WORK" LIST NAMES ONE DOMINANT CAUSE — AND IT IS THE CELL OUR MECHANISM OWNS
+
+⭐ **Issue #460, open, titled *"appimages that can't make them work"*** — the
+field's own list of applications they gave up on, with a reason beside each.
+Read 2026-09-04c. ⛔ **The reasons repeat:**
+
+| their subject | their reason, quoted |
+|---|---|
+| `KeeperFX` | *"if extracted works … need to set `INSTALL_PATH` inside `keeperfx.cfg`"* |
+| `Myth-II` | *"similar to keeperfx, only works when extracted"* |
+| `Rigs-of-Rods`, `OpenTESArena` | *"has a path line inside `plugins.cfg` that need to set"* |
+| `FEX-Emu` | *"issues when loading the x86_64 rootfs"* |
+| `FS-UAE` | *"complaining about `xcb` Qt"* |
+| `NetHack-X11` | *"don't know how to dir inside `APPDIR/bin`"* |
+
+⭐ **Four of the six are ONE cause: an absolute path that lives in a CONFIG
+FILE, not in the ELF.** `quick-sharun`'s mechanism is a **build-time patch of
+the strings inside binaries and libraries** (their #228, #330), so a path that
+only ever exists in `keeperfx.cfg` or `plugins.cfg` is invisible to it.
+
+⛔ **AND THAT IS THE DIFFERENCE BETWEEN THE TWO MECHANISMS, STATED AS A GRID
+RATHER THAN AS A BOAST:**
+
+| | the path is `/nix/store/…` | the path is `/usr/…`, `/usr/local/…`, `/etc/…` |
+|---|---|---|
+| **compiled into the ELF's strings** | ⭐ both reach it — theirs by patching, ours by rewriting the syscall | ⚠ **theirs**, not ours: `pgb-storefix.c`'s `fix()` returns anything not starting `/nix/store/` unchanged |
+| ⭐ **in a config file, or assembled at run time** | ⭐ **OURS, and not theirs** — the interposer sees the path the program actually `open`s and does not care where the string came from | ⛔ **NEITHER**, and this is the cell that holds `pdfarranger` |
+
+⚠ **The claim is about the mechanisms, not about those six subjects**: nobody
+has put `KeeperFX` or `OpenTESArena` through `pgb bundle appimage`, and a
+nixpkgs build of one is not the same artefact they were packing. ⭐ **What is
+established is the shape**: a run-time rewrite at the syscall is reached by a
+path from *any* source, and a build-time string patch is not. **The experiment
+that would settle it** is a subject whose only compiled-in-free absolute store
+path lives in a data file — and none of our 26 is one.
+
+⭐ **AND THE BOTTOM-RIGHT CELL IS WHERE `flatimage` WINS**, which is the same
+conclusion this page's runtime-projects table reached from the other side: a
+portable **root** serves a program with any absolute path from any source.
+
+### ⛔ Two more of their open issues land on classes we measured this session
+
+| theirs | ours |
+|---|---|
+| **#110** *"What to do with applications with hard dependency on portals?"* — and their own answer in the thread is *"I believe there's nothing we can do about this beside convincing upstream"* | ⚠ **The same shape as our DBus row**: a portal is a **host D-Bus service**, and a bundle cannot ship one any more than it can ship `getsubids`. ⭐ Ours is the more general statement, reached on `lilipod` and `xterm`: *what a bundle cannot supply is another **process**, not another library* |
+| **#664** `kitty`: *"`can't find '__main__' module` … a relative path resolution issue when kitty tries to execute its Python components"* | ⭐ **Byte-for-byte the family of C41** — a Python import failing inside a bundle because a path did not resolve. ⚠ Theirs is a squashfs AppImage and a different pipeline, so it is not the same bug; ⭐ but our version of it had a cause (`stat64` uninterposed) and a fix, and that is worth offering rather than filing |
+
 ### ⚠ The rows we have nothing to say about yet
 
 | theirs | why it is open for us |

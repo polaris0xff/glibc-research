@@ -45,3 +45,19 @@ evidence     : /home/user/glibc-research/evidence/90-kdenlive-vs-enhanced
 -- arm O: the same payload, packed by onelf ----------------------
         adding the rust target onelf needs: x86_64-unknown-linux-musl
         packing 5349 libraries and 5 programs with onelf
+  ARM                N     MEDIAN        MIN        MAX     MAD%
+  P                  7      638.7      586.0      671.4      2.6
+  E                  7      785.3      741.4     1341.0      5.6
+  O                  7      461.4      443.5      491.0      3.0
+  twin               7      607.1      581.3      624.6      1.3
+
+  A/A control (P vs its own copy): ratio 1.05, floor 1.05, resolves no
+  ok    onelf packed the same payload                  = yes
+  ok    and it rendered a real MP4                     = yes
+  O  onelf (our payload)                  597905535       2291 ms render    461.4 ms cold    471 ms warm
+
+-- melt on the eleven, both artefacts -----------------------------
+  ENVIRONMENT         LIBC   | P:res    P:host | E:res    E:host
+  alpine-3.22         musl   | ok       0      | ok       0     
+  alpine-3.20         musl   | ok       0      | ok       0     
+  alpine-3.10         musl   | ok       0      | ok       0     

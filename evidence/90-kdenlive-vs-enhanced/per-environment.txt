@@ -1,0 +1,3 @@
+alpine-3.22         musl   P=ok host=0 | E=ok host=0
+alpine-3.20         musl   P=ok host=0 | E=ok host=0
+alpine-3.10         musl   P=ok host=0 | E=ok host=0
