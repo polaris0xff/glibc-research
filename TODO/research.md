@@ -315,11 +315,28 @@ not by an inference: `programs <prog> + N more`.
 
 ⚠ **The entry stays open, and the goalposts are not being moved.**
 
-1. ⭐ **`--with-program` IS EXERCISED — 2026-09-04c — and it works. ⚠ On ONE
-   environment, by hand, so it is a demonstration and not yet a row.**
-   The subject is `flameshot`, whose own closure carries `dbus-daemon` and
-   `dbus-run-session` in a **dependency** store path — exactly the case this
-   branch exists for, because they are not in the entry's `bin/`:
+1. ⛔ **THIS ITEM SAID `--with-program` WAS NEVER EXERCISED AND THAT WAS
+   FALSE — `experiments/90-` HAS BEEN EXERCISING IT SINCE IT WAS WRITTEN.**
+   Found 2026-09-04c by reading the script rather than the entry, which is
+   delivery rule 5 doing its job on this page:
+
+       ./pgb bundle appimage kdenlive --with-program melt --with-program ffmpeg
+       …
+       /kd-arm melt -version
+       /kd-arm melt color:blue out=12 -consumer avformat:/tmp/kd.mp4 …
+
+   ⭐ **`melt` is in the `mlt` store path, not in `kdenlive`'s `bin/`**, so it
+   is precisely the whole-closure branch this item is about — and `90-` does
+   not merely start it, it makes it **render an MP4**, on **all eleven**
+   environments, and reports `P=ok E=ok` per row. ⚠ It also knows the
+   assertion discriminates: its own comment records that the competitor's
+   artefact runs *kdenlive* with `melt` as an argument.
+
+   ⭐ **A second, independent exercise, 2026-09-04c**, on a subject chosen for
+   it rather than for something else: `flameshot`, whose own closure carries
+   `dbus-daemon` and `dbus-run-session` in a **dependency** store path —
+   exactly the case this branch exists for, because they are not in the
+   entry's `bin/`:
 
        pgb bundle appimage flameshot --name flameshot \
            --with-program dbus-daemon --with-program dbus-run-session
@@ -331,8 +348,12 @@ not by an inference: `programs <prog> + N more`.
 
    ⭐ **The assertion discriminates**: `dbus-daemon` prints its OWN identity,
    so a dispatch that quietly ran the default would print flameshot's banner
-   instead. ⛔ **What is still owed is the eleven** — one environment is a
-   demonstration, and this entry does not count it as the Prove line.
+   instead. ⚠ **One environment, by hand** — a second closure rather than a
+   second eleven, and this entry does not count it as the Prove line.
+
+   ⛔ **So what this item actually still owes is narrow**: the `flameshot`
+   demonstration on the eleven. The whole-closure branch itself is measured
+   across the bed by `90-`, twice over — a start and a render.
 2. **Two names, not N.** The bundle carried five programs and the run asserted
    two of them. A third name costs one more row and would catch a selector
    that only ever gets the first two right.

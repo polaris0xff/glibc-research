@@ -2,7 +2,7 @@
 90 - our kdenlive bundle against kdenlive-AppImage-Enhanced AND onelf
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-03T13:21:37Z
+date (UTC)   : 2026-09-04T12:22:20Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -13,59 +13,5 @@ evidence     : /home/user/glibc-research/evidence/90-kdenlive-vs-enhanced
 --------------------------------------------------------------
 
 -- the two artefacts ---------------------------------------------
-        artefact built with: debloat=safe
-  ok    ours exists                                    = yes
-  ok    the competitor exists                          = yes
-
-  ARTEFACT                                    BYTES
-  P  ours (one command, nixpkgs)          565332219
-  E  kdenlive-AppImage-Enhanced           191900604
-     ratio P/E                                2.95x
-        operator's bar: smaller, loads faster, runs faster than E
-
--- the render (melt, the engine kdenlive drives) ------------------
-  P  ours                                  1140 ms         4149 bytes of MP4
-  E  enhanced                               995 ms         4162 bytes of MP4
-  ok    ours rendered a real MP4                       = yes
-  ok    the competitor rendered a real MP4             = yes
-
--- startup (the instrument experiments/86- ended up with) ---------
-  ARM                N     MEDIAN        MIN        MAX     MAD%
-  P                  7      380.2      343.1      400.4      3.4
-  E                  7      513.9      473.5      762.4      7.9
-  twin               7      388.7      369.8      398.0      2.4
-
-  A/A control (P vs its own copy): ratio 1.02, floor 1.06, resolves no
-
-  P  ours                                 380.2 ms cold        114 ms warm
-  E  enhanced                             513.9 ms cold         33 ms warm
-
--- arm O: the same payload, packed by onelf ----------------------
-  SKIP  arm O (onelf)                                  (onelf did not build: see /home/user/glibc-research/evidence/90-kdenlive-vs-enhanced/build/onelf-build.log (musl-gcc is also absent))
-
--- melt on the eleven, both artefacts -----------------------------
-  ENVIRONMENT         LIBC   | P:res    P:host | E:res    E:host
-  alpine-3.22         musl   | ok       0      | ok       0     
-  alpine-3.20         musl   | ok       0      | ok       0     
-  alpine-3.10         musl   | ok       0      | ok       0     
-  voidlinux-musl      musl   | ok       0      | ok       0     
-  debian-11           glibc  | ok       0      | ok       1     
-  debian-12           glibc  | ok       0      | ok       1     
-  ubuntu-20.04        glibc  | ok       0      | ok       1     
-  rockylinux-8        glibc  | ok       0      | ok       10    
-  opensuse-leap-15.6  glibc  | ok       0      | ok       4     
-  fedora-42           glibc  | ok       0      | ok       2     
-  archlinux-latest    glibc  | ok       0      | ok       3     
-
-  ok    the A/A pair is NOT resolvable (the control)   = no
-  ok    environments measured                          = 11
-  ok    ours rendered on every environment             = 11
-  ok    the competitor did too                         = 11
-  ok    ours is no worse than the competitor on host objects = yes
-        clean rows: ours 11/11, the competitor 4/11
-        ⚠ both arms use a shell AppRun; the four musl rows are zero for both
-
--- result ----------------------------------------------------
-pass=9 fail=0 skip=1
-VERDICT: matched expectation.
---------------------------------------------------------------
+        fetching the competitor, pinned at 26.08.0-1@2026-09-01_1788277742
+        building ours (debloat=safe): ./pgb bundle appimage kdenlive --with-program melt

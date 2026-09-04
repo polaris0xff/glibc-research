@@ -1737,6 +1737,39 @@ recording: *a discarded error is a wrong answer waiting to be believed.*
 
 ---
 
+## C45 — "`--with-program` is NOT exercised" was false, and a shipped experiment had been exercising it all along
+
+**Found** 2026-09-04c, by reading `experiments/90-` rather than the entry that
+described it. ⛔ T-088 carried, as its first open item:
+
+> *"`--with-program` is NOT exercised. It is the branch that searches the
+> whole closure rather than one `bin/`, and it is the one a helper living in a
+> dependency needs. **Nothing has run it.**"*
+
+⭐ **`experiments/90-` runs it, and has since it was written:**
+
+    ./pgb bundle appimage kdenlive --with-program melt --with-program ffmpeg
+    …
+    /kd-arm melt -version
+    /kd-arm melt color:blue out=12 -consumer avformat:/tmp/kd.mp4 …
+
+`melt` lives in the **`mlt`** store path, not in `kdenlive`'s `bin/`, so it is
+exactly the whole-closure branch the item is about. ⭐ And `90-` does not merely
+start it: it makes it **render an MP4**, on **all eleven** environments, with
+`P=ok E=ok` recorded per row. ⚠ The script even knows the assertion
+discriminates — its own comment records that the *competitor's* artefact runs
+kdenlive with `melt` as an argument instead.
+
+⚠ **Why it was missed is worth stating**: `90-` is filed as the kdenlive
+head-to-head, so nobody looking for a multi-entry measurement looked in it.
+⛔ **This is delivery rule 5** — *verify your own write-up against the source* —
+catching a claim on a TODO page rather than in a document.
+
+⭐ **What T-088 still owes is therefore much narrower** than the entry said:
+a second closure on the eleven, not the branch itself.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |
