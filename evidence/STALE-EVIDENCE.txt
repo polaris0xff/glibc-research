@@ -73,10 +73,16 @@
 89-debloat.sh 775172d72fa22a7d243eadb71882e874485d4859 44b6a1c89fe011e4988acfcc5ffc9189afac5bbe T-084 step 2: classifier converted; calls payload only and invokes the artefact once, so C38 is latent (102- arm S)
 90-kdenlive-vs-enhanced.sh 775172d72fa22a7d243eadb71882e874485d4859 88e41e4e294a1c2cf285ebea0475b2d3adb42bb9 T-084 step 2: ⛔ THE ONE C38 REACHES — re-run OWED this session; pinned only while the corpus holds the machine
 
-# ⚠ AND ONE THAT IS NOT A DEBT AT ALL, which is why it says so.
-# `evidence/65-capability-corpus/` holds ONLY the README describing the row
-# format; the experiment has not been run yet. The gate compares the script's
-# last commit against that directory's and sees the script as newer, which is
-# true and means nothing here. ⛔ The line goes inert the moment the corpus
-# runs and writes a row, which is the first thing the next session should do.
-65-capability-corpus.sh a2af0124ab013ac390fa99ab61aa8ef2ffe55871 7f56ed65ad3c257c5da222eb1b4855978155840c NOT A DEBT: the experiment has never been run; the directory holds only its README
+# ⭐ AND ONE LINE WAS DELETED HERE, 2026-09-04c, WHICH IS THE POINT OF THE
+# FORMAT. `65-capability-corpus.sh` was pinned as "NOT A DEBT: the experiment
+# has never been run". It has now run to completion — 26 of 26 rows — so the
+# pair moved, the line went inert, and it is gone rather than left to be read
+# as a current statement about the corpus.
+
+# ⛔ ONE MORE, 2026-09-04c, AND IT IS THE SHORTEST-LIVED ENTRY HERE.
+# `experiments/103-` ran once (its RESULT.txt is that run) and then had BOTH
+# of run 1's own defects fixed: the decode leg used `wavenc`, which lives in
+# gst-plugins-good and is not in the closure, and the control could not be
+# told from its subject. ⭐ Run 2 is what removes this line; it needs the bed,
+# which the corpus was holding when the fix landed.
+103-gstreamer-decode.sh ce91364c817cbee71494c75f573f6977232b1d9f 82a66bf6c2746701d9c3a0614dccd1cb134364fc T-091: run 1 is committed; run 2 is owed after the two criterion fixes it exposed

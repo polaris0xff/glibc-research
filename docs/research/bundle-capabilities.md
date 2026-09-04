@@ -58,15 +58,16 @@ one of the twenty-six carries a count and, where that count is not eleven, the
 reason it is not.
 
     subjects in the corpus                   26
-    subjects that produced an artefact       25
-    ⛔ UNRESOLVED (not a pass, not a fail)    1
+    subjects that produced an artefact       26
+    ⛔ UNRESOLVED (not a pass, not a fail)    0
     ⛔ INSTRUMENT errors                      0
-    ⭐ subjects passing on all 11            19
-    ⭐ subjects clean on all 11              23
+    ⭐ subjects passing on all 11            21
+    ⭐ subjects clean on all 11              24
 
     C6  control subjects MEASURED             3 of 3      ✅
     C6  controls at 11 of 11, as 64- had them 3 of 3      ✅
     C7  no subject failed its criterion's sanity check    ✅
+    C8  every subject measured on all 11                  ✅
 
 | category | subjects | verdict |
 |---|---|---|
@@ -78,7 +79,7 @@ reason it is not.
 | ⭐ **SDL** | ⭐ **3 of 3 — CLOSED, all clean** | `dosbox` **11/11** (**181** store paths compiled in, 169 resolving — the largest closure in the corpus), `stella` **11/11** (179/167), `scummvm` **11/11** (180/168) |
 | ⭐ **media / codecs** | **1 of 3 in, and it passes** | ⭐ `mpv` **11/11, clean 11/11**, 151 store paths compiled in — the row that read **0/11** until **C39**, a subject that had answered completely against an assertion that could not match it. ⛔ The row runs `--version`, so it does **not** close T-091: nothing decodes |
 | ⭐ **Python GUI** | ⭐ **2 of 3 passing**, and the third is not ours | `meld` **11/11** clean 11/11 — the third C6 control. ⭐ `virt-manager` **11/11, clean 11/11**, 239 store paths compiled in — **0/11 → 11/11 by C41**, exactly as pre-registered. ⛔ `pdfarranger` **0/11**, and re-measured against the same fixed tool it does **not move**, also as pre-registered |
-| **the field's recipes** | ⛔ 0 of 4 passing as recorded, and ⭐ **ALL FOUR are now explained, two of them by a shipped fix** | `neovim` **0/11** — the closure's own glibc 2.26 (C35), not ours. `flameshot` **0/11** — ⭐ **not a bundler failure**: a tray application with no toplevel, and no session bus in this bed. `gearlever` — was UNRESOLVED, ⭐ **C42 makes it build**. ⭐ `helix` **0/11** — **C43, a real bundler defect and a FOURTH entry-point shape**: by hand, `hx --version` now answers `helix 25.07.1` and exits 0 |
+| **the field's recipes** | ⭐ **1 of 4 passing, and ALL FOUR are explained** | ⭐ `helix` **11/11 pass, 11/11 clean** — it was `0/11` and **silent**, and the cause was **C43**, a real bundler defect and a fourth entry-point shape. `neovim` **0/11** — the closure's own glibc 2.26 (C35), not ours. `flameshot` **0/11** — ⭐ **not a bundler failure**: a tray application with no toplevel, and no session bus in this bed. ⭐ `gearlever` — was **UNRESOLVED**, now **measured**: **C42** makes it build and **C41** gets it past its own imports, and it fails on all eleven with one reproducible line — `RuntimeError: could not create new GType: gearlever+preferences+Preferences (subclass of void)`, a libadwaita question **not established as ours**. **Clean 11/11** |
 
 ⭐ **THE THREE ZEROS THAT ARE NOT OURS, each measured rather than argued:**
 

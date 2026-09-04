@@ -335,6 +335,19 @@ NENV=$(printf '%s\n' "$ENVS" | wc -l | tr -d ' ')
 
 TOTAL=0; BUILT=0; UNRESOLVED=0; FULL=0; CLEANALL=0; INSTRUMENT=0
 
+# ⛔ C8'S COUNTER, AND IT IS THE HALF OF C44 THAT WOULD HAVE READ GREEN.
+# `pass/rows` says nothing about how many environments were reached: a subject
+# staged on four of eleven and passing all four records `4/4`, which C1 accepts
+# and a reader takes for a pass. SHORT counts subjects whose denominator is not
+# the full bed. docs/history/corrections.md C44.
+SHORT=0
+note_short() {   # id rows
+  [ "$2" = "$NENV" ] || {
+    SHORT=$((SHORT+1))
+    exp_note "⛔ $1: measured on $2 of $NENV environments, not $NENV"
+  }
+}
+
 # ⭐ C6, THE POSITIVE CONTROL. These three ids are `experiments/64-` arms G, X
 # and P, each measured at 11 of 11 on these same eleven environments, twice.
 # ⛔ They are named here rather than inferred, so that renaming a corpus id
@@ -404,6 +417,7 @@ while IFS= read -r line <&3; do
       [ "$pass" = "$rows" ] && [ "$rows" -gt 0 ] && FULL=$((FULL+1))
       [ "$clean" = "$rows" ] && [ "$rows" -gt 0 ] && CLEANALL=$((CLEANALL+1))
       note_control "$id" "$pass" "$rows"
+      note_short "$id" "$rows"
       show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" "$paths" "$note (recorded)"
     fi
     continue
@@ -448,6 +462,21 @@ while IFS= read -r line <&3; do
     [ -n "$instr" ] && break
     root=$(exp_rootfs "$name") || true
     [ -n "$root" ] || { exp_skip "$id/$name" "rootfs not fetched"; continue; }
+
+    # ⛔ STAGE FIRST, AND A FAILED COPY IS A SKIP, NOT A ZERO. This line used
+    # to be `cp "$img" "$root/subj65" 2>/dev/null` further down, AFTER the row
+    # was counted. `gearlever`'s artefact is 907 MiB; under disk pressure the
+    # copy failed into a discarded stderr, the row ran a subject that was not
+    # there, `/bin/sh` said `not found`, and the harness recorded that as a
+    # capability result. docs/history/corrections.md C44.
+    rm -f "$root/subj65"
+    if ! cp "$img" "$root/subj65" 2>"$WORK/cp.$id.$name"; then
+      exp_skip "$id/$name" "could not stage the artefact: $(tr -d '\n' < "$WORK/cp.$id.$name" | cut -c1-90)"
+      rm -f "$root/subj65" "$WORK/cp.$id.$name"
+      continue
+    fi
+    rm -f "$WORK/cp.$id.$name"
+    chmod +x "$root/subj65"
     rows=$((rows+1))
     # ⛔ THE DISPLAY MUST BE IDLE BEFORE THE SUBJECT STARTS, or a window left
     # by the previous row is counted as this one's.
@@ -463,7 +492,6 @@ while IFS= read -r line <&3; do
     base=$(windows_real)
     [ "$base" != 0 ] && exp_note "⚠ $id/$name: display not idle at launch ($base window(s)); counting the DELTA"
 
-    rm -f "$root/subj65"; cp "$img" "$root/subj65" 2>/dev/null; chmod +x "$root/subj65"
     tr="$WORK/tr.$id.$name"
     strace -f -e trace=openat,open,execve,clone,clone3,vfork -o "$tr" \
       timeout "$RUN_TIMEOUT" "$REPO_DIR/pgb" rootfs run "$root" \
@@ -589,6 +617,7 @@ while IFS= read -r line <&3; do
   [ "$pass" = "$rows" ] && [ "$rows" -gt 0 ] && FULL=$((FULL+1))
   [ "$clean" = "$rows" ] && [ "$rows" -gt 0 ] && CLEANALL=$((CLEANALL+1))
   note_control "$id" "$pass" "$rows"
+  note_short "$id" "$rows"
 
   # ⛔ RECLAIM IMMEDIATELY. A cache is ~2.3 GiB; twenty-six of them is far
   # more disk than this machine has, and a run that dies on ENOSPC halfway
@@ -639,6 +668,10 @@ fi
 # criterion cannot recognise its own answer is not a capability result, and
 # three of this corpus's five zeros were exactly that.
 exp_check "C7  ⭐ no subject failed its criterion's sanity check" "$INSTRUMENT" 0
+
+# ⛔ C8 IS THE DENOMINATOR, and it is checked here for the same reason C6 and
+# C7 are: `pass/rows` is not a result until `rows` is the whole bed.
+exp_check "C8  ⭐ every subject measured on all $NENV environments" "$SHORT" 0
 
 # ⛔ C1 AND C2 COUNT THE MEASURED SUBJECTS, NOT EVERY ARTEFACT. An INSTRUMENT
 # error produced an artefact and no rows, so counting it against BUILT would
