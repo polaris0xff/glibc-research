@@ -140,12 +140,17 @@ evidence that it drew something.
         bed still isolates under pivot_root, whether teardown stays
         clean, and whether a bundled browser then sandboxes. Until one
         is taken, a browser row measures --no-sandbox.
-    T-084  ⛔ the trace classifier is SIX hand copies and one counted
-        FAILED opens as loads. lib.sh's shared version needs the `mode`
-        argument first -- it is not the deletion the entry first said.
-        The competitor's "4 of 11" in comparison.md may be inflated.
-        ⛔ BLOCKED WHILE 65- RUNS: it edits experiments/lib.sh, and a
-        running sh re-reads from a byte offset.
+    T-084  ⭐ THE CHEAP HALF IS DONE. experiments/102- diffs all six hand
+        copies against lib.sh's shared classifier on fixtures, with NO
+        bundle build: 3 distinct texts, ⭐ 2 distinct BEHAVIOURS, and
+        they differ in TWO ways, not one. ⛔ C38: besides C25 they clear
+        their result set on the artefact's own execve -- five do it
+        unconditionally (a DIRTY tree row read CLEAN, and 90- is the
+        competitor's "4 of 11"), 60- never does it (a CLEAN payload row
+        read DIRTY). ⭐ Latent in the shape measured: a real trace execs
+        the artefact ONCE. ⛔ STEP 2 STILL OWES the conversion and the
+        re-run, and is blocked while 65- runs -- editing a script that
+        is BEING EXECUTED is the catastrophic one, not lib.sh.
     T-091  ⭐ LANDED, ⛔ UNMEASURED. All four GStreamer variables, and
         gst-plugin-scanner installed as a bundle PROGRAM so it runs
         through sharun rather than the host loader. The Prove line is a

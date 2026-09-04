@@ -1367,9 +1367,64 @@ acceptance subject — still draws, in 4 seconds, with **identical** store-path
 resolution (`88 compiled in, 85 resolve`), so the `mergedFor` change did not
 disturb the path that was already working.
 
-⛔ **NOT YET IN A CORPUS ROW.** `./pgb` was not rebuilt: `experiments/65-` was
-running, and a rebuild mid-run puts rows from two tools in one table. ⚠ `x11-3`
-and any other shell-wrapped subject must be re-measured **after** `make`.
+⭐ **CONFIRMED IN THE CORPUS, ON TWO SUBJECTS.** `./pgb` was rebuilt once
+`experiments/65-` could be stopped, and the rows measured against the old tool
+were deleted and re-taken:
+
+| row | before | after |
+|---|---|---|
+| `x11-3` `xterm` | `0/11` | ⭐ **`11/11`** (clean `4/11`, which is C5) |
+| `gl-3` `glmark2` | `0/11` | ⭐ **`11/11`**, clean `11/11` |
+
+---
+
+## C38 — "the classifier error only runs one way" is true of C25 and FALSE of the copies
+
+**Found** 2026-09-04b by `experiments/102-`, which diffs the six hand copies
+against `experiments/lib.sh`'s `exp_classify_trace` on fixtures — **no bundle
+build at all**. `TODO/ci.md` T-084 asserted, and this tree repeated in four
+places:
+
+> *"THE ERROR ONLY RUNS ONE WAY. It can turn a clean row dirty and can never
+> turn a dirty row clean, so every committed ZERO stands."*
+
+⭐ **That is a claim about C25, and it was being read as a claim about the
+copies.** The copies carry a **second** difference, and it runs the other way.
+
+**The mechanism.** Both implementations clear their result set when the
+artefact's own path is `execve`d. The shared classifier guards that on the
+mode; the copies do not, and they disagree about which way:
+
+| | on `execve("<artefact>")` | consequence |
+|---|---|---|
+| `exp_classify_trace` | clears **only in `payload` mode** | correct in both |
+| ⛔ `62-` `85-` `86-` `89-` `90-` | clears **unconditionally** | in **`tree`** mode it discards everything counted before the exec — a **dirty row read clean** |
+| ⛔ `60-` | **never** clears there | in **`payload`** mode it keeps objects the exec unmapped — a **clean row read dirty** |
+
+⛔ **The two experiments that call `tree` mode are `62-` and `90-`** — and
+`90-` is the source of the competitor's *"4 of 11"* that T-084 names as the
+number at risk. So that number could be too **low**, which is the opposite of
+what the entry warned about.
+
+⭐ **AND THE HAZARD IS LATENT IN THE DELIVERY SHAPE MEASURED.** `102-` arm R1
+counts `execve("<artefact>")` lines in a real corpus trace: **one**. With one
+exec the unconditional clear has nothing to clear, so the committed numbers
+stand — as a measurement, not as an argument. ⛔ It is one delivery shape; a
+wrapper that re-execs the artefact under its own name would make it fire, and
+nothing prevents one.
+
+⛔ **A SECOND CORRECTION, IN THIS EXPERIMENT'S OWN PRE-REGISTRATION.** `102-`
+predicted *"six files, **two** implementations"*, measured by hashing the
+comment-stripped bodies. It read **three**. ⭐ A hash measures **text**:
+`90-` is `62-`'s code with one rule reflowed across four lines, so it hashes
+differently and behaves identically. The prediction is kept in the file as
+written, and the number it *meant* is now measured behaviourally — every
+copy's output over five fixtures in both modes — which reads **two**. ⚠ Two
+texts that behave alike are one implementation, and only running them says so.
+
+**Landed.** `experiments/102-classifier-equivalence.sh`, `pass=15 fail=0`,
+**two runs identical**. It moves no committed number and says so; T-084 step 2
+still owes the conversion and the re-run.
 
 ---
 
