@@ -4,7 +4,7 @@
 the entries, and [`../HISTORY/`](../HISTORY/).
 
     STATE     2026-09-03e  ✅ COMPLETE
-    COUNTS    57 entries, 20 open, 37 done
+    COUNTS    57 entries, 19 open, 38 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)
               musl-gcc INSTALLED — the blocker the last session recorded
@@ -71,46 +71,47 @@ exists. ⛔ A program's own output is not evidence that it drew something.
 
     ---- ⭐ WHAT THE NEXT SESSION SHOULD DO, AND IT IS ONE ENTRY FIRST ----
 
-    ⭐ T-081 IS NOW THE WORK, and it is no longer speculative — this
-       session MEASURED what it costs, with a positive control:
+    ⭐ T-081 IS CLOSED. Its acceptance test was named by the operator
+       before the work and is met, twice, pass=11 fail=0 skip=0:
 
-         arm G  galculator, UI at a compiled-in store path   0 of 11 draw
-         arm X  mousepad,  UI compiled in as a GResource    11 of 11 draw
-         arm C  galculator AGAIN with the path resolving    11 of 11 draw
+         arm G  galculator, UI at a compiled-in store path  11 of 11 draw
+         arm N  the SAME bundle, --no-storefix               0 of 11 draw
+         arm X  mousepad, the regression control            11 of 11 draw
+         arm P  meld, a PYTHON GUI application              11 of 11 draw
 
-       ⭐ Arm C is the argument: identical artefact, one variable, and it
-       draws. So "a hardcoded store path is what stops it" is a
-       measurement rather than a reading of an error message.
+       ⭐ Arm N is why arm G means anything, and arm P is the operator's
+       own counter-example reached: meld produced NO ARTEFACT before.
 
-       TWO BLOCKERS, BOTH IN T-081's ENTRY WITH A ROUTE EACH:
-         1. absolute store paths compiled into .rodata. ⚠ A rewrite
-            cannot LENGTHEN the string — but `/nix/store/` is 11 bytes
-            and so is `/tmp/.pgbs/`. ⛔ Answer the security question
-            before building it: a fixed path under a world-writable /tmp
-            is a symlink-attack surface.
-         2. script entry points. resolveEntry oscillates between a
-            makeBinaryWrapper ELF and the Python script it targets, so
-            NO Python GUI app bundles at all. That is the standard
-            nixpkgs shape, not a meld quirk.
+    ⛔ T-080 IS REOPENED AND IS NOW THE WORK. The operator: "every
+       capability listed in docs/research/bundle-capabilities.md
+       including ones already measured, must be remeasured with 3
+       applications per category in order of simple to complex".
 
-       ⛔ ITS ACCEPTANCE TEST ALREADY EXISTS: `experiments/64-` arm G
-       must go 0 of 11 -> 11 of 11 WITHOUT the bind arm C uses.
+       `experiments/65-` is the corpus: 26 subjects, three per category,
+       plus four of the field's own thirteen nixappimage recipes. It is
+       RESUMABLE — a row in evidence/65-capability-corpus/rows is never
+       re-measured — so run it, and keep running it until every row of
+       §0 carries a count out of eleven and the subject that produced it.
+
+       ⛔ TWO ROWS CANNOT BE CLOSED ON THIS MACHINE AND MUST SAY SO IN
+       THE SENTENCE: every GL and Vulkan row here is a SOFTWARE
+       rasteriser, and NVIDIA is not bundled by design. T-059.
 
     ---- then, in order ----
 
-    T-079's residue  ⛔ THE ELEVENTH ROW HAS NO MECHANISM. /etc/services
-        and /etc/protocols: getservbyname returns NULL on 3 of 11, all
-        glibc. The precedent for a fix is --embed-tzdata: look first,
-        carry a fallback, never prefer the stale copy.
-    T-059  a real GPU. ⛔ Every GL row is still swrast and surfaceless,
-        and T-080's guarantee says so in its own sentence rather than in
-        a footnote. Vulkan and NVIDIA are NOT measured.
+    T-084  ⛔ NEW: the trace classifier is nine hand copies and one of
+        them counted FAILED opens as loads. Two are converted; seven are
+        not, and the competitor's "4 of 11" in comparison.md may be
+        inflated. corrections.md C25.
+    T-059  a real GPU. ⛔ Every GL row is still swrast and surfaceless.
     T-066  ⛔ still the only open P0, and its remaining column is SIZE,
         which the operator struck on 2026-09-03c and deferred on
         2026-09-03d. ⚠ The priority ordering points here; this work
         order does not. This page decides.
     T-082  vendor + patch + drift detection. XL — start early, finish late.
-    T-083  desktop integration. Depends on T-081.
+    T-083  desktop integration. ⭐ Its two named gaps are already closed
+        (X-AppImage-Version and a dangling Icon=), and the bundle now
+        carries a usr/ tree; what is left is the managers themselves.
 
     ---- then the builder, by how foundational ----
 

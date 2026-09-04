@@ -1860,3 +1860,133 @@ that ships a large-TLS library which is **not** an interposer would need it.
 ⭐ **And the sweep that answered this found two other things it was not looking
 for**, both in T-068: `--host-dlopen` could not load any object using iconv,
 and general-dynamic TLS bound cross-module references to offset 0.
+
+## T-081 — ⭐ every store path, without the regex cascade: the bundle DRAWS
+
+**Source** ⭐ **operator, 2026-09-03d**: *"Our nix debloater/patcher covers any
+and all cases including shebang lines or hardcoded paths in .desktop files or
+anything else in a nix bundle ... all of those were necessary, our debloater
+must find a way to get better results without being so messy."*
+⭐ Unblocked 2026-09-03e, **closed 2026-09-03f**.
+**Category** toolchain · **Priority** P1 · **Effort** L · **Status** ✅ done
+
+⛔ **THE ACCEPTANCE TEST WAS NAMED BEFORE THE WORK AND IT IS MET.** The
+operator's words: *"`experiments/64-` arm G must go 0 of 11 → 11 of 11 WITHOUT
+the bind arm C uses."* Two runs, both `pass=11 fail=0 skip=0`:
+
+| arm | subject | window on a real X server | host `.so` |
+|---|---|---|---|
+| **G** | `galculator` — UI is a file at a compiled-in absolute store path | ⭐ **11 / 11**, and no bind | **0 / 11** |
+| **N** | ⭐ the SAME bundle, built `--no-storefix` | ⛔ **0 / 11** | — |
+| **X** | `mousepad` — the regression control | ✅ **11 / 11** | **0 / 11** |
+| **P** | `meld` — ⭐ **Python 3 + GTK 3, a SCRIPT entry point** | ⭐ **11 / 11** | **0 / 11** |
+
+⭐ **ARM N IS WHY ARM G MEANS ANYTHING.** Delivery rule 6 — *check that your
+success criterion can fail for the right reason* — is not satisfied by a
+comment, so the negative control is a **shipped flag**: same subject, same
+bundler, one mechanism absent. It draws nothing on any of the eleven, and it
+dies with the exact message the entry was opened for:
+`Couldn't load /nix/store/…-galculator-2.1.4/share/galculator/ui/main_frame.ui`.
+
+⭐ **AND ARM P IS THE OPERATOR'S OWN COUNTER-EXAMPLE, REACHED.** *"in
+nixappimage python is easy and works, choose any python gui app and it
+works"* — `meld` produced **no artefact at all** before this entry. It now
+draws a real toplevel window on eleven distributions, four of which ship no
+glibc, none of which ship Python or GTK, with **zero host shared objects**.
+
+## ⛔ THE SECURITY QUESTION WAS ANSWERED FIRST, AND THE ANSWER WAS NO
+
+`/nix/store/` and `/tmp/.pgbs/` are both 11 bytes, so a same-length prefix
+rewrite inside `.rodata` needs no relocation and no `patchelf`. ⛔ It is also
+unshippable, and **both** branches of it are:
+
+| the launcher… | what a local attacker gets |
+|---|---|
+| **follows** a `/tmp/.pgbs` that already exists | an arbitrary-write primitive as the victim |
+| **refuses** when it is not ours | a one-command denial of every `pgb` bundle for every other user on the machine |
+
+⭐ And the tree it would serve is **loadable code** — a GTK `.ui` names
+GModules, a `loaders.cache` names shared objects to `dlopen` — so it is code
+execution rather than a stale copy. ⚠ The safe-`mkdir` dance closes the write
+primitive and cannot close the second row: the name is fixed, so refusing is
+the only safe answer and refusing is the denial.
+[`../../docs/design/store-paths.md`](../../docs/design/store-paths.md) §2.
+
+## The mechanism, and why it is not "nicer regexes"
+
+    tool/runtime/pgb-storefix.c   the interposer, via sharun's own .preload
+    internal/bundle/storefix.go   the map, the farm, the ABI check, the report
+    tool/runtime/pgb-exec.c       the script entry point's static trampoline
+
+⭐ **Exact match against the closure.** `pgb` computes the set, so a path in it
+is rewritten and a path outside it is **reported** — at build time for what is
+compiled into the binaries, at run time for what is assembled.
+⚠ **The field takes the same route by hand**: `quick-sharun.sh`'s
+`_map_paths_ld_preload_open` builds `path-mapping.so` from a `PATH_MAPPING`
+variable a packager writes, one recipe at a time.
+
+⭐ **A SCRIPT ENTRY POINT IS A PAIR, NOT A PATH.** `resolveEntry` returns
+interpreter + script; `installProgram` lays that out as the interpreter under
+its own name, the script under `shared/script/`, and a **static trampoline** at
+`shared/bin/<name>`. sharun execs a static binary directly, so the trampoline
+needs no loader cooperation and drags no host libc in. ⛔ A shebang naming a
+HOST interpreter is refused rather than adopted.
+
+## ⭐ The "Prove" line, paid on one bundle and measured
+
+Scanning a `galculator` AppDir's **text** files — `share/`, `etc/`, `.env`,
+the desktop entry — for store-shaped strings:
+
+| | |
+|---|---|
+| occurrences | **117** |
+| distinct store paths | **12** |
+| IN this bundle's closure | **11** — resolved |
+| NOT in it | ⭐ **1**, and it is the argument |
+
+⭐ The one that is not is `…-dejavu-fonts-minimal-2.37<`. Its trailing `<` is
+an **XML markup boundary**: the match is a path followed by the start of the
+next tag, because the field's `[^ \"']*` does not stop at `<`. ⛔ Regex 5
+rewrites it **and eats the boundary with it**, silently, in a data file. Exact
+match against the closure reports it and changes nothing.
+
+⚠ **ONE SUBJECT**, not the thirteen `nixappimage` recipes the Prove line names.
+`experiments/65-`'s `field` rows pay four of the thirteen; the other nine are
+chromium/brave/discord/telegram-class and their closures do not fit this
+machine. **T-080** owns the corpus.
+
+## ⛔ Two instrument defects the work found, both recorded
+
+1. **The trace classifier counted FAILED opens as loads.** `strace` splits a
+   call across `openat(…, "path" <unfinished ...>` and
+   `<... openat resumed>) = -1 ENOENT`: the path is on the first line and the
+   result on the second, so a filter dropping `ENOENT` keeps the first half.
+   ⭐ The error only runs ONE WAY — it can turn a clean row dirty and never the
+   reverse — so every committed zero stands.
+   `docs/history/corrections.md` C25, **T-084**.
+2. ⛔ **`strace` DEADLOCKS ON A dwarfs FUSE MOUNT.** It reads a path argument
+   out of the tracee's address space; that page is backed by the mount; the
+   only process that can serve it is the FUSE daemon **strace has itself
+   ptrace-stopped**. strace ends in state **D**, `kill` cannot end a process in
+   D, and the row freezes. ⭐ Two fixes: reap the daemon BEFORE `wait`, and run
+   the Python arm in **extract** mode, which removes the daemon entirely.
+   ⚠ Mount and extract are two delivery modes of one artefact and neither
+   criterion depends on which.
+
+## What it cost
+
+| | before | after |
+|---|---|---|
+| `galculator` artefact | 163,454,035 B | 177,585,784 B (**+8.6%**) |
+| `mousepad` artefact | 174,265,491 B | ~196 MB (**+12%**) |
+
+⚠ **The "before" column is not re-derivable from the tree** — it was recorded
+in the session before `pgb bundle appimage` was rebuilt and the build log that
+carried it has been overwritten since. ⛔ And `--no-storefix` does **not**
+isolate the cost: it produced 177,654,074 B, within 0.08%, because the growth
+is the lib-tree and `etc/`/`libexec/` merging, which the flag does not gate.
+The size buys: every directory under a store path's `lib/` instead of a
+nine-name whitelist (which was silently missing `lib/gconv`, the directory
+`.env` sets `GCONV_PATH` to), `etc/` and `libexec/` merged, one symlink farm
+per store path, a 22,536-byte interposer and a 9,662-byte map.
+
