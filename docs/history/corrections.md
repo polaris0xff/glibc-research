@@ -1476,9 +1476,41 @@ down in this corpus were the instrument, and all three were the *criterion*
 rather than the subject: C34 (`exit 0 AND the assertion`), C36 (the separator
 ate an alternating regex), and now C39 (a regex that never matched the real
 output). ⛔ **A `cli` assertion is written from what the program is expected
-to print and is never checked against what it does print**, and nothing in the
-harness closes that loop. A subject whose assertion has never matched anything
-is indistinguishable from a subject that fails.
+to print and is never checked against what it does print.**
+
+### ⭐ THE LOOP IS CLOSED — 2026-09-04c
+
+`experiments/65-` now **interrogates its own assertion on the first
+environment** and abandons the subject with an **INSTRUMENT** row rather than
+scoring it zero eleven times. Two tests, and they catch different defects:
+
+| test | catches | how |
+|---|---|---|
+| does the pattern **compile**? | ⭐ **C36** | `grep -E` exits **2** on a malformed pattern and **1** on a valid one that matched nothing, so empty input separates them |
+| did the program print the assertion's **literal prefix** while the full pattern missed? | ⭐ **C39** | `assert_anchor` is the leading run of the pattern before the first regex metacharacter: `mpv v[0-9]` → `mpv `, `helix [0-9]` → `helix `, `(llvmpipe\|Mesa)` → empty |
+
+⛔ **The criterion is deliberately NOT "the assertion matched nothing."**
+`neovim` really does score 0 of 11 — its closure's `ld.so` rejects `--argv0`,
+so the program never runs (C35) — and reporting that as an instrument error
+would throw a real result away. ⭐ **The anchor is what separates *the program
+answered and we misread it* from *the program never spoke*.**
+
+⭐ **Checked against every historical case before it was trusted**, which is
+the point of the rule it exists to serve:
+
+| assertion | output it was given | verdict |
+|---|---|---|
+| `mpv [0-9]` (C39, the defect) | `mpv v0.41.0 Copyright …` | ⭐ **INSTRUMENT**, anchor `mpv ` |
+| `mpv v[0-9]` (the fix) | the same | ✅ pass |
+| `NVIM v[0-9]` (C35, a real zero) | `ld.so: unrecognized option '--argv0'` | ⭐ **fail, and kept as a fail** |
+| `(llvmpipe\|Mesa\|softpipe)` | an `eglinfo` config table | ✅ pass |
+| `(llvmpipe` (C36, the cut pattern) | the same | ⭐ **INSTRUMENT**, does not compile |
+| `helix [0-9]` | no output at all | fail, and kept as a fail |
+
+⛔ **An INSTRUMENT subject writes NO row**, so it is re-measured on the next run
+once the pattern is fixed — the same rule that makes deleting a bad row safe.
+**C7** is checked before C1 and C2, for the reason C6 is: a subject whose
+criterion cannot recognise its own answer is not a capability result.
 
 ⭐ **And the same run measured something T-091 needed.** `mpv`'s build log
 reads *`gstreamer  scanner installed as a program (GST_PLUGIN_SCANNER
@@ -1486,6 +1518,35 @@ follows)`* — T-091's shipped code firing on a real corpus subject, not on a
 synthetic one. ⛔ It still does not close T-091, and now for a precise reason:
 the row runs `--version`, which never launches the scanner, so its
 host-object count cannot say which process it counted.
+
+---
+
+## C40 — the corpus row note threw the answer away twice over
+
+**Found** 2026-09-04b, fixed 2026-09-04c. Not a wrong measurement — a
+**diagnostic** that could not carry the diagnosis, which is how three rows sat
+unexplained for a session.
+
+`experiments/65-` builds each failing row's note like this:
+
+    note=$(cat "$WORK/err.$id."* | grep -m1 -E "…|Traceback|…|Error" | cut -c1-70)
+
+⛔ **Both halves discard the answer, for different reasons.**
+
+| | |
+|---|---|
+| `grep -m1` — the **FIRST** matching line | ⛔ A Python traceback **opens** with `Traceback (most recent call last):`. The line naming the cause is the **LAST** one. `py-2`'s note was therefore the word "Traceback" and nothing else |
+| `cut -c1-70` | ⛔ Truncated two real answers: `neovim`'s loader message, and `vkmark`'s `[/dev/dri]` — **the entire finding**, which had to be recovered by hand from the raw stderr |
+| `cat "$WORK/err.$id."*` | ⚠ A **passing** environment's stderr noise sorts in among a failing one's, so the chosen line need not belong to the failure at all |
+
+⭐ **It is now the LAST matching line of the FIRST environment that has one, at
+180 characters.** Per-file rather than over the concatenation, so the note
+describes one environment's failure completely instead of the pile's.
+
+⚠ **The general shape is worth naming**, because it is the cheapest defect in
+this tree to reintroduce: **a diagnostic that is nearly right is worse than one
+that is absent**, because a reader treats it as the answer. `py-2`'s note said
+`Traceback` for a whole session and nobody re-read the stderr.
 
 ---
 

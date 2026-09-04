@@ -222,7 +222,7 @@ qt-3;Qt;qbittorrent;qbittorrent;gui;;;
 py-1;Python GUI;meld;meld;gui;;;
 py-2;Python GUI;pdfarranger;pdfarranger;gui;;;
 py-3;Python GUI;virt-manager;virt-manager;gui;;;
-media-1;media / codecs;mpv;mpv;cli;mpv [0-9];mesa;--version
+media-1;media / codecs;mpv;mpv;cli;mpv v[0-9];mesa;--version
 field-1;the field's own recipes;helix;hx;cli;helix [0-9];;--version
 field-2;the field's own recipes;neovim;nvim;cli;NVIM v[0-9];;--version
 field-3;the field's own recipes;flameshot;flameshot;gui;;;
@@ -290,6 +290,37 @@ reap_in_root() {
   done
 }
 
+# ---------------------------------------------------------------------------
+# ⭐ THE CHECK THAT CLOSES THE LOOP AN ASSERTION LEAVES OPEN.
+#
+# ⛔ THREE OF THIS CORPUS'S FIVE ZEROS WERE THE CRITERION, NOT THE SUBJECT —
+# C34, C36 and C39 — and the pattern in all three is one thing: a `cli`
+# assertion is written from what the program is EXPECTED to print and is never
+# checked against what it DOES print. `mpv --version` prints `mpv v0.41.0`, the
+# assertion said `mpv [0-9]`, and the row read 0 of 11 on a subject that
+# answered completely.
+#
+# ⭐ So the assertion is INTERROGATED on the FIRST environment, and the two
+# tests are cheap and different:
+#
+#   1. is the pattern even a pattern? `grep -E` exits >1 on a malformed one,
+#      which is what C36's `(llvmpipe` did after the separator collision cut it
+#      in half. A pattern that cannot compile matches nothing on all eleven.
+#   2. did the program print the assertion's LITERAL PREFIX while the full
+#      pattern missed? `assert_anchor` is the leading run of the pattern before
+#      the first regex metacharacter — `mpv v[0-9]` → `mpv v`, `helix [0-9]` →
+#      `helix `, `(llvmpipe|Mesa)` → empty. ⭐ If the anchor is there and the
+#      pattern is not, the program answered and the criterion missed it.
+#
+# ⛔ IT IS DELIBERATELY NOT "the assertion matched nothing". `neovim` really
+# does score 0 of 11 — its closure's `ld.so` rejects `--argv0` and the program
+# never runs — and calling that an instrument error would throw away a real
+# result. The anchor is what separates "the program answered and we misread it"
+# from "the program never spoke".
+assert_anchor() {   # the leading LITERAL run of a `grep -E` pattern
+  printf '%s' "$1" | sed 's/[][(){}.*+?^$\\|].*//'
+}
+
 # ⭐ THE CLASSIFIER IS experiments/lib.sh's `exp_classify_trace`, NOT A COPY.
 # ⛔ Nine experiments carried the same awk by hand and they could not be
 # corrected together: 2026-09-03f found that a split `openat( ... <unfinished
@@ -302,7 +333,7 @@ reap_in_root() {
 ENVS=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt")
 NENV=$(printf '%s\n' "$ENVS" | wc -l | tr -d ' ')
 
-TOTAL=0; BUILT=0; UNRESOLVED=0; FULL=0; CLEANALL=0
+TOTAL=0; BUILT=0; UNRESOLVED=0; FULL=0; CLEANALL=0; INSTRUMENT=0
 
 # ⭐ C6, THE POSITIVE CONTROL. These three ids are `experiments/64-` arms G, X
 # and P, each measured at 11 of 11 on these same eleven environments, twice.
@@ -402,8 +433,19 @@ while IFS= read -r line <&3; do
   BUILT=$((BUILT+1))
   paths=$(grep -a -m1 '^store paths' "$blog" | sed 's/^store paths *//' | cut -c1-24)
 
+  # ⛔ TEST 1 OF THE ASSERTION, AND IT COSTS NOTHING: does the pattern COMPILE?
+  # `grep -E` exits 2 on a malformed one and 1 on a valid one that matched
+  # nothing, so an empty input separates them. C36 was exactly this — a
+  # `|`-split corpus handed grep an unmatched `(` and eleven rows read zero.
+  instr=""
+  if [ -n "$assert" ]; then
+    printf '' | grep -qE "$assert" 2>/dev/null
+    [ $? -gt 1 ] && instr="assertion '$assert' is not a valid grep -E pattern"
+  fi
+
   pass=0; clean=0; rows=0
   for name in $ENVS; do
+    [ -n "$instr" ] && break
     root=$(exp_rootfs "$name") || true
     [ -n "$root" ] || { exp_skip "$id/$name" "rootfs not fetched"; continue; }
     rows=$((rows+1))
@@ -483,14 +525,64 @@ while IFS= read -r line <&3; do
       [ "$st" = 0 ] && ok=yes
     fi
     [ "$ok" = yes ] && pass=$((pass+1))
+
+    # ⛔ TEST 2 OF THE ASSERTION, ON THE FIRST ENVIRONMENT AND NOWHERE ELSE.
+    # If the program printed the assertion's literal prefix and the pattern
+    # still missed, the criterion is wrong and the next ten rows would only
+    # repeat the mistake. ⭐ Reported as an INSTRUMENT error and the subject is
+    # abandoned WITHOUT a row, so it is re-measured once the pattern is fixed.
+    if [ -n "$assert" ] && [ "$rows" = 1 ] \
+       && ! printf '%s' "$all" | grep -qE "$assert"; then
+      anch=$(assert_anchor "$assert")
+      if [ -n "$anch" ] && printf '%s' "$all" | grep -qF "$anch"; then
+        instr="'$assert' missed, but the program printed: $(printf '%s' "$all" \
+          | grep -F "$anch" | head -1 | tr -d '\t' | cut -c1-80)"
+      fi
+    fi
+
     nhost=$(exp_classify_trace "$tr" /subj65 | grep -c '^host ' || true)
     [ "$nhost" = 0 ] && clean=$((clean+1))
     rm -f "$tr"
   done
 
+  # ⛔ AN INSTRUMENT ERROR IS NOT A ROW, AND THAT IS THE WHOLE POINT. Nothing
+  # is written to $ROWS, so the subject is re-measured on the next run rather
+  # than carrying a zero somebody has to disbelieve later.
+  if [ -n "$instr" ]; then
+    INSTRUMENT=$((INSTRUMENT+1))
+    show_row "$id" "$cat_" "$attr" "$mode" INSTR "-" "${paths:--}" "⛔ $instr"
+    exp_note "⛔ $id: INSTRUMENT ERROR — the criterion, not the subject."
+    exp_note "   $instr"
+    exp_note "   No row was written. Fix the assertion in this script's CORPUS"
+    exp_note "   table, then re-run with PGB_EXP65_ONLY='$id'."
+    rm -f "$img" "$WORK/out.$id."* "$WORK/err.$id."*
+    grep -q "^[^;]*;[^;]*;$attr;" "$WORK/remaining.txt" 2>/dev/null || rm -rf "$cache"
+    continue
+  fi
+
+  # ⭐ THE NOTE IS THE LAST MATCHING LINE OF THE FIRST ENVIRONMENT THAT HAS
+  # ONE, AND IT IS 180 CHARACTERS WIDE.
+  #
+  # ⛔ IT USED TO BE THE FIRST MATCHING LINE OF THE CONCATENATION, CUT TO 70,
+  # and both halves of that threw away the answer. A Python traceback OPENS
+  # with `Traceback (most recent call last):` — the line naming the cause is
+  # the LAST one — so `py-2`'s note said nothing at all. And 70 characters
+  # truncated two real answers: `neovim`'s loader message and `vkmark`'s
+  # `[/dev/dri]`, which was the whole finding.
+  #
+  # ⚠ Per-file rather than over the concatenation, because a passing
+  # environment's stderr noise sorts in among a failing one's and the last
+  # line of the pile need not belong to the failure at all.
   note=""
-  [ "$pass" -lt "$rows" ] && note=$(cat "$WORK/err.$id."* 2>/dev/null | tr -d '\r' \
-    | grep -m1 -E "Couldn't load|cannot open|Traceback|error while loading|not found|Error" | cut -c1-70)
+  if [ "$pass" -lt "$rows" ]; then
+    for _ef in "$WORK/err.$id."*; do
+      [ -s "$_ef" ] || continue
+      note=$(tr -d '\r' < "$_ef" | tr '\t' ' ' \
+        | grep -E "Couldn't load|cannot open|Traceback|error while loading|not found|Error" \
+        | tail -1 | cut -c1-180)
+      [ -n "$note" ] && break
+    done
+  fi
   printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
     "$id" "$pass" "$rows" "$clean" "${paths:--}" "$note" > "$row"
   show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" "${paths:--}" "$note"
@@ -514,6 +606,7 @@ printf -- '-- summary ---------------------------------------------------------\
 printf '  %-40s %s\n' 'subjects in the corpus'            "$TOTAL"
 printf '  %-40s %s\n' 'subjects that produced an artefact' "$BUILT"
 printf '  %-40s %s\n' '⛔ UNRESOLVED (not a pass, not a fail)' "$UNRESOLVED"
+printf '  %-40s %s\n' '⛔ INSTRUMENT errors (criterion, not subject)' "$INSTRUMENT"
 printf '  %-40s %s\n' "⭐ subjects passing on all $NENV"     "$FULL"
 printf '  %-40s %s\n' "⭐ subjects clean on all $NENV"       "$CLEANALL"
 
@@ -542,8 +635,18 @@ if [ "$CTRL_SEEN" -gt 0 ] && [ "$CTRL_OK" != "$CTRL_SEEN" ]; then
   exp_note "   delivery mode."
 fi
 
-exp_check "C1  every subject that BUILT passes on all $NENV" "$FULL"     "$BUILT"
-exp_check "C2  every subject that BUILT is clean on all $NENV" "$CLEANALL" "$BUILT"
+# ⭐ C7 IS CHECKED BEFORE C1 AND C2 FOR THE SAME REASON C6 IS: a subject whose
+# criterion cannot recognise its own answer is not a capability result, and
+# three of this corpus's five zeros were exactly that.
+exp_check "C7  ⭐ no subject failed its criterion's sanity check" "$INSTRUMENT" 0
+
+# ⛔ C1 AND C2 COUNT THE MEASURED SUBJECTS, NOT EVERY ARTEFACT. An INSTRUMENT
+# error produced an artefact and no rows, so counting it against BUILT would
+# report a criterion defect as a capability failure — the confusion this whole
+# check exists to end.
+MEASURED=$((BUILT-INSTRUMENT))
+exp_check "C1  every subject MEASURED passes on all $NENV"    "$FULL"     "$MEASURED"
+exp_check "C2  every subject MEASURED is clean on all $NENV"  "$CLEANALL" "$MEASURED"
 exp_note "⛔ C3 IS A LIMIT AND IT IS NOT MEASURED AWAY BY A GREEN TABLE."
 exp_note "   Every OpenGL and Vulkan row here is a SOFTWARE rasteriser —"
 exp_note "   llvmpipe and lavapipe — on a machine with no GPU. This experiment"

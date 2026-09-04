@@ -6,32 +6,29 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-04b, at the START, refreshed as each piece
-                   landed, and again at the END.
-                   ⛔ THE SESSION ENDED WITH `experiments/65-` STILL
-                   RUNNING. That is not a failure — it is resumable and 21
-                   of its 26 rows are recorded and committed. Re-run it.
-    TREE           main, began at 4f652df4 (== origin/main at session start)
+    LAST WRITTEN   2026-09-04c, at the START, refreshed as each piece lands.
+    TREE           main, began at 2ea02061 (== origin/main at session start)
     BRANCH         ⛔ main. The harness named
-                   `claude/app-corpus-research-34c2el` and THE OPERATOR SAID
-                   main, again. FIFTH session running.
-    SCOPE          ⏳ T-080 finish experiments/65- (RESUMABLE). Then the arms
-                   below that need the bed.
-    CI             ⭐ 335-385 all success. Read after every push.
+                   `claude/agents-corpus-work-nk8dj2` and THE OPERATOR SAID
+                   main, again. SIXTH session running.
+    SCOPE          C39 + the harness check that would have caught it, then
+                   finish experiments/65- (T-080), then T-084 step 2,
+                   T-091, the three unexplained rows, T-088, T-089.
+    CI             read after every push.
     GATES          both green at every commit.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
 
-⚠ **The clone comes up SHALLOW and `main` comes up BEHIND.** Measured a fifth
-time; the number was **338** (267, 311, 321, 358, 338):
+⚠ **The clone comes up SHALLOW.** ⭐ **`main` came up CURRENT this time** —
+`git rev-list --count HEAD..origin/main` read **0 after the checkout**, where
+the last five sessions read 267, 311, 321, 358, 338. ⛔ **Check it anyway, and
+check it AFTER the checkout**: on the harness branch the count reads 0 because
+that branch points at the same head, not because the tree is current.
 
     git fetch --unshallow
     git checkout main
     git rev-list --count HEAD..origin/main     ⛔ check it AFTER the checkout
     git merge --ff-only origin/main
-
-⛔ **On the harness branch the count reads 0.** It reads 0 because that branch
-points at the same head, not because the tree is current.
 
 ⚠ **The container is fresh: nothing is bootstrapped.**
 
@@ -73,57 +70,79 @@ scored a bundle 11 of 11 green on it, reasoning that the message comes from the
 11 rows became **0**. ⛔ Before trusting any GUI row, ask what would make the
 criterion fail *for the right reason*.
 
-## In flight right now
+## ⭐ THE LOOP THAT LET THREE ZEROS THROUGH IS NOW CLOSED — read this before writing an assertion
 
-    ⭐ **`./pgb` HAS BEEN REBUILT AND CARRIES C37.** The corpus was stopped a
-    third time to do it, five rows measured against the old tool were
-    DELETED (`gl-3`, `x11-3`, `py-2`, `py-3`, `field-2`), and both instances
-    restarted. ⛔ Anything measured before that point is not evidence about
-    the bundler.
+⛔ **Three of this corpus's five zeros were the CRITERION, not the subject**
+(C34, C36, C39), and the pattern in all three is one thing: *a `cli` assertion
+is written from what the program is expected to print and is never checked
+against what it does print.*
+
+⭐ **`experiments/65-` now interrogates its own assertion, on the FIRST
+environment and nowhere else**, and abandons the subject with an **INSTRUMENT**
+row rather than scoring it zero eleven times:
+
+| test | catches | how |
+|---|---|---|
+| does the pattern **compile**? | ⭐ **C36** | `grep -E` exits **2** on a malformed pattern and **1** on a valid one that matched nothing; empty input separates them |
+| did the program print the assertion's **literal prefix** while the pattern missed? | ⭐ **C39** | `assert_anchor` is the leading run before the first regex metacharacter — `mpv v[0-9]` → `mpv `, `(llvmpipe\|Mesa)` → empty |
+
+⛔ **It is deliberately NOT "the assertion matched nothing".** `neovim` really
+does score 0 of 11 — its closure's `ld.so` rejects `--argv0`, so the program
+never runs — and calling that an instrument error would throw a real result
+away. **The anchor is what separates *the program answered and we misread it*
+from *the program never spoke*.** Verified against all five historical cases
+before it was trusted; `docs/history/corrections.md` C39.
+
+⭐ **An INSTRUMENT subject writes NO row**, so it is re-measured once the
+pattern is fixed. **C7** is checked before C1 and C2 and fails the run.
+
+## In flight right now
 
     ⏳ `experiments/65-` — the T-080 corpus. RESUMABLE. A recorded row in
        `evidence/65-capability-corpus/rows/` is NEVER re-measured, so
        `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
        ⛔ A row measured by a BROKEN instrument must be DELETED, not adjusted
        — that is what makes resumability safe.
-       ⭐ 21 of 26 in. FIVE categories CLOSED at 3 of 3, all passing —
-       GTK 3, X11/XCB, OpenGL/EGL, Qt, SDL. Vulkan is 3 of 3 with the
-       third a BED limit (`vkmark` needs `/dev/dri`, nowhere here).
-       ⛔ STILL TO MEASURE: `py-2`, `py-3`, `media-1`, `field-1`,
-       `field-2`.
-       ⚠ ~35 minutes per subject serially — see the PARALLEL recipe above.
+       ⭐ 22 of 26 in. FIVE categories CLOSED at 3 of 3, every subject
+       passing and clean — GTK 3, X11/XCB, OpenGL/EGL, Qt, ⭐ **SDL**.
+       Vulkan is 3 of 3 with the third a BED limit (`vkmark` needs
+       `/dev/dri`, which exists nowhere here).
+       ⛔ STILL TO MEASURE: `py-2`, `py-3`, `media-1`, `field-2`.
+       ⚠ ~35 minutes per subject serially — see the PARALLEL recipe below.
 
-    ⛔⛔ FIRST, BEFORE ANYTHING ELSE: IF `rows/media-1.tsv` EXISTS, DELETE
-    IT AND DO NOT READ IT AS A RESULT. The corpus instance was still
-    running when this session ended and its queue still reaches `media-1`
-    with C39's broken assertion in place, so it may have written another
-    false zero after the last commit. ⚠ A row is normally never
-    re-measured — that rule is what makes resumability safe, and it is
-    exactly why a row from a known-broken criterion has to be removed by
-    hand rather than left to be trusted.
+    ⭐ C39 IS FIXED and so is the defect class behind it. `media-1`'s
+    assertion is `mpv v[0-9]`; the harness check above is what stops the
+    next one. Both landed BEFORE 65- was restarted.
 
-    ⛔ AND FIX C39 BEFORE RE-RUNNING `media-1` — it is ONE CHARACTER, and
-    the row was DELETED once already so it will be re-measured:
+    ⛔⛔ AND ONE INSTANCE WAS EDITED OUT FROM UNDER ITSELF. The 2026-09-04b
+    corpus instance (started 07:31) was STILL RUNNING when
+    `experiments/65-capability-corpus.sh` was rewritten at **10:04** to fix
+    C39. That is the hazard this tree documents in `docs/AGENTS.md` §0b and
+    `TODO/ci.md` T-084 — `sh` re-reads a script from a BYTE OFFSET, so a
+    rewrite mid-run makes it re-enter at a shifted position, and the run
+    log shows it re-printing the run header, which is what re-executing the
+    tail looks like. ⭐ **It was killed before it wrote another row**, and
+    the 22 rows on disk are all accounted for: nothing was recorded after
+    the edit. ⚠ If a future row looks impossible, check whether its
+    instance outlived an edit to the harness.
 
-        experiments/65-capability-corpus.sh line 225
-        media-1;media / codecs;mpv;mpv;cli;mpv [0-9];mesa;--version
-                                               ^^^^^^^^^
-        must be                                mpv v[0-9]
+    ⛔ AND THE `pkill -f` SELF-MATCH TRAP HAS A SECOND FORM THE RECORDED
+    WORKAROUND DOES NOT COVER. The documented fix is the bracket trick
+    (`grep '[6]5-capability'`), which stops grep matching its own pattern.
+    ⚠ It does NOT help when the harness wraps the command in a `bash -c`
+    whose command line CONTAINS the pattern text — the wrapper matched, and
+    killing it killed the shell issuing the kill. ⭐ Kill by explicit PID
+    read in a separate, earlier command.
 
-    ⭐ `mpv --version` prints `mpv v0.41.0 Copyright ...` — there is a
-    literal `v` before the digit, so the assertion could never match and the
-    row read 0/11 on a subject that answered completely. ⛔ THIS IS THE
-    THIRD DEFECT OF EXACTLY THIS KIND (C34, C36, C39) and the pattern is
-    one thing: A `cli` ASSERTION IS WRITTEN FROM WHAT THE PROGRAM IS
-    EXPECTED TO PRINT AND IS NEVER CHECKED AGAINST WHAT IT DOES PRINT.
-    ⭐ The cheap fix is a harness check: on the FIRST environment, if the
-    assertion matches nothing, say so as an INSTRUMENT error rather than
-    scoring the subject zero eleven times.
+    ⭐ AND THE ROW NOTE IS FIXED. It was the FIRST matching line of the
+    concatenated stderr cut to 70 characters, which is useless for a Python
+    traceback (whose first line is always `Traceback (most recent call
+    last):`) and truncated two real answers. It is now the LAST matching
+    line of the FIRST environment that has one, at 180 characters.
 
-    ⛔ THE INSTANCES ARE GONE — the container does not survive the session.
+    ⛔ THE INSTANCES DO NOT SURVIVE THE SESSION — the container is wiped.
        Just re-run the full one; every recorded row is committed and is
-       never re-measured. The second instance is optional and pays for
-       itself only while more than one subject is left.
+       never re-measured.
 
     ⭐ 102- IS DONE — the CHEAP half of T-084, no bundle build at all.
     It diffs the six hand copies of the trace classifier against the shared
@@ -143,123 +162,19 @@ criterion fail *for the right reason*.
     different answer; either give an environment a real locale, or measure
     the mechanism the way `64-` arms G/N do (does the app DRAW).
 
-## ⭐ A PRE-REGISTERED PREDICTION FOR THE NEXT PASS — write the result down
+## ⛔ THE THREE UNEXPLAINED ROWS, each with its reproduction
 
-⛔ **Committed before the run that settles it.** Every corpus row at **11/11**
-is a subject whose entry point is a **plain ELF**. Of the zeros, four —
-`xterm`, `pdfarranger`, `virt-manager`, `neovim` — have a **script or
-shell-wrapper** entry point.
-
-⭐ **C37 fixed one of those** (`xterm`, which now draws in 2 s) by installing
-the dot-named wrapper target and pointing the farm's `bin` at the sharun
-hardlinks. ⭐ **The fix IS in `./pgb` now** — rebuilt once the corpus was
-stopped, and the five affected rows deleted so they are re-measured against it.
-
-| after `make`, re-measured | predicted |
-|---|---|
-| `x11-3` `xterm` | ⭐ **passes** — measured by hand at 1 window in 2 s. ✅ **SETTLED: 11/11.** And its CLEAN count is **4/11**, which is C5's other pre-registered prediction confirmed |
-| `gl-3` `glmark2` | ⭐ **passes** — also a shell wrapper; by hand it draws in 2 s and benchmarks at **360 FPS**. ⚠ Added after the table was first written, and said so |
-| `py-2` `pdfarranger` | ⚠ **still fails.** It dies with a Python **Traceback**, so it STARTED — C37's exec failure is not its problem |
-| `py-3` `virt-manager` | ⛔ **not predicted.** Nobody has read its error |
-| `field-2` `neovim` | ⛔ **still fails**, and not ours: the closure carries **glibc 2.26**, and `ld.so` learned `--argv0` in 2.33 |
-
-⚠ **If `pdfarranger` passes, the script-entry class was broken in a way C37
-describes and this table did not** — the more interesting outcome, which is
-why it is written down rather than left as an expectation.
-
-    ⛔ THREE THAT ARE STILL UNEXPLAINED AT THE END OF THIS SESSION, and
-    they are recorded as unexplained rather than smoothed over:
-        field-3  flameshot 0/11. ⭐ NOT C37 — MEASURED, not assumed. Its
-                 build log says `bin/flameshot is a nixpkgs wrapper ->
-                 .flameshot-wrapped`, the RESOLVED shape, which is
-                 mousepad's handler and mousepad passes 11/11. So its row
-                 was correctly kept when the other five were deleted, and
-                 nobody has read its actual error. Start there.
-        field-4  gearlever UNRESOLVED — it produced no artefact at all.
-                 The reason is in its build log, and nobody has read it.
-        qt-1     qalculate-qt 11/11 PASS but 4/11 CLEAN. ⛔ NOT a C37
-                 regression — galculator rebuilt with the same pgb traces
-                 to ZERO host objects, so the change did not introduce
-                 host loading. Which four environments, and which object?
-
-    ⛔ FOUR NAMED UNKNOWNS THE CORPUS HAS ALREADY PRODUCED, each with its
-    reproduction (`PGB_EXP65_ONLY='<id>'`):
-        field-2  ⭐ SOLVED. The closure carries glibc 2.26; sharun passes
-                 `--argv0` to the loader and ld.so learned that in 2.33, so
-                 the loader takes it as the program. The SAME old glibc is
-                 why the interposer warned about dladdr/dlsym (they were in
-                 libdl.so until 2.34). `checkLoaderOptions` now says so at
-                 build time. ⛔ The bundle still cannot run — that is a
-                 nixpkgs-closure fact, not a bundler one.
-        field-1  helix 0/11. ⚠ A named limit of the farm and ⛔ NOT
-                 established as the cause: its closure carries ~200 bare
-                 TOP-LEVEL `.so` grammars, and mergedFor maps eight names,
-                 none of which covers a bare file. ⭐ The route is short --
-                 copyLibraries already flattened those `.so` into lib/, so a
-                 top-level `.so` could point there -- but helix also finds
-                 grammars via HELIX_RUNTIME, so it may never consult the
-                 compiled-in path. A fixed mergedFor that left the row at 0
-                 would be the useful result.
-        vkmark   ⭐ SOLVED, AND IT IS THE BED. The full error ends
-                 `[/dev/dri]` -- vkmark enumerates DRM devices before it asks
-                 Vulkan anything, and /dev/dri exists NOWHERE here. Not a
-                 bundler failure. ⚠ The guess recorded earlier -- a
-                 compiled-in data directory, the T-081 shape -- was WRONG.
-        glmark2  ✅ CLOSED at 11/11 and 11/11 CLEAN. It was C37, the same
-                 class as xterm: a nixpkgs SHELL wrapper execing a dot-named
-                 target by store path. ⚠ The vkmark guess -- a compiled-in
-                 data directory -- was offered for this too and was WRONG
-                 for both subjects.
-        gl-1     ⭐ SOLVED -- TWO instrument defects, and the second was
-        vulkan-1 hiding behind the first. C34: the cli criterion was
-                 `exit 0 AND the assertion` and eglinfo exits 3 headless.
-                 FIXED -- and gl-1 STILL read 0/11, which forced the real
-                 search. C36: the corpus was `|`-SEPARATED and these two
-                 assertions ALTERNATE, so `cut -d'|' -f6` gave grep an
-                 unmatched `(`, handed --extra the wrong word, and passed
-                 the rest as arguments. Separator is `;` now; both rows
-                 deleted and re-measured. ⭐ Both capabilities WORK, measured
-                 by hand: eglinfo matches its real assertion 30 times, and
-                 vulkaninfo exits 0 with GPU0 = llvmpipe 1.4.354.
-        x11-3    ✅ CLOSED. 11/11 pass after C37, and 4/11 CLEAN -- which
-                 is C5's pre-registered prediction confirmed: xterm runs the
-                 user's SHELL, a HOST program, so a host libc enters by
-                 construction. ⚠ It is the one row where a dirty count is
-                 the EXPECTED answer. xterm's
-                 nixpkgs `bin/xterm` is a SHELL wrapper that execs
-                 `.xterm-wrapped` by store path. Two defects: the dot-named
-                 target was never installed, AND the farm's `bin` resolved to
-                 `shared/bin` (raw payloads) whose PT_INTERP names a
-                 /nix/store loader the bundle lacks -- so execve returned
-                 ENOENT FOR THE INTERPRETER and the shell printed it against
-                 the program. Both fixed; xterm now DRAWS in 2 s, with
-                 galculator as an unchanged regression control.
-                 ⭐ THE FIX IS IN ./pgb, the row was deleted and re-measured,
-                 and xterm now passes 11/11. corrections.md C37.
-        py-2     pdfarranger 0/11. Its entry is a SCRIPT (python3.14 + the
-                 static trampoline) and it dies with a Python Traceback --
-                 ⛔ NOT the C37 exec failure. ⚠ The row's note is USELESS
-                 here: it takes the FIRST matching line, which for a
-                 traceback is "Traceback (most recent call last):". Fix the
-                 note to prefer the LAST line and keep >70 chars, then
-                 re-measure: PGB_EXP65_ONLY='py-2'.
-        vulkan-1 ✅ CLOSED at 11/11 and 11/11 CLEAN. It was C36 -- the
-                 separator, not the selector default the note above
-                 suspected. Re-measured after the row was deleted, and its
-                 store paths went 12 -> 42 because `--extra mesa` had been
-                 failing to resolve as well.
-
-    ⛔ AND ONE THING IS STILL BLOCKED ON 65-, THOUGH LESS OF IT THAN WAS
-    WRITTEN HERE. ⭐ T-084's cheap half is DONE (`experiments/102-`) and its
-    expensive half is now ONE experiment, `90-`, not six. T-084 changes
-    `exp_classify_trace`'s signature.
-    Editing the sourced `lib.sh` is SAFE while 65- runs (measured — the
-    function is in memory). What is not safe is that 65- is **resumable**: a
-    resumed run re-sources the new `lib.sh` and, calling it the old way,
-    would report **every row zero host objects**. So the call sites must
-    change with it, and one of them is 65- itself, which is executing.
-    ⭐ T-084 step 1 now says `mode` goes LAST with a default, not first,
-    precisely so that cannot happen.
+    field-3  flameshot 0/11. ⭐ MEASURED NOT TO BE C37: its build log says
+             `bin/flameshot is a nixpkgs wrapper -> .flameshot-wrapped`,
+             the RESOLVED shape, which is mousepad's handler and mousepad
+             passes 11/11. ⛔ Nobody has read its actual error.
+             PGB_EXP65_ONLY='field-3'
+    field-4  gearlever UNRESOLVED — it produced no artefact at all. The
+             reason is in its build log and nobody has read it.
+             PGB_EXP65_ONLY='field-4'
+    qt-1     qalculate-qt 11/11 PASS but 4/11 CLEAN. ⛔ NOT a C37
+             regression — galculator rebuilt with the same pgb traces to
+             ZERO host objects. Which four environments, and which object?
 
 ## ⭐ THE CORPUS CAN BE RUN IN PARALLEL, AND THIS IS THE RECIPE
 
@@ -271,7 +186,7 @@ serial ~35 minutes per subject is not a CPU limit and more instances fit.
 kills *every* process chrooted under a rootfs, so two runs sharing a bed
 destroy each other's rows. Give each instance its own of all three:
 
-    PGB_ROOTFS_DIR=/var/lib/pgb-rootfsN   ⭐ `cp -a` the bed: 2.1 GiB, 4 s
+    PGB_ROOTFS_DIR=/var/lib/pgb-rootfsN   ⭐ `cp -a` the bed: 2.1 GiB, 19 s
     PGB_EXP65_WORK=/var/tmp/t065X         its own caches and artefacts
     PGB_EXP65_DISPLAY=:97                 ⛔ never the same display as another
                                           GUI run — a stray window is a false
@@ -292,7 +207,9 @@ subject set, so its own verdict is meaningless and must not be quoted. ⭐ Its
 **rows** are still valid: they are written by the same code path, and the full
 instance reads them back and counts C6 from them (`note_control` runs on the
 recorded-row branch too). ⛔ So quote the FULL run's verdict, never a filtered
-one's.
+one's. ⭐ Give the filtered instance its own `PGB_EVIDENCE_DIR` as well, or its
+verdict overwrites the full run's `RESULT.txt`; point `PGB_EXP65_ROWS` back at
+the repository so the rows are still shared.
 
 ⛔ **TWO INSTANCES IS THE CEILING ON THIS MACHINE, measured.** With one the
 machine reads **99% idle** (load 0.48 on 4 cores); with two it reads **51%
@@ -318,6 +235,8 @@ they are not reclaimed by anything:
       - ⛔ Do not run another GUI experiment on `:99`: 65- counts windows
         there, and a second program's window is a false positive nothing else
         in the harness catches. A different display (`:98`) is safe.
+      - ⛔ NEVER EDIT `65-` ITSELF WHILE IT EXECUTES. `sh` re-reads from a byte
+        offset — measured, and it ran statements twice.
       - ⚠ Do not run bed-heavy experiments; the counts they take need the bed
         idle and 65- uses it continuously.
 
@@ -338,8 +257,8 @@ they are not reclaimed by anything:
 
 ## ⛔ Machine notes (carried forward, re-verify)
 
-- 4 cores, uid 0, 15 GiB RAM. Kernel `6.18.44-fc-v24`. ~24 GiB free after
-  bootstrap.
+- 4 cores, uid 0, 15 GiB RAM. Kernel `6.18.44-fc-v24`. ~22 GiB free after
+  bootstrap and one bed copy.
 - ⭐ **musl-gcc, Xvfb and x11-utils were installed this session** — a fresh
   container has none of them.
 - ⚠ **`unshare -U` SUCCEEDS on the HOST here** (`/proc/sys/user/max_user_namespaces`
@@ -363,7 +282,7 @@ they are not reclaimed by anything:
 - ⛔ **DISK IS BINDING.** Safe to reclaim, in this order:
   `/root/.local/state/pgb/nix-deps/<hash>` (biggest, one per option set — `ls`
   it first), `nix-build`, `nix-prefix`, `/var/tmp/pgb-appimage-*`,
-  `/var/tmp/t065/*cache`, `/var/tmp/pgb-poc/<one POC>`.
+  `/var/tmp/t065*/*cache`, `/var/tmp/pgb-poc/<one POC>`.
 - ⛔ **Do not rebuild `./pgb` while the POC suite is running.**
 - ⛔ **`$?` after a pipeline is the PIPELINE's status.**
 - ⛔ **`chmod 000` is not a control when you are root.** Move the file away.
