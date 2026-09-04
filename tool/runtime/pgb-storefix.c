@@ -104,6 +104,37 @@ static int         debug_on;   /* PGB_STOREFIX_DEBUG=1 */
 static char *misses[MISS_MAX];
 static int   nmisses;
 
+/* ⛔ LOADED AND INERT IS THE ONE STATE THAT LOOKED EXACTLY LIKE WORKING.
+ *
+ * `fix()` used to `return p` here without a word. So an artefact whose
+ * interposer is preloaded but whose AppDir could not be found -- or whose
+ * `.storemap` is missing or empty -- rewrites NOTHING and says NOTHING, and
+ * every experiment in this tree that asks "does the interposer work" would
+ * score that as a legitimate negative result rather than a broken instrument.
+ * ⚠ `load_map`'s own "no .storemap" line is gated behind PGB_STOREFIX_DEBUG,
+ * which is not on in any run that matters.
+ *
+ * ⭐ ONE LINE, ONCE, UNCONDITIONALLY, and only once a real /nix/store path has
+ * actually been seen -- a bundle that never touches one is not broken and must
+ * stay quiet. By this point `load_map()` has been attempted (`fix` calls it
+ * just above), so this cannot fire merely because a call arrived early.
+ * ⚠ `--no-storefix` does not ship the object at all, so a legitimate control
+ * cannot trip this. */
+static int warned_inert;
+
+static void warn_inert(void)
+{
+    if (warned_inert)
+        return;
+    warned_inert = 1;
+    fprintf(stderr,
+            "pgb-storefix: a %s path was seen but NOTHING CAN BE REWRITTEN "
+            "(%s). The interposer is loaded and INERT.\n",
+            STORE_PREFIX,
+            appdir_len ? "the .storemap is missing or empty"
+                       : "the AppDir was not found");
+}
+
 static void note_miss(const char *base, int blen)
 {
     int i;
@@ -236,8 +267,10 @@ static const char *fix(const char *p, char *buf, size_t bufsz)
         return p;
     if (!ready)
         load_map();
-    if (!nrows || !appdir_len)
+    if (!nrows || !appdir_len) {
+        warn_inert();
         return p;
+    }
 
     p += STORE_PREFIX_LEN;
     rest = strchr(p, '/');

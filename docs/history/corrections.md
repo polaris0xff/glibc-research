@@ -2118,6 +2118,64 @@ the instrument had been blind to:
 
 ---
 
+## C53 — the interposer had a LOADED AND INERT state, and it looked exactly like working
+
+⛔ **This is the silent-failure family again, in the one place it costs the
+most**: `tool/runtime/pgb-storefix.c` is the mechanism nearly every result in
+this tree turns on.
+
+`fix()` is a pure substitution driven by a map the bundler writes to
+`.storemap`. Its guard read:
+
+```c
+if (!ready)
+    load_map();
+if (!nrows || !appdir_len)
+    return p;          /* ⛔ and not a word */
+```
+
+⭐ **So an artefact whose interposer is preloaded but whose AppDir could not be
+found — or whose `.storemap` is missing or empty — rewrites NOTHING and says
+NOTHING.** It behaves precisely like a bundle built `--no-storefix`, and every
+experiment here that asks *does the interposer work* would score that as a
+legitimate negative result rather than as a broken instrument.
+
+⚠ **`load_map`'s own "no `.storemap`" line is gated behind
+`PGB_STOREFIX_DEBUG`**, which is not set in any run that matters, so it could
+not close the gap either.
+
+⭐ **THE FIX is one line, once, unconditionally** — and only after a real
+`/nix/store` path has actually been seen, so a bundle that never touches one
+stays quiet:
+
+    pgb-storefix: a /nix/store/ path was seen but NOTHING CAN BE REWRITTEN
+    (the AppDir was not found). The interposer is loaded and INERT.
+
+⚠ **It cannot fire spuriously.** `fix()` calls `load_map()` immediately above,
+so the map load has been attempted by the time the guard runs — an early call
+during libc initialisation cannot trip it. And `--no-storefix` does not ship
+the object at all, so a legitimate control cannot trip it either.
+
+⭐ **VERIFIED FOUR WAYS** against a standalone build of the object, before
+commit:
+
+| case | expected | measured |
+|---|---|---|
+| inert, a `/nix/store` path touched | one warning | ⭐ one |
+| inert, **no** store path touched | silence | ⭐ 0 lines |
+| inert, three store paths in ONE process | once | ⭐ 1 |
+| ⭐ **valid `.storemap`** | silent **and rewriting** | ⭐ 0 warnings, and `cat /nix/store/deadbeef-thing-1.0/hello` printed the file from the fake AppDir |
+
+⚠ **How it was found**: not by a gate, and not by looking for it. Three probe
+runs on the RUNNER HOST read 0 catalogues where the bed reads 43, and the trace
+said the interposer was loaded. Chasing *why the artefact behaved as though it
+were not there* is what turned up a state in which that is exactly what
+happens, with no diagnostic. ⛔ The host puzzle itself is NOT explained by this
+entry and is not claimed to be — the runner host is not the measurement bed and
+nothing here is reasoned from it.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |
