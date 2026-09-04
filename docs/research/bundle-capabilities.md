@@ -50,20 +50,64 @@ must be re-derived with **three applications per category, simple to complex**
 (`experiments/65-`), because one subject measures a subject. ⚠ A row that still
 says *hypothesis* or *not measured* means exactly that.
 
-⭐ **Progress, 2026-09-04b** — `evidence/65-capability-corpus/rows/`, one file
-per subject, and a recorded row is never re-measured:
+## ⭐ THE CORPUS IS COMPLETE — 26 OF 26 SUBJECTS, EVERY ROW A COUNT OUT OF ELEVEN
 
-| category | subjects in | verdict so far |
+⭐ **2026-09-04c**, `evidence/65-capability-corpus/RESULT.txt` and one row file
+per subject under `rows/`. ⛔ **No row is a blank and none is "not run"**: every
+one of the twenty-six carries a count and, where that count is not eleven, the
+reason it is not.
+
+    subjects in the corpus                   26
+    subjects that produced an artefact       25
+    ⛔ UNRESOLVED (not a pass, not a fail)    1
+    ⛔ INSTRUMENT errors                      0
+    ⭐ subjects passing on all 11            19
+    ⭐ subjects clean on all 11              23
+
+    C6  control subjects MEASURED             3 of 3      ✅
+    C6  controls at 11 of 11, as 64- had them 3 of 3      ✅
+    C7  no subject failed its criterion's sanity check    ✅
+
+| category | subjects | verdict |
 |---|---|---|
 | **GTK 3** | ⭐ **3 of 3 — CLOSED** | `galculator`, `mousepad`, `geany`, all **11/11 pass and 11/11 clean** |
-| ⭐ **X11 / XCB** | **3 of 3, all passing** | `xeyes` **11/11**, `xclock` **11/11**, ⭐ `xterm` **11/11** once C37 was fixed. ⛔ `xterm`'s **clean** count is **4/11**, and that is **C5 coming true** — see below |
-| ⭐ **OpenGL / EGL** | ⭐ **3 of 3 — CLOSED, all passing, all clean** | `eglinfo` **11/11**, `glxgears` **11/11**, `glmark2` **11/11** — **11/11 clean each** |
+| ⭐ **X11 / XCB** | ⭐ **3 of 3 — CLOSED** | `xeyes` **11/11**, `xclock` **11/11**, `xterm` **11/11** once C37 was fixed. ⛔ `xterm`'s **clean** count is **4/11**, and that is **C5 coming true** — see below |
+| ⭐ **OpenGL / EGL** | ⭐ **3 of 3 — CLOSED, all clean** | `eglinfo` **11/11**, `glxgears` **11/11**, `glmark2` **11/11** — **11/11 clean each** |
 | ⭐ **Vulkan** | **3 of 3, and the third is the BED** | `vulkaninfo` **11/11**, `vkcube` **11/11** — both clean 11/11. ⭐ `vkmark` **0/11 because there is no GPU**: it dies with `directory iterator cannot open directory … [/dev/dri]`, and `/dev/dri` exists **nowhere** here. The bundle carries `lvp_icd` (lavapipe) and the other two subjects use it |
-| ⭐ **Qt** | ⭐ **3 of 3 — CLOSED, all passing** | `qalculate-qt` **11/11** (clean **4/11**, unexplained and recorded as such), `keepassxc` **11/11** clean **11/11**, `qbittorrent` **11/11** clean **11/11** — 127, 101 and 120 store paths compiled in |
-| ⭐ **SDL** | ⭐ **3 of 3 — CLOSED, all passing, all clean** | `dosbox` **11/11** (**181** store paths compiled in, 169 resolving — the largest closure in the corpus), `stella` **11/11** (179/167), `scummvm` **11/11** (180/168) — **11/11 clean each** |
-| **Python GUI** | 1 of 3 in | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⏳ `pdfarranger` and `virt-manager` re-queued against the C37 `pgb` |
-| **the field's recipes** | 2 of 4 | ⛔ `flameshot` **0/11** — unexplained; `gearlever` UNRESOLVED. `helix` and `neovim` re-queued |
-| **media / codecs** | ⛔ 0 — the row was **DELETED** | `mpv` ran and answered `mpv v0.41.0`; the assertion was `mpv [0-9]`, which cannot match it — **C39**, the fourth instrument defect. ⭐ Its build log did show **T-091's GStreamer scanner installed as a program** on a real subject |
+| ⭐ **Qt** | ⭐ **3 of 3 — CLOSED** | `qalculate-qt` **11/11** (clean **4/11**, unexplained and recorded as such), `keepassxc` **11/11** clean **11/11**, `qbittorrent` **11/11** clean **11/11** — 127, 101 and 120 store paths compiled in |
+| ⭐ **SDL** | ⭐ **3 of 3 — CLOSED, all clean** | `dosbox` **11/11** (**181** store paths compiled in, 169 resolving — the largest closure in the corpus), `stella` **11/11** (179/167), `scummvm` **11/11** (180/168) |
+| ⭐ **media / codecs** | **1 of 3 in, and it passes** | ⭐ `mpv` **11/11, clean 11/11**, 151 store paths compiled in — the row that read **0/11** until **C39**, a subject that had answered completely against an assertion that could not match it. ⛔ The row runs `--version`, so it does **not** close T-091: nothing decodes |
+| **Python GUI** | 1 of 3 passing | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⛔ `pdfarranger` **0/11** and `virt-manager` **0/11**, and ⭐ **the two are NOT the same failure** — see the row-note table below |
+| **the field's recipes** | ⛔ 0 of 4 passing, and ⭐ **three of the four are now explained** | `neovim` **0/11** — the closure's own glibc 2.26 (C35). `flameshot` **0/11** — ⭐ **not a bundler failure**: it is a tray application with no toplevel, and this bed has no session bus. `gearlever` — was UNRESOLVED, ⭐ **C42 makes it build**. `helix` **0/11** — ⛔ still unexplained, and its note is **empty** |
+
+⭐ **THE THREE ZEROS THAT ARE NOT OURS, each measured rather than argued:**
+
+| row | what the zero is |
+|---|---|
+| `vkmark` | ⛔ **the BED.** No `/dev/dri` on this machine or in any rootfs |
+| `neovim` | ⛔ **the CLOSURE.** glibc 2.26; `ld.so` learned `--argv0` in 2.33 (C35) |
+| ⭐ `flameshot` | ⛔ **the SUBJECT'S SHAPE.** Measured by hand 2026-09-04c: given a session bus it runs for 180 s and never exits, and the only window it puts on the server is a **3×3 `Qt Selection Owner`**. It is a tray/daemon screenshot tool — `flameshot` with no subcommand draws nothing by design. ⭐ So Qt initialised, connected to X and owned a selection out of the bundle; a `gui` row demanding a toplevel ≥50×50 cannot pass on it. ⚠ And it needs a **session DBus**, which no rootfs here provides |
+
+⚠ **`flameshot` is also where the ≥50×50 rule earned its keep**: a crude
+"is there any window" check counted that 3×3 selection owner and would have
+scored the row green.
+
+### ⭐ THE TWO PYTHON ZEROS ARE DIFFERENT FAILURES, and the row note is what says so
+
+⛔ **Until 2026-09-04c both notes read `Traceback (most recent call last):`** —
+the harness took the FIRST matching line of the stderr and cut it to 70
+characters, which for a Python traceback is always that sentence and never the
+cause (**C40**). The note is now the LAST matching line at 180 characters, and
+the two rows stop looking alike:
+
+| row | the note | what it is |
+|---|---|---|
+| `py-3` `virt-manager` | `ModuleNotFoundError: No module named 'virtManager'` | ⭐ **C41**, byte for byte: the interposer defined `stat`/`lstat`/`fstatat` and not the `64` names a nixpkgs Python imports, so a compiled-in store path was rewritten when OPENED and not when STATTED — and Python's import finder stats before it imports |
+| `py-2` `pdfarranger` | `FileNotFoundError: … '/usr/local/share/pdfarranger/pdfarranger.ui'` | ⛔ **a different class, and it is the field's own "Garbage — GTK" row arriving on OUR pipeline.** `/usr/local`, not `/nix/store` — so `pgb-storefix.c`'s `fix()` returns it unchanged by construction, and no interposer change can reach it. ⚠ [`app-corpus.md`](app-corpus.md) rung 3 says a nixpkgs-built application compiles in *its own store path* rather than `/usr/share`; this one compiles in **neither** — it asks Python at run time and Python answers `/usr/local` |
+
+⛔ **Both rows were measured by a `pgb` without C41 and are being re-measured.**
+The prediction — `py-3` moves, `py-2` does not — was committed before the run
+that settles it.
 
 ⭐ **THE THREE C6 POSITIVE CONTROLS ARE ALL IN AND ALL GREEN** — `galculator`,
 `mousepad` and `meld`, each **11/11**, each agreeing with `experiments/64-`,

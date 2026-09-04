@@ -2,7 +2,7 @@
 65 - the capability corpus: three applications per category, simple to complex
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T09:54:25Z
+date (UTC)   : 2026-09-04T11:04:02Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -28,10 +28,8 @@ evidence     : /home/user/glibc-research/evidence/65-capability-corpus
   vulkan-3   Vulkan           vkmark         gui  0/11    11/11   43 compiled in: 42 resol Error: filesystem error: directory iterator cannot open directory: No  (recorded)
   sdl-1      SDL              dosbox         gui  11/11   11/11   181 compiled in: 169 res  (recorded)
   sdl-2      SDL              stella         gui  11/11   11/11   179 compiled in: 167 res  (recorded)
-  sdl-3      SDL              scummvm        gui  11/11   11/11   180 compiled in: 168 res 
+  sdl-3      SDL              scummvm        gui  11/11   11/11   180 compiled in: 168 res  (recorded)
   qt-1       Qt               qalculate-qt   gui  11/11   4/11    127 compiled in: 124 res  (recorded)
   qt-2       Qt               keepassxc      gui  11/11   11/11   101 compiled in: 98 reso  (recorded)
   qt-3       Qt               qbittorrent    gui  11/11   11/11   120 compiled in: 117 res  (recorded)
   py-1       Python GUI       meld           gui  11/11   11/11   89 compiled in: 86 resol  (recorded)
-  py-2       Python GUI       pdfarranger    gui  0/11    11/11   113 compiled in: 109 res FileNotFoundError: [Errno 2] No such file or directory: '/usr/local/share/pdfarranger/pdfarranger.ui'
-  py-3       Python GUI       virt-manager   gui  0/11    11/11   239 compiled in: 226 res ModuleNotFoundError: No module named 'virtManager'
