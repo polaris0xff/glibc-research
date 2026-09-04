@@ -84,6 +84,7 @@ host-object count in this tree.** Two of them change what "clean" means.
 | **T-093** (P2) | The **only** field objection left with no measurement: *"no more Vulkan layers like mangohud"*. A real layer is already in the mesa closure (`VkLayer_MESA_overlay`). ⚠ Runs on the RUNNER host, not the bed — a fixture may not add a shared object. |
 | **T-090** (P1) | The sandbox rung. ⚠ `unshare -U` succeeds on the host and that is **not** the answer; measure it **inside the chroot bed** with `lsns -t user`. |
 | **T-077** (P1) | The head-to-head was measured on the **retired** glibc pin and nobody re-ran it. |
+| **T-095** (P2, new) | ⛔ **CI is fragile in a way that costs whole runs**: the libiconv fetch is ONE host (`ftp.gnu.org`) with no mirror and no retry, and it sits in the `build` job — so an upstream timeout skips `run-matrix` and `verify-docker` and turns a green tree red. Seen on a documentation-only commit (run 437). ⚠ A retry alone is not the fix: the failure was a **two-minute connect timeout**. |
 | **T-059** (P1) | Real GPU. Every GL and Vulkan row here is `llvmpipe`/`lavapipe`. ⭐ Per the operator's fixture ruling, ask what a *seam* could answer before recording it as a limit. |
 
 ### 3. ⛔ WHAT IS **NOT** OWED, so nobody re-opens it
