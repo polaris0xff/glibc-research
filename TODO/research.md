@@ -272,22 +272,57 @@ handling apps that provide multiple binaries like busybox … does simply
 renaming or symlinking the bundle with the app we want to enter work?"*
 **Category** research · **Priority** P1 · **Effort** S · **Status** open
 
-⭐ **The answer read off the source is YES, and that is the problem.**
+⭐ **The answer read off the source was YES, and that was the problem.**
 `assemble.go` installs every non-dot program in the entry store path's `bin/`
 automatically; `--with-program` adds one from anywhere in the closure; and
-`tool/runtime/pgb-apprun.c` is a **static** selector dispatching on `ARGV0`,
-then `argv[0]`'s basename, then `$1`, then the default — the AppImage
-convention. ⛔ **No experiment has ever run a second program out of a bundle.**
+`tool/runtime/pgb-apprun.c` is a **static** selector.
 
-**What to do.** An `experiments/65-` row per extra entry point on `rnote`
-(`rnote-cli`), `nicotine-plus` (`nicotine`), `imagemagick` (`convert`,
-`identify`) and `mkvtoolnix` (`mkvtoolnix-cli`): symlink the artefact to the
-program's name, run it, assert the program's **own** output.
+## ⭐ MEASURED — `experiments/68-`, `pass=24 fail=0 skip=0`
 
-⚠ **And answer the second half of the operator's question with a number**:
-the build already prints `programs <prog> + N more`, so "how many entry points
-does this app have" is a build-log field, not an inference. Put it in the
-corpus table as a column.
+**Arm S, the dispatch table** (a synthetic AppDir; no bed, no display) —
+18 of 18, and it **corrected the source's own header comment**, which stated
+the order wrongly and named `ARGV0` nowhere:
+
+    $ARGV0's basename  →  argv[1] (and it is DROPPED)  →  argv[0]  →  default
+
+with it: a selected `argv[1]` is consumed and later arguments survive; an
+`argv[1]` that did not select is passed through; the child's `argv[0]` is the
+**absolute** path; `ARGV0` is unset and `APPDIR` set in the child; ⛔ a name
+containing `/` is **never** a program, so a path cannot be injected; and
+`shared/bin` without `bin/` is not a program. ⭐ The negative control — the
+same source with an empty default — exits **127** with `no default program`
+while still dispatching when told a name.
+
+**Arm B, a real closure on all eleven** — `mkvtoolnix`:
+
+| | |
+|---|---|
+| the build's entry-point count | ⭐ **`programs mkvmerge + 4 more`** |
+| the selector actually built | the **static** `pgb-apprun`, not a shell |
+| ⭐ the SECOND program (`mkvextract`), by its own name | ✅ **11 / 11** |
+| the entry (`mkvmerge`), same artefact — within-row control | ✅ **11 / 11** |
+| the second program's host shared objects | ⭐ **0 on 11 / 11** |
+
+⛔ **The assertion is each program's OWN identity**: `mkvextract --version`
+says `mkvextract`, so a dispatch that quietly ran the default fails. That is
+why `imagemagick` was rejected as the subject — its `convert` and `identify`
+are symlinks to one binary printing one string.
+
+⭐ **The operator's second question is answered by a number the tool emits**,
+not by an inference: `programs <prog> + N more`.
+
+## ⛔ WHAT THE PROVE LINE ASKS FOR AND THIS DID NOT DO
+
+⚠ **The entry stays open, and the goalposts are not being moved.**
+
+1. **`--with-program` is NOT exercised.** It is the branch that searches the
+   *whole closure* rather than one `bin/`, and it is the one a helper living
+   in a dependency needs. Nothing has run it.
+2. **Two names, not N.** The bundle carried five programs and the run asserted
+   two of them. A third name costs one more row and would catch a selector
+   that only ever gets the first two right.
+3. **One closure.** A second multi-program subject — `rnote`/`rnote-cli` is
+   the rung-1 example — is a different measurement, not a repeat.
 
 **Prove.** One artefact, N names, N assertions, on all eleven — and the
 `--with-program` path exercised at least once, because it is the branch that

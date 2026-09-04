@@ -1,0 +1,54 @@
+===============================================================
+68 - multi-entry dispatch: does a SECOND program come out of a bundle
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T04:57:56Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/68-multi-entry
+--------------------------------------------------------------
+
+
+-- arm S: the dispatch table -------------------------------------
+  ok    E1  ARGV0's basename selects the program       = beta
+  ok    E2  ⭐ ARGV0 BEATS argv[1]                    = beta
+  ok    E3  an argv[1] that did not select is passed on = alpha
+  ok    E2  ⭐ argv[1] BEATS argv[0]                  = beta
+  ok    E3  a selected argv[1] is CONSUMED             = --flag
+  ok    E3  the arguments after it survive             = 2
+  ok    E2  argv[0]'s basename selects when it is alone = beta
+  ok    E2  otherwise the DEFAULT runs                 = alpha
+  ok    E4  the child's argv[0] is the ABSOLUTE path   = /var/tmp/t068/AppDir/bin/beta
+  ok    E5  ARGV0 is UNSET in the child                = no
+  ok    E5  APPDIR is set to the AppDir                = /var/tmp/t068/AppDir
+  ok    E6  ⛔ a name containing '/' does not select  = alpha
+  ok    E6  ⛔ ...and is NOT consumed from argv       = ../../etc/passwd
+  ok    E7  shared/bin without bin/ is not a program   = alpha
+  ok    E7  ...and its name stays in argv              = gamma
+  ok    E8  ⭐ CONTROL: no default and no name EXITS 127 = 127
+  ok    E8  ⭐ CONTROL: ...and says why               = yes
+  ok    E8  ⭐ CONTROL: the same binary still dispatches = beta
+
+-- arm B: a second program out of a real bundle --------------------
+        build says: programs mkvmerge + 4 more
+  ok    E10 the build PRINTS extra entry points        = yes
+  ok    E10 the selector is the STATIC one, not a shell = yes
+        rows measured: 11 of 11
+  ok    E9  ⭐ the SECOND program (mkvextract) runs, by its OWN name = 11
+  ok    E9  the ENTRY program (mkvmerge) still runs (within-row control) = 11
+  ok    E11 the second program RAN and loaded ZERO host objects = 11
+
+  ok    both arms ran (S = the selector, B = the bundle) = SB
+        ⚠ arm S uses ordinary host stand-in binaries, so it says NOTHING
+          about host shared objects; that is arm B's E11 and only E11.
+        ⚠ arm B measures ONE closure. A second multi-program subject is a
+          different measurement, not a repeat of this one.
+
+-- result ----------------------------------------------------
+pass=24 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

@@ -1,0 +1,51 @@
+===============================================================
+100 - the interposer against a STATIC and a RAW-SYSCALL payload
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T04:58:06Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/100-static-payload
+--------------------------------------------------------------
+
+
+-- arm P: the mechanism ------------------------------------------
+        the planted path is /nix/store/00000000000000000000000000000000-data-1.0/hello.txt and it does NOT exist on this machine
+        dynamic + preload        MAPPED=1   OPEN=ok
+        static + preload         MAPPED=0   OPEN=fail
+        raw syscall + preload    MAPPED=1   OPEN=fail
+        dynamic, NO preload      MAPPED=0   OPEN=fail
+  ok    S1  ⭐ CONTROL: dynamic + preload RESOLVES the path = the-real-payload
+  ok    S5  ⭐ CONTROL: the same probe with NO preload fails = fail
+  ok    S2  ⛔ PREDICTED FAIL: -static does not resolve = fail
+  ok    S3  ⛔ PREDICTED FAIL: raw syscall does not resolve = fail
+  ok    S4  the interposer IS mapped in the dynamic probe = 1
+  ok    S4  ⭐ ...is ABSENT in the static one (no loader) = 0
+  ok    S4  ⭐ ...and IS mapped in the raw-syscall one = 1
+        ⭐ S4 is what makes S2 and S3 two findings instead of one: the
+           static probe fails because our object is NOT THERE, the
+           raw-syscall probe fails WITH IT LOADED. Only the first is about
+           linking, and store-paths.md §3 writes them as one row.
+
+-- arm G: a real Go subject --------------------------------------
+        build reports store paths: 8 compiled in: 7 resolve inside the bundle, 1 do not
+  ok    G1  the build REPORTS compiled-in store paths  = yes
+        the payload's shape reads as: dynamic
+  FAIL  G3  the payload has no host interpreter path   = dynamic, expected static
+        ⭐ G2 (REPORTED, NOT PREDICTED): syncthing ran on 11 of 11
+           host-object-clean on 11 of 11
+  ok    G2  the arm produced a number for every environment = 11
+
+  ok    both arms ran (P = the mechanism, G = a real Go subject) = PG
+        ⚠ Arm P measures ONE interposer against THREE call shapes on the
+          build host. It says nothing about other architectures, and nothing
+          about a payload that mixes shapes -- which a real Go binary does.
+
+-- result ----------------------------------------------------
+pass=10 fail=1 skip=0
+VERDICT: the measurement ran and did NOT match expectation.
+--------------------------------------------------------------

@@ -63,10 +63,25 @@ name in `shared/bin` alone, without `bin/`, is not a program.
 source built with an *empty* default and given no name exits **127** with
 `no default program`, while the same binary still dispatches when told one.
 
-**What is still missing: the bundle half.** Arm S is a synthetic AppDir with
-host stand-in programs, so it says nothing about sharun, uruntime, the closure,
-or host shared objects. ⛔ **No experiment has yet run a second program out of
-a real bundle** — that is `68-` arm B, which needs the bed.
+⭐ **AND THE BUNDLE HALF IS MEASURED TOO — `68-` arm B, `pass=24 fail=0
+skip=0`.** `mkvtoolnix`, a real nixpkgs closure, on all eleven environments:
+
+| | |
+|---|---|
+| the build's own entry-point count | ⭐ **`programs mkvmerge + 4 more`** — the operator's question 3 answered by a number the tool emits |
+| the selector actually built | ⭐ the **static** `pgb-apprun`, not a shell |
+| ⭐ **the SECOND program (`mkvextract`) runs, by its own name** | ✅ **11 / 11** |
+| the entry program (`mkvmerge`), same artefact — the within-row control | ✅ **11 / 11** |
+| the second program's host shared objects | ⭐ **0 on 11 / 11** |
+
+⛔ **The assertion is each program's OWN identity, not a shared version
+string**: `mkvmerge --version` says `mkvmerge` and `mkvextract --version` says
+`mkvextract`, so a dispatch that quietly ran the default **fails**. That is why
+the subject was chosen over `imagemagick`, whose `convert` and `identify` are
+symlinks to one binary printing one string.
+
+⚠ **It measures ONE closure.** A second multi-program subject is a different
+measurement, not a repeat of this one.
 
 **Study.** `internal/bundle/assemble.go` `installProgram`;
 `tool/runtime/pgb-apprun.c` (130 lines, and it is the answer);
@@ -103,11 +118,36 @@ result — the first version of the harness wrote the `.storemap` in the wrong
 format, every lookup missed, and both predicted failures "passed" for entirely
 the wrong reason.
 
-⛔ **What is still open is the application half**, and it is arm G: a real Go
-subject is usually *both* shapes at once, and a store path in its `.rodata`
-does not mean it ever opens one. Its result is **reported, not predicted**.
+## ⛔ AND THE APPLICATION HALF FALSIFIED THIS RUNG'S PREMISE
 
-**Study.** `docs/design/store-paths.md` §3 and §4; `experiments/100-` arm P.
+⭐ **`experiments/100-` arm G ran, and the pre-registered check that caught it
+is the one that failed.** This page said *"A Go program from the closure with a
+store path compiled in is exactly that shape, and `pgb` itself is one."*
+
+| G3 — is the payload actually static? | ⛔ **NO. `dynamic`** — nixpkgs' `syncthing` carries a `PT_INTERP` |
+|---|---|
+| G1 — store paths compiled in | **8**, of which **7 resolve inside the bundle** and 1 does not |
+| ⭐ G2 (**reported, never predicted**) | `syncthing` **ran on 11 of 11**, host-object-clean on **11 of 11** |
+
+⛔ **So `syncthing` was the wrong subject for the static claim**, and the run
+says so rather than the claim being quietly adjusted. Arm P's mechanism result
+is untouched — it does not depend on any subject.
+
+⚠ **WHAT THIS DOES NOT ESTABLISH, and the gap is interesting rather than
+tidy.** Go issues **raw syscalls** for much of its file I/O even when the
+binary is dynamic, and arm P's S3 shows a raw-syscall caller defeats the
+interposer *with our object loaded*. Yet the subject ran everywhere with 7 of
+8 paths resolving. ⛔ **Three explanations are consistent with that and none is
+measured**: the paths may have been rewritten in **text at build time** rather
+than at run time; the program may never **open** them; or this build may route
+those opens through libc after all. Establishing which needs `LD_DEBUG` and a
+trace on one row, not another subject.
+
+⭐ **The static subject is therefore still owed**, and the candidates are
+`lilipod` (a genuinely static Go binary) or `pgb` itself. Until one runs, the
+`-static` row above is a **mechanism** result with no application behind it.
+
+**Study.** `docs/design/store-paths.md` §3 and §4; `experiments/100-`.
 
 ### Rung 3 · GTK's hardcoded prefix. ⭐ THE FIELD'S OWN "GARBAGE" ROW, AND OUR INTERPOSER IS THE ANSWER
 

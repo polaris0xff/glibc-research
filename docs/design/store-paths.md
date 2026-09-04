@@ -168,12 +168,24 @@ Both failing probes otherwise report the same thing — "it did not work" — an
 the two causes would be indistinguishable without asking each process whether
 `libpgb-storefix.so` is in its own `/proc/self/maps`.
 
-⛔ **What is still not measured, stated rather than left to be assumed**: a
-*real* application of either shape. A Go binary out of the closure is usually
-**both** at once, and a store path in its `.rodata` does not mean it ever opens
-one — so its passing or failing is not evidence either way about the rows
-above. That is `experiments/100-` arm G, and it is why arm G is reported and
-**not predicted**.
+⛔ **What is still not measured, and one attempt has already failed to supply
+it.** `experiments/100-` arm G bundled `syncthing` expecting a static payload;
+its pre-registered shape check reported **`dynamic`** — nixpkgs' build carries
+a `PT_INTERP`. ⭐ The subject ran on **11 of 11**, host-object-clean on **11 of
+11**, with **8** store paths compiled in and **7** resolving; ⚠ but that is a
+*dynamic* subject and says nothing about the `-static` row.
+
+⛔ **A genuinely static application is still owed** — `lilipod`, or `pgb`
+itself. Until one runs, the two rows above are a **mechanism** result with no
+application behind them, which is a smaller claim than the table alone
+suggests.
+
+⚠ **And an open question the run raised rather than settled.** Go issues raw
+syscalls for much of its file I/O even when dynamic, so the raw-syscall row
+predicts the interposer loses — yet 7 of 8 paths resolved. Three explanations
+fit and none is measured: build-time **text** rewriting, the program never
+opening them, or those opens routing through libc in this build. `LD_DEBUG`
+plus one traced row would separate them.
 
 ## 4. ⛔ What the interposer does NOT cover
 
