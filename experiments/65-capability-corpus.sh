@@ -24,8 +24,16 @@
 # and the operator rejected them. So a GUI subject is scored by asking the
 # X SERVER, from outside the process, whether a window exists:
 #
-#   gui  a toplevel window on a real Xvfb display, seen with `xwininfo`
-#   cli  the program's own exit status AND a required string in its output
+#   gui  a toplevel window on a real Xvfb display, seen with `xwininfo`,
+#        AND the required string when the subject names one
+#   cli  ⭐ the required string in the program's own output when it names one,
+#        with a non-zero exit status REPORTED beside it; the exit status alone
+#        when it names none.
+#
+# ⛔ THE `cli` RULE WAS `exit 0 AND the assertion` AND IT WAS WRONG. `eglinfo`
+# prints a full EGL config table naming `llvmpipe` twenty times and exits 3,
+# because some EGL platform is unavailable headless -- so the OpenGL row read
+# 0 of 11 on a capability that works. docs/history/corrections.md C34.
 #
 # ⭐ EVERY subject, in both modes, additionally has to load ZERO HOST SHARED
 # OBJECTS, by `experiments/lib.sh`'s `exp_classify_trace` — attributed across
@@ -430,13 +438,35 @@ while IFS= read -r line <&3; do
     ok=no
     if [ "$mode" = gui ]; then
       [ "$win" -gt "$base" ] && ok=yes
+      # ⚠ For a GUI subject the assertion is still AND-ed with the window: a
+      # window with no renderer string is not an OpenGL row.
+      if [ -n "$assert" ] && [ "$ok" = yes ]; then
+        printf '%s' "$all" | grep -qE "$assert" || ok=no
+      fi
+    elif [ -n "$assert" ]; then
+      # ⭐ A `cli` SUBJECT WITH AN ASSERTION IS SCORED BY THE ASSERTION, and
+      # its exit status is REPORTED beside it rather than AND-ed in.
+      #
+      # ⛔ THIS WAS `exit 0 AND the assertion` AND IT SCORED A CORRECT ANSWER
+      # AS A FAILURE. `eglinfo` prints a full EGL config table naming
+      # `llvmpipe` twenty times and then exits 3, because some EGL platform
+      # (wayland, gbm) is unavailable in a headless bed -- measured, and it
+      # still exits 3 with XDG_RUNTIME_DIR set and every `error:` line gone,
+      # so it is not a bed condition that could be arranged away. The OpenGL
+      # row read 0 of 11 on a capability that works.
+      # docs/history/corrections.md C34.
+      #
+      # ⚠ The exit status is not discarded: a non-zero one is printed, so a
+      # row that answers correctly while failing is visible rather than
+      # silently equal to one that answers correctly and succeeds.
+      if printf '%s' "$all" | grep -qE "$assert"; then
+        ok=yes
+        [ "$st" = 0 ] || exp_note "⚠ $id/$name: assertion matched, exit status $st"
+      fi
     else
+      # ⛔ NO ASSERTION MEANS THE STATUS IS ALL THERE IS. A `cli` row with
+      # neither would assert nothing at all.
       [ "$st" = 0 ] && ok=yes
-    fi
-    # ⚠ THE ASSERTION IS AND-ED WITH THE MODE'S CRITERION, never substituted
-    # for it: a window with no renderer string is not an OpenGL row.
-    if [ -n "$assert" ] && [ "$ok" = yes ]; then
-      printf '%s' "$all" | grep -qE "$assert" || ok=no
     fi
     [ "$ok" = yes ] && pass=$((pass+1))
     nhost=$(exp_classify_trace "$tr" /subj65 | grep -c '^host ' || true)

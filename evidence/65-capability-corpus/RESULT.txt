@@ -2,7 +2,7 @@
 65 - the capability corpus: three applications per category, simple to complex
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T02:28:18Z
+date (UTC)   : 2026-09-04T03:29:55Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -14,3 +14,13 @@ evidence     : /home/user/glibc-research/evidence/65-capability-corpus
 
 
   ID         CATEGORY         SUBJECT        MODE PASS/N  CLEAN/N PATHS     NOTE
+  gtk3-1     GTK 3            galculator     gui  11/11   11/11   88 compiled in: 85 resol  (recorded)
+  gtk3-2     GTK 3            mousepad       gui  11/11   11/11   104 compiled in: 101 res 
+  gtk3-3     GTK 3            geany          gui  11/11   11/11   90 compiled in: 87 resol 
+  x11-1      X11 / XCB        xorg.xeyes     gui  11/11   11/11   12 compiled in: 11 resol 
+  x11-2      X11 / XCB        xorg.xclock    gui  11/11   11/11   23 compiled in: 22 resol 
+  x11-3      X11 / XCB        xterm          gui  0/11    11/11   25 compiled in: 24 resol 
+  gl-1       OpenGL / EGL     mesa-demos     cli  0/11    11/11   89 compiled in: 86 resol 
+  gl-2       OpenGL / EGL     mesa-demos     gui  11/11   11/11   89 compiled in: 86 resol 
+  gl-3       OpenGL / EGL     glmark2        gui  0/11    11/11   43 compiled in: 42 resol 
+  vulkan-1   Vulkan           vulkan-tools   cli  0/11    11/11   12 compiled in: 11 resol 
