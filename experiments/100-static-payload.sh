@@ -96,6 +96,14 @@
 #       arriving from someone else's compiler.
 #   L4  ⭐ and it loads ZERO host shared objects on 11 of 11, for the same
 #       reason: it has no loader to load any.
+#   L5  ⭐ ADDED AFTER RUN 1, AND IT SPLITS L3 IN TWO. Run 1 scored 2 of 11
+#       and the cause was NOT the ELF: nine rows printed lilipod's OWN
+#       message, "failed to find dependency getsubids, can't recover".
+#       ⛔ The binary ran everywhere; the APPLICATION refused to proceed
+#       because it execs a HOST PROGRAM it does not carry. Reporting only
+#       one number attributes a host-program dependency to portability,
+#       which is the wrong axis. L5 is "the ELF executed", L3 is "the
+#       application completed", and they are different properties.
 #
 # ⭐ IF L3 HOLDS, THE REFUSAL IS THE RIGHT ANSWER BADLY EXPLAINED: a payload
 # that already runs everywhere does not need bundling, and the message should
@@ -357,7 +365,7 @@ case "$ONLY" in *L*)
     exp_check "L2  the payload has no PT_INTERP" "$lstatic" yes
 
     ENVS2=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt")
-    lok=0; lclean=0; lrows=0
+    lok=0; lclean=0; lrows=0; lexeced=0
     for name in $ENVS2; do
       root=$(exp_rootfs "$name") || true
       [ -n "$root" ] || { exp_skip "L/$name" "rootfs not fetched"; continue; }
@@ -373,17 +381,30 @@ case "$ONLY" in *L*)
         case "$_rt" in "$root"|"$root"/*) kill -9 "$_pid" 2>/dev/null ;; esac
       done
       lall=$(cat "$WORK/out.l.$name" "$WORK/err.l.$name" 2>/dev/null)
-      lran=no
-      # ⚠ --help exits non-zero on some CLIs, so the criterion is the
-      # program's own output, not its status alone.
-      printf '%s' "$lall" | grep -qiE "usage|command|$LPROG" && lran=yes
+      # ⭐ TWO DIFFERENT QUESTIONS, AND THE FIRST RUN CONFLATED THEM.
+      #   lexec  did the ELF execute at all? A program that prints its OWN
+      #          diagnostic has run its own code -- that is the portability
+      #          claim, and it is what static linking buys.
+      #   lran   did the APPLICATION complete? That is a different property
+      #          and it can fail for reasons no linker or bundler touches.
+      # ⛔ Reporting only the second reads a host-program dependency as a
+      # portability failure, which is the wrong attribution.
+      lexec=no; lran=no
+      [ -n "$lall" ] && lexec=yes
+      printf '%s' "$lall" | grep -qiE "usage|available commands" && lran=yes
+      # a missing HOST PROGRAM is recorded by name rather than as a failure
+      hostdep=$(printf '%s' "$lall" | grep -oE 'dependency [a-z0-9_-]+' | head -1 | awk '{print $2}')
+      [ -n "$hostdep" ] && exp_note "  $name: needs the HOST program '$hostdep'"
+      [ "$lexec" = yes ] && lexeced=$((lexeced+1))
       [ "$lran" = yes ] && lok=$((lok+1))
       nh=$(exp_classify_trace "$tr" /lstatic | grep -c '^host ' || true)
       # ⛔ clean counts only where it RAN -- a corpse loads nothing either.
       [ "$lran" = yes ] && [ "$nh" = 0 ] && lclean=$((lclean+1))
       rm -f "$tr" "$root/lstatic"
     done
-    exp_check "L3  ⭐ the RAW static binary runs, NO BUNDLE AT ALL" "$lok" "$lrows"
+    # ⭐ L5 IS THE PORTABILITY CLAIM AND L3 IS THE APPLICATION CLAIM.
+    exp_check "L5  ⭐ the static ELF EXECUTES, no bundle" "$lexeced" "$lrows"
+    exp_check "L3  ⭐ ...and the APPLICATION completes" "$lok" "$lrows"
     exp_check "L4  ⭐ ...and loads ZERO host shared objects" "$lclean" "$lrows"
     exp_note "⭐ If L3 and L4 hold, the refusal in L1 is the RIGHT answer badly"
     exp_note "  explained: a payload that already runs everywhere does not need"

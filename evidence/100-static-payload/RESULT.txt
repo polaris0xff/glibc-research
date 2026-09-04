@@ -2,7 +2,7 @@
 100 - the interposer against a STATIC and a RAW-SYSCALL payload
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T05:07:03Z
+date (UTC)   : 2026-09-04T05:17:41Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -40,12 +40,32 @@ evidence     : /home/user/glibc-research/evidence/100-static-payload
            host-object-clean on 11 of 11
   ok    G2  the arm produced a number for every environment = 11
 
-  ok    both arms ran (P = the mechanism, G = a real Go subject) = PG
+-- arm L: a fully static payload ---------------------------------
+  ok    L1  ⚠ RECORDED: the bundler refuses a loader-less closure = yes
+  ok    L2  the payload has no PT_INTERP               = yes
+          alpine-3.22: needs the HOST program 'getsubids'
+          alpine-3.20: needs the HOST program 'getsubids'
+          alpine-3.10: needs the HOST program 'getsubids'
+          voidlinux-musl: needs the HOST program 'getsubids'
+          debian-11: needs the HOST program 'getsubids'
+          debian-12: needs the HOST program 'getsubids'
+          ubuntu-20.04: needs the HOST program 'getsubids'
+          rockylinux-8: needs the HOST program 'getsubids'
+          fedora-42: needs the HOST program 'getsubids'
+  ok    L5  ⭐ the static ELF EXECUTES, no bundle     = 11
+  FAIL  L3  ⭐ ...and the APPLICATION completes       = 2, expected 11
+  FAIL  L4  ⭐ ...and loads ZERO host shared objects  = 1, expected 11
+        ⭐ If L3 and L4 hold, the refusal in L1 is the RIGHT answer badly
+          explained: a payload that already runs everywhere does not need
+          bundling, and the message should say that instead of naming a
+          missing loader.
+
+  ok    all three arms ran (P mechanism, G a Go subject, L a static one) = PGL
         ⚠ Arm P measures ONE interposer against THREE call shapes on the
           build host. It says nothing about other architectures, and nothing
           about a payload that mixes shapes -- which a real Go binary does.
 
 -- result ----------------------------------------------------
-pass=10 fail=1 skip=0
+pass=13 fail=3 skip=0
 VERDICT: the measurement ran and did NOT match expectation.
 --------------------------------------------------------------

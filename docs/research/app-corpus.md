@@ -143,9 +143,56 @@ than at run time; the program may never **open** them; or this build may route
 those opens through libc after all. Establishing which needs `LD_DEBUG` and a
 trace on one row, not another subject.
 
-⭐ **The static subject is therefore still owed**, and the candidates are
-`lilipod` (a genuinely static Go binary) or `pgb` itself. Until one runs, the
-`-static` row above is a **mechanism** result with no application behind it.
+## ⭐ THE STATIC SUBJECT RAN, AND IT MOVED THE QUESTION OFF THE LINKER
+
+`lilipod` — `experiments/100-` arm L. It is genuinely static (`L2`: no
+`PT_INTERP`, no dynamic section), and the first thing that happened is that
+**`pgb bundle appimage` refused it**:
+
+    closure     4 store paths
+    libraries   0 from the closure
+    pgb: the closure carries no dynamic loader
+
+⛔ **So for a fully static payload the interposer question never arises**:
+there is no artefact to ask it of. Run the raw binary instead, no bundle at
+all, on all eleven:
+
+| | |
+|---|---|
+| ⭐ **L5 — the static ELF EXECUTES** | ✅ **11 / 11.** Every row ran lilipod's own code and printed lilipod's own message |
+| ⛔ **L3 — the APPLICATION completes** | **2 / 11** |
+| L4 — zero host shared objects | **1 / 11** |
+
+⭐ **AND THE NINE FAILURES ARE ONE CAUSE, NAMED BY THE PROGRAM ITSELF**:
+*"failed to find dependency `getsubids`, can't recover"*. `getsubids` is a
+**host program on `$PATH`** (shadow-utils). Probed across the bed: exactly
+**two** rootfs carry it — `archlinux-latest` and `opensuse-leap-15.6` — and
+those are **exactly** the two that completed. ⚠ One of the two needed the
+network as well: openSUSE has no `tar`, so lilipod **downloaded busybox at run
+time**, which is not portability either.
+
+⛔ **THE FINDING IS THAT THIS IS A DIFFERENT AXIS ENTIRELY.** A statically
+linked ELF is portable — L5 is 11 of 11 and that is what static linking buys.
+A statically linked *application* need not be, and no linker, loader trick or
+bundler addresses a dependency that is **another program**. ⭐ Static linking
+answers *"will this binary start"*; it says nothing about *"will this program
+find the tools it shells out to"*.
+
+⭐ **This is exactly the class rung 7 predicted for container tooling** —
+`newuidmap`/`newgidmap` are setuid host binaries a bundle cannot ship, and
+`getsubids` is the same family. Predicted there from reading; measured here on
+a rung-7 subject.
+
+⚠ **And it explains L4.** When a static program execs host programs, the host's
+libraries enter the **process tree**, so the trace is no longer clean. That is
+the same mechanism `experiments/65-` pre-registers for `xterm` (C5), whose job
+is to run the user's shell — reached independently, on a different subject.
+
+⭐ **So the refusal in L1 is right for a reason better than the one it gives**:
+a payload that already starts everywhere does not need bundling. ⛔ But the
+message names a missing **loader**, which sends the reader to the wrong
+problem — and bundling `lilipod` would not have helped, because the missing
+thing is a program, not a library.
 
 **Study.** `docs/design/store-paths.md` §3 and §4; `experiments/100-`.
 
