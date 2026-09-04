@@ -3,31 +3,38 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log,
 the entries, and [`../HISTORY/`](../HISTORY/).
 
-    STATE     2026-09-04b. ⏳ T-080 STILL IN FLIGHT — experiments/65- is
-              RESUMABLE and 21 of 26 rows are recorded. ⭐ FIVE categories
-              are CLOSED at three subjects each, all passing on all
-              eleven: GTK 3, X11/XCB, OpenGL/EGL, Qt, SDL. Vulkan is 3
-              of 3 with the third a BED limit.
-              ⛔ Left: py-2, py-3, media-1, field-1, field-2. ⛔ media-1 needs C39's one-character fix first.
+    STATE     2026-09-04c. ⭐ T-080's CORPUS IS COMPLETE — 26 of 26 subjects,
+              every row a count out of eleven, no blanks and no "not run".
+              ⭐ SIX categories CLOSED at three subjects each: GTK 3,
+              X11/XCB, OpenGL/EGL, Qt, SDL — and Python GUI is 2 of 3 with
+              the third not reachable by our mechanism. ⛔ Every remaining
+              zero is NAMED: the BED (vkmark, no /dev/dri), the CLOSURE
+              (neovim, glibc 2.26), the SUBJECT'S SHAPE (flameshot, a tray
+              application with no toplevel) and ONE path class we do not
+              reach (pdfarranger, /usr/local).
     COUNTS    65 entries, 25 open, 40 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)
               throughput: glibc 8.40 ns/op vs musl 704.79 (malloc, 4 threads)
-    NEW       ⭐ T-090's CAUSE IS ISOLATED AND THERE IS A ROUTE: the sandbox
-              EPERM is CHROOT's, not the bed's — chroot alone reproduces it,
-              unshare --mount alone does not, and pivot_root permits the
-              call. experiments/69-, pass=9, three runs.
-              ⭐ T-088 rung 1: the dispatch table MEASURED, 18 of 18, and
-              the source's own header stated the order wrongly.
-              ⭐ T-089 rung 2: store-paths.md's ONE "NOT MEASURED" row is
-              measured and it was TWO mechanisms — static fails with
-              NOTHING OF OURS MAPPED, raw-syscall fails WITH IT LOADED.
-              ⭐ T-091 and T-092 landed, both UNMEASURED and both saying so.
-              ⛔ FIVE CORRECTIONS: C29 three instrument defects, C30 the
-              dispatch order in our own comment, C31 a comment that broke
-              pgb-apprun.c behind a SILENT FALLBACK to a shell AppRun,
-              C32 a wrong claim read from half a function, C33 three
-              controls that would have passed on a dead subject.
+    NEW       ⭐ FOUR BUNDLER DEFECTS FOUND AND FIXED, each by running a
+              recorded zero down instead of believing it:
+                C41 the interposer answered `open` and not `stat64` — which
+                    is the whole of Python. virt-manager 0/11 → 11/11.
+                C42 an FHS symlink farm's dangling loader link aborted the
+                    build. gearlever UNRESOLVED → builds.
+                C43 a wrapper target that is an ABSOLUTE SYMLINK into
+                    another store path. helix 0/11 → 11/11, and it had been
+                    failing SILENTLY: exit 255, not one byte of output.
+                +   a nixpkgs SHELL FRAGMENT lifted into `.env` as if it
+                    were a value, shadowing the real plugin path.
+              ⭐ T-084 step 2: the six hand copies of the trace classifier
+              are GONE; `102-` rewritten to read them back out of git so the
+              before/after outlives them.
+              ⭐ T-091 MEASURED: a bundled GStreamer pipeline runs on 11/11
+              with ZERO host objects in payload AND tree, and
+              gst-plugin-scanner is exec'd on 11/11.
+              ⛔ THREE CORRECTIONS TO OUR OWN INSTRUMENTS: C39 (the
+              assertion), C40 (the row note), C44 (a silent `cp`).
 
 ## ⛔ READ THIS FIRST
 
@@ -49,6 +56,10 @@ a display prints too; a real display turned those 11 rows into 0.
 ask the **X server** whether a window exists. ⛔ A program's own output is not
 evidence that it drew something.
 
+⭐ **AND THE ≥50×50 RULE IS NOT DECORATION.** `flameshot` puts a **3×3**
+`Qt Selection Owner` window on the server and no toplevel at all. A crude "is
+there any window" check counts it and scores the row green.
+
 ## ⭐ The operator's rulings in force
 
 | when | ruling | where it is recorded |
@@ -58,8 +69,9 @@ evidence that it drew something.
 | 2026-09-02b | *"pgb bundle isn't good enough, it is bloated, slow and a complete failure"* | T-066 |
 | 2026-09-03c | *"us having a bigger size than anylinux-appimages and onelf is acceptable as long as ours performs better and packaging is just one command"* | [`../docs/design/toolchain.md`](../docs/design/toolchain.md) |
 | 2026-09-03d | *"Defer comparing speed/startup/performance with anylinux-appimages & onelf for now"* | this page |
-| ⭐ **2026-09-03e** | *"you may take on T-081 as you go since it is required now to complete your own tasks"* | T-081, **unblocked** |
-| ⭐ **2026-09-03e** | *"you may be measuring the wrong success criteria ... confirm it properly by feeding it a fake/emulated display"* | `experiments/64-`, and §"read this first" |
+| 2026-09-03e | *"you may take on T-081 as you go since it is required now to complete your own tasks"* | T-081, **closed** |
+| 2026-09-03e | *"you may be measuring the wrong success criteria ... confirm it properly by feeding it a fake/emulated display"* | `experiments/64-`, and §"read this first" |
+| ⭐ **2026-09-04** | *"All three apps open, run and work, use emulated/dummy stubs for hw gaps."* | `experiments/65-`, and the Prove bar in [`../docs/research/app-corpus.md`](../docs/research/app-corpus.md) |
 
 ## ⭐ The operator's three goals
 
@@ -72,101 +84,65 @@ evidence that it drew something.
 | goal | entries | where it stands |
 |---|---|---|
 | 1. the builder | T-051, T-060, T-012 | ⛔ Blocked on **building nix's own closure static**, not on a tool |
-| 2. the bundler | T-057, T-066, T-081 | ⭐ **GTK PROVEN: real windows on 11 of 11, zero host objects.** ⛔ Blocked on T-081 — a hardcoded store path stops one GUI app drawing and a script entry point stops Python bundling at all |
-| 3. kdenlive | T-054, T-055 | ⭐ cold start 0.74×, host objects 0 of 11 against 4 of 11. ⛔ *smaller* not met; *run faster* unresolved |
+| 2. the bundler | T-057, T-066, T-081 | ⭐ **PROVEN ACROSS SIX TOOLKIT CATEGORIES**, three subjects each, real windows on a real X server, zero host objects. The failures that remain are named, and four of them were bundler defects now fixed |
+| 3. kdenlive | T-054, T-055 | ⭐ cold start 0.74×, host objects 0 of 11 against 4 of 11. ⛔ *smaller* not met; *run faster* unresolved. ⚠ `90-`'s host counts are owed a re-run — T-084 |
 
 ## ⭐ Work order
 
-    ---- ⭐ WHAT THE NEXT SESSION SHOULD DO, AND IT IS ONE ENTRY FIRST ----
+    ---- ⭐ WHAT THE NEXT SESSION SHOULD DO ----
 
-    ⭐ T-081 IS CLOSED. Its acceptance test was named by the operator
-       before the work and is met, twice, pass=11 fail=0 skip=0:
+    ⭐ T-080's CORPUS IS COMPLETE. 26 of 26 rows, and
+       docs/research/bundle-capabilities.md §0 closes every one with a
+       count out of eleven. ⛔ What is left is NOT "run the corpus". It is
+       the four rows that are not eleven, three of which are not ours:
 
-         arm G  galculator, UI at a compiled-in store path  11 of 11 draw
-         arm N  the SAME bundle, --no-storefix               0 of 11 draw
-         arm X  mousepad, the regression control            11 of 11 draw
-         arm P  meld, a PYTHON GUI application              11 of 11 draw
-
-       ⭐ Arm N is why arm G means anything, and arm P is the operator's
-       own counter-example reached: meld produced NO ARTEFACT before.
-
-    ⛔ T-080 IS REOPENED AND IS NOW THE WORK. The operator: "every
-       capability listed in docs/research/bundle-capabilities.md
-       including ones already measured, must be remeasured with 3
-       applications per category in order of simple to complex".
-
-       `experiments/65-` is the corpus: 26 subjects, three per category,
-       plus four of the field's own thirteen nixappimage recipes. It is
-       RESUMABLE — a row in evidence/65-capability-corpus/rows is never
-       re-measured — so run it, and keep running it until every row of
-       §0 carries a count out of eleven and the subject that produced it.
-
-       ⛔ TWO ROWS CANNOT BE CLOSED ON THIS MACHINE AND MUST SAY SO IN
-       THE SENTENCE: every GL and Vulkan row here is a SOFTWARE
-       rasteriser, and NVIDIA is not bundled by design. T-059.
+       pdfarranger 0/11  ⛔ THE ONE THAT IS OURS, AND IT IS A CLASS:
+                         `/usr/local/share/pdfarranger/…`, asked of Python
+                         at RUN TIME. pgb-storefix.c answers `/nix/store/…`
+                         and nothing else, by construction. The same class
+                         blocks a bundled dbus-daemon
+                         (`/etc/dbus-1/session.conf`). flatimage's portable
+                         root is the shape that serves it — docs/research/
+                         app-corpus.md rung 3.
+       flameshot   0/11  the SUBJECT: a tray application with no toplevel,
+                         and no session bus in this bed.
+       neovim      0/11  the CLOSURE: its own glibc 2.26.
+       vkmark      0/11  the BED: no /dev/dri anywhere.
 
     ---- then, in order. ⛔ THE ORDER IS BY MECHANISM, NOT BY EASE ----
 
-    ⭐ OPERATOR, 2026-09-04, and it decides the four entries below:
-       "sort the tasks for next session based on completing/fixing what
-       will auto fix/complete what, not easy first". The classification
-       is docs/research/app-corpus.md and its EIGHT RUNGS are the task
-       list; rungs 1-3 decide about twenty of the forty subjects.
-
-    ⛔ FOUR EXPERIMENTS ARE WRITTEN, PRE-REGISTERED AND COMMITTED. Three
-       have an arm that needed no bed and it has RUN; the arms that need
-       the bed are waiting for 65- and are the first thing to do when it
-       finishes. RUN THEM, do not rewrite them.
-
-    T-088  ⭐ RUNG 1. experiments/68-. Arm S (the selector, no bed) is
-        DONE: 18 of 18, and it corrected the source's own header --
-        the order is $ARGV0 -> argv[1] (dropped) -> argv[0] -> default,
-        and ARGV0 was named nowhere. ⛔ ARM B IS NOT RUN: a SECOND
-        program out of a real bundle on eleven. Subject mkvtoolnix,
-        because mkvmerge/mkvextract print their OWN names in --version
-        and a dispatch that ran the default would FAIL.
-    T-089  ⭐ RUNG 2. experiments/100-. Arm P (the mechanism, no bed) is
-        DONE, two runs: static fails with NOTHING OF OURS MAPPED,
-        raw-syscall fails WITH IT LOADED -- one row in store-paths.md
-        was two mechanisms. ⛔ ARM G IS NOT RUN: syncthing on eleven,
-        and it is REPORTED not predicted.
-    T-087  ⛔ RUNG 3. experiments/101- is written and pre-registered and
-        HAS NOT RUN. Its criterion is NOT a window -- the window appears
-        either way -- it is the .mo catalogue being opened under the
-        bundle, against the same bundle built --no-storefix.
-        ⚠ THE MEASURE-TWICE RULE IS SUSPENDED FOR THIS ENTRY, by the
-        operator; every other delivery rule holds.
-    T-090  ⭐ RUNG 5. experiments/69- ANSWERED THE GATING QUESTION: the
-        refusal is CHROOT's, and pivot_root permits the call. ⛔ THREE
-        THINGS STAY UNMEASURED and none follows from it -- whether the
-        bed still isolates under pivot_root, whether teardown stays
-        clean, and whether a bundled browser then sandboxes. Until one
-        is taken, a browser row measures --no-sandbox.
-    T-084  ⭐ THE CHEAP HALF IS DONE. experiments/102- diffs all six hand
-        copies against lib.sh's shared classifier on fixtures, with NO
-        bundle build: 3 distinct texts, ⭐ 2 distinct BEHAVIOURS, and
-        they differ in TWO ways, not one. ⛔ C38: besides C25 they clear
-        their result set on the artefact's own execve -- five do it
-        unconditionally (a DIRTY tree row read CLEAN, and 90- is the
-        competitor's "4 of 11"), 60- never does it (a CLEAN payload row
-        read DIRTY). ⭐ Latent in the shape measured: a real trace execs
-        the artefact ONCE. ⛔ STEP 2 STILL OWES the conversion and the
-        re-run, and is blocked while 65- runs -- editing a script that
-        is BEING EXECUTED is the catastrophic one, not lib.sh.
-    T-091  ⭐ LANDED, ⛔ UNMEASURED. All four GStreamer variables, and
-        gst-plugin-scanner installed as a bundle PROGRAM so it runs
-        through sharun rather than the host loader. The Prove line is a
-        media subject whose host-object count says WHICH PROCESS it
-        counted.
-    T-059  a real GPU. ⛔ Every GL row is still swrast and surfaceless.
+    T-084  ⭐ THE CONVERSION IS DONE — six hand copies deleted, every call
+        site on lib.sh's exp_classify_trace, and 102- rewritten to read the
+        copies back out of git at a pinned commit so the before/after
+        outlives them (pass=20, two runs). ⛔ STEP 2 STILL OWES THE RE-RUN,
+        and 102- arm S says it is exactly ONE experiment: 90-, whose
+        committed host counts describe only the SECOND of two invocations.
+        It needs the machine to itself.
+    T-091  ⭐ MEASURED, experiments/103-, run 1: ENCODE on 11/11, ZERO host
+        objects in the payload AND the tree, and gst-plugin-scanner exec'd
+        on 11/11 — which answers "which process did you count". ⛔ TWO
+        DEFECTS IN RUN 1, both fixed and both owed a second run: the decode
+        leg used `wavenc` from gst-plugins-GOOD, which is not in the
+        closure; and THE CONTROL WAS CONFOUNDED — the bundle's only GST_*
+        variable came from a nixpkgs SHELL FRAGMENT lifted verbatim out of
+        the wrapper, present in subject and control alike.
+    T-088  ⭐ --with-program IS EXERCISED and works: `flameshot + 2 more`,
+        and `./flameshot.AppImage dbus-daemon --version` answers
+        `D-Bus Message Bus Daemon 1.16.2` — the helper's OWN identity, so a
+        dispatch that ran the default would fail. ⛔ ONE environment, by
+        hand. The eleven are owed.
+    T-089  open: a static application that needs a compiled-in PATH
+        (powershell). syncthing and lilipod are done.
+    T-090  ⭐ the cause is isolated: the sandbox EPERM is CHROOT's, and
+        pivot_root permits the call. ⛔ Whether the bed still isolates
+        under pivot_root is unmeasured, so a browser row measures
+        --no-sandbox.
+    T-059  a real GPU. ⛔ Every GL and Vulkan row is still swrast.
     T-066  ⛔ still the only open P0, and its remaining column is SIZE,
         which the operator struck on 2026-09-03c and deferred on
-        2026-09-03d. ⚠ The priority ordering points here; this work
-        order does not. This page decides.
-    T-082  vendor + patch + drift detection. XL -- start early, finish late.
-    T-083  desktop integration. ⭐ Its two named gaps are already closed
-        (X-AppImage-Version and a dangling Icon=), and the bundle now
-        carries a usr/ tree; what is left is the managers themselves.
+        2026-09-03d.
+    T-082  vendor + patch + drift detection. XL — start early, finish late.
+    T-083  desktop integration; what is left is the managers themselves.
 
     ---- then the builder, by how foundational ----
 
@@ -194,107 +170,46 @@ later."* Every other rule holds everywhere, T-087 included.
 
     1. ⛔ PRE-REGISTER the expectation before the run, and COMMIT it
        before the run so the git log shows it was not written after.
-       Predictions HAVE been falsified this way and were recorded rather
-       than rewritten -- that is the rule working, not failing.
+       ⭐ 2026-09-04c: which of TWO Python zeros a fix would move was
+       committed before the run that settled it, and BOTH halves held —
+       py-3 moved 0/11 → 11/11, py-2 did not move. ⚠ The point is not
+       that the guesses were right: until the row note was fixed the two
+       rows were INDISTINGUISHABLE, so no prediction was possible at all.
     2. ⛔ A SKIP IS NOT A PASS. Read the skip count on every run.
-    3. ⛔ TWO RUNS OR IT IS NOT A NUMBER. This caught a counter that
-       moved 0 -> 7 between two runs with no change to the subject.
+    3. ⛔ TWO RUNS OR IT IS NOT A NUMBER.
     4. ⛔ AN ABSENCE IS NOT A ZERO. Say where you looked, AND where you
-       could not: T-079's search cannot see runtime-assembled paths or
-       other libraries' host data, and says so.
-    5. ⛔ VERIFY YOUR OWN WRITE-UP AGAINST THE SOURCE. Claims that have
-       failed this check: "SIGABRT on 3" (it was SIGABRT on two, SIGFPE on
-       one); a figure quoted from a run whose RESULT.txt the next run had
-       overwritten; a list of eight wrapped symbols that named one not
-       wrapped.
+       could not.
+    5. ⛔ VERIFY YOUR OWN WRITE-UP AGAINST THE SOURCE.
     6. ⛔ CHECK THAT YOUR SUCCESS CRITERION CAN FAIL FOR THE RIGHT
-       REASON. `Gtk-WARNING: cannot open display` is emitted by the
-       BUNDLED library, so it looked like proof the bundle worked -- and
-       it prints on real hardware WITH a display too. An instrument that
-       cannot tell a working subject from a broken one is worse than no
-       instrument, because it reports green.
-    7. ⛔ AND CHECK THAT IT CAN FINISH. `strace` on a program reading
-       through a FUSE mount deadlocks in state D; `kill` cannot end a
-       process in D, so `wait` never returns. The fix was an ORDERING --
-       reap the FUSE daemon BEFORE waiting -- and it also made every row
-       ten times faster, which means the slow version had been paying
-       the same cost in a milder form all along.
-    8. ⭐ **NEW, 2026-09-04 — CARRY A POSITIVE CONTROL, AND NEVER CARRY A
-       CONSTANT ACROSS A CHANGE OF MODE.** experiments/65- scored
-       galculator 0 of 11 on a subject experiments/64- had measured at
-       11 of 11 twice, because it copied 64-'s 25-second window budget
-       while switching every subject from MOUNT to EXTRACT delivery --
-       and 64- itself uses 150s for the one arm it extracts.
-       ⛔ The budget was the symptom. THE DEFECT WAS THAT NOTHING IN THE
-       EXPERIMENT COULD TELL A BROKEN SUBJECT FROM A BROKEN INSTRUMENT:
-       five pre-registered expectations and not one control.
-       corrections.md C26.
+       REASON — ⭐ and CHECK IT AGAINST REAL OUTPUT. Three of the corpus's
+       five zeros were the criterion rather than the subject (C34, C36,
+       C39), and `experiments/65-` now interrogates its own assertion on
+       the FIRST environment instead of scoring a subject zero eleven
+       times. ⚠ It caught nothing on the completed corpus, which is the
+       outcome that makes the remaining zeros readable.
+    7. ⛔ AND CHECK THAT IT CAN FINISH.
+    8. ⛔ CARRY A POSITIVE CONTROL, AND NEVER CARRY A CONSTANT ACROSS A
+       CHANGE OF MODE. ⚠ 2026-09-04c adds the other half:
+       ⛔ **A CONTROL THAT CANNOT BE TOLD FROM ITS SUBJECT IS NOT A
+       CONTROL.** `experiments/103-` built one with `--no-plugin-env`, and
+       the flag removed nothing that mattered because the variable in
+       question came from somewhere the flag does not reach. The run
+       printed "the variables are redundant" and that conclusion was not
+       supported. ⭐ Assert the difference, do not assume it.
 
-## ⭐ THE OPERATOR'S FOUR QUESTIONS, 2026-09-04 — ANSWERED HERE
-
-**1. Has the GLIBC-STATIC work really fully completed?** ⛔ **No, and the
-number is countable.** `REQUIREMENTS.md` enumerates **eleven** issues; **ten
-are closed** on all eleven environments and **one is open** — `dlopen` of a
-HOST shared object, which stays open because the row says *host-dependent* and
-it still is. ⚠ Three further reasons not to call it complete:
-  - closing the eleventh exposed a **boundary inside it**: `getaddrinfo` with a
-    service name is 8 of 11 and no flag closes it (T-085);
-  - four of the ten are closed by an **opt-in flag** a developer must pass, not
-    by the default build;
-  - ⛔ the list went **nine → ten → eleven on three consecutive days**, each
-    time because somebody searched rather than assuming. "Ten of eleven" is a
-    snapshot of a search, never a distance to done.
-
-**2. Multiple binaries, busybox-style — and does renaming or symlinking the
-bundle work?** ⭐ **Yes, by construction, and it is unmeasured.** `assemble.go`
-installs the entry point and then **every other non-dot program in the same
-store path's `bin/`**; `--with-program NAME` adds one found anywhere in the
-closure. `tool/runtime/pgb-apprun.c` is a **static** selector — no shell, no
-host interpreter — dispatching on `ARGV0` (what uruntime sets), then `argv[0]`'s
-basename, then `$1`, then the default. So a symlink or a rename selects the
-program exactly as an AppImage does, and `./app.AppImage rnote-cli` works too.
-⛔ **No experiment has ever run a second program out of a bundle.** T-088.
-
-**3. Can the walker say how many entry points an app has?** ⭐ **Yes, and it
-already prints it**: the build log line `programs <prog> + N more`, and
-`--name X` failing lists what IS in `bin/`. That count is the multi-call
-dispatch table — the same set the selector chooses from. ⚠ It counts the entry
-store path's `bin/` only, so a helper in a dependency needs `--with-program`
-and is not in the number. T-088 puts the count in the corpus table.
-
-**4. Feature parity with anylinux AppImages?** ⚠ **No — close on mechanism,
-behind on features, and the list is theirs not mine.** Level or ahead:
-coverage 11/11 both, payload clean 11/11 both, a static delivery path (no shell
-in ours), nothing written to the filesystem, `dlopen` of our own plugins, the
-compiled-in store path (T-081), a Python GUI (T-081), the seven host-data
-dependencies. ⭐ **And one row that is ours outright**: they run `strace` to
-guess a dependency set (`STRACE_MODE=1`); we are handed the exact one the
-derivation declared. ⛔ **Where they are ahead**, read off their own
-`HOW-TO-MAKE-THESE.md` variable list rather than inferred:
-  - **the sandbox** — a namespaces hook and shipped browsers; we cannot even
-    measure it in this bed (T-090);
-  - ⭐ **`OPTIMIZE_LAUNCH`, a DWARFS *profile* image** — PGO for the mount. We
-    have `lite` and `-S18`, which are different levers. A named cold-start
-    lever we have never tried (T-066);
-  - **four capability-check hooks** (`x86-64-v3`/`v4`, `vulkan`, `wayland`)
-    that print a message where ours crashes silently;
-  - `GTK_CLASS_FIX` (the taskbar groups the window with its icon),
-    `self-updater`, `udev-installer`, and `QUICK_SHARUN_SKIP_DEPS_FOR`
-    (skip a dependency subtree **by name**, where `--debloat` is coarser);
-  - **breadth** — hundreds of applications and a graded per-toolkit record
-    against our 26-subject corpus.
-  ⚠ Not parity questions: size and speed, which the operator has deferred.
-  ⭐ The full table is [`../docs/research/app-corpus.md`](../docs/research/app-corpus.md).
-
-## Open questions for the operator
+## ⛔ Open questions for the operator
 
 ⭐ **None blocking.**
 
-1. ⚠ **A GPU** — **T-059**. Every GL row is `swrast` and surfaceless.
-   T-080's guarantee claims *"the closure produces a working EGL display
-   offscreen"* and explicitly does **not** claim Vulkan or NVIDIA.
+1. ⚠ **A GPU** — **T-059**. Every GL and Vulkan row is `swrast`/lavapipe.
 2. ⚠ **kdenlive's warm row is 3.45× against us and unexplained.** First
    candidate: at 565 MB it is over uruntime's 350 MB `MAX_EXTRACT_SELF_SIZE`,
    so it **extracts** where `jq` **mounts**.
 3. ⚠ **Docker Hub rate-limits anonymous pulls here.** `pgb rootfs pull` does
    the anonymous-token dance and succeeds where `docker pull` 429s.
+4. ⚠ **A session DBus does not exist in this bed**, and it is **not** a
+   hardware gap, so the stub rule does not cover it. ⭐ The bundle can carry
+   `dbus-daemon` itself (`--with-program`, measured) — but the daemon then
+   reads `/etc/dbus-1/session.conf`, which is not a `/nix/store` path and
+   which the interposer therefore does not rewrite. Same class as
+   pdfarranger.

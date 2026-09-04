@@ -25,9 +25,14 @@
 #       ⚠ It is here so that D2 has something real to read; a decode of a
 #       file this run did not produce would be measuring the fixture.
 #   D2  ⭐ THE DECODE LEG PRODUCES SAMPLES. filesrc -> oggdemux -> vorbisdec
-#       -> wavenc -> file, and the WAV is larger than the Ogg it came from,
-#       because PCM is bigger than Vorbis. ⭐ That size relation is the
-#       application's OWN answer and no broken bundle prints it.
+#       -> audioconvert -> file, and the PCM is larger than the Ogg it came
+#       from, because raw samples are bigger than Vorbis. ⭐ That size relation
+#       is the application's OWN answer and no broken bundle prints it.
+#       ⛔ RUN 1 ENDED THIS LEG WITH `wavenc`, WHICH IS IN gst-plugins-GOOD
+#       and is not in this closure — so it read 0/11 on a bundle that had
+#       just encoded on 11/11. The fourth criterion-not-subject defect in
+#       this tree; raw PCM through `audioconvert` needs no extra closure and
+#       keeps the size relation.
 #   D3  zero HOST shared objects in the PAYLOAD, on every environment.
 #   D4  ⭐ THE COUNT NAMES ITS PROCESS. The same trace classified in `tree`
 #       mode and in `payload` mode, printed side by side, plus whether a
@@ -87,30 +92,45 @@ reap_in_root() {
 # named so the pipeline below is buildable from the closure rather than from
 # whatever the host happens to have.
 # ---------------------------------------------------------------------------
-build() {  # out-image extra-flag...
-  _img=$1; shift
-  [ -s "$_img" ] && return 0
-  PGB_APPIMAGE_CACHE="$WORK/cache" "$REPO_DIR/pgb" bundle appimage "$ATTR" \
-    --out "$_img" --name "$PROG" \
-    --extra gst_all_1.gst-plugins-base "$@" >"$_img.log" 2>&1 || true
+#
+# ⛔ AND THE `.env` OF EACH IS COPIED OUT AS IT IS BUILT. Both builds share one
+# cache directory and one `--name`, so the AppDir on disk is whichever was
+# built LAST — run 1 read the CONTROL's `.env` and reported it as the
+# subject's. A control that cannot be told from its subject is not a control.
+build() {  # out-image env-copy extra-flag...
+  _img=$1; _envout=$2; shift 2
+  if [ ! -s "$_img" ]; then
+    PGB_APPIMAGE_CACHE="$WORK/cache" "$REPO_DIR/pgb" bundle appimage "$ATTR" \
+      --out "$_img" --name "$PROG" \
+      --extra gst_all_1.gst-plugins-base "$@" >"$_img.log" 2>&1 || true
+  fi
+  cp "$WORK/cache/$PROG/AppDir/.env" "$_envout" 2>/dev/null || : > "$_envout"
   [ -s "$_img" ]
 }
 
 printf -- '-- building the subject and its control ---------------------------\n'
 IMG="$WORK/gst.AppImage"
 CTL="$WORK/gst-noenv.AppImage"
-build "$IMG" || { exp_note "subject did not build; see $IMG.log"; tail -5 "$IMG.log"; exit 2; }
+build "$IMG" "$WORK/env.subject" \
+  || { exp_note "subject did not build; see $IMG.log"; tail -5 "$IMG.log"; exit 2; }
 exp_check "B1  the subject built" "$([ -s "$IMG" ] && echo yes || echo no)" yes
-build "$CTL" --no-plugin-env || exp_note "control did not build; see $CTL.log"
+build "$CTL" "$WORK/env.control" --no-plugin-env \
+  || exp_note "control did not build; see $CTL.log"
 exp_check "B2  ⭐ the control built (--no-plugin-env)" \
     "$([ -s "$CTL" ] && echo yes || echo no)" yes
 
-# ⭐ THE CONTROL MUST DIFFER IN THE WAY IT CLAIMS TO. A flag that changed
-# nothing would make every row below meaningless, so the .env of each is read
-# and the GStreamer variables counted.
+# ⭐ THE CONTROL MUST DIFFER IN THE WAY IT CLAIMS TO, AND B3 IS WHERE RUN 1
+# WENT WRONG. `--no-plugin-env` suppresses carryBakedPaths and
+# GST_PLUGIN_SCANNER; if the two `.env` files are identical the flag changed
+# nothing and every row below is a comparison of a bundle with itself.
 gstvars() { grep -c '^GST_' "$1" 2>/dev/null || true; }
-SUBJ_ENV=$(gstvars "$WORK/cache/$PROG/AppDir/.env")
-exp_note "$(printf 'GST_* variables in the subject .env: %s' "${SUBJ_ENV:-?}")"
+SUBJ_GST=$(gstvars "$WORK/env.subject"); CTL_GST=$(gstvars "$WORK/env.control")
+exp_note "$(printf 'GST_* in .env — subject %s, control %s' "$SUBJ_GST" "$CTL_GST")"
+for v in $(grep -o '^GST_[A-Z_0-9]*' "$WORK/env.subject" 2>/dev/null); do
+  exp_note "$(printf '  subject: %s' "$v")"
+done
+exp_check "B3  ⛔ the control has FEWER GST_* variables than the subject" \
+    "$([ "${CTL_GST:-0}" -lt "${SUBJ_GST:-0}" ] && echo yes || echo no)" yes
 
 printf -- '\n-- the eleven ------------------------------------------------------\n'
 printf '  %-22s %-6s %-6s %-9s %-9s %s\n' ENVIRONMENT ENC DEC 'HOST(pay)' 'HOST(tree)' SCANNER
@@ -132,7 +152,7 @@ for name in $ENVS; do
         ! audioconvert ! vorbisenc ! oggmux ! filesink location=/tmp/t.ogg
       echo "OGG=$(wc -c < /tmp/t.ogg 2>/dev/null || echo 0)"
       APPIMAGE_EXTRACT_AND_RUN=1 /subj103 -q filesrc location=/tmp/t.ogg \
-        ! oggdemux ! vorbisdec ! audioconvert ! wavenc ! filesink location=/tmp/t.wav
+        ! oggdemux ! vorbisdec ! audioconvert ! filesink location=/tmp/t.wav
       echo "WAV=$(wc -c < /tmp/t.wav 2>/dev/null || echo 0)"
     ' >"$WORK/out.$name" 2>"$WORK/err.$name" || true
   reap_in_root "$root"
