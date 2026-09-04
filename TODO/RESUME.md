@@ -6,7 +6,8 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03f, at the START. Session IN PROGRESS.
+    LAST WRITTEN   2026-09-03f, at the START; refreshed when arm G came
+                   back 11 of 11. Session IN PROGRESS.
     TREE           main, began at 820d899f (== origin/main at session start)
     BRANCH         ⛔ main. The harness named
                    `claude/t-081-bundle-capabilities-2c24c0` and THE OPERATOR
@@ -16,8 +17,8 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
                    docs/research/bundle-capabilities.md with THREE
                    applications per category, simple -> complex. Then
                    T-079's residue (/etc/services) and the codeset axis.
-    CI             not yet pushed this session.
-    GATES          not yet run this session.
+    CI             302 success; 303 and 304 in flight, READ THEM.
+    GATES          both green at every commit so far.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
 
@@ -62,32 +63,36 @@ criterion fail *for the right reason*.
 
 ## In flight right now
 
-    ⭐ T-081, and it has TWO blockers with a route each. Nothing is
-      committed for it yet beyond this file.
+    ⭐ T-081's ACCEPTANCE TEST IS MET ON ARM G, run 1 of 2:
 
-    1. absolute store paths compiled into .rodata.
-       ⛔ THE SECURITY QUESTION IS ANSWERED AND THE ANSWER IS **NO**:
-       see docs/design/store-paths.md. A fixed `/tmp/.pgbs/` is
-       squattable by any local user, and the two outcomes are a write
-       primitive (if the launcher follows the squatted symlink) or a
-       permanent denial of every pgb bundle on the machine (if it
-       refuses). The route taken instead is an INTERPOSER inside the
-       bundle, exact-match against the closure pgb already computes.
-    2. script entry points. resolveEntry oscillates between a
-       makeBinaryWrapper ELF and the Python script it targets, five
-       hops, then `no entry point` (assemble.go:60). NO Python GUI app
-       bundles at all. The route is a static trampoline in
-       shared/bin/<prog> that execs the bundled interpreter with the
-       script as its argument -- sharun execs a STATIC bin directly
-       (main.rs:410), so the trampoline needs no loader cooperation.
+        experiments/64- arm G  galculator, UI at a compiled-in store path
+        WINDOW on a real X server   11 of 11
+        HOST shared objects          0 of 11
+        ⛔ AND WITH NO BIND. The 2026-09-03e arm C used a mount namespace
+        and root; this is the mechanism.
 
-    ⚠ ALSO OPEN, and neither is blocking:
-       the ELEVENTH glibc-static quirk (/etc/services) has a measurement
-         and no mechanism. The precedent is --embed-tzdata: look first,
-         carry a fallback, never prefer the stale copy.
-       the environment-default codeset is the one axis where native musl
-         beats both glibc columns, 11-0. --embed-locale answers a REQUEST
-         and does not change what an unset LANG means.
+    ⏳ RUNNING: arms N (--no-storefix, the NEGATIVE CONTROL, must draw
+       0 of 11), X (mousepad, the regression control) and P (meld, a
+       PYTHON GUI application, which did not build at all before).
+       ⛔ TWO RUNS OR IT IS NOT A NUMBER: run 2 is chained and starts
+       automatically when run 1 exits. ⚠ Both runs use the pgb built at
+       commit 2e66b0ce; the tool has changed since (reporting, the icon
+       policy, usr/, --embed-netdb, --utf8-default) and none of those
+       changes touch what arms G/N/X/P measure.
+
+    ⏳ WRITTEN, PRE-REGISTERED, NOT YET RUN — in this order:
+       experiments/66-  --embed-netdb, the ELEVENTH glibc-static quirk
+       experiments/67-  --utf8-default, the one axis native musl wins
+       experiments/65-  the T-080 REDO: 26 subjects, 3 per capability,
+                        simple -> complex, plus 4 of the field's own 13
+                        nixappimage recipes. ⚠ HOURS. It is RESUMABLE:
+                        rows land in evidence/65-capability-corpus/rows
+                        and a recorded row is never re-measured.
+
+    ⛔ DO NOT `make` WHILE experiments/64- IS RUNNING. Its `stale()` check
+    compares each artefact against ./pgb, so a rebuild mid-run makes later
+    arms describe a different tool than earlier ones. That happened once
+    this session and the run was discarded.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 
