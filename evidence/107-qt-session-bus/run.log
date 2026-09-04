@@ -1,0 +1,27 @@
+===============================================================
+107 - qalculate-qt's 4-of-11 clean: Qt autolaunches a bus, and execs the host shell
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T17:49:47Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/107-qt-session-bus
+--------------------------------------------------------------
+
+-- the bed --------------------------------------------------------
+           /etc/dbus-1/session.conf present on 11 rootfs
+
+-- building the two arms ------------------------------------------
+  ok    Q0  arm A built (stock, as the corpus built it) = yes
+  ok    Q0  ⭐ arm B built (--extra dbus --with-program dbus-daemon dbus-launch) = yes
+           arm B programs: programs    qalculate-qt + 2 more
+  FAIL  Q0  ⛔ arm B installed BOTH programs (no 'no such program') = 0
+0, expected 0
+           
+
+-- the eleven -----------------------------------------------------
+  ENVIRONMENT        LIBC   sh dyn  A win     A host    B win     B host

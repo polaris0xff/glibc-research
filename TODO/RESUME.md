@@ -52,6 +52,30 @@ extraction directory:
     nohup sh scripts/common/watchdog.sh --watch --interval 120 --floor 6 \
           --reap --log /var/tmp/watchdog.log >/dev/null 2>&1 &
 
+⛔⛔ **AND START A LONG RUN WITH `setsid`, NOT `nohup … &`. THIS COST A RUN ON
+2026-09-04c.** A job backgrounded from a tool call shares the harness's process
+group, so when the harness tore down an unrelated background task the whole
+group went with it — the experiment's parent shell was killed **47 minutes and
+seven rows in**, leaving an orphaned `strace` still writing:
+
+    ⛔ nohup sh scripts/common/run-experiment.sh 101 >/var/tmp/x.log 2>&1 &
+    ⭐ setsid nohup sh scripts/common/run-experiment.sh 101 \
+           >/var/tmp/x.log 2>&1 < /dev/null &
+
+⚠ **And two ways of checking on it are traps of the same family as `pkill -f`**:
+`pgrep -f '101-gtk-locale'` **matches the watching shell's own command line**,
+so a `while pgrep -f …; do sleep; done` waiter never exits; and a waiter that
+looks alive can be watching a **stale log path** while the run writes elsewhere.
+⭐ Check the experiment's own **pid** (`ps -ef | grep '[1]01-'`) and the log's
+**mtime**, not a name match.
+
+⛔ **AND A RUN THAT LOOKS DEAD MAY ONLY BE BLOCKED.** The same day, `101-`
+appeared dead — no matching process, log stalled for minutes — and was in fact
+waiting on one hung child in `rockylinux-8`. Killing that child let it carry
+on. ⚠ Cleaning up "leftovers" from a run that is merely blocked **destroys its
+in-flight evidence**: deleting `tr.*` mid-row cost four rows and the whole run
+had to be discarded. ⭐ Confirm death by **pid**, and only then clean.
+
 It also reports any process in **state D**, which is the `strace`-on-FUSE
 deadlock and cannot be killed. `docs/AGENTS.md` §6 has the rest, including why
 `LD_DEBUG=libs` is the first instrument for a bundle and `strace` the second.

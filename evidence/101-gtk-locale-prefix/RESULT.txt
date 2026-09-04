@@ -2,7 +2,7 @@
 101 - rung 3: GTK's compiled-in locale prefix, with and without the interposer
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T15:54:14Z
+date (UTC)   : 2026-09-04T17:04:53Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -13,33 +13,12 @@ evidence     : /home/user/glibc-research/evidence/101-gtk-locale-prefix
 --------------------------------------------------------------
 
 
-  ENVIRONMENT      T .mo    N .mo    N /nix    WINDOWS  T host .so
-  alpine-3.22      43       0        0         1/1      0
-  alpine-3.20      43       0        0         1/1      0
-  alpine-3.10      43       0        0         1/1      0
-  voidlinux-musl   43       0        0         1/1      0
-  debian-11        43       0        0         1/1      0
-  debian-12        43       0        0         1/1      0
-  ubuntu-20.04     43       0        0         1/1      0
-  rockylinux-8     43       0        0         1/1      0
-  opensuse-leap-15.6 43       0        0         1/1      0
-  fedora-42        43       0        0         1/1      0
-  archlinux-latest 43       0        0         1/1      0
-
-  ok    L1  ⭐ arm T opens a catalogue INSIDE the bundle = 11
-  FAIL  L2  ⭐ CONTROL: --no-storefix tries /nix/store, opens none = 0, expected 11
-  ok    L3  the window appears in BOTH arms            = 11
-  ok    L4  arm T DREW and loaded zero host objects    = 11
-        ⚠ L5 IS REPORTED, NOT CHECKED: whether a translated string is
-          actually rendered depends on the environment having locale
-          support, and four of the eleven ship none. Counting it would
-          charge the bundle for the environment.
-        ⛔ L3 IS THE ROW THAT MAKES L1 MEAN SOMETHING. If arm N loses its
-          window, the control is failing for a second reason and L1 cannot
-          be read as a locale result -- it would be measuring whether the
-          bundle starts at all, which experiments/64- already owns.
-
--- result ----------------------------------------------------
-pass=3 fail=1 skip=0
-VERDICT: the measurement ran and did NOT match expectation.
---------------------------------------------------------------
+  ENVIRONMENT      T .mo  N .mo  Thost  Nhost  N failed WINDOWS  T host .so
+  alpine-3.22      43     0      0      0      33       1/1      0
+  alpine-3.20      43     0      0      0      34       1/1      0
+  alpine-3.10      43     0      0      0      34       1/1      0
+  voidlinux-musl   43     0      0      0      34       1/1      0
+  debian-11        43     0      0      0      33       1/1      0
+  debian-12        43     0      0      0      34       1/1      0
+  ubuntu-20.04     43     0      0      0      33       1/1      0
+  rockylinux-8     43     0      0      0      34       1/1      0
