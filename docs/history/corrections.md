@@ -1279,6 +1279,48 @@ already-patched payload, so such a closure still works.
 
 ---
 
+## C36 — the corpus separator was `|` and the assertions are regexes that alternate
+
+⛔ **Two capability rows read `0 of 11` on capabilities that demonstrably work,
+and neither was a bundler failure or the C34 criterion.** The cause is one
+character.
+
+`experiments/65-`'s corpus is `|`-separated, and an `assertion` is a `grep -E`
+pattern — the useful ones **alternate**. `cut -d'|' -f6` cuts at the first
+alternation. For `gl-1`:
+
+| field | what it should be | what it got |
+|---|---|---|
+| `assert` | `(llvmpipe\|Mesa\|softpipe)` | ⛔ **`(llvmpipe`** — `grep: Unmatched ( or \(`, exit 2, **can never match** |
+| `extras` | `mesa` | ⛔ `Mesa` — the build log says `pgb: could not resolve --extra Mesa: no hydra job` |
+| `args` | *(none)* | ⛔ `softpipe)` — handed to the program as an argument |
+
+`vulkan-1` was mangled the same way: `assert` `(lavapipe`, `extras` `llvmpipe`,
+`args` `Vulkan Instance)`.
+
+⭐ **The evidence that these are not real failures**, taken by hand out of the
+corpus's own artefacts:
+
+| | |
+|---|---|
+| `eglinfo`, run exactly as the corpus runs it, inside a rootfs, with a real display | prints a full EGL table; the **real** assertion matches **30 times** |
+| `vulkaninfo --summary` | exit **0**, `GPU0 deviceName llvmpipe (LLVM 21.1.8)`, `apiVersion 1.4.354` |
+
+⚠ **The build log had been saying so all along** — `could not resolve --extra
+Mesa` is not a sentence anything in the corpus should produce, and nobody read
+it.
+
+**Landed**: the separator is `;`, which appears in no field and which a
+`grep -E` pattern has no use for. Both rows **deleted** and re-measured.
+
+⛔ **AND IT HID BEHIND A REAL DEFECT.** C34 — the `cli` criterion being
+`exit 0 AND the assertion` — is genuine and was fixed first; `gl-1` was
+re-measured under the fix and **still read 0 of 11**. ⭐ That second zero is
+what forced the search that found this. A correct fix that does not move the
+number is information, and stopping at "fixed it" would have buried this one.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

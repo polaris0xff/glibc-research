@@ -173,9 +173,23 @@ ONLY="${PGB_EXP65_ONLY:-}"          # run only subjects whose id matches this
 command -v strace >/dev/null 2>&1 || { exp_note "no strace on PATH"; exit 2; }
 
 # ---------------------------------------------------------------------------
-# ⭐ THE CORPUS. Fields, separated by '|':
+# ⭐ THE CORPUS. Fields, separated by ';':
 #
-#   id | category | nixpkgs attribute | program | mode | assertion | extras | args
+#   id ; category ; nixpkgs attribute ; program ; mode ; assertion ; extras ; args
+#
+# ⛔ THE SEPARATOR WAS '|' AND THAT SILENTLY DESTROYED TWO SUBJECTS. An
+# `assertion` is a `grep -E` pattern, and the useful ones ALTERNATE:
+# `(llvmpipe|Mesa|softpipe)`. `cut -d'|' -f6` cut it at the first alternation,
+# so gl-1 got:
+#
+#   assert  "(llvmpipe"     -> grep: Unmatched ( or \(  -- exit 2, NEVER matches
+#   extras  "Mesa"          -> `pgb: could not resolve --extra Mesa`
+#   args    "softpipe)"     -> handed to the program as an argument
+#
+# ⭐ Both `gl-1` and `vulkan-1` read 0 of 11 on capabilities that WORK, and the
+# rows looked like bundler failures. docs/history/corrections.md C36.
+# ⚠ ';' appears in no field of this corpus, and a `grep -E` pattern has no use
+# for it.
 #
 # ⛔ ORDERED SIMPLE -> COMPLEX WITHIN EACH CATEGORY, and "complex" means how
 # much of the stack the subject drags in rather than how big it is:
@@ -187,32 +201,32 @@ command -v strace >/dev/null 2>&1 || { exp_note "no strace on PATH"; exit 2; }
 # empty assertion means the mode's criterion is the whole test.
 # ---------------------------------------------------------------------------
 CORPUS=$(cat <<'EOF'
-gtk3-1|GTK 3|galculator|galculator|gui|||
-gtk3-2|GTK 3|mousepad|mousepad|gui|||
-gtk3-3|GTK 3|geany|geany|gui|||
-x11-1|X11 / XCB|xorg.xeyes|xeyes|gui|||
-x11-2|X11 / XCB|xorg.xclock|xclock|gui|||
-x11-3|X11 / XCB|xterm|xterm|gui|||
-gl-1|OpenGL / EGL|mesa-demos|eglinfo|cli|(llvmpipe|Mesa|softpipe)|mesa|
-gl-2|OpenGL / EGL|mesa-demos|glxgears|gui||mesa|
-gl-3|OpenGL / EGL|glmark2|glmark2|gui||mesa|
-vulkan-1|Vulkan|vulkan-tools|vulkaninfo|cli|(lavapipe|llvmpipe|Vulkan Instance)|mesa|--summary
-vulkan-2|Vulkan|vulkan-tools|vkcube|gui||mesa|
-vulkan-3|Vulkan|vkmark|vkmark|gui||mesa|
-sdl-1|SDL|dosbox|dosbox|gui|||
-sdl-2|SDL|stella|stella|gui|||
-sdl-3|SDL|scummvm|scummvm|gui|||
-qt-1|Qt|qalculate-qt|qalculate-qt|gui|||
-qt-2|Qt|keepassxc|keepassxc|gui|||
-qt-3|Qt|qbittorrent|qbittorrent|gui|||
-py-1|Python GUI|meld|meld|gui|||
-py-2|Python GUI|pdfarranger|pdfarranger|gui|||
-py-3|Python GUI|virt-manager|virt-manager|gui|||
-media-1|media / codecs|mpv|mpv|cli|mpv [0-9]|mesa|--version
-field-1|the field's own recipes|helix|hx|cli|helix [0-9]||--version
-field-2|the field's own recipes|neovim|nvim|cli|NVIM v[0-9]||--version
-field-3|the field's own recipes|flameshot|flameshot|gui|||
-field-4|the field's own recipes|gearlever|gearlever|gui|||
+gtk3-1;GTK 3;galculator;galculator;gui;;;
+gtk3-2;GTK 3;mousepad;mousepad;gui;;;
+gtk3-3;GTK 3;geany;geany;gui;;;
+x11-1;X11 / XCB;xorg.xeyes;xeyes;gui;;;
+x11-2;X11 / XCB;xorg.xclock;xclock;gui;;;
+x11-3;X11 / XCB;xterm;xterm;gui;;;
+gl-1;OpenGL / EGL;mesa-demos;eglinfo;cli;(llvmpipe|Mesa|softpipe);mesa;
+gl-2;OpenGL / EGL;mesa-demos;glxgears;gui;;mesa;
+gl-3;OpenGL / EGL;glmark2;glmark2;gui;;mesa;
+vulkan-1;Vulkan;vulkan-tools;vulkaninfo;cli;(lavapipe|llvmpipe|Vulkan Instance);mesa;--summary
+vulkan-2;Vulkan;vulkan-tools;vkcube;gui;;mesa;
+vulkan-3;Vulkan;vkmark;vkmark;gui;;mesa;
+sdl-1;SDL;dosbox;dosbox;gui;;;
+sdl-2;SDL;stella;stella;gui;;;
+sdl-3;SDL;scummvm;scummvm;gui;;;
+qt-1;Qt;qalculate-qt;qalculate-qt;gui;;;
+qt-2;Qt;keepassxc;keepassxc;gui;;;
+qt-3;Qt;qbittorrent;qbittorrent;gui;;;
+py-1;Python GUI;meld;meld;gui;;;
+py-2;Python GUI;pdfarranger;pdfarranger;gui;;;
+py-3;Python GUI;virt-manager;virt-manager;gui;;;
+media-1;media / codecs;mpv;mpv;cli;mpv [0-9];mesa;--version
+field-1;the field's own recipes;helix;hx;cli;helix [0-9];;--version
+field-2;the field's own recipes;neovim;nvim;cli;NVIM v[0-9];;--version
+field-3;the field's own recipes;flameshot;flameshot;gui;;;
+field-4;the field's own recipes;gearlever;gearlever;gui;;;
 EOF
 )
 
@@ -321,19 +335,19 @@ show_row ID CATEGORY SUBJECT MODE 'PASS/N' 'CLEAN/N' 'PATHS' NOTE
 printf '%s\n' "$CORPUS" > "$WORK/corpus.txt"
 while IFS= read -r line <&3; do
   [ -n "$line" ] || continue
-  id=$(printf '%s' "$line" | cut -d'|' -f1)
-  cat_=$(printf '%s' "$line" | cut -d'|' -f2)
-  attr=$(printf '%s' "$line" | cut -d'|' -f3)
-  prog=$(printf '%s' "$line" | cut -d'|' -f4)
-  mode=$(printf '%s' "$line" | cut -d'|' -f5)
-  assert=$(printf '%s' "$line" | cut -d'|' -f6)
-  extras=$(printf '%s' "$line" | cut -d'|' -f7)
-  args=$(printf '%s' "$line" | cut -d'|' -f8)
+  id=$(printf '%s' "$line" | cut -d';' -f1)
+  cat_=$(printf '%s' "$line" | cut -d';' -f2)
+  attr=$(printf '%s' "$line" | cut -d';' -f3)
+  prog=$(printf '%s' "$line" | cut -d';' -f4)
+  mode=$(printf '%s' "$line" | cut -d';' -f5)
+  assert=$(printf '%s' "$line" | cut -d';' -f6)
+  extras=$(printf '%s' "$line" | cut -d';' -f7)
+  args=$(printf '%s' "$line" | cut -d';' -f8)
   [ -n "$ONLY" ] && { case "$id" in $ONLY) ;; *) continue ;; esac; }
   TOTAL=$((TOTAL+1))
   # every line AFTER this one, so the reclaim step below can ask whether the
   # closure is still wanted
-  awk -v me="$id" 'seen {print} $0 ~ "^"me"\\|" {seen=1}' "$WORK/corpus.txt" > "$WORK/remaining.txt"
+  awk -v me="$id" 'seen {print} $0 ~ "^"me";" {seen=1}' "$WORK/corpus.txt" > "$WORK/remaining.txt"
 
   # ⭐ A ROW IS STORED AS FIELDS, NOT AS THE TABLE LINE IT PRINTS.
   #
@@ -490,7 +504,7 @@ while IFS= read -r line <&3; do
   # closure — the corpus keeps subjects sharing an attribute adjacent, and
   # this asks the remaining lines rather than assuming it.
   rm -f "$img" "$WORK/out.$id."* "$WORK/err.$id."*
-  if ! grep -q "^[^|]*|[^|]*|$attr|" "$WORK/remaining.txt" 2>/dev/null; then
+  if ! grep -q "^[^;]*;[^;]*;$attr;" "$WORK/remaining.txt" 2>/dev/null; then
     rm -rf "$cache"
   fi
 done 3< "$WORK/corpus.txt"
