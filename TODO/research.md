@@ -507,12 +507,24 @@ when a static program execs host programs, the host's libraries enter the
    `lilipod` and whether that refusal is correct** — not to look for a fifth
    subject.
 
-   ⚠ **And the honest possibility must stay on the table**: if a static
-   nixpkgs application with a compiled-in store path cannot be bundled at all,
-   then the `-static` row has no real application behind it *by construction*,
-   and **that is the answer** rather than an open task. Arm P has already
-   measured the mechanism with a planted path (`-static` → `no`, as
-   pre-registered).
+   ⭐ **AND THAT POSSIBILITY IS THE ANSWER — the evidence was already in arm L
+   and had not been read back against the row.** `pgb bundle appimage` refuses
+   `lilipod` with one line, `pgb: the closure carries no dynamic loader`, and
+   the refusal is **correct**: arm L ran the raw static binary with **no
+   bundle at all** and it executed on **11 of 11** loading **0** host shared
+   objects. A statically linked ELF is already portable, so bundling it adds
+   nothing — and there is therefore **no artefact to ask the interposer
+   question of**. ⛔ The `-static` row is not untested; it is one a `pgb`
+   artefact **cannot reach**, because the loader that would carry the
+   interposer is exactly what such a closure lacks.
+
+   ⚠ **WHAT WOULD ACTUALLY MOVE THE ROW, stated precisely.** A **mixed**
+   closure: a statically linked main program in a closure that *does* carry a
+   loader because its sibling programs are dynamic. That gets bundled, and its
+   entry point defeats the interposer exactly as arm P predicts. ⛔ No such
+   subject is known here — `syncthing` was checked and nixpkgs builds it
+   dynamic. `docs/design/store-paths.md` §3 now says this instead of "still
+   owed".
 
    ⚠ **And one thing the run establishes on the way**: `shared/script/pwsh`
    carries its `/nix/store` paths **as text, unrewritten** —

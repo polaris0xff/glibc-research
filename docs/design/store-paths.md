@@ -175,10 +175,45 @@ a `PT_INTERP`. ⭐ The subject ran on **11 of 11**, host-object-clean on **11 of
 11**, with **8** store paths compiled in and **7** resolving; ⚠ but that is a
 *dynamic* subject and says nothing about the `-static` row.
 
-⛔ **A genuinely static application is still owed** — `lilipod`, or `pgb`
-itself. Until one runs, the two rows above are a **mechanism** result with no
-application behind them, which is a smaller claim than the table alone
-suggests.
+## ⭐ AND THE `-static` ROW IS NOW ANSWERED — by a refusal, which is the answer
+
+⛔ **This section used to say "a genuinely static application is still owed —
+`lilipod`, or `pgb` itself".** The evidence for closing it was already in
+`experiments/100-` arm L and had not been read back against this row.
+
+⭐ **A FULLY STATIC APPLICATION CANNOT BE BUNDLED AT ALL, AND THE BUNDLER SAYS
+SO IN ONE LINE:**
+
+    closure     4 store paths
+    libraries   0 from the closure
+    pgb: the closure carries no dynamic loader
+
+⛔ **So there is no artefact to ask the interposer question of.** The `-static`
+row is not an untested configuration — it is one a `pgb` artefact **cannot
+reach**, because the thing that would carry the interposer (a loader, and the
+`LD_PRELOAD` that rides on it) is exactly what such a closure lacks.
+
+⭐ **AND THE REFUSAL IS CORRECT, MEASURED RATHER THAN ASSUMED.** Arm L ran
+`lilipod`'s raw static binary with **no bundle at all**:
+
+| | |
+|---|---|
+| the static ELF executes | ⭐ **11 / 11** |
+| host shared objects loaded | ⭐ **0 on 11 / 11** |
+
+A statically linked ELF is already portable — that is what static linking buys
+— so bundling it would add nothing. ⚠ Arm L also split that result: the
+**application** completed on only 2 of 11, for its own reasons (`failed to
+find …`), which is a fact about `lilipod` and not about the ELF.
+
+⚠ **WHAT REMAINS, STATED PRECISELY RATHER THAN LEFT AS "STILL OWED".** One
+configuration could still reach the `-static` row for real: a **mixed**
+closure — a statically linked main program in a closure that *does* carry a
+loader because its sibling programs are dynamic. That closure would be
+bundled, and its entry point would defeat the interposer exactly as arm P
+predicts. ⛔ No such subject is known here; `syncthing` was checked and
+nixpkgs builds it dynamic. **That, and not "a static application", is what
+would move this row.**
 
 ⚠ **And an open question the run raised rather than settled.** Go issues raw
 syscalls for much of its file I/O even when dynamic, so the raw-syscall row
