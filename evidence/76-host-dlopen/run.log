@@ -1,0 +1,74 @@
+===============================================================
+76 - --host-dlopen: a static binary loading an object it did not link
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T13:10:16Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/76-host-dlopen
+--------------------------------------------------------------
+
+-- building --------------------------------------------------
+  built  libdemo.so       16000 bytes
+  built  bigtls.so        15128 bytes  (56,248 B initial-exec PT_TLS)
+  built  host-loader      5734304 bytes  (--host-dlopen)
+  built  host-reserve     5734384 bytes  (--tls-reserve 65536)
+  built  host-plain       978768 bytes  (control, host loader)
+  subject PT_INTERP=0 DT_NEEDED=0
+
+-- running ---------------------------------------------------
+TARGET                 LIBC   CARRIED   NATIVE    CONTROL   BIGTLS@0   BIGTLS@64K HOST .so LOADED BY SUBJECT
+alpine-3.22            musl   ok        exit1     exit1     exit1      ok         none
+alpine-3.20            musl   ok        exit1     exit1     exit1      ok         none
+alpine-3.10            musl   ok        exit1     exit1     exit1      ok         none
+voidlinux-musl         musl   ok        exit1     exit1     exit1      ok         none
+debian-11              glibc  ok        ok        SIG6      exit1      ok         none
+debian-12              glibc  ok        ok        SIG8      exit1      ok         none
+ubuntu-20.04           glibc  ok        ok        SIG6      exit1      ok         none
+rockylinux-8           glibc  ok        ok        SIG11     exit1      ok         none
+opensuse-leap-15.6     glibc  ok        ok        SIG8      exit1      ok         none
+fedora-42              glibc  ok        ok        SIG11     exit1      ok         none
+archlinux-latest       glibc  ok        ok        SIG8      exit1      ok         none
+
+-- time to first symbol --------------------------------------
+  ours (compiled-in loader) : first=163116 second=103695 
+  control (host ld.so)      : no reading
+
+-- assertions ------------------------------------------------
+  ok    carried: nine assertions pass, every environment = 11
+  ok    carried: loaded no host shared object, every environment = 11
+  ok    native: loads a real host object on every glibc row = 7
+  ok    native: refuses CLEANLY on every musl row, no signal = 4
+  ok    bigtls: reserve 0 REFUSES cleanly, every environment = 11
+  ok    bigtls: --tls-reserve 65536 LOADS it, every environment = 11
+  ok    reserve arm: loaded no host shared object, every environment = 11
+  --    control arm ran (observed, not asserted)       = 0 of 11
+
+        The control is EXPECTED to fail: with no --host-dlopen its dlopen
+        reaches the host loader, which is experiments/50-'s result. Its count
+        is recorded, never asserted, because what it does is host-dependent.
+        
+        The musl rows of the NATIVE arm are a refusal by design: a host object
+        there needs musl's libc, and mapping it into a glibc image is the
+        second-libc outcome docs/limitations.md §1 calls worse than failing.
+        
+        ⭐ BIGTLS is TODO T-072's subject and the pair is the measurement.
+        56,248 bytes of INITIAL-EXEC thread-local storage against glibc's
+        ~3,168 bytes of surplus headroom -- a surplus that does NOT grow with
+        the program, which route B measured and refuted. Reserve 0 must
+        REFUSE and say so through dlerror(); 65536 must load it. A refusal
+        that arrived as a SIGNAL would be the loader failing, not declining,
+        so exit* is counted and SIG* is not.
+        
+        size cost of --tls-reserve 65536 on the binary: 80 bytes
+
+full table: /home/user/glibc-research/evidence/76-host-dlopen/RESULT.txt
+
+-- result ----------------------------------------------------
+pass=7 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

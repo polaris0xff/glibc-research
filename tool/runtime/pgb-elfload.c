@@ -204,7 +204,23 @@ struct el_obj {
 
     int refcount;
     int initialised;
+
+    /* ⛔ IS THIS OBJECT IN THE GLOBAL LOOKUP SCOPE? Set from `dlopen`'s
+     * RTLD_GLOBAL and propagated to the object's DT_NEEDED tree, which is what
+     * ld.so does. ⚠ It was not modelled at all until 2026-09-04c: `flags` was
+     * discarded and every object behaved as RTLD_GLOBAL, so the FIRST object
+     * loaded won every name for every object loaded after it.
+     * docs/history/corrections.md C46; experiments/104-. */
+    int global;
 };
+
+/* RTLD_GLOBAL's value, spelled out because this file deliberately does not
+ * include <dlfcn.h>: it defines the same entry points and the header would
+ * fight it. The value is ABI on every glibc and musl target this loader runs
+ * on, and a wrong value here can only mean an object is treated as local. */
+#ifndef EL_RTLD_GLOBAL
+#define EL_RTLD_GLOBAL 0x00100
+#endif
 
 static struct el_obj *el_objs[EL_MAX_OBJS];
 static int            el_nobjs;
@@ -885,6 +901,19 @@ static const char *el_refver(const struct el_obj *o, uint32_t si)
  * nothing else did". A single table can express one or the other, never both.
  * See el_own_syms_first / el_own_syms_last above. TODO T-073.
  */
+/* el_mark_global puts an object AND its DT_NEEDED tree into the global lookup
+ * scope, which is what ld.so does for a dependency of an RTLD_GLOBAL object.
+ * ⛔ Depth is bounded by the already-set flag rather than by a counter: a
+ * cyclic DT_NEEDED graph is legal ELF and would otherwise not terminate. */
+static void el_mark_global(struct el_obj *o)
+{
+    int i;
+    if (!o || o->global) return;
+    o->global = 1;
+    for (i = 0; i < o->nneeded; i++)
+        el_mark_global(o->needed[i]);
+}
+
 static void *el_resolve(struct el_obj *req, const char *name, const char *ver,
                         int *found)
 {
@@ -901,15 +930,46 @@ static void *el_resolve(struct el_obj *req, const char *name, const char *ver,
         s = el_lookup_in(req, name, ver);
         if (s) { *found = 1; return req->base + s->st_value; }
     }
+    /* ⛔ THE GLOBAL SCOPE FIRST, AND IT USED TO BE EVERY LOADED OBJECT.
+     * `experiments/104-` measured the consequence: two objects each defining
+     * `pgb_which`, the second one's internal call to its OWN function bound to
+     * the FIRST object's definition — and it did so whether the first was
+     * opened RTLD_GLOBAL or RTLD_LOCAL, because `flags` was discarded. That is
+     * exactly the failure the Anylinux FAQ warns about for solo and detour
+     * ("none of the solutions implement dlmopen, so you are likely to run into
+     * a lot of symbol collisions"), and it landed on us.
+     *
+     * ⭐ ld.so's order for a reference inside object O is: the global scope
+     * (the executable, then everything RTLD_GLOBAL in load order), then O's
+     * own local scope (O, then its DT_NEEDED tree). The three steps below are
+     * that order. */
     for (i = 0; i < el_nobjs; i++) {
+        if (!el_objs[i]->global) continue;
         s = el_lookup_in(el_objs[i], name, ver);
         if (s) { *found = 1; return el_objs[i]->base + s->st_value; }
     }
     if (req) {
+        s = el_lookup_in(req, name, ver);
+        if (s) { *found = 1; return req->base + s->st_value; }
         for (i = 0; i < req->nneeded; i++) {
             s = el_lookup_in(req->needed[i], name, ver);
             if (s) { *found = 1; return req->needed[i]->base + s->st_value; }
         }
+    }
+    /* ⚠ AND THEN EVERY REMAINING OBJECT, WHICH IS NOT ld.so's BEHAVIOUR AND IS
+     * KEPT DELIBERATELY. `experiments/93-` loads 882 of 1,527 host objects on
+     * this machine, and some of them resolve only because a sibling that is
+     * not in their DT_NEEDED tree happens to be mapped. Narrowing the scope to
+     * be strictly correct would turn loads that work today into failures, and
+     * this loader's job is to LOAD things. ⭐ What the reordering fixes is
+     * which definition WINS; what this step preserves is whether one is found
+     * at all. ⛔ A name reaching this step is a program relying on something
+     * ld.so would not have given it — T-073 owns making that visible. */
+    for (i = 0; i < el_nobjs; i++) {
+        if (el_objs[i]->global) continue;      /* already tried above */
+        if (req && el_objs[i] == req) continue;
+        s = el_lookup_in(el_objs[i], name, ver);
+        if (s) { *found = 1; return el_objs[i]->base + s->st_value; }
     }
     {
         void *p = el_provider(name);
@@ -2115,7 +2175,8 @@ void *pgb_elf_dlopen(const char *path, int flags)
     struct el_obj *o;
     char found[4096];
 
-    (void)flags;   /* RTLD_LAZY is honoured as RTLD_NOW -- see the header. */
+    /* ⚠ RTLD_LAZY is honoured as RTLD_NOW -- see the header. RTLD_GLOBAL is
+     * read below; every other bit is ignored. */
     pgb_el_errset = 0;
 
     if (!pgb_elf_available()) {
@@ -2157,11 +2218,21 @@ void *pgb_elf_dlopen(const char *path, int flags)
     {
         const char *b = strrchr(found, '/');
         struct el_obj *have = el_already(b ? b + 1 : found);
-        if (have) { have->refcount++; return have; }
+        if (have) {
+            have->refcount++;
+            /* ⚠ RTLD_GLOBAL on a SECOND dlopen of an object already loaded
+             * locally promotes it, which is what ld.so does. The reverse is
+             * not true: RTLD_LOCAL never demotes. */
+            if (flags & EL_RTLD_GLOBAL) el_mark_global(have);
+            return have;
+        }
     }
     o = el_load(found, NULL);
     if (!o)
         return NULL;
+    /* ⭐ BEFORE el_init, because an initialiser can call back into a symbol
+     * whose resolution this flag decides. */
+    if (flags & EL_RTLD_GLOBAL) el_mark_global(o);
     el_init(o);
     return o;
 }

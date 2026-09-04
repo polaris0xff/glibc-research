@@ -1770,6 +1770,65 @@ a second closure on the eleven, not the branch itself.
 
 ---
 
+## C46 — the compiled-in loader discarded `dlopen`'s flags, and the field's objection landed on us
+
+**Found** 2026-09-04c, by `experiments/104-`, written **because** the operator
+said to take the field's *"can't fix / unfixable / hard"* claims seriously one
+by one. `pkgforge-dev/Anylinux-AppImages`' FAQ, on why it does not use
+`solo`/`detour` — the route this project took:
+
+> *"it seems none of the solutions implement `dlmopen`, so you are likely to
+> run into a lot of symbol collisions with host libraries."*
+
+⛔ **`docs/research/bundle-capabilities.md` answered that from the DESIGN** —
+"each loaded object's undefined symbols are resolved by us, against the static
+glibc already linked in, and nothing is added to a global search scope" — and
+said in the same sentence that it was **read off the design, not measured**.
+⭐ **Measured, the design reading was wrong.**
+
+**The probe.** Two objects, each defining `int pgb_which(void)` — A returns 1,
+B returns 2 — and B also exports `int b_calls_which(void) { return
+pgb_which(); }`. ⭐ A call to a default-visibility function *inside one shared
+object* still goes through the PLT and is interposable, so the number
+`b_calls_which()` returns says which scope won.
+
+| | glibc's `ld.so` | ⛔ ours, before | ⭐ ours, after |
+|---|---|---|---|
+| `liba` opened `RTLD_GLOBAL` | **1** | 1 | **1** |
+| `liba` opened `RTLD_LOCAL` | **2** | ⛔ **1** | ⭐ **2** |
+
+⛔ **`pgb_elf_dlopen` began with `(void)flags;`.** The flags were discarded
+entirely, and `el_resolve` searched **every loaded object in load order before
+the requesting object's own definition**. So the first object loaded won every
+name for every object loaded after it — which is exactly the collision the FAQ
+describes, in a loader nobody had asked.
+
+⭐ **The fix is ld.so's order, and it keeps a deliberate fallback:**
+
+1. our static glibc's "first" table (the executable's scope);
+2. the requester itself, if it is `DT_SYMBOLIC`;
+3. ⭐ **objects in the GLOBAL scope only** — `RTLD_GLOBAL`, propagated to their
+   `DT_NEEDED` tree, which is what ld.so does;
+4. ⭐ **the requester itself, then its `DT_NEEDED` tree** — its local scope;
+5. ⚠ **every remaining loaded object**, which is *not* ld.so's behaviour and is
+   kept on purpose: `experiments/93-` loads **882 of 1,527** host objects here,
+   and some resolve only because a sibling outside their `DT_NEEDED` tree
+   happens to be mapped. Narrowing to be strictly correct would turn loads that
+   work today into failures. ⭐ **The reordering fixes which definition WINS;
+   this step preserves whether one is found at all.**
+6. the provider table's "last" entries.
+
+⚠ **AND THE EXPERIMENT'S FIRST VERSION COULD NOT HAVE SEEN THE FIX.** It
+asserted `== 2` and ran the subject **only** with `RTLD_GLOBAL`, where **1 is
+the correct answer** — so it failed against a correct loader for the wrong
+reason. ⭐ The criterion is now *agreement with `ld.so` in BOTH scopes*, and
+the two answers differ from each other, which is what stops the agreement from
+being a constant. **Delivery rule 8, again**: a control that cannot be told
+from its subject is not a control — and neither is an experiment that only
+asks one of the two arms.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

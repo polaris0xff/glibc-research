@@ -1,9 +1,9 @@
 93 - host shared objects through pgb-elfload
-date        : 2026-09-03T01:26:44Z
+date        : 2026-09-04T13:10:31Z
 host        : Linux 6.18.44-fc-v24
-objects     : 1527
+objects     : 1532
 
-ok=882 refused=122 failed=478 crash=45 hang=0
+ok=887 refused=122 failed=478 crash=45 hang=0
 
 by reason:
   undefined              376

@@ -1,0 +1,49 @@
+===============================================================
+104 - does our compiled-in loader leak symbols between objects?
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T13:09:38Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/104-loader-namespace
+--------------------------------------------------------------
+
+-- building the two objects and the two probes --------------------
+  ok    N0  both objects built                         = yes
+  ok    N0  the subject is static (no PT_INTERP)       = 0
+
+-- the four rows: the SAME question asked of both loaders -----------
+  PROBE                        A_WHICH  B_WHICH  B_CALLS
+  dynamic, liba RTLD_GLOBAL    1        2        1
+  dynamic, liba RTLD_LOCAL     1        2        2
+  ⭐ OURS, RTLD_GLOBAL        1        2        1
+  ⭐ OURS, RTLD_LOCAL         1        2        2
+
+  ok    N4  each object answers from its OWN handle (dynamic) = 1/2
+  ok    N4  each object answers from its OWN handle (ours) = 1/2
+  ok    N1  ⭐ THE HAZARD IS REAL: dynamic + RTLD_GLOBAL, B calls A's = 1
+  ok    N2  ⚠ and the probe is not rigged: RTLD_LOCAL, B calls its own = 2
+  ok    N3  ⭐ OURS AGREES WITH ld.so, RTLD_GLOBAL    = 1
+  ok    N3  ⭐ OURS AGREES WITH ld.so, RTLD_LOCAL     = 2
+        ⭐ OURS AND ld.so GIVE THE SAME ANSWER IN BOTH SCOPES, and the two
+           answers DIFFER from each other — which is what makes the
+           agreement mean something rather than being a constant.
+        ⛔ THIS IS A FIX, NOT A PROPERTY. Until 2026-09-04c pgb-elfload.c
+           discarded dlopen's flags and searched EVERY loaded object before
+           the requester's own, so it read 1 in BOTH scopes: the Anylinux
+           FAQ's 'symbol collisions' objection landed on us, and this
+           experiment is what found it. corrections.md C46.
+        ⛔ BUILD HOST ONLY, and deliberately: the binding decision is made by
+           code compiled INTO the subject, so the eleven would re-measure one
+           answer eleven times. ⚠ Two objects and ONE symbol; it says nothing
+           about a large library's whole symbol table, and nothing about
+           dlmopen's other guarantee — separate copies of a library's DATA.
+
+-- result ----------------------------------------------------
+pass=8 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

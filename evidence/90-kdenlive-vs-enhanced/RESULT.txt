@@ -9,9 +9,9 @@ competitor pinned at 26.08.0-1@2026-09-01_1788277742
   O  onelf (our payload, their packer)      597905535
 
 render (melt, a real MP4):
-  P 2179 ms, 4149 bytes of MP4
-  E 1494 ms, 4162 bytes of MP4
-  O 2291 ms, 4149 bytes of MP4
+  P 1873 ms, 4149 bytes of MP4
+  E 1328 ms, 4162 bytes of MP4
+  O 2299 ms, 4149 bytes of MP4
 
 startup (melt -version):
   ⭐ cold: median of 7, arms interleaved with a rotating start,
@@ -20,12 +20,12 @@ startup (melt -version):
      protocol this replaces obtained "cold" by copying the file, and
      uruntime keys its mount on CONTENT, so the copy reused the live
      mount and the column reported a warm start.
-     A/A control: ratio 1.05, floor 1.05, resolves no (must be "no")
-  P 638.7 ms cold, 224 ms warm
-  E 785.3 ms cold, 42 ms warm
-  O 461.4 ms cold, 471 ms warm
+     A/A control: ratio 1.02, floor 1.07, resolves no (must be "no")
+  P 672.3 ms cold, 224 ms warm
+  E 749.4 ms cold, 47 ms warm
+  O 459.9 ms cold, 452 ms warm
 
 on the eleven: ours 11/11 rendered, 11/11 with zero host objects;
                the competitor 11/11 rendered, 4/11 clean.
 
-conditions: 2026-09-04T12:53:15Z, Linux 6.18.44-fc-v24
+conditions: 2026-09-04T13:05:42Z, Linux 6.18.44-fc-v24

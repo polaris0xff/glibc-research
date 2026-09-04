@@ -1,0 +1,169 @@
+===============================================================
+93 - every host shared object through pgb's own ELF loader
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T13:10:21Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/93-host-object-residue
+--------------------------------------------------------------
+
+-- the probe -----------------------------------------------------
+  ok    the probe built with --host-dlopen             = yes
+  ok    the probe has no interpreter                   = (none)
+  ok    the probe has no DT_NEEDED                     = (none)
+        probe: 5730144 bytes
+
+-- the population ------------------------------------------------
+  ok    objects found to sweep                         = many
+        1532 shared objects under /lib /lib64 /usr/lib /usr/lib64 /usr/local/lib
+
+-- the sweep -----------------------------------------------------
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+Segmentation fault
+  CLASS                  COUNT
+  ok (loaded)            887
+  refused by name        122
+  failed with a reason   478
+  CRASHED (a signal)     45
+  hung                   0
+
+  by reason:
+  undefined              376
+  not-an-object          96
+  other                  70
+  crash                  45
+  missing-dep            29
+  refused-interposer     12
+  served-by-image        10
+  refused-nss            4
+  tlsdesc                3
+  ok    no host object hangs the loader                = 0
+
+-- the control: does GLIBC'S OWN ld.so crash on them too? ------
+  OBJECT                                                     GLIBC ld.so
+        45 of 45 also crash glibc's own ld.so
+  ok    nothing crashes this loader that glibc's loader loads = 0
+
+  ⚠ the objects that crashed or hung (most are not ours -- see the control):
+    /usr/lib/x86_64-linux-gnu/xtables/libarpt_mangle.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libebt_arpreply.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libebt_dnat.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libebt_log.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libebt_mark.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libebt_nflog.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libebt_redirect.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libebt_snat.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libip6t_DNPT.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libip6t_HL.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libip6t_NETMAP.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libip6t_REJECT.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libip6t_SNPT.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libipt_CLUSTERIP.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libipt_ECN.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libipt_NETMAP.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libipt_REJECT.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libipt_TTL.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libipt_ULOG.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_AUDIT.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_CHECKSUM.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_CLASSIFY.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_CONNMARK.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_CONNSECMARK.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_CT.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_DSCP.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_HMARK.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_IDLETIMER.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_LED.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_LOG.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_MARK.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_NAT.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_NFLOG.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_NFQUEUE.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_RATEEST.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_SECMARK.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_SET.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_SYNPROXY.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_TCPMSS.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_TCPOPTSTRIP.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_TEE.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_TOS.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_TPROXY.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_TRACE.so	status=139	
+    /usr/lib/x86_64-linux-gnu/xtables/libxt_standard.so	status=139	
+
+  ⚠ failures this classifier does not recognise -- read them:
+    /usr/lib/jvm/java-21-openjdk-amd64/lib/libsyslookup.so	pgb-elfload: libsyslookup.so: relocation names symbol 1 of 1
+    /usr/lib/libreoffice/program/libLanguageToollo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libacclo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libavmediagst.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libbiblo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libcached1.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libcairocanvaslo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libchartcontrollerlo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libchartcorelo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libcmdmaillo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libcuilo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libdeploymentgui.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libdesktop_detectorlo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libdlgprovlo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libembobj.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libemboleobj.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libfilelo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libicglo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libldapbe2lo.so	pgb-elfload: more than 64 objects loaded
+    /usr/lib/libreoffice/program/libloglo.so	pgb-elfload: more than 64 objects loaded
+        written: /home/user/glibc-research/evidence/93-host-object-residue/RESULT.txt
+        per-object: /home/user/glibc-research/evidence/93-host-object-residue/per-object.txt
+
+-- result ----------------------------------------------------
+pass=6 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

@@ -43,11 +43,17 @@
 #   N2  the same dynamic control with RTLD_LOCAL on liba:  == 2.
 #       ⚠ So the probe is not rigged: it reads 1 only when a global scope
 #       actually exists.
-#   N3  ⭐ THE SUBJECT — the same source built `pgb build --host-dlopen`,
-#       whose `dlopen` is `pgb-elfload.c` and not glibc's:  == 2 predicted,
-#       and the prediction is read off the loader's structure rather than
-#       hoped for. ⛔ A 1 here would be a real defect and the FAQ's objection
-#       landing on us.
+#   N3  ⭐ THE SUBJECT, AND THE CRITERION IS AGREEMENT WITH ld.so IN BOTH
+#       SCOPES, not a fixed number. The same source built
+#       `pgb build --host-dlopen`, whose `dlopen` is `pgb-elfload.c`:
+#         RTLD_GLOBAL -> 1   (the global scope legitimately interposes)
+#         RTLD_LOCAL  -> 2   (a local object is not in anyone else's scope)
+#
+#       ⛔ THE FIRST VERSION OF THIS FILE ASSERTED "== 2" AND RAN THE SUBJECT
+#       ONLY WITH RTLD_GLOBAL, where 1 is the RIGHT answer. It therefore
+#       failed against a correct loader and could not have seen the defect it
+#       was written for. ⚠ Two arms of one probe are not a control; the
+#       control is the SAME question asked of both loaders.
 #   N4  and both objects actually loaded — a `dlopen` that failed would make
 #       N3 unreadable. Each handle is checked and `pgb_which` is resolved
 #       from each handle directly, which must give 1 from A and 2 from B.
@@ -161,14 +167,16 @@ run_probe() {  # binary scope -> prints A_WHICH B_WHICH B_CALLS or "-"
   printf '%s %s %s' "${_a:--}" "${_b:--}" "${_c:--}"
 }
 
-printf -- '\n-- the three rows -------------------------------------------------\n'
+printf -- '\n-- the four rows: the SAME question asked of both loaders -----------\n'
 printf '  %-28s %-8s %-8s %s\n' PROBE A_WHICH B_WHICH B_CALLS
 set -- $(run_probe probe-dyn global);    DG_A=$1; DG_B=$2; DG_C=$3
 printf '  %-28s %-8s %-8s %s\n' 'dynamic, liba RTLD_GLOBAL' "$DG_A" "$DG_B" "$DG_C"
 set -- $(run_probe probe-dyn local);     DL_A=$1; DL_B=$2; DL_C=$3
 printf '  %-28s %-8s %-8s %s\n' 'dynamic, liba RTLD_LOCAL'  "$DL_A" "$DL_B" "$DL_C"
 set -- $(run_probe probe-static global); SG_A=$1; SG_B=$2; SG_C=$3
-printf '  %-28s %-8s %-8s %s\n' '⭐ OURS, --host-dlopen'    "$SG_A" "$SG_B" "$SG_C"
+printf '  %-28s %-8s %-8s %s\n' '⭐ OURS, RTLD_GLOBAL'      "$SG_A" "$SG_B" "$SG_C"
+set -- $(run_probe probe-static local);  SL_A=$1; SL_B=$2; SL_C=$3
+printf '  %-28s %-8s %-8s %s\n' '⭐ OURS, RTLD_LOCAL'       "$SL_A" "$SL_B" "$SL_C"
 
 printf '\n'
 exp_check "N4  each object answers from its OWN handle (dynamic)" \
@@ -179,15 +187,18 @@ exp_check "N1  ⭐ THE HAZARD IS REAL: dynamic + RTLD_GLOBAL, B calls A's" \
     "$DG_C" 1
 exp_check "N2  ⚠ and the probe is not rigged: RTLD_LOCAL, B calls its own" \
     "$DL_C" 2
-exp_check "N3  ⭐ OURS: B calls its OWN definition" "$SG_C" 2
+exp_check "N3  ⭐ OURS AGREES WITH ld.so, RTLD_GLOBAL" "$SG_C" "$DG_C"
+exp_check "N3  ⭐ OURS AGREES WITH ld.so, RTLD_LOCAL"  "$SL_C" "$DL_C"
 
-if [ "$SG_C" = 2 ] && [ "$DG_C" = 1 ]; then
-  exp_note "⭐ SO THE FAQ'S OBJECTION DOES NOT LAND ON THIS LOADER, and the"
-  exp_note "   row above is why that sentence is allowed: the SAME probe reads"
-  exp_note "   1 under glibc's global scope, so it can see a collision."
-  exp_note "⛔ pgb-elfload.c resolves each object's undefined symbols itself,"
-  exp_note "   against the static glibc already in the executable, and adds"
-  exp_note "   nothing to a scope a later object is searched against."
+if [ "$SG_C" = "$DG_C" ] && [ "$SL_C" = "$DL_C" ] && [ "$DG_C" != "$DL_C" ]; then
+  exp_note "⭐ OURS AND ld.so GIVE THE SAME ANSWER IN BOTH SCOPES, and the two"
+  exp_note "   answers DIFFER from each other — which is what makes the"
+  exp_note "   agreement mean something rather than being a constant."
+  exp_note "⛔ THIS IS A FIX, NOT A PROPERTY. Until 2026-09-04c pgb-elfload.c"
+  exp_note "   discarded dlopen's flags and searched EVERY loaded object before"
+  exp_note "   the requester's own, so it read 1 in BOTH scopes: the Anylinux"
+  exp_note "   FAQ's 'symbol collisions' objection landed on us, and this"
+  exp_note "   experiment is what found it. corrections.md C46."
 fi
 exp_note "⛔ BUILD HOST ONLY, and deliberately: the binding decision is made by"
 exp_note "   code compiled INTO the subject, so the eleven would re-measure one"

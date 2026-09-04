@@ -859,6 +859,7 @@
 /usr/lib/x86_64-linux-gnu/libXext.so.6.4.0	ok	
 /usr/lib/x86_64-linux-gnu/libXfixes.so.3.1.0	ok	
 /usr/lib/x86_64-linux-gnu/libXfont2.so.2.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libXft.so.2.3.6	ok	
 /usr/lib/x86_64-linux-gnu/libXi.so.6.1.0	ok	
 /usr/lib/x86_64-linux-gnu/libXinerama.so.1.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libXmu.so.6.2.0	ok	
@@ -868,6 +869,8 @@
 /usr/lib/x86_64-linux-gnu/libXrender.so.1.3.0	ok	
 /usr/lib/x86_64-linux-gnu/libXt.so.6.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libXtst.so.6.1.0	ok	
+/usr/lib/x86_64-linux-gnu/libXv.so.1.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libXxf86dga.so.1.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libXxf86vm.so.1.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libabsl_bad_any_cast_impl.so.20220623.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libabsl_bad_optional_access.so.20220623.0.0	ok	
@@ -1270,6 +1273,7 @@
 /usr/lib/x86_64-linux-gnu/libxcb-present.so.0.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libxcb-randr.so.0.1.0	ok	
 /usr/lib/x86_64-linux-gnu/libxcb-render.so.0.0.0	ok	
+/usr/lib/x86_64-linux-gnu/libxcb-shape.so.0.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libxcb-shm.so.0.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libxcb-sync.so.1.0.0	ok	
 /usr/lib/x86_64-linux-gnu/libxcb-xfixes.so.0.0.0	ok	
@@ -1525,3 +1529,4 @@
 /usr/lib/x86_64-linux-gnu/xtables/libxt_tos.so	ok	
 /usr/lib/x86_64-linux-gnu/xtables/libxt_u32.so	ok	
 /usr/lib/x86_64-linux-gnu/xtables/libxt_udp.so	ok	
+/usr/lib/x86_64-linux-musl/libc.so	ok	
