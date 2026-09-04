@@ -1,0 +1,1202 @@
+[
+ {
+  "name": "v0.81.3",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.81.3",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.81.3",
+  "commit": {
+   "sha": "d3b30673e3e26d2d6348ecd85e36232c1c8c3a21",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/d3b30673e3e26d2d6348ecd85e36232c1c8c3a21"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODEuMw"
+ },
+ {
+  "name": "v0.81.2",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.81.2",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.81.2",
+  "commit": {
+   "sha": "59cb823f91b4dd73d572f29ae61f2f2622189956",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/59cb823f91b4dd73d572f29ae61f2f2622189956"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODEuMg"
+ },
+ {
+  "name": "v0.81.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.81.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.81.1",
+  "commit": {
+   "sha": "c63d60d7fa32b1e73830674e424365ec47417a03",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/c63d60d7fa32b1e73830674e424365ec47417a03"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODEuMQ"
+ },
+ {
+  "name": "v0.80.8",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.80.8",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.80.8",
+  "commit": {
+   "sha": "fddfca19b3da2d4888ad533392a7790b66676003",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/fddfca19b3da2d4888ad533392a7790b66676003"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODAuOA"
+ },
+ {
+  "name": "v0.80.7",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.80.7",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.80.7",
+  "commit": {
+   "sha": "89acdb8c1c7e14354035aaffadd0fdf941c559c5",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/89acdb8c1c7e14354035aaffadd0fdf941c559c5"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODAuNw"
+ },
+ {
+  "name": "v0.80.6",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.80.6",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.80.6",
+  "commit": {
+   "sha": "eebcd13d2e7bcc66c85b5bdbc09e854ab9a9bb59",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/eebcd13d2e7bcc66c85b5bdbc09e854ab9a9bb59"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODAuNg"
+ },
+ {
+  "name": "v0.80.5",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.80.5",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.80.5",
+  "commit": {
+   "sha": "58abda75644fa12f0321df1aca5906c1c755fa40",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/58abda75644fa12f0321df1aca5906c1c755fa40"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODAuNQ"
+ },
+ {
+  "name": "v0.80.4",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.80.4",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.80.4",
+  "commit": {
+   "sha": "e6d332344e18eabd85475959bd55ee5bfd376cd8",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/e6d332344e18eabd85475959bd55ee5bfd376cd8"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODAuNA"
+ },
+ {
+  "name": "v0.80.3",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.80.3",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.80.3",
+  "commit": {
+   "sha": "55d09da87a14e4e81d25ef409e261a970fb20010",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/55d09da87a14e4e81d25ef409e261a970fb20010"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODAuMw"
+ },
+ {
+  "name": "v0.80.2",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.80.2",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.80.2",
+  "commit": {
+   "sha": "82262ab83a04f80972054e3a22f051e9ab94b74c",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/82262ab83a04f80972054e3a22f051e9ab94b74c"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODAuMg"
+ },
+ {
+  "name": "v0.80.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.80.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.80.1",
+  "commit": {
+   "sha": "faf1902eb45342b400fda900918159b96d7a29a0",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/faf1902eb45342b400fda900918159b96d7a29a0"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuODAuMQ"
+ },
+ {
+  "name": "v0.78.5.5",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.5.5",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.5.5",
+  "commit": {
+   "sha": "54953690a900fa33bb4c055da6f2537c3b47a326",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/54953690a900fa33bb4c055da6f2537c3b47a326"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNS41"
+ },
+ {
+  "name": "v0.78.5.4",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.5.4",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.5.4",
+  "commit": {
+   "sha": "1c13f50f0a52f887936b657c4215b691c83033a3",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/1c13f50f0a52f887936b657c4215b691c83033a3"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNS40"
+ },
+ {
+  "name": "v0.78.5.3",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.5.3",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.5.3",
+  "commit": {
+   "sha": "c74c948d53efb9359a3312e9820adda2163ea8fd",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/c74c948d53efb9359a3312e9820adda2163ea8fd"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNS4z"
+ },
+ {
+  "name": "v0.78.5.2",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.5.2",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.5.2",
+  "commit": {
+   "sha": "2ccd2478612ca78ab4b76312f18e4b86cd2f0d1d",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/2ccd2478612ca78ab4b76312f18e4b86cd2f0d1d"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNS4y"
+ },
+ {
+  "name": "v0.78.5.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.5.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.5.1",
+  "commit": {
+   "sha": "0c14c4684bbb17589fe7d86d006575bc259c9ec9",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/0c14c4684bbb17589fe7d86d006575bc259c9ec9"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNS4x"
+ },
+ {
+  "name": "v0.78.4.9",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.4.9",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.4.9",
+  "commit": {
+   "sha": "9fed852ba0f6959692b1ea41dd6070a89b5795ad",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/9fed852ba0f6959692b1ea41dd6070a89b5795ad"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNC45"
+ },
+ {
+  "name": "v0.78.4.8",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.4.8",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.4.8",
+  "commit": {
+   "sha": "a2da7220be889a80619fc59a995fdffdb1b285fd",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/a2da7220be889a80619fc59a995fdffdb1b285fd"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNC44"
+ },
+ {
+  "name": "v0.78.4.7",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.4.7",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.4.7",
+  "commit": {
+   "sha": "6df73e66aebe048a9d3ca06d671871ef09dca5f4",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/6df73e66aebe048a9d3ca06d671871ef09dca5f4"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNC43"
+ },
+ {
+  "name": "v0.78.4.6",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.4.6",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.4.6",
+  "commit": {
+   "sha": "51355dd1fa03e5ed86047a8a6e341fc493332e80",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/51355dd1fa03e5ed86047a8a6e341fc493332e80"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNC42"
+ },
+ {
+  "name": "v0.78.4.5",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.4.5",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.4.5",
+  "commit": {
+   "sha": "4b5f4c94aa56d2310c48a1efa0f176f46b6c8229",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/4b5f4c94aa56d2310c48a1efa0f176f46b6c8229"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNC41"
+ },
+ {
+  "name": "v0.78.4.4",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.4.4",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.4.4",
+  "commit": {
+   "sha": "f26e56fda2a2191a246f64c067f7395b7de05842",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/f26e56fda2a2191a246f64c067f7395b7de05842"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNC40"
+ },
+ {
+  "name": "v0.78.4.3",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.4.3",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.4.3",
+  "commit": {
+   "sha": "da516772ab54997cbd84827bd4745fb2d512ff1e",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/da516772ab54997cbd84827bd4745fb2d512ff1e"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNC4z"
+ },
+ {
+  "name": "v0.78.4.2",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.4.2",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.4.2",
+  "commit": {
+   "sha": "554bb839468703bbeaba28f7c9f570b97b4c20f5",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/554bb839468703bbeaba28f7c9f570b97b4c20f5"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNC4y"
+ },
+ {
+  "name": "v0.78.4.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.4.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.4.1",
+  "commit": {
+   "sha": "089c29ccf5bfb0e4f4cf367d9363a060e6e3ba4b",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/089c29ccf5bfb0e4f4cf367d9363a060e6e3ba4b"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguNC4x"
+ },
+ {
+  "name": "v0.78.3.9",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.3.9",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.3.9",
+  "commit": {
+   "sha": "06dba96b4deb8ea932af3b0d7219a606b0f51ac6",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/06dba96b4deb8ea932af3b0d7219a606b0f51ac6"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMy45"
+ },
+ {
+  "name": "v0.78.3.8",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.3.8",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.3.8",
+  "commit": {
+   "sha": "a4dfbf2312eff7d69e559111af337cc3568aeb9f",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/a4dfbf2312eff7d69e559111af337cc3568aeb9f"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMy44"
+ },
+ {
+  "name": "v0.78.3.7",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.3.7",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.3.7",
+  "commit": {
+   "sha": "109796277354f0949e187181666bd03dcdf2e0ca",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/109796277354f0949e187181666bd03dcdf2e0ca"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMy43"
+ },
+ {
+  "name": "v0.78.3.6",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.3.6",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.3.6",
+  "commit": {
+   "sha": "14559f395427277ae310fea61ad92fe2be24e604",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/14559f395427277ae310fea61ad92fe2be24e604"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMy42"
+ },
+ {
+  "name": "v0.78.3.5",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.3.5",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.3.5",
+  "commit": {
+   "sha": "148f5792ec7ee316c3f64807aa86ce53a11b4def",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/148f5792ec7ee316c3f64807aa86ce53a11b4def"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMy41"
+ },
+ {
+  "name": "v0.78.3.4",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.3.4",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.3.4",
+  "commit": {
+   "sha": "cbee49c4820a6f60e0dda6a4507c0980b3da304d",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/cbee49c4820a6f60e0dda6a4507c0980b3da304d"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMy40"
+ },
+ {
+  "name": "v0.78.3.3",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.3.3",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.3.3",
+  "commit": {
+   "sha": "a9ae4de88f7b6aa762b24a8566b626ff3c4f3b29",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/a9ae4de88f7b6aa762b24a8566b626ff3c4f3b29"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMy4z"
+ },
+ {
+  "name": "v0.78.3.2",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.3.2",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.3.2",
+  "commit": {
+   "sha": "10126f1bf6cf96012490ee42be3c9396d09586d2",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/10126f1bf6cf96012490ee42be3c9396d09586d2"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMy4y"
+ },
+ {
+  "name": "v0.78.3.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.3.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.3.1",
+  "commit": {
+   "sha": "bc0f77cc5166ac656899d964badf926a97796817",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/bc0f77cc5166ac656899d964badf926a97796817"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMy4x"
+ },
+ {
+  "name": "v0.78.2.9",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.2.9",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.2.9",
+  "commit": {
+   "sha": "8c91773a88e4b25cb064a94d0fc7d6a2c4fdd8b7",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/8c91773a88e4b25cb064a94d0fc7d6a2c4fdd8b7"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMi45"
+ },
+ {
+  "name": "v0.78.2.8",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.2.8",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.2.8",
+  "commit": {
+   "sha": "919bbee2073db34acf24cb57a0858def6ddb6281",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/919bbee2073db34acf24cb57a0858def6ddb6281"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMi44"
+ },
+ {
+  "name": "v0.78.2.7",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.2.7",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.2.7",
+  "commit": {
+   "sha": "32064aa955840a6c3c0c47a9fa5024b786797631",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/32064aa955840a6c3c0c47a9fa5024b786797631"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMi43"
+ },
+ {
+  "name": "v0.78.2.6",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.2.6",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.2.6",
+  "commit": {
+   "sha": "da5d1b90254a3824c4604e5fd692f44052f49fa6",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/da5d1b90254a3824c4604e5fd692f44052f49fa6"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMi42"
+ },
+ {
+  "name": "v0.78.2.5",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.2.5",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.2.5",
+  "commit": {
+   "sha": "cc6be4d63bc27ad633fe55c1b6dc60d8f53238e9",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/cc6be4d63bc27ad633fe55c1b6dc60d8f53238e9"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMi41"
+ },
+ {
+  "name": "v0.78.2.4",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.2.4",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.2.4",
+  "commit": {
+   "sha": "05a2bd3b759c6be9b3248eb1b29282e9ad71d8d7",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/05a2bd3b759c6be9b3248eb1b29282e9ad71d8d7"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMi40"
+ },
+ {
+  "name": "v0.78.2.3",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.2.3",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.2.3",
+  "commit": {
+   "sha": "2891b699c866558ad6be57cecaca7ced29350967",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/2891b699c866558ad6be57cecaca7ced29350967"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMi4z"
+ },
+ {
+  "name": "v0.78.2.2",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.2.2",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.2.2",
+  "commit": {
+   "sha": "de6a9303ff0ee9fcbdf28f6163b95b05fb552d47",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/de6a9303ff0ee9fcbdf28f6163b95b05fb552d47"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMi4y"
+ },
+ {
+  "name": "v0.78.2.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.2.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.2.1",
+  "commit": {
+   "sha": "fb40efdb360fe4b226ad7f6d4c3cf49656656ec7",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/fb40efdb360fe4b226ad7f6d4c3cf49656656ec7"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMi4x"
+ },
+ {
+  "name": "v0.78.1.9",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.1.9",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.1.9",
+  "commit": {
+   "sha": "9f9541bd1ba6a586a396dbc9009656490ae752a4",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/9f9541bd1ba6a586a396dbc9009656490ae752a4"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMS45"
+ },
+ {
+  "name": "v0.78.1.8",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.1.8",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.1.8",
+  "commit": {
+   "sha": "eb7ff8166dc5aeca548e0f0621a52eee509f34d4",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/eb7ff8166dc5aeca548e0f0621a52eee509f34d4"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMS44"
+ },
+ {
+  "name": "v0.78.1.7",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.1.7",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.1.7",
+  "commit": {
+   "sha": "993d852cdf761c8ea7eea2b595d9836acb864ddc",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/993d852cdf761c8ea7eea2b595d9836acb864ddc"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMS43"
+ },
+ {
+  "name": "v0.78.1.6",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.1.6",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.1.6",
+  "commit": {
+   "sha": "43f37dfc351d882295afdd4c7bde34b1f30438fd",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/43f37dfc351d882295afdd4c7bde34b1f30438fd"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMS42"
+ },
+ {
+  "name": "v0.78.1.5",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.1.5",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.1.5",
+  "commit": {
+   "sha": "dbe682ad77a4b986d412ad8678d68dba14d58998",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/dbe682ad77a4b986d412ad8678d68dba14d58998"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMS41"
+ },
+ {
+  "name": "v0.78.1.4",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.1.4",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.1.4",
+  "commit": {
+   "sha": "26381b78e64489835c1131dd3671918f9bc407f6",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/26381b78e64489835c1131dd3671918f9bc407f6"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMS40"
+ },
+ {
+  "name": "v0.78.1.3",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.1.3",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.1.3",
+  "commit": {
+   "sha": "ad2ac6e1c9942cf7f0936c830b41d7793a9c9fd7",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/ad2ac6e1c9942cf7f0936c830b41d7793a9c9fd7"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMS4z"
+ },
+ {
+  "name": "v0.78.1.2",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.1.2",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.1.2",
+  "commit": {
+   "sha": "7cf83c85704572260b6584e394fdab56a82fb1a4",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/7cf83c85704572260b6584e394fdab56a82fb1a4"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMS4y"
+ },
+ {
+  "name": "v0.78.1.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.78.1.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.78.1.1",
+  "commit": {
+   "sha": "f2b45bac0f88c96dbeee6dc1402b585df5bb8091",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/f2b45bac0f88c96dbeee6dc1402b585df5bb8091"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzguMS4x"
+ },
+ {
+  "name": "v0.77.9.9",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.9.9",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.9.9",
+  "commit": {
+   "sha": "fa44de2c0ddd28b4ca45991cb0ea77141a770494",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/fa44de2c0ddd28b4ca45991cb0ea77141a770494"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzcuOS45"
+ },
+ {
+  "name": "v0.77.9.8",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.9.8",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.9.8",
+  "commit": {
+   "sha": "fabc4c6c926dfdb85c1e3b61a4bcb24b7b0a7b31",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/fabc4c6c926dfdb85c1e3b61a4bcb24b7b0a7b31"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzcuOS44"
+ },
+ {
+  "name": "v0.77.9.7",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.9.7",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.9.7",
+  "commit": {
+   "sha": "7e0e2e59921ef51756ad5208f92dd522aab2404d",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/7e0e2e59921ef51756ad5208f92dd522aab2404d"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzcuOS43"
+ },
+ {
+  "name": "v0.77.9.6",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.9.6",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.9.6",
+  "commit": {
+   "sha": "9deeecbc600d79c66b36a37ffb8dac7436e882de",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/9deeecbc600d79c66b36a37ffb8dac7436e882de"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzcuOS42"
+ },
+ {
+  "name": "v0.77.9.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.9.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.9.1",
+  "commit": {
+   "sha": "97a43aa0c9b3cf0806cbce32dc6c0e047a4b0a49",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/97a43aa0c9b3cf0806cbce32dc6c0e047a4b0a49"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzcuOS4x"
+ },
+ {
+  "name": "v0.77.8.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.8.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.8.1",
+  "commit": {
+   "sha": "9fc048a1d4b9280267d35a8ad031c8170fda014d",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/9fc048a1d4b9280267d35a8ad031c8170fda014d"
+  },
+  "node_id": "REF_kwDOGYbiMrNyZWZzL3RhZ3MvdjAuNzcuOC4x"
+ },
+ {
+  "name": "v0.77.8",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.8",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.8",
+  "commit": {
+   "sha": "06bad42e33a34c3e0160a7337ed0f2349552edde",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/06bad42e33a34c3e0160a7337ed0f2349552edde"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzcuOA"
+ },
+ {
+  "name": "v0.77.7",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.7",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.7",
+  "commit": {
+   "sha": "4dbdf44458036293ba83901d9e9f2b32813a1e0e",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/4dbdf44458036293ba83901d9e9f2b32813a1e0e"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzcuNw"
+ },
+ {
+  "name": "v0.77.6",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.6",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.6",
+  "commit": {
+   "sha": "dd7b98048565007880f61feae1b9d737eed252ea",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/dd7b98048565007880f61feae1b9d737eed252ea"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzcuNg"
+ },
+ {
+  "name": "v0.77.5",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.5",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.5",
+  "commit": {
+   "sha": "dd010288a90e491779a11c16dbedca3b7af46ef3",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/dd010288a90e491779a11c16dbedca3b7af46ef3"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzcuNQ"
+ },
+ {
+  "name": "v0.77.4",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.4",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.4",
+  "commit": {
+   "sha": "bd41642381b457ed05fe2e3e63815cebec866226",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/bd41642381b457ed05fe2e3e63815cebec866226"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzcuNA"
+ },
+ {
+  "name": "v0.77.3",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.3",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.3",
+  "commit": {
+   "sha": "99e940ee53521948ff2ce0c4493e6a1e86d54317",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/99e940ee53521948ff2ce0c4493e6a1e86d54317"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzcuMw"
+ },
+ {
+  "name": "v0.77.2",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.2",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.2",
+  "commit": {
+   "sha": "86bae7c228f7687963536e40237e16a68e32a57a",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/86bae7c228f7687963536e40237e16a68e32a57a"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzcuMg"
+ },
+ {
+  "name": "v0.77.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.77.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.77.1",
+  "commit": {
+   "sha": "adf88e40558aa9bc46c3f69cf7c97c809ab2e4ae",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/adf88e40558aa9bc46c3f69cf7c97c809ab2e4ae"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzcuMQ"
+ },
+ {
+  "name": "v0.76.9",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.76.9",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.76.9",
+  "commit": {
+   "sha": "5827be369bcfa9826fbf42d8db367e6966067d98",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/5827be369bcfa9826fbf42d8db367e6966067d98"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzYuOQ"
+ },
+ {
+  "name": "v0.76.8",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.76.8",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.76.8",
+  "commit": {
+   "sha": "e0937c39225416be0d3b3f6409948739d5c53045",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/e0937c39225416be0d3b3f6409948739d5c53045"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzYuOA"
+ },
+ {
+  "name": "v0.76.7",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.76.7",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.76.7",
+  "commit": {
+   "sha": "5d9ca3b30c11f36d646e1b75573bb67a3a2b9813",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/5d9ca3b30c11f36d646e1b75573bb67a3a2b9813"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzYuNw"
+ },
+ {
+  "name": "v0.76.6",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.76.6",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.76.6",
+  "commit": {
+   "sha": "a968aff974d0270639d4f150e48838a92a7c9b06",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/a968aff974d0270639d4f150e48838a92a7c9b06"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzYuNg"
+ },
+ {
+  "name": "v0.76.5",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.76.5",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.76.5",
+  "commit": {
+   "sha": "53ac65b9d976358141d8e05d7913906c18aaa43a",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/53ac65b9d976358141d8e05d7913906c18aaa43a"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzYuNQ"
+ },
+ {
+  "name": "v0.76.4",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.76.4",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.76.4",
+  "commit": {
+   "sha": "06dfee06604173609701101539c0aa7b5460e85c",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/06dfee06604173609701101539c0aa7b5460e85c"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzYuNA"
+ },
+ {
+  "name": "v0.76.3",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.76.3",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.76.3",
+  "commit": {
+   "sha": "5583eced6ccfd926400a58b53f2fc85d1167621d",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/5583eced6ccfd926400a58b53f2fc85d1167621d"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzYuMw"
+ },
+ {
+  "name": "v0.76.2",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.76.2",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.76.2",
+  "commit": {
+   "sha": "3227cc160d305b8a0d4d1c4071e085d39048eee4",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/3227cc160d305b8a0d4d1c4071e085d39048eee4"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzYuMg"
+ },
+ {
+  "name": "v0.76.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.76.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.76.1",
+  "commit": {
+   "sha": "3a800a67bd23324597b4f1d8d9bfbcdbfde929dc",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/3a800a67bd23324597b4f1d8d9bfbcdbfde929dc"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzYuMQ"
+ },
+ {
+  "name": "v0.75.9",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.75.9",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.75.9",
+  "commit": {
+   "sha": "9f0aa54e54d03cc42d219a82c23b5be24bcda5af",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/9f0aa54e54d03cc42d219a82c23b5be24bcda5af"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzUuOQ"
+ },
+ {
+  "name": "v0.75.8",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.75.8",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.75.8",
+  "commit": {
+   "sha": "cb69e50c20821d78a3802cc9722a882135379e77",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/cb69e50c20821d78a3802cc9722a882135379e77"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzUuOA"
+ },
+ {
+  "name": "v0.75.7",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.75.7",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.75.7",
+  "commit": {
+   "sha": "105a593b56acdffb36e3bb1c91688fe95ac77e9d",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/105a593b56acdffb36e3bb1c91688fe95ac77e9d"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzUuNw"
+ },
+ {
+  "name": "v0.75.6",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.75.6",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.75.6",
+  "commit": {
+   "sha": "bf4d353bf305ee7e3764db6fef04992faac26d7d",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/bf4d353bf305ee7e3764db6fef04992faac26d7d"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzUuNg"
+ },
+ {
+  "name": "v0.75.5",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.75.5",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.75.5",
+  "commit": {
+   "sha": "958ba0fd9ab555f353eab44f4240d5bb2d686383",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/958ba0fd9ab555f353eab44f4240d5bb2d686383"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzUuNQ"
+ },
+ {
+  "name": "v0.75.4",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.75.4",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.75.4",
+  "commit": {
+   "sha": "5510d3edc0cccea9edb946e7c0f986c152306058",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/5510d3edc0cccea9edb946e7c0f986c152306058"
+  },
+  "node_id": "REF_kwDOGYbiMrFyZWZzL3RhZ3MvdjAuNzUuNA"
+ },
+ {
+  "name": "v0.75",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.75",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.75",
+  "commit": {
+   "sha": "b9d7ede828db3c05cb2de3ba37db008293b79282",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/b9d7ede828db3c05cb2de3ba37db008293b79282"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNzU"
+ },
+ {
+  "name": "v0.74",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.74",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.74",
+  "commit": {
+   "sha": "29c204f6b5a56283b349e5f354cf02a780c7394b",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/29c204f6b5a56283b349e5f354cf02a780c7394b"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNzQ"
+ },
+ {
+  "name": "v0.73",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.73",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.73",
+  "commit": {
+   "sha": "46701954ca51296ffa9ef41c128ce2a43fc9b083",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/46701954ca51296ffa9ef41c128ce2a43fc9b083"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNzM"
+ },
+ {
+  "name": "v0.72",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.72",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.72",
+  "commit": {
+   "sha": "2267a0d392d64f7bd0e85573ec89f8947bdc0c35",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/2267a0d392d64f7bd0e85573ec89f8947bdc0c35"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNzI"
+ },
+ {
+  "name": "v0.71",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.71",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.71",
+  "commit": {
+   "sha": "46441e313d47899a6a6dfc11d222f15bce418130",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/46441e313d47899a6a6dfc11d222f15bce418130"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNzE"
+ },
+ {
+  "name": "v0.70",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.70",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.70",
+  "commit": {
+   "sha": "e87dc01a73818871845fd4bb1ce909799973fa9e",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/e87dc01a73818871845fd4bb1ce909799973fa9e"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNzA"
+ },
+ {
+  "name": "v0.69",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.69",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.69",
+  "commit": {
+   "sha": "5c6e0d3d08a0ae0652c1aed9d9dfd7e8cae706df",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/5c6e0d3d08a0ae0652c1aed9d9dfd7e8cae706df"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNjk"
+ },
+ {
+  "name": "v0.68",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.68",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.68",
+  "commit": {
+   "sha": "996aaf45d6b4fb80637ee6f79a81f73ef28fdfa2",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/996aaf45d6b4fb80637ee6f79a81f73ef28fdfa2"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNjg"
+ },
+ {
+  "name": "v0.67",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.67",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.67",
+  "commit": {
+   "sha": "bd26bbbbe8bc132bba3cbb782b3f131b60ab1e45",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/bd26bbbbe8bc132bba3cbb782b3f131b60ab1e45"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNjc"
+ },
+ {
+  "name": "v0.66",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.66",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.66",
+  "commit": {
+   "sha": "c530934eab62937a2ba733563d2b166fffd0fca3",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/c530934eab62937a2ba733563d2b166fffd0fca3"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNjY"
+ },
+ {
+  "name": "v0.65",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.65",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.65",
+  "commit": {
+   "sha": "9ab833cace553bc6772fd15f5890126e97563b69",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/9ab833cace553bc6772fd15f5890126e97563b69"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNjU"
+ },
+ {
+  "name": "v0.64",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.64",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.64",
+  "commit": {
+   "sha": "588cf6b7364038b797c07600bc506646d0b9d54e",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/588cf6b7364038b797c07600bc506646d0b9d54e"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNjQ"
+ },
+ {
+  "name": "v0.63",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.63",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.63",
+  "commit": {
+   "sha": "8f6860807b1dc751e2e4c9394375bdc26157882d",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/8f6860807b1dc751e2e4c9394375bdc26157882d"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNjM"
+ },
+ {
+  "name": "v0.62",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.62",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.62",
+  "commit": {
+   "sha": "db3e9338fad830e30012e641fd6fe34d1f7aa578",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/db3e9338fad830e30012e641fd6fe34d1f7aa578"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNjI"
+ },
+ {
+  "name": "v0.61",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.61",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.61",
+  "commit": {
+   "sha": "580651c32857247682d8f89c61518ca8e18206d7",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/580651c32857247682d8f89c61518ca8e18206d7"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNjE"
+ },
+ {
+  "name": "v0.60",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.60",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.60",
+  "commit": {
+   "sha": "2615e90cc240265f66c02789c98415f628bde250",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/2615e90cc240265f66c02789c98415f628bde250"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNjA"
+ },
+ {
+  "name": "v0.59",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.59",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.59",
+  "commit": {
+   "sha": "0f84517d13d8f3318e63b763af65f0a071c45702",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/0f84517d13d8f3318e63b763af65f0a071c45702"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNTk"
+ },
+ {
+  "name": "v0.58",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.58",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.58",
+  "commit": {
+   "sha": "859f5ea058fb627bd14024a01ebf6bd7508148e7",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/859f5ea058fb627bd14024a01ebf6bd7508148e7"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNTg"
+ },
+ {
+  "name": "v0.57",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.57",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.57",
+  "commit": {
+   "sha": "f51b63966c7e1cf0a8c0536d8447407abcab3c7f",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/f51b63966c7e1cf0a8c0536d8447407abcab3c7f"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNTc"
+ },
+ {
+  "name": "v0.56",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.56",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.56",
+  "commit": {
+   "sha": "4c1694a73015c81cf4f0627f53695281d711339e",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/4c1694a73015c81cf4f0627f53695281d711339e"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNTY"
+ },
+ {
+  "name": "v0.55",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.55",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.55",
+  "commit": {
+   "sha": "06be58dde3f01fc77bbd8feec9b9498537b527b7",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/06be58dde3f01fc77bbd8feec9b9498537b527b7"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNTU"
+ },
+ {
+  "name": "v0.54",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.54",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.54",
+  "commit": {
+   "sha": "acaf80d1c2cea92023d29038d168f7f7213eb6d2",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/acaf80d1c2cea92023d29038d168f7f7213eb6d2"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNTQ"
+ },
+ {
+  "name": "v0.53",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.53",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.53",
+  "commit": {
+   "sha": "60d5810b1788fc2668d4e8c9c52b0174d3b46024",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/60d5810b1788fc2668d4e8c9c52b0174d3b46024"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNTM"
+ },
+ {
+  "name": "v0.52",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.52",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.52",
+  "commit": {
+   "sha": "79e1d73946b8c2f3ed32794545e8c3ca3ddc2712",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/79e1d73946b8c2f3ed32794545e8c3ca3ddc2712"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNTI"
+ },
+ {
+  "name": "v0.51",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.51",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.51",
+  "commit": {
+   "sha": "9aac6e57df21dc76b2772e044462f074e4dc13f9",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/9aac6e57df21dc76b2772e044462f074e4dc13f9"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNTE"
+ },
+ {
+  "name": "v0.50",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.50",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.50",
+  "commit": {
+   "sha": "81229438f821364a00c3f18dbbc96367591f698d",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/81229438f821364a00c3f18dbbc96367591f698d"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNTA"
+ },
+ {
+  "name": "v0.49",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.49",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.49",
+  "commit": {
+   "sha": "c07724f9bf995dd6b955c159a7297fb5ac6deb07",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/c07724f9bf995dd6b955c159a7297fb5ac6deb07"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNDk"
+ },
+ {
+  "name": "v0.48",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.48",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.48",
+  "commit": {
+   "sha": "df31531abfd97ebc491f9c5da81fd9218fb35117",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/df31531abfd97ebc491f9c5da81fd9218fb35117"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNDg"
+ },
+ {
+  "name": "v0.47",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.47",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.47",
+  "commit": {
+   "sha": "e878ed297f3e145356c9a4dde2fcfa3da6dfcd35",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/e878ed297f3e145356c9a4dde2fcfa3da6dfcd35"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNDc"
+ },
+ {
+  "name": "v0.46",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.46",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.46",
+  "commit": {
+   "sha": "fa07309759405d698fbf7351e29e7ada1d75d0f2",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/fa07309759405d698fbf7351e29e7ada1d75d0f2"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNDY"
+ },
+ {
+  "name": "v0.45",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.45",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.45",
+  "commit": {
+   "sha": "9d7da54081a2dd9a0bc1dcd761ef0ab73fd8c7ea",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/9d7da54081a2dd9a0bc1dcd761ef0ab73fd8c7ea"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNDU"
+ },
+ {
+  "name": "v0.44",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.44",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.44",
+  "commit": {
+   "sha": "be0c29a9ce0e7199cf547c3f4d87b6fbd113c986",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/be0c29a9ce0e7199cf547c3f4d87b6fbd113c986"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNDQ"
+ },
+ {
+  "name": "v0.43",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.43",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.43",
+  "commit": {
+   "sha": "53729b3da26ed5c8719fe4fe9384d8dfdb3df9de",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/53729b3da26ed5c8719fe4fe9384d8dfdb3df9de"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNDM"
+ },
+ {
+  "name": "v0.42",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.42",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.42",
+  "commit": {
+   "sha": "19abd9fb70b516fccedff7c5d9a2e6feee8e0450",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/19abd9fb70b516fccedff7c5d9a2e6feee8e0450"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNDI"
+ },
+ {
+  "name": "v0.41",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.41",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.41",
+  "commit": {
+   "sha": "fe6b9aad971c34dd75a00ba1edc56f9ca5f37127",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/fe6b9aad971c34dd75a00ba1edc56f9ca5f37127"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNDE"
+ },
+ {
+  "name": "v0.40",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.40",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.40",
+  "commit": {
+   "sha": "9f4c22712197d1070503e129e12fae0493070cfe",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/9f4c22712197d1070503e129e12fae0493070cfe"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuNDA"
+ },
+ {
+  "name": "v0.39",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.39",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.39",
+  "commit": {
+   "sha": "c0f14d10c25e34fc38196152400e46fd982e8ac3",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/c0f14d10c25e34fc38196152400e46fd982e8ac3"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuMzk"
+ },
+ {
+  "name": "v0.38",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.38",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.38",
+  "commit": {
+   "sha": "eb9df762420c9959f9654cf2f3451485a9ae9510",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/eb9df762420c9959f9654cf2f3451485a9ae9510"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuMzg"
+ },
+ {
+  "name": "v0.37",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/zipball/refs/tags/v0.37",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lux-wine/tarball/refs/tags/v0.37",
+  "commit": {
+   "sha": "e461a2dee28a71dad69f4f3e777afcf20be805f2",
+   "url": "https://api.github.com/repos/VHSgunzo/lux-wine/commits/e461a2dee28a71dad69f4f3e777afcf20be805f2"
+  },
+  "node_id": "REF_kwDOGYbiMq9yZWZzL3RhZ3MvdjAuMzc"
+ }
+]

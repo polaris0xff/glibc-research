@@ -1,0 +1,52 @@
+[
+ {
+  "name": "v0.0.5",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lw-runtime/zipball/refs/tags/v0.0.5",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lw-runtime/tarball/refs/tags/v0.0.5",
+  "commit": {
+   "sha": "0150d1d63270dc409c1a36a0e5cc38fa470245d3",
+   "url": "https://api.github.com/repos/VHSgunzo/lw-runtime/commits/0150d1d63270dc409c1a36a0e5cc38fa470245d3"
+  },
+  "node_id": "REF_kwDOKS7QWLByZWZzL3RhZ3MvdjAuMC41"
+ },
+ {
+  "name": "v0.0.3",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lw-runtime/zipball/refs/tags/v0.0.3",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lw-runtime/tarball/refs/tags/v0.0.3",
+  "commit": {
+   "sha": "026006b34e096e8102da47a8649f0c0b913eae77",
+   "url": "https://api.github.com/repos/VHSgunzo/lw-runtime/commits/026006b34e096e8102da47a8649f0c0b913eae77"
+  },
+  "node_id": "REF_kwDOKS7QWLByZWZzL3RhZ3MvdjAuMC4z"
+ },
+ {
+  "name": "v0.0.2",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lw-runtime/zipball/refs/tags/v0.0.2",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lw-runtime/tarball/refs/tags/v0.0.2",
+  "commit": {
+   "sha": "55201887913e1cdae09656c6592d932c6be8a811",
+   "url": "https://api.github.com/repos/VHSgunzo/lw-runtime/commits/55201887913e1cdae09656c6592d932c6be8a811"
+  },
+  "node_id": "REF_kwDOKS7QWLByZWZzL3RhZ3MvdjAuMC4y"
+ },
+ {
+  "name": "v0.0.1",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lw-runtime/zipball/refs/tags/v0.0.1",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lw-runtime/tarball/refs/tags/v0.0.1",
+  "commit": {
+   "sha": "d73043f8d39feb037ed99b75bea5cbf8405f03d2",
+   "url": "https://api.github.com/repos/VHSgunzo/lw-runtime/commits/d73043f8d39feb037ed99b75bea5cbf8405f03d2"
+  },
+  "node_id": "REF_kwDOKS7QWLByZWZzL3RhZ3MvdjAuMC4x"
+ },
+ {
+  "name": "continuous",
+  "zipball_url": "https://api.github.com/repos/VHSgunzo/lw-runtime/zipball/refs/tags/continuous",
+  "tarball_url": "https://api.github.com/repos/VHSgunzo/lw-runtime/tarball/refs/tags/continuous",
+  "commit": {
+   "sha": "026006b34e096e8102da47a8649f0c0b913eae77",
+   "url": "https://api.github.com/repos/VHSgunzo/lw-runtime/commits/026006b34e096e8102da47a8649f0c0b913eae77"
+  },
+  "node_id": "REF_kwDOKS7QWLRyZWZzL3RhZ3MvY29udGludW91cw"
+ }
+]

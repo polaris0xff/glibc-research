@@ -1,0 +1,11 @@
+#DB# Need for Speed Porsche # DB_EXES=('Porsche.exe')
+#DB# Emperor: Rise of the Middle Kingdom # DB_EXES=('EMPEROR.exe')
+
+WIN_VER=10
+DGVOODOO2=1
+WINEARCH=win64
+RESTORE_RESOL=1
+WINE_VERSION=System
+USE_DEFPFX_BACKUP=1
+MUST_HAVE_DLL=Disabled
+WPREFIX_NAME=syswinepfx

@@ -1,0 +1,1052 @@
+[
+ {
+  "name": "@2025-08-06_1754457754",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/@2025-08-06_1754457754",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/@2025-08-06_1754457754",
+  "commit": {
+   "sha": "f3795d528e5cfd8de4dbd41764054f724e78f707",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/f3795d528e5cfd8de4dbd41764054f724e78f707"
+  },
+  "node_id": "REF_kwDOISnl7toAIHJlZnMvdGFncy9AMjAyNS0wOC0wNl8xNzU0NDU3NzU0"
+ },
+ {
+  "name": "utils",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/utils",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/utils",
+  "commit": {
+   "sha": "c3c0da7b0d71e44f4516c5617336f657cf47ac50",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/c3c0da7b0d71e44f4516c5617336f657cf47ac50"
+  },
+  "node_id": "REF_kwDOISnl7q9yZWZzL3RhZ3MvdXRpbHM"
+ },
+ {
+  "name": "continuous",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/continuous",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/continuous",
+  "commit": {
+   "sha": "8e9e8048a37b37d3ef41e58aa41800efd4f69610",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/8e9e8048a37b37d3ef41e58aa41800efd4f69610"
+  },
+  "node_id": "REF_kwDOISnl7rRyZWZzL3RhZ3MvY29udGludW91cw"
+ },
+ {
+  "name": "20250630-062933",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250630-062933",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250630-062933",
+  "commit": {
+   "sha": "dd66e77e7c9c156cd5ee02b5054e0419f114bf77",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dd66e77e7c9c156cd5ee02b5054e0419f114bf77"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA2MzAtMDYyOTMz"
+ },
+ {
+  "name": "20250623-063035",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250623-063035",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250623-063035",
+  "commit": {
+   "sha": "dd66e77e7c9c156cd5ee02b5054e0419f114bf77",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dd66e77e7c9c156cd5ee02b5054e0419f114bf77"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA2MjMtMDYzMDM1"
+ },
+ {
+  "name": "20250616-063010",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250616-063010",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250616-063010",
+  "commit": {
+   "sha": "dd66e77e7c9c156cd5ee02b5054e0419f114bf77",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dd66e77e7c9c156cd5ee02b5054e0419f114bf77"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA2MTYtMDYzMDEw"
+ },
+ {
+  "name": "20250609-062951",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250609-062951",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250609-062951",
+  "commit": {
+   "sha": "dd66e77e7c9c156cd5ee02b5054e0419f114bf77",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dd66e77e7c9c156cd5ee02b5054e0419f114bf77"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA2MDktMDYyOTUx"
+ },
+ {
+  "name": "20250602-062903",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250602-062903",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250602-062903",
+  "commit": {
+   "sha": "dd66e77e7c9c156cd5ee02b5054e0419f114bf77",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dd66e77e7c9c156cd5ee02b5054e0419f114bf77"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA2MDItMDYyOTAz"
+ },
+ {
+  "name": "20250526-062837",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250526-062837",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250526-062837",
+  "commit": {
+   "sha": "dd66e77e7c9c156cd5ee02b5054e0419f114bf77",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dd66e77e7c9c156cd5ee02b5054e0419f114bf77"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA1MjYtMDYyODM3"
+ },
+ {
+  "name": "20250519-223305",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250519-223305",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250519-223305",
+  "commit": {
+   "sha": "68807e82559376b2b6d90b4f71eaced2938529c3",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/68807e82559376b2b6d90b4f71eaced2938529c3"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA1MTktMjIzMzA1"
+ },
+ {
+  "name": "20250519-064107",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250519-064107",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250519-064107",
+  "commit": {
+   "sha": "d903997d599ac005c0ff14577abbfef60597b4a4",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/d903997d599ac005c0ff14577abbfef60597b4a4"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA1MTktMDY0MTA3"
+ },
+ {
+  "name": "20250519-063032",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250519-063032",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250519-063032",
+  "commit": {
+   "sha": "d903997d599ac005c0ff14577abbfef60597b4a4",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/d903997d599ac005c0ff14577abbfef60597b4a4"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA1MTktMDYzMDMy"
+ },
+ {
+  "name": "20250518-225101",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250518-225101",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250518-225101",
+  "commit": {
+   "sha": "323bf4189397f996ff70afcf775a6d3c975d8b7b",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/323bf4189397f996ff70afcf775a6d3c975d8b7b"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA1MTgtMjI1MTAx"
+ },
+ {
+  "name": "20250512-063019",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250512-063019",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250512-063019",
+  "commit": {
+   "sha": "323bf4189397f996ff70afcf775a6d3c975d8b7b",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/323bf4189397f996ff70afcf775a6d3c975d8b7b"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA1MTItMDYzMDE5"
+ },
+ {
+  "name": "20250506-154105",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250506-154105",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250506-154105",
+  "commit": {
+   "sha": "33b16a68c707a2d436057aae91f8399d800bbd45",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/33b16a68c707a2d436057aae91f8399d800bbd45"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA1MDYtMTU0MTA1"
+ },
+ {
+  "name": "20250506-092255",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250506-092255",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250506-092255",
+  "commit": {
+   "sha": "a9b6d5d3c34128ce18dd99a287fded4d7764df4c",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/a9b6d5d3c34128ce18dd99a287fded4d7764df4c"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA1MDYtMDkyMjU1"
+ },
+ {
+  "name": "20250505-062835",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250505-062835",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250505-062835",
+  "commit": {
+   "sha": "219bf9f9e0bbbe5ac5c0e9f721ac6401b4c2d72d",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/219bf9f9e0bbbe5ac5c0e9f721ac6401b4c2d72d"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA1MDUtMDYyODM1"
+ },
+ {
+  "name": "20250505-044430",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250505-044430",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250505-044430",
+  "commit": {
+   "sha": "219bf9f9e0bbbe5ac5c0e9f721ac6401b4c2d72d",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/219bf9f9e0bbbe5ac5c0e9f721ac6401b4c2d72d"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA1MDUtMDQ0NDMw"
+ },
+ {
+  "name": "20250428-063524",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250428-063524",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250428-063524",
+  "commit": {
+   "sha": "dc8c5a09f638859c77eeea113ad05c946ca1e4a2",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dc8c5a09f638859c77eeea113ad05c946ca1e4a2"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA0MjgtMDYzNTI0"
+ },
+ {
+  "name": "20250421-062744",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250421-062744",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250421-062744",
+  "commit": {
+   "sha": "dc8c5a09f638859c77eeea113ad05c946ca1e4a2",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dc8c5a09f638859c77eeea113ad05c946ca1e4a2"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA0MjEtMDYyNzQ0"
+ },
+ {
+  "name": "20250414-062816",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250414-062816",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250414-062816",
+  "commit": {
+   "sha": "dc8c5a09f638859c77eeea113ad05c946ca1e4a2",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dc8c5a09f638859c77eeea113ad05c946ca1e4a2"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA0MTQtMDYyODE2"
+ },
+ {
+  "name": "20250410-094809",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250410-094809",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250410-094809",
+  "commit": {
+   "sha": "22a417a533ce4fb14bb4d55f618e01a7cc6da7ee",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/22a417a533ce4fb14bb4d55f618e01a7cc6da7ee"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA0MTAtMDk0ODA5"
+ },
+ {
+  "name": "20250408-214209",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250408-214209",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250408-214209",
+  "commit": {
+   "sha": "22a417a533ce4fb14bb4d55f618e01a7cc6da7ee",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/22a417a533ce4fb14bb4d55f618e01a7cc6da7ee"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA0MDgtMjE0MjA5"
+ },
+ {
+  "name": "20250407-062713",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250407-062713",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250407-062713",
+  "commit": {
+   "sha": "a72664dd7e9a6f4b9db0ce4f3dcbd7dda9e5da09",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/a72664dd7e9a6f4b9db0ce4f3dcbd7dda9e5da09"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA0MDctMDYyNzEz"
+ },
+ {
+  "name": "20250405-092809",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250405-092809",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250405-092809",
+  "commit": {
+   "sha": "a72664dd7e9a6f4b9db0ce4f3dcbd7dda9e5da09",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/a72664dd7e9a6f4b9db0ce4f3dcbd7dda9e5da09"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA0MDUtMDkyODA5"
+ },
+ {
+  "name": "20250401-030124",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250401-030124",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250401-030124",
+  "commit": {
+   "sha": "a72664dd7e9a6f4b9db0ce4f3dcbd7dda9e5da09",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/a72664dd7e9a6f4b9db0ce4f3dcbd7dda9e5da09"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTA0MDEtMDMwMTI0"
+ },
+ {
+  "name": "20250331-062700",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250331-062700",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250331-062700",
+  "commit": {
+   "sha": "4303bd783888838d797d6e4be8685d074bf657be",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/4303bd783888838d797d6e4be8685d074bf657be"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMzEtMDYyNzAw"
+ },
+ {
+  "name": "20250330-220203",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250330-220203",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250330-220203",
+  "commit": {
+   "sha": "4303bd783888838d797d6e4be8685d074bf657be",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/4303bd783888838d797d6e4be8685d074bf657be"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMzAtMjIwMjAz"
+ },
+ {
+  "name": "20250330-181627",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250330-181627",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250330-181627",
+  "commit": {
+   "sha": "f9451e02d8b4089dc551543eaa44db52478a6f62",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/f9451e02d8b4089dc551543eaa44db52478a6f62"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMzAtMTgxNjI3"
+ },
+ {
+  "name": "20250329-225256",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250329-225256",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250329-225256",
+  "commit": {
+   "sha": "7531fcdd3a2388119eb2a9d245c96105e72652fc",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/7531fcdd3a2388119eb2a9d245c96105e72652fc"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMjktMjI1MjU2"
+ },
+ {
+  "name": "20250328-170817",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250328-170817",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250328-170817",
+  "commit": {
+   "sha": "05dcf2e9dac422595195d0acfa209662ca752a2e",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/05dcf2e9dac422595195d0acfa209662ca752a2e"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMjgtMTcwODE3"
+ },
+ {
+  "name": "20250326-180206",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250326-180206",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250326-180206",
+  "commit": {
+   "sha": "7efca87138e7af3ef1cc3eb3f661356b25068a01",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/7efca87138e7af3ef1cc3eb3f661356b25068a01"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMjYtMTgwMjA2"
+ },
+ {
+  "name": "20250324-160859",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250324-160859",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250324-160859",
+  "commit": {
+   "sha": "adfcc9d7c0998b892a9dd0e8e8cda622c7de4a63",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/adfcc9d7c0998b892a9dd0e8e8cda622c7de4a63"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMjQtMTYwODU5"
+ },
+ {
+  "name": "20250317-062606",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250317-062606",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250317-062606",
+  "commit": {
+   "sha": "74769ec33c4b869414851631d26cc84a0fae3d49",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/74769ec33c4b869414851631d26cc84a0fae3d49"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMTctMDYyNjA2"
+ },
+ {
+  "name": "20250310-062254",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250310-062254",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250310-062254",
+  "commit": {
+   "sha": "74769ec33c4b869414851631d26cc84a0fae3d49",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/74769ec33c4b869414851631d26cc84a0fae3d49"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMTAtMDYyMjU0"
+ },
+ {
+  "name": "20250304-052902",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250304-052902",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250304-052902",
+  "commit": {
+   "sha": "74769ec33c4b869414851631d26cc84a0fae3d49",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/74769ec33c4b869414851631d26cc84a0fae3d49"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMDQtMDUyOTAy"
+ },
+ {
+  "name": "20250303-062634",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250303-062634",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250303-062634",
+  "commit": {
+   "sha": "b97225605023c9de218db6a7775fee1e7d0b0a4b",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/b97225605023c9de218db6a7775fee1e7d0b0a4b"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAzMDMtMDYyNjM0"
+ },
+ {
+  "name": "20250224-062634",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250224-062634",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250224-062634",
+  "commit": {
+   "sha": "c4a2cbdf4a70495bf758a867afa8cbb2a189d3ed",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/c4a2cbdf4a70495bf758a867afa8cbb2a189d3ed"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAyMjQtMDYyNjM0"
+ },
+ {
+  "name": "20250217-062517",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250217-062517",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250217-062517",
+  "commit": {
+   "sha": "c4a2cbdf4a70495bf758a867afa8cbb2a189d3ed",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/c4a2cbdf4a70495bf758a867afa8cbb2a189d3ed"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAyMTctMDYyNTE3"
+ },
+ {
+  "name": "20250216-224530",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250216-224530",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250216-224530",
+  "commit": {
+   "sha": "c4a2cbdf4a70495bf758a867afa8cbb2a189d3ed",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/c4a2cbdf4a70495bf758a867afa8cbb2a189d3ed"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAyMTYtMjI0NTMw"
+ },
+ {
+  "name": "20250213-185312",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250213-185312",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250213-185312",
+  "commit": {
+   "sha": "589eb388ec20edeaed3f5632645fea02094bd3f1",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/589eb388ec20edeaed3f5632645fea02094bd3f1"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAyMTMtMTg1MzEy"
+ },
+ {
+  "name": "20250210-204310",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250210-204310",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250210-204310",
+  "commit": {
+   "sha": "25812e07d046158c1073d2c1df06fea93067a1d3",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/25812e07d046158c1073d2c1df06fea93067a1d3"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAyMTAtMjA0MzEw"
+ },
+ {
+  "name": "20250210-062504",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250210-062504",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250210-062504",
+  "commit": {
+   "sha": "28ebc23a20bf1445c129125a207d890a82d3f072",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/28ebc23a20bf1445c129125a207d890a82d3f072"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAyMTAtMDYyNTA0"
+ },
+ {
+  "name": "20250204-041646",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250204-041646",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250204-041646",
+  "commit": {
+   "sha": "b6bee24cd3dc34fdb1051e83e5fd88ea7f5564b0",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/b6bee24cd3dc34fdb1051e83e5fd88ea7f5564b0"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAyMDQtMDQxNjQ2"
+ },
+ {
+  "name": "20250203-062653",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250203-062653",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250203-062653",
+  "commit": {
+   "sha": "5048119da0dd943a9c1c5c0e5ed9c05c6b83c14f",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/5048119da0dd943a9c1c5c0e5ed9c05c6b83c14f"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAyMDMtMDYyNjUz"
+ },
+ {
+  "name": "20250129-141314",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250129-141314",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250129-141314",
+  "commit": {
+   "sha": "c3c0da7b0d71e44f4516c5617336f657cf47ac50",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/c3c0da7b0d71e44f4516c5617336f657cf47ac50"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAxMjktMTQxMzE0"
+ },
+ {
+  "name": "20250127-062727",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250127-062727",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250127-062727",
+  "commit": {
+   "sha": "64cd03101d0045fc2165078ac7d39c74f030757d",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/64cd03101d0045fc2165078ac7d39c74f030757d"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAxMjctMDYyNzI3"
+ },
+ {
+  "name": "20250120-062845",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250120-062845",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250120-062845",
+  "commit": {
+   "sha": "f6c63e46999b6352deb792d5a8cbceddd3239036",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/f6c63e46999b6352deb792d5a8cbceddd3239036"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAxMjAtMDYyODQ1"
+ },
+ {
+  "name": "20250111-034845",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/20250111-034845",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/20250111-034845",
+  "commit": {
+   "sha": "f6c63e46999b6352deb792d5a8cbceddd3239036",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/f6c63e46999b6352deb792d5a8cbceddd3239036"
+  },
+  "node_id": "REF_kwDOISnl7rlyZWZzL3RhZ3MvMjAyNTAxMTEtMDM0ODQ1"
+ },
+ {
+  "name": "1.0.0.87-3@2026-09-01_1788260048",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.87-3@2026-09-01_1788260048",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.87-3@2026-09-01_1788260048",
+  "commit": {
+   "sha": "6d6b864779ee491ec28852810370bb6693795890",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/6d6b864779ee491ec28852810370bb6693795890"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Ny0zQDIwMjYtMDktMDFfMTc4ODI2MDA0OA"
+ },
+ {
+  "name": "1.0.0.87-1@2026-08-21_1787294590",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.87-1@2026-08-21_1787294590",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.87-1@2026-08-21_1787294590",
+  "commit": {
+   "sha": "fc9dea6a7bc5e409d4effdec71fc6f1c36031d67",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/fc9dea6a7bc5e409d4effdec71fc6f1c36031d67"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Ny0xQDIwMjYtMDgtMjFfMTc4NzI5NDU5MA"
+ },
+ {
+  "name": "1.0.0.87-1@2026-08-16_1786890213",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.87-1@2026-08-16_1786890213",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.87-1@2026-08-16_1786890213",
+  "commit": {
+   "sha": "dcf440cb22270392903d5ac5d0241e1f07ef377e",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dcf440cb22270392903d5ac5d0241e1f07ef377e"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Ny0xQDIwMjYtMDgtMTZfMTc4Njg5MDIxMw"
+ },
+ {
+  "name": "1.0.0.87-1@2026-07-01_1782898538",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.87-1@2026-07-01_1782898538",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.87-1@2026-07-01_1782898538",
+  "commit": {
+   "sha": "d2331251d6eefd72774b573458b64e2b79f963d2",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/d2331251d6eefd72774b573458b64e2b79f963d2"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Ny0xQDIwMjYtMDctMDFfMTc4Mjg5ODUzOA"
+ },
+ {
+  "name": "1.0.0.86-1@2026-06-27_1782572985",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.86-1@2026-06-27_1782572985",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.86-1@2026-06-27_1782572985",
+  "commit": {
+   "sha": "d6310aaf918993b1ad0dd68b9fdc37246d321723",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/d6310aaf918993b1ad0dd68b9fdc37246d321723"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Ni0xQDIwMjYtMDYtMjdfMTc4MjU3Mjk4NQ"
+ },
+ {
+  "name": "1.0.0.85-7@2026-06-21_1782034894",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-7@2026-06-21_1782034894",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-7@2026-06-21_1782034894",
+  "commit": {
+   "sha": "31438ed0702aca117f125398b48999125d1713fa",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/31438ed0702aca117f125398b48999125d1713fa"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS03QDIwMjYtMDYtMjFfMTc4MjAzNDg5NA"
+ },
+ {
+  "name": "1.0.0.85-7@2026-06-01_1780312474",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-7@2026-06-01_1780312474",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-7@2026-06-01_1780312474",
+  "commit": {
+   "sha": "b224be0fda95c1d19a61ef14be190b6e675f3a1a",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/b224be0fda95c1d19a61ef14be190b6e675f3a1a"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS03QDIwMjYtMDYtMDFfMTc4MDMxMjQ3NA"
+ },
+ {
+  "name": "1.0.0.85-6@2026-05-21_1779354182",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-6@2026-05-21_1779354182",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-6@2026-05-21_1779354182",
+  "commit": {
+   "sha": "2bbec3d50a0531b237ea5ba1e89b51643eca961e",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/2bbec3d50a0531b237ea5ba1e89b51643eca961e"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS02QDIwMjYtMDUtMjFfMTc3OTM1NDE4Mg"
+ },
+ {
+  "name": "1.0.0.85-6@2026-05-01_1777622844",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-6@2026-05-01_1777622844",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-6@2026-05-01_1777622844",
+  "commit": {
+   "sha": "7b937d789200e5f0ef2929fe5d92902caec6e08f",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/7b937d789200e5f0ef2929fe5d92902caec6e08f"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS02QDIwMjYtMDUtMDFfMTc3NzYyMjg0NA"
+ },
+ {
+  "name": "1.0.0.85-6@2026-04-21_1776756583",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-6@2026-04-21_1776756583",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-6@2026-04-21_1776756583",
+  "commit": {
+   "sha": "aa7c1cccf70613bca6ba8e248d90c75cb31e6a09",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/aa7c1cccf70613bca6ba8e248d90c75cb31e6a09"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS02QDIwMjYtMDQtMjFfMTc3Njc1NjU4Mw"
+ },
+ {
+  "name": "1.0.0.85-6@2026-04-01_1775027745",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-6@2026-04-01_1775027745",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-6@2026-04-01_1775027745",
+  "commit": {
+   "sha": "25332c750bfb2ca3ef501ec029afff812752c52f",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/25332c750bfb2ca3ef501ec029afff812752c52f"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS02QDIwMjYtMDQtMDFfMTc3NTAyNzc0NQ"
+ },
+ {
+  "name": "1.0.0.85-5@2026-03-21_1774075124",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-5@2026-03-21_1774075124",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-5@2026-03-21_1774075124",
+  "commit": {
+   "sha": "d00cb313f933ac96da8242a11b903da52fb6cd64",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/d00cb313f933ac96da8242a11b903da52fb6cd64"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS01QDIwMjYtMDMtMjFfMTc3NDA3NTEyNA"
+ },
+ {
+  "name": "1.0.0.85-3@2026-03-01_1772347470",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-3@2026-03-01_1772347470",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-3@2026-03-01_1772347470",
+  "commit": {
+   "sha": "4d0cd8a84d47299326f8b03944dca3d9e2c14037",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/4d0cd8a84d47299326f8b03944dca3d9e2c14037"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0zQDIwMjYtMDMtMDFfMTc3MjM0NzQ3MA"
+ },
+ {
+  "name": "1.0.0.85-3@2026-02-21_1771656053",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-3@2026-02-21_1771656053",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-3@2026-02-21_1771656053",
+  "commit": {
+   "sha": "c6037db248cd2f27ad42b373ea828e917a945b2f",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/c6037db248cd2f27ad42b373ea828e917a945b2f"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0zQDIwMjYtMDItMjFfMTc3MTY1NjA1Mw"
+ },
+ {
+  "name": "1.0.0.85-1@2026-01-26_1769466494",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2026-01-26_1769466494",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2026-01-26_1769466494",
+  "commit": {
+   "sha": "b4c5d01ba333d661a4b816f87618369ed79ff11f",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/b4c5d01ba333d661a4b816f87618369ed79ff11f"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjYtMDEtMjZfMTc2OTQ2NjQ5NA"
+ },
+ {
+  "name": "1.0.0.85-1@2026-01-21_1768977034",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2026-01-21_1768977034",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2026-01-21_1768977034",
+  "commit": {
+   "sha": "9bc1d9875aa55f88c6089a37e605a8c3a255491d",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/9bc1d9875aa55f88c6089a37e605a8c3a255491d"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjYtMDEtMjFfMTc2ODk3NzAzNA"
+ },
+ {
+  "name": "1.0.0.85-1@2026-01-01_1767248832",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2026-01-01_1767248832",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2026-01-01_1767248832",
+  "commit": {
+   "sha": "518a96a7e4412ca4f32805027487affc6619a266",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/518a96a7e4412ca4f32805027487affc6619a266"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjYtMDEtMDFfMTc2NzI0ODgzMg"
+ },
+ {
+  "name": "1.0.0.85-1@2025-12-21_1766298304",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-12-21_1766298304",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-12-21_1766298304",
+  "commit": {
+   "sha": "a2eb3b9ec643ea257d86d874d9e94f756ae335b8",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/a2eb3b9ec643ea257d86d874d9e94f756ae335b8"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTItMjFfMTc2NjI5ODMwNA"
+ },
+ {
+  "name": "1.0.0.85-1@2025-12-18_1766045227",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-12-18_1766045227",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-12-18_1766045227",
+  "commit": {
+   "sha": "224e848a3b526d220fb67d04af451ca3c53c3e39",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/224e848a3b526d220fb67d04af451ca3c53c3e39"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTItMThfMTc2NjA0NTIyNw"
+ },
+ {
+  "name": "1.0.0.85-1@2025-12-14_1765700052",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-12-14_1765700052",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-12-14_1765700052",
+  "commit": {
+   "sha": "05809e56e7f4682a02cb8b3d661fe03beaf56cce",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/05809e56e7f4682a02cb8b3d661fe03beaf56cce"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTItMTRfMTc2NTcwMDA1Mg"
+ },
+ {
+  "name": "1.0.0.85-1@2025-12-12_1765515662",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-12-12_1765515662",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-12-12_1765515662",
+  "commit": {
+   "sha": "78324dadc87912287e8c81ba3328685457383ee4",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/78324dadc87912287e8c81ba3328685457383ee4"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTItMTJfMTc2NTUxNTY2Mg"
+ },
+ {
+  "name": "1.0.0.85-1@2025-12-10_1765362949",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-12-10_1765362949",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-12-10_1765362949",
+  "commit": {
+   "sha": "890bd0fdd28d723597f458d1c93c5a309458b585",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/890bd0fdd28d723597f458d1c93c5a309458b585"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTItMTBfMTc2NTM2Mjk0OQ"
+ },
+ {
+  "name": "1.0.0.85-1@2025-12-09_1765315668",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-12-09_1765315668",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-12-09_1765315668",
+  "commit": {
+   "sha": "0c3dd16155d40ee5e2b1dc18cd48b03695b5b68c",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/0c3dd16155d40ee5e2b1dc18cd48b03695b5b68c"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTItMDlfMTc2NTMxNTY2OA"
+ },
+ {
+  "name": "1.0.0.85-1@2025-12-08_1765233744",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-12-08_1765233744",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-12-08_1765233744",
+  "commit": {
+   "sha": "dbdaccc6fe5e12baa499fd6346c84d8179da94e3",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dbdaccc6fe5e12baa499fd6346c84d8179da94e3"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTItMDhfMTc2NTIzMzc0NA"
+ },
+ {
+  "name": "1.0.0.85-1@2025-12-08_1765230223",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-12-08_1765230223",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-12-08_1765230223",
+  "commit": {
+   "sha": "928195ebcce682ade114aa7f501f98321e414e41",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/928195ebcce682ade114aa7f501f98321e414e41"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTItMDhfMTc2NTIzMDIyMw"
+ },
+ {
+  "name": "1.0.0.85-1@2025-12-08_1765220437",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-12-08_1765220437",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-12-08_1765220437",
+  "commit": {
+   "sha": "4de667a8be63294c28a80e190d3f6b2e8d78f6c3",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/4de667a8be63294c28a80e190d3f6b2e8d78f6c3"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTItMDhfMTc2NTIyMDQzNw"
+ },
+ {
+  "name": "1.0.0.85-1@2025-12-01_1764570462",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-12-01_1764570462",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-12-01_1764570462",
+  "commit": {
+   "sha": "9ab732cf29105f58b136c0585fe78528695ab3ca",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/9ab732cf29105f58b136c0585fe78528695ab3ca"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTItMDFfMTc2NDU3MDQ2Mg"
+ },
+ {
+  "name": "1.0.0.85-1@2025-11-21_1763706337",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-11-21_1763706337",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-11-21_1763706337",
+  "commit": {
+   "sha": "189b6681da0653fa6428e47415a000f8a71d6149",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/189b6681da0653fa6428e47415a000f8a71d6149"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTEtMjFfMTc2MzcwNjMzNw"
+ },
+ {
+  "name": "1.0.0.85-1@2025-11-01_1761978177",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-11-01_1761978177",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-11-01_1761978177",
+  "commit": {
+   "sha": "99e7ac2b4d97027c22ed6cf55e886b8f58ade8fd",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/99e7ac2b4d97027c22ed6cf55e886b8f58ade8fd"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTEtMDFfMTc2MTk3ODE3Nw"
+ },
+ {
+  "name": "1.0.0.85-1@2025-10-26_1761439866",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.85-1@2025-10-26_1761439866",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.85-1@2025-10-26_1761439866",
+  "commit": {
+   "sha": "2bc26e8f702df03b0ef8e1547d56caba19c7cd92",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/2bc26e8f702df03b0ef8e1547d56caba19c7cd92"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NS0xQDIwMjUtMTAtMjZfMTc2MTQzOTg2Ng"
+ },
+ {
+  "name": "1.0.0.84-1@2025-10-01_1759299925",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.84-1@2025-10-01_1759299925",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.84-1@2025-10-01_1759299925",
+  "commit": {
+   "sha": "07e01ad4e9e52b82832f45ed6ce595e8cc26b331",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/07e01ad4e9e52b82832f45ed6ce595e8cc26b331"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NC0xQDIwMjUtMTAtMDFfMTc1OTI5OTkyNQ"
+ },
+ {
+  "name": "1.0.0.84-1@2025-09-29_1759127320",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.84-1@2025-09-29_1759127320",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.84-1@2025-09-29_1759127320",
+  "commit": {
+   "sha": "8cdef1961ba0a880b6d39c60985ad4903ae925bf",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/8cdef1961ba0a880b6d39c60985ad4903ae925bf"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NC0xQDIwMjUtMDktMjlfMTc1OTEyNzMyMA"
+ },
+ {
+  "name": "1.0.0.84-1@2025-09-22_1758522520",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.84-1@2025-09-22_1758522520",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.84-1@2025-09-22_1758522520",
+  "commit": {
+   "sha": "574e17db2c1a6c31aae5e3e378eedc98bda4065a",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/574e17db2c1a6c31aae5e3e378eedc98bda4065a"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NC0xQDIwMjUtMDktMjJfMTc1ODUyMjUyMA"
+ },
+ {
+  "name": "1.0.0.84-1@2025-09-15_1757917696",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.84-1@2025-09-15_1757917696",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.84-1@2025-09-15_1757917696",
+  "commit": {
+   "sha": "ee8a67bd81eeab3347492312814e488e9e5a859f",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/ee8a67bd81eeab3347492312814e488e9e5a859f"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NC0xQDIwMjUtMDktMTVfMTc1NzkxNzY5Ng"
+ },
+ {
+  "name": "1.0.0.84-1@2025-09-10_1757491973",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.84-1@2025-09-10_1757491973",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.84-1@2025-09-10_1757491973",
+  "commit": {
+   "sha": "9b3ee1a597587f1bab9d9e1e25ab31d7a4b9d89c",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/9b3ee1a597587f1bab9d9e1e25ab31d7a4b9d89c"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44NC0xQDIwMjUtMDktMTBfMTc1NzQ5MTk3Mw"
+ },
+ {
+  "name": "1.0.0.82-2@2025-09-08_1757312893",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-09-08_1757312893",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-09-08_1757312893",
+  "commit": {
+   "sha": "272c24a4c36001fd649725a1c136a642cc322e4b",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/272c24a4c36001fd649725a1c136a642cc322e4b"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDktMDhfMTc1NzMxMjg5Mw"
+ },
+ {
+  "name": "1.0.0.82-2@2025-09-05_1757042893",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-09-05_1757042893",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-09-05_1757042893",
+  "commit": {
+   "sha": "83ccc8f0db8df9f1997125771ec1bd4e987d85b7",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/83ccc8f0db8df9f1997125771ec1bd4e987d85b7"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDktMDVfMTc1NzA0Mjg5Mw"
+ },
+ {
+  "name": "1.0.0.82-2@2025-09-01_1756708218",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-09-01_1756708218",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-09-01_1756708218",
+  "commit": {
+   "sha": "b6435377561c458bf50e8a4c97846aca5377700f",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/b6435377561c458bf50e8a4c97846aca5377700f"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDktMDFfMTc1NjcwODIxOA"
+ },
+ {
+  "name": "1.0.0.82-2@2025-08-25_1756103457",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-08-25_1756103457",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-08-25_1756103457",
+  "commit": {
+   "sha": "907525dfbafa7cfa73538f931d2df754b404336d",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/907525dfbafa7cfa73538f931d2df754b404336d"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDgtMjVfMTc1NjEwMzQ1Nw"
+ },
+ {
+  "name": "1.0.0.82-2@2025-08-18_1755498691",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-08-18_1755498691",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-08-18_1755498691",
+  "commit": {
+   "sha": "4595eb83f0c2860f4eab615b90f60944e9b00ffd",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/4595eb83f0c2860f4eab615b90f60944e9b00ffd"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDgtMThfMTc1NTQ5ODY5MQ"
+ },
+ {
+  "name": "1.0.0.82-2@2025-08-11_1754893893",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-08-11_1754893893",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-08-11_1754893893",
+  "commit": {
+   "sha": "3e8853f9cc503e2682105ecf58fd72c1caf43404",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/3e8853f9cc503e2682105ecf58fd72c1caf43404"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDgtMTFfMTc1NDg5Mzg5Mw"
+ },
+ {
+  "name": "1.0.0.82-2@2025-08-10_1754784958",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-08-10_1754784958",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-08-10_1754784958",
+  "commit": {
+   "sha": "853f48f2a439e23db32bf5a179aad89d922eb37c",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/853f48f2a439e23db32bf5a179aad89d922eb37c"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDgtMTBfMTc1NDc4NDk1OA"
+ },
+ {
+  "name": "1.0.0.82-2@2025-08-06_1754458582",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-08-06_1754458582",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-08-06_1754458582",
+  "commit": {
+   "sha": "3457e9e7c98697bfb7c0e613d9f941f995bf9a92",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/3457e9e7c98697bfb7c0e613d9f941f995bf9a92"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDgtMDZfMTc1NDQ1ODU4Mg"
+ },
+ {
+  "name": "1.0.0.82-2@2025-08-06_1754451055",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-08-06_1754451055",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-08-06_1754451055",
+  "commit": {
+   "sha": "63b84b98364ef390017506896d30fc22ae3a0e03",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/63b84b98364ef390017506896d30fc22ae3a0e03"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDgtMDZfMTc1NDQ1MTA1NQ"
+ },
+ {
+  "name": "1.0.0.82-2@2025-08-05_1754424174",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-08-05_1754424174",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-08-05_1754424174",
+  "commit": {
+   "sha": "7b9fb0b49ed9a730db8edf534bbc2da550a4be35",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/7b9fb0b49ed9a730db8edf534bbc2da550a4be35"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDgtMDVfMTc1NDQyNDE3NA"
+ },
+ {
+  "name": "1.0.0.82-2@2025-08-05_1754418663",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-08-05_1754418663",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-08-05_1754418663",
+  "commit": {
+   "sha": "7b9fb0b49ed9a730db8edf534bbc2da550a4be35",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/7b9fb0b49ed9a730db8edf534bbc2da550a4be35"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDgtMDVfMTc1NDQxODY2Mw"
+ },
+ {
+  "name": "1.0.0.82-2@2025-08-04_1754341228",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-08-04_1754341228",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-08-04_1754341228",
+  "commit": {
+   "sha": "03d4d56f39dc9d5317ecdc680a68d71795b25bdf",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/03d4d56f39dc9d5317ecdc680a68d71795b25bdf"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDgtMDRfMTc1NDM0MTIyOA"
+ },
+ {
+  "name": "1.0.0.82-2@2025-08-04_1754289409",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-08-04_1754289409",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-08-04_1754289409",
+  "commit": {
+   "sha": "e972931b8efb97f5603522b6366d788b920e4889",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/e972931b8efb97f5603522b6366d788b920e4889"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDgtMDRfMTc1NDI4OTQwOQ"
+ },
+ {
+  "name": "1.0.0.82-2@2025-07-28_1753684327",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-07-28_1753684327",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-07-28_1753684327",
+  "commit": {
+   "sha": "b08ececed3e6cc9690997a4e8eb470786d816761",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/b08ececed3e6cc9690997a4e8eb470786d816761"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDctMjhfMTc1MzY4NDMyNw"
+ },
+ {
+  "name": "1.0.0.82-2@2025-07-21_1753079452",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-07-21_1753079452",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-07-21_1753079452",
+  "commit": {
+   "sha": "8ba942584f51ca55463fb6315c843b1f383f73c5",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/8ba942584f51ca55463fb6315c843b1f383f73c5"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDctMjFfMTc1MzA3OTQ1Mg"
+ },
+ {
+  "name": "1.0.0.82-2@2025-07-14_1752474672",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-07-14_1752474672",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-07-14_1752474672",
+  "commit": {
+   "sha": "d8fd45d79cc87b51accbc460370839d02ea3d18f",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/d8fd45d79cc87b51accbc460370839d02ea3d18f"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDctMTRfMTc1MjQ3NDY3Mg"
+ },
+ {
+  "name": "1.0.0.82-2@2025-07-02_1751477745",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2@2025-07-02_1751477745",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2@2025-07-02_1751477745",
+  "commit": {
+   "sha": "c292fcc8e8f05fe4bbfc202d92957dfe32d1dd7d",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/c292fcc8e8f05fe4bbfc202d92957dfe32d1dd7d"
+  },
+  "node_id": "REF_kwDOISnl7toAKnJlZnMvdGFncy8xLjAuMC44Mi0yQDIwMjUtMDctMDJfMTc1MTQ3Nzc0NQ"
+ },
+ {
+  "name": "1.0.0.82-2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-2",
+  "commit": {
+   "sha": "dd66e77e7c9c156cd5ee02b5054e0419f114bf77",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/dd66e77e7c9c156cd5ee02b5054e0419f114bf77"
+  },
+  "node_id": "REF_kwDOISnl7rRyZWZzL3RhZ3MvMS4wLjAuODItMg"
+ },
+ {
+  "name": "1.0.0.82-1",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.82-1",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.82-1",
+  "commit": {
+   "sha": "a72664dd7e9a6f4b9db0ce4f3dcbd7dda9e5da09",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/a72664dd7e9a6f4b9db0ce4f3dcbd7dda9e5da09"
+  },
+  "node_id": "REF_kwDOISnl7rRyZWZzL3RhZ3MvMS4wLjAuODItMQ"
+ },
+ {
+  "name": "1.0.0.81-2",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/1.0.0.81-2",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/1.0.0.81-2",
+  "commit": {
+   "sha": "25812e07d046158c1073d2c1df06fea93067a1d3",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/25812e07d046158c1073d2c1df06fea93067a1d3"
+  },
+  "node_id": "REF_kwDOISnl7rRyZWZzL3RhZ3MvMS4wLjAuODEtMg"
+ },
+ {
+  "name": "202404161337-deb",
+  "zipball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/zipball/refs/tags/202404161337-deb",
+  "tarball_url": "https://api.github.com/repos/ivan-hc/Steam-appimage/tarball/refs/tags/202404161337-deb",
+  "commit": {
+   "sha": "9019c0ebd56899359279a17cc11511456e64d7f2",
+   "url": "https://api.github.com/repos/ivan-hc/Steam-appimage/commits/9019c0ebd56899359279a17cc11511456e64d7f2"
+  },
+  "node_id": "REF_kwDOISnl7rpyZWZzL3RhZ3MvMjAyNDA0MTYxMzM3LWRlYg"
+ }
+]

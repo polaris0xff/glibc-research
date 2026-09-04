@@ -1,0 +1,5 @@
+#DB# Epic Games Launcher # DB_EXES=('EpicGamesLauncher.exe')
+
+pre_launch() { EXE_ARGS+=(-opengl) ; }
+
+WIN_VER=10

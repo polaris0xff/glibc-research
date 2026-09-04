@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - action
+    tags:
+    - 'stub'  # '*'
+
+jobs:
+  build_and_release:
+    name: lwrap
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build archlinux packages
+        uses: countstarlight/arch-makepkg-action@master
+        with:
+          scripts: "cd lwrap && makepkg -fsCc --noconfirm --nodeps"
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: lwrap/lwrap-*.pkg*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

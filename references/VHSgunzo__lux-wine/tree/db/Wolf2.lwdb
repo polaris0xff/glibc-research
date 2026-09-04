@@ -1,0 +1,5 @@
+#DB# Wolfenstein 2009 # DB_EXES=('Wolf2.exe')
+
+pre_launch() { EXE_ARGS+=(+set com_skipIntro 1) ; }
+
+WIN_VER=10

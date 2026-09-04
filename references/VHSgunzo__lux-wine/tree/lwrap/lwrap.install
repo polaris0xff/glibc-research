@@ -1,0 +1,99 @@
+pkg_tool() {
+    local ret=1
+    unset pacdblck_exist
+    pacdblck='/var/lib/pacman/db.lck'
+    if [ -f "$pacdblck" ]
+        then
+            pacdblck_exist=1
+            rm -f "$pacdblck"
+    fi
+    LANG= sh -c "$@"
+    ret="$?"
+    if [ "$pacdblck_exist" == 1 ]
+        then touch "$pacdblck"
+    fi
+    return $ret
+}
+export -f pkg_tool
+
+## arg 1:  the new package version
+pre_install() {
+    if ! grep -q cachyos /etc/pacman.conf
+        then
+            echo '
+[cachyos]
+Server = https://cdn.cachyos.org/repo/$arch/$repo
+Server = https://cdn-1.cachyos.org/$arch/$repo
+Server = https://cdn77.cachyos.org/repo/$arch/$repo
+' >> /etc/pacman.conf
+            pkg_tool 'yes|pac -Sy proton-cachyos'
+    fi
+}
+
+## arg 1:  the new package version
+#post_install() {
+    # do something here
+#}
+
+## arg 1:  the new package version
+## arg 2:  the old package version
+pre_upgrade() {
+    pre_install
+}
+
+## arg 1:  the new package version
+## arg 2:  the old package version
+post_upgrade() {
+    pac -Q zenity 2>/dev/null|grep -q '4\.[0-9]\.[0-9]' && \
+    pkg_tool 'yes|sudo downgrade zenity=3.44.2'
+
+    if [ "$RUNIMAGE_VERSION" == '0.39.1' ]
+        then
+            pac -Q chromium &>/dev/null && \
+            pkg_tool 'yes|pac -Rsndd chromium'
+
+            pac -Q amdvlk &>/dev/null && \
+            pkg_tool 'yes|pac -Rsndd amdvlk'
+
+            pac -Q lib32-amdvlk &>/dev/null && \
+            pkg_tool 'yes|pac -Rsndd lib32-amdvlk'
+
+            pac -Q glibc-eac lib32-glibc-eac &>/dev/null||\
+            pkg_tool 'yes|pac -Sy glibc-eac lib32-glibc-eac'
+    fi
+
+    pac -Q GE-Proton &>/dev/null && \
+    pkg_tool 'yes|pac -Rsndd GE-Proton'
+
+    local LWRUN="$HOME/.local/share/LuxWine/bin/lwrun"
+    if [ -f "$LWRUN" ]
+        then
+            env -u LD_PRELOAD lwrap --install
+            for link in lwrap xterm
+                do
+                    local link_path="$HOME/.local/share/LuxWine/bin/$link"
+                    if [ ! -L "$link_path" ]
+                        then ln -sfr "$LWRUN" "$link_path"
+                    fi
+            done
+    fi
+
+    if grep -q nocap /usr/lib/steam/steam 2>/dev/null
+        then sed -i 's| nocap||' /usr/lib/steam/steam
+    fi
+
+    sed -i 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=2|' /var/RunDir/sharun/bin/uruntime
+    echo RIM_CMPRS_BSIZE=18 >> "$RIMENVFL"
+
+    return 0
+}
+
+## arg 1:  the old package version
+#pre_remove() {
+    # do something here
+#}
+
+## arg 1:  the old package version
+#post_remove() {
+    # do something here
+#}

@@ -1,0 +1,11 @@
+#DB# Direct Commander # DB_EXES=('Direct Commander.exe' 'Direct Commander Setup*.exe')
+
+pre_launch() {
+    [[ "${EXE_NAME,,}" == 'direct commander setup'* ]] && \
+        installrun_nupkg_exe
+}
+
+WIN_VER=10
+WINEARCH=win64
+MUST_HAVE_DLL=Disabled
+WPREFIX_NAME=defprefix_dotnet

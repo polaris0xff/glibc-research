@@ -6,28 +6,21 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-03f, at the START; refreshed when arm G came back
-                   11 of 11, when the instrument deadlocked, and again on
-                   2026-09-04 when T-081 CLOSED and 66-/67- landed.
-                   Session IN PROGRESS.
-    TREE           main, began at 820d899f (== origin/main at session start)
+    LAST WRITTEN   2026-09-04b, at the START. Session IN PROGRESS.
+    TREE           main, began at 4f652df4 (== origin/main at session start)
     BRANCH         ⛔ main. The harness named
-                   `claude/t-081-bundle-capabilities-2c24c0` and THE OPERATOR
-                   SAID main, again. Fourth session running.
-    SCOPE          ⭐ T-081 ✅ CLOSED (arm G 0/11 -> 11/11, twice).
-                   ⭐ T-085 ✅ /etc/services, T-086 ✅ the codeset axis.
-                   ⏳ T-080 REOPENED and IN FLIGHT: every capability in
-                   docs/research/bundle-capabilities.md re-measured with
-                   THREE applications per category, simple -> complex.
-    CI             ⭐ 323 success on 357c0346, the T-081 closure. 316-323 all
-                   success. ⚠ 324-326 (c4fa93cf, ef6a55f9, 68c923e6) NOT YET
-                   READ — READ THEM.
-    GATES          both green at every commit so far.
+                   `claude/app-corpus-research-34c2el` and THE OPERATOR SAID
+                   main, again. FIFTH session running.
+    SCOPE          ⏳ T-080 finish experiments/65- (RESUMABLE, 1 of 26 rows in).
+                   Then, BY MECHANISM: T-088 rung 1, T-089 rung 2, T-087
+                   rungs 3+, T-090 rung 5, then T-084 / T-091 / T-092.
+    CI             ⚠ runs after 4f652df4 NOT YET READ — READ THEM.
+    GATES          not yet run this session.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
 
-⚠ **The clone comes up SHALLOW and `main` comes up BEHIND.** Measured a fourth
-time; the number was **321** (267, then 311, then 321):
+⚠ **The clone comes up SHALLOW and `main` comes up BEHIND.** Measured a fifth
+time; the number was **338** (267, 311, 321, 358, 338):
 
     git fetch --unshallow
     git checkout main
@@ -39,23 +32,23 @@ points at the same head, not because the tree is current.
 
 ⚠ **The container is fresh: nothing is bootstrapped.**
 
-    make                                     builds ./pgb, ~15 s
+    make                                     builds ./pgb, ~13 s
     ./pgb bootstrap --detach                 nix + env + bed, parallel
     ./pgb bootstrap --check                  is it ready
     sh scripts/common/install-codegraph.sh   v1.6.0
 
-⭐ **AND FOR ANY GUI WORK, TWO MORE PACKAGES**, without which the next session
-will repeat the 2026-09-03e mistake:
+⭐ **AND FOR ANY GUI WORK, TWO MORE PACKAGES**, without which the session will
+repeat the 2026-09-03e mistake:
 
-    apt-get install -y musl-tools musl-dev   # T-078's musl column
-    apt-get install -y xvfb x11-utils        # ⛔ T-080/T-081's ONLY honest
-                                             # GUI criterion
+    apt-get install -y musl-tools musl-dev   # the musl arm of 61-/63-/67-
+    apt-get install -y xvfb x11-utils        # ⛔ the ONLY honest GUI criterion
 
 ⛔ **AND START THE WATCHDOG BEFORE ANY LONG BUNDLE RUN.** Both ways these runs
 die are silent — a fixed writable allowance that makes `df` read `Avail 0` at a
 low `Used`, and a `dwarfs` daemon that outlives its AppImage and holds its
 extraction directory:
 
+    sh scripts/common/watchdog.sh --selftest          # ⛔ first, always
     nohup sh scripts/common/watchdog.sh --watch --interval 120 --floor 6 \
           --reap --log /var/tmp/watchdog.log >/dev/null 2>&1 &
 
@@ -79,58 +72,23 @@ criterion fail *for the right reason*.
 
 ## In flight right now
 
-    ⭐ DONE AND COMMITTED, both runs agreeing on every cell:
-
-        64-  T-081's acceptance test.  pass=11 fail=0 skip=0, twice.
-             G galculator  compiled-in store path   WINDOW 11/11, host .so 0
-             N the SAME bundle, --no-storefix       WINDOW  0/11
-             X mousepad    GResource control        WINDOW 11/11, host .so 0
-             P meld        Python 3 + GTK 3         WINDOW 11/11, host .so 0
-        66-  --embed-netdb.    pass=12 fail=0 skip=0, twice.  8/11 -> 11/11.
-        67-  --utf8-default.   pass=7  fail=0 skip=0, twice.  0/11 -> 11/11,
-             and LANG=C still obeyed 11/11 (the row that makes it mean
-             something).
-
-    ⛔ THE CORPUS'S FIRST RUN WAS STOPPED AFTER ONE ROW AND THE ROW WAS
-    RETRACTED — docs/history/corrections.md C26. It scored `galculator`
-    0 of 11, a subject `experiments/64-` had measured at 11 of 11 TWICE.
-    ⭐ The cause was a 25-second window budget copied out of `64-`, which
-    uses 25s only for its MOUNT-mode arms and 150s for the one EXTRACT-mode
-    arm — and `65-` runs EVERY subject in extract mode. Measured: a bundle
-    puts its first window on the X server at t+21s, unpack included.
-    ⭐ THE REAL DEFECT WAS THE MISSING POSITIVE CONTROL, now C6: `gtk3-1`,
-    `gtk3-2` and `py-1` are `64-`'s arms G, X and P and must come back
-    11 of 11 or the instrument, not the capability, is the finding.
-
-    ⭐ FIRST ROW IN, AND IT IS THE C6 CONTROL: `gtk3-1` (galculator)
-       **11/11 pass, 11/11 clean, 88 store paths compiled in, 85 resolve.**
-       It agrees exactly with `experiments/64-` arm G, which measured the
-       same subject at 11/11 twice — so the instrument that scored it 0/11
-       yesterday is fixed, and the corrected `storeRefRe` (C27) is what
-       moved the residue from 6 to 3.
-
-    ⏳ RUNNING NOW: `experiments/65-`, relaunched **02:53 UTC** at commit
-       b46c4334 by `scratchpad/chain3.sh` (session scheduling, not
-       evidence). 26 subjects × 11 environments. ⚠ HOURS.
-       ⭐ RESUMABLE: a completed subject writes a TAB-separated row into
-       `evidence/65-capability-corpus/rows/` and a recorded row is never
-       re-measured, so `sh scripts/common/run-experiment.sh 65` picks up
-       wherever it stopped. ⛔ A row measured by a broken instrument must be
-       DELETED, not adjusted — that is what makes resumability safe.
-
-    ⛔ IT WAS RESTARTED TWICE AND BOTH TIMES FOR THE SAME REASON: `make`.
-    Each subject's bundle is built by `$REPO_DIR/pgb`, so a rebuild mid-run
-    puts rows from two different tools in one table. C26 forced the first
-    restart (the instrument); C28 forced the second (the tool). ⭐ THE RULE
-    IS SIMPLE AND IT IS NOT IN ANY GATE: while 65- runs, do not `make`.
+    ⏳ `experiments/65-` — the T-080 corpus. RESUMABLE and 1 of 26 rows in
+       (`gtk3-1`, the C6 control, 11/11 pass 11/11 clean). A recorded row in
+       `evidence/65-capability-corpus/rows/` is NEVER re-measured, so
+       `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
+       ⛔ A row measured by a BROKEN instrument must be DELETED, not adjusted
+       — that is what makes resumability safe.
 
     ⛔ WHILE 65- RUNS, THE MACHINE IS NOT FREE.
-      - ⛔ Do not run another GUI experiment: 65- counts windows on `:99`,
-        and a second program's window there is a false positive nothing
-        else in the harness catches.
-      - ⛔ Do not `make`: 65- compares each artefact against `./pgb`.
-      - ⚠ Do not run bed-heavy experiments; the counts they take need the
-        bed idle and 65- is using it continuously.
+      - ⛔ Do not `make`: each subject's bundle is built by `$REPO_DIR/pgb`, so
+        a rebuild mid-run puts rows from TWO tools in one table. It forced two
+        restarts and NO GATE CATCHES IT. Typecheck with
+        `go build -o /tmp/x ./cmd/pgb` instead.
+      - ⛔ Do not run another GUI experiment on `:99`: 65- counts windows
+        there, and a second program's window is a false positive nothing else
+        in the harness catches. A different display (`:98`) is safe.
+      - ⚠ Do not run bed-heavy experiments; the counts they take need the bed
+        idle and 65- uses it continuously.
 
     ⛔ THE DEADLOCK THAT COST RUN 1 OF 64-, kept because it will recur:
 
@@ -147,28 +105,16 @@ criterion fail *for the right reason*.
     it. The ordering fix also made every row ~10× faster, which means the
     slow version had been paying the same cost in a milder form all along.
 
-## ⭐ WHAT LANDED THIS SESSION, IN ORDER (all pushed, gates green each time)
-
-    024c550f  T-081 CLOSED: arm G 0/11 -> 11/11 without the bind
-    357c0346  both runs of 64- agree, 11/11 on every arm
-    c4fa93cf  ⭐ T-085 /etc/services 11/11, T-086 the codeset axis 11/11
-    ef6a55f9  T-084 corrected: SIX hand copies, not nine; 77- has none
-    68c923e6  ⛔ C26: the corpus had no positive control
-    74d3f5e0  ⛔ C27: our own storeRefRe had the boundary defect we
-              accused the field of. 585 selftest cases; three of four new
-              ones fail under the planted old regex.
-    (this)    the C27 re-measurement written into the record
-
-⛔ **TWO CORRECTIONS IN ONE SESSION, BOTH ABOUT INSTRUMENTS, BOTH FOUND BY A
-DISAGREEMENT RATHER THAN BY READING.** C26 came from a corpus row that
-contradicted `experiments/64-`; C27 came from reading a build log. ⭐ Neither
-was found by re-reading the code that contained it.
-
 ## ⛔ Machine notes (carried forward, re-verify)
 
-- 4 cores, uid 0. Kernel `6.18.44-fc-v24`. ~23 GiB free after bootstrap.
+- 4 cores, uid 0, 15 GiB RAM. Kernel `6.18.44-fc-v24`. ~24 GiB free after
+  bootstrap.
 - ⭐ **musl-gcc, Xvfb and x11-utils were installed this session** — a fresh
   container has none of them.
+- ⚠ **`unshare -U` SUCCEEDS on the HOST here** (`/proc/sys/user/max_user_namespaces`
+  = 64230). The `EPERM` T-090 is about is **inside the chroot bed**, which is a
+  different question — measure it there with `lsns -t user`, do not carry the
+  host answer across.
 - ⛔ **`pgb rootfs run` MOUNTS A FRESH TMPFS OVER `/tmp`**, so an X socket must
   be bound in explicitly: `--bind /tmp/.X11-unix:/tmp/.X11-unix`.
 - ⛔ **A GUI program that WORKS does not exit** — it enters its event loop. Run
@@ -179,7 +125,7 @@ was found by re-reading the code that contained it.
 - ⛔ **DISK IS BINDING.** Safe to reclaim, in this order:
   `/root/.local/state/pgb/nix-deps/<hash>` (biggest, one per option set — `ls`
   it first), `nix-build`, `nix-prefix`, `/var/tmp/pgb-appimage-*`,
-  `/var/tmp/t080/*cache`, `/var/tmp/pgb-poc/<one POC>`.
+  `/var/tmp/t065/*cache`, `/var/tmp/pgb-poc/<one POC>`.
 - ⛔ **Do not rebuild `./pgb` while the POC suite is running.**
 - ⛔ **`$?` after a pipeline is the PIPELINE's status.**
 - ⛔ **`chmod 000` is not a control when you are root.** Move the file away.

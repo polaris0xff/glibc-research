@@ -1,0 +1,11 @@
+#DB# WeMod # DB_EXES=('WeMod.exe' 'WeMod-.*.exe')
+
+pre_launch() {
+    [[ "${EXE_NAME,,}" == 'wemod-'[0-9]* ]] && \
+        installrun_nupkg_exe
+}
+
+WIN_VER=10
+WINEARCH=win64
+MUST_HAVE_DLL=Disabled
+WPREFIX_NAME=defprefix_dotnet

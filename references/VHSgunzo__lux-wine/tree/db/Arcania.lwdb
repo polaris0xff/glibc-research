@@ -1,0 +1,8 @@
+#DB# Gothic 4: Arcania # DB_EXES=('Arcania Addon.exe' 'ArcaniA Addon POL.exe' 'ArcaniA Addon RUS.exe' 'Arcania.exe')
+
+WIN_VER=10
+WINEARCH=win64
+TZ=Europe/Moscow
+USE_DEFPFX_BACKUP=1
+WPREFIX_NAME=arcaniapfx
+MUST_HAVE_DLL='wmp11 physx'

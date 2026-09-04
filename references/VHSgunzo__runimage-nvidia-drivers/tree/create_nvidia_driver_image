@@ -1,0 +1,93 @@
+#!/bin/bash
+#set -e
+shopt -s extglob
+
+# usage: ./create_nvidia_driver_image 535.104.05
+
+try_dl() {
+     for driver_url in ${driver_url_list[@]}
+          do
+               if which aria2c &>/dev/null
+                    then
+                         aria2c -x 13 -s 13 --allow-overwrite -o "$nvidia_run" \
+                              -d "$nvidia_drivers_dir" "$driver_url" && return 0
+               elif which wget &>/dev/null
+                    then
+                         wget --no-check-certificate --content-disposition -t 3 -T 5 -w 0.5 \
+                              "$driver_url" -O "$nvidia_drivers_dir/$nvidia_run" && return 0
+               elif which curl &>/dev/null
+                    then
+                         curl -L "$driver_url" -o "$nvidia_drivers_dir/$nvidia_run" && return 0
+               else
+                    return 1
+               fi
+     done
+}
+
+[[ ! -n "$1" && -n "$(git tag --list|tac|head -1|sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g')" ]] && \
+     nvidia_version="$(git tag --list|tac|head -1|sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g')"
+
+if [[ -n "$1" || -n "$nvidia_version" ]]
+     then
+          [ ! -n "$nvidia_version" ] && \
+               nvidia_version="$1"
+          [[ -d "$2" && ! -n "$nvidia_drivers_dir" ]] && \
+               nvidia_drivers_dir="$2"
+          [[ ! -d "$2" && ! -n "$nvidia_drivers_dir" ]] && \
+               nvidia_drivers_dir="."
+          [ ! -n "$nvidia_driver_sfs" ] && \
+               nvidia_driver_sfs="$nvidia_version.nv.drv"
+          mkdir -p "$nvidia_drivers_dir"
+          echo "Downloading Nvidia ${nvidia_version}, please wait..."
+          nvidia_run="NVIDIA-Linux-x86_64-${nvidia_version}.run"
+          driver_url_list=(
+               "https://download.nvidia.com/XFree86/Linux-x86_64/${nvidia_version}/$nvidia_run"
+               "https://us.download.nvidia.com/tesla/${nvidia_version}/$nvidia_run"
+               "https://developer.nvidia.com/downloads/vulkan-beta-${nvidia_version//.}-linux"
+               "https://developer.nvidia.com/vulkan-beta-${nvidia_version//.}-linux"
+               "https://developer.nvidia.com/linux-${nvidia_version//.}"
+          )
+          if [ -f "$nvidia_run" ] || try_dl
+               then
+                    binary_files="mkprecompiled nvidia-cuda-mps-control nvidia-cuda-mps-srv nvidia-pcc \
+                        nvidia-debugdump nvidia-installer nvidia-modprobe nvidia-ngx-updater tls_test \
+                        nvidia-persistenced nvidia-powerd nvidia-settings nvidia-smi nvidia-xconfig
+                        nvidia-cuda-mps-server nvidia-bug-report.sh nvidia-sleep.sh"
+                    trash_libs="libEGL.so* libGLdispatch.so* *.swidtag *.la \
+                         libGLESv!(*nvidia).so* libGL.so* libGLX.so* libOpenCL.so* libOpenGL.so*"
+                    chmod u+x "$nvidia_drivers_dir/$nvidia_run"
+                    echo "Unpacking $nvidia_run..."
+                    (cd "$nvidia_drivers_dir" && rm -rf "$nvidia_version" && \
+                         "./$nvidia_run" --target "$nvidia_version" -x &>/dev/null)
+                    echo "Creating a driver directory structure..."
+                    (cd "$nvidia_drivers_dir/$nvidia_version" && \
+                         rm -rf html kernel* libglvnd_install_checker 32/libglvnd_install_checker \
+                              supported-gpus systemd *.gz *.bz2 *.txt .manifest *.desktop *.png firmware *.h
+                         for temp in $(ls *.template 2>/dev/null) ; do mv "$temp" "${temp%.template}" ; done
+                         mkdir profiles && mv *application-profiles* profiles
+                         [ -f "nvoptix.bin" ] && mv nvoptix.bin profiles
+                         [ -n "$(ls *.dll 2>/dev/null)" ] && mkdir wine && mv *.dll wine
+                         mkdir json && mv *.json json
+                         mkdir conf && mv *.conf *.icd conf
+                         for lib in $trash_libs ; do rm -f $lib 32/$lib ; done
+                         mkdir bin && mv *.sh bin
+                         for binary in $binary_files ; do [ -f "$binary" ] && mv $binary bin ; done
+                         mkdir 64 && mv *.so* 64
+                         [ -d "tls" ] && mv tls/* 64 && rm -rf tls
+                         [ -d "32/tls" ] && mv 32/tls/* 32 && rm -rf 32/tls)
+                    echo "Creating a squashfs driver image..."
+                    echo "$nvidia_drivers_dir/$nvidia_driver_sfs"
+                    if mksquashfs "$nvidia_drivers_dir/$nvidia_version" "$nvidia_drivers_dir/$nvidia_driver_sfs" \
+                         -root-owned -no-xattrs -noappend -b 1M -comp zstd -Xcompression-level 19 -quiet
+                         then
+                              echo "Deleting the source directory of the driver..."
+                              rm -rf "$nvidia_drivers_dir/$nvidia_version"
+                    fi
+               else
+                    echo "Failed to download Nvidia driver!"
+                    exit 1
+          fi
+     else
+          echo "You must specify the Nvidia driver version!"
+          exit 1
+fi

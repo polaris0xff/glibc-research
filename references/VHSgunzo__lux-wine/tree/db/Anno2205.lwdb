@@ -1,0 +1,3 @@
+#DB# Anno 2205 # DB_EXES=('Anno2205.exe')
+
+PYTHONIOENCODING=utf-8

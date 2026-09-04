@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+"http://www.freedesktop.org/standards/menu-spec/menu-1.0.dtd">
+<Menu>
+    <Name>Applications</Name>
+    <Menu>
+        <Name>LuxWine</Name>
+        <Directory>LuxWine.directory</Directory>
+        <Include>
+            <Category>Lux Wine</Category>
+        </Include>
+    </Menu>
+    <Menu>
+        <Name>LuxWineApps</Name>
+        <Directory>LuxWineApps.directory</Directory>
+        <Include>
+                <Category>Lux Wine Apps</Category>
+        </Include>
+    </Menu>
+</Menu>

@@ -1,0 +1,4 @@
+#DB# Crysis # DB_EXES=('Crysis.exe' 'Crysis64.exe' 'CrysisLauncher.exe')
+
+WIN_VER=10
+ESYNC=0

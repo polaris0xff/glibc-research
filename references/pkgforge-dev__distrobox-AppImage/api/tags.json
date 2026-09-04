@@ -1,0 +1,22 @@
+[
+ {
+  "name": "1.8.2.3-1@2026-02-01_1769936800",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/distrobox-AppImage/zipball/refs/tags/1.8.2.3-1@2026-02-01_1769936800",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/distrobox-AppImage/tarball/refs/tags/1.8.2.3-1@2026-02-01_1769936800",
+  "commit": {
+   "sha": "2536a5a468a3f35534131178666125196eaae4ea",
+   "url": "https://api.github.com/repos/pkgforge-dev/distrobox-AppImage/commits/2536a5a468a3f35534131178666125196eaae4ea"
+  },
+  "node_id": "REF_kwDOQy0CzNoAKXJlZnMvdGFncy8xLjguMi4zLTFAMjAyNi0wMi0wMV8xNzY5OTM2ODAw"
+ },
+ {
+  "name": "1.8.2.3-1@2026-01-22_1769069337",
+  "zipball_url": "https://api.github.com/repos/pkgforge-dev/distrobox-AppImage/zipball/refs/tags/1.8.2.3-1@2026-01-22_1769069337",
+  "tarball_url": "https://api.github.com/repos/pkgforge-dev/distrobox-AppImage/tarball/refs/tags/1.8.2.3-1@2026-01-22_1769069337",
+  "commit": {
+   "sha": "9b24ac90cb4af8bc7ae1d6ce04a3685eada6fd14",
+   "url": "https://api.github.com/repos/pkgforge-dev/distrobox-AppImage/commits/9b24ac90cb4af8bc7ae1d6ce04a3685eada6fd14"
+  },
+  "node_id": "REF_kwDOQy0CzNoAKXJlZnMvdGFncy8xLjguMi4zLTFAMjAyNi0wMS0yMl8xNzY5MDY5MzM3"
+ }
+]

@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches:
+    - action
+    tags:
+    - '*'
+
+jobs:
+  build_and_release:
+    name: Run-wrapper
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          override: true
+          target: x86_64-unknown-linux-musl
+
+      - name: Install deps
+        run: >
+          sudo bash -c 'apt update && apt install upx binutils -y';
+          rustup component add rust-src --toolchain nightly;
+          cargo install cross;
+
+      - name: Build x86_64
+        run: >
+          cargo clean;
+          cargo build --release;
+          mv target/x86_64-unknown-linux-musl/release/Run Run-x86_64;
+
+      - name: Build aarch64
+        run: >
+          cargo clean;
+          cross build --release --target aarch64-unknown-linux-musl;
+          mv target/aarch64-unknown-linux-musl/release/Run Run-aarch64;
+
+      - name: Strip
+        run: >
+          strip -s -R .comment -R .gnu.version --strip-unneeded Run-x86_64;
+
+      # - name: Build archlinux packages
+      #   uses: countstarlight/arch-makepkg-action@master
+      #   with:
+      #     scripts: |
+      #       cp -f Run-* pkgbuild;
+      #       cd pkgbuild && for arch in aarch64 x86_64; do CARCH=$arch makepkg -fsCc --noconfirm --nodeps; done;
+      #       cp -f Run-wrapper*.pkg.* ../ && cd ../ ;
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: Run*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

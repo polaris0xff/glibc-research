@@ -1,0 +1,22 @@
+#DB# Need for Speed Most Wanted # DB_EXES=('speed.exe')
+#DB# Need for Speed Carbon # DB_EXES=('NFSC.exe')
+#DB# Need for Speed Underground # DB_EXES=('speed.exe')
+#DB# Need for Speed Underground 2 # DB_EXES=('SPEED2.exe')
+
+
+set_syswine() {
+    WIN_VER=10
+    WINEARCH=win64
+    RESTORE_RESOL=1
+    USE_DEFPFX_BACKUP=1
+    WINE_VERSION=System
+    MUST_HAVE_DLL=Disabled
+    WPREFIX_NAME=syswinepfx
+}
+
+case "$EXE_DIR" in
+    'Need for Speed'*'Most Wanted'|\
+    'Need for Speed'*'Carbon') set_syswine ;;
+    'Need for Speed'*'Underground'|\
+    'Need for Speed'*'Underground 2') set_syswine ; WD3DMODE=WineD3D ;;
+esac

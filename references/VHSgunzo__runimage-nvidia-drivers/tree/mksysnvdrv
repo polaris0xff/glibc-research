@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+cp_nvfiles() (
+    local sys_pth sys_pths
+    local dir="$1"
+    shift
+    mkdir -p "$dir" && \
+    cd "$dir"||return 1
+    for item in "$@"
+        do
+            OLD_IFS="$IFS"
+            IFS=$'\n'
+            case "$dir" in
+                64|32) sys_pths="$(realpath "$item" 2>/dev/null)" ;;
+                bin) sys_pths="$(command -v "$item" 2>/dev/null)" ;;
+                wine) sys_pths=($(find /usr -type f -name "$item" 2>/dev/null)) ;;
+                .) sys_pths=($(ls "$item" 2>/dev/null)) ;;
+                *) sys_pths=($(find /etc/ /usr/share -name "*${item}" -type f 2>/dev/null)) ;;
+            esac
+            IFS="$OLD_IFS"
+            if [ -n "$sys_pths" ]
+                then
+                    for sys_pth in "${sys_pths[@]}"
+                        do
+                            local file="$(basename "$sys_pth")"
+                            if [[ ! -e "$file" && -e "$sys_pth" ]]
+                                then cp -f "$sys_pth" "$file"
+                            fi
+                    done
+            fi
+    done
+)
+
+
+nvidia_version="$(cat /sys/module/nvidia/version)"
+
+TRASH_LIBS=('libnvidia-container*')
+BINS=(
+    'mkprecompiled' 'nvidia-cuda-mps-control' 'nvidia-cuda-mps-server'
+    'nvidia-debugdump' 'nvidia-installer' 'nvidia-modprobe'
+    'nvidia-ngx-updater' 'tls_test' 'nvidia-persistenced' 'nvidia-powerd'
+    'nvidia-settings' 'nvidia-smi' 'nvidia-xconfig' 'nvidia-pcc'
+    'nvidia-cuda-mps-srv' 'nvidia-bug-report.sh' 'nvidia-sleep.sh'
+)
+
+CONFS=('nvidia*.conf' 'nvidia.icd')
+JSONS=('nvidia*.json')
+PROFS=(
+    "nvidia-application-profiles-${nvidia_version}-*"
+    'nvoptix.bin'
+)
+WINEL=('*nvngx*.dll')
+LICENSES=(
+    '/usr/share/licenses/nvidia-utils/LICENSE'
+    /usr/share/doc/nvidia-driver-*/LICENSE
+)
+
+NVLIB="$(ldconfig -p|grep -E 'nvidia|nvoptix|libcuda|libnvcuvid'|sed 's|.*=> ||g'|sort -u)"
+for lib in "${TRASH_LIBS[@]}"
+    do NVLIB="$(grep -v "$lib"<<<"$NVLIB")"
+done
+
+NVLIB32=($(grep -E '/lib32/|/i386-linux-gnu/'<<<"$NVLIB"))
+for pth in lib32 i386-linux-gnu
+    do
+        nvvdpau="/usr/$pth/vdpau/libvdpau_nvidia.so"
+        [ -e "$nvvdpau" ] && NVLIB32+=("$nvvdpau")
+done
+
+NVLIB64=($(grep -E '/lib/|/x86_64-linux-gnu/'<<<"$NVLIB"))
+for pth in lib lib/x86_64-linux-gnu
+    do
+        libs=(
+            "/usr/$pth/vdpau/libvdpau_nvidia.so.1"
+            "/usr/$pth/xorg/modules/drivers/nvidia_drv.so"
+            "/usr/$pth/nvidia/xorg/libglxserver_nvidia.so"
+            "/usr/$pth/nvidia/libglxserver_nvidia.so"
+        )
+        for lib in "${libs[@]}"
+            do [ -e "$lib" ] && NVLIB64+=("$lib")
+        done
+done
+
+(mkdir -p "$nvidia_version" && \
+cd "$nvidia_version"||exit 1
+
+cp_nvfiles 32 "${NVLIB32[@]}"
+
+cp_nvfiles 64 "${NVLIB64[@]}"
+
+cp_nvfiles bin "${BINS[@]}"
+
+cp_nvfiles conf "${CONFS[@]}"
+
+cp_nvfiles json "${JSONS[@]}"
+
+if [[ ! -e 'profiles' ]]
+    then
+        if [ -d '/usr/share/nvidia'  ]
+            then cp -TLrf '/usr/share/nvidia' 'profiles'
+            else cp_nvfiles profiles "${PROFS[@]}"
+        fi
+fi
+
+if [ ! -e 'wine' ]
+    then
+        if [ -d '/usr/lib/nvidia/wine' ]
+            then cp -rf '/usr/lib/nvidia/wine' 'wine'
+            else cp_nvfiles wine "${WINEL[@]}"
+        fi
+fi
+
+cp_nvfiles . "${LICENSES[@]}"
+)||exit 1
+
+mksquashfs "$nvidia_version" "$nvidia_version.nv.drv" \
+    -root-owned -no-xattrs -noappend -b 1M -comp zstd -Xcompression-level 1 -quiet && \
+rm -rf "$nvidia_version"
