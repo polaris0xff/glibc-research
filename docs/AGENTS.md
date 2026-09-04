@@ -579,6 +579,15 @@ here turns on, so installing one cannot silently move somebody else's result.
 does **not** survive `pgb rootfs fetch`, which replaces the rootfs — re-install
 after one.
 
+⛔ **AND A FIXTURE CAN BE NECESSARY WITHOUT BEING SUFFICIENT, which is the trap
+the first one fell into.** With the `de_DE.UTF-8` locale installed on all seven
+glibc rows, `experiments/101-` *still* read zero catalogues — because
+`internal/bundle/debloat.go` had been dropping every `share/locale` directory
+out of the artefact, and saying so in the build log on every run
+(`locale catalogues (kept: none)`, **C48**). ⭐ **So "the fixture is installed"
+is not "the criterion can now fire":** the run must be read again afterwards,
+and if it still reads zero the next cause is the artefact, not the bed.
+
 ## 9. Status
 
 ⭐ **Every row is a measurement.** The story behind any of them — what was
