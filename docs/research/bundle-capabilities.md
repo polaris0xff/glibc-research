@@ -84,13 +84,28 @@ all.**
 
 ## ⭐ THE ENTRY-POINT SHAPE PREDICTS THE RESULT, and C37 fixes a CLASS
 
-Every subject's build log says whether its entry is a plain ELF or a
-**script/shell wrapper**. Read against its row:
+Every subject's build log names its entry shape, and there are **three**, not
+two — a distinction the first version of this table did not make and that
+turns out to be the whole predictor:
 
-| entry shape | rows | result |
-|---|---|---|
-| **plain ELF** | 9 | ⭐ **8 pass at 11/11.** The one failure is `vkmark`, and that is the **missing GPU** (`/dev/dri`) |
-| ⛔ **script / shell wrapper** | 6 measured | ⛔ **5 fail.** `gl-3`, `x11-3`, `py-2`, `py-3`, `field-2` |
+| shape | what the build log says | subjects | result |
+|---|---|---|---|
+| **plain ELF** | `entry …/bin/<name>` | `dosbox`, `vkmark`, `xeyes`, … | ⭐ pass. The one failure is `vkmark`, and that is the **missing GPU** |
+| ⭐ **nixpkgs wrapper, RESOLVED at build time** | `bin/<n> is a nixpkgs wrapper -> .<n>-wrapped`, and the entry becomes the **dot-named ELF** | `mousepad`, `meld`, `flameshot` | ⭐ **works** — the wrapper is consumed, its environment lifted into `.env`, and no shell is left in the path |
+| ⛔ **generic SCRIPT** | `bin/<n> is a SCRIPT; its entry point is bash + the script itself`, and the entry becomes **bash** | `xterm`, `glmark2` | ⛔ **both were `0/11`** → ⭐ **both `11/11` after C37** |
+
+⭐ **THE PREDICTOR IS THE THIRD SHAPE AND NOTHING ELSE.** It is not "a script
+entry" — `meld` hits **both** wrapper handlers (`nixpkgs wrapper -> .meld-wrapped`,
+then `.meld-wrapped is a SCRIPT; its entry point is python3`) and passes
+**11/11**. It is not "a nixpkgs wrapper" — `mousepad` is one and passes
+**11/11**. It is **bash running a generic script that `exec`s a dot-named ELF
+by absolute store path**, which is exactly what C37 describes.
+
+⭐ **AND THAT SETTLES A SUSPICION ABOUT `flameshot`.** Its build log says
+*`bin/flameshot is a nixpkgs wrapper -> .flameshot-wrapped`* — the **resolved**
+shape, the same handler `mousepad` passes through. ⛔ So its `0/11` is **not**
+C37, its row was correctly left out of the five that were deleted, and the
+zero is still **unexplained**.
 
 ⭐ **AND THE FIX IS NOW CONFIRMED IN THE CORPUS ITSELF, ON BOTH SUBJECTS.**
 It was first measured by hand — `xterm` drawing in 2 s, `glmark2` drawing in
@@ -103,10 +118,8 @@ rows deleted, and both re-measured:
 | `gl-3` `glmark2` | **0 / 11** | ⭐ **11 / 11**, clean **11 / 11** |
 
 ⚠ **`meld` is the counter-example that keeps this honest**: it is a script
-entry and it passes **11/11**. ⭐ So the broken thing is not "a script entry" —
-it is specifically **a wrapper that `exec`s a dot-named ELF target by absolute
-store path**, which is what C37 describes. `meld`'s interpreter *reads* its
-script; nothing dot-named is exec'd.
+entry and it passes **11/11**. `meld`'s interpreter *reads* its script;
+nothing dot-named is exec'd.
 
 ⛔ **`field-2` (`neovim`) is in the failing column and is NOT C37**: its
 closure carries glibc 2.26 and `ld.so` learned `--argv0` in 2.33 — diagnosed
