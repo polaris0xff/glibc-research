@@ -28,7 +28,7 @@ the recommendation will not come back for it.**
 
 ## The corpus
 
-⭐ **Tracked, in this tree, under `references/`.** **52** repositories
+⭐ **Tracked, in this tree, under `references/`.** **55** repositories
 (`ls references/ | wc -l`), each with metadata, issues and pull requests in
 both states, comments, review comments, releases, tags, and the tree at a
 captured commit. Re-fetch any of them with:
