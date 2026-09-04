@@ -218,7 +218,12 @@ func (b *Builder) buildStoreFarm() ([]StoreMapEntry, error) {
 			list = append(list, k)
 		}
 		sort.Strings(list)
-		logx.Warnf("store paths carry top-level directories the bundle does not merge: %s",
+		// ⚠ "entries", not "directories": topLevelNames returns FILES too, and
+		// the case that made this warning fire in anger was 200 bare `.so`
+		// files at a store path's top level (helix's tree-sitter grammars).
+		// Calling them directories sent the reader looking for the wrong thing.
+		logx.Warnf("store paths carry %d top-level entries the bundle does not merge", len(list))
+		logx.Warnf("   a compiled-in path naming one of these cannot resolve: %s",
 			strings.Join(list, " "))
 	}
 	logx.Say("store map   %d store path(s) resolve inside the bundle", len(out))

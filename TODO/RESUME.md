@@ -106,8 +106,15 @@ criterion fail *for the right reason*.
                  libdl.so until 2.34). `checkLoaderOptions` now says so at
                  build time. ⛔ The bundle still cannot run — that is a
                  nixpkgs-closure fact, not a bundler one.
-        field-1  helix 0/11. Its closure carries ~200 TOP-LEVEL `.so`
-                 grammars and `mergedFor` maps no such top level.
+        field-1  helix 0/11. ⚠ A named limit of the farm and ⛔ NOT
+                 established as the cause: its closure carries ~200 bare
+                 TOP-LEVEL `.so` grammars, and mergedFor maps eight names,
+                 none of which covers a bare file. ⭐ The route is short --
+                 copyLibraries already flattened those `.so` into lib/, so a
+                 top-level `.so` could point there -- but helix also finds
+                 grammars via HELIX_RUNTIME, so it may never consult the
+                 compiled-in path. A fixed mergedFor that left the row at 0
+                 would be the useful result.
         gl-1     ⭐ SOLVED, AND IT IS THE INSTRUMENT. eglinfo RUNS, and the
                  assertion (llvmpipe|Mesa|softpipe) matches 20 times -- but
                  it exits 3 headless (and still 3 with XDG_RUNTIME_DIR set),

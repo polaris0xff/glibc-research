@@ -72,8 +72,36 @@ failures are subject-specific and each needs its own reading.
 |---|---|---|
 | `xterm` **0/11**, clean **11/11** | ⭐ **C5 predicted it would fail the HOST-OBJECT row and it did not** — it is clean on 11 of 11. ⚠ It also never drew, so the prediction is not so much falsified as **unevaluable**: a subject that does not start its shell never loads the shell's libc | why it does not draw |
 | ⭐ `neovim` **0/11** — **ROOT CAUSE FOUND** | the closure carries **glibc 2.26**. See below | — |
-| `helix` **0/11** | ⚠ the build warns that this closure's store paths carry **top-level `.so` files** (its ~200 tree-sitter grammars: `rust.so`, `python.so`, …), and `mergedFor` maps only `bin`/`lib`/`share`/`etc`/`libexec` — so the farm has nowhere to put them | whether that is the cause of the failure or an unrelated warning |
+| `helix` **0/11** | ⚠ a named limitation of the farm, below — ⛔ **not established as the cause** | whether it is the cause |
 | ⭐ `eglinfo` **0/11** — **AN INSTRUMENT DEFECT, NOT A FAILURE** | see below | — |
+
+### ⚠ `helix`: a named limit of the store farm, and it is NOT established as the cause
+
+`helix`'s closure carries **~200 bare `.so` files at a store path's top level**
+— its tree-sitter grammars, `rust.so`, `python.so`, … — and the build says so:
+*"store paths carry top-level entries the bundle does not merge"*.
+
+⛔ **`mergedFor` maps eight names** (`bin`, `sbin`, `lib`, `lib64`, `lib32`,
+`share`, `etc`, `libexec`) **to somewhere in the bundle. A top-level entry that
+is not one of them has no home**, so `buildStoreFarm` cannot answer a
+compiled-in path naming it, and `fillFarmDir` skips it.
+
+⭐ **The route is short and it is not "add another name to the table"**: those
+grammars *are* in the bundle already — `copyLibraries` takes **every** shared
+object in the closure and flattens it into `lib/`. So a bare top-level `.so`
+could be answered by pointing it at `lib`, which is where its content actually
+went. ⚠ Unmeasured, and it must not be shipped on this reasoning alone: helix
+also finds its grammars through `HELIX_RUNTIME`, so it may never consult the
+compiled-in path at all.
+
+⛔ **What is NOT established**: that this is why `helix` scores 0 of 11. The
+warning and the failure are two observations of the same subject, and nothing
+has connected them. ⚠ A fixed `mergedFor` that left the row at 0 would be the
+useful result.
+
+⚠ **One thing WAS fixed**: the warning called them *"directories"*.
+`topLevelNames` returns files too, and every one of these is a file — the word
+sent a reader looking for the wrong thing.
 
 ### ⛔ `eglinfo`: the capability WORKS and the row is the instrument's
 
