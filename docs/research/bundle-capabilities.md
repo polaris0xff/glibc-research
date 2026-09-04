@@ -75,6 +75,26 @@ failures are subject-specific and each needs its own reading.
 | `helix` **0/11** | ⚠ a named limitation of the farm, below — ⛔ **not established as the cause** | whether it is the cause |
 | ⭐ `eglinfo` **0/11** — **AN INSTRUMENT DEFECT, NOT A FAILURE** | see below | — |
 
+### ⛔ `vulkan-1` reads 0/11 and the capability demonstrably works
+
+⭐ **Run by hand out of the corpus's own `vulkan-2` artefact** (renamed, the
+`68-` dispatch rule again):
+
+    vulkaninfo --summary   exit 0, assertion matched, GPU0 = llvmpipe
+
+⚠ Reproduced **twice** — without `DISPLAY`, and with `DISPLAY` pointing at a
+real Xvfb bound into the rootfs, which is the corpus's own condition. Both
+exit 0.
+
+⛔ **So the row is not explained by the C34 exit-status defect, and it is not
+explained at all.** ⚠ The `vulkan-1` artefact was built `--name vulkaninfo` and
+deleted when its row was written; the one on disk is `vulkan-2`, built
+`--name vkcube`, so the two differ in which program the selector defaults to —
+that is the obvious place to look and it has **not** been looked at.
+
+⭐ **The Vulkan capability must not be read off that 0.** Delete the row and
+re-measure: `PGB_EXP65_ONLY='vulkan-1'`.
+
 ### ⚠ `helix`: a named limit of the store farm, and it is NOT established as the cause
 
 `helix`'s closure carries **~200 bare `.so` files at a store path's top level**
@@ -178,7 +198,7 @@ is `<id> <pass> <rows> <clean> <store paths> <note>`.
 | ⭐ **XCB / X11 client stack** | ⏳ **1 of 3 subjects in.** `xeyes` **11/11**, clean **11/11**, 12 store paths compiled in and 11 resolving — ⭐ a pure Xlib/XCB client with no toolkit above it. `xclock` and `xterm` are still running; ⛔ **`xterm` is pre-registered to FAIL the host-object row** and the reason is the application, not the bundler: its job is to run the user's shell, which is a host program | `65-` `x11-1..3` |
 | **EGL** | ⚠ **offscreen only.** *"The closure produces a working EGL display offscreen"* — `pass=10 fail=0`, every row **`swrast` and surfaceless** | `85-` |
 | **OpenGL driver stack** | ⚠ same. The bundle carries mesa and points libglvnd at itself; the negative control (`--no-gl`) cannot produce a vendor string on any row | `85-` |
-| **Vulkan** | ⛔ **NOT MEASURED. NOT CLAIMED.** The ICD mechanism is relocatable by design (§1) and the bundler writes `VK_DRIVER_FILES`, but no Vulkan call has been made here | — |
+| ⭐ **Vulkan** | ✅ **MEASURED — and on ONE environment, by hand, which is the honest size of the claim.** A bundled `vulkaninfo --summary` out of the `vulkan-tools` closure enumerates a device: `apiVersion 1.4.354`, `deviceName llvmpipe (LLVM 21.1.8, 256 bits)`, `driverName llvmpipe`. Exit **0**, with and without `DISPLAY`. ⛔ **C3's limit stands and is the whole point**: that is a **software rasteriser**, and this says nothing about a real GPU or NVIDIA. ⚠ The corpus's own `vulkan-1` row reads **0/11** and is **unexplained** — see below | by hand, from the `vulkan-2` artefact |
 | **NVIDIA** | ⛔ **NOT MEASURED, and not bundled by design.** The driver is taken from the HOST; `design/host-fallback.md` governs it. T-059 owns the hardware | — |
 | **SDL** | ⛔ **NOT RUN through our pipeline.** A hypothesis, graded *Excellent* by the field | §1 |
 | ⭐ **Python GUI** | ✅ **MEASURED, AND IT WORKS.** `meld` — Python 3 + GTK 3 through PyGObject — draws a real toplevel window on **11 of 11** with **zero host shared objects**, on eleven distributions of which four ship no glibc and none ship Python or GTK. ⛔ It produced **no artefact at all** before T-081 | `64-` arm P |

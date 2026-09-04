@@ -125,6 +125,14 @@ criterion fail *for the right reason*.
                  ⚠ vulkan-1 and media-1 are at risk from the same rule.
         x11-3    xterm 0/11 and it never drew, so C5's host-object
                  prediction is UNEVALUABLE rather than falsified.
+        vulkan-1 ⛔ 0/11 AND THE CAPABILITY DEMONSTRABLY WORKS. Run by hand
+                 out of the vulkan-2 artefact: `vulkaninfo --summary` exits
+                 0 and enumerates GPU0 = llvmpipe, apiVersion 1.4.354 --
+                 twice, with and without DISPLAY. ⛔ NOT the C34 defect and
+                 NOT explained. The obvious unexamined difference: vulkan-1
+                 was built `--name vulkaninfo` and vulkan-2 `--name vkcube`,
+                 so the selector's DEFAULT differs. Delete the row and
+                 re-measure.
 
     ⛔ AND ONE THING IS BLOCKED ON 65- FOR A DIFFERENT REASON THAN THE ONE
     THAT WAS WRITTEN HERE. T-084 changes `exp_classify_trace`'s signature.
