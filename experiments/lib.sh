@@ -145,6 +145,24 @@ exp_skip() {    # label why
 
 exp_note() { printf '        %s\n' "$*"; }
 
+# ⛔ exp_count EXISTS BECAUSE `$(grep -c … || echo 0)` IS WRONG AND KEEPS BEING
+# WRITTEN ANYWAY. `grep -c` PRINTS the count and then EXITS 1 when the count is
+# zero, so the fallback fires as well and the value becomes two lines, "0\n0",
+# which never equals "0" — and it fails at exactly the moment everything passed.
+#
+# ⚠ THE TREE HAD ALREADY DIAGNOSED THIS THREE TIMES — in `79-`, `91-` and `95-`,
+# each in a comment beside one call site — and the pattern was reintroduced in
+# five more files, because a comment is not a mechanism. ⭐ One helper and one
+# gate (`TODO/check.sh`) is the mechanism.
+#
+# ⚠ `|| echo 0` after `wc -c < file` is NOT the same bug and is correct: when
+# the file is missing the redirection fails, `wc` never runs, and nothing is
+# printed at all.
+exp_count() {   # pattern file -> exactly one integer, always
+  _xc=$(grep -ac "$1" "$2" 2>/dev/null) || _xc=${_xc:-0}
+  printf '%s' "${_xc:-0}"
+}
+
 exp_rootfs() {  # name -> echoes path, or empty when absent
   if [ -d "$ROOTFS_DIR/$1" ]; then printf '%s' "$ROOTFS_DIR/$1"; fi
 }
@@ -442,6 +460,12 @@ TRACE
   # ⛔ an unknown mode is an error, never a silent fallback
   exp_classify_trace "$_t" /subj nonsense >/dev/null 2>&1
   _ck "⛔ an unknown mode returns 2, not a fallback" "$?" 2
+
+  # ⛔ exp_count: the "0\n0" defect, which has bitten this tree four times
+  printf 'alpha\nbeta\n' > "$_d/c"
+  _ck "exp_count: a match counts"                 "$(exp_count alpha "$_d/c")" 1
+  _ck "⛔ exp_count: NO match is one 0, not two"  "$(exp_count zeta "$_d/c")"  0
+  _ck "⛔ exp_count: a MISSING file is 0"         "$(exp_count alpha "$_d/nope")" 0
   rm -rf "$_d"
   printf '\nlib.sh --selftest: %d pass, %d fail\n' "$_p" "$_f"
   [ "$_f" = 0 ]

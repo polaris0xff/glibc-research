@@ -65,7 +65,7 @@ else
   exp_check "pgb nix drv selftest" FAIL pass
   sed 's/^/        /' "$WORK/drv.selftest" >&2
 fi
-exp_note "$(grep -c '^  ok' "$WORK/drv.selftest" 2>/dev/null || echo 0) checks, including both nix escapes and two refusals"
+exp_note "$(exp_count '^  ok' "$WORK/drv.selftest") checks, including both nix escapes and two refusals"
 
 # -- arm 2: how much of the graph is actually in the cache -------------------
 printf '\n-- arm 2: is the deriver .drv in the binary cache? -------------\n'

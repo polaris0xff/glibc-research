@@ -91,8 +91,20 @@ WORK="${PGB_EXP107_WORK:-/var/tmp/t107}"
 mkdir -p "$WORK" || exit 2
 ATTR="${PGB_EXP107_ATTR:-qalculate-qt}"
 PROG=qalculate-qt
-RUN_TIMEOUT="${PGB_EXP107_TIMEOUT:-90}"
-WIN_WAIT="${PGB_EXP107_WINWAIT:-25}"
+# ⛔ THE WINDOW BUDGET MUST MATCH THE CORPUS OR Q1 CANNOT REPRODUCE IT, AND
+# THE FIRST RUN OF THIS FILE PROVED IT. `experiments/65-` waits
+# RUN_TIMEOUT=150 and sets WIN_WAIT to the SAME value; 107- was written with
+# 90 and 25. ⭐ Measured on the first two rows: `A win = no` on both, with the
+# only window on the server a 3x3 `Qt Selection Owner for qalculate-qt` —
+# qalculate-qt had STARTED and had not yet drawn. A 238 MiB Qt artefact needs
+# to extract before it can draw, and 25 seconds does not cover it.
+#
+# ⚠ AND THE FAILURE WOULD HAVE LOOKED LIKE A RESULT: a row that never draws
+# also loads zero host objects, so arm A would have read `clean 11/11` — the
+# corpus number it exists to reproduce, arrived at by measuring nothing.
+# ⭐ Q1 is the gate that caught it, which is what Q1 is for.
+RUN_TIMEOUT="${PGB_EXP107_TIMEOUT:-150}"
+WIN_WAIT="${PGB_EXP107_WINWAIT:-$RUN_TIMEOUT}"
 
 ENVS=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt")
 NENV=$(printf '%s\n' "$ENVS" | wc -l | tr -d ' ')
@@ -192,7 +204,7 @@ printf -- '-- the bed --------------------------------------------------------\n
 # ⛔ CHECKED, NOT ASSUMED. A run that silently measured a bed without the
 # fixture would blame the bundle for a file the bed was missing.
 sh "$REPO_DIR/scripts/common/bed-fixtures.sh" --install dbus >"$WORK/fixture.log" 2>&1 || true
-nfix=$(grep -c 'session.conf' "$WORK/fixture.log" 2>/dev/null || echo 0)
+nfix=$(exp_count 'session.conf' "$WORK/fixture.log")
 have=0
 for name in $ENVS; do
   root=$(exp_rootfs "$name" 2>/dev/null) || continue
@@ -219,7 +231,7 @@ exp_note "$(printf '   arm B programs: %s' \
     "$(grep -a -m1 '^programs' "$B.log" 2>/dev/null | cut -c1-100)")"
 # ⛔ AND THE WARNING IS AN INSTRUMENT ERROR, NOT A ROW. If either program is
 # missing, arm B is arm A and Q4 would be measuring nothing.
-miss=$(grep -ac 'no such program in the closure' "$B.log" 2>/dev/null || echo 0)
+miss=$(exp_count 'no such program in the closure' "$B.log")
 exp_check "Q0  ⛔ arm B installed BOTH programs (no 'no such program')" "${miss:-0}" 0
 [ "${miss:-0}" != 0 ] && exp_note "$(printf '   %s' \
     "$(grep -a 'no such program in the closure' "$B.log" | head -2 | tr '\n' ' ')")"
@@ -337,7 +349,7 @@ for name in $ENVS; do
     [ -s "$_t" ] || continue
     grep -aE 'execve\("[^"]*(dbus-launch|dbus-daemon|/sh|/bash|/dash)"' "$_t" \
       | sed 's/^[0-9]* *//' | cut -c1-160 | sort -u > "$WORK/exec.$arm.$name" || true
-    n=$(grep -ac . "$WORK/exec.$arm.$name" 2>/dev/null || echo 0)
+    n=$(exp_count . "$WORK/exec.$arm.$name")
     [ "$n" != 0 ] && exp_note "$(printf '   %s arm %s: %s launcher/shell exec(s), e.g. %s' \
         "$name" "$arm" "$n" "$(head -1 "$WORK/exec.$arm.$name" | cut -c1-100)")"
   done

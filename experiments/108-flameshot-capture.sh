@@ -157,7 +157,7 @@ build "$B" --extra xdg-desktop-portal --extra xdg-desktop-portal-gtk \
   || exp_note "arm B did not build; see $B.log"
 exp_check "S0  ⭐ arm B built (portal + backend)" \
     "$([ -s "$B" ] && echo yes || echo no)" yes
-miss=$(grep -ac 'no such program in the closure\|nixpkgs has no attribute' "$B.log" 2>/dev/null || echo 0)
+miss=$(exp_count 'no such program in the closure\|nixpkgs has no attribute' "$B.log")
 exp_check "S0  ⛔ arm B resolved BOTH portal pieces" "${miss:-0}" 0
 [ "${miss:-0}" != 0 ] && exp_note "$(printf '   %s' \
     "$(grep -a 'no such program in the closure\|nixpkgs has no attribute' "$B.log" \

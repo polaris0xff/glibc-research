@@ -105,7 +105,7 @@ cat > "$WORK/helper.sh" <<'EOF'
 #!/bin/sh
 n=0
 if [ -r /etc/os-release ]; then
-  n=$(grep -c '=' /etc/os-release 2>/dev/null || echo 0)
+  n=$(exp_count '=' /etc/os-release)
 fi
 printf 'pgb-carried-helper-ok sh %s\n' "$n"
 EOF

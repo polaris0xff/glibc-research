@@ -270,6 +270,39 @@ else
   note "no cc; tool/runtime/*.c not syntax-checked"
 fi
 
+# ---------------------------------------------------------------------------
+# ⛔ `$(grep -c … || echo 0)` — THE "0\n0" DEFECT, GATED RATHER THAN COMMENTED.
+#
+# `grep -c` PRINTS the count and then EXITS 1 when the count is zero, so the
+# fallback fires as well and the value becomes two lines. It never equals "0",
+# so the check fails at exactly the moment everything passed.
+#
+# ⚠ This tree diagnosed it three separate times — `experiments/79-`, `91-` and
+# `95-` each carry a comment about it beside one call site — and it was then
+# reintroduced in five more files. ⭐ A comment is not a mechanism; use
+# `exp_count` from `experiments/lib.sh`, or `awk '{n++} END{print n+0}'`.
+#
+# ⚠ Deliberately narrow: `wc -c < file || echo 0` is CORRECT (a missing file
+# makes the redirection fail so `wc` never runs and prints nothing), and is not
+# matched here.
+badcount=0
+for f in "$D"/../experiments/*.sh "$D"/../scripts/common/*.sh "$D"/../poc/*.sh "$D"/*.sh; do
+  [ -f "$f" ] || continue
+  # ⚠ THE PATTERN IS BUILT FROM TWO HALVES so that no single line of THIS file
+  # contains the whole of it. The first draft matched its own definition and
+  # reported check.sh as a defect.
+  _gc='grep -[a-zA-Z]*c[a-zA-Z]*'
+  _oe='\|\| *echo +[0-9]'
+  hits=$(grep -nE "$_gc.*$_oe" "$f" 2>/dev/null | grep -v '^[0-9]*: *#' || true)
+  [ -n "$hits" ] || continue
+  printf '%s\n' "$hits" | while IFS= read -r h; do
+    # ⚠ worded to avoid the literal this gate matches, or it flags itself
+    bad "$(basename "$f") line ${h%%:*}: a 'grep -c' with an '|| echo N' fallback is the 0\\n0 defect; use exp_count"
+  done
+  badcount=$((badcount + 1))
+done
+[ "$badcount" = 0 ] && ok "no \$(grep -c … || echo N) anywhere (the 0\\n0 defect)"
+
 fail=$(grep -c . "$FAILS")
 printf '\n'
 if [ "$fail" -gt 0 ]; then printf 'VERDICT: the record disagrees with itself (%s).\n' "$fail"; exit 1; fi

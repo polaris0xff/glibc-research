@@ -91,7 +91,7 @@ exp_check "F0  the subject built" "$([ -s "$IMG" ] && echo yes || echo no)" yes
 magicvars=$(grep -cE '^MAGIC(_PATH)?=' "$WORK/env.subject" 2>/dev/null || true)
 exp_check "F2  ⭐ the bundle sets NO MAGIC variable" "${magicvars:-0}" 0
 exp_note "$(printf '   .env carries %s variable(s): %s' \
-    "$(grep -c . "$WORK/env.subject" 2>/dev/null || echo 0)" \
+    "$(exp_count . "$WORK/env.subject")" \
     "$(cut -d= -f1 "$WORK/env.subject" 2>/dev/null | tr '\n' ' ')")"
 
 # ⛔ THE AppRun MUST BE THE STOCK ONE. A per-application shell AppRun is

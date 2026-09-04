@@ -408,7 +408,11 @@ done
 # `experiments/NN-*.sh`, so the check now asks that question directly.
 x_have=$(ls experiments/[0-9]*-*.sh 2>/dev/null | wc -l | tr -d ' ')
 p_all=$(ls -d poc/*/ 2>/dev/null | wc -l | tr -d ' ')
-p_wip=$(grep -c '^⚠ `poc/[0-9]' docs/AGENTS.md 2>/dev/null || echo 0)
+# ⛔ NOT `grep -c … || echo 0`: grep -c PRINTS 0 and EXITS 1 when nothing
+# matches, so the fallback fires too and the value becomes "0\n0". This gate
+# does not source experiments/lib.sh, so the same thing is done with awk.
+p_wip=$(awk '/^⚠ `poc\/[0-9]/ {n++} END {print n+0}' docs/AGENTS.md 2>/dev/null)
+p_wip=${p_wip:-0}
 p_have=$((p_all - p_wip))
 n=0; broken=0
 for f in $OURS; do
