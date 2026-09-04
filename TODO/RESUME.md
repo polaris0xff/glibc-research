@@ -7,7 +7,8 @@ over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
     LAST WRITTEN   2026-09-03f, at the START; refreshed when arm G came
-                   back 11 of 11. Session IN PROGRESS.
+                   back 11 of 11, and again when the instrument deadlocked.
+                   Session IN PROGRESS.
     TREE           main, began at 820d899f (== origin/main at session start)
     BRANCH         ⛔ main. The harness named
                    `claude/t-081-bundle-capabilities-2c24c0` and THE OPERATOR
@@ -63,36 +64,42 @@ criterion fail *for the right reason*.
 
 ## In flight right now
 
-    ⭐ T-081's ACCEPTANCE TEST IS MET ON ARM G, run 1 of 2:
+    ⛔ RUN 1 OF experiments/64- WAS DISCARDED, AND THE REASON IS A FINDING.
+    Arms G, N and X each completed 11 clean rows in it:
 
-        experiments/64- arm G  galculator, UI at a compiled-in store path
-        WINDOW on a real X server   11 of 11
-        HOST shared objects          0 of 11
-        ⛔ AND WITH NO BIND. The 2026-09-03e arm C used a mount namespace
-        and root; this is the mechanism.
+        G  galculator, UI at a compiled-in store path   WINDOW 11/11, host 0
+        N  the SAME bundle, --no-storefix               WINDOW  0/11
+        X  mousepad, the regression control             WINDOW 11/11, host 0
 
-    ⏳ RUNNING: arms N (--no-storefix, the NEGATIVE CONTROL, must draw
-       0 of 11), X (mousepad, the regression control) and P (meld, a
-       PYTHON GUI application, which did not build at all before).
-       ⛔ TWO RUNS OR IT IS NOT A NUMBER: run 2 is chained and starts
-       automatically when run 1 exits. ⚠ Both runs use the pgb built at
-       commit 2e66b0ce; the tool has changed since (reporting, the icon
-       policy, usr/, --embed-netdb, --utf8-default) and none of those
-       changes touch what arms G/N/X/P measure.
+    ⛔ THEN ARM P DEADLOCKED THE INSTRUMENT, for nineteen minutes:
 
-    ⏳ WRITTEN, PRE-REGISTERED, NOT YET RUN — in this order:
-       experiments/66-  --embed-netdb, the ELEVENTH glibc-static quirk
-       experiments/67-  --utf8-default, the one axis native musl wins
-       experiments/65-  the T-080 REDO: 26 subjects, 3 per capability,
-                        simple -> complex, plus 4 of the field's own 13
-                        nixappimage recipes. ⚠ HOURS. It is RESUMABLE:
-                        rows land in evidence/65-capability-corpus/rows
-                        and a recorded row is never re-measured.
+        strace   D    folio_wait_bit_common
+        dwarfs   Ssl  futex_do_wait        (the FUSE daemon for the mount)
+        python3  t    ptrace_stop
 
-    ⛔ DO NOT `make` WHILE experiments/64- IS RUNNING. Its `stale()` check
+    strace was blocked reading a page the FUSE daemon could only serve by
+    making progress the ptrace-stopped process could not make. ⛔ `kill`
+    cannot end a process in D, so `wait` never returned. ⭐ THE FIX IS AN
+    ORDERING — `reap_in_root` kills the FUSE daemon and must run BEFORE
+    `wait`, not after — plus a per-arm window budget, because a Python
+    interpreter importing its stack through ptrace is far slower than a C
+    program starting.
+
+    ⏳ RUNNING NOW: `scratchpad/chain2.sh`, which is session scheduling and
+       not evidence. In order:
+         64- run A, 64- run B     (both with the CURRENT ./pgb; artefacts
+                                   cleared first so they describe one tool)
+         66- twice                --embed-netdb, the ELEVENTH quirk
+         67- twice                --utf8-default, the codeset axis
+         65- once                 the T-080 REDO corpus, 26 subjects.
+                                  ⚠ HOURS, and RESUMABLE: rows land in
+                                  evidence/65-capability-corpus/rows and a
+                                  recorded row is never re-measured.
+
+    ⛔ DO NOT `make` WHILE experiments/64- IS RUNNING. Its stale() check
     compares each artefact against ./pgb, so a rebuild mid-run makes later
-    arms describe a different tool than earlier ones. That happened once
-    this session and the run was discarded.
+    arms describe a different tool than earlier ones. That happened once this
+    session and that run was discarded too.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 
