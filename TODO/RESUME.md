@@ -138,6 +138,14 @@ why it is written down rather than left as an expectation.
                  grammars via HELIX_RUNTIME, so it may never consult the
                  compiled-in path. A fixed mergedFor that left the row at 0
                  would be the useful result.
+        vkmark   0/11, note truncated to "Error: filesystem error: directory
+                 iterator cannot open directory: No ". ⭐ vkmark keeps its
+                 shaders and models in share/vkmark, so this smells like a
+                 compiled-in DATA directory the farm did not answer -- the
+                 T-081 shape. ⛔ Not established; read the full error.
+        glmark2  0/11, no error line matched at all. Same category, same
+                 smell (glmark2 has share/glmark2 data), same lack of
+                 evidence.
         gl-1     ⭐ SOLVED -- TWO instrument defects, and the second was
         vulkan-1 hiding behind the first. C34: the cli criterion was
                  `exit 0 AND the assertion` and eglinfo exits 3 headless.
