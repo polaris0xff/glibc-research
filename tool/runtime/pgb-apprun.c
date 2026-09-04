@@ -17,11 +17,25 @@
  * DT_NEEDED. ⭐ The shebang could never have pointed into the bundle anyway:
  * the mount path is not known until run time.
  *
- * The rule, in order, matching Anylinux's AppRun.sh so behaviour is familiar:
+ * ⭐ THE RULE, IN ORDER, AND EVERY LINE OF IT IS MEASURED BY experiments/68-
+ * arm S, eighteen checks against a synthetic AppDir:
  *
- *   1. argv[0]'s basename names a program in shared/bin  -> run it
- *   2. argv[1] names a program in shared/bin             -> run it, drop argv[1]
- *   3. otherwise                                          -> run the default
+ *   1. $ARGV0's basename names a program  -> run it   (what uruntime feeds,
+ *                                                      so a RENAME lands here)
+ *   2. argv[1] names a program            -> run it, and DROP argv[1]
+ *   3. argv[0]'s basename names a program -> run it
+ *   4. otherwise                          -> run the default
+ *
+ * ⛔ A NAME CONTAINING '/' IS NEVER A PROGRAM, so a path cannot be injected
+ * through argv[1]; it is passed through to the default untouched. And a name
+ * must exist in BOTH shared/bin and bin/ -- shared/bin alone is not enough.
+ *
+ * Anylinux's AppRun.sh is `ARG0="${ARGV0:-$0}"` -> bin/${ARG0##*/} -> bin/$1
+ * -> MAIN_BIN. ⚠ Same order, and ours is a SUPERSET: theirs collapses ARGV0
+ * and $0 into one test, so it never re-checks $0 once ARGV0 is set but
+ * unmatched, where rule 3 above does. ⛔ An earlier version of this comment
+ * put argv[0] FIRST and named ARGV0 nowhere. experiments/68- E2 is what
+ * corrected it -- the code was right and the comment was not.
  *
  * ⚠ It execs `<appdir>/bin/<name>`, which is a HARDLINK OF sharun, not the ELF
  * in shared/bin. sharun is what sets the library path and runs the bundled

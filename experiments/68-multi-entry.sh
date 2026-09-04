@@ -140,11 +140,42 @@ EOF
   [ -f "$SRC" ] || { exp_note "missing $SRC"; exit 2; }
   cc -O2 -DPGB_APPRUN_DEFAULT='"alpha"' -o "$AD/AppRun" "$SRC" 2>>"$WORK/cc.log" \
     || { exp_note "could not build the selector; see $WORK/cc.log"; exit 2; }
-  # E8's negative control: the same source with no default at all.
-  cc -O2 -DPGB_APPRUN_DEFAULT='""' -o "$WORK/AppRun-nodefault" "$SRC" \
+  # ⛔ E8's negative control LIVES IN THE SAME AppDir, and the first version of
+  # this file put it in $WORK. The selector derives its AppDir from
+  # /proc/self/exe, so a control sitting outside the tree sees an AppDir with
+  # no programs in it at all -- it exited 127 for the wrong reason and the
+  # check went green. A control that passes because it can see nothing is not
+  # a control. docs/AGENTS.md §0b: verify before you trust.
+  cc -O2 -DPGB_APPRUN_DEFAULT='""' -o "$AD/AppRun-nodefault" "$SRC" \
     2>>"$WORK/cc.log" || exit 2
 
-  # sel <tag> [env assignments...] -- <argv...>   ; output lands in $WORK/<tag>
+  # ⭐ argv[0] MUST BE SETTABLE INDEPENDENTLY OF THE PATH EXECUTED, or the
+  # argv[0] rule cannot be tested at all. POSIX sh has no way to do that --
+  # `exec -a` and `"${@:3}"` are bash, and this tree's experiments are sh --
+  # so the helper is eleven lines of C. It execs argv[2] with argv[1] as the
+  # child's argv[0].
+  cat > "$WORK/execas.c" <<'EOF'
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+int main(int argc, char **argv)
+{
+    char *path;
+    if (argc < 3) { fprintf(stderr, "execas ARGV0 PATH [args...]\n"); return 2; }
+    path = argv[2];         /* what is actually exec'd */
+    argv[2] = argv[1];      /* ...while the child's argv[0] is the name given */
+    execv(path, &argv[2]);
+    perror("execas");
+    return 127;
+}
+EOF
+  cc -O2 -o "$WORK/execas" "$WORK/execas.c" 2>>"$WORK/cc.log" || exit 2
+
+  # sel <tag> [VAR=VAL...] <argv...>   ; output lands in $WORK/<tag>.out
+  # ⛔ NO `--` IN THE CALLS. `env -u ARGV0 VAR=VAL -- prog` treats `--` as the
+  # PROGRAM, because it is no longer in option position once an assignment has
+  # been seen. Six checks read `(none)` before that was found, and the three
+  # that happened to pass did so because their `--` did follow the options.
   sel() {
     _tag=$1; shift
     env -u ARGV0 "$@" > "$WORK/$_tag.out" 2>"$WORK/$_tag.err"
@@ -156,35 +187,31 @@ EOF
     printf '%s' "${_v:-(none)}"
   }
 
-  # ⭐ argv[0] IS SET INDEPENDENTLY OF THE PATH EXECUTED, which is the only way
-  # to test the argv[0] rule without making a copy per case. `sh -c 'cmd' NAME`
-  # sets $0 of the exec'd program to NAME.
-  run_as_argv0() {   # tag argv0 -- rest...
+  run_as_argv0() {   # tag argv0 [args-to-AppRun...]
     _tag=$1; _a0=$2; shift 2
-    env -u ARGV0 sh -c 'exec -a "$1" "$2" "${@:3}"' sh "$_a0" "$AD/AppRun" "$@" \
-      > "$WORK/$_tag.out" 2>"$WORK/$_tag.err" 2>/dev/null \
-      || true
+    env -u ARGV0 "$WORK/execas" "$_a0" "$AD/AppRun" "$@" \
+      > "$WORK/$_tag.out" 2>"$WORK/$_tag.err"
     printf '%s' $? > "$WORK/$_tag.code"
   }
 
   printf '\n-- arm S: the dispatch table -------------------------------------\n'
 
   # E1/E2: ARGV0 names beta, and it wins even though argv[1] names alpha.
-  sel e1 ARGV0=/wherever/it/came/from/beta -- "$AD/AppRun"
+  sel e1 ARGV0=/wherever/it/came/from/beta "$AD/AppRun"
   exp_check "E1  ARGV0's basename selects the program" "$(field e1 PROGRAM)" beta
 
-  sel e2 ARGV0=/x/beta -- "$AD/AppRun" alpha
+  sel e2 ARGV0=/x/beta "$AD/AppRun" alpha
   exp_check "E2  ⭐ ARGV0 BEATS argv[1]" "$(field e2 PROGRAM)" beta
   # ...and because ARGV0 won, argv[1] was NOT consumed.
   exp_check "E3  an argv[1] that did not select is passed on" "$(field e2 ARG1)" alpha
 
   # E2b: with no ARGV0, argv[1] selects -- and it beats argv[0], which the
   # header comment states in the opposite order.
-  run_as_argv0 e2b /some/path/alpha -- beta
+  run_as_argv0 e2b /some/path/alpha beta
   exp_check "E2  ⭐ argv[1] BEATS argv[0]" "$(field e2b PROGRAM)" beta
 
   # E3: a selected argv[1] is consumed, and later arguments survive.
-  sel e3 -- "$AD/AppRun" beta --flag value
+  sel e3 "$AD/AppRun" beta --flag value
   exp_check "E3  a selected argv[1] is CONSUMED" "$(field e3 ARG1)" --flag
   exp_check "E3  the arguments after it survive" "$(field e3 NARGS)" 2
 
@@ -204,26 +231,26 @@ EOF
 
   # E6 -- a name with a '/' is not a program, is not consumed, and the
   # default runs with it still in argv.
-  sel e6 -- "$AD/AppRun" ../../etc/passwd
+  sel e6 "$AD/AppRun" ../../etc/passwd
   exp_check "E6  ⛔ a name containing '/' does not select" "$(field e6 PROGRAM)" alpha
   exp_check "E6  ⛔ ...and is NOT consumed from argv" "$(field e6 ARG1)" ../../etc/passwd
 
   # E7 -- shared/bin only is not enough
-  sel e7 -- "$AD/AppRun" gamma
+  sel e7 "$AD/AppRun" gamma
   exp_check "E7  shared/bin without bin/ is not a program" "$(field e7 PROGRAM)" alpha
   exp_check "E7  ...and its name stays in argv" "$(field e7 ARG1)" gamma
 
   # E8 -- ⭐ THE NEGATIVE CONTROL. Same source, empty default, nothing named.
   # ⛔ If this passes, arm S proves nothing: it would mean the selector runs
   # something no matter what it is told.
-  env -u ARGV0 "$WORK/AppRun-nodefault" > "$WORK/e8.out" 2>"$WORK/e8.err"
+  env -u ARGV0 "$AD/AppRun-nodefault" > "$WORK/e8.out" 2>"$WORK/e8.err"
   e8code=$?
   exp_check "E8  ⭐ CONTROL: no default and no name EXITS 127" "$e8code" 127
   if grep -q "no default program" "$WORK/e8.err" 2>/dev/null; then e8msg=yes; else e8msg=no; fi
   exp_check "E8  ⭐ CONTROL: ...and says why" "$e8msg" yes
   # and the same binary DOES dispatch when told a name -- so 127 above is the
   # absence of a default, not a broken build.
-  env -u ARGV0 "$WORK/AppRun-nodefault" beta > "$WORK/e8b.out" 2>&1
+  env -u ARGV0 "$AD/AppRun-nodefault" beta > "$WORK/e8b.out" 2>&1
   exp_check "E8  ⭐ CONTROL: the same binary still dispatches" \
     "$(grep -m1 '^PROGRAM=' "$WORK/e8b.out" | cut -d= -f2-)" beta
   ;;
