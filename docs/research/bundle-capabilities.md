@@ -58,10 +58,25 @@ per subject, and a recorded row is never re-measured:
 | **GTK 3** | ⭐ **3 of 3 — CLOSED** | `galculator`, `mousepad`, `geany`, all **11/11 pass and 11/11 clean** |
 | **X11 / XCB** | ⭐ **3 of 3** | `xeyes` **11/11**, `xclock` **11/11**, ⛔ `xterm` **0/11** — see below |
 | ⭐ **OpenGL / EGL** | **3 of 3** | ⭐ `eglinfo` **11/11**, `glxgears` **11/11** — both clean 11/11. ⛔ `glmark2` **0/11** |
-| ⭐ **Vulkan** | **2 of 3** | `vulkaninfo` **11/11**, `vkcube` **11/11** — both clean 11/11 |
-| **Python GUI** | 1 of 3 | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⛔ `pdfarranger` **0/11** |
+| ⭐ **Vulkan** | **3 of 3** | `vulkaninfo` **11/11**, `vkcube` **11/11** — both clean 11/11. ⛔ `vkmark` **0/11** |
+| **Python GUI** | **3 of 3** | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⛔ `pdfarranger` **0/11**, `virt-manager` **0/11** |
 | **the field's recipes** | 3 of 4 | ⛔ `neovim` **0/11** (glibc 2.26, below), `flameshot` **0/11**, `gearlever` UNRESOLVED. `helix` re-queued |
 | SDL, Qt, media | 0 | ⏳ running |
+
+⭐ **THE THREE C6 POSITIVE CONTROLS ARE ALL IN AND ALL GREEN** — `galculator`,
+`mousepad` and `meld`, each **11/11**, each agreeing with `experiments/64-`,
+which measured them twice. ⛔ That is what makes the rest of this table
+readable at all; a run where a control came back below 11 would be a statement
+about the instrument, not about a capability.
+
+⚠ **The pattern in the zeros is worth stating before it is over-read.** Of the
+eleven rows at 11/11, every one is a subject whose entry point is a plain ELF.
+Of the seven zeros, `neovim`, `xterm`, `pdfarranger` and `virt-manager` all
+have a **script or shell-wrapper entry point** — the shape T-081 added support
+for and C37 found still broken in a second way. ⛔ **That is a correlation, not
+a diagnosis**: `neovim` is the closure's glibc, `xterm` is C37, `pdfarranger`
+is a Python traceback nobody has read, and `virt-manager`, `flameshot`,
+`glmark2` and `vkmark` have no explanation at all.
 
 ⛔ **A NOTE-FIELD DEFECT WORTH FIXING BEFORE THE NEXT PASS.** A row's note is
 the **first** line matching `Couldn't load|cannot open|Traceback|…`, cut to 70
