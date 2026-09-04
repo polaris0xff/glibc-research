@@ -77,22 +77,37 @@ criterion fail *for the right reason*.
        `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
        ⛔ A row measured by a BROKEN instrument must be DELETED, not adjusted
        — that is what makes resumability safe.
-       ⭐ 3 of 26 in, and the GTK 3 category is COMPLETE:
-       galculator, mousepad and geany all 11/11 pass, 11/11 clean.
-       ⚠ ~35 minutes per subject measured, so the remaining 23 are ~13 hours.
+       ⭐ 9 of 26 in. GTK 3 and X11/XCB are CLOSED at 3 of 3 each.
+       ⚠ ~35 minutes per subject serially — see the PARALLEL recipe above.
 
-    ⛔ FOUR EXPERIMENTS ARE WRITTEN AND PRE-REGISTERED. RUN THEM, DO NOT
-    REWRITE THEM. The bed-free arms have already run; these are what is left,
-    and each needs 65- to finish first:
+    ⭐ AT THE TIME OF WRITING TWO INSTANCES ARE RUNNING:
+       the FULL one (`/var/lib/pgb-rootfs`, `:99`, `/var/tmp/t065`) and a
+       `field-*` one (`/var/lib/pgb-rootfs3`, `:97`, `/var/tmp/t065b`).
+       ⛔ If they are gone, just re-run the full one; the rows survive.
 
-        68- arm B   a SECOND program out of a real bundle, eleven rows.
-                    `sh scripts/common/run-experiment.sh 68`
-        100- arm G  syncthing, eleven rows. REPORTED, not predicted.
-                    `sh scripts/common/run-experiment.sh 100`
-        101-        rung 3, the GTK locale prefix, T vs --no-storefix.
-                    ⛔ It uses DISPLAY :98 on purpose; 65- owns :99.
-                    `sh scripts/common/run-experiment.sh 101`
-        69-         DONE (pass=9, three runs) — nothing left to run.
+    ⭐ 68-, 69- and 100- ARE DONE. Their numbers are in SUMMARY.md and in
+    their `evidence/*/RESULT.txt`. Nothing there is waiting to be run.
+
+    ⛔ 101- IS STOPPED AND HAS NO RESULT, DELIBERATELY. Its criterion — a
+    `.mo` catalogue opened under the bundle — CANNOT FIRE in this bed: no
+    environment has a non-C locale compiled, so `setlocale` fails,
+    `LC_MESSAGES` stays `C`, and gettext never consults `LANGUAGE`. ⚠ Six of
+    the eleven DO carry `share/locale/de` catalogues, which is what makes the
+    missing locale look like a bundler failure. Do not re-run it expecting a
+    different answer; either give an environment a real locale, or measure
+    the mechanism the way `64-` arms G/N do (does the app DRAW).
+
+    ⛔ FOUR NAMED UNKNOWNS THE CORPUS HAS ALREADY PRODUCED, each with its
+    reproduction (`PGB_EXP65_ONLY='<id>'`):
+        field-2  neovim dies with `--argv0: error while loading shared
+                 libraries`. Its entry is a SCRIPT (bash + the static
+                 trampoline). `ReadWrapper` handles `--argv0` at BUILD time,
+                 so this is a RUN-time path: read `shared/script/nvim`.
+        field-1  helix 0/11. Its closure carries ~200 TOP-LEVEL `.so`
+                 grammars and `mergedFor` maps no such top level.
+        gl-1     eglinfo 0/11 and NOTHING is known — no error line matched.
+        x11-3    xterm 0/11 and it never drew, so C5's host-object
+                 prediction is UNEVALUABLE rather than falsified.
 
     ⛔ AND ONE THING IS BLOCKED ON 65- FOR A DIFFERENT REASON THAN THE ONE
     THAT WAS WRITTEN HERE. T-084 changes `exp_classify_trace`'s signature.
