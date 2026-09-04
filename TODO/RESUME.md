@@ -126,8 +126,18 @@ criterion fail *for the right reason*.
                  deleted and re-measured. ⭐ Both capabilities WORK, measured
                  by hand: eglinfo matches its real assertion 30 times, and
                  vulkaninfo exits 0 with GPU0 = llvmpipe 1.4.354.
-        x11-3    xterm 0/11 and it never drew, so C5's host-object
-                 prediction is UNEVALUABLE rather than falsified.
+        x11-3    ⭐ SOLVED AND FIXED, ⛔ NOT YET RE-MEASURED. xterm's
+                 nixpkgs `bin/xterm` is a SHELL wrapper that execs
+                 `.xterm-wrapped` by store path. Two defects: the dot-named
+                 target was never installed, AND the farm's `bin` resolved to
+                 `shared/bin` (raw payloads) whose PT_INTERP names a
+                 /nix/store loader the bundle lacks -- so execve returned
+                 ENOENT FOR THE INTERPRETER and the shell printed it against
+                 the program. Both fixed; xterm now DRAWS in 2 s, with
+                 galculator as an unchanged regression control.
+                 ⛔ THE FIX IS NOT IN ./pgb: it was not rebuilt while 65- ran.
+                 AFTER `make`, DELETE the x11-3 row and re-measure.
+                 corrections.md C37.
         vulkan-1 ⛔ 0/11 AND THE CAPABILITY DEMONSTRABLY WORKS. Run by hand
                  out of the vulkan-2 artefact: `vulkaninfo --summary` exits
                  0 and enumerates GPU0 = llvmpipe, apiVersion 1.4.354 --

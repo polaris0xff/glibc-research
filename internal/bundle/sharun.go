@@ -45,6 +45,21 @@ func (b *Builder) installSharun() error {
 		if e.IsDir() || reservedNames[e.Name()] {
 			continue
 		}
+		// ⛔ A DOT-NAMED PAYLOAD IS NOT A PROGRAM, BUT IT STILL NEEDS ITS
+		// sharun HARDLINK. A shell wrapper execs it by store path, the
+		// interposer rewrites that into `store/<name>/bin/…` -> `bin/…`, and
+		// what has to be there is sharun — not the raw ELF, whose PT_INTERP
+		// names a loader the bundle does not carry.
+		// ⭐ What makes it "not a program" is the TOP-LEVEL hardlink and the
+		// `programs` count, both of which feed the selector. It gets neither.
+		if strings.HasPrefix(e.Name(), ".") {
+			at := filepath.Join(b.AppDir, "bin", e.Name())
+			_ = os.Remove(at)
+			if err := os.Link(appSharun, at); err != nil {
+				_ = copyResolved(appSharun, at, 0o755)
+			}
+			continue
+		}
 		programs++
 		for _, at := range []string{
 			filepath.Join(b.AppDir, e.Name()),

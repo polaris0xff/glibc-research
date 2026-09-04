@@ -1321,6 +1321,58 @@ number is information, and stopping at "fixed it" would have buried this one.
 
 ---
 
+## C37 — a shell-wrapped nixpkgs application could not start, and the message named the wrong file
+
+⛔ **A whole class of subjects, and the error pointed at a file that was
+present.** `xterm` scored `0 of 11`, dying with:
+
+    shared/script/xterm: line 3: /nix/store/<hash>-xterm-410/bin/.xterm-wrapped:
+    No such file or directory
+
+⭐ **THE MECHANISM, IN FOUR STEPS, EACH MEASURED.**
+
+1. A nixpkgs `bin/<name>` can be a **shell** wrapper rather than a
+   `makeBinaryWrapper` ELF. Its last line is
+   `exec -a "$0" "/nix/store/<hash>-xterm-410/bin/.xterm-wrapped"`.
+2. `assemble.go` skipped **dot-named** files in `bin/` — a rule added so
+   `.meld-wrapped` would not become a second entry point. ⛔ *"Not a program"*
+   and *"not in the bundle"* are different things, and conflating them left the
+   wrapper's target out entirely.
+3. Installing it was **necessary and not sufficient**. The interposer rewrote
+   the path correctly — confirmed with `PGB_STOREFIX_DEBUG=1`, three times per
+   run — and the target then resolved to a real **1,034,328-byte** executable.
+   It still failed.
+4. ⭐ **Because the farm's `bin` resolved to `shared/bin`, the RAW payloads.**
+   That target is a dynamic ELF whose `PT_INTERP` names a `/nix/store` loader
+   the bundle does not carry, so `execve` returns **ENOENT for the
+   interpreter** — and the shell prints it against the **program** path.
+   Running it directly says `cannot execute: required file not found`, which
+   is the message that gives it away.
+
+⚠ **That is why it read as "the file is missing" when the file was right
+there**, and it is a confusion worth keeping: ENOENT from `execve` names the
+program, never the interpreter.
+
+**Landed**, two halves, and neither works alone:
+
+| | |
+|---|---|
+| `assemble.go` | a dot-named file in `bin/` is copied into `shared/bin` as a **payload** |
+| `sharun.go` | it gets its **`bin/` sharun hardlink** but **no top-level hardlink** and is **not counted** in `programs` — so it never enters the selector |
+| `storefix.go` | ⭐ `mergedFor["bin"]` and `["sbin"]` resolve to **`bin`**, the sharun hardlinks, not to `shared/bin`. A compiled-in `<store>/bin/<x>` now reaches something that sets the library path and runs the bundled loader |
+
+⭐ **Measured**: `xterm` draws a real toplevel window on a real X server in
+**2 seconds**, from `0`. ⭐ **Regression control**: `galculator` — the T-081
+acceptance subject — still draws, in 4 seconds, with **identical** store-path
+resolution (`88 compiled in, 85 resolve`), so the `mergedFor` change did not
+disturb the path that was already working.
+
+⛔ **NOT YET IN A CORPUS ROW.** `./pgb` was not rebuilt: `experiments/65-` was
+running, and a rebuild mid-run puts rows from two tools in one table. ⚠ `x11-3`
+and any other shell-wrapped subject must be re-measured **after** `make`.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

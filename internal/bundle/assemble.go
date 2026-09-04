@@ -70,12 +70,35 @@ func (b *Builder) assemble() error {
 	extra := 0
 	if entries, err := os.ReadDir(filepath.Join(entryDir, "bin")); err == nil {
 		for _, e := range entries {
+			if e.IsDir() || e.Name() == b.Prog {
+				continue
+			}
 			// ⚠ A DOT-NAMED FILE IN bin/ IS NOT A PROGRAM. `.meld-wrapped` is
 			// the target a makeBinaryWrapper execs, and installing it as a
 			// second program gave the bundle two entry points for one
 			// application — and, once a script could resolve, a second static
 			// trampoline and a second copy of the script.
-			if e.IsDir() || e.Name() == b.Prog || strings.HasPrefix(e.Name(), ".") {
+			//
+			// ⛔ BUT "NOT A PROGRAM" AND "NOT IN THE BUNDLE" ARE DIFFERENT
+			// THINGS, AND CONFLATING THEM BROKE EVERY SHELL-WRAPPED
+			// APPLICATION. A nixpkgs `bin/<name>` that is a SHELL wrapper
+			// (rather than a makeBinaryWrapper ELF) ends with
+			//
+			//   exec -a "$0" "/nix/store/<hash>-xterm-410/bin/.xterm-wrapped"
+			//
+			// and the store-path interposer resolves that into the bundle's
+			// own `shared/bin/` — where the dot-named target had never been
+			// put. Measured on `xterm`: the script runs, the farm resolves,
+			// and the exec fails with "No such file or directory".
+			//
+			// ⭐ So it IS copied, as a payload, and `installSharun` is what
+			// keeps it from becoming an entry point: it gets no sharun
+			// hardlink and is not counted in `programs`.
+			if strings.HasPrefix(e.Name(), ".") {
+				src := filepath.Join(entryDir, "bin", e.Name())
+				if fi, err := os.Stat(src); err == nil && fi.Mode().IsRegular() {
+					_ = copyResolved(src, filepath.Join(b.AppDir, "shared", "bin", e.Name()), 0o755)
+				}
 				continue
 			}
 			r, err := b.resolveEntry(entryDir, e.Name(), false)

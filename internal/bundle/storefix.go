@@ -51,8 +51,26 @@ const storefixSO = "libpgb-storefix.so"
 // than something the run time should look for. A top-level directory not in
 // this table is REPORTED, so the list grows on evidence.
 var mergedFor = map[string]string{
-	"bin":     "shared/bin",
-	"sbin":    "shared/bin",
+	// ⛔ `bin` RESOLVES TO THE SHARUN HARDLINKS, NOT TO THE RAW PAYLOADS, and
+	// it used to be `shared/bin`. A nixpkgs `bin/<name>` that is a SHELL
+	// wrapper (rather than a makeBinaryWrapper ELF) ends with
+	//
+	//   exec -a "$0" "/nix/store/<hash>-xterm-410/bin/.xterm-wrapped"
+	//
+	// and the interposer rewrites that into the farm. Landing it on
+	// `shared/bin` handed the shell a DYNAMIC ELF whose PT_INTERP names a
+	// /nix/store loader that is not in the bundle — so `execve` failed with
+	// ENOENT **for the interpreter**, and the shell printed it against the
+	// program path. ⚠ That is why it read as "the file is missing" when the
+	// file was right there: measured on `xterm`, where the target is a real
+	// 1,034,328-byte executable and running it directly says
+	// `cannot execute: required file not found`.
+	//
+	// ⭐ `bin/<name>` is a hardlink of sharun, which sets the library path and
+	// runs the bundled loader. That is the same distinction pgb-apprun.c and
+	// pgb-exec.c both make, for the same reason.
+	"bin":     "bin",
+	"sbin":    "bin",
 	"lib":     "lib",
 	"lib64":   "lib",
 	"lib32":   "lib32",
