@@ -396,3 +396,60 @@ not.
 
 ---
 
+---
+
+## T-080 · retired detail — the capability guarantee, as it stood when it was first closed
+
+⚠ **T-080 WAS CLOSED ON 2026-09-03e AND REOPENED BY THE OPERATOR ON
+2026-09-03f**: *"REOPEN & REDO T-080, every capability listed in
+docs/research/bundle-capabilities.md including ones already measured, must be
+remeasured with 3 applications per category in order of simple to complex
+applications"*. This is what the entry said when it was closed; the open entry
+is in [`../../TODO/research.md`](../../TODO/research.md).
+
+**Source** ⭐ **operator, 2026-09-03d**: *"Write up on guarantee that only thing
+left unsolved in our nix 'appimage/bundle' are all related to
+tooling/size/performance not that nix can't do egl/sdl or can't load
+vulkan/nvidia etc."*
+**Category** research · **Priority** P1 · **Effort** L · **Status** ⚠ closed 2026-09-03e, REOPENED 2026-09-03f
+
+**Delivered.** [`../../docs/research/bundle-capabilities.md`](../../docs/research/bundle-capabilities.md)
+§0 — every capability row labelled **measured**, **hypothesis** or **tooling
+gap**, with the experiment named beside it.
+
+⭐ **THE GUARANTEE IS EARNED RATHER THAN ASSERTED, because a bundle runs.**
+`experiments/64-`, three arms, all on the eleven:
+
+| arm | subject | window on a real X server |
+|---|---|---|
+| G | `galculator` — UI is a file at a compiled-in store path | ⛔ **0 / 11** |
+| X | `mousepad` — UI is a GResource compiled into the binary | ✅ **11 / 11** |
+| C | `galculator` again, with that store path made to resolve | ✅ **11 / 11** |
+
+⭐ **GTK is NOT the blocker**, and arm X says so: real toplevel windows out of a
+nixpkgs closure, on distributions that ship no GTK, with **zero host shared
+objects**. The field grades GTK *"Garbage"* — earned deploying Arch packages
+through `quick-sharun`, a different pipeline.
+
+⛔ **BOTH REMAINING GAPS ARE TOOLING, AND ARM C IS WHAT PROVES IT.** Identical
+artefact, one variable changed, and it draws. So *"a hardcoded store path stops
+it"* is a measurement rather than a reading of an error message. The second gap
+is a **script entry point**: `meld` never builds, because `resolveEntry`
+oscillates between a `makeBinaryWrapper` ELF and the Python script it targets.
+Both belong to **T-081**, unblocked by the operator the same day.
+
+⛔ **AN EARLIER VERSION OF THIS WORK SCORED GTK 11 OF 11 GREEN AND WAS WRONG.**
+Its criterion was that the program printed `Gtk-WARNING **: cannot open
+display:`, on the reasoning that the message proves the bundled GTK loaded.
+⭐ **The operator rejected it**: *"previously nixappimage bundled apps showed
+the same error on real hw with display"*. The message does not discriminate.
+Feeding it a real display (`Xvfb`, socket bound into each rootfs) and checking
+for a window **from outside the process** with `xwininfo` turned 11 green rows
+into **0** — and only then did a second subject separate GTK from the data path.
+
+⚠ **WHAT IS NOT CLAIMED, in the sentence rather than a footnote**: EGL is
+*offscreen only* — every row in `experiments/85-` is `swrast` and surfaceless.
+**Vulkan is not measured and NVIDIA is not measured**; T-059 owns the hardware.
+**SDL was not run through this pipeline** and stays a hypothesis. **Python GUI
+applications are blocked by our own tooling**, so the operator's counter-example
+is still unreached.

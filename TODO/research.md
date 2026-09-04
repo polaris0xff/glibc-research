@@ -175,3 +175,44 @@ code runs at all.
 renderer strings, plus the detection path exercised on the eleven that do not.
 
 📚 [detail](../HISTORY/entries/research-open.md)
+
+## T-080 — ⛔ REOPENED: the capability guarantee, on THREE applications per category
+
+**Source** ⭐ **operator, 2026-09-03d** for the guarantee itself; ⛔ **reopened
+by the operator, 2026-09-03f**: *"every capability listed in
+docs/research/bundle-capabilities.md including ones already measured, must be
+remeasured with 3 applications per category in order of simple to complex
+applications ... all capabilities are closed as 'MEASURED, AND IT WORKS'"*.
+**Category** research · **Priority** P1 · **Effort** L · **Status** open
+
+⚠ **The closed version and everything it established are
+[`../HISTORY/entries/research-open.md`](../HISTORY/entries/research-open.md)
+`T-080 · retired detail`.** It is not repeated here.
+
+⛔ **WHY ONE SUBJECT WAS NOT ENOUGH, AND THE RECORD ALREADY SHOWS IT.**
+`experiments/64-` scored GTK on ONE application, `galculator`, and got **0 of
+11** — from which *"GTK does not work out of a nix closure"* would have been
+the obvious and WRONG conclusion. A second subject, `mousepad`, drew **11 of
+11** through the same bundler on the same day, and the boundary turned out to
+be a compiled-in data path rather than GTK. ⭐ One subject measures a subject.
+
+**What is left.** `experiments/65-` is the corpus: three applications per
+category, ordered by how much of the stack they drag in, each scored by a
+**window on a real X server** (or, for a CLI subject, its exit status AND a
+required string) plus **zero host shared objects** on all eleven.
+
+⛔ **The rows that must come out MEASURED rather than assumed** are the ones
+§0 currently labels otherwise: **SDL** (never run through this pipeline),
+**Vulkan** (the ICD mechanism is relocatable by design and nothing has made a
+Vulkan call here), **Qt**, **Python GUI** (T-081 unblocked it) and **apps with
+a compiled-in data path** (T-081's own subject).
+
+⚠ **TWO ROWS CANNOT BE CLOSED ON THIS MACHINE AND MUST SAY SO IN THE
+SENTENCE**: every GL and Vulkan row here is a SOFTWARE rasteriser — `llvmpipe`
+and `lavapipe` — and **NVIDIA is not bundled by design**. `T-059` owns
+hardware, and a green corpus is not a GPU claim.
+
+**Prove.** Every row of
+[`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md)
+§0 carrying a count out of eleven and the subject that produced it, with the
+UNRESOLVED subjects listed by name and reason rather than dropped.
