@@ -336,6 +336,43 @@ runs in its last-resort mode. A Chromium sandbox needs exactly that call, so a
 browser row run in this bed measures `--no-sandbox`, which is a different
 program.
 
+## ⭐ THE CAUSE IS ISOLATED AND THERE IS A ROUTE — `experiments/69-`
+
+⛔ **"EPERM in the chroot bed" named no cause, and a cause you have not
+isolated is an unfinished measurement rather than a blocker.** `pgb rootfs run`
+does **two** things — `unshare --mount` *and* `chroot` — so neither could be
+blamed from the bed row alone. Run without the other, on the same rootfs,
+same kernel, same probe:
+
+| arm | `unshare(CLONE_NEWUSER)` |
+|---|---|
+| ⭐ the HOST, one process per call (**the control**) | **OK** — all five namespaces |
+| the bed, entered as `pgb rootfs run` enters it | ⛔ **EPERM** |
+| ⭐ **`chroot` ALONE**, no unshare | ⛔ **EPERM** |
+| ⭐ **`unshare --mount` ALONE**, no chroot | ✅ **OK** |
+| ⭐ **the same rootfs entered by `pivot_root`** | ✅ **OK**, and `CLONE_NEWUSER\|CLONE_NEWNS` too |
+
+⭐ **So the refusal is `chroot`'s.** It is not the machine (the host permits
+every namespace), not the kernel's policy here, and not a sysctl —
+`/proc/sys/user/max_user_namespaces` reads **64230** *inside* the bed. And it
+is specific to `CLONE_NEWUSER`: mount, pid and net all unshare inside the bed
+(`N8`). ⭐ `lsns -t user` inside the bed reports exactly **1** — the operator's
+"check, do not guess", answered.
+
+⭐ **The route, therefore, is named rather than wished for**: entering the bed
+by **`pivot_root`** instead of `chroot` permits the call. ⛔ **That is not the
+same as saying `pgb rootfs run` should do it** — three things are still
+unmeasured and none is implied by `69-`: whether the bed still isolates
+correctly under `pivot_root`, whether teardown stays clean, and whether a
+bundled browser then sandboxes. `69-` says the kernel permits the call; it says
+nothing about the other three.
+
+⚠ **Runs:** `pass=9 fail=0 skip=0` on `debian-12`, **three times**; and
+`pass=8 fail=0 skip=1` on `alpine-3.22`, where `N7` **skips** because busybox
+ships no `lsns`. ⛔ The alpine run is why that row is a skip: the first version
+counted `lsns | wc -l` and reported **0**, which is a missing tool wearing a
+disagreement's clothes. `history/corrections.md` C29.
+
 ⛔ **Two questions, and merging them is the error to avoid.**
 1. *Does the bundle carry a working browser?* — answerable today with
    `--no-sandbox`, and worth having.

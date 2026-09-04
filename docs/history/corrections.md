@@ -1058,6 +1058,82 @@ the full `<hash>-<name>` and the `.env` still emits the short one.
 
 ---
 
+## C29 — three instrument defects in one session, each caught by running rather than reading
+
+⭐ **All three were in experiments written THIS session, and none survived to
+a published number.** They are recorded together because they are the same
+shape: a check that reported something other than what it was asked.
+
+**1. `env` took `--` as the program.** `experiments/68-` arm S drove the
+selector with `env -u ARGV0 VAR=VAL -- prog`. Once an assignment has been seen,
+`--` is no longer in option position, so `env` ran a program called `--`. Six
+of eighteen checks read `(none)`; ⚠ **three passed anyway**, because their call
+had no assignment and the `--` did still follow the options — which is the part
+worth keeping: a partly-working harness reported a mixture, not a clean
+failure.
+
+**2. `exec -a` and `"${@:3}"` are bash, and the experiments are `sh`.** Setting
+`argv[0]` independently of the path exec'd is the only way to test the
+selector's third rule, and POSIX `sh` cannot do it. ⭐ Replaced with an
+eleven-line C `execas` helper rather than by changing the interpreter — the
+experiments are the independent acceptance harness and stay shell
+(`docs/AGENTS.md` §0b).
+
+**3. ⛔ A NEGATIVE CONTROL THAT PASSED BECAUSE IT COULD SEE NOTHING.** The same
+arm built its no-default control into `$WORK` instead of the AppDir. The
+selector derives its AppDir from `/proc/self/exe`, so the control was pointed
+at a directory with **no programs in it at all**: it exited 127 because nothing
+matched, not because it had no default. The check went green.
+⭐ **A control that passes for the reason under test and for an unrelated
+reason is not a control**, and the fix was one path. Delivery rule 6 — check
+that the criterion can fail *for the right reason* — applies to controls too,
+and this is the second session running in which it has fired.
+
+**4. "no `lsns`" reported as "zero namespaces".** `experiments/69-` N7 counted
+`lsns -t user | tail -n +2 | wc -l`, which yields `0` both when there is
+nothing to count and when the binary is absent. On `alpine-3.22`, whose busybox
+ships no `lsns`, N7 reported `0, expected 1` and read as a real disagreement
+about namespaces. ⛔ **A skip is neither a pass nor a failure** (`docs/AGENTS.md`
+§0b); it now reports as a skip with its reason. ⚠ Caught by the **second run on
+a different rootfs** — delivery rule 3 doing exactly what it exists for.
+
+**Landed**: `experiments/68-` arm S `pass=18 fail=0`; `experiments/69-`
+`pass=9 fail=0 skip=0` on `debian-12` three times and `pass=8 fail=0 skip=1`
+on `alpine-3.22`.
+
+---
+
+## C30 — `pgb-apprun.c`'s header stated the dispatch order wrongly, and two documents copied it
+
+⛔ **The code was right; the comment and both documents that quoted it were
+not.** `tool/runtime/pgb-apprun.c` opened with:
+
+    1. argv[0]'s basename names a program in shared/bin  -> run it
+    2. argv[1] names a program in shared/bin             -> run it, drop argv[1]
+    3. otherwise                                          -> run the default
+
+`docs/research/app-corpus.md` rung 1 carried a third variant —
+*"`ARGV0` → `argv[0]` basename → `$1`"*. ⭐ **The measured order**
+(`experiments/68-` arm S, E2) is:
+
+    $ARGV0's basename  ->  argv[1] (DROPPED)  ->  argv[0]'s basename  ->  default
+
+⛔ **`ARGV0` is the rule that matters and the source comment named it nowhere.**
+uruntime sets `ARGV0` to the AppImage's own path, so it is the rule a **renamed
+or symlinked** artefact lands on — the whole feature the comment was describing.
+And `argv[1]` beats `argv[0]`, not the reverse.
+
+⚠ **This was PRE-REGISTERED as a prediction about our own source** and
+committed before the run (`2b1daeff`), which is why it counts: E2 said the
+comment was wrong and the code right, and the run agreed. ⭐ The comparison
+against the field also survives and is now stated from measurement rather than
+from the comment: Anylinux's `AppRun.sh` is
+`ARG0="${ARGV0:-$0}"` → `bin/${ARG0##*/}` → `bin/$1` → `MAIN_BIN`, so ours is a
+**superset** — theirs collapses `ARGV0` and `$0` into one test and never
+re-checks `$0` once `ARGV0` is set but unmatched.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

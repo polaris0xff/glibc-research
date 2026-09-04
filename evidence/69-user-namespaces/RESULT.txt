@@ -1,0 +1,59 @@
+===============================================================
+69 - the sandbox: why CLONE_NEWUSER is EPERM in the bed, and the route out
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T03:45:25Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/69-user-namespaces
+--------------------------------------------------------------
+
+
+-- N1: the HOST, one process per call (⭐ the control) --------------
+        host user    OK
+        host userns  OK
+        host mount   OK
+        host pid     OK
+        host net     OK
+  ok    N1  ⭐ CONTROL: every namespace unshares on the HOST = ok
+
+-- N2: the bed, entered exactly as `pgb rootfs run` enters it -------
+  ok    N2  CLONE_NEWUSER inside the bed               = EPERM
+
+-- N3/N4: ⭐ the isolation pair, and they are each other's control --
+  ok    N3  ⭐ chroot ALONE reproduces it             = EPERM
+  ok    N4  ⭐ unshare --mount ALONE does NOT         = OK
+
+-- N5: ⭐ THE ROUTE -- the same rootfs entered by pivot_root ---------
+  ok    N5  ⭐ CLONE_NEWUSER after pivot_root         = OK
+  ok    N5  ⭐ ...and CLONE_NEWUSER|CLONE_NEWNS too   = OK
+
+-- N6/N7/N8: what the bed is NOT refusing ---------------------------
+        max_user_namespaces inside the bed: 64230
+  ok    N6  the sysctl is NOT the limit                = yes
+        lsns -t user inside the bed reports: 1
+  ok    N7  ⭐ exactly ONE user namespace, nothing nested = 1
+        bed  mount   OK
+        bed  pid     OK
+        bed  net     OK
+  ok    N8  mount/pid/net ARE permitted in the bed     = ok
+
+        ⭐ WHAT THIS ESTABLISHES: the refusal is CHROOT's, not the bed's, not
+           the kernel's policy on this machine, and not a sysctl. N3 and N4
+           isolate it; N5 shows the same rootfs entered by pivot_root permits
+           the call. ⚠ No man page is installed here to cite for the kernel's
+           own reason -- that was looked for and is absent, so the mechanism
+           is recorded as MEASURED behaviour rather than as a quotation.
+        ⛔ WHAT IT DOES NOT ESTABLISH: that pgb rootfs run SHOULD pivot_root
+           (isolation and teardown are unmeasured), that a bundled browser
+           runs, or that a sandbox works once the namespace exists. Those are
+           three further measurements. T-090.
+
+-- result ----------------------------------------------------
+pass=9 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

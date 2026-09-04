@@ -29,20 +29,36 @@ program in the same store path's `bin/`** automatically — dot-named files
 excluded, because `.meld-wrapped` is a wrapper target and not a program.
 `--with-program NAME` adds one found anywhere in the closure, for the case where
 a helper lives in a dependency. `tool/runtime/pgb-apprun.c` is a **static**
-selector, built whenever a bundle carries more than one program, dispatching on
-`ARGV0` → `argv[0]` basename → `$1` → the default. ⭐ **So renaming or
-symlinking the AppImage selects the program, exactly as an AppImage does**, and
-`./app.AppImage rnote-cli …` works as a subcommand form.
+selector, built whenever a bundle carries more than one program.
 
-**What is missing: a measurement.** No experiment has ever run a *second*
-program out of a bundle. The claim above is read off the source.
+⭐ **THE DISPATCH ORDER IS MEASURED — `experiments/68-` arm S, 18 of 18** —
+and it is **not** the order this page and the source's own header comment both
+carried until it was run:
 
-**First task, and it is cheap.** One `experiments/65-` row per extra entry
-point: bundle `rnote`, symlink the artefact to `rnote-cli`, run it, assert the
-CLI's own output. ⛔ It also answers the question the operator asked — *"can our
-nix parser/walker tell how many entry points an app has"* — with a number
-printed by the build (`programs <prog> + N more`), not with a reading of the
-code.
+    $ARGV0's basename  →  argv[1] (and it is DROPPED)  →  argv[0]'s basename  →  default
+
+⛔ **`ARGV0` is the one that matters and neither text named it.** uruntime sets
+`ARGV0` to the AppImage's own path, so a **rename or a symlink lands on rule 1**
+— which is what makes `./rnote-cli` work — and `./app.AppImage rnote-cli …`
+lands on rule 2. Measured with it: a selected `argv[1]` is consumed and later
+arguments survive; an `argv[1]` that did *not* select is passed through
+untouched; the child's `argv[0]` is the **absolute** path (load-bearing for
+sharun); `ARGV0` is unset and `APPDIR` set in the child; ⛔ **a name containing
+`/` is never a program**, so a path cannot be injected through `argv[1]`; and a
+name in `shared/bin` alone, without `bin/`, is not a program.
+
+⭐ **And the negative control is what makes those mean anything**: the same
+source built with an *empty* default and given no name exits **127** with
+`no default program`, while the same binary still dispatches when told one.
+
+**What is still missing: the bundle half.** Arm S is a synthetic AppDir with
+host stand-in programs, so it says nothing about sharun, uruntime, the closure,
+or host shared objects. ⛔ **No experiment has yet run a second program out of
+a real bundle** — that is `68-` arm B, which needs the bed.
+
+**Study.** `internal/bundle/assemble.go` `installProgram`;
+`tool/runtime/pgb-apprun.c` (130 lines, and it is the answer);
+`experiments/68-` arm S for what each rule actually does.
 
 **Study.** `internal/bundle/assemble.go` `installProgram`;
 `tool/runtime/pgb-apprun.c` (the whole file is 130 lines and it is the answer).
@@ -152,17 +168,38 @@ application.
 **Study.** `HALL-OF-FAME.md` "Bad - GStreamer"; `internal/bundle/sharun.go`
 `bakedOverride`.
 
-### Rung 5 · Namespaces and the sandbox. ⛔ NOT MEASURABLE IN THIS BED
+### Rung 5 · Namespaces and the sandbox. ⭐ THE CAUSE IS `chroot`, AND THERE IS A ROUTE
 
 `brave`, `firefox`, `google-chrome`, `signal-desktop`, every Electron app,
 `bottles`.
 
-⛔ **The bed forbids it.** `unshare(CLONE_NEWUSER|CLONE_NEWNS)` is `EPERM`
-inside the chroot bed — already recorded in
-[`../comparison.md`](../comparison.md) as the reason every `onelf` row runs in
-its last-resort mode. A Chromium sandbox needs exactly that call. ⭐ **So this
-rung needs a bed change before it needs a bundler change**, and a row run
-without one measures `--no-sandbox`, which is a different program.
+⛔ **`unshare(CLONE_NEWUSER)` is `EPERM` inside the bed** — the recorded reason
+every `onelf` row in [`../comparison.md`](../comparison.md) runs in its
+last-resort mode, and a Chromium sandbox needs exactly that call. ⭐ **What was
+missing was the CAUSE**, and `pgb rootfs run` does two things — `unshare
+--mount` *and* `chroot` — so the bed row alone could not blame either.
+`experiments/69-` runs each without the other, same rootfs, same probe:
+
+| arm | `unshare(CLONE_NEWUSER)` |
+|---|---|
+| ⭐ the HOST, one process per call (**the control**) | **OK** — all five namespaces |
+| the bed, as `pgb rootfs run` enters it | ⛔ **EPERM** |
+| ⭐ **`chroot` ALONE** | ⛔ **EPERM** |
+| ⭐ **`unshare --mount` ALONE** | ✅ **OK** |
+| ⭐ **the same rootfs entered by `pivot_root`** | ✅ **OK**, and with `CLONE_NEWNS` too |
+
+⭐ **The refusal is `chroot`'s.** Not the machine, not a sysctl —
+`/proc/sys/user/max_user_namespaces` reads **64230** *inside* the bed — and not
+a blanket refusal: mount, pid and net all unshare there. `lsns -t user` inside
+the bed reports exactly **1**, which is the operator's *"check, do not guess"*
+answered rather than assumed.
+
+⭐ **So the bed change is now NAMED and small**: enter by `pivot_root` instead
+of `chroot`. ⛔ **`69-` does not say `pgb rootfs run` should do that.** Three
+things stay unmeasured and none follows from it — whether the bed still
+isolates under `pivot_root`, whether teardown stays clean, and whether a
+bundled browser then actually sandboxes. ⚠ Until one of those is taken, a
+browser row here still measures `--no-sandbox`, which is a different program.
 
 **Two separate questions, and they must not be merged.**
 1. *Does the bundle carry a working Chromium?* — answerable today with
@@ -296,7 +333,7 @@ emulated/dummy stubs for hw gaps."*
 | | why |
 |---|---|
 | a real GPU, NVIDIA | no device on this machine. T-059 |
-| an unprivileged user namespace | `EPERM` in the chroot bed — rung 5 |
+| an unprivileged user namespace | ⭐ **the cause is `chroot`, not the bed** — `experiments/69-`: the same rootfs entered by `pivot_root` permits it. Until that change is taken and its isolation measured, a browser row measures `--no-sandbox`. Rung 5 |
 | a kernel module (`virtualbox`) | the bundle cannot supply one, ever |
 | Wayland-only behaviour | no compositor here; `Xvfb` is X11 |
 | a setuid helper (`newuidmap`) | a bundle cannot ship setuid — rung 7 |
