@@ -132,6 +132,23 @@ Two constants in `internal/bundle/appimage.go` did:
 **lite**; ours was the full build, less than half as fast to stand up. Nothing
 in the record had noticed.
 
+### ⭐ AND "ONE COMMAND" NOW COVERS TWO SHAPES IT COULD NOT PACKAGE AT ALL
+
+⚠ **The second half of the ruling — *"packaging is just one command not a
+multiline shell script"* — was true of `pgb bundle appimage` and false of what
+it could be pointed at.** Two standard nixpkgs shapes produced either an
+artefact that did not draw or no artefact at all:
+
+| shape | before | after |
+|---|---|---|
+| a program whose data path is compiled into `.rodata` (`galculator`) | packed, ran, drew **0 of 11** | ⭐ **11 of 11**, no bind |
+| a Python program, which nixpkgs wraps as `bin/x` → a SCRIPT (`meld`) | ⛔ **no artefact**: `no entry point`, after five wrapper hops | ⭐ an artefact, and it runs |
+
+⭐ **One command that produces something which does not run is not one
+command.** [`store-paths.md`](store-paths.md) is the mechanism for the first
+and the security answer for the route not taken; the second is a script entry
+point resolving to *interpreter + script argument*. `TODO/toolchain.md` T-081.
+
 ⛔ **The kdenlive pair is a direction, not a number**, and now for two reasons.
 `90-` takes **one sample** per arm and its published figures come from a
 superseded version of the cited evidence file — four runs give cold-start
