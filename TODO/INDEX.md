@@ -73,7 +73,7 @@ pretending to be one.
 | T-081 | P1 | L | done | toolchain | ⭐ Every store path, without the regex cascade: the bundle DRAWS, and Python bundles |
 | T-082 | P2 | XL | open | toolchain | Vendor and patch the third-party runtime and tooling, with drift detection |
 | T-083 | P2 | M | open | toolchain | Native desktop integration: our bundles as ordinary AppImages |
-| T-084 | P1 | M | open | ci | ⛔ The trace classifier is nine hand copies, and one of them counted FAILED opens as loads |
+| T-084 | P1 | M | open | ci | ⛔ The trace classifier is SIX hand copies, and one of them counted FAILED opens as loads |
 | T-085 | P1 | S | done | runtime | ⭐ The ELEVENTH quirk CLOSED: `--embed-netdb`, and the boundary `--wrap` cannot cross |
 | T-086 | P1 | S | done | runtime | ⭐ The one axis where native musl beat both glibc columns, closed: `--utf8-default` |
 

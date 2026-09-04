@@ -897,11 +897,20 @@ inflated, and the claim at risk is named: `comparison.md` and `docs/AGENTS.md`
 §9 quote *"host objects 0 of 11 against 4 of 11"* for kdenlive, and that 4 is
 the competitor's count from `experiments/90-`.
 
-**The fix** is one implementation instead of nine: `experiments/lib.sh`'s
+**The fix** is one implementation instead of seven: `experiments/lib.sh`'s
 `exp_classify_trace` pairs a split `openat` with its own `<... openat resumed>`
 line by pid and records the path only when the result is not an error.
-`experiments/64-` and `65-` use it. ⚠ The other seven copies carry a comment
+`experiments/64-` and `65-` use it. ⚠ The other **six** copies carry a comment
 naming this correction and are converted and re-run by **T-084**.
+
+⛔ **This paragraph said "nine" and "seven" on 2026-09-03f and both were
+wrong** — corrected 2026-09-04 by counting `classify_trace()` definitions
+rather than trusting the sentence. There are **six** hand copies (`60-`, `62-`,
+`85-`, `86-`, `89-`, `90-`) and one shared implementation. ⚠ `77-` was named
+among them and has no `strace` and no classifier at all. ⛔ **And the
+conversion is not the deletion T-084 first described**: all six take a `mode`
+argument — `payload` or `tree` — that `exp_classify_trace` does not implement,
+so the shared function has to grow it before anything can be deleted.
 
 ---
 

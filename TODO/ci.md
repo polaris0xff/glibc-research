@@ -74,7 +74,7 @@ reason.
 **Prove.** `evidence/STALE-EVIDENCE.txt` is empty of entries, and gate 10
 reports `0 pinned stale`.
 
-## T-084 — ⛔ the trace classifier is nine hand copies, and one of them was wrong
+## T-084 — ⛔ the trace classifier is SIX hand copies, and one of them was wrong
 
 **Source** ⭐ **found by a disagreement, 2026-09-03f**: `experiments/64-`
 reported **2 host shared objects** for a bundle running on `alpine-3.22` — a
@@ -100,15 +100,37 @@ competitor's *"4 of 11"* in `docs/comparison.md` and `docs/AGENTS.md` §9, from
 
 **What is left.** ⭐ **The corrected implementation already exists and is
 shared**: `experiments/lib.sh`'s `exp_classify_trace`, used by `64-` and `65-`.
-Seven experiments still carry a hand copy and each has a comment naming this
-entry: `60-`, `62-`, `77-`, `85-`, `86-`, `89-`, `90-`.
 
-1. convert each to `exp_classify_trace` — a deletion, not a rewrite;
-2. re-run them, and compare the host counts before and after. ⚠ `90-` and
+⛔ **THIS PARAGRAPH SAID "NINE HAND COPIES" AND NAMED SEVEN FILES. BOTH NUMBERS
+WERE WRONG AND THE ROUTE WAS WRONG TOO** — corrected 2026-09-04 by counting
+`classify_trace()` definitions in the tree instead of trusting the sentence
+that opened this entry:
+
+- **SIX** experiments carry a hand copy — `60-`, `62-`, `85-`, `86-`, `89-`,
+  `90-` — so with `lib.sh`'s there are **seven implementations**, not nine.
+- ⛔ **`77-` was named and has no classifier and no `strace` at all.** It is a
+  packing experiment (uruntime `full` → `lite`, the dwarfs block size). It was
+  in the list because the list was written from memory.
+- ⛔ **It is NOT "a deletion, not a rewrite".** Every one of the six takes a
+  third argument the shared classifier does not implement: `mode`, either
+  `payload` or `tree`. In `payload` mode the copy counts only opens in the pid
+  that last `execve`d and clears its set at each exec, because an object opened
+  before the last exec is not mapped in the running program; in `tree` mode it
+  counts the whole process set. `exp_classify_trace` implements neither
+  explicitly — it is `tree` without the clear.
+
+1. **extend `exp_classify_trace` to take `mode` first**, with a selftest for
+   each mode, then convert the six — ⛔ and `experiments/lib.sh` is sourced by
+   every experiment, so this edit lands only when nothing is running;
+2. re-run all six, and compare the host counts before and after. ⚠ `90-` and
    `86-` build kdenlive-scale bundles, so this is the expensive half and it is
    why the entry is M rather than S;
 3. if the competitor's count moves, `docs/comparison.md` and `docs/AGENTS.md`
    §9 change with it.
+
+⭐ **What the correction does NOT change**: the one-way argument still holds in
+both modes — the split-`openat` defect can only turn a clean row dirty — so
+every committed zero stands and only the committed non-zeros are suspect.
 
 **Prove.** Every one of the seven re-run against the shared classifier, with
 the before/after host count for each printed side by side.
