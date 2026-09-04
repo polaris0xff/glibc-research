@@ -12,7 +12,7 @@ the entries, and [`../HISTORY/`](../HISTORY/).
               (neovim, glibc 2.26), the SUBJECT'S SHAPE (flameshot, a tray
               application with no toplevel) and ONE path class we do not
               reach (pdfarranger, /usr/local).
-    COUNTS    65 entries, 25 open, 40 done
+    COUNTS    66 entries, 26 open, 40 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)
               throughput: glibc 8.40 ns/op vs musl 704.79 (malloc, 4 threads)

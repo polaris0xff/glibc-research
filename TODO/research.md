@@ -733,3 +733,47 @@ into the script before the run:**
 ⚠ **What it will not measure**: hardware decode. There is no `/dev/dri` here,
 so every codec path is software (the C3 limit again), and one container format
 on one codec pair is not *"media works"*.
+
+## T-093 — ⛔ "no more Vulkan layers like mangohud" is the ONE field objection still marked NOT MEASURED
+
+**Source** pkgforge-dev/Anylinux-Appimage, quoted in
+`docs/research/bundle-capabilities.md` §"THEIR HARD CASES TAKEN ONE BY ONE".
+**Category** research · **Priority** P2 · **Effort** M · **Status** open
+
+> *"you are no longer able to use vulkan layers like mangohud"*
+
+⭐ **Every other row in that table has a measurement behind it. This one says
+`⛔ NOT MEASURED — a named next experiment, not an answer`,** and it has said
+so since the table was written.
+
+⛔ **THE OBJECTION IS ABOUT A *HOST* LAYER, AND THE TWO QUESTIONS MUST NOT BE
+MERGED.**
+
+| question | mechanism | status |
+|---|---|---|
+| can a bundle load a layer it **carries**? | ordinary bundled `.so` + a manifest under `share/vulkan/*_layer.d` | ⚠ untested, but nothing special |
+| ⭐ can a bundle load a layer on the **host**? | `--host-dlopen` — a host `.so` opened at run time, which is exactly route D | ⛔ **the actual claim, unmeasured** |
+
+⭐ **AND A REAL LAYER IS ALREADY IN REACH — no fixture needed.** The mesa
+closure every GL bundle here carries ships genuine layers:
+
+    share/vulkan/explicit_layer.d/VkLayer_MESA_overlay.json     ⭐ mangohud's class
+    share/vulkan/explicit_layer.d/VkLayer_MESA_screenshot.json
+    share/vulkan/implicit_layer.d/VkLayer_MESA_anti_lag.json
+
+`VkLayer_MESA_overlay` is an **overlay layer** — the same shape as MangoHud —
+so the claim can be tested against a real one rather than a stub.
+
+⛔ **WHERE IT MAY RUN, AND WHY NOT IN THE BED.** A host-layer test needs a
+layer installed on the *host*, and `scripts/common/bed-fixtures.sh` forbids a
+fixture that adds a **shared object** — that would change what "zero host
+objects" means for every other experiment. ⭐ So this runs on the RUNNER host,
+the way `experiments/93-` already sweeps host objects there, and reports a
+runner result with the bed explicitly out of scope.
+
+⚠ **What would make it fail for the right reason.** A layer is loaded by the
+Vulkan **loader**, not by the application, so a bundle carrying its own
+`libvulkan.so.1` decides the search itself. ⛔ A green row that turns out to
+have loaded the *bundled* overlay rather than the host's would answer the
+wrong question — so the discriminator is the **path** the layer was opened
+from, read off the trace, plus a control with `VK_LAYER_PATH` unset.
