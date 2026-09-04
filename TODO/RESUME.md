@@ -162,6 +162,26 @@ pattern is fixed. **C7** is checked before C1 and C2 and fails the run.
     different answer; either give an environment a real locale, or measure
     the mechanism the way `64-` arms G/N do (does the app DRAW).
 
+## ⭐ A PRE-REGISTERED PREDICTION, COMMITTED BEFORE THE RUN THAT SETTLES IT
+
+⛔ **C41 changes `./pgb` in a way that can only affect Python subjects, and the
+corpus measured both of them with the OLD tool.** Their rows must be deleted
+and re-measured after `make` — the same rule C37's five rows were given. ⭐ The
+row note (C40) is what makes the two distinguishable at all: before this
+session both said `Traceback (most recent call last):`.
+
+| row | the note the corpus recorded | predicted after `make` |
+|---|---|---|
+| `py-3` `virt-manager` | `ModuleNotFoundError: No module named 'virtManager'` | ⭐ **MOVES.** Byte-for-byte C41's signature — the same failure gearlever gave before the `stat64` family was added, and gearlever's import resolved after it |
+| `py-2` `pdfarranger` | `FileNotFoundError: [Errno 2] No such file or directory: '/usr/local/share/pdfarranger/pdfarranger.ui'` | ⛔ **DOES NOT MOVE.** `/usr/local`, not `/nix/store` — `pgb-storefix.c`'s `fix()` returns a path unchanged unless it begins with `/nix/store/`, so no interposer change can touch it |
+| `field-4` `gearlever` | `UNRESOLVED` | ⭐ **BUILDS** (C42, measured by hand: 907.6 MiB, 542 store paths). ⚠ Whether it DRAWS is not predicted — by hand it reaches a libadwaita `GType` error that is not established as ours |
+
+⭐ **`py-2` is the more interesting row if the prediction holds**, because it is
+the field's own *"Garbage — GTK"* class arriving on OUR pipeline:
+`docs/research/app-corpus.md` rung 3 says a nixpkgs-built application compiles
+in *its own store path* rather than `/usr/share`, and this one compiles in
+neither — it asks Python at run time and Python answers `/usr/local`.
+
 ## ⛔ THE THREE UNEXPLAINED ROWS, each with its reproduction
 
     field-3  flameshot 0/11. ⭐ MEASURED NOT TO BE C37: its build log says

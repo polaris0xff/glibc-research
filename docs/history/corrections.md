@@ -1550,6 +1550,94 @@ that is absent**, because a reader treats it as the answer. `py-2`'s note said
 
 ---
 
+## C41 — the interposer rewrote what a program OPENED and not what it STATTED
+
+**Found** 2026-09-04c, by running `field-4` `gearlever`'s UNRESOLVED down. ⛔ A
+shipped claim — *"a compiled-in `/nix/store` path now resolves"* — was true of
+one syscall family and false of another, and the gap is the whole of Python.
+
+`gearlever` started, and died at:
+
+    ModuleNotFoundError: No module named 'gearlever'
+
+⚠ **With the interposer loaded and working.** The line before it,
+`Gio.Resource.load(os.path.join(pkgdatadir, 'gearlever.gresource'))`, had just
+succeeded at the *same* compiled-in store path. The trace says exactly what
+happened:
+
+| call | path | result |
+|---|---|---|
+| `openat` for the gresource | ⭐ rewritten to `…/store/gearlever-3.4.7/share/gearlever/gearlever.gresource` | opened |
+| `newfstatat(AT_FDCWD, …)` for the directory | ⛔ **`/nix/store/plv6…/share/gearlever`, untranslated** | `-1 ENOENT` |
+
+⭐ **`nm -D` on the bundle's own libpython names the cause in three lines:**
+
+    U stat64@GLIBC_2.33   U lstat64@GLIBC_2.33   U fstatat64@GLIBC_2.33
+
+⛔ **`pgb-storefix.c` defined `stat`, `lstat` and `fstatat` and not one of the
+`64` names.** A caller built with `_FILE_OFFSET_BITS=64` — which is every
+nixpkgs Python — references the `64` symbol, so an interposer that defines
+only the unsuffixed name is never asked. Python's path-based finder asks
+`stat` whether a directory exists before it will import from it, so
+`sys.path.insert(1, pkgdatadir)` was a no-op for every bundled Python program.
+
+**Added**, each forwarding the buffer and reading nothing: `stat64`,
+`lstat64`, `fstatat64`, the pre-2.33 `__xstat64`/`__lxstat64`/`__fxstatat64`
+for the same reason `__xstat` was already there, and `readlinkat`, which
+libpython also imports and whose absence made the bundle answer two different
+things about one path.
+
+⭐ **MEASURED, and the traceback moved:** gearlever's failure is now *inside*
+its own modules at the compiled-in store path —
+`/nix/store/plv6…/share/gearlever/gearlever/preferences.py` — so the import
+resolved. ⛔ It now fails later and elsewhere, on
+`RuntimeError: could not create new GType: gearlever+preferences+Preferences
+(subclass of void)`, which is a libadwaita question and is **not established
+as ours**.
+
+⚠ **THE GENERAL LESSON, and it is cheap to check.** An `LD_PRELOAD` interposer
+is only asked about the symbols its callers actually import. ⛔ **`nm -D
+--undefined-only` on the payload is the check**, and nothing in the tree ran
+it before this. The same question is open for every other family the
+interposer defines by its unsuffixed name only.
+
+---
+
+## C42 — a loader NAME is not a loader, and an FHS symlink farm is where they differ
+
+**Found** 2026-09-04c, the first half of the same gearlever run. The build
+died before it produced anything:
+
+    pgb: open …/6zj308…-appimage-run-fhsenv-rootfs/usr/lib64/
+         ld-linux-x86-64.so.2: no such file or directory
+
+and the corpus recorded the subject as **UNRESOLVED** — a gap in the corpus
+rather than a result about the capability, which is why nobody had read it.
+
+⛔ **`gearlever`'s closure contains an FHS environment**, a store path that
+emulates a `/usr` tree out of symlinks. Its `usr/lib64/ld-linux-x86-64.so.2`
+points at an **absolute** `/nix/store/…-glibc-2.42-84/lib/…`, and there is no
+`/nix/store` on the machine doing the bundling. ⚠ It also sorts *before* the
+glibc store path that holds the real loader, so `findFile` — which takes the
+first name that matches — returned the one that reaches nothing.
+
+⭐ **The resolver already existed and was already the idiom elsewhere.**
+`b.storeResolve` re-roots a `/nix/store/…` link at the fetched closure and is
+what `copyDesktop` and the icon copy already used. `findResolvable` is
+`findFile` with that one condition — a candidate is a candidate once it
+reaches a real file — and it returns both paths, because the found path
+carries the NAME the bundle must use and the resolved path carries the BYTES.
+
+⚠ `checkLoaderOptions` reads the RESOLVED path now for the same reason: an FHS
+farm's link is named `ld-linux-x86-64.so.2` under a store path with no glibc
+version in it, so the old-loader warning would have had nothing to read and
+would have said nothing.
+
+**MEASURED:** gearlever went UNRESOLVED → **builds**, 907.6 MiB, 542 store
+paths, loader `ld-linux-x86-64.so.2` from the closure's own glibc.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

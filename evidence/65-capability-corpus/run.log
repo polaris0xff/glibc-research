@@ -34,3 +34,4 @@ evidence     : /home/user/glibc-research/evidence/65-capability-corpus
   qt-3       Qt               qbittorrent    gui  11/11   11/11   120 compiled in: 117 res  (recorded)
   py-1       Python GUI       meld           gui  11/11   11/11   89 compiled in: 86 resol  (recorded)
   py-2       Python GUI       pdfarranger    gui  0/11    11/11   113 compiled in: 109 res FileNotFoundError: [Errno 2] No such file or directory: '/usr/local/share/pdfarranger/pdfarranger.ui'
+  py-3       Python GUI       virt-manager   gui  0/11    11/11   239 compiled in: 226 res ModuleNotFoundError: No module named 'virtManager'
