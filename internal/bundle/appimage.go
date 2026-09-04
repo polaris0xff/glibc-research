@@ -106,6 +106,11 @@ type Builder struct {
 	Base    string // the entry store path's base name
 	wrapEnv []WrapRecord
 
+	// farmNames memoises farmDirName: store base -> the directory name the
+	// bundle answers that store path under. Computed once from the closure, so
+	// writeEnv and storefix cannot disagree about it. T-092.
+	farmNames map[string]string
+
 	// Host is what this bundle may take from the machine it runs on.
 	// docs/design/host-fallback.md; the zero value is bundled-first.
 	Host HostPolicy
@@ -241,6 +246,13 @@ func (b *Builder) Build() error {
 		b.DropUnreachable()
 	}
 	b.integrity()
+	// ⛔ THE THIRD INTEGRITY CHECK, AND IT IS THE ONE THAT DID NOT EXIST.
+	// integrity() walks DT_NEEDED and manifestIntegrity() reads ICD manifests;
+	// NEITHER READS A `.env` VALUE BACK AGAINST THE TREE, which is how
+	// `${SHARUN_DIR}` expanded to nothing for a whole session and how a
+	// short-name collision could point every override in a package at a
+	// directory that was never created. T-092, corrections.md C28.
+	b.envIntegrity()
 	// ⛔ AFTER the sweep, for the same reason integrity() is: the manifests
 	// have to be checked against what actually ships, not against what the
 	// AppDir held before anything was deleted. It reads the half of the
@@ -338,11 +350,10 @@ func (b *Builder) hydraAttr() string {
 var versionSuffix = regexp.MustCompile(`-[0-9].*$`)
 
 func deriveProgramName(base string) string {
-	name := base
-	if len(name) > 33 {
-		name = name[33:]
-	}
-	return versionSuffix.ReplaceAllString(name, "")
+	// ⚠ shortStoreName, NOT farmDirName: this is the PROGRAM's name, and it
+	// must not pick up the farm's collision fallback -- a closure with two
+	// builds of one package would otherwise name the program after a hash.
+	return versionSuffix.ReplaceAllString(shortStoreName(base), "")
 }
 
 // augment pulls mesa in when the closure has libglvnd and no driver.

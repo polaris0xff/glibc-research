@@ -132,6 +132,23 @@ func (b *Builder) copyClosureTrees() {
 // top-level directory and every store path points at it — except the ones
 // carryBakedPaths already materialised, which keep their real contents and only
 // gain the entries they were missing.
+// buildStoreFarmNames is what buildStoreFarm would WRITE, without creating
+// anything. It exists so a selftest can compare the farm's side of the naming
+// rule against the `.env`'s side; asking farmDirName twice would prove nothing.
+func (b *Builder) buildStoreFarmNames() (map[string]string, error) {
+	names, err := os.ReadDir(b.Root)
+	if err != nil {
+		return nil, err
+	}
+	out := map[string]string{}
+	for _, e := range names {
+		if e.IsDir() {
+			out[e.Name()] = "store/" + b.farmDirName(e.Name())
+		}
+	}
+	return out, nil
+}
+
 func (b *Builder) buildStoreFarm() ([]StoreMapEntry, error) {
 	storeDir := filepath.Join(b.AppDir, "store")
 	root := filepath.Join(storeDir, ".root")
@@ -158,14 +175,6 @@ func (b *Builder) buildStoreFarm() ([]StoreMapEntry, error) {
 	// hash — a closure legitimately carries two builds of one package. The
 	// short name is used when it is unique and the full one when it is not, so
 	// the map is never ambiguous.
-	count := map[string]int{}
-	for _, e := range names {
-		if !e.IsDir() {
-			continue
-		}
-		count[shortStoreName(e.Name())]++
-	}
-
 	var out []StoreMapEntry
 	unmapped := map[string]bool{}
 	for _, e := range names {
@@ -173,10 +182,7 @@ func (b *Builder) buildStoreFarm() ([]StoreMapEntry, error) {
 			continue
 		}
 		base := e.Name()
-		dirName := shortStoreName(base)
-		if count[dirName] > 1 {
-			dirName = base
-		}
+		dirName := b.farmDirName(base)
 		dst := filepath.Join(storeDir, dirName)
 		fi, err := os.Lstat(dst)
 		switch {
@@ -245,6 +251,49 @@ func topLevelNames(dir string) []string {
 		out = append(out, e.Name())
 	}
 	return out
+}
+
+// farmDirName is THE rule for what a store path is called inside the bundle,
+// and it exists because there were two of them.
+//
+// ⛔ THE DIVERGENCE IT CLOSES. buildStoreFarm falls back to the FULL
+// `<hash>-<name>` when two store paths share a short name — a closure
+// legitimately carries two builds of one package. `carryBakedPaths` computed
+// `base[33:]` inline and had no such fallback, so on a collision the `.env`
+// named `store/<short>` while the farm had created `store/<hash>-<short>`, and
+// every variable pointing into that package resolved to nothing. Nothing
+// caught it: `integrity()` walks DT_NEEDED and `manifestIntegrity()` reads ICD
+// manifests, and neither reads a `.env` value back against the tree.
+// docs/history/corrections.md C28, T-092.
+//
+// ⚠ It is keyed on b.Root, the CLOSURE, not on the AppDir — so it gives the
+// same answer before the farm is built (writeEnv) and after (storefix).
+func (b *Builder) farmDirName(base string) string {
+	if b.farmNames == nil {
+		b.farmNames = map[string]string{}
+		count := map[string]int{}
+		names, _ := os.ReadDir(b.Root)
+		for _, e := range names {
+			if e.IsDir() {
+				count[shortStoreName(e.Name())]++
+			}
+		}
+		for _, e := range names {
+			if !e.IsDir() {
+				continue
+			}
+			short := shortStoreName(e.Name())
+			if count[short] > 1 {
+				b.farmNames[e.Name()] = e.Name()
+			} else {
+				b.farmNames[e.Name()] = short
+			}
+		}
+	}
+	if n, ok := b.farmNames[base]; ok {
+		return n
+	}
+	return shortStoreName(base)
 }
 
 func shortStoreName(base string) string {

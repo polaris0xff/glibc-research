@@ -200,6 +200,42 @@ for k in DefaultEnvName DefaultEnvImage DefaultEnvDigest; do
   fi
 done
 
+# 9. ⛔ A STORE PATH'S NAME INSIDE THE BUNDLE HAS ONE RULE, AND IT IS
+# farmDirName. Two existed: buildStoreFarm fell back to the full
+# `<hash>-<name>` when two store paths shared a short name, and carryBakedPaths
+# sliced `base[33:]` inline with no fallback -- so on a closure carrying two
+# builds of one package the `.env` named a directory the farm never created,
+# and nothing read a `.env` value back to notice. T-092, corrections.md C28.
+#
+# ⛔ WHY A GREP AND NOT A SELFTEST. The selftest can prove farmDirName is right
+# and that both sides build the same string; it CANNOT see a third caller that
+# slices the name itself and never calls farmDirName. That is the shape the
+# defect actually had, so it needs a structural check -- the same argument as
+# check 8 above.
+#
+# ⚠ 33 is the length of a store hash plus its `-`. Whole-line comments are
+# exempt for the same reason as check 8: the block saying what a file no longer
+# does has to be able to say it.
+# ⚠ THE EXEMPTION IS shortStoreName'S BODY, FOUND BY CONTEXT. The first version
+# exempted a LINE RANGE in storefix.go and was wrong within the same commit --
+# inserting farmDirName above it moved the function. A gate whose exemption
+# drifts is worse than no gate.
+sn_body=$(awk '/^func shortStoreName\(/ {f=1} f {print FILENAME":"FNR} f && /^}/ {f=0}' \
+          "$D/../internal/bundle/storefix.go" 2>/dev/null)
+slices=$(grep -rnE '\[33:\]|> 33' "$D/../internal/bundle" 2>/dev/null \
+         | grep -vE ':[0-9]+:[[:space:]]*(//|\*|/\*)' || true)
+for e in $sn_body; do
+  slices=$(printf '%s\n' "$slices" | grep -vF "$e:" || true)
+done
+if [ -n "$slices" ]; then
+  printf '%s\n' "$slices" | while IFS= read -r c; do
+    [ -n "$c" ] || continue
+    bad "slices a store name by hand: ${c#"$D"/../} (call shortStoreName, or farmDirName for a farm directory)"
+  done
+else
+  ok "the store-name slice lives only in shortStoreName"
+fi
+
 fail=$(grep -c . "$FAILS")
 printf '\n'
 if [ "$fail" -gt 0 ]; then printf 'VERDICT: the record disagrees with itself (%s).\n' "$fail"; exit 1; fi

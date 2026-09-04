@@ -459,11 +459,10 @@ func (b *Builder) carryBakedPaths() []string {
 			continue
 		}
 		nDir++
-		short := base
-		if len(short) > 33 {
-			short = short[33:]
-		}
-		lines := bakedOverride(short, sub)
+		// ⛔ farmDirName, NOT base[33:]. The inline version here had no
+		// collision fallback and disagreed with the farm on exactly the case
+		// the farm has one for. T-092.
+		lines := bakedOverride(b.farmDirName(base), sub)
 		if len(lines) == 0 {
 			continue
 		}

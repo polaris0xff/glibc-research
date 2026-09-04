@@ -769,6 +769,60 @@ func (b *Builder) writeUsrTree() error {
 // integrity checks that every DT_NEEDED of every ELF left in the bundle
 // resolves inside it. It is a REPORT, not a refusal: a closure legitimately
 // contains libraries that dlopen things nothing links against.
+// envStoreRef matches what an override variable actually emits: a value under
+// the bundle's own store farm. The name is the part that has to agree with
+// what buildStoreFarm created.
+var envStoreRef = regexp.MustCompile(`\$\{SHARUN_DIR\}/store/([^/:\s]+)(/[^:\s]*)?`)
+
+// envIntegrity reads every value the bundle wrote into `.env` back against the
+// tree it ships.
+//
+// ⛔ IT IS THE CHECK C28 FOUND MISSING. Two integrity passes existed and
+// neither looked at `.env`: integrity() walks DT_NEEDED, manifestIntegrity()
+// reads ICD manifests. So a variable naming a directory that does not exist
+// was invisible until an application failed at a user's double-click — which
+// is exactly what a short-name collision between farmDirName's two callers
+// would have produced, silently, on the subset of closures that carry two
+// builds of one package.
+//
+// ⚠ IT WARNS RATHER THAN FAILING, deliberately: `.env` legitimately names
+// paths the debloater removed later, and a dangling override resolves to
+// ENOENT, which is the answer the program would have had anyway. What must not
+// happen is that nobody is told.
+func (b *Builder) envIntegrity() {
+	data, err := os.ReadFile(filepath.Join(b.AppDir, ".env"))
+	if err != nil {
+		return
+	}
+	seen := map[string]bool{}
+	bad := 0
+	checked := 0
+	for _, line := range strings.Split(string(data), "\n") {
+		key, value, ok := strings.Cut(line, "=")
+		if !ok || strings.HasPrefix(line, "#") {
+			continue
+		}
+		for _, m := range envStoreRef.FindAllStringSubmatch(value, -1) {
+			rel := filepath.Join("store", m[1]+m[2])
+			if seen[rel] {
+				continue
+			}
+			seen[rel] = true
+			checked++
+			// The farm answers through a symlink to .root, so the target is
+			// what matters rather than the link.
+			if _, err := os.Stat(filepath.Join(b.AppDir, rel)); err != nil {
+				logx.Warnf("`.env` %s names %s, which the bundle does not have", key, rel)
+				bad++
+			}
+		}
+	}
+	if checked > 0 {
+		logx.Say("env paths   %d store reference(s) checked against the tree, %d unresolved",
+			checked, bad)
+	}
+}
+
 func (b *Builder) integrity() {
 	provided := map[string]bool{}
 	for _, d := range []string{"lib", "lib32"} {
@@ -929,10 +983,9 @@ func sortStrings(s []string) {
 // invent one. docs/research/bundle-capabilities.md §2. The version is not a
 // guess — nixpkgs puts it in the store path the closure was resolved to.
 func storeVersion(base string) string {
-	name := base
-	if len(name) > 33 {
-		name = name[33:]
-	}
+	// ⚠ shortStoreName for the same reason deriveProgramName uses it: this is
+	// the package's own version, not a directory the bundle answers under.
+	name := shortStoreName(base)
 	// The first `-` followed by a digit starts the version, which is the same
 	// rule deriveProgramName uses to strip it.
 	for i := 0; i+1 < len(name); i++ {

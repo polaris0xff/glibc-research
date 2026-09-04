@@ -461,3 +461,31 @@ session.
 **Prove.** A check that resolves every `${SHARUN_DIR}`-relative path in `.env`
 against the AppDir and fails on a miss, plus a selftest closure with a
 deliberate short-name collision.
+
+## ⭐ BOTH HALVES LANDED, and the third slice was found by the check itself
+
+| | |
+|---|---|
+| **one naming rule** | `farmDirName` — the collision-aware farm directory name, memoised from the **closure**, so `writeEnv` (before the farm exists) and `storefix` (after) cannot disagree. `carryBakedPaths` sliced `base[33:]` inline with no fallback; it calls `farmDirName` now |
+| **the missing check** | `envIntegrity()` reads every `${SHARUN_DIR}/store/…` value in `.env` back against the tree and names the variable that does not resolve. ⚠ It **warns** rather than failing: `.env` legitimately names paths the debloater removed, and a dangling override is ENOENT either way — what must not happen is that nobody is told |
+| **a structural gate** | `TODO/check.sh` check 9: the `[33:]` slice may appear **only** inside `shortStoreName` |
+
+⭐ **The gate found a defect on its first run, which is the argument for having
+it.** Two more hand-slices existed — `deriveProgramName` and `storeVersion` —
+that no value test could have seen, because a third caller that never calls the
+shared function is invisible to a test of the shared function. ⚠ Both wanted
+the **pure** slice rather than the farm rule, and now call `shortStoreName`:
+giving a *program* the farm's collision fallback would name it after a hash.
+
+⛔ **AND ONE OF THE NEW SELFTEST CASES COULD NOT FAIL**, in the commit citing
+C28 for exactly that. "The farm and the `.env` agree" compared `farmDirName`
+with `buildStoreFarmNames` — both of which *call* `farmDirName` — so it passed
+under a planted regression that made the other two fail. ⭐ It now compares the
+**strings the two sides construct**, and was checked against two plants: a
+changed format string in `bakedOverride` (it fails) and the naming regression
+(the collision cases fail). `bundle-appimage --selftest`: **53 cases**.
+
+⚠ **Still not observed in a real bundle**, and that is unchanged: no closure
+here carries two builds of one package. What changed is that the divergence is
+now impossible to reintroduce silently — one rule, a gate on the slice, and a
+check that reads `.env` back.

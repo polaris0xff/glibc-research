@@ -317,6 +317,70 @@ func AppImageSelftest(c *cfg.Config) *selftest.Report {
 	r.CheckInt("an empty file is 0", classOf("empty.so", nil), 0)
 	r.CheckInt("a file that does not exist is 0",
 		elfClass(filepath.Join(ec, "absent.so")), 0)
+
+	// ⭐ T-092: ONE NAMING RULE, and these cases fail under the two that were
+	// here before. `carryBakedPaths` computed `base[33:]` inline with no
+	// collision fallback while `buildStoreFarm` fell back to the full
+	// `<hash>-<name>`, so on a closure carrying two builds of one package the
+	// `.env` named a directory the farm never created.
+	fn := filepath.Join(dir, "farm")
+	h1 := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+	h2 := "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+	h3 := "cccccccccccccccccccccccccccccccc"
+	for _, d := range []string{h1 + "-gst-1.0", h2 + "-gst-1.0", h3 + "-solo-2.0"} {
+		_ = os.MkdirAll(filepath.Join(fn, d), 0o755)
+	}
+	fb := &Builder{C: c, Root: fn}
+	// ⛔ THE COLLIDING PAIR KEEPS ITS HASH. Both would have been "gst-1.0".
+	r.Check("a colliding short name keeps the full base (1)",
+		fb.farmDirName(h1+"-gst-1.0"), h1+"-gst-1.0")
+	r.Check("a colliding short name keeps the full base (2)",
+		fb.farmDirName(h2+"-gst-1.0"), h2+"-gst-1.0")
+	// ...and a unique one is still shortened, or every path in every bundle
+	// would change and the fix would be a regression wearing a fix's clothes.
+	r.Check("a unique short name is still shortened",
+		fb.farmDirName(h3+"-solo-2.0"), "solo-2.0")
+	// ⚠ AND THE TWO SIDES MUST AGREE ON THE PATH THEY BUILD, which is the
+	// actual property and is NOT what asking farmDirName twice tests.
+	// ⛔ THE FIRST VERSION OF THIS CASE COMPARED farmDirName WITH
+	// buildStoreFarmNames -- both of which CALL farmDirName -- so it passed
+	// under a planted regression that made the other two cases fail. A case
+	// that cannot fail is corrections.md C28 happening again, in the commit
+	// that cites it.
+	//
+	// ⭐ So it compares the STRINGS the two sides actually construct: the farm
+	// writes `"store/" + dirName`, and bakedOverride writes
+	// `${SHARUN_DIR}/store/<name>/<sub>`. A divergence in either format --
+	// not only in the name -- is what this catches.
+	entries, _ := fb.buildStoreFarmNames()
+	envLine := bakedOverride(fb.farmDirName(h1+"-gst-1.0"), "lib/gstreamer-1.0")[0]
+	_, envValue, _ := strings.Cut(envLine, "=")
+	m := envStoreRef.FindStringSubmatch(envValue)
+	envDir := "(no match)"
+	if m != nil {
+		envDir = "store/" + m[1]
+	}
+	r.Check("⭐ the farm and the .env build the SAME path",
+		envDir, entries[h1+"-gst-1.0"])
+
+	// ⭐ And the regex envIntegrity reads `.env` back with. ⛔ It must stop at
+	// `:` — a path-list value carries several — and it must accept a bare
+	// store reference with no tail.
+	envCase := func(v string) string {
+		m := envStoreRef.FindStringSubmatch(v)
+		if m == nil {
+			return "(no match)"
+		}
+		return m[1] + m[2]
+	}
+	r.Check("an env store reference with a tail",
+		envCase("${SHARUN_DIR}/store/gst-1.0/lib/gstreamer-1.0"), "gst-1.0/lib/gstreamer-1.0")
+	r.Check("⛔ ...stops at the ':' of a path list",
+		envCase("${SHARUN_DIR}/store/gst-1.0/lib:${SHARUN_DIR}/store/other/lib"), "gst-1.0/lib")
+	r.Check("a bare store reference with no tail",
+		envCase("${SHARUN_DIR}/store/gst-1.0"), "gst-1.0")
+	r.Check("a value naming no store path does not match",
+		envCase("${SHARUN_DIR}/lib/gconv"), "(no match)")
 	return r
 }
 
