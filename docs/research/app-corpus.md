@@ -562,7 +562,7 @@ emulated/dummy stubs for hw gaps."*
 
 | | why |
 |---|---|
-| a real GPU, NVIDIA | no device on this machine. T-059 |
+| a real GPU, NVIDIA | no device on this machine — ⭐ **`/dev/dri` does not exist**, on the host or in any of the eleven rootfs. Measured when `vkmark` died with `directory iterator cannot open directory … [/dev/dri]`. T-059 |
 | an unprivileged user namespace | ⭐ **the cause is `chroot`, not the bed** — `experiments/69-`: the same rootfs entered by `pivot_root` permits it. Until that change is taken and its isolation measured, a browser row measures `--no-sandbox`. Rung 5 |
 | ⛔ **a non-C locale** | **0 of 11** environments have one compiled — only `C.UTF-8`, and the three Alpines and Void have nothing at all. So `setlocale` fails, `LC_MESSAGES` stays `C`, and gettext opens no catalogue: rung 3's locale criterion cannot fire. ⚠ Six of the eleven *do* carry `share/locale/de` message catalogues, which is what makes the absence easy to miss |
 | ⛔ **a host program a subject shells out to** | `experiments/100-` arm L: `lilipod` needs `getsubids`, which **2 of 11** carry. Neither static linking nor bundling supplies another program — rungs 2 and 7 |
