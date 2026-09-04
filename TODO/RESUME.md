@@ -94,9 +94,15 @@ criterion fail *for the right reason*.
                     `sh scripts/common/run-experiment.sh 101`
         69-         DONE (pass=9, three runs) — nothing left to run.
 
-    ⛔ AND ONE THING IS BLOCKED ON 65- FOR A DIFFERENT REASON: T-084 edits
-    `experiments/lib.sh`, which 65- sourced. A running `sh` re-reads from a
-    byte offset. Do it after.
+    ⛔ AND ONE THING IS BLOCKED ON 65- FOR A DIFFERENT REASON THAN THE ONE
+    THAT WAS WRITTEN HERE. T-084 changes `exp_classify_trace`'s signature.
+    Editing the sourced `lib.sh` is SAFE while 65- runs (measured — the
+    function is in memory). What is not safe is that 65- is **resumable**: a
+    resumed run re-sources the new `lib.sh` and, calling it the old way,
+    would report **every row zero host objects**. So the call sites must
+    change with it, and one of them is 65- itself, which is executing.
+    ⭐ T-084 step 1 now says `mode` goes LAST with a default, not first,
+    precisely so that cannot happen.
 
     ⛔ WHILE 65- RUNS, THE MACHINE IS NOT FREE.
       - ⛔ Do not `make`: each subject's bundle is built by `$REPO_DIR/pgb`, so
@@ -157,7 +163,15 @@ criterion fail *for the right reason*.
 - ⛔ **Do not rebuild `./pgb` while the POC suite is running.**
 - ⛔ **`$?` after a pipeline is the PIPELINE's status.**
 - ⛔ **`chmod 000` is not a control when you are root.** Move the file away.
-- ⛔ **Never edit a shell script while it is running.**
+- ⛔ **Never edit a shell script while it is running** — measured 2026-09-04b,
+  and the failure is worse than "it changes": the shell re-entered the
+  rewritten file at a **shifted byte offset**, executed a garbage line, and
+  then **ran the tail a second time**. Statements executed twice.
+- ⭐ **But editing a SOURCED library is SAFE**, measured the same way: the
+  function is in memory once `.` has read it and the file is never re-read.
+  ⛔ The hazard for `experiments/lib.sh` is a different one and it is real —
+  a **resumable** experiment re-sources it, so a changed signature makes an
+  un-updated caller silently wrong. `TODO/ci.md` T-084 step 1.
 - ⛔ **USE `sh scripts/common/run-experiment.sh <NN>`**, not the script directly:
   19 experiments write their own `RESULT.txt` and 13 do not, and there is no
   way to tell which without reading them.

@@ -119,9 +119,35 @@ that opened this entry:
   counts the whole process set. `exp_classify_trace` implements neither
   explicitly — it is `tree` without the clear.
 
-1. **extend `exp_classify_trace` to take `mode` first**, with a selftest for
-   each mode, then convert the six — ⛔ and `experiments/lib.sh` is sourced by
-   every experiment, so this edit lands only when nothing is running;
+1. ⛔ **`mode` MUST BE THE LAST ARGUMENT WITH A DEFAULT, NOT THE FIRST**, and
+   this instruction said the opposite. Measured 2026-09-04b — the reasoning is
+   about `experiments/65-`, which is **resumable**:
+
+   - a resumed `65-` **re-sources** `lib.sh`, so it gets the NEW function;
+   - if it still calls the OLD two-argument way, `mode` takes the *tracefile*
+     and `want` takes nothing;
+   - `want` empty means no `execve` line ever matches, so `inset` stays empty,
+     so **every row reports zero host shared objects**.
+
+   ⭐ **A silent, total false clean on the exact number the corpus exists to
+   measure.** With `mode` last and defaulting to `tree` — which is what
+   `exp_classify_trace` already does — an un-updated caller keeps today's
+   behaviour instead. ⛔ Anything not in `{payload, tree}` must be a loud
+   error, not a fallback.
+
+   Extend it that way, with a selftest for each mode, then convert the six.
+   ⚠ And `65-`, `68-`, `100-` and `101-` call the two-argument form today.
+
+   ⛔ **The edit still waits for `65-` to finish**, and the reason is NOT the
+   one that was written here. Measured, both directions:
+
+   | | |
+   |---|---|
+   | editing a **sourced** library while a script that sourced it runs | ✅ **safe** — the function is already in memory, and a re-read never happens |
+   | editing a script that is **being executed** | ⛔ **catastrophic**, and worse than "it changes": the shell re-entered the rewritten file at a shifted byte offset, ran a garbage line, and then **executed the tail a second time** |
+
+   ⭐ So `lib.sh` itself was never the hazard. `65-` is, because it is
+   resumable *and* it is the file that would need its call sites changed;
 2. re-run all six, and compare the host counts before and after. ⚠ `90-` and
    `86-` build kdenlive-scale bundles, so this is the expensive half and it is
    why the entry is M rather than S;
