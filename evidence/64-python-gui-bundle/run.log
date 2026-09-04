@@ -86,3 +86,24 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
       out: <none>  [exit 124]
   debian-11            glibc  yes   1        0        yes      3822
       out: WARNING: Cannot find CA Certificates in host!  [exit 124]
+  debian-12            glibc  yes   1        0        yes      3822
+      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
+  ubuntu-20.04         glibc  yes   1        0        yes      3822
+      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
+  rockylinux-8         glibc  yes   1        0        yes      3822
+      out: <none>  [exit 124]
+  opensuse-leap-15.6   glibc  yes   1        0        yes      3822
+      out: <none>  [exit 124]
+  fedora-42            glibc  yes   1        0        yes      3822
+      out: <none>  [exit 124]
+  archlinux-latest     glibc  yes   1        0        yes      3822
+      out: <none>  [exit 124]
+
+
+-- arm P: a PYTHON GUI application (meld) --------------------------
+        building meld — several minutes
+        arm P closure: unknown store paths
+  ok    arm P: an artefact was produced                = yes
+        arm P entry: <not a script entry>
+
+  ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so

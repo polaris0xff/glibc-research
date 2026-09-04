@@ -167,11 +167,16 @@ func AppImageSelftest(c *cfg.Config) *selftest.Report {
 	// the bundler's earlier line -- the one naming ${SHARUN_DIR}/share, the
 	// merged tree holding every icon theme and schema in the closure -- was
 	// resolved away. writeEnv now puts it back at the front AFTER the lift.
+	// ⭐ THE LAST LINE COMES FROM THE MECHANISM, NOT FROM THE FIXTURE. Writing
+	// it into the fixture by hand would have asserted FoldEnv's behaviour given
+	// a line, which is true whether or not writeEnv ever adds one.
+	written := FinalEnvLines([]string{
+		"XDG_DATA_DIRS=${SHARUN_DIR}/share:${XDG_DATA_DIRS}:/usr/share",
+		"XDG_DATA_DIRS=${SHARUN_DIR}/store/meld/share",
+	}, func(string) bool { return true })
+	r.CheckInt("the bundle's own share is appended by the MECHANISM", len(written), 3)
 	env2 := filepath.Join(dir, ".env2")
-	_ = os.WriteFile(env2, []byte(
-		"XDG_DATA_DIRS=${SHARUN_DIR}/share:${XDG_DATA_DIRS}:/usr/share\n"+
-			"XDG_DATA_DIRS=${SHARUN_DIR}/store/meld/share\n"+
-			"XDG_DATA_DIRS=${SHARUN_DIR}/share:${XDG_DATA_DIRS}\n"), 0o644)
+	_ = os.WriteFile(env2, []byte(strings.Join(written, "\n")+"\n"), 0o644)
 	if _, _, _, err := FoldEnv(env2); err != nil {
 		r.Fail("fold the second env file", err.Error(), "no error")
 		return r

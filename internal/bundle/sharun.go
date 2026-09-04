@@ -174,6 +174,30 @@ var storeRefWithSub = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[A-Za-z0-9._+-
 // the bundle's own store farm answers under.
 var storeRefName = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-([^/:; ]*)`)
 
+// FinalEnvLines appends the lines that must be LAST whatever a wrapper said.
+//
+// ⛔ THE BUNDLE'S OWN share/ MUST SURVIVE A WRAPPER'S `--set`, and it did not.
+// nixpkgs wraps meld with `--set XDG_DATA_DIRS <its own paths>`, and a SET
+// replaces rather than extends: FoldEnv correctly resolved the later line over
+// the earlier one and `${SHARUN_DIR}/share` -- the merged tree holding every
+// icon theme, gsettings schema and mime database in the closure -- vanished
+// from the variable entirely.
+//
+// ⚠ IT WORKED ANYWAY, WHICH IS WHY THIS WAS NOT VISIBLE: every store path the
+// wrapper named resolves through storefix.go's farm to the same merged share/.
+// Depending on that is depending on an accident.
+//
+// ⭐ IT IS A FUNCTION SO THE SELFTEST CAN ASSERT THE DECISION rather than
+// FoldEnv's behaviour given a line somebody typed into the fixture. A check
+// that exercises the mechanism's INPUT instead of the mechanism is the defect
+// class TODO/RULES.md "an assertion you have not seen fail" is about.
+func FinalEnvLines(lines []string, have func(string) bool) []string {
+	if have("share") {
+		lines = append(lines, "XDG_DATA_DIRS=${SHARUN_DIR}/share:${XDG_DATA_DIRS}")
+	}
+	return lines
+}
+
 // StoreRefToBundle turns every store path in a value into the bundle-relative
 // one, keeping ${SHARUN_DIR} as a LITERAL.
 //
@@ -240,21 +264,7 @@ func (b *Builder) writeEnv() error {
 	lines = append(lines, b.liftWrapperEnv()...)
 	lines = append(lines, b.carryBakedPaths()...)
 
-	// ⛔ THE BUNDLE'S OWN share/ MUST SURVIVE A WRAPPER'S `--set`, and it did
-	// not. nixpkgs wraps meld with `--set XDG_DATA_DIRS <its own paths>`, and
-	// a SET replaces rather than extends: FoldEnv correctly resolved the later
-	// line over the earlier one and `${SHARUN_DIR}/share` -- the merged tree
-	// holding every icon theme, gsettings schema and mime database in the
-	// closure -- vanished from the variable entirely.
-	//
-	// ⚠ IT WORKED ANYWAY, WHICH IS WHY THIS WAS NOT VISIBLE: every store path
-	// the wrapper named resolves through storefix.go's farm to the same merged
-	// share/. Depending on that is depending on an accident, so the bundle's
-	// own directory is put back at the FRONT, after everything else has had
-	// its say. A repeated component is dropped by dedupePath.
-	if have("share") {
-		add("XDG_DATA_DIRS=${SHARUN_DIR}/share:${XDG_DATA_DIRS}")
-	}
+	lines = FinalEnvLines(lines, have)
 
 	envPath := filepath.Join(b.AppDir, ".env")
 	if err := os.WriteFile(envPath, []byte(strings.Join(lines, "\n")+"\n"), 0o644); err != nil {
