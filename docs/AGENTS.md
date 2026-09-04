@@ -446,13 +446,19 @@ experiment; none has been shown to be unreachable.
    **The residue**, `experiments/93-`, every shared object on the build host
    through the loader, one `timeout`ed fork each:
 
-   | 1,527 objects | |
+   | **1,532** objects, re-measured 2026-09-04c | |
    |---|---|
-   | loaded | ⭐ **882** |
+   | loaded | ⭐ **887** |
    | refused by name or by shape | 122 |
    | failed with a reason | 478 — 376 an undefined symbol |
    | crashed | 45, and ⭐ **45 of 45 crash glibc's own `ld.so` too** |
    | ⛔ crashes that glibc LOADS | ⭐ **0** |
+
+   ⭐ **RE-RUN AS THE REGRESSION TEST FOR C46**, the loader's symbol-resolution
+   reordering, and nothing moved that the change could have moved: 887 of
+   1,532 against the previous 882 of 1,527. ⚠ The denominator grew because
+   this session installed `musl-tools`, `xvfb` and `x11-utils` on the machine
+   — five more objects on disk, five more loaded.
 
    ⚠ **"Failed" is not a defect count.** Of those failing on an undefined
    symbol, glibc's own `ld.so` fails **374** too: they are plugins of a host
