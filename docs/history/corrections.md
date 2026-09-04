@@ -1212,6 +1212,73 @@ negative one.
 
 ---
 
+## C34 — `experiments/65-`'s `cli` criterion scores a correct answer as a failure
+
+⛔ **The OpenGL / EGL row read `0 of 11` and the capability works.**
+
+`65-` scores a `cli` subject as `exit 0` **AND** the assertion. `eglinfo` in a
+headless environment:
+
+| | |
+|---|---|
+| runs, printing a full EGL config table | ⭐ yes |
+| the corpus assertion `(llvmpipe\|Mesa\|softpipe)` | ⭐ **matches 20 times** |
+| exit status | ⛔ **3** |
+
+⚠ **And it is not the bed.** With `XDG_RUNTIME_DIR` set and every `error:` line
+gone, it **still exits 3** — that is how the program reports that some EGL
+platform (wayland, gbm) is unavailable, while answering completely about the
+one that is.
+
+⭐ **How it was found**: `mesa-demos` bundles `glxgears + 309 more`, so
+`eglinfo` was reached out of the corpus's own `gl-2` artefact by **renaming
+it** — `experiments/68-`'s dispatch rule used as a diagnostic, and an
+independent confirmation of that rule on a 310-program bundle.
+
+**The rule that is wrong**: an assertion is *"checked IN ADDITION to the mode's
+criterion, never instead of it"*. That is right for a subject with no
+assertion and wrong for one with a good assertion and a noisy exit status. ⭐
+**When a subject carries an assertion, the assertion is the criterion** and the
+status is reported beside it.
+
+⛔ **Not fixed in this session**: `65-` was running, and editing an executing
+script re-enters it at a shifted byte offset (C31's neighbour). The `gl-1` row
+must be **deleted** and re-measured after the fix — a row from a broken
+instrument is deleted, never adjusted. ⚠ `vulkan-1` and `media-1` are `cli`
+with assertions and must be re-read under the new rule too.
+
+---
+
+## C35 — `neovim`'s bundle could not start, and one old glibc explains two messages
+
+⛔ **The corpus note is truncated at 70 characters and that hid the answer.**
+The full error is the dynamic loader's: `--argv0: error while loading shared
+libraries: --argv0: cannot open shared object file`.
+
+The `neovim` closure carries **`glibc-2.26-115`**. sharun starts a dynamic
+payload as `<loader> --library-path <p> --argv0 <a> [--preload …] <bin> …`, and
+`ld.so` learned `--preload` in **2.30** and `--argv0` in **2.33**. ⭐ A loader
+with no option parsing takes the first argument as the **program**, which is
+exactly what the message says; measured, that loader rejects even `--version`
+the same way.
+
+⭐ **And the same old glibc explains the other warning that build printed** —
+*"the interposer was NOT installed: the bundle's libc does not define dladdr,
+dlsym"*. That `libc.so.6` exports **0** of the two: they lived in `libdl.so`
+until glibc **2.34**. ⚠ Two messages that look unrelated, one cause, and `pgb`
+already had the evidence.
+
+⚠ **A plausible wrong hypothesis, recorded because it was plausible**: the
+build log also names `/nix/store/eeee…-glibc-2.23`. That is nixpkgs'
+**placeholder** hash, not a store path; the real loader is on the `loader` line.
+
+**Landed**: `checkLoaderOptions` reads the loader's glibc version at build time
+and warns with the exact runtime string. ⚠ It **warns** rather than refusing,
+because sharun skips the loader command line entirely for a static or
+already-patched payload, so such a closure still works.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

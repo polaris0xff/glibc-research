@@ -73,7 +73,39 @@ failures are subject-specific and each needs its own reading.
 | `xterm` **0/11**, clean **11/11** | ⭐ **C5 predicted it would fail the HOST-OBJECT row and it did not** — it is clean on 11 of 11. ⚠ It also never drew, so the prediction is not so much falsified as **unevaluable**: a subject that does not start its shell never loads the shell's libc | why it does not draw |
 | ⭐ `neovim` **0/11** — **ROOT CAUSE FOUND** | the closure carries **glibc 2.26**. See below | — |
 | `helix` **0/11** | ⚠ the build warns that this closure's store paths carry **top-level `.so` files** (its ~200 tree-sitter grammars: `rust.so`, `python.so`, …), and `mergedFor` maps only `bin`/`lib`/`share`/`etc`/`libexec` — so the farm has nowhere to put them | whether that is the cause of the failure or an unrelated warning |
-| `eglinfo` **0/11** | — | ⛔ nothing; no error line matched. It needs one row run by hand with the output kept |
+| ⭐ `eglinfo` **0/11** — **AN INSTRUMENT DEFECT, NOT A FAILURE** | see below | — |
+
+### ⛔ `eglinfo`: the capability WORKS and the row is the instrument's
+
+⭐ **Run by hand out of the corpus's own artefact.** `mesa-demos` bundles
+`glxgears + 309 more`, so `eglinfo` was reached from the existing `gl-2`
+AppImage by **renaming it** — which is `experiments/68-`'s dispatch rule used
+as a diagnostic, on a 310-program bundle.
+
+| | |
+|---|---|
+| does it run? | ⭐ **yes** — a full EGL config table |
+| the corpus assertion `(llvmpipe\|Mesa\|softpipe)` | ⭐ **matches 20 times** |
+| its exit status | ⛔ **3** |
+
+⛔ **`65-`'s `cli` criterion is `exit 0` AND the assertion.** `eglinfo` exits
+**3** in a headless environment because some EGL platforms (wayland, gbm) are
+unavailable — ⚠ and it **still exits 3** with `XDG_RUNTIME_DIR` set and every
+`error:` line gone, so it is not a bed condition either. It simply never
+returns 0 here, while answering completely.
+
+⭐ **So the OpenGL / EGL row must NOT be read as a failure.** The capability is
+demonstrated; the row measures the criterion.
+
+⛔ **The fix, and it cannot be made while `65-` is running**: when a subject
+carries an assertion, **the assertion is the criterion** and the exit status is
+reported beside it; a subject with no assertion keeps the status as its
+criterion. ⚠ Then **delete the `gl-1` row and re-measure** — a row produced by
+a broken instrument is deleted, never adjusted.
+
+⚠ **Two other rows are at risk from the same rule** and must be re-read when it
+changes: `vulkan-1` (`vulkaninfo --summary`) and `media-1` (`mpv --version`),
+both `cli` with an assertion.
 
 ### ⭐ `neovim`: one old glibc, two unrelated-looking messages
 

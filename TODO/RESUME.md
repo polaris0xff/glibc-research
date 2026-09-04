@@ -108,7 +108,14 @@ criterion fail *for the right reason*.
                  nixpkgs-closure fact, not a bundler one.
         field-1  helix 0/11. Its closure carries ~200 TOP-LEVEL `.so`
                  grammars and `mergedFor` maps no such top level.
-        gl-1     eglinfo 0/11 and NOTHING is known — no error line matched.
+        gl-1     ⭐ SOLVED, AND IT IS THE INSTRUMENT. eglinfo RUNS, and the
+                 assertion (llvmpipe|Mesa|softpipe) matches 20 times -- but
+                 it exits 3 headless (and still 3 with XDG_RUNTIME_DIR set),
+                 and 65-'s cli criterion is `exit 0 AND the assertion`.
+                 ⛔ FIX AFTER 65- FINISHES: when a subject carries an
+                 assertion, the ASSERTION is the criterion and the status is
+                 reported; then DELETE the gl-1 row and re-measure.
+                 ⚠ vulkan-1 and media-1 are at risk from the same rule.
         x11-3    xterm 0/11 and it never drew, so C5's host-object
                  prediction is UNEVALUABLE rather than falsified.
 
