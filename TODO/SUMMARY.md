@@ -27,7 +27,7 @@
 | **T-091** GStreamer | *"we emit one of four"* | ⛔ the entry described the **wrong layer**; all four emitted, the scanner installed as a program — ⭐ now seen **firing on a real closure**, still **unmeasured** and it says why |
 | **T-092** the `.env` coupling | a known divergence, no check | ⭐ one naming rule, the missing check, and a **gate that found two more** hand-slices on its first run |
 | **T-087** rung 3 | pre-registered | ⛔ the **locale** half is **not measurable in this bed** — no environment has a non-C locale. ⭐ The mechanism claim holds on a different discriminator |
-| the corpus | 1 of 26 rows | **19 of 26**, ⭐ **four categories CLOSED**, and five zeros run down to root cause |
+| the corpus | 1 of 26 rows | **20 of 26**, ⭐ **four categories CLOSED**, and five zeros run down to root cause |
 | `references/` | 46 trees, text said 34 | **55**, and rungs 6 and 7 rewritten against what arrived |
 
 ## ⭐ The measurements, each with its verdict line
@@ -39,7 +39,7 @@
 | `100-` static payload, arms P, G, L | `pass=13 fail=3` | arm P **two**, arm G **two** |
 | `102-` classifier equivalence | `pass=17 fail=0 skip=0` | **two**, identical |
 | `101-` rung 3 | ⛔ **stopped, no result recorded** | the criterion cannot fire in this bed |
-| `65-` the corpus | ⏳ **19 of 26** | resumable; a recorded row is never re-measured, and a row from a broken instrument is DELETED |
+| `65-` the corpus | ⏳ **20 of 26** | resumable; a recorded row is never re-measured, and a row from a broken instrument is DELETED |
 
 ## ⭐ FOUR CAPABILITY CATEGORIES ARE CLOSED
 
@@ -54,7 +54,7 @@ environments.**
 | **OpenGL / EGL** | `eglinfo`, `glxgears`, `glmark2` | **11/11** each | **11/11** each |
 | **Qt** | `qalculate-qt`, `keepassxc`, `qbittorrent` | **11/11** each | ⚠ **4**, 11, 11 |
 | **Vulkan** | `vulkaninfo`, `vkcube`, `vkmark` | 11, 11, ⛔ **0** | 11/11 each |
-| **SDL** | `dosbox` (1 of 3) | **11/11** | **11/11** |
+| **SDL** | `dosbox`, `stella` (2 of 3) | **11/11** each | **11/11** each |
 
 ⭐ **`xterm`'s `4/11` is the one dirty count this corpus EXPECTS**, and it was
 pre-registered as C5 before the corpus ever ran: xterm's job is to run the
@@ -160,8 +160,8 @@ print.** Nothing in the harness closes that loop.
 
 ## ⚠ What the next session inherits
 
-    T-080  ⏳ 19 of 26. FINISH IT. RESUME.md has the PARALLEL recipe and
-           the two-instance ceiling. Left: sdl-2, sdl-3, py-2, py-3,
+    T-080  ⏳ 20 of 26. FINISH IT. RESUME.md has the PARALLEL recipe and
+           the two-instance ceiling. Left: sdl-3, py-2, py-3,
            media-1 (after C39), field-1, field-2.
     ⛔ C39 IS OWED A ONE-CHARACTER FIX. `media-1`'s assertion must become
        `mpv v[0-9]`. It could not be made this session: 65- was executing,

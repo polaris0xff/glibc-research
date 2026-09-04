@@ -9,7 +9,7 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
     LAST WRITTEN   2026-09-04b, at the START, refreshed as each piece
                    landed, and again at the END.
                    ⛔ THE SESSION ENDED WITH `experiments/65-` STILL
-                   RUNNING. That is not a failure — it is resumable and 19
+                   RUNNING. That is not a failure — it is resumable and 20
                    of its 26 rows are recorded and committed. Re-run it.
     TREE           main, began at 4f652df4 (== origin/main at session start)
     BRANCH         ⛔ main. The harness named
@@ -17,7 +17,7 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
                    main, again. FIFTH session running.
     SCOPE          ⏳ T-080 finish experiments/65- (RESUMABLE). Then the arms
                    below that need the bed.
-    CI             ⭐ 335-380 all success. Read after every push.
+    CI             ⭐ 335-385 all success. Read after every push.
     GATES          both green at every commit.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
@@ -86,11 +86,11 @@ criterion fail *for the right reason*.
        `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
        ⛔ A row measured by a BROKEN instrument must be DELETED, not adjusted
        — that is what makes resumability safe.
-       ⭐ 19 of 26 in. FOUR categories CLOSED at 3 of 3 and all passing —
+       ⭐ 20 of 26 in. FOUR categories CLOSED at 3 of 3 and all passing —
        GTK 3, X11/XCB, OpenGL/EGL, Qt. Vulkan is 3 of 3 with the third a
        BED limit (`vkmark` needs `/dev/dri`, which exists nowhere here).
-       SDL is 1 of 3 and its first row passes 11/11 clean 11/11.
-       ⛔ STILL TO MEASURE: `sdl-2`, `sdl-3`, `py-2`, `py-3`, `media-1`,
+       SDL is 2 of 3 and both rows pass 11/11, clean 11/11.
+       ⛔ STILL TO MEASURE: `sdl-3`, `py-2`, `py-3`, `media-1`,
        `field-1`, `field-2`.
        ⚠ ~35 minutes per subject serially — see the PARALLEL recipe above.
 
