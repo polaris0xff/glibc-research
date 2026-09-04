@@ -551,9 +551,23 @@ to agree — the coupling class T-092 is about.
 sharun-as-AppRun. That path is measured (`experiments/68-` arm S) but this
 *combination* is not.
 
+⭐ **ONE HALF IS NOW MEASURED ON A REAL SUBJECT, 2026-09-04b.** The corpus
+built `mpv` (`media-1`) and its build log reads:
+
+    gstreamer   scanner installed as a program (GST_PLUGIN_SCANNER follows)
+
+So `installGstScanner` fires on a real nixpkgs closure, not only on the
+synthetic path. ⛔ **That is the build half and it is not the Prove line.**
+
 ⛔ **Prove — and NOTHING ABOVE IS A RESULT UNTIL THIS RUNS.** A media subject
 that plays, with its host-object count explained: `gst-plugin-scanner` *"opens
 every single gstreamer plugin on the system"*, so a count taken on such a
 subject must say **which process** it counted. Any row for `lmms`, `handbrake`
 or `gnome-music` has to name that. The negative control is the same subject
 built without these variables.
+
+⛔ **AND `media-1` AS THE CORPUS DEFINES IT CANNOT BE THAT ROW.** Its argument
+is `--version`, which never launches the scanner, so its host-object count
+cannot discriminate — the row would be green and mean nothing. ⚠ Fixing C39's
+assertion makes `media-1` a valid *corpus* row; it does not make it T-091's.
+This entry needs a subject that **decodes something**.

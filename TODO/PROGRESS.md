@@ -4,9 +4,12 @@
 the entries, and [`../HISTORY/`](../HISTORY/).
 
     STATE     2026-09-04b. ⏳ T-080 STILL IN FLIGHT — experiments/65- is
-              running and RESUMABLE. 3 of 26 rows in, and ⭐ the GTK 3
-              category is COMPLETE: galculator, mousepad, geany, all
-              11/11 pass and 11/11 clean.
+              RESUMABLE and 19 of 26 rows are recorded. ⭐ FOUR categories
+              are CLOSED at three subjects each, all passing on all
+              eleven: GTK 3, X11/XCB, OpenGL/EGL, Qt. Vulkan is 3 of 3
+              with the third a BED limit; SDL is 1 of 3 and passing.
+              ⛔ Left: sdl-2, sdl-3, py-2, py-3, media-1, field-1,
+              field-2. ⛔ media-1 needs C39's one-character fix first.
     COUNTS    65 entries, 25 open, 40 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)

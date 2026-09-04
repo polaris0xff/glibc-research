@@ -63,7 +63,7 @@ per subject, and a recorded row is never re-measured:
 | **SDL** | 1 of 3 in | ⭐ `dosbox` **11/11**, clean **11/11** — **181** store paths compiled in and 169 resolving, the largest closure in the corpus so far. ⏳ `stella`, `scummvm` |
 | **Python GUI** | 1 of 3 in | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⏳ `pdfarranger` and `virt-manager` re-queued against the C37 `pgb` |
 | **the field's recipes** | 2 of 4 | ⛔ `flameshot` **0/11** — unexplained; `gearlever` UNRESOLVED. `helix` and `neovim` re-queued |
-| **media / codecs** | 0 | ⏳ running — and it is **T-091's Prove subject**, not just a row |
+| **media / codecs** | ⛔ 0 — the row was **DELETED** | `mpv` ran and answered `mpv v0.41.0`; the assertion was `mpv [0-9]`, which cannot match it — **C39**, the fourth instrument defect. ⭐ Its build log did show **T-091's GStreamer scanner installed as a program** on a real subject |
 
 ⭐ **THE THREE C6 POSITIVE CONTROLS ARE ALL IN AND ALL GREEN** — `galculator`,
 `mousepad` and `meld`, each **11/11**, each agreeing with `experiments/64-`,

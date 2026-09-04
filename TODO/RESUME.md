@@ -6,8 +6,11 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-04b, at the START; refreshed as each piece landed.
-                   Session IN PROGRESS.
+    LAST WRITTEN   2026-09-04b, at the START, refreshed as each piece
+                   landed, and again at the END.
+                   ⛔ THE SESSION ENDED WITH `experiments/65-` STILL
+                   RUNNING. That is not a failure — it is resumable and 19
+                   of its 26 rows are recorded and committed. Re-run it.
     TREE           main, began at 4f652df4 (== origin/main at session start)
     BRANCH         ⛔ main. The harness named
                    `claude/app-corpus-research-34c2el` and THE OPERATOR SAID
@@ -83,17 +86,36 @@ criterion fail *for the right reason*.
        `sh scripts/common/run-experiment.sh 65` picks up where it stopped.
        ⛔ A row measured by a BROKEN instrument must be DELETED, not adjusted
        — that is what makes resumability safe.
-       ⭐ 17 of 26 in. THREE categories CLOSED at 3 of 3 and all passing —
-       GTK 3, X11/XCB, OpenGL/EGL. Vulkan is 3 of 3 with the third a BED
-       limit (`vkmark` needs `/dev/dri`, which exists nowhere here).
-       ⛔ STILL TO MEASURE: `sdl-1..3`, `qt-3`, `py-2`, `py-3`, `media-1`,
+       ⭐ 19 of 26 in. FOUR categories CLOSED at 3 of 3 and all passing —
+       GTK 3, X11/XCB, OpenGL/EGL, Qt. Vulkan is 3 of 3 with the third a
+       BED limit (`vkmark` needs `/dev/dri`, which exists nowhere here).
+       SDL is 1 of 3 and its first row passes 11/11 clean 11/11.
+       ⛔ STILL TO MEASURE: `sdl-2`, `sdl-3`, `py-2`, `py-3`, `media-1`,
        `field-1`, `field-2`.
        ⚠ ~35 minutes per subject serially — see the PARALLEL recipe above.
 
-    ⭐ AT THE TIME OF WRITING TWO INSTANCES ARE RUNNING:
-       the FULL one (`/var/lib/pgb-rootfs`, `:99`, `/var/tmp/t065`) and a
-       `qt-*` one (`/var/lib/pgb-rootfs3`, `:97`, `/var/tmp/t065b`).
-       ⛔ If they are gone, just re-run the full one; the rows survive.
+    ⛔ AND FIX C39 BEFORE RE-RUNNING `media-1` — it is ONE CHARACTER, and
+    the row has already been DELETED so it will be re-measured:
+
+        experiments/65-capability-corpus.sh line 225
+        media-1;media / codecs;mpv;mpv;cli;mpv [0-9];mesa;--version
+                                               ^^^^^^^^^
+        must be                                mpv v[0-9]
+
+    ⭐ `mpv --version` prints `mpv v0.41.0 Copyright ...` — there is a
+    literal `v` before the digit, so the assertion could never match and the
+    row read 0/11 on a subject that answered completely. ⛔ THIS IS THE
+    THIRD DEFECT OF EXACTLY THIS KIND (C34, C36, C39) and the pattern is
+    one thing: A `cli` ASSERTION IS WRITTEN FROM WHAT THE PROGRAM IS
+    EXPECTED TO PRINT AND IS NEVER CHECKED AGAINST WHAT IT DOES PRINT.
+    ⭐ The cheap fix is a harness check: on the FIRST environment, if the
+    assertion matches nothing, say so as an INSTRUMENT error rather than
+    scoring the subject zero eleven times.
+
+    ⛔ THE INSTANCES ARE GONE — the container does not survive the session.
+       Just re-run the full one; every recorded row is committed and is
+       never re-measured. The second instance is optional and pays for
+       itself only while more than one subject is left.
 
     ⭐ 102- IS DONE — the CHEAP half of T-084, no bundle build at all.
     It diffs the six hand copies of the trace classifier against the shared
@@ -136,6 +158,21 @@ stopped, and the five affected rows deleted so they are re-measured against it.
 ⚠ **If `pdfarranger` passes, the script-entry class was broken in a way C37
 describes and this table did not** — the more interesting outcome, which is
 why it is written down rather than left as an expectation.
+
+    ⛔ THREE THAT ARE STILL UNEXPLAINED AT THE END OF THIS SESSION, and
+    they are recorded as unexplained rather than smoothed over:
+        field-3  flameshot 0/11. ⭐ NOT C37 — MEASURED, not assumed. Its
+                 build log says `bin/flameshot is a nixpkgs wrapper ->
+                 .flameshot-wrapped`, the RESOLVED shape, which is
+                 mousepad's handler and mousepad passes 11/11. So its row
+                 was correctly kept when the other five were deleted, and
+                 nobody has read its actual error. Start there.
+        field-4  gearlever UNRESOLVED — it produced no artefact at all.
+                 The reason is in its build log, and nobody has read it.
+        qt-1     qalculate-qt 11/11 PASS but 4/11 CLEAN. ⛔ NOT a C37
+                 regression — galculator rebuilt with the same pgb traces
+                 to ZERO host objects, so the change did not introduce
+                 host loading. Which four environments, and which object?
 
     ⛔ FOUR NAMED UNKNOWNS THE CORPUS HAS ALREADY PRODUCED, each with its
     reproduction (`PGB_EXP65_ONLY='<id>'`):

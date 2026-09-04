@@ -1448,6 +1448,47 @@ still owes the conversion and the re-run.
 
 ---
 
+## C39 — `media-1`'s assertion cannot match the answer `mpv` actually gives
+
+**Found** 2026-09-04b, the **fourth** instrument defect in `experiments/65-`
+and the third of its kind. The row read **`0 / 11`**. The subject answered
+completely.
+
+The corpus line is:
+
+    media-1;media / codecs;mpv;mpv;cli;mpv [0-9];mesa;--version
+
+and `mpv --version` prints:
+
+    mpv v0.41.0 Copyright © 2000-2025 mpv/MPlayer/mplayer2 projects
+
+⛔ **There is a literal `v` between `mpv` and the digit.** `mpv [0-9]` cannot
+match it; `mpv v[0-9]` does. Measured against the captured banner: **0** and
+**1**.
+
+⭐ **The row is DELETED, not adjusted** — the rule that makes a resumable
+corpus safe. It is re-measured once the assertion is fixed:
+
+    PGB_EXP65_ONLY='media-1'  sh experiments/65-capability-corpus.sh
+
+⚠ **Why this keeps happening, stated plainly.** Three of the four zeros run
+down in this corpus were the instrument, and all three were the *criterion*
+rather than the subject: C34 (`exit 0 AND the assertion`), C36 (the separator
+ate an alternating regex), and now C39 (a regex that never matched the real
+output). ⛔ **A `cli` assertion is written from what the program is expected
+to print and is never checked against what it does print**, and nothing in the
+harness closes that loop. A subject whose assertion has never matched anything
+is indistinguishable from a subject that fails.
+
+⭐ **And the same run measured something T-091 needed.** `mpv`'s build log
+reads *`gstreamer  scanner installed as a program (GST_PLUGIN_SCANNER
+follows)`* — T-091's shipped code firing on a real corpus subject, not on a
+synthetic one. ⛔ It still does not close T-091, and now for a precise reason:
+the row runs `--version`, which never launches the scanner, so its
+host-object count cannot say which process it counted.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |
