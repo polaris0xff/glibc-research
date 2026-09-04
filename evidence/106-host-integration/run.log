@@ -1,0 +1,52 @@
+===============================================================
+106 - the two criteria that were parked as unmeasurable, measured against a fixture
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T14:25:16Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/106-host-integration
+--------------------------------------------------------------
+
+-- the fixture ----------------------------------------------------
+    alpine-3.22            theme=ok     locale=n/a (musl)
+    alpine-3.20            theme=ok     locale=n/a (musl)
+    alpine-3.10            theme=ok     locale=n/a (musl)
+    voidlinux-musl         theme=ok     locale=n/a (musl)
+    debian-11              theme=ok     locale=ok
+    debian-12              theme=ok     locale=ok
+    ubuntu-20.04           theme=ok     locale=ok
+    rockylinux-8           theme=ok     locale=ok
+    opensuse-leap-15.6     theme=ok     locale=ok
+    fedora-42              theme=ok     locale=ok
+    archlinux-latest       theme=ok     locale=ok
+  ok    L0  the locale fixture is on every glibc rootfs = 7
+  ok    L0  the theme fixture is on every rootfs       = 11
+
+-- arm L: a static probe asking for the fixture --------------------
+  ok    L0  the probe is static (no PT_INTERP)         = 0
+  ENVIRONMENT            LIBC   SET        CODESET   DECIMAL
+  alpine-3.22            musl   n/a — musl has only C and C.UTF-8
+  alpine-3.20            musl   n/a — musl has only C and C.UTF-8
+  alpine-3.10            musl   n/a — musl has only C and C.UTF-8
+  voidlinux-musl         musl   n/a — musl has only C and C.UTF-8
+  debian-11              glibc  ok         UTF-8     ,
+  debian-12              glibc  ok         UTF-8     ,
+  ubuntu-20.04           glibc  ok         UTF-8     ,
+  rockylinux-8           glibc  ok         UTF-8     ,
+  opensuse-leap-15.6     glibc  ok         UTF-8     ,
+  fedora-42              glibc  ok         UTF-8     ,
+  archlinux-latest       glibc  ok         UTF-8     ,
+
+  ok    L1  ⭐ setlocale(de_DE.UTF-8) succeeds on the glibc rows = 7
+  ok    L2  ⛔ the control: setlocale(xx_XX.UTF-8) FAILS everywhere = 7
+  ok    L3  ⭐ and the locale is in EFFECT — CODESET=UTF-8, decimal ',' = 7
+
+-- arm T: a bundled GTK application reading the HOST theme ---------
+  ENVIRONMENT            GTK_THEME= unset (control)
+  alpine-3.22            2 open(s)  0 open(s)
+  alpine-3.20            2 open(s)  0 open(s)

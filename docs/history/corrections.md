@@ -1829,6 +1829,43 @@ asks one of the two arms.
 
 ---
 
+## C47 — an absolute symlink resolved against the host, for the THIRD time in one day
+
+**Found** 2026-09-04c, in a shell script written that afternoon. `is_musl()`
+in `scripts/common/bed-fixtures.sh` tested
+
+    [ -e "$root/lib/ld-musl-x86_64.so.1" ]
+
+and reported **Void Linux musl as glibc**, so the installer tried to put a
+glibc locale into it. ⛔ Void's loader is a chain of two links and the second
+one is **absolute**:
+
+    <root>/lib                        -> usr/lib          (relative, fine)
+    <root>/lib/ld-musl-x86_64.so.1    -> /usr/lib64/libc.so
+
+`-e` follows that against the **host** root, where `/usr/lib64/libc.so` does
+not exist, so it answers *no*. `-L` asks whether the **link** is there, which
+is the actual question.
+
+⭐ **THE POINT IS NOT THE ONE-CHARACTER FIX. IT IS THE THIRD SIGHTING:**
+
+| | where | what it broke |
+|---|---|---|
+| **C42** | `copyLoader`, Go | an FHS farm's dangling loader link aborted a build |
+| **C43** | the wrapper resolver, Go | `.hx-wrapped -> /nix/store/…` read as ENOENT; `helix` failed **silently** |
+| **C47** | `is_musl`, shell | Void reported as glibc |
+
+⛔ **This is a structural hazard of what this repository does**, not three
+coincidences: almost everything here operates on an **unpacked root from
+outside it**, and every absolute symlink inside such a tree points somewhere
+that means something different to the process looking at it. ⭐ **The rule, so
+it stops being rediscovered: inside an unpacked root, resolve a symlink
+against THAT ROOT or ask only whether the link exists. Never let the host
+resolve it.** The Go side has `b.storeResolve` for exactly this; the shell
+side has `-L`.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

@@ -614,22 +614,27 @@ libraries: bundled first, host as the lower-priority fallback.
 `qt6ct`, their `qt-theme.hook` (`APPIMAGE_QT_THEME` + `-stylesheet`), and their
 `fix-gnome-csd.hook`.
 
-⛔ **AND THE QUESTION SPLITS IN TWO, because one half is not measurable in this
-bed and saying so is the honest answer.** Counted 2026-09-04c:
+⭐⭐ **AND IT IS MEASURED — `experiments/106-` arm T, `11 of 11`.** ⛔ The first
+version of this answer said the question *"cannot fire here"* because `0 of 11`
+rootfs carry a theme. That was a **deferral wearing a finding's clothes**: a
+theme is a directory with an `index.theme` and a `gtk.css`, and
+`scripts/common/bed-fixtures.sh` installs one.
 
 | | |
 |---|---|
-| rootfs carrying anything under `usr/share/themes` or `usr/share/icons` | ⛔ **0 of 11** |
+| **T1** a bundled GTK application told `GTK_THEME=PgbFixture` **opens the host's** `/usr/share/themes/PgbFixture/gtk-3.0/gtk.css` | ⭐ **11 / 11** (2 opens per row) |
+| **T2** ⛔ the same bundle with `GTK_THEME` unset | ⭐ **0 opens on 11 / 11** |
 
-⚠ **So *"does the bundle follow the system theme"* cannot fire here** — there
-is nothing on any of the eleven to follow, the same shape as rung 3's locale
-criterion in [`app-corpus.md`](app-corpus.md). ⭐ **The other half is
-measurable and is a different question**: does the bundle *ask* the host? The
-search order says it should, and the **build host** does carry themes
-(`Adwaita`, `Humanity`), so the experiment is a trace of a GTK subject there
-under `GTK_THEME=Adwaita:dark`, asserting an `openat` under
-`/usr/share/themes/`. ⛔ **Not run.** One environment, and it would say the
-bundle looks — not that it follows. T-083.
+⭐ **T2 is why T1 means anything**: without it, T1 could be GTK enumerating
+every theme directory it can find, which is not *following* anything. ⚠ And the
+theme is named `PgbFixture` on purpose — `Adwaita` exists on real machines, and
+a row that passes because the host already had the theme is not a measurement.
+
+⛔ **What it does NOT say**: that the window *looks* different. That needs a
+screenshot comparison and is a different experiment. It says the bundle carries
+its own GTK, its own themes, and **still reaches the host tree when a user's
+variable names something there** — which is the search order
+`design/host-fallback.md` describes, working. T-083 owns the rest.
 
 **2. Can it pack `file`(1) without patching — no custom AppRun, no env var?**
 
