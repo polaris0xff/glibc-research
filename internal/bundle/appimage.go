@@ -49,58 +49,25 @@ import (
 // runs a week apart produce AppImages with different runtimes and nothing in
 // either says so.
 //
-// ⭐ THE RUNTIME IS THE COLD-START COST, AND THE `lite` BUILD IS 24% OF IT.
-// experiments/84- measured that cold start is a fixed price for standing the
-// runtime up rather than a function of the artefact: a 29.6x image and a 138x
-// file count each move it about 1.05x. experiments/77- then packed ONE AppDir
-// five ways, changing one component at a time, median of 21, interleaved, with
-// an A/A control in the same pass:
+// ⭐ THE RUNTIME IS THE COLD-START COST AND `lite` IS 24% OF IT. experiments/77-
+// packed one AppDir five ways, one component at a time, median of 21: only
+// `full` -> `lite` moves the clock (0.76x, -1,552,384 B, exactly the two
+// headers' difference). Neither the uruntime version bump nor the dwarfs
+// upgrade is distinguishable from 1.00x. dwarfs 0.15.6 is taken anyway for
+// COMPARABILITY -- it is what experiments/86- stages for the competitor arm,
+// so the head-to-head now differs in the closure and nothing else.
 //
-//	v0.5.6 full  + dwarfs 0.14.1   84.6 ms   7,331,882 B  pinned until 2026-09-03d
-//	v0.5.9 full  + dwarfs 0.14.1   85.3 ms   7,360,554 B  1.01x -- the version
-//	                                                      bump alone buys
-//	                                                      NOTHING, does not
-//	                                                      resolve
-//	v0.5.9 lite  + dwarfs 0.14.1   64.4 ms   5,779,498 B  0.76x, resolves
-//	v0.5.9 lite  + dwarfs 0.15.6   65.0 ms   5,779,502 B  0.77x, resolves
+// ⭐ `lite` DROPS TOOLS, NOT CODECS: it embeds `dwarfs-fuse-extract-*` where
+// full embeds `dwarfs-universal-*` and gates out `dwarfsck`/`mkdwarfs`
+// (`src/main.rs:98-131`). The same AppDir runs under both headers at
+// `-C zstd:level=19`, `-C lzma:level=6` and `-C null`, six for six.
 //
-// ⚠ IT IS `lite` AND ONLY `lite`. Neither the uruntime version bump nor the
-// dwarfs upgrade is distinguishable from 1.00x, and the whole 1,552,384 B the
-// artefact loses is exactly the difference between the two headers
-// (3,039,728 - 1,487,344). Size is a footnote under the operator's
-// 2026-09-03c ruling, not a result.
-//
-// ⚠ dwarfs 0.15.6 is taken anyway, and the reason is comparability rather
-// than speed: it is the mkdwarfs `experiments/86-` stages for the COMPETITOR
-// arm, so the head-to-head now differs in the closure and nothing else. It is
-// measured to cost nothing (0.76x vs 0.77x, inside the floor).
-//
-// ⛔ AND THIS IS THE STACK `experiments/86-` ALREADY STAGES FOR THE COMPETITOR
-// ARM, out of references/pkgforge-dev__Anylinux-AppImages. The bundler was
-// being compared against a different runtime from the one it shipped, and
-// nothing in the record said so.
-//
-// ⭐ WHAT `lite` DROPS, SETTLED FROM THE SOURCE. The first version of this
-// comment guessed "compression backends"; a measurement could not confirm it
-// (the same AppDir at `-C zstd:level=19`, `-C lzma:level=6` and `-C null` runs
-// under BOTH headers, six for six) and the claim was withdrawn. The fork's own
-// build task list answers it -- `appimage-lite-x86_64  build x86_64 AppImage
-// uruntime (no dwarfsck, mkdwarfs)` -- and `src/main.rs:98-131` shows the
-// mechanism: lite embeds `assets/dwarfs-fuse-extract-*` where full embeds
-// `assets/dwarfs-universal-*`, and gates `dwarfsck` and `mkdwarfs` out with
-// `#[cfg(not(feature = "lite"))]`.
-// ⭐ It drops TOOLS, not codecs, which is exactly why the compressor test came
-// out six for six. `references/pkgforge-dev__Anylinux-uruntime` at
-// 5a0b4a336a89daa56902d95c328ff7a4ae673c66;
-// `docs/research/nix-bundle-patching.md` §2.
-//
-// ⛔ AND THE MODE SELECTOR IS PATCHABLE, WHICH THIS PROJECT ALSO GOT WRONG.
-// `URUNTIME_EXTRACT=3` and `URUNTIME_MOUNT=3` are compile-time constants laid
-// out as ASCII and read back through `.replace("URUNTIME_EXTRACT=", "=")`, so
-// `strings -a` finds them in the artefact this packs. Mode 3 is "mount below
-// 350 MB, EXTRACT above" -- so a jq bundle mounts and a kdenlive bundle does
-// not, and a lever measured on one does not transfer to the other. Nothing
-// here sets them yet; `nix-bundle-patching.md` §1 names the probe.
+// ⛔ AND THE MODE SELECTOR IS PATCHABLE. `URUNTIME_EXTRACT=3` and
+// `URUNTIME_MOUNT=3` are compile-time constants laid out as ASCII, so
+// `strings -a` finds them in the artefact. Mode 3 is "mount below 350 MB,
+// EXTRACT above" -- so a jq bundle mounts and a kdenlive bundle does not, and
+// a lever measured on one does not transfer to the other. Nothing here sets
+// them yet; docs/research/nix-bundle-patching.md §1 names the probe.
 const (
 	defaultURuntimeURL = "https://github.com/VHSgunzo/uruntime/releases/download/v0.5.9/uruntime-appimage-dwarfs-lite-%s"
 	defaultSharunURL   = "https://github.com/pkgforge-dev/Anylinux-sharun/releases/latest/download/sharun-%s"
@@ -634,37 +601,25 @@ func (b *Builder) shebangInterpreter(script string) string {
 	return ""
 }
 
-// storeRefRe finds a candidate store reference. ⛔ IT DOES NOT DECIDE
-// ANYTHING: every caller cuts the match at the first `/`, looks the base up in
-// the closure, and leaves the text alone when it is not there. The regex only
-// says where a candidate might START and END.
-//
-// ⛔ THE END WAS WRONG AND A BUILD LOG SHOWED IT. The class was `[^" ']*` —
-// three excluded characters — so in a BINARY the match ran through the
-// terminating NUL into whatever `.rodata` came next, and in XML it ran through
-// the closing `<`. Measured on the galculator bundle, 2026-09-04:
-//
-//	python3-3.14.7\0\0\0\0\0\0Exception        NUL is not a boundary
-//	glibc-2.42-84\0\0\0\0\0\0\0                 …so the base never matched
-//	dejavu-fonts-minimal-2.37<                  nor is `<`
-//
-// Three of the six paths that bundle reported as "does not resolve inside the
-// bundle" were this, not a real finding — an instrument that over-reports is
-// a weaker argument than the one T-081 claims to make.
+// storeRefRe finds a candidate store reference. ⛔ IT DOES NOT DECIDE ANYTHING:
+// every caller cuts the match at the first `/`, looks the base up in the
+// closure, and leaves the text alone when it is not there. The regex only says
+// where a candidate STARTS and ENDS.
 //
 // ⭐ THE CLASS IS A BLACKLIST AND THAT DIRECTION IS DELIBERATE. Nix does not
 // constrain the names of files INSIDE a store path, so a whitelist would
-// TRUNCATE a legitimate tail — and a truncated tail is the dangerous failure:
-// `rewriteTextStorePaths` would rewrite the head and leave the remainder
-// behind, corrupting the file. Over-capture fails safe: the base does not
-// match the closure, nothing is rewritten, and the path is REPORTED.
-// So: exclude what cannot be in a path here — every control character and
-// space (a C string ends at NUL), quotes, and the XML and shell delimiters
-// that end a path in the file formats a bundle actually carries.
-// storeRefStop is the ONE definition of where a store reference ends, shared
-// by every pattern in this package so the four that existed cannot drift apart
-// again. ⛔ FOUR PATTERNS WITH FOUR CHARACTER CLASSES IS THE "REGEX CASCADE"
-// T-081 SAID IT WAS REPLACING. docs/history/corrections.md C27, C28.
+// TRUNCATE a legitimate tail -- the dangerous failure, because
+// rewriteTextStorePaths substitutes the prefix and copies the tail verbatim, so
+// a short tail is written back and corrupts the file. Over-capture fails safe:
+// the base matches nothing, nothing is rewritten, and the path is REPORTED.
+// So exclude only what cannot be in a path here -- control characters and space
+// (a C string ends at NUL), quotes, and the XML and shell delimiters that end a
+// path in the formats a bundle carries.
+// ⚠ It excluded three characters until docs/history/corrections.md C27, and
+// stopped at neither NUL nor `<`. The selftest carries both cases.
+// storeRefStop is the ONE definition of where a store reference ends, shared by
+// every pattern in this package. ⛔ Four patterns with four character classes
+// is the "regex cascade" T-081 said it was replacing. corrections.md C27, C28.
 const storeRefStop = `\x00-\x20"'` + "`" + `<>|;,()\\`
 
 var storeRefRe = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[^` + storeRefStop + `]*`)

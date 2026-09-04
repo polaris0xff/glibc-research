@@ -95,10 +95,9 @@ significant overhead — and ship the tool that does it.
 acceptance bar — *works everywhere, or strictly better than every existing
 format and technique* — which this project **does not meet**, and it tracks
 what each piece of work does about that.
-⭐ **Part 2 of that bar was replaced by an operator ruling on 2026-09-01b**: it
-is no longer a comparison against bundles but *a static glibc binary with none
-of the issues*, and the issues are an enumerated list of nine, six closed and
-three open. `history/corrections.md` C13.
+⭐ **Part 2 of the bar is not a comparison against bundles**; it is *a static
+glibc binary with none of the issues*, and the issues are an enumerated list —
+**eleven, ten closed**. `REQUIREMENTS.md` has the table.
 
 The tool is [`../pgb`](../pgb) (portable glibc build): ⭐ **one statically
 linked Go binary**, built `CGO_ENABLED=0`, carrying the four small C runtime
@@ -321,11 +320,11 @@ make                                 # CGO_ENABLED=0 go build -o pgb ./cmd/pgb
 ./pgb bootstrap --check              # is it ready yet
 ```
 
-⛔ **Serially those steps are ~25 minutes of watching** — nix ~7, the build
-environment ~8, the bed ~10 — and nothing in them depends on anything else in
-them. **Two sessions paid that** before it was parallel. It is resumable (each
-step skipped when its artefact is on disk, checked by looking at the disk
-rather than at a marker it wrote), and `--check` changes nothing.
+⛔ **Serially those steps are ~25 minutes** — nix ~7, the build environment ~8,
+the bed ~10 — and nothing in them depends on anything else in them, so
+`--detach` runs them in parallel. Resumable: each step is skipped when its
+artefact is on disk, checked by looking at the disk rather than at a marker.
+`--check` changes nothing.
 
 ⛔ **It also starts dockerd AND builds the docker environment, together,
 because starting the daemon alone breaks every build.** Engine detection
@@ -382,10 +381,9 @@ every FUSE mount with its age and its users, and any process in **state D** —
 the signature of the `strace`-on-FUSE deadlock, which `kill` cannot end.
 ⚠ `--reap` unmounts only a mount with **no users** whose daemon is older than
 `--min-age` (900s), so a live run's own mount is never pulled out from under
-it. ⛔ Its `mountinfo` parser has a `--selftest` because the first version read
-the fstype from field 3, which is `major:minor` — it matched nothing, ever, and
-a mount check that reports "no stray mounts" on a machine full of them is worse
-than no check.
+it. ⛔ Run `--selftest` after touching it: `/proc/self/mountinfo` field 3 is
+`major:minor`, not the fstype, and a mount check that reports "no stray mounts"
+on a machine full of them is worse than no check.
 
 ⭐ **AND FOR "WHY DID IT NOT LOAD MY LIBRARY", `strace` IS THE WRONG TOOL
 FIRST.** `strace` says which paths were opened; it does not say which the
@@ -428,14 +426,13 @@ experiment; none has been shown to be unreachable.
 
 1. ⭐ **`dlopen` of an object the build did not link — SOLVED, and it is
    `pgb build --host-dlopen`.** `tool/runtime/pgb-elfload.c` is an ELF loader
-   compiled into the binary: it maps the object itself, walks `DT_NEEDED`,
-   relocates (including `DT_RELR`), honours symbol versioning, runs the
-   initialisers, and binds every undefined symbol to the static glibc already
-   in the executable. A `DT_NEEDED` naming a library the image already
-   contains is **answered, not opened**, which is what keeps a second libc
-   out. `experiments/76-`:
+   compiled into the binary: it maps the object, walks `DT_NEEDED`, relocates
+   (including `DT_RELR`), honours symbol versioning, runs the initialisers, and
+   binds every undefined symbol to the static glibc already in the executable.
+   A `DT_NEEDED` naming a library the image already contains is **answered, not
+   opened**, which is what keeps a second libc out. 1,093 code lines.
 
-   | | |
+   | `experiments/76-` | |
    |---|---|
    | a pinned-glibc `.so` dlopen'd on the target | ✅ **11 of 11**, nine assertions each |
    | host shared objects opened while doing it | ✅ **zero on all eleven** |
@@ -444,72 +441,40 @@ experiment; none has been shown to be unreachable.
    | the control, same source without the flag | ⛔ **0 of 11**, SIG6 / SIG8 / SIG11 |
 
    ⭐ **On the four musl rows that is a GLIBC shared object being `dlopen`'d on
-   a machine that ships no glibc**, from one ordinary static ELF. ⭐ And it is
-   **1,093 code lines** against `pg83/solo`'s 2,332 for the loader alone —
-   solo's other 5,948 translate glibc onto musl, and a glibc host needs none
-   of it. T-064, **closed**. ⭐ **The residue is T-068, and it is CLOSED too**,
-   with a committed harness behind every number: `experiments/93-` puts every
-   shared object on the host through the loader, one `timeout`ed fork each, and
-   asserts the right question — *nothing may crash this loader that glibc's own
-   loader loads*.
+   a machine that ships no glibc**, from one ordinary static ELF.
 
-   | `evidence/93-host-object-residue/` | 1,527 objects |
+   **The residue**, `experiments/93-`, every shared object on the build host
+   through the loader, one `timeout`ed fork each:
+
+   | 1,527 objects | |
    |---|---|
    | loaded | ⭐ **882** |
    | refused by name or by shape | 122 |
-   | failed with a reason | 478 — 376 of them an undefined symbol |
+   | failed with a reason | 478 — 376 an undefined symbol |
    | crashed | 45, and ⭐ **45 of 45 crash glibc's own `ld.so` too** |
    | ⛔ crashes that glibc LOADS | ⭐ **0** |
 
-   ⭐ **`loaded` was 406 at the start of the session that closed this.** Four
-   defects were found and fixed against that one population, and each is in
-   `HISTORY/entries/runtime.md` T-068 with its control.
+   ⚠ **"Failed" is not a defect count.** Of those failing on an undefined
+   symbol, glibc's own `ld.so` fails **374** too: they are plugins of a host
+   *program* (CPython, Perl, PostgreSQL, PHP) whose symbols live in the
+   executable that loads them, and nobody can load those standalone.
 
-   ⚠ **And "failed" is not a defect count either.** Of the objects failing with
-   an undefined symbol, **glibc's own `ld.so` fails 374 of them too** — they are
-   plugins of a host PROGRAM (CPython, Perl, PostgreSQL, PHP) whose symbols live
-   in the executable that loads them, and nobody can load those standalone.
+   ⚠ Objects wanting more static TLS than glibc's surplus are served by
+   `--tls-reserve N`, measured on the build host only (56,248 bytes refused at
+   0, loaded at 65536) and ⛔ **not re-measured across the eleven** — T-072.
 
-   ⚠ **That zero is earned rather than asserted.** It read **10**, then **1**,
-   then **0** across one session as two real loader defects were fixed — a weak
-   reference to `__wrap_iconv_open` that no archive member satisfied, and a
-   general-dynamic TLS pair whose two halves searched different sets of
-   objects. The first was HIDING the second.
-   ⭐ **Two of the 86 are now addressable**: the objects wanting more static
-   TLS than glibc's surplus are served by `pgb build --host-dlopen
-   --tls-reserve N`, which allocates out of the binary's own `__thread` array
-   because the surplus is a constant that padding cannot enlarge. Measured on
-   the build host only — 56,248 bytes refused at 0 and loaded at 65536 —
-   ⛔ **not re-measured across the eleven**. `TODO` T-072.
+   ⛔ **It stays listed because the row says *host-dependent* and it still is**:
+   the four musl rows refuse a host object by design. T-064 and T-068 closed;
+   the design alternatives and how D was chosen are in
+   [`limitations.md`](limitations.md) §1.
 
-   ⚠ **The old routes, kept because the argument is what chose D:**
-
-   | | route | where it stands |
-   |---|---|---|
-   | **D** | ⭐ **compile an ELF loader IN** and resolve the host object against **our own** static glibc | ⭐ **best-evidenced, and T-064 takes it.** `experiments/73-` measures 90.8%–99.3% of every versioned import of 6,007 real host objects as already definable, residue **zero**; `experiments/72-` measures why the host loader can never work — a static binary's dynamic symbol table is empty. Read [`research/solo.md`](research/solo.md); `references/pg83__solo`'s `elf_loader.cpp` is 2,707 lines and most of it is musl translation a glibc host does not need |
-   | **A** | `--wrap` on `dlopen` against a compiled-in table | ⭐ already shipped for a program's **own** plugins as `--wrap-dlopen`; `allyourcodebase/pipewire`'s `src/wrap/dlfcn.zig` does the same for host libraries |
-   | **B** | port cross-libc-dlopen's **full** rewrite, not the one function `experiments/50-` tried | ⚠ **T-031**, and the measurement so far is no effect. It lets host objects *in*, which is the opposite direction to D |
-   | **C** | carry a loader beside the binary | ⛔ refused by the brief — the output must be one ordinary ELF |
-   **The class served today is: that, plus programs loading a shared object
-   the build did not link.**
-   ⭐ **A program loading its *own* plugins is now served by a mechanism rather
-   than by hand, and it is proved on a real project.** `--wrap-dlopen`
-   generates a symbol table with `nm` from the objects the build produced,
-   gives each plugin its own symbol namespace with `objcopy --redefine-syms`,
-   and answers `dlopen`/`dlsym`/`dlclose`/`dlerror` out of it — 11 of 11, zero
-   host shared objects, `experiments/71-`. ⭐ **POC 70 runs SQLite with fifteen
-   of its own extensions out of an EMPTY directory** on all eleven, against a
-   control that loads the host loader and libc on the two rows where it works
-   at all. `TODO` T-002 and T-030, both closed.
 2. **NSS beyond `files`/`dns` is gone**: no LDAP, SSSD, NIS, mDNS,
    systemd-resolved. Measured cost: on Fedora 42 a plain static binary resolves
    the machine's own hostname via `libnss_myhostname` and the pgb binary does
    not.
 3. **SEVEN host *data* dependencies exist and static linking touches none of
-   them.** ⚠ **It was FIVE until 2026-09-03c and SIX until 2026-09-03e** — each
-   time because somebody asked whether the list was complete rather than
-   whether the known rows were closed. ⭐ **The seventh is the network name
-   databases** (`/etc/services`, `/etc/protocols`): `getservbyname("http","tcp")`
+   them.** ⚠ **The count reached seven by SEARCHING, twice, and may not be
+   final.** ⭐ **The seventh is the network name databases** (`/etc/services`, `/etc/protocols`): `getservbyname("http","tcp")`
    returns **NULL on 3 of 11 — debian-11, debian-12 and ubuntu-20.04, all
    glibc** — while all four musl environments ship the file. ⭐ **Closed
    2026-09-04 by `--embed-netdb`, 11 of 11, two runs** (`experiments/66-`),
@@ -578,8 +543,8 @@ repeated here.
 | item | status |
 |---|---|
 | test bed, 11 environments | ✅ 11 of 11, digest-pinned |
-| all **43** experiments | ✅ every one measured. ⚠ **The count read 24 until 2026-09-03c** and **40 until 2026-09-03f**, when 65-, 66- and 67- were added; it is `ls experiments/[0-9]*-*.sh \| wc -l` and nothing else. `86-` writes one evidence file per subject (`RESULT.jq.txt`, `RESULT.mpv.txt`) because it runs against two. ⭐ `experiments/clock.sh` and `lib.sh` are **libraries**, not experiments |
-| all 10 POCs | ✅ 11 of 11 environments each, zero host shared objects. ⭐ **All ten re-run at the 2.41 pin on 2026-09-03**, and each `RESULT.txt` now names the environment, image, digest, gcc and glibc that built it |
+| all **43** experiments | ✅ every one measured. ⚠ The count is `ls experiments/[0-9]*-*.sh \| wc -l` and nothing else — `clock.sh` and `lib.sh` are **libraries**. `86-` writes one evidence file per subject (`RESULT.jq.txt`, `RESULT.mpv.txt`) because it runs against two |
+| all 10 POCs | ✅ 11 of 11 environments each, zero host shared objects, all at the 2.41 pin. Each `RESULT.txt` names the environment, image, digest, gcc and glibc that built it |
 | the **seven** host-data mechanisms | ✅ 11 of 11 each: NSS, iconv, locale, terminfo, CA bundle, `--embed-tzdata`, and ⭐ `--embed-netdb` (`/etc/services`, 2026-09-04). ⭐ Plus `--utf8-default`, which is not a repair but a change to a documented default — 11 of 11, with an explicit `LANG=C` still obeyed on 11 of 11. ⛔ One boundary stays open: `getaddrinfo` with a service name, 8 of 11 |
 | `pgb` chroot and host engines | ✅ complete |
 | `pgb` docker engine | ✅ complete — output **byte-identical** to the chroot engine for the same source |
@@ -795,3 +760,13 @@ treat it as a format ask the wrong question — see
 - **Do not reap test processes by name or with `pkill -f`.** `-f` matches the
   runner's own command line and kills the experiment; a name match misses the
   FUSE daemons a bundle format leaves behind. Match `/proc/PID/root`.
+- ⛔ **Do not `make` while a bundle experiment is running.** Each subject's
+  artefact is built by `./pgb`, so a rebuild mid-run puts rows from two
+  different tools in one table. No gate catches it; it cost two restarts.
+- **Do not read the fstype from `/proc/self/mountinfo` field 3.** Field 3 is
+  `major:minor`; the fstype is the field after the `-` separator, whose
+  position varies. `scripts/common/watchdog.sh --selftest`.
+- **Do not invent a character class for finding a `/nix/store` path.**
+  `internal/bundle`'s `storeRefStop` is the one definition of where such a
+  reference ends; four hand-written classes had drifted apart, and two stopped
+  at neither NUL nor `<`. `history/corrections.md` C27, C28.

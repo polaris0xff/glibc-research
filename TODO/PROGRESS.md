@@ -3,24 +3,19 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log,
 the entries, and [`../HISTORY/`](../HISTORY/).
 
-    STATE     2026-09-03e  ✅ COMPLETE
+    STATE     2026-09-04.  ⏳ T-080 IN FLIGHT — experiments/65- is running.
     COUNTS    65 entries, 25 open, 40 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)
-              musl-gcc INSTALLED — the blocker the last session recorded
               throughput: glibc 8.40 ns/op vs musl 704.79 (malloc, 4 threads)
-    NEW       ⭐ THREE ENTRIES CLOSED, AND TWO OF THEM CAME OUT AGAINST US.
-              T-078 the three-way matrix: level with or ahead of native
-              musl everywhere EXCEPT the environment-default codeset,
-              where musl wins 11-0 and a pre-registered prediction said
-              the opposite. T-079 found an ELEVENTH glibc-static quirk
-              (/etc/services) by a re-runnable search. T-080 proved GTK
-              works out of a nix closure — real windows on 11 of 11 —
-              and showed both remaining gaps are OUR tooling.
-              ⛔ AND THE OPERATOR CORRECTED THE T-080 INSTRUMENT MID-RUN:
-              "cannot open display" is not a result, because bundled apps
-              print it on real hardware WITH a display. A real display
-              turned 11 green rows into 0.
+    NEW       ⭐ T-081 CLOSED: a compiled-in /nix/store path and a SCRIPT
+              entry point both resolve, so galculator draws 11/11 without
+              a bind and meld — Python 3 + GTK 3 — bundles at all.
+              ⭐ T-085 /etc/services 11/11, T-086 the codeset axis 11/11.
+              ⛔ THREE CORRECTIONS, ALL INSTRUMENTS: C26 the corpus had no
+              positive control, C27 our store-path regex had the boundary
+              defect we accused the field of, C28 a review's own hypothesis
+              falsified by its own plant.
 
 ## ⛔ READ THIS FIRST
 
@@ -35,11 +30,12 @@ are the oracle every gate is measured against.
 interleaved with a rotating start, and an **A/A control** whose ratio is the
 floor below which no row may be believed.
 
-⛔ **AND A GUI CLAIM NEEDS A DISPLAY, NOT A LOG LINE.** Added 2026-09-03e
-after the operator caught this session scoring a bundle green on
-`Gtk-WARNING: cannot open display`. `experiments/64-` now starts `Xvfb`,
-binds its socket into each rootfs, and asks the **X server** whether a window
-exists. ⛔ A program's own output is not evidence that it drew something.
+⛔ **AND A GUI CLAIM NEEDS A DISPLAY, NOT A LOG LINE.** A bundle once scored
+11 of 11 green on `Gtk-WARNING: cannot open display`, which real hardware WITH
+a display prints too; a real display turned those 11 rows into 0.
+`experiments/64-` and `65-` start `Xvfb`, bind its socket into each rootfs, and
+ask the **X server** whether a window exists. ⛔ A program's own output is not
+evidence that it drew something.
 
 ## ⭐ The operator's rulings in force
 

@@ -6,11 +6,6 @@ how much of it has been discharged. The requirement text is **not** to be
 softened, deleted, or marked satisfied by any agent; only the *status* section
 moves, and only when a measurement moves it.
 
-> Relocated here from the top of [`AGENTS.md`](AGENTS.md), where it was
-> originally inserted for visibility with a note that a later agent should give
-> it its own file and link it from §1. That is this file. Nothing in the
-> requirement was altered in the move.
-
 ---
 
 # ⛔ HARD REQUIREMENT (operator, binding, NOT yet met)
@@ -19,40 +14,24 @@ moves, and only when a measurement moves it.
 > that is strictly better and/or faster than every existing format and
 > technique.**
 
-## ⭐ AMENDMENT — part 2 replaced, operator ruling, 2026-09-01b
-
-⛔ **The requirement above keeps its text; part 2 of the two-part discharge
-below is REPLACED.** The ruling was taken at the start of the session of
-2026-09-01b, in answer to the open question the previous session recorded, and
-it is quoted verbatim because the reason matters as much as the decision:
+## ⭐ AMENDMENT — part 2 replaced (operator ruling)
 
 > *"replace with per part claim, also anylinux is a bundle, our primary goal
 > is still a static glibc binary that has none of the issues"*
 
-⭐ **What that changes.** "Strictly better than every existing format and
-technique" measured `pgb` against `Anylinux-AppImages`, and the two are not
-the same kind of thing: one is a **bundle** — it mounts or extracts a small
-distribution — and `pgb` is a toolchain whose output is one ordinary ELF. A
-comparison that scores them on one axis asks the wrong question, which is the
-same point [`design/toolchain.md`](design/toolchain.md) makes about treating
-`pgb` as a format.
+⛔ **Part 2 is no longer a comparison against bundles.** anylinux is a bundle —
+it mounts or extracts a small distribution — and `pgb` is a toolchain whose
+output is one ordinary ELF; scoring them on one axis asks the wrong question
+([`design/toolchain.md`](design/toolchain.md)). Part 2 is now *a static glibc
+binary that has none of the issues*, and the issues are enumerated below.
+⚠ **Part 1 is UNCHANGED and now carries the whole bar.** The head-to-head
+numbers stay in [`comparison.md`](comparison.md) as measurement, not as a test.
 
-⛔ **Part 2 is therefore no longer a comparison against bundles.** It is the
-per-part claim, and the goal it names is the operator's own: *a static glibc
-binary that has none of the issues.* The issues are enumerable and each is
-either closed or open, below.
+## ⭐ AMENDMENT — the BUNDLER's bar (operator ruling)
 
-⚠ **Part 1 is UNCHANGED and still binding**, and it is now the part that
-carries the whole bar. The head-to-head numbers stay in
-[`comparison.md`](comparison.md) as measurement; they are no longer the test.
-
-## ⭐ AMENDMENT — the BUNDLER's bar, operator ruling, 2026-09-03c
-
-⚠ **This one is SCOPED: it changes the bundler's bar and neither part of the
-requirement above.** It is recorded here because it is an operator ruling and
-this is the page that carries them; the full amendment, with the axes table it
-rewrites, is in [`design/toolchain.md`](design/toolchain.md) "Static first,
-bundle last".
+⚠ **Scoped: it changes the bundler's bar and neither part of the requirement
+above.** The axes table it rewrites is in
+[`design/toolchain.md`](design/toolchain.md) "Static first, bundle last".
 
 > *"us having a bigger size than anylinux-appimages and onelf is acceptable as
 > long as ours performs better and packaging is just one command not a
@@ -96,17 +75,16 @@ parts, and **both** are required:
    | C++ unwinding | no `PT_GNU_EH_FRAME` on any static link | ✅ **closed** — T-018 |
    | CA bundle | no compiled-in trust store; one path works on 5 of 11 | ✅ **closed** — opt-in `--embed-cacert`; POC 30 verifies real TLS on **11/11** with the harness's own CA variables unset. T-032 |
    | terminfo | host terminal database | ✅ **closed** — opt-in `--embed-terminfo`; POC 20's `setupterm(xterm-256color)` succeeds on **11/11** with `TERMINFO`/`TERMINFO_DIRS` unset. T-032 |
-   | **host plugins** | `dlopen` of a host `.so` is host-dependent | ⛔ **open, and now SERVED BY A SHIPPED MECHANISM rather than untouched** — `pgb build --host-dlopen`, T-064 ✅, T-068 ✅. A `.so` built by the pinned glibc loads on **11 of 11** with zero host objects; a **real host** `.so` loads on **7 of 7 glibc rows** and is refused by name on **4 of 4 musl rows**; **882 of 1,527** host objects on the build host load. ⛔ It stays OPEN because the row says *host-dependent* and it still is. ⚠ **It was called "the last one" until 2026-09-03c**; see the row below |
-   | ⭐ **timezone** | `tzset` reads the host's zone database; nothing is linked in | ✅ **closed, and it was found AND closed on 2026-09-03c** — opt-in `--embed-tzdata`; `experiments/97-` runs two arms, pass=13 fail=0. Arm A (plain `-static`) resolves `Europe/Berlin` on **7 of 11** and ⛔ **4 of 11 cannot and do not say so**, printing `Europe +0000` — the zone name **asked for**, at a UTC offset. Arm B resolves on **11 of 11** for **193,208 B** of carried zones. ⚠ A handful (20), not a database; a zone not carried is unchanged. T-076 |
-   | ⭐ **network name databases** | `/etc/services`, `/etc/protocols`: `getservbyname`/`getprotobyname` read a host file that a static link does not absorb | ✅ **CLOSED 2026-09-04, opt-in `--embed-netdb`** — found 2026-09-03e by the search T-079 asked for, measured 2026-09-04 by `experiments/66-` (`pass=12 fail=0 skip=0`, two runs identical). Without it, `getservbyname("http","tcp")` returns **NULL on 3 of 11 — debian-11, debian-12, ubuntu-20.04, and ALL THREE ARE GLIBC**; all four musl environments ship the file. With it, **11 of 11**, and ⭐ **the host still wins where it has the file** (the wrappers call `__real_*` first) while a name nobody carries still answers NULL on 11 of 11. ⚠ **Not a restatement of NSS**: NSS is closed for *dispatch* — `__nss_configure_lookup` pins the `services` database to `files` — and that cannot conjure a `files` backing store the host does not have; dispatch and data were two failures and this is the second. ⛔ **ONE BOUNDARY STAYS OPEN, pre-registered as a failure before the run**: `getaddrinfo(NULL,"http")` is still **8 of 11**, because `--wrap` redirects the *public* symbol and glibc's `getaddrinfo` calls its own internal `__getservbyname_r`, which the linker cannot interpose |
+   | **host plugins** | `dlopen` of a host `.so` is host-dependent | ⛔ **open, and now SERVED BY A SHIPPED MECHANISM rather than untouched** — `pgb build --host-dlopen`, T-064 ✅, T-068 ✅. A `.so` built by the pinned glibc loads on **11 of 11** with zero host objects; a **real host** `.so` loads on **7 of 7 glibc rows** and is refused by name on **4 of 4 musl rows**; **882 of 1,527** host objects on the build host load. ⛔ It stays OPEN because the row says *host-dependent* and it still is |
+   | ⭐ **timezone** | `tzset` reads the host's zone database; nothing is linked in | ✅ **closed** — opt-in `--embed-tzdata`; `experiments/97-` runs two arms, pass=13 fail=0. Arm A (plain `-static`) resolves `Europe/Berlin` on **7 of 11** and ⛔ **4 of 11 cannot and do not say so**, printing `Europe +0000` — the zone name **asked for**, at a UTC offset. Arm B resolves on **11 of 11** for **193,208 B** of carried zones. ⚠ A handful (20), not a database; a zone not carried is unchanged. T-076 |
+   | ⭐ **network name databases** | `/etc/services`, `/etc/protocols`: `getservbyname`/`getprotobyname` read a host file that a static link does not absorb | ✅ **closed** — opt-in `--embed-netdb`, `experiments/66-` (`pass=12 fail=0 skip=0`, two runs identical). Found by the search T-079 asked for. Without it, `getservbyname("http","tcp")` returns **NULL on 3 of 11 — debian-11, debian-12, ubuntu-20.04, and ALL THREE ARE GLIBC**; all four musl environments ship the file. With it, **11 of 11**, and ⭐ **the host still wins where it has the file** (the wrappers call `__real_*` first) while a name nobody carries still answers NULL on 11 of 11. ⚠ **Not a restatement of NSS**: NSS is closed for *dispatch* — `__nss_configure_lookup` pins the `services` database to `files` — and that cannot conjure a `files` backing store the host does not have; dispatch and data were two failures and this is the second. ⛔ **ONE BOUNDARY STAYS OPEN, pre-registered as a failure before the run**: `getaddrinfo(NULL,"http")` is still **8 of 11**, because `--wrap` redirects the *public* symbol and glibc's `getaddrinfo` calls its own internal `__getservbyname_r`, which the linker cannot interpose |
 
-   ## ⛔ THE LIST WAS NINE, THEN TEN, AND IT IS NOW ELEVEN — 2026-09-03e
+   ## ⛔ THE LIST GREW NINE → TEN → ELEVEN, EACH TIME BY SEARCHING
 
-   ⭐ **The eleventh was found the way T-079 required — by a SEARCH, and the
-   search is re-runnable.** `experiments/82-` enumerates every absolute path
-   the **pinned** `libc.a` names (78 of them at glibc 2.41), classifies each
-   against the rows above, and prints the residue that no row owns (19).
-   `/etc/services` was in that residue.
+   ⭐ **`experiments/82-` is that search and it is re-runnable.** It enumerates
+   every absolute path the **pinned** `libc.a` names (78 at glibc 2.41),
+   classifies each against the rows above, and prints the residue no row owns
+   (19). `/etc/services` was in that residue.
 
    ⛔ **AND THE SEARCH SAYS WHERE IT DID NOT LOOK**, because an absence is not
    a zero. It sees absolute-path string literals and environment-variable names
@@ -124,40 +102,21 @@ parts, and **both** are required:
    its **reach**, not the row. `pgb` fixes it: `experiments/63-` has
    `hostid` answering on 11 of 11 under `pgb` and crashing under vanilla.
 
-   ## ⛔ THE LIST WAS NINE AND IT IS TEN — 2026-09-03c
+   ## ⛔ TREAT THE ELEVEN AS THE CURRENT BEST ENUMERATION, NOT A CLOSED SET
 
-   ⚠ **This page said, of the nine: *"there is no unenumerated remainder, so
-   the distance to the bar is one named problem rather than an unknown
-   quantity."* That sentence was FALSE and it was load-bearing** — it is what
-   made part 2 countable.
+   ⚠ **This page once said *"there is no unenumerated remainder"* about nine
+   rows. That sentence was FALSE and load-bearing** — it is what made part 2
+   countable. Two more rows have been found since, each by looking rather than
+   by reasoning, and neither search was expensive.
 
-   ⭐ **It was disproved by attacking it rather than believing it.** The
-   operator asked on 2026-09-03c to *"fix all remaining GLIBC quirks if there
-   still are some"*, which is a question about **completeness**, not about the
-   eight that are closed. `grep -rn zoneinfo` over the whole tree — `docs/`,
-   `TODO/`, `experiments/`, `poc/`, `internal/`, `tool/` — returned **nothing**.
-   Nobody had looked, and the row that came out of looking fails on four
-   environments including a **glibc** one.
-
-   ⛔ **So treat the ten as the current best enumeration and not as a closed
-   set.** The honest statement is *"ten found, NINE closed, and the method that
-   found the tenth was one grep"*. ⭐ The right response is to keep
-   attacking it: the next candidates worth one measurement each are
-   `/etc/nsswitch.conf` policy beyond what NSS covers, `libgcc_s.so.1` for
-   `pthread_cancel` and `backtrace` (⚠ **0 mentions in the build host's
-   `libc.a`** at glibc 2.39 — probed the same day, so likely already dead, but
-   not measured on the **pinned** 2.41), and `/etc/services` and `/etc/protocols`
-   for `getservbyname` — ⭐ **that last candidate was taken: it became the
-   eleventh row on 2026-09-03e and closed on 2026-09-04**, so this list is
-   two candidates long now, not three.
-
-   ⚠ **The old text of this part is not deleted, it is superseded**, and the
-   measurement it asked for was carried out: `experiments/60-`, `61-` and
-   `62-` built the same program as an AppImage, a Flatpak, a snap, an onelf
-   bundle and a static-musl binary and ran every one on the same eleven
-   environments. That table is in [`comparison.md`](comparison.md) and stays
-   there as evidence. What changed is that it is no longer the acceptance
-   test — `history/corrections.md` C13.
+   ⭐ **The right response is to keep attacking it.** The next candidates worth
+   one measurement each: `/etc/nsswitch.conf` policy beyond what NSS covers,
+   and `libgcc_s.so.1` for `pthread_cancel` and `backtrace` (⚠ **0 mentions in
+   the build host's `libc.a`** at glibc 2.39 — likely already dead, but not
+   measured on the **pinned** 2.41). ⚠ Also untested and the same shape as the
+   eleventh: `/etc/networks`, `/etc/ethers`, `/etc/rpc`, and the `*ent`
+   iteration family (`setservent`/`getservent`/`endservent`), which
+   `--embed-netdb` does not wrap.
 
 ⭐ **The honest public claim, until then**, is the falsifiable one `pgb verify`
 already emits: *built at tier N, ran correctly and loaded no host object on
@@ -180,8 +139,8 @@ rather than as unmeasured gaps.
 
 | part | state | why |
 |---|---|---|
-| **1. No known environment where it fails** | ⛔ **not met** | One measured failure, and it is now the **only** one: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ **Route D was TAKEN and it SHIPPED** — `pgb build --host-dlopen`, an ELF loader compiled in (**T-064 ✅**, residue **T-068 ✅**), 11 of 11 carried with zero host objects and a real host `.so` on 7 of 7 glibc rows. ⚠ **Corrected 2026-09-03**: this cell used to point at **T-033**, an entry still marked open that describes the same route T-064 completed, and it named no shipped mechanism at all — so the bar read as though nothing had been built. ⛔ It remains not-met because the failure is *host-dependence*, and that persists: the four musl rows refuse a host object by design, and 645 of 1,527 host objects on the build host do not load (**374 of which glibc's own `ld.so` also fails** — plugins of a host program). |
-| **2. A static glibc binary with none of the issues** | ⛔ **not met — but the deficit that GREW on 2026-09-03e was closed on 2026-09-04** | ⭐ **TEN of ELEVEN** enumerated issues are closed on all eleven environments. **One** is open: host plugins. ⭐ **The eleventh — the network name databases (`/etc/services`), found by `experiments/82-` on 2026-09-03e — closed the next day**: `--embed-netdb`, 11 of 11, two runs (`experiments/66-`). ⛔ **The list went nine → ten → eleven on three consecutive days, each time because somebody asked whether it was complete rather than whether the known rows were closed** — so read "ten of eleven" as a count of the rows *found so far*, not of the rows that exist. ⭐ What is different about the eleventh is the method: it came from a **re-runnable search over the pinned `libc.a`**, not from one guessed grep, and that search states where it cannot see. ⚠ **And closing it revealed a boundary inside it**: `getaddrinfo` with a service name stays at 8 of 11, pre-registered as a failure before the run. The distance to the bar is ONE named problem plus that boundary. |
+| **1. No known environment where it fails** | ⛔ **not met** | One measured failure, and it is now the **only** one: `dlopen` of a **host** shared object ([`limitations.md`](limitations.md) §1). ⭐ **Route D was TAKEN and it SHIPPED** — `pgb build --host-dlopen`, an ELF loader compiled in (**T-064 ✅**, residue **T-068 ✅**), 11 of 11 carried with zero host objects and a real host `.so` on 7 of 7 glibc rows. ⛔ It remains not-met because the failure is *host-dependence*, and that persists: the four musl rows refuse a host object by design, and 645 of 1,527 host objects on the build host do not load (**374 of which glibc's own `ld.so` also fails** — plugins of a host program). |
+| **2. A static glibc binary with none of the issues** | ⛔ **not met** | ⭐ **TEN of ELEVEN** enumerated issues are closed on all eleven environments; **one** is open, host plugins. ⛔ **The list grew nine → ten → eleven, each time because somebody searched** — so read "ten of eleven" as a count of the rows *found so far*, not of the rows that exist. ⚠ **And closing the eleventh revealed a boundary inside it**: `getaddrinfo` with a service name stays at 8 of 11, pre-registered as a failure before the run. The distance to the bar is ONE named problem plus that boundary. |
 
 ### The head-to-head, which is now evidence rather than the test
 
@@ -222,22 +181,15 @@ is work, not a verdict — `AGENTS.md` §7 now has **four** routes, and
 
 **What would move part 2 to met**, under the amended text: the open rows of the
 issues table close, each on all eleven environments with the measurement
-recorded. ⭐ **T-032 closed two of them on 2026-09-01d** — the CA bundle and
-terminfo — and ⭐ **2026-09-03c opened a tenth and closed it the same day**
-(**timezone**, T-076), so **one** row is left: **host plugins**, owned by T-064 (closed,
-the mechanism) with its residue in T-068 (closed) — ⚠ **not T-033, which this
-page pointed at until 2026-09-03 and which is a stale duplicate of the route
-T-064 took**.
-⭐ **T-079 ASKED AGAIN ON 2026-09-03e AND THE ANSWER WAS NO.** The operator set
-it on 2026-09-03d — *"GLIBC static is truly complete, no edgecases exist ... No
-buts and no ifs."* ⛔ It is not: `experiments/82-` found an **eleventh** row,
-`/etc/services`, by the search the entry demanded rather than by the sentence
-that failed here. `../HISTORY/entries/runtime.md` T-079, now closed.
-⭐ **AND THE ELEVENTH ROW ITSELF CLOSED ON 2026-09-04** — `--embed-netdb`, 11 of
-11, two runs, `experiments/66-`. ⛔ That does not make the sentence T-079 tested
-true: the answer to *"no buts and no ifs"* is still no, because the mechanism is
-a **flag a developer has to pass** and because `getaddrinfo` with a service name
-stays at 8 of 11 behind it.
+recorded. **One row is left: host plugins**, owned by T-064 (the mechanism,
+closed) with its residue in T-068 (closed).
+
+⭐ **THE OPERATOR ASKED WHETHER IT WAS ALREADY DONE — *"GLIBC static is truly
+complete, no edgecases exist ... No buts and no ifs"* — AND THE ANSWER IS
+STILL NO.** T-079 answered it by SEARCHING and found an eleventh row;
+`--embed-netdb` then closed that row. ⛔ The answer is still no, for two
+reasons that outlive it: the mechanism is a **flag a developer has to pass**,
+and `getaddrinfo` with a service name stays at **8 of 11** behind it.
 
 ⛔ **TEN of ELEVEN are closed and ONE is not, so this is a countable deficit and
 not a judgement.** Do not soften it: host plugins is the hardest of the eleven,
