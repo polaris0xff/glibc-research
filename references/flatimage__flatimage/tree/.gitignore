@@ -1,0 +1,12 @@
+# Ignore on project root
+.gdb_history
+build
+build-test
+site
+doc/mkdocs/site
+doc/mkdocs/env
+compile_commands.json
+
+# Ignore temporary data the test directory
+test/data
+test/**/__pycache__

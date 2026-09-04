@@ -1,0 +1,23 @@
+# syntax=docker/dockerfile:1
+
+# Per-arch build environment. The cross-rs base image provides the C cross
+# toolchain + target sysroot + static libc archives. We layer rustup on top
+# so cargo can drive the whole build in-container.
+#
+# Build args:
+#   TARGET — the Rust target triple (e.g. aarch64-unknown-linux-musl).
+#            Also used to pick the cross-rs image from ghcr.io/cross-rs/<TARGET>.
+#
+# Tag (host side): flatroot-build-toolchain:<arch>, one per release arch.
+
+ARG TARGET
+FROM ghcr.io/cross-rs/${TARGET}:main
+
+ARG TARGET
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+      sh -s -- -y --profile minimal --default-toolchain stable -t ${TARGET}
+ENV PATH="/root/.cargo/bin:${PATH}"
+
+WORKDIR /workspace

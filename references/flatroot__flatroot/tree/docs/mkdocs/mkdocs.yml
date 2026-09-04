@@ -1,0 +1,155 @@
+site_name: FlatRoot
+site_description: Build Linux root filesystem directories from official distribution packages — without root privileges or a running package manager.
+site_dir: "site"
+
+nav:
+  - Overview: index.md
+  - Tutorials:
+      - Build your first rootfs: tutorials/first-rootfs.md
+      - Reproducible Builds: tutorials/reproducible-builds.md
+  - How-To Guides:
+      - Get FlatRoot: how-to/get-flatroot.md
+      - Install Packages: how-to/install-packages.md
+      - Query Packages: how-to/query-packages.md
+      - Pinning: how-to/pinning.md
+      - Multiple Architectures: how-to/multiarch.md
+  - Reference:
+      - CLI: reference/cli.md
+      - Environment: reference/environment.md
+      - Cache: reference/cache.md
+      - Database: reference/database.md
+      - Path Index: reference/path_index.md
+      - Rootfs Metadata: reference/metadata.md
+      - Package Formats:
+          - deb: reference/package-formats/deb.md
+          - rpm: reference/package-formats/rpm.md
+          - pacman: reference/package-formats/pacman.md
+          - apk: reference/package-formats/apk.md
+  - Explanation:
+      - Overview: explanation/index.md
+      - The distro abstraction: explanation/the-distro-abstraction.md
+      - The seed list: explanation/the-seed-list.md
+      - Dependency resolution: explanation/dependency-resolution.md
+      - Virtual names and providers: explanation/virtual-names-and-providers.md
+      - Conditional dependencies: explanation/conditional-dependencies.md
+      - The sandbox: explanation/the-sandbox.md
+      - Cache regeneration: explanation/cache-regeneration.md
+      - The metadata layer: explanation/the-metadata-layer.md
+      - Cross-distro boundaries: explanation/cross-distro-boundaries.md
+      - Multiarch: explanation/multiarch.md
+  - Architecture:
+      - Overview: architecture/index.md
+      - CLI Design: architecture/cli.md
+      - Packages: architecture/packages.md
+      - Spec:
+          - Overview: architecture/spec/index.md
+          - Installing Packages: architecture/spec/install.md
+          - Searching Packages: architecture/spec/search.md
+          - Querying the Catalogue: architecture/spec/query.md
+          - Listing Distributions: architecture/spec/remotes.md
+          - Listing Releases: architecture/spec/releases.md
+          - Exporting a Rootfs: architecture/spec/export.md
+          - Tracing Dependencies: architecture/spec/trace.md
+  - Appendix:
+      - System:
+          - Rootfs: appendix/system/rootfs.md
+          - chroot: appendix/system/chroot.md
+          - bubblewrap: appendix/system/bubblewrap.md
+          - ldconfig: appendix/system/ldconfig.md
+          - Shared-library sonames: appendix/system/soname.md
+      - Packages:
+          - Virtual Packages: appendix/packages/virtual.md
+          - Contents Indices: appendix/packages/contents-indices.md
+          - SBOM: appendix/packages/sbom.md
+      - Dependencies:
+          - Alternatives: appendix/dependencies/alternatives.md
+          - Rich Dependencies: appendix/dependencies/rich.md
+          - Install-If Triggers: appendix/dependencies/install-if.md
+          - BFS Traversal: appendix/dependencies/bfs.md
+          - Rich-Dep AST: appendix/dependencies/ast.md
+      - Versioning:
+          - glibc: appendix/versioning/glibc.md
+          - Snapshot Pinning: appendix/versioning/snapshot-pinning.md
+          - Version Comparison: appendix/versioning/version-comparison.md
+      - Post-Install:
+          - Stub Commands: appendix/postinstall/stubs.md
+          - Base Packages: appendix/postinstall/base-packages.md
+      - Formats:
+          - ar (deb archive): appendix/formats/ar.md
+          - cpio (rpm payload): appendix/formats/cpio.md
+          - RFC822 records: appendix/formats/rfc822.md
+          - OCI image: appendix/formats/oci.md
+          - DwarFS: appendix/formats/dwarfs.md
+          - SquashFS: appendix/formats/squashfs.md
+
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path:
+        - docs
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - tables
+  - attr_list
+  - md_in_html
+  - abbr
+
+theme:
+  name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+  palette:
+    scheme: default
+    primary: black
+  features:
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+    - content.tooltips
+
+plugins:
+  - search
+  - tags
+  - mkdocs-material-footer-tags:
+      max_pages: 3
+      min_shared_tags: 1
+      heading: Related pages
+      heading_level: 2
+      show_summary: true
+      show_tags: true
+      show_breadcrumb: true
+      summary_max_chars: 180
+      summary_ellipsis: "..."
+  - macros
+  - mermaid2
+  - drawio
+  - panzoom:
+      key: "shift"
+      hint_location: "bottom"
+      always_show_hint: true
+      mermaid: true
+      full_screen: True
+      include_selectors:
+        - ".mermaid"
+        - ".drawio"
+      exclude_selectors:
+        - "img"
+
+site_url: https://flatroot.github.io/docs
+repo_url: !ENV [FLATROOT_REPO_URL, 'https://github.com/flatroot/flatroot']
+
+extra:
+  version:
+    provider: mike

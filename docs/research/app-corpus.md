@@ -104,9 +104,19 @@ does not mean it ever opens one. Its result is **reported, not predicted**.
 
 The field's `HALL-OF-FAME.md` opens its GTK section with: *"Every single GTK app
 has the path to its locales hardcoded at the prefix (`/usr/share/locale`) and
-there is no env variable to change this."* ⭐ **That is a compiled-in absolute
-path with no search variable — the exact shape T-081's interposer resolves**,
-and the exact shape `--embed-terminfo`-style variable redirection cannot.
+there is no env variable to change this."* ⭐ **A compiled-in absolute path with
+no search variable is the class T-081's interposer answers**, and the class
+`--embed-terminfo`-style variable redirection cannot.
+
+⚠ **But not that literal path, and the distinction matters.**
+`tool/runtime/pgb-storefix.c`'s `fix()` returns a path **unchanged** unless it
+begins with `/nix/store/`; `/usr/share/locale` is not rewritten and never was.
+⭐ What makes the rung ours is that a **nixpkgs-built** GTK application does not
+compile in `/usr/share/locale` — it compiles in *its own store path*, which is
+precisely what the interposer answers. So we resolve **our form** of the field's
+problem. ⛔ A distro-built binary with `/usr/share/…` in its `.rodata` is a case
+the farm does not cover, and `flatimage`'s portable root is the shape that
+would.
 
 ⛔ **So this rung is the differentiator, and it should be measured as one**: a
 GNOME app under a non-English `LANG`, asserting a translated string, against the
@@ -428,12 +438,11 @@ the operator is right that the specific issue comments are the best source.
 `ivan-hc/AM` was already here. `references/` is **52** trees
 (`ls references/ | wc -l`).
 
-⚠ **Still NOT vendored**: `flatimage`, `flatroot`, `gameimage`. ⛔ The owner
-names this page carries — `flatimage/flatimage`, `flatroot/flatroot`,
-`gameimage/gameimage` — are **guesses that were never resolved**, and
-`mine-repo.sh` reports a 404 beside a known-public control precisely so a
-wrong owner is not read as a missing repository. Find the real owners before
-recording either.
+⭐ **AND SO ARE THE LAST THREE.** `flatimage/flatimage`, `gameimage/gameimage`
+and `flatroot/flatroot` are **vendored** too — the owner names this page
+already carried were right (each is an organisation with a same-named
+repository), and all three resolved on the first attempt. `references/` is
+**55** trees.
 
 ⭐ **What the six that arrived actually said**, so the next session does not
 re-read them for the same answer:
@@ -445,9 +454,35 @@ re-read them for the same answer:
 | `runimage-nvidia-drivers` | builds a driver **image per NVIDIA version** from the vendor `.run`, placed beside the container | ⚠ T-059: it is per-version and host-matched, which is what [`../design/host-fallback.md`](../design/host-fallback.md) already says a driver must be |
 | `Run-wrapper` | a 2-star Rust ELF wrapper that dispatches argv into RunImage's `Run.sh` | ⚠ rung 1: the same job as `pgb-apprun.c`, for a **shell script** target. Ours is static C with the dispatch table measured (`experiments/68-`); there is nothing here we need |
 
-⭐ **What to look for in the four unvendored runtime projects**, so the reading
-has a question: all four solve *"a program that expects a root filesystem"* —
-`flatimage` and `flatroot` with a portable root, `gameimage` with a per-game
-prefix, `Run-wrapper` with argv dispatch. `pgb`'s answer is the symlink farm
-plus the interposer. **The question is whether any of them handles a case the
-farm cannot**, not whether they are nicer.
+## ⭐ The question this page asked about the runtime projects, answered
+
+It asked *"whether any of them handles a case the farm cannot"*, not whether
+they are nicer. Read 2026-09-04b. **Two do, and one of them is a case we are
+currently describing wrongly.**
+
+| tree | what it actually is | a case the farm cannot |
+|---|---|---|
+| `flatimage` (C++, 124★) | a **portable root** in one ELF — sandboxed by default, DwarFS, *"all config embedded in the ELF binary's reserved space"*, statically linked with embedded tools | ⭐ **yes.** A full root serves a program with **any** absolute path compiled in. Our interposer serves `/nix/store/…` and nothing else — see below |
+| `flatroot` (Rust, 6★) | ⭐ **not a bundler at all**: it builds distribution rootfs trees from official mirrors, *"without root privileges or a running package manager"*, ten distributions across deb/rpm/pacman/apk, one static binary, pinnable to historical snapshots | ⚠ **not our rung** — it is `pgb rootfs`'s problem, from mirrors where ours goes through OCI. Relevant to **T-051/T-060** (a host with no compiler) and to the bed, not to bundling |
+| `gameimage` (Rust, 342★) | a **FlatImage** game packer — a front end over the row above | no; it inherits flatimage's answer |
+| `Run-wrapper` (Rust, 2★) | an ELF wrapper dispatching argv into RunImage's shell `Run.sh` | no — the same job as `pgb-apprun.c`, for a **script** target |
+
+⛔ **AND THE FIRST ROW EXPOSES AN IMPRECISION ON THIS PAGE, in rung 3.** That
+rung says the field's *"hardcoded at the prefix (`/usr/share/locale`)"* is
+*"the exact shape T-081's interposer resolves"*. ⚠ **It is not.**
+`tool/runtime/pgb-storefix.c`'s `fix()` returns the path **unchanged** unless it
+begins with `/nix/store/` — a literal `/usr/share/locale` is not rewritten and
+never was.
+
+⭐ **The mechanism still applies to our pipeline, for a reason worth stating
+rather than glossing**: a nixpkgs-built GTK application does not compile in
+`/usr/share/locale`; it compiles in *its own store path*, which is exactly what
+the interposer answers. So the rung is real — but what we resolve is **our**
+form of the field's problem, not theirs, and a distro-built binary with
+`/usr/share/…` in its `.rodata` is a case the farm does not cover. ⛔ Say it
+that way; the stronger version is not what the source does.
+
+⚠ **`flatroot` also answers `experiments/69-` from the other side**: it replays
+post-install scripts *"inside an unprivileged user-namespace sandbox"* — the
+call our chroot bed refuses and `pivot_root` permits. A working example of the
+route, in a static binary, is worth reading before changing the bed.

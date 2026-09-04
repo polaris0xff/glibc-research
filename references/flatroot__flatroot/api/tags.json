@@ -1,0 +1,12 @@
+[
+ {
+  "name": "v0.1.0",
+  "zipball_url": "https://api.github.com/repos/flatroot/flatroot/zipball/refs/tags/v0.1.0",
+  "tarball_url": "https://api.github.com/repos/flatroot/flatroot/tarball/refs/tags/v0.1.0",
+  "commit": {
+   "sha": "24fe1ae5fa63faaa8b9d98c28567c9813bb5f3b7",
+   "url": "https://api.github.com/repos/flatroot/flatroot/commits/24fe1ae5fa63faaa8b9d98c28567c9813bb5f3b7"
+  },
+  "node_id": "REF_kwDOSBqhLrByZWZzL3RhZ3MvdjAuMS4w"
+ }
+]

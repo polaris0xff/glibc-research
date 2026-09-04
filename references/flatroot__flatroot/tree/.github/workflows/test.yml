@@ -1,0 +1,86 @@
+name: Test
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq bubblewrap qemu-user-static squashfs-tools
+
+      # Rootless podman needs the setuid newuidmap/newgidmap helpers and a
+      # subordinate-ID range for the account it resolves at runtime; without
+      # them it falls back to a single-uid mapping and rejects any layer entry
+      # it cannot chown.
+      - name: Provision rootless podman
+        run: |
+          sudo apt-get install -y -qq podman uidmap
+          for u in root "$(id -un)"; do
+            grep -q "^$u:" /etc/subuid || echo "$u:100000:65536" | sudo tee -a /etc/subuid
+            grep -q "^$u:" /etc/subgid || echo "$u:100000:65536" | sudo tee -a /etc/subgid
+          done
+          podman system migrate
+          podman unshare cat /proc/self/uid_map
+          podman unshare awk '{ n += $3 } END { exit n < 65536 }' /proc/self/uid_map
+
+      - name: Install dwarfs tools
+        run: |
+          DWARFS_VER=0.15.3
+          sudo curl -LsSf -o /usr/local/bin/dwarfs-universal \
+            "https://github.com/mhx/dwarfs/releases/download/v${DWARFS_VER}/dwarfs-universal-${DWARFS_VER}-Linux-x86_64"
+          sudo chmod +x /usr/local/bin/dwarfs-universal
+          sudo ln -s dwarfs-universal /usr/local/bin/mkdwarfs
+          sudo ln -s dwarfs-universal /usr/local/bin/dwarfsextract
+          sudo ln -s dwarfs-universal /usr/local/bin/dwarfsck
+
+      - name: Setup QEMU binfmt
+        run: |
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+      - name: Pull Docker images
+        run: |
+          docker pull debian:bookworm
+          docker pull ubuntu:noble
+          docker pull archlinux:latest
+          docker pull alpine:edge
+          docker pull centos:7
+          docker pull fedora:42
+
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install cargo-nextest
+        run: curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C "$HOME/.cargo/bin/"
+
+      - name: Build
+        run: cargo build --tests
+
+      - name: Create output directory
+        run: mkdir -p test-results
+
+      - name: Tests
+        shell: bash -eo pipefail {0}
+        run: 2>&1 cargo nextest run | tee test-results/nextest.log
+
+      - name: Upload test results (GitHub)
+        if: always() && contains(github.server_url, 'github.com')
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/
+
+      - name: Upload test results (Gitea)
+        if: always() && !contains(github.server_url, 'github.com')
+        uses: christopherhx/gitea-upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results/

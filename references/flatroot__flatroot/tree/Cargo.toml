@@ -1,0 +1,65 @@
+[package]
+name = "flatroot"
+version = "0.1.0"
+edition = "2024"
+authors = ["Ruan Formigoni <ruanformigoni@gmail.com>"]
+license = "Apache-2.0"
+description = "Build Linux root filesystem directories from official distribution packages — without root privileges or a running package manager."
+repository = "https://github.com/flatroot/flatroot"
+
+[[bin]]
+name = "flatroot"
+path = "src/main.rs"
+
+[lib]
+name = "flatroot"
+path = "src/lib.rs"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive", "env"] }
+flate2 = "1"
+reqwest = { version = "0.12", features = ["blocking", "rustls-tls", "stream", "hickory-dns"], default-features = false }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+futures = "0.3"
+base64 = "0.22"
+sha1 = "0.10"
+sha2 = "0.10"
+tar = "0.4"
+ar = "0.9"
+xz2 = { version = "0.1", features = ["static"] }
+bzip2 = { version = "0.5", features = ["static"] }
+hex = "0.4"
+zstd = "0.13"
+nix = { version = "0.31", features = ["sched", "mount", "fs", "process", "signal", "user"] }
+quick-xml = "0.37"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+which = "8"
+rusqlite = { version = "0.34", features = ["bundled", "functions", "collation"] }
+tempfile = "3"
+indicatif = "0.18.4"
+object = { version = "0.36", default-features = false, features = ["read", "elf", "std"] }
+globset = "0.4"
+
+[dev-dependencies]
+assert_cmd = "2"
+predicates = "3"
+serial_test = "3"
+pathdiff = "0.2"
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+# Strip symbol tables so release artifacts stay small. rustc handles this
+# per-target, so every arch in the matrix gets the same treatment without
+# needing a separate strip binary per target.
+strip = "symbols"
+# panic=abort eliminates the dependency on libgcc_s.so.1 (Rust's default
+# unwinder pulls in glibc/libgcc unwinding support). Combined with
+# +crt-static in the Dockerfile, the resulting binary is fully self-contained
+# and runs on any glibc or non-glibc host without an interpreter dependency.
+panic = "abort"

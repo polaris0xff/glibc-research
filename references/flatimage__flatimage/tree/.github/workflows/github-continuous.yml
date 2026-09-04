@@ -1,0 +1,106 @@
+name: Continuous Linux (GitHub)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  #
+  # Build
+  #
+  build:
+    if: ${{ contains(github.server_url, 'github.com') }}
+    strategy:
+      matrix:
+        dist: [alpine,arch,blueprint]
+        arch: [x86_64]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install build tools
+        uses: ./.github/actions/install-build-tools
+
+      - name: Build FlatImage
+        uses: ./.github/actions/build-flatimage
+        with:
+          distribution: ${{ matrix.dist }}
+          architecture: ${{ matrix.arch }}
+          artifact-version: v4
+
+  #
+  # Test
+  #
+  test-doctest:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run DocTest
+        uses: ./.github/actions/test-doctest
+
+  test-unittest:
+    runs-on: ubuntu-latest
+    needs: [build]
+    strategy:
+      matrix:
+        dist: [alpine,arch]
+        arch: [x86_64]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download built artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: flatimage-${{ matrix.dist }}-${{ matrix.arch }}
+          path: dist
+
+      - name: Run UnitTest
+        uses: ./.github/actions/test-unittest
+        with:
+          flatimage: dist/${{ matrix.dist }}-${{ matrix.arch }}.flatimage
+
+  #
+  # Release
+  #
+  release:
+    runs-on: ubuntu-latest
+    needs: [build, test-doctest, test-unittest]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: flatimage-*
+          merge-multiple: true
+          path: dist
+
+      - name: Setup platform CLI
+        uses: ./.github/actions/setup-platform-cli
+
+      - name: Create/Update continuous release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Delete existing continuous release if it exists
+          gh release delete continuous --yes || true
+          # Delete the tag if it exists
+          git push origin :refs/tags/continuous || true
+          # Create new continuous release
+          gh release create continuous \
+            --title "Continuous Build" \
+            --notes "Automated continuous build from the latest commit on ${GITHUB_REF_NAME}" \
+            --prerelease \
+            dist/*

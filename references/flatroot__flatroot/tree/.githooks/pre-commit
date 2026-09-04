@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! cargo fmt -- --check; then
+  echo "error: unformatted Rust code. Run 'cargo fmt' and try again." >&2
+  exit 1
+fi

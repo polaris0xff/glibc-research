@@ -1,0 +1,252 @@
+[
+ {
+  "name": "v2.0.1",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v2.0.1",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v2.0.1",
+  "commit": {
+   "sha": "8afe7e9d015522523c8f5d6f87e6d47bd351e0ad",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/8afe7e9d015522523c8f5d6f87e6d47bd351e0ad"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjIuMC4x"
+ },
+ {
+  "name": "v2.0.0",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v2.0.0",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v2.0.0",
+  "commit": {
+   "sha": "cb0adbe61bbca77b0d8a17e19069f347f16c4056",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/cb0adbe61bbca77b0d8a17e19069f347f16c4056"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjIuMC4w"
+ },
+ {
+  "name": "v1.0.8",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v1.0.8",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v1.0.8",
+  "commit": {
+   "sha": "817782c6025365ad706a41776b176b9cc41f7061",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/817782c6025365ad706a41776b176b9cc41f7061"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjEuMC44"
+ },
+ {
+  "name": "v1.0.7",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v1.0.7",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v1.0.7",
+  "commit": {
+   "sha": "77d4fbf6d130d8204ce5c5d6e6ed53c2b7b09aee",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/77d4fbf6d130d8204ce5c5d6e6ed53c2b7b09aee"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjEuMC43"
+ },
+ {
+  "name": "v1.0.6",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v1.0.6",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v1.0.6",
+  "commit": {
+   "sha": "26d78059db847333d44255d57876913c0b540d45",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/26d78059db847333d44255d57876913c0b540d45"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjEuMC42"
+ },
+ {
+  "name": "v1.0.5",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v1.0.5",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v1.0.5",
+  "commit": {
+   "sha": "119216d71a67117e55b24c046e27bca6dea15ac2",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/119216d71a67117e55b24c046e27bca6dea15ac2"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjEuMC41"
+ },
+ {
+  "name": "v1.0.4",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v1.0.4",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v1.0.4",
+  "commit": {
+   "sha": "f3bb9ef2c601991555ca9297c38c2238b48355bd",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/f3bb9ef2c601991555ca9297c38c2238b48355bd"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjEuMC40"
+ },
+ {
+  "name": "v1.0.3",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v1.0.3",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v1.0.3",
+  "commit": {
+   "sha": "6bc6815548d136d10c6fe3b6bd254e9f28beb599",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/6bc6815548d136d10c6fe3b6bd254e9f28beb599"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjEuMC4z"
+ },
+ {
+  "name": "v1.0.2",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v1.0.2",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v1.0.2",
+  "commit": {
+   "sha": "9a56858367f6b6fac5de3f3c5b6f9515f97bb0ec",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/9a56858367f6b6fac5de3f3c5b6f9515f97bb0ec"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjEuMC4y"
+ },
+ {
+  "name": "v1.0.1",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v1.0.1",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v1.0.1",
+  "commit": {
+   "sha": "3f63d4e11b35b3bd72b764432a5bb82810f3dd7c",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/3f63d4e11b35b3bd72b764432a5bb82810f3dd7c"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjEuMC4x"
+ },
+ {
+  "name": "v1.0.0",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v1.0.0",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v1.0.0",
+  "commit": {
+   "sha": "f51b16305ee887cd10b5a4f3128d19e7bcd4224d",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/f51b16305ee887cd10b5a4f3128d19e7bcd4224d"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjEuMC4w"
+ },
+ {
+  "name": "v0.3.5",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.3.5",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.3.5",
+  "commit": {
+   "sha": "bf0a4bd133ef7396c7e90c962f95ec1dacdadd53",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/bf0a4bd133ef7396c7e90c962f95ec1dacdadd53"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMy41"
+ },
+ {
+  "name": "v0.3.4",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.3.4",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.3.4",
+  "commit": {
+   "sha": "baf639ca088cf44af2808a2f2ee08b3e8d72c7dd",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/baf639ca088cf44af2808a2f2ee08b3e8d72c7dd"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMy40"
+ },
+ {
+  "name": "v0.3.3",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.3.3",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.3.3",
+  "commit": {
+   "sha": "ab76e2979cd52082ef461bfc5cc6e20660f16e40",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/ab76e2979cd52082ef461bfc5cc6e20660f16e40"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMy4z"
+ },
+ {
+  "name": "v0.3.2",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.3.2",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.3.2",
+  "commit": {
+   "sha": "a1388f0d6dd449616aeb1a635622e3c435ba5e9e",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/a1388f0d6dd449616aeb1a635622e3c435ba5e9e"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMy4y"
+ },
+ {
+  "name": "v0.3.1",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.3.1",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.3.1",
+  "commit": {
+   "sha": "75340b681575986f07cb58808100da90483d9301",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/75340b681575986f07cb58808100da90483d9301"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMy4x"
+ },
+ {
+  "name": "v0.3.0",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.3.0",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.3.0",
+  "commit": {
+   "sha": "266c699a8c2b46fcf48a4072e5605108b22fca3a",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/266c699a8c2b46fcf48a4072e5605108b22fca3a"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMy4w"
+ },
+ {
+  "name": "v0.2.5",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.2.5",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.2.5",
+  "commit": {
+   "sha": "71cf41a571273b9410af0664e0ca950db66303b5",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/71cf41a571273b9410af0664e0ca950db66303b5"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMi41"
+ },
+ {
+  "name": "v0.2.4",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.2.4",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.2.4",
+  "commit": {
+   "sha": "6a897e99e2bd3918a6d3f1ca1b16e9abbee48b43",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/6a897e99e2bd3918a6d3f1ca1b16e9abbee48b43"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMi40"
+ },
+ {
+  "name": "v0.2.3",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.2.3",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.2.3",
+  "commit": {
+   "sha": "126d5a911ea054d7b6a18f37905ed33c0c3a19bb",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/126d5a911ea054d7b6a18f37905ed33c0c3a19bb"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMi4z"
+ },
+ {
+  "name": "v0.2.2",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.2.2",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.2.2",
+  "commit": {
+   "sha": "65017307d500bf15207174ad1e4428aef8ce916a",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/65017307d500bf15207174ad1e4428aef8ce916a"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMi4y"
+ },
+ {
+  "name": "v0.2.1",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.2.1",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.2.1",
+  "commit": {
+   "sha": "502568f61104344988f97fc908318023e50c90e5",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/502568f61104344988f97fc908318023e50c90e5"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMi4x"
+ },
+ {
+  "name": "v0.2.0",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.2.0",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.2.0",
+  "commit": {
+   "sha": "3e96659070a328a404cb5c47beb3f9e9e399926c",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/3e96659070a328a404cb5c47beb3f9e9e399926c"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMi4w"
+ },
+ {
+  "name": "v0.1.0",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/v0.1.0",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/v0.1.0",
+  "commit": {
+   "sha": "bf4862d33998e472f87d2b2dc6c86d0edbae9fde",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/bf4862d33998e472f87d2b2dc6c86d0edbae9fde"
+  },
+  "node_id": "REF_kwDOJCs35LByZWZzL3RhZ3MvdjAuMS4w"
+ },
+ {
+  "name": "continuous",
+  "zipball_url": "https://api.github.com/repos/flatimage/flatimage/zipball/refs/tags/continuous",
+  "tarball_url": "https://api.github.com/repos/flatimage/flatimage/tarball/refs/tags/continuous",
+  "commit": {
+   "sha": "f86edc9af53979a84c780b92b8e780efc29a3769",
+   "url": "https://api.github.com/repos/flatimage/flatimage/commits/f86edc9af53979a84c780b92b8e780efc29a3769"
+  },
+  "node_id": "REF_kwDOJCs35LRyZWZzL3RhZ3MvY29udGludW91cw"
+ }
+]

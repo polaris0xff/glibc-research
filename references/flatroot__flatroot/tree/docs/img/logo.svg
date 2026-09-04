@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 512 512"
+   width="512"
+   height="512"
+   version="1.1"
+   id="svg16"
+   sodipodi:docname="logo.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview16"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.1871856"
+     inkscape:cx="236.69425"
+     inkscape:cy="297.34188"
+     inkscape:window-width="2560"
+     inkscape:window-height="1008"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg16" />
+  <defs
+     id="defs2">
+    <inkscape:path-effect
+       effect="bool_op"
+       operand-path=""
+       id="path-effect13"
+       is_visible="true"
+       lpeversion="1"
+       operation="union"
+       swap-operands="false"
+       filltype-this="from-curve"
+       filter=""
+       filltype-operand="from-curve" />
+    <filter
+       id="selectable_hidder_filter"
+       width="1"
+       height="1"
+       x="0"
+       y="0"
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="LPE boolean visibility">
+      <feComposite
+         id="boolops_hidder_primitive"
+         result="composite1"
+         operator="arithmetic"
+         in2="SourceGraphic"
+         in="BackgroundImage" />
+    </filter>
+    <inkscape:path-effect
+       effect="bool_op"
+       operand-path=""
+       id="path-effect12"
+       is_visible="true"
+       lpeversion="1"
+       operation="diff"
+       swap-operands="false"
+       filltype-this="from-curve"
+       filter=""
+       filltype-operand="from-curve" />
+    <linearGradient
+       id="bg"
+       x1="16"
+       y1="16"
+       x2="496"
+       y2="496"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0666667,0,0,1.0666667,-17.06668,-17.06668)">
+      <stop
+         offset="0%"
+         style="stop-color:#4f46e5;stop-opacity:1"
+         id="stop1" />
+      <stop
+         offset="100%"
+         style="stop-color:#7c3aed;stop-opacity:1"
+         id="stop2" />
+    </linearGradient>
+    <linearGradient
+       id="bg-4"
+       x1="16"
+       y1="16"
+       x2="496"
+       y2="496"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(0.44194,-0.75)">
+      <stop
+         offset="0%"
+         style="stop-color:#4f46e5;stop-opacity:1"
+         id="stop1-7" />
+      <stop
+         offset="100%"
+         style="stop-color:#7c3aed;stop-opacity:1"
+         id="stop2-2" />
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <!-- Root system — upper-right origin, evenly spread with curves, no central stem -->
+  <circle
+     fill="url(#bg)"
+     id="circle2"
+     style="fill:#007ff8;fill-opacity:1"
+     cx="256.44193"
+     cy="255.25"
+     r="240" />
+  <g
+     fill="none"
+     stroke="#ffffff"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     opacity="0.9"
+     id="g16"
+     transform="translate(-20,-7)"
+     style="display:inline;stroke-linecap:butt"
+     clip-path="none">
+    <!-- Root 1 — topmost, curves gently left -->
+    <path
+       style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#ffffff;stroke:none;stroke-linejoin:miter;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+       d="m 198.02911,35.420921 c 0,0 -20.84562,7.667247 -23.15363,9.379643 50.78053,64.345176 73.6515,114.849646 83.14991,179.799046 9.49841,64.9494 6.38728,147.65922 5.91602,277.60547 l 25,0.0898 C 289.41129,372.72779 292.8055,289.64764 282.76367,220.98242 272.72185,152.3172 250.48618,101.89049 198.02911,35.420921 Z"
+       id="path2"
+       sodipodi:nodetypes="ccsccsc" />
+    <!-- Root 1 sub-branch -->
+    <path
+       style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#ffffff;stroke:none;stroke-linejoin:miter;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+       d="m 80.252568,124.01203 c 0,0 -10.736049,15.99358 -13.341869,21.20522 127.673511,61.1203 199.114691,206.32572 199.114691,206.32572 l 22.55664,-10.78125 c 0,0 -70.13082,-150.59076 -208.329462,-216.74969 z"
+       id="path3"
+       sodipodi:nodetypes="ccccc" />
+    <!-- Root 2 — steep diagonal -->
+    <!-- Root 2 sub-branch left -->
+    <!-- Root 2 sub-branch right -->
+    <!-- Root 3 — middle curve, sweeps down-center -->
+    <!-- Root 3 sub-branch -->
+    <!-- Root 4 — curves further right, more vertical -->
+    <!-- Root 4 sub-branch -->
+    <!-- Root 5 — rightmost, gentle arc staying right -->
+    <!-- Root 5 sub-branch -->
+    <!-- Extra fine tendrils -->
+    <path
+       style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#ffffff;stroke:none;stroke-linejoin:miter;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+       d="m 36.789155,249.34459 c 0,0 -0.592831,12.02332 -0.01373,25.55322 132.463905,45.74785 230.376915,170.15492 230.376915,170.15492 l 19.4336,-15.72851 c 0,0 -107.90327,-130.97518 -249.796785,-179.97963 z"
+       id="path3-9"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#ffffff;stroke:none;stroke-linejoin:miter;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+       d="M 482.82954,139.75856 C 350.15344,179.34149 266.5957,288.23242 266.5957,288.23242 l 19.61914,15.49414 c 0,0 84.88759,-105.16443 208.18415,-141.94904 -2.84286,-6.63334 -11.56945,-22.01896 -11.56945,-22.01896 z"
+       id="path3-9-1-9-4"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="baseline-shift:baseline;display:inline;overflow:visible;opacity:1;vector-effect:none;fill:#ffffff;stroke:none;stroke-linejoin:miter;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+       d="M 516.097,249.38747 C 400.94368,283.34293 271.59961,395.26953 271.59961,395.26953 l 16.41016,18.85938 c 0,0 122.63333,-108.10757 228.09733,-139.20593 0.73704,-15.63572 -0.0101,-25.53551 -0.0101,-25.53551 z"
+       id="path3-9-1-9-4-4"
+       sodipodi:nodetypes="ccccc" />
+  </g>
+</svg>

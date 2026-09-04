@@ -1,0 +1,104 @@
+<mxfile host="65bd71144e">
+    <diagram name="Install pipeline" id="page1">
+        <mxGraphModel dx="939" dy="783" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="680" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="&lt;b&gt;Install Pipeline&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontColor=#333333;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="10" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="mirror" value="&lt;b&gt;Distribution&lt;br&gt;mirror&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="60" width="130" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="fetch" value="&lt;b&gt;Fetch &amp;amp; parse&lt;br&gt;index&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="230" y="60" width="130" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="index" value="&lt;b&gt;Flat package&lt;br&gt;table&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;every package in the&lt;br&gt;repo with its deps,&lt;br&gt;provides, version&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="430" y="47.5" width="150" height="75" as="geometry"/>
+                </mxCell>
+                <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;" parent="1" source="mirror" target="fetch" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" parent="1" source="fetch" target="index" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="seeds" value="&lt;b&gt;Seed packages&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;user-requested +&lt;br&gt;base + essential&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="660" y="50" width="130" height="65" as="geometry"/>
+                </mxCell>
+                <mxCell id="resolve" value="&lt;b&gt;BFS dependency&lt;br&gt;resolver&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;walk deps, resolve&lt;br&gt;virtuals, check versions,&lt;br&gt;fixpoint loops&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="430" y="170" width="150" height="85" as="geometry"/>
+                </mxCell>
+                <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;" parent="1" source="index" target="resolve" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e3b" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;entryX=1;entryY=0.25;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="seeds" target="resolve" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="725" y="130"/>
+                            <mxPoint x="620" y="130"/>
+                            <mxPoint x="620" y="191"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ordered" value="&lt;b&gt;Ordered install&lt;br&gt;list&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;deps before&lt;br&gt;dependants&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="660" y="245" width="130" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="resolve" target="ordered" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="download" value="&lt;b&gt;Parallel&lt;br&gt;download&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;cache check →&lt;br&gt;fetch misses →&lt;br&gt;verify checksum&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="430" y="300" width="150" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="ordered" target="download" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="cache" value="&lt;b&gt;Local cache&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;~/.cache/flatroot/&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999999;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="230" y="315" width="130" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="e5b" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#999999;dashed=1;" parent="1" source="cache" target="download" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="extract" value="&lt;b&gt;Extract&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;unpack archives&lt;br&gt;in resolver order&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="440" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#6c8ebf;exitX=0;exitY=1;exitDx=0;exitDy=0;" parent="1" source="download" target="extract" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="95" y="385"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="scripts" value="&lt;b&gt;Post-install&lt;br&gt;scripts&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;stubs + namespace&lt;br&gt;sandbox&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="230" y="440" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#9673a6;" parent="1" source="extract" target="scripts" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="hooks" value="&lt;b&gt;Cache&lt;br&gt;hooks&lt;/b&gt;&lt;br&gt;&lt;font size=&quot;1&quot;&gt;ldconfig, fonts,&lt;br&gt;icons, mime&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="430" y="440" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#9673a6;" parent="1" source="scripts" target="hooks" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="rootfs" value="&lt;b&gt;Functional&lt;br&gt;rootfs&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="640" y="440" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#82b366;" parent="1" source="hooks" target="rootfs" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg1" value="&lt;font size=&quot;1&quot;&gt;blue = core pipeline&lt;/font&gt;" style="text;html=1;fontSize=10;fillColor=none;strokeColor=none;fontColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="870" y="60" width="120" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg2" value="&lt;font size=&quot;1&quot;&gt;purple = post-install&lt;/font&gt;" style="text;html=1;fontSize=10;fillColor=none;strokeColor=none;fontColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="870" y="80" width="120" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg3" value="&lt;font size=&quot;1&quot;&gt;green = output&lt;/font&gt;" style="text;html=1;fontSize=10;fillColor=none;strokeColor=none;fontColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="870" y="100" width="120" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leg4" value="&lt;font size=&quot;1&quot;&gt;grey = external input&lt;/font&gt;" style="text;html=1;fontSize=10;fillColor=none;strokeColor=none;fontColor=#999999;" parent="1" vertex="1">
+                    <mxGeometry x="870" y="120" width="120" height="20" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

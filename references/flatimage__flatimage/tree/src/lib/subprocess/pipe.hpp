@@ -1,0 +1,251 @@
+/**
+ * @file pipe.hpp
+ * @author Ruan Formigoni
+ * @brief Pipe handling utilities for subprocess
+ *
+ * @copyright Copyright (c) 2025 Ruan Formigoni
+ */
+
+#pragma once
+
+#include <cstring>
+#include <istream>
+#include <thread>
+#include <functional>
+#include <optional>
+#include <vector>
+#include <sys/wait.h>
+#include <sys/prctl.h>
+#include <csignal>
+#include <string>
+#include <unistd.h>
+#include <sys/types.h>
+#include <filesystem>
+
+#include "../../macro.hpp"
+#include "../../lib/log.hpp"
+#include "../../lib/linux/fd.hpp"
+
+namespace ns_subprocess
+{
+
+/**
+ * @namespace ns_subprocess::ns_pipe
+ * @brief Inter-process pipe management
+ *
+ * Manages Unix pipe creation, configuration, and cleanup for inter-process communication.
+ * Handles file descriptor management with RAII semantics, read/write end access, and
+ * automatic closing on destruction for safe stdio redirection in child processes.
+ */
+namespace ns_pipe
+{
+
+/**
+ * @brief Write from an input stream to a pipe file descriptor
+ *
+ * Reads lines from the input stream and writes them to the pipe.
+ * Continues until the child process exits or stream errors occur.
+ *
+ * @param child_pid PID of the child process to monitor
+ * @param pipe_fd File descriptor of the pipe write end
+ * @param stream Input stream to read from
+ */
+inline void write_pipe(pid_t child_pid, int pipe_fd, std::istream& stream)
+{
+  ns_linux::ns_fd::redirect_stream_to_fd(child_pid, stream, pipe_fd).discard();
+  close(pipe_fd);
+}
+
+/**
+ * @brief Read from a pipe file descriptor and write to an output stream
+ *
+ * Reads data from the pipe and writes it to the output stream.
+ * Handles line splitting and filtering of empty/whitespace-only lines.
+ * Replaces carriage returns with newlines to handle Windows-style line endings
+ * and progress updates.
+ *
+ * @param child_pid PID of the child process to monitor
+ * @param pipe_fd File descriptor of the pipe read end
+ * @param stream Output stream to write to
+ * @param path_file_log Log file path for logging output
+ */
+inline void read_pipe(pid_t child_pid, int pipe_fd, std::ostream& stream, std::filesystem::path const& path_file_log)
+{
+  ns_log::set_sink_file(path_file_log);
+
+  ns_linux::ns_fd::redirect_fd_to_stream(child_pid
+    , pipe_fd
+    , stream
+    , [](std::string const& s) { logger("D::STD(OUT|ERR)::{}", s); return s; }
+  ).discard();
+  close(pipe_fd);
+}
+
+/**
+ * @brief Check if a stream is a standard stream (std::cin, std::cout, or std::cerr)
+ *
+ * @tparam Stream The stream type (std::istream or std::ostream)
+ * @param stream The stream reference to check
+ * @return true if the stream is std::cin, std::cout, or std::cerr
+ */
+template<typename Stream>
+bool is_standard_stream(Stream& stream)
+{
+  if constexpr (std::is_same_v<Stream, std::istream>)
+  {
+    return (&stream == &std::cin);
+  }
+  else if constexpr (std::is_same_v<Stream, std::ostream>)
+  {
+    return (&stream == &std::cout) or (&stream == &std::cerr);
+  }
+  return false;
+}
+
+/**
+ * @brief Setup pipe for child process (unified for stdin/stdout/stderr)
+ *
+ * @tparam Stream The stream type (std::istream or std::ostream)
+ * @param is_istream True for input streams (stdin), false for output streams (stdout/stderr)
+ * @param pipe Pipe array [read_end, write_end]
+ * @param stream The stream reference to check
+ * @param fileno The file descriptor to redirect to (STDIN_FILENO, STDOUT_FILENO, or STDERR_FILENO)
+ */
+template<typename Stream>
+void pipes_child(bool is_istream, int pipe[2], Stream& stream, int fileno)
+{
+  // For input streams (stdin):  child uses read end [0], parent uses write end [1]
+  // For output streams (stdout/stderr): child uses write end [1], parent uses read end [0]
+  int idx_child  = is_istream ? 0 : 1;
+  int idx_parent = is_istream ? 1 : 0;
+
+  // Close the parent's end
+  return_if(close(pipe[idx_parent]) == -1,, "E::pipe[{}]: {}}", idx_parent, strerror(errno));
+
+  // If using standard stream, don't redirect (allow terminal access)
+  if (is_standard_stream(stream))
+  {
+    close(pipe[idx_child]);
+    return;
+  }
+
+  // Redirect to the specified file descriptor
+  return_if(dup2(pipe[idx_child], fileno) == -1,, "E::dup2(pipe[{}], {}): {}", idx_child, fileno, strerror(errno));
+  return_if(close(pipe[idx_child]) == -1,, "E::pipe[{}]: {}", idx_child, strerror(errno));
+}
+
+/**
+ * @brief Setup pipe for parent process (unified for stdin/stdout/stderr)
+ *
+ * @tparam Stream The stream type (std::istream or std::ostream)
+ * @param child_pid PID of child process (needed for stdin writer)
+ * @param is_istream True for input streams (stdin), false for output streams (stdout/stderr)
+ * @param pipe Pipe array [read_end, write_end]
+ * @param stream The stream reference to use
+ * @param path_file_log Optional log file path (unused for stdin)
+ * @return std::optional<std::jthread> The created thread, or std::nullopt if no thread was created
+ */
+template<typename Stream>
+std::optional<std::jthread> pipes_parent(
+  pid_t child_pid,
+  bool is_istream,
+  int pipe[2],
+  Stream& stream,
+  std::filesystem::path const& path_file_log)
+{
+  // For input streams (stdin):  parent uses write end [1], child uses read end [0]
+  // For output streams (stdout/stderr): parent uses read end [0], child uses write end [1]
+  int idx_parent = is_istream ? 1 : 0;
+  int idx_child  = is_istream ? 0 : 1;
+
+  // Close the child's end
+  return_if(close(pipe[idx_child]) == -1, std::nullopt,"E::pipe[{}]: {}", idx_child, strerror(errno));
+
+  // If using standard stream, close parent end and return (no thread needed)
+  if (is_standard_stream(stream))
+  {
+    close(pipe[idx_parent]);
+    return std::nullopt;
+  }
+
+  // Create appropriate thread (use if constexpr to avoid compiling invalid branch)
+  if constexpr (std::is_same_v<Stream, std::istream>)
+  {
+    // Input stream: read from Stream and write to child's stdin pipe
+    return std::jthread(write_pipe, child_pid, pipe[idx_parent], std::ref(stream));
+  }
+  else // std::ostream
+  {
+    // Output stream: read from child's stdout/stderr pipe and write to Stream
+    return std::jthread(read_pipe, child_pid, pipe[idx_parent], std::ref(stream), path_file_log);
+  }
+}
+
+/**
+ * @brief Handle pipe setup for both parent and child processes
+ *
+ * This function manages the pipe setup after fork():
+ * - For parent (pid > 0): Creates threads for reading/writing pipes
+ * - For child (pid == 0): Redirects stdin/stdout/stderr to pipes via dup2()
+ *
+ * Standard streams (std::cin, std::cout, std::cerr) are not redirected,
+ * allowing terminal access.
+ *
+ * @param pid Process ID from fork() (0 for child, >0 for parent)
+ * @param pipestdin Stdin pipe array [read_end, write_end]
+ * @param pipestdout Stdout pipe array [read_end, write_end]
+ * @param pipestderr Stderr pipe array [read_end, write_end]
+ * @param stdin Input stream to read from (for child's stdin)
+ * @param stdout Output stream to write to (for child's stdout)
+ * @param stderr Error stream to write to (for child's stderr)
+ * @param path_file_log Log file path for pipe reader threads
+ * @return std::vector<std::jthread> Vector of created threads (empty for child process)
+ */
+inline std::vector<std::jthread> setup(
+  pid_t pid,
+  int pipestdin[2],
+  int pipestdout[2],
+  int pipestderr[2],
+  std::istream& stdin,
+  std::ostream& stdout,
+  std::ostream& stderr,
+  std::filesystem::path const& path_file_log)
+{
+  std::vector<std::jthread> threads;
+
+  // Parent: setup writer/reader threads (or skip if std::cin/cout/cerr)
+  if (pid > 0)
+  {
+    if (auto t = pipes_parent(pid, true, pipestdin, stdin, path_file_log))
+    {
+      threads.push_back(std::move(*t));
+    }
+    if (auto t = pipes_parent(pid, false, pipestdout, stdout, path_file_log))
+    {
+      threads.push_back(std::move(*t));
+    }
+    if (auto t = pipes_parent(pid, false, pipestderr, stderr, path_file_log))
+    {
+      threads.push_back(std::move(*t));
+    }
+  }
+  // Child: redirect stdin/stdout/stderr (or skip if std::cin/cout/cerr)
+  else if (pid == 0)
+  {
+    pipes_child(true, pipestdin, stdin, STDIN_FILENO);
+    pipes_child(false, pipestdout, stdout, STDOUT_FILENO);
+    pipes_child(false, pipestderr, stderr, STDERR_FILENO);
+  }
+  else
+  {
+    logger("E::Invalid negative pid for pipe setup");
+  }
+
+  return threads;
+}
+
+} // namespace ns_pipe
+
+} // namespace ns_subprocess
+
+/* vim: set expandtab fdm=marker ts=2 sw=2 tw=100 et :*/

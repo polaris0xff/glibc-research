@@ -1,0 +1,32 @@
+services:
+  flatroot-mkdocs:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.mkdocs
+      args:
+        - FLATROOT_RELEASE_URL
+        - FLATROOT_REPO_URL
+    env_file: .env.mkdocs
+  flatroot-mkdocs-serve:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.mkdocs
+      args:
+        - FLATROOT_RELEASE_URL
+        - FLATROOT_REPO_URL
+    env_file: .env.mkdocs
+    working_dir: /flatroot/docs/mkdocs
+    entrypoint:
+      - /flatroot/docs/mkdocs/env/bin/mkdocs
+    command:
+      - serve
+      - --dev-addr=0.0.0.0:8222
+      - --config-file=/flatroot/docs/mkdocs/mkdocs.yml
+      - --livereload
+    ports:
+      - "${MKDOCS_PORT:-8222}:8222"
+    volumes:
+      - ../docs/mkdocs/docs:/flatroot/docs/mkdocs/docs
+      - ../docs/mkdocs/mkdocs.yml:/flatroot/docs/mkdocs/mkdocs.yml
+      - ../docs/mkdocs/main.py:/flatroot/docs/mkdocs/main.py
+      - ../docs/img/logo.svg:/flatroot/docs/mkdocs/docs/assets/logo.svg:ro

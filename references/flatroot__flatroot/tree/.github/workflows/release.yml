@@ -1,0 +1,173 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BUILDKIT_PROGRESS: plain
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+            target: x86_64-unknown-linux-musl
+          - arch: aarch64
+            target: aarch64-unknown-linux-musl
+          - arch: armv7l
+            target: armv7-unknown-linux-musleabihf
+          - arch: i686
+            target: i686-unknown-linux-musl
+          - arch: riscv64
+            target: riscv64gc-unknown-linux-musl
+    steps:
+      - uses: actions/checkout@v4
+
+      # The Dockerfiles are the build recipe; the runner only drives docker.
+      # Same commands work locally, so CI output is reproducible by hand.
+      - name: Build toolchain image
+        run: |
+          set -o pipefail
+          docker build \
+            -f docker/Dockerfile.build.toolchain \
+            --build-arg TARGET=${{ matrix.target }} \
+            -t flatroot-build-toolchain:${{ matrix.arch }} . \
+            2>&1 | tee log-build-toolchain-${{ matrix.arch }}.log
+
+      - name: Build release image
+        run: |
+          set -o pipefail
+          docker build \
+            -f docker/Dockerfile.build.release \
+            --build-arg TARGET=${{ matrix.target }} \
+            --build-arg ARCH=${{ matrix.arch }} \
+            -t flatroot-build-release:${{ matrix.arch }} . \
+            2>&1 | tee log-build-release-${{ matrix.arch }}.log
+
+      - name: Upload build logs (GitHub)
+        if: always() && contains(github.server_url, 'github.com')
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs_build_${{ matrix.arch }}
+          path: log-build-*-${{ matrix.arch }}.log
+          if-no-files-found: warn
+
+      - name: Upload build logs (Gitea)
+        if: always() && !contains(github.server_url, 'github.com')
+        uses: christopherhx/gitea-upload-artifact@v4
+        with:
+          name: logs_build_${{ matrix.arch }}
+          path: log-build-*-${{ matrix.arch }}.log
+          if-no-files-found: warn
+
+      - name: Extract binary
+        run: |
+          mkdir -p dist
+          CID=$(docker create flatroot-build-release:${{ matrix.arch }})
+          docker cp "$CID:/out/flatroot-linux-${{ matrix.arch }}" dist/
+          docker rm "$CID"
+          chmod +x dist/flatroot-linux-${{ matrix.arch }}
+
+      - name: Upload artifact (GitHub)
+        if: ${{ contains(github.server_url, 'github.com') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: flatroot-linux-${{ matrix.arch }}
+          path: dist/flatroot-linux-${{ matrix.arch }}
+
+      - name: Upload artifact (Gitea)
+        if: ${{ !contains(github.server_url, 'github.com') }}
+        uses: christopherhx/gitea-upload-artifact@v4
+        with:
+          name: flatroot-linux-${{ matrix.arch }}
+          path: dist/flatroot-linux-${{ matrix.arch }}
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate tag
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          CARGO_VERSION="v$(grep '^version' Cargo.toml | head -1 | sed 's/.*"\(.*\)"/\1/')"
+          if [[ "${TAG}" != "${CARGO_VERSION}" ]]; then
+            echo "ERROR: Tag '${TAG}' does not match Cargo.toml version '${CARGO_VERSION}'" >&2
+            exit 1
+          fi
+          TAGGED_SHA="$(git rev-list -n 1 "${TAG}")"
+          MASTER_SHA="$(git rev-parse origin/master)"
+          if [[ "${TAGGED_SHA}" != "${MASTER_SHA}" ]]; then
+            echo "ERROR: Tag '${TAG}' (${TAGGED_SHA}) is not at HEAD of master (${MASTER_SHA})" >&2
+            exit 1
+          fi
+          echo "Tag ${TAG} validated against Cargo.toml and master HEAD"
+
+      - name: Download artifacts (GitHub)
+        if: ${{ contains(github.server_url, 'github.com') }}
+        uses: actions/download-artifact@v4
+        with:
+          pattern: flatroot-linux-*
+          merge-multiple: true
+          path: dist
+
+      - name: Download artifacts (Gitea)
+        if: ${{ !contains(github.server_url, 'github.com') }}
+        uses: christopherhx/gitea-download-artifact@v4
+        with:
+          pattern: flatroot-linux-*
+          merge-multiple: true
+          path: dist
+
+      - name: Generate checksums
+        run: |
+          cd dist
+          chmod +x flatroot-linux-*
+          for bin in flatroot-linux-*; do
+            sha256sum "$bin" > "$bin.sha256sum"
+          done
+
+      - name: Setup platform CLI
+        uses: ./.github/actions/setup-platform-cli
+
+      - name: Create release (GitHub)
+        if: ${{ contains(github.server_url, 'github.com') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete "${GITHUB_REF_NAME}" --yes 2>/dev/null || true
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --notes "Commit: ${GITHUB_SHA}" \
+            dist/*
+
+      - name: Create release (Gitea)
+        if: ${{ !contains(github.server_url, 'github.com') }}
+        run: |
+          tea login add \
+            --name current \
+            --url "${{ env.GITHUB_SERVER_URL }}" \
+            --token "${{ secrets.GITHUB_TOKEN }}"
+          tea release delete \
+            --login current \
+            --repo ${{ github.repository }} \
+            "${GITHUB_REF_NAME}" 2>/dev/null || true
+          tea release create \
+            --login current \
+            --tag "${GITHUB_REF_NAME}" \
+            --repo ${{ github.repository }} \
+            --title "${GITHUB_REF_NAME}" \
+            --note "Commit: ${GITHUB_SHA}"
+          tea release assets create \
+            --login current \
+            --repo ${{ github.repository }} \
+            ${{ github.event.release.tag_name || github.ref_name }} \
+            dist/*

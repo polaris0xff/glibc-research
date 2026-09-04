@@ -1,0 +1,95 @@
+site_name: FlatImage User Documentation
+site_dir: 'site'
+nav:
+  - FlatImage: index.md
+  - How To:
+    - Getting Started:
+      - Download and Run: howto/getting-started/download-and-run.md
+      - Install Applications: howto/getting-started/install-applications.md
+      - Commit Changes: howto/getting-started/commit-changes.md
+      - Run Applications: howto/getting-started/run-application.md
+      - Desktop Integration: howto/getting-started/desktop-integration.md
+    - Configuration:
+      - Environment: howto/configuration/environment.md
+      - Bindings: howto/configuration/bindings.md
+    - Instances:
+      - Multiple Instances: howto/instances/multiple-instances.md
+    - Layers:
+      - External Layer Files: howto/layers/layer-files.md
+      - External Layer Directories: howto/layers/layer-directories.md
+    - Portal:
+      - Commands: howto/portal/commands.md
+  - Examples:
+    - Alpine:
+      - Firefox: examples/alpine/firefox.md
+    - Arch:
+      - Firefox: examples/arch/firefox.md
+      - Steam: examples/arch/steam.md
+    - Blueprint:
+      - Batocera: examples/blueprint/batocera.md
+  - Commands:
+    - fim-bind: cmd/bind.md
+    - fim-boot: cmd/boot.md
+    - fim-casefold: cmd/casefold.md
+    - fim-desktop: cmd/desktop.md
+    - fim-env: cmd/env.md
+    - fim-exec: cmd/exec.md
+    - fim-instance: cmd/instance.md
+    - fim-layer: cmd/layer.md
+    - fim-overlay: cmd/overlay.md
+    - fim-notify: cmd/notify.md
+    - fim-perms: cmd/perms.md
+    - fim-recipe: cmd/recipe.md
+    - fim-remote: cmd/remote.md
+    - fim-root: cmd/root.md
+    - fim-unshare: cmd/unshare.md
+    - fim-version: cmd/version.md
+  - Configuration:
+    - User Identity: configuration/user-identity.md
+    - Prompt: configuration/prompt.md
+    - Compression: configuration/compression.md
+    - Overlays: configuration/overlays.md
+  - Architecture:
+    - Overview: architecture/overview.md
+    - Boot Sequence: architecture/boot-sequence.md
+    - Directories: architecture/directories.md
+    - Environment: architecture/environment.md
+    - Layers: architecture/layers.md
+    - Filesystem: architecture/filesystem.md
+    - Portal: architecture/portal.md
+    - Process: architecture/process.md
+    - Reserved Space: architecture/reserved-space.md
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+         # alternative from pymdonwx
+          #format: !!python/name:pymdownx.superfences.fence_code_format
+          format: !!python/name:mermaid2.fence_mermaid
+theme:
+  logo: icon.svg
+  name: material
+  palette:
+    scheme: default
+    primary: indigo
+extra_css:
+  - stylesheets/extra.css
+plugins:
+  - search
+  - mermaid2
+  - panzoom:
+      key: "shift"
+      hint_location: "bottom"
+      always_show_hint: true
+      mermaid: true
+      full_screen: True
+      include_selectors:
+        - .myClass
+        - "#myId"
+        - ".mermaid"
+        - ".d2"
+      exclude_selectors:
+        - "img"
+site_url: https://flatimage.github.io/docs
+repo_url: https://github.com/flatimage/flatimage

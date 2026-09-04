@@ -1,0 +1,76 @@
+/**
+ * @file bind.hpp
+ * @author Ruan Formigoni
+ * @brief Manages the bindings reserved space
+ *
+ * @copyright Copyright (c) 2025 Ruan Formigoni
+ */
+
+#pragma once
+
+#include <string>
+#include <filesystem>
+
+#include "../std/expected.hpp"
+#include "../macro.hpp"
+#include "reserved.hpp"
+
+/**
+ * @namespace ns_reserved::ns_bind
+ * @brief Bind mount configuration storage in reserved space
+ *
+ * This namespace manages bind mount configurations stored as a JSON string in the binary's
+ * reserved space. It stores mappings between host paths and container
+ * paths, allowing specific directories or files from the host system to be made available
+ * inside the containerized environment. Bind mounts can be read-only or read-write and
+ * are applied at runtime during container initialization.
+ */
+namespace ns_reserved::ns_bind
+{
+
+namespace
+{
+
+namespace fs = std::filesystem;
+
+}
+
+/**
+ * @brief Writes the bindings json string to the target binary
+ *
+ * @param path_file_binary Target binary to write the json string
+ * @param json Json string to write to the target file as binary data
+ * @return Value<void> Nothing on success, or the respective error message
+ */
+inline Value<void> write(fs::path const& path_file_binary, std::string_view const& json)
+{
+  uint64_t space_available = ns_reserved::FIM_RESERVED_OFFSET_BINDINGS_END - ns_reserved::FIM_RESERVED_OFFSET_BINDINGS_BEGIN;
+  uint64_t space_required = json.size();
+  return_if(space_available <= space_required, Error("E::Not enough space to fit json data"));
+  Pop(ns_reserved::write(path_file_binary
+    , FIM_RESERVED_OFFSET_BINDINGS_BEGIN
+    , FIM_RESERVED_OFFSET_BINDINGS_END
+    , json.data()
+    , json.size()
+  ));
+  return {};
+}
+
+/**
+ * @brief Reads the bindings json string from the target binary
+ *
+ * @param path_file_binary Target binary to write the json string
+ * @return On success it returns the read data, or the respective error message
+ */
+inline Value<std::string> read(fs::path const& path_file_binary)
+{
+  uint64_t offset_begin = ns_reserved::FIM_RESERVED_OFFSET_BINDINGS_BEGIN;
+  uint64_t size = ns_reserved::FIM_RESERVED_OFFSET_BINDINGS_END - offset_begin;
+  auto buffer = std::make_unique<char[]>(size);
+  Pop(ns_reserved::read(path_file_binary, offset_begin, buffer.get(), size));
+  return buffer.get();
+}
+
+} // namespace ns_reserved::ns_bind
+
+/* vim: set expandtab fdm=marker ts=2 sw=2 tw=100 et :*/

@@ -1,0 +1,57 @@
+# syntax=docker/dockerfile:1
+
+# Per-arch release build. Takes a pre-built toolchain image, copies the
+# source in, runs `cargo build --release` for the target, and drops the
+# output binary at /out/flatroot-linux-<arch>.
+#
+# Musl targets are statically linked by default (no `+crt-static` needed).
+# Extract the binary with:
+#   docker create --name tmp flatroot-build-release:<arch>
+#   docker cp tmp:/out/flatroot-linux-<arch> ./dist/
+#   docker rm tmp
+#
+# Build args:
+#   ARCH   — the short arch name (e.g. aarch64). Used to pick the
+#            toolchain image tag and to name the output binary.
+#   TARGET — the Rust target triple. Passed to `cargo build --target`.
+
+ARG ARCH
+FROM flatroot-build-toolchain:${ARCH}
+
+ARG TARGET
+ARG ARCH
+
+COPY . /workspace
+WORKDIR /workspace
+
+# `+crt-static` forces static libc linkage even on targets whose Rust spec
+# sets `crt-static-default: false` (e.g. riscv64gc-unknown-linux-musl).
+# `relocation-model=static` suppresses PIE code generation so every target
+# produces a plain `statically linked` ELF (not `static-pie`). Plain static
+# binaries are what UPX can reliably compress, and the linkage semantics
+# are otherwise identical — no runtime overhead, same arch correctness.
+RUN RUSTFLAGS="-C target-feature=+crt-static -C relocation-model=static" \
+      cargo build --release --target ${TARGET}
+
+# Assert static linkage before publishing the artifact. Any runtime .so
+# dependency, or any libnss/libresolv reference (which would indicate a
+# glibc dynamic-lookup path leaked in), fails the build.
+RUN set -eu; \
+    bin="target/${TARGET}/release/flatroot"; \
+    echo "--- readelf --file-header ---"; \
+    readelf --file-header "$bin" | grep -E "Class|Type|Machine"; \
+    NEEDED=$(readelf -d "$bin" 2>/dev/null | grep -c NEEDED || true); \
+    echo "--- NEEDED entries: ${NEEDED} ---"; \
+    if [ "$NEEDED" -ne 0 ]; then \
+      echo "FAIL: binary has ${NEEDED} runtime .so dependency"; \
+      readelf -d "$bin" | grep NEEDED; \
+      exit 1; \
+    fi; \
+    if strings "$bin" | grep -qE "libnss|libresolv"; then \
+      echo "FAIL: binary references NSS/resolv dynamic-lookup libraries"; \
+      strings "$bin" | grep -E "libnss|libresolv"; \
+      exit 1; \
+    fi; \
+    echo "validation OK"
+
+RUN mkdir -p /out && cp target/${TARGET}/release/flatroot /out/flatroot-linux-${ARCH}

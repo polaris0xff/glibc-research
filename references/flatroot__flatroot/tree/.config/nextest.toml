@@ -1,0 +1,25 @@
+# Nextest configuration for flatroot.
+# Reference: https://nexte.st/docs/configuration/
+
+[profile.default]
+# Show every test outcome (pass/fail/skip), not just failures. The suite
+# has no #[ignore], so the line count in `status-level = "all"` doubles as
+# a sanity check that every test ran.
+status-level = "all"
+# After the run, re-list any test that warned slow so they're visible at
+# the bottom of the log instead of buried mid-stream.
+final-status-level = "slow"
+# Most integration tests are network-bound (mirror fetches, index
+# downloads) and routinely cross 360 seconds. Warn at 360 seconds, never
+# terminate — the slowness is upstream-driven, not test-loop-driven, so
+# killing would just replace a long pass with a flaky failure.
+slow-timeout = { period = "360s" }
+# Retry transient failures with exponential backoff. The integration
+# suite hits live distro mirrors; a brief upstream blip would otherwise
+# fail the run. Tests that pass on retry are reported as FLAKY (not PASS),
+# so flakiness stays visible without killing the run.
+retries = { backoff = "exponential", count = 3, delay = "5s", max-delay = "60s" }
+# Run every test even after a failure. With ~200 tests and many network-
+# bound integration cases, fail-fast would hide later failures behind the
+# first one — slower to diagnose a flaky mirror or a real regression.
+fail-fast = false

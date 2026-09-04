@@ -1,0 +1,114 @@
+/**
+ * @file unionfs.hpp
+ * @author Ruan Formigoni
+ * @brief Manages unionfs filesystems
+ *
+ * @copyright Copyright (c) 2025 Ruan Formigoni
+ */
+
+#pragma once
+
+#include <filesystem>
+#include <unistd.h>
+
+#include "../lib/subprocess.hpp"
+#include "../lib/env.hpp"
+#include "../lib/fuse.hpp"
+#include "../std/filesystem.hpp"
+#include "filesystem.hpp"
+
+namespace
+{
+
+namespace fs = std::filesystem;
+
+} // namespace
+
+/**
+ * @namespace ns_filesystems::ns_unionfs
+ * @brief UnionFS-FUSE overlay filesystem implementation
+ *
+ * Compatible overlay filesystem using unionfs-fuse for layering read-only base mounts with
+ * a writable upper directory. Provides copy-on-write semantics with broader compatibility
+ * than OverlayFS. Suitable for systems where FUSE-OverlayFS is unavailable or when better
+ * compatibility is needed.
+ */
+namespace ns_filesystems::ns_unionfs
+{
+
+class UnionFs final : public ns_filesystem::Filesystem
+{
+  private:
+    fs::path m_path_dir_upper;
+    std::vector<fs::path> m_vec_path_dir_layer;
+  public:
+    UnionFs(pid_t pid_to_die_for
+      , fs::path const& path_dir_mount
+      , fs::path const& path_dir_upper
+      , fs::path const& path_file_log
+      , std::vector<fs::path> const& vec_path_dir_layer
+    );
+    Value<void> mount() override;
+};
+
+/**
+ * @brief Construct a new Union Fs:: Union Fs object
+ *
+ * @param pid_to_die_for Pid the mount process should die with
+ * @param path_dir_mount Path to the mount directory
+ * @param path_dir_upper Upper directory where the changes of overlayfs are stored
+ * @param vec_path_dir_layers Vector of directories to overlay with overlayfs (bottom-up)
+ */
+inline UnionFs::UnionFs(pid_t pid_to_die_for
+    , fs::path const& path_dir_mount
+    , fs::path const& path_dir_upper
+    , fs::path const& path_file_log
+    , std::vector<fs::path> const& vec_path_dir_layer
+  )
+  : ns_filesystem::Filesystem(pid_to_die_for, path_dir_mount, path_file_log)
+  , m_path_dir_upper(path_dir_upper)
+  , m_vec_path_dir_layer(vec_path_dir_layer)
+{
+  this->mount().discard("E::Could not mount unionfs filesystem to '{}'", path_dir_mount);
+}
+
+/**
+ * @brief Mounts the filesystem
+ *
+ * @return Value<void> Nothing on success or the respective error
+ */
+inline Value<void> UnionFs::mount()
+{
+  // Validate directories
+  Pop(ns_fs::create_directories(m_path_dir_upper), "E::Could not create upper directory");
+  Pop(ns_fs::create_directories(m_path_dir_mount), "E::Could not create lower directory");
+  // Find unionfs
+  auto path_file_unionfs = Pop(ns_env::search_path("unionfs"), "E::Could not find unionfs in PATH");
+  // Create string to represent layers argumnet
+  // First layer is the writteable one
+  // Layers are overlayed as top_branch:lower_branch:...:lowest_branch
+  std::string arg_layers=std::format("{}=RW", m_path_dir_upper.string());
+  for (auto&& path_dir_layer : m_vec_path_dir_layer | std::views::reverse)
+  {
+    arg_layers += std::format(":{}=RO", path_dir_layer.string());
+  } // for
+  // Include arguments and spawn process
+  using enum ns_subprocess::Stream;
+  m_child = ns_subprocess::Subprocess(path_file_unionfs)
+    .with_args("-f")
+    .with_args("-o", "cow")
+    .with_args(arg_layers)
+    .with_args(m_path_dir_mount)
+    .with_die_on_pid(m_pid_to_die_for)
+    .with_stdio(ns_subprocess::Stream::Pipe)
+    .with_log_file(m_path_file_log)
+    .spawn();
+  // Wait for mount
+  ns_fuse::wait_fuse(m_path_dir_mount);
+  return {};
+}
+
+
+} // namespace ns_filesystems::ns_unionfs
+
+/* vim: set expandtab fdm=marker ts=2 sw=2 tw=100 et :*/
