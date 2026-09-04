@@ -41,27 +41,38 @@ pipeline.** What is new is that some of those rows have now been **run through
 | ⛔ **Python GUI** | ⛔ **BLOCKED BY OUR TOOLING**, and the closure is not at fault | `64-` arm P |
 | ⛔ **apps with a compiled-in data path** | ⛔ **BLOCKED BY OUR TOOLING** | `64-` arm G |
 
-### ⛔ The two blockers, both ours, both named at a line
+### ⭐ The two blockers were ours, and BOTH ARE CLOSED — T-081
 
-⭐ **Neither is a statement about nix.** In both, the closure fetched
+⭐ **Neither was ever a statement about nix.** In both, the closure fetched
 completely and every library resolved.
 
-1. **A hardcoded absolute store path to a data file.** `galculator` connects to
-   a real X server and then dies on
+1. **A hardcoded absolute store path to a data file.** `galculator` connected
+   to a real X server and then died on
    `Couldn't load /nix/store/<hash>-galculator-2.1.4/share/galculator/ui/main_frame.ui`.
-   ⭐ **That file IS in the bundle**, at `AppDir/share/galculator/ui/`. The
-   bundler sets `XDG_DATA_DIRS` to its own `share`, which serves every
-   application that *looks up* its data and cannot serve one with the path
-   baked into its `.rodata`. ⛔ **T-081's entry names this verbatim** —
-   *"shebang lines, hardcoded paths, .desktop files"*.
-2. **A script entry point.** `meld` — a Python 3 + GTK application — never
-   produces an artefact. `internal/bundle/appimage.go`'s `resolveEntry`
-   oscillates: `bin/meld` is a `makeBinaryWrapper` ELF whose target
-   `bin/.meld-wrapped` is a **Python script**; `ReadWrapper` returns nothing
-   for a script and `elfx.IsELF` is false, so `lastExistingStorePath` scans the
-   script's text and resolves back to `bin/meld`. Five hops, then
-   `no entry point` (`assemble.go:60`). ⚠ **This is the standard nixpkgs shape
-   for a Python application**, not a `meld` quirk.
+   ⭐ **That file was in the bundle all along**, at
+   `AppDir/share/galculator/ui/`. `XDG_DATA_DIRS` points at the bundle's own
+   `share` and serves every application that *looks up* its data; it cannot
+   serve one with the path baked into its `.rodata`.
+   ⭐ **CLOSED by an interposer** loaded through sharun's own `.preload`,
+   rewriting **by exact match against the closure** `pgb` already computes — a
+   path outside that set is reported, never guessed.
+   ⛔ **The route NOT taken, and why, is the first thing
+   [`../design/store-paths.md`](../design/store-paths.md) says**: a same-length
+   rewrite to a fixed `/tmp` path needs no relocation and is unshippable,
+   because the tree it would serve is loadable code and the path is squattable.
+2. **A script entry point.** `meld` — a Python 3 + GTK application — produced
+   no artefact at all. `resolveEntry` oscillated: `bin/meld` is a
+   `makeBinaryWrapper` ELF whose target `bin/.meld-wrapped` is a **Python
+   script**; `ReadWrapper` returned nothing for a script and `elfx.IsELF` was
+   false, so `lastExistingStorePath` scanned the script's text and resolved
+   back to `bin/meld`. Five hops, then `no entry point`. ⚠ **That is the
+   standard nixpkgs shape for a Python application**, not a `meld` quirk.
+   ⭐ **CLOSED by making the entry point a PAIR**: a script resolves to
+   *interpreter + script argument*, laid out as the interpreter under its own
+   name, the script under `shared/script/`, and a **static trampoline** at
+   `shared/bin/<name>` that joins them — sharun execs a static binary directly,
+   so it needs no loader cooperation and drags no host libc in.
+   ⛔ A shebang naming a HOST interpreter is refused rather than adopted.
 
 ### ⛔ How this section corrects itself, and the correction is the point
 
