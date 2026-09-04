@@ -236,6 +236,9 @@ while IFS= read -r line <&3; do
   args=$(printf '%s' "$line" | cut -d'|' -f8)
   [ -n "$ONLY" ] && { case "$id" in $ONLY) ;; *) continue ;; esac; }
   TOTAL=$((TOTAL+1))
+  # every line AFTER this one, so the reclaim step below can ask whether the
+  # closure is still wanted
+  awk -v me="$id" 'seen {print} $0 ~ "^"me"\\|" {seen=1}' "$WORK/corpus.txt" > "$WORK/remaining.txt"
 
   # ⭐ A ROW IS STORED AS FIELDS, NOT AS THE TABLE LINE IT PRINTS.
   #
@@ -266,7 +269,10 @@ while IFS= read -r line <&3; do
   fi
 
   img="$WORK/$id.AppImage"
-  cache="$WORK/${id}cache"
+  # ⭐ THE CACHE IS KEYED ON THE ATTRIBUTE, NOT THE SUBJECT. `vulkan-tools`
+  # supplies both `vulkaninfo` and `vkcube`, and `mesa-demos` both `eglinfo`
+  # and `glxgears`; keying on the id fetched each of those closures twice.
+  cache="$WORK/cache-$(printf '%s' "$attr" | tr '/.' '__')"
   blog="$WORK/build-$id.log"
   if [ ! -s "$img" ]; then
     set -- bundle appimage "$attr" --out "$img" --name "$prog"
@@ -346,10 +352,15 @@ while IFS= read -r line <&3; do
   [ "$pass" = "$rows" ] && [ "$rows" -gt 0 ] && FULL=$((FULL+1))
   [ "$clean" = "$rows" ] && [ "$rows" -gt 0 ] && CLEANALL=$((CLEANALL+1))
 
-  # ⛔ RECLAIM IMMEDIATELY. A cache is ~2.3 GiB; twenty-one of them is more
-  # disk than this machine has, and a run that dies on ENOSPC halfway measures
-  # nothing.
-  rm -rf "$cache" "$img" "$WORK/out.$id."* "$WORK/err.$id."*
+  # ⛔ RECLAIM IMMEDIATELY. A cache is ~2.3 GiB; twenty-six of them is far
+  # more disk than this machine has, and a run that dies on ENOSPC halfway
+  # measures nothing. ⚠ But NOT while a later subject still needs the same
+  # closure — the corpus keeps subjects sharing an attribute adjacent, and
+  # this asks the remaining lines rather than assuming it.
+  rm -f "$img" "$WORK/out.$id."* "$WORK/err.$id."*
+  if ! grep -q "^[^|]*|[^|]*|$attr|" "$WORK/remaining.txt" 2>/dev/null; then
+    rm -rf "$cache"
+  fi
 done 3< "$WORK/corpus.txt"
 
 printf '\n'
