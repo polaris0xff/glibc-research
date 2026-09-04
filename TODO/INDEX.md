@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 66  OPEN 26  DONE 40
+    TOTAL 67  OPEN 27  DONE 40
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 7 | 1 | 6 |
-| P1 | a documented capability does not work, or a flag does nothing | 45 | 15 | 30 |
+| P1 | a documented capability does not work, or a flag does nothing | 46 | 16 | 30 |
 | P2 | worth doing; nothing is wrong without it | 14 | 10 | 4 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -82,6 +82,7 @@ pretending to be one.
 | T-090 | P1 | M | open | research | ⛔ The sandbox rung needs a BED change, not a bundler change |
 | T-091 | P2 | S | open | research | GStreamer needs four variables and a scanner; NOTHING was setting them |
 | T-093 | P2 | M | open | research | "no more Vulkan layers like mangohud" is the one field objection still marked NOT MEASURED |
+| T-094 | P1 | M | open | research | an application that shells out to the HOST loads the host libc, and no path rewriting prevents it |
 | T-092 | P2 | S | open | toolchain | The `.env` names a farm directory the farm may not have created |
 
 ## The argument behind the ordering

@@ -2231,6 +2231,71 @@ an argument and the ledger takes measurements.
 
 ---
 
+## C55 — the corpus's last unexplained row is explained, and my diagnosis of it was wrong
+
+`experiments/65-` had one row that disagreed with itself: **`qt-1`
+`qalculate-qt`, pass 11/11, clean 4/11.** `experiments/107-` measured it —
+**9 pass, 1 fail**, and the failure is the finding.
+
+| check | result |
+|---|---|
+| **Q1** arm A reproduces the corpus | ⭐ **clean on 4 of 11**, window on **11 of 11** |
+| **Q2** `/bin/sh` is dynamic on all eleven | ⭐ **11** |
+| **Q3a** no row leaks a Qt/X11/GL host object | ⭐ **0** |
+| **Q3b** every dirty row spawned a shell | ⭐ **7 of 7** |
+| ⛔ **Q4** arm B (`--with-program dbus-daemon dbus-launch`) is clean on all eleven | ⛔ **4** |
+
+## ⛔ TWO PRE-REGISTERED CLAIMS OF MINE FELL, WHICH IS WHY THEY WERE WRITTEN DOWN
+
+**1. "The four clean rows are the four musl ones, because Alpine ships a STATIC
+busybox."** ⛔ Refuted by `readelf -l` *before the run*: `/bin/sh` is a dynamic
+PIE on **all eleven**, alpine's busybox included (`interpreter
+/lib/ld-musl-x86_64.so.1`). ⭐ The musl/glibc correlation is nonetheless
+**real** — it just has a different cause, below.
+
+**2. "Qt autolaunches a session bus, fails to find `dbus-launch`, and falls
+back through a shell; `--with-program dbus-launch` closes the row."** ⛔ **Arm
+B carries `dbus-daemon` AND `dbus-launch` and is clean on exactly the same four
+rows.** The mechanism was wrong.
+
+## ⭐ THE REAL MECHANISM, OFF THE TRACE
+
+    execve("/bin/sh", ["sh", "-c", "--",
+            "/nix/store/b5c8ki47…-gnuplot-6.0.5/…"])
+
+**`qalculate-qt` probes for GNUPLOT through a shell.** That is the spawn, on
+every environment, in both arms.
+
+⭐ **AND THE musl/glibc SPLIT IS THE SHELL'S FATE, NOT ITS LINKAGE.** On the
+four musl rows the exec never completes — the child goes straight to
+`+++ exited with 127 +++` having loaded **nothing**. On the seven glibc rows
+the shell **runs**, loads the host libc, and only *then* fails to find the
+(untranslated) path.
+
+⭐ **AND THE COUNT TRACKS WHICH SHELL THE ENVIRONMENT SHIPS**, which is the
+clearest evidence that none of it is the bundle's:
+
+| environments | host objects | shell |
+|---|---|---|
+| debian-11, debian-12, ubuntu-20.04 | **1** | `dash` → `libc.so.6` |
+| fedora-42 | **2** | |
+| rockylinux-8, archlinux | **3** | `bash` → `libc.so.6`, `libdl.so.2`, `libtinfo.so.6` |
+| opensuse-leap-15.6 | **4** | |
+
+## ⭐ WHAT THE ROW MEANS
+
+**The bundler is not leaking.** Q3a is zero on every row: no Qt, X11, GL or GTK
+object is ever loaded from the host. The residue is a **host shell the
+application asked for** and the bundle never carried.
+
+⚠ **AND WHAT WOULD ACTUALLY CLOSE IT IS NOT A PATH FIX.** An application that
+shells out to the host loads the host's libc *through that shell*, and no
+amount of path rewriting prevents it — the bundle would have to **carry a
+shell** and be found first. Not implemented, not measured; see
+`TODO/research.md` **T-094**.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

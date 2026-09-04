@@ -835,3 +835,50 @@ Vulkan **loader**, not by the application, so a bundle carrying its own
 have loaded the *bundled* overlay rather than the host's would answer the
 wrong question — so the discriminator is the **path** the layer was opened
 from, read off the trace, plus a control with `VK_LAYER_PATH` unset.
+
+## T-094 — ⛔ an application that shells out to the HOST loads the host's libc, and no path rewriting prevents it
+
+**Source** `experiments/107-`, measured 2026-09-04c
+(`docs/history/corrections.md` **C55**).
+**Category** research · **Priority** P1 · **Effort** M · **Status** open
+
+⭐ **MEASURED, NOT SUPPOSED.** `qalculate-qt` probes for GNUPLOT by spawning a
+shell:
+
+    execve("/bin/sh", ["sh", "-c", "--", "/nix/store/…-gnuplot-6.0.5/…"])
+
+On the seven **glibc** rows that shell runs and loads **1 to 4 host objects** —
+`dash` costs `libc.so.6`, `bash` costs `libc.so.6 libdl.so.2 libtinfo.so.6`.
+On the four **musl** rows the exec never completes (`exited with 127`) and
+costs nothing. ⭐ **That is the whole of `qt-1`'s 4-of-11.**
+
+⛔ **THE INTERPOSER CANNOT REACH IT.** `pgb-storefix.c` rewrites the paths a
+process passes to `open`, `stat`, `execve` and friends. `/bin/sh` is **not** a
+store path, so nothing is rewritten and nothing should be: the application
+genuinely asked for the host's shell.
+
+⚠ **This is a real limit of the delivery format, not a defect in the
+implementation**, and it is the honest counterpart to every "zero host
+objects" row in this tree: *zero host objects holds for what the bundle
+LOADS; an application that SPAWNS a host program is a different question.*
+
+## ⭐ THE ROUTE, AND WHY IT IS NOT OBVIOUSLY RIGHT
+
+The bundle would have to **carry a shell** and be found first — `--with-program
+bash` plus something that makes `/bin/sh` resolve to it. ⛔ Three objections,
+none resolved:
+
+1. `/bin/sh` is an **absolute path**, not a `PATH` lookup, so `PATH` does not
+   help. The interposer *could* map `/bin/sh` to the bundled one — but that is
+   a **policy** change, not a path fix: it would silently replace the host's
+   shell for every `system()` call an application makes.
+2. ⚠ Some spawns *should* reach the host — `xdg-open`, a browser, a desktop
+   portal. A blanket redirect breaks those.
+3. The cost is real: `bash` plus `libtinfo` in every bundle that might shell
+   out.
+
+⭐ **WHAT TO MEASURE FIRST, and it is cheap**: how many of the twenty-six
+corpus subjects spawn a host program at all? The trace already shows it
+(`execve` of a path outside the bundle). ⛔ If it is one subject, this is a
+footnote; if it is ten, it is the next real piece of work. **That count does
+not exist yet.**

@@ -2,7 +2,7 @@
 107 - qalculate-qt's 4-of-11 clean: Qt autolaunches a bus, and execs the host shell
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T17:49:47Z
+date (UTC)   : 2026-09-04T18:00:17Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -19,15 +19,82 @@ evidence     : /home/user/glibc-research/evidence/107-qt-session-bus
   ok    Q0  arm A built (stock, as the corpus built it) = yes
   ok    Q0  ⭐ arm B built (--extra dbus --with-program dbus-daemon dbus-launch) = yes
            arm B programs: programs    qalculate-qt + 2 more
-  FAIL  Q0  ⛔ arm B installed BOTH programs (no 'no such program') = 0
-0, expected 0
-           
+  ok    Q0  ⛔ arm B installed BOTH programs (no 'no such program') = 0
 
 -- the eleven -----------------------------------------------------
   ENVIRONMENT        LIBC   sh dyn  A win     A host    B win     B host
-  alpine-3.22        musl   dynamic no        0         no        0
-           alpine-3.22 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000258008 /* 139 vars
-           alpine-3.22 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001ce008 /* 139 vars
-  alpine-3.20        musl   dynamic no        0         no        0
-           alpine-3.20 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001d8008 /* 139 vars
-           alpine-3.20 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001e2008 /* 139 vars
+  alpine-3.22        musl   dynamic yes       0         yes       0
+           alpine-3.22 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000240008 /* 139 vars
+           alpine-3.22 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001d8008 /* 139 vars
+  alpine-3.20        musl   dynamic yes       0         yes       0
+           alpine-3.20 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001d6008 /* 139 vars
+           alpine-3.20 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc00019e008 /* 139 vars
+  alpine-3.10        musl   dynamic yes       0         yes       0
+           alpine-3.10 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001a0008 /* 139 vars
+           alpine-3.10 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001dc008 /* 139 vars
+  voidlinux-musl     musl   dynamic yes       0         yes       0
+           voidlinux-musl arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001d6008 /* 139 vars
+           voidlinux-musl arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001e0008 /* 139 vars
+  debian-11          glibc  dynamic yes       1         yes       1
+           debian-11 arm A host objects: libc.so.6 
+           debian-11 arm B STILL dirty: libc.so.6 
+           debian-11 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000202008 /* 139 vars
+           debian-11 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001a0008 /* 139 vars
+  debian-12          glibc  dynamic yes       1         yes       1
+           debian-12 arm A host objects: libc.so.6 
+           debian-12 arm B STILL dirty: libc.so.6 
+           debian-12 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0000b2008 /* 139 vars
+           debian-12 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000162008 /* 139 vars
+  ubuntu-20.04       glibc  dynamic yes       1         yes       1
+           ubuntu-20.04 arm A host objects: libc.so.6 
+           ubuntu-20.04 arm B STILL dirty: libc.so.6 
+           ubuntu-20.04 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc00019e008 /* 139 vars
+           ubuntu-20.04 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001ca008 /* 139 vars
+  rockylinux-8       glibc  dynamic yes       3         yes       3
+           rockylinux-8 arm A host objects: libc.so.6 libdl.so.2 libtinfo.so.6 
+           rockylinux-8 arm B STILL dirty: libc.so.6 libdl.so.2 libtinfo.so.6 
+           rockylinux-8 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc00019e008 /* 139 vars
+           rockylinux-8 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc00019e008 /* 139 vars
+  opensuse-leap-15.6 glibc  dynamic yes       4         yes       4
+           opensuse-leap-15.6 arm A host objects: libc.so.6 libdl.so.2 libreadline.so.7 libtinfo.so.6 
+           opensuse-leap-15.6 arm B STILL dirty: libc.so.6 libdl.so.2 libreadline.so.7 libtinfo.so.6 
+           opensuse-leap-15.6 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001d8008 /* 139 vars
+           opensuse-leap-15.6 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000160008 /* 139 vars
+  fedora-42          glibc  dynamic yes       2         yes       2
+           fedora-42 arm A host objects: libc.so.6 libtinfo.so.6 
+           fedora-42 arm B STILL dirty: libc.so.6 libtinfo.so.6 
+           fedora-42 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001a0008 /* 139 vars
+           fedora-42 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000160008 /* 139 vars
+  archlinux-latest   glibc  dynamic yes       3         yes       3
+           archlinux-latest arm A host objects: libc.so.6 libncursesw.so.6 libreadline.so.8 
+           archlinux-latest arm B STILL dirty: libc.so.6 libncursesw.so.6 libreadline.so.8 
+           archlinux-latest arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000240008 /* 139 vars
+           archlinux-latest arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001c0008 /* 139 vars
+
+  ok    Q1  ⭐ arm A reproduces the corpus: clean on 4 of 11 = 4
+  ok    Q1  arm A opens a window on all 11             = 11
+  ok    Q2  ⛔ /bin/sh is DYNAMIC on all 11 (refutes the musl story) = 11
+  ok    Q3a ⛔ no row leaks a Qt/X11/GL host object   = 0
+  ok    Q3b ⭐ every dirty row spawned a shell or launcher = 7
+  FAIL  Q4  ⭐ arm B is clean on all 11               = 4, expected 11
+  ok    Q4  arm B still opens a window on all 11       = 11
+        ⭐ WHAT THE ROW MEANS ONCE THIS IS GREEN. qalculate-qt's 4-of-11 is
+           not the bundle leaking. Qt autolaunches a session bus, cannot find
+           dbus-launch at /sbin or /bin, and falls back through a SHELL the
+           environment supplies -- so the residue belongs to a process the
+           application asked for and the bundle never carried.
+        ⛔ WHICH FOUR ROWS ARE CLEAN IS REPORTED, NOT PREDICTED. The obvious
+           story -- musl ships a static busybox, so the exec costs nothing --
+           is FALSE: readelf says /bin/sh is a dynamic PIE on all eleven,
+           alpine's busybox included. Q2 records that refutation so no
+           later session repeats the guess.
+        ⛔ AND IT IS A BUILD FLAG, NOT A PATCH: --with-program dbus-daemon
+           dbus-launch puts the launcher in the artefact, the shell fallback
+           is never reached, and the row closes at 11/11.
+        ⚠ ONE subject. It explains this row; it does not revalidate the
+           other twenty-five, and it does not say a bundle can never leak.
+
+-- result ----------------------------------------------------
+pass=9 fail=1 skip=0
+VERDICT: the measurement ran and did NOT match expectation.
+--------------------------------------------------------------
