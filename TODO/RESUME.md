@@ -115,14 +115,17 @@ criterion fail *for the right reason*.
                  grammars via HELIX_RUNTIME, so it may never consult the
                  compiled-in path. A fixed mergedFor that left the row at 0
                  would be the useful result.
-        gl-1     ⭐ SOLVED, AND IT IS THE INSTRUMENT. eglinfo RUNS, and the
-                 assertion (llvmpipe|Mesa|softpipe) matches 20 times -- but
-                 it exits 3 headless (and still 3 with XDG_RUNTIME_DIR set),
-                 and 65-'s cli criterion is `exit 0 AND the assertion`.
-                 ⛔ FIX AFTER 65- FINISHES: when a subject carries an
-                 assertion, the ASSERTION is the criterion and the status is
-                 reported; then DELETE the gl-1 row and re-measure.
-                 ⚠ vulkan-1 and media-1 are at risk from the same rule.
+        gl-1     ⭐ SOLVED -- TWO instrument defects, and the second was
+        vulkan-1 hiding behind the first. C34: the cli criterion was
+                 `exit 0 AND the assertion` and eglinfo exits 3 headless.
+                 FIXED -- and gl-1 STILL read 0/11, which forced the real
+                 search. C36: the corpus was `|`-SEPARATED and these two
+                 assertions ALTERNATE, so `cut -d'|' -f6` gave grep an
+                 unmatched `(`, handed --extra the wrong word, and passed
+                 the rest as arguments. Separator is `;` now; both rows
+                 deleted and re-measured. ⭐ Both capabilities WORK, measured
+                 by hand: eglinfo matches its real assertion 30 times, and
+                 vulkaninfo exits 0 with GPU0 = llvmpipe 1.4.354.
         x11-3    xterm 0/11 and it never drew, so C5's host-object
                  prediction is UNEVALUABLE rather than falsified.
         vulkan-1 ⛔ 0/11 AND THE CAPABILITY DEMONSTRABLY WORKS. Run by hand

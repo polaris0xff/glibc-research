@@ -71,29 +71,72 @@ failures are subject-specific and each needs its own reading.
 | row | what is known | ⛔ what is NOT yet known |
 |---|---|---|
 | `xterm` **0/11**, clean **11/11** | ⭐ **C5 predicted it would fail the HOST-OBJECT row and it did not** — it is clean on 11 of 11. ⚠ It also never drew, so the prediction is not so much falsified as **unevaluable**: a subject that does not start its shell never loads the shell's libc | why it does not draw |
-| ⭐ `neovim` **0/11** — **ROOT CAUSE FOUND** | the closure carries **glibc 2.26**. See below | — |
+| ⭐ `neovim` **0/11** — **ROOT CAUSE FOUND, and it is real** | the closure carries **glibc 2.26**; see below | — |
 | `helix` **0/11** | ⚠ a named limitation of the farm, below — ⛔ **not established as the cause** | whether it is the cause |
-| ⭐ `eglinfo` **0/11** — **AN INSTRUMENT DEFECT, NOT A FAILURE** | see below | — |
+| ⭐ `eglinfo` **0/11** — **TWO INSTRUMENT DEFECTS, NOT A FAILURE** | C34 and C36, below | — |
 
-### ⛔ `vulkan-1` reads 0/11 and the capability demonstrably works
+### ⚠ `helix`: a named limit of the store farm, and it is NOT established as the cause
 
-⭐ **Run by hand out of the corpus's own `vulkan-2` artefact** (renamed, the
-`68-` dispatch rule again):
+`helix`'s closure carries **~200 bare `.so` files at a store path's top level**
+— its tree-sitter grammars, `rust.so`, `python.so`, … — and the build says so:
+*"store paths carry top-level entries the bundle does not merge"*.
 
-    vulkaninfo --summary   exit 0, assertion matched, GPU0 = llvmpipe
+⛔ **`mergedFor` maps eight names** (`bin`, `sbin`, `lib`, `lib64`, `lib32`,
+`share`, `etc`, `libexec`) **to somewhere in the bundle. A top-level entry that
+is not one of them has no home**, so `buildStoreFarm` cannot answer a
+compiled-in path naming it, and `fillFarmDir` skips it.
 
-⚠ Reproduced **twice** — without `DISPLAY`, and with `DISPLAY` pointing at a
-real Xvfb bound into the rootfs, which is the corpus's own condition. Both
-exit 0.
+⭐ **The route is short and it is not "add another name to the table"**: those
+grammars *are* in the bundle already — `copyLibraries` takes **every** shared
+object in the closure and flattens it into `lib/`. So a bare top-level `.so`
+could be answered by pointing it at `lib`, which is where its content actually
+went. ⚠ Unmeasured, and it must not be shipped on this reasoning alone: helix
+also finds its grammars through `HELIX_RUNTIME`, so it may never consult the
+compiled-in path at all.
 
-⛔ **So the row is not explained by the C34 exit-status defect, and it is not
-explained at all.** ⚠ The `vulkan-1` artefact was built `--name vulkaninfo` and
-deleted when its row was written; the one on disk is `vulkan-2`, built
-`--name vkcube`, so the two differ in which program the selector defaults to —
-that is the obvious place to look and it has **not** been looked at.
+⛔ **What is NOT established**: that this is why `helix` scores 0 of 11. The
+warning and the failure are two observations of the same subject, and nothing
+has connected them. ⚠ A fixed `mergedFor` that left the row at 0 would be the
+useful result.
 
-⭐ **The Vulkan capability must not be read off that 0.** Delete the row and
-re-measure: `PGB_EXP65_ONLY='vulkan-1'`.
+⚠ **One thing WAS fixed**: the warning called them *"directories"*.
+`topLevelNames` returns files too, and every one of these is a file — the word
+sent a reader looking for the wrong thing.
+
+### ⛔ `eglinfo` and `vulkan-1`: TWO defects, and the second was hiding behind the first
+
+⭐ **Both rows read `0 of 11` on capabilities that work. Neither was a bundler
+failure.**
+
+**The capability, measured by hand** out of the corpus's own artefacts —
+renaming them to reach the program, which is `experiments/68-`'s dispatch rule
+used as a diagnostic:
+
+| | |
+|---|---|
+| `eglinfo`, run **exactly as the corpus runs it** — inside a rootfs, with a real display bound in | a full EGL config table; the real assertion matches **30 times** |
+| `vulkaninfo --summary` | exit **0**; `GPU0 deviceName llvmpipe (LLVM 21.1.8, 256 bits)`, `apiVersion 1.4.354` |
+
+**Defect 1 — the `cli` criterion (C34).** `65-` scored a `cli` subject as
+`exit 0` **AND** the assertion. `eglinfo` exits **3** headless because some EGL
+platform is unavailable — ⚠ and still exits 3 with `XDG_RUNTIME_DIR` set and
+every `error:` line gone, so it is not a bed condition. ⭐ Fixed: when a subject
+names an assertion, **the assertion is the criterion** and a non-zero status is
+**reported** beside it.
+
+⛔ **Defect 2 — the corpus separator (C36), and it only surfaced because
+fixing defect 1 did not move the number.** The corpus was `|`-separated and an
+assertion is a `grep -E` pattern that **alternates**:
+
+| gl-1's field | should be | got |
+|---|---|---|
+| `assert` | `(llvmpipe\|Mesa\|softpipe)` | ⛔ `(llvmpipe` — **`grep: Unmatched (`**, exit 2, can never match |
+| `extras` | `mesa` | ⛔ `Mesa` — the build log said `could not resolve --extra Mesa` |
+| `args` | *(none)* | ⛔ `softpipe)` — passed to the program |
+
+⚠ **The build log had been saying so all along** and nobody read it. ⭐ The
+separator is `;` now, and both rows were **deleted and re-measured** — a row
+from a broken instrument is deleted, never adjusted.
 
 ### ⚠ `helix`: a named limit of the store farm, and it is NOT established as the cause
 
@@ -198,7 +241,7 @@ is `<id> <pass> <rows> <clean> <store paths> <note>`.
 | ⭐ **XCB / X11 client stack** | ⏳ **1 of 3 subjects in.** `xeyes` **11/11**, clean **11/11**, 12 store paths compiled in and 11 resolving — ⭐ a pure Xlib/XCB client with no toolkit above it. `xclock` and `xterm` are still running; ⛔ **`xterm` is pre-registered to FAIL the host-object row** and the reason is the application, not the bundler: its job is to run the user's shell, which is a host program | `65-` `x11-1..3` |
 | **EGL** | ⚠ **offscreen only.** *"The closure produces a working EGL display offscreen"* — `pass=10 fail=0`, every row **`swrast` and surfaceless** | `85-` |
 | **OpenGL driver stack** | ⚠ same. The bundle carries mesa and points libglvnd at itself; the negative control (`--no-gl`) cannot produce a vendor string on any row | `85-` |
-| ⭐ **Vulkan** | ✅ **MEASURED — and on ONE environment, by hand, which is the honest size of the claim.** A bundled `vulkaninfo --summary` out of the `vulkan-tools` closure enumerates a device: `apiVersion 1.4.354`, `deviceName llvmpipe (LLVM 21.1.8, 256 bits)`, `driverName llvmpipe`. Exit **0**, with and without `DISPLAY`. ⛔ **C3's limit stands and is the whole point**: that is a **software rasteriser**, and this says nothing about a real GPU or NVIDIA. ⚠ The corpus's own `vulkan-1` row reads **0/11** and is **unexplained** — see below | by hand, from the `vulkan-2` artefact |
+| ⭐ **Vulkan** | ✅ **MEASURED — and on ONE environment, by hand, which is the honest size of the claim.** A bundled `vulkaninfo --summary` out of the `vulkan-tools` closure enumerates a device: `apiVersion 1.4.354`, `deviceName llvmpipe (LLVM 21.1.8, 256 bits)`, `driverName llvmpipe`. Exit **0**, with and without `DISPLAY`. ⛔ **C3's limit stands and is the whole point**: that is a **software rasteriser**, and this says nothing about a real GPU or NVIDIA. ⚠ Its corpus row read **0/11** for a reason that was **the corpus file, not the bundle** — C36 below | by hand, from the `vulkan-2` artefact |
 | **NVIDIA** | ⛔ **NOT MEASURED, and not bundled by design.** The driver is taken from the HOST; `design/host-fallback.md` governs it. T-059 owns the hardware | — |
 | **SDL** | ⛔ **NOT RUN through our pipeline.** A hypothesis, graded *Excellent* by the field | §1 |
 | ⭐ **Python GUI** | ✅ **MEASURED, AND IT WORKS.** `meld` — Python 3 + GTK 3 through PyGObject — draws a real toplevel window on **11 of 11** with **zero host shared objects**, on eleven distributions of which four ship no glibc and none ship Python or GTK. ⛔ It produced **no artefact at all** before T-081 | `64-` arm P |
