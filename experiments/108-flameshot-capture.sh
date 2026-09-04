@@ -184,22 +184,40 @@ for name in $ENVS; do
   # ⭐ THE BUS AND THE PORTAL ARE STARTED BY THE ARTEFACT, INSIDE THE ROOTFS.
   # `dbus-run-session` is not used: it is not in every closure, and starting
   # the daemon by hand is what proves the bundle carries a working one.
-  arm_run() {  # subject shot-path trace -> prints "<dims-or-none> <nhost>"
-    _sp=$1; _shot=$2; _tr=$3
+  # ⛔ THE OUTPUT FILES ARE PER-ARM. They used to be per-ENVIRONMENT, so arm B
+  # overwrote arm A and the "why did it not capture" note quoted whichever ran
+  # last while naming the other. A note that names the wrong arm is worse than
+  # no note.
+  #
+  # ⛔ AND `--appimage-extract` IS CHECKED RATHER THAN ASSUMED. If it fails, or
+  # uruntime does not honour the flag, `squashfs-root/bin` does not exist, the
+  # bus and the portal never start, and arm B silently BECOMES arm A — an
+  # instrument failure that reads exactly like a capability result. ⭐ The
+  # script prints EXTRACT=yes|no and the caller SKIPS the row when it is no.
+  # ⚠ `cd /tmp` first so `squashfs-root` lands somewhere known: the flag
+  # extracts into the CWD, and the CWD inside `pgb rootfs run` is not this
+  # experiment's to assume.
+  arm_run() {  # subject shot-path trace out-prefix -> "<dims|none> <nhost> <extract>"
+    _sp=$1; _shot=$2; _tr=$3; _op=$4
     strace -f -e trace=openat,open,execve,clone,clone3,vfork -o "$_tr" \
       timeout "$RUN_TIMEOUT" "$REPO_DIR/pgb" rootfs run "$root" \
         --bind /tmp/.X11-unix:/tmp/.X11-unix -- \
         /bin/sh -c "
+          cd /tmp || exit 9
+          rm -rf squashfs-root
           export DISPLAY=$XDISP QT_QPA_PLATFORM=xcb APPIMAGE_EXTRACT_AND_RUN=1
           export XDG_RUNTIME_DIR=/tmp/xdgrt; mkdir -p \$XDG_RUNTIME_DIR
           $_sp --appimage-extract >/dev/null 2>&1 || true
-          D=squashfs-root
+          D=/tmp/squashfs-root
+          if [ -d \$D/bin ]; then echo EXTRACT=yes; else echo EXTRACT=no; fi
           [ -x \$D/bin/dbus-daemon ] && {
             \$D/bin/dbus-daemon --session --print-address --fork \
               > /tmp/busaddr 2>/dev/null || true
             export DBUS_SESSION_BUS_ADDRESS=\$(cat /tmp/busaddr 2>/dev/null)
+            echo BUS=\$DBUS_SESSION_BUS_ADDRESS
           }
           [ -x \$D/bin/xdg-desktop-portal ] && {
+            echo PORTAL=starting
             \$D/bin/xdg-desktop-portal >/tmp/portal.log 2>&1 &
             [ -x \$D/bin/xdg-desktop-portal-gtk ] && \
               \$D/bin/xdg-desktop-portal-gtk >>/tmp/portal.log 2>&1 &
@@ -207,22 +225,35 @@ for name in $ENVS; do
           }
           $_sp full --path $_shot
           echo \"EXIT=\$?\"
-        " >"$WORK/out.$name" 2>"$WORK/err.$name" &
+        " >"$_op.out" 2>"$_op.err" &
     _pid=$!
     wait "$_pid" 2>/dev/null
     reap_in_root "$root"
     _d=$(png_dims "$root$_shot")
     [ -n "$_d" ] && printf '%s ' "$_d" || printf 'none '
-    exp_classify_trace "$_tr" "$_sp" | grep -c '^host ' || true
+    printf '%s ' "$(exp_classify_trace "$_tr" "$_sp" | grep -c '^host ' || true)"
+    sed -n 's/^EXTRACT=//p' "$_op.out" 2>/dev/null | tail -1 | grep -q yes \
+      && printf 'yes' || printf 'no'
   }
 
-  set -- $(arm_run /subjA /tmp/shotA.png "$WORK/tr.A.$name")
-  adim=$1
-  bdim=-; bhost=-
+  set -- $(arm_run /subjA /tmp/shotA.png "$WORK/tr.A.$name" "$WORK/A.$name")
+  adim=$1; aext=$3
+  bdim=-; bhost=-; bext=no
+  # ⛔ A ROW WHOSE ARM A COULD NOT EXTRACT IS NOT A ROW. Nothing below it was
+  # measured: no bus, no portal, no subject.
+  if [ "$aext" != yes ]; then
+    exp_skip "$name" "the artefact did not --appimage-extract; nothing was measured"
+    rm -f "$root/subjA" "$root/subjB"; rows=$((rows-1)); continue
+  fi
   if [ "$bhave" = yes ]; then
-    set -- $(arm_run /subjB /tmp/shotB.png "$WORK/tr.B.$name")
-    bdim=$1; bhost=$2
-    b_rows=$((b_rows+1))
+    set -- $(arm_run /subjB /tmp/shotB.png "$WORK/tr.B.$name" "$WORK/B.$name")
+    bdim=$1; bhost=$2; bext=$3
+    if [ "$bext" = yes ]; then
+      b_rows=$((b_rows+1))
+    else
+      exp_note "$(printf '   ⛔ %s arm B did not extract; NOT counted toward S2' "$name")"
+      bdim=-; bhost=-
+    fi
   fi
   rm -f "$root/subjA" "$root/subjB" "$root/tmp/shotA.png" "$root/tmp/shotB.png"
 
@@ -231,11 +262,12 @@ for name in $ENVS; do
   [ "$bdim" != none ] && [ "$bdim" != - ] && b_cap=$((b_cap+1))
   # ⛔ AND THE REASON IS KEPT WHEN THERE IS NO CAPTURE, or S1/S2 are numbers
   # with nothing behind them.
-  if [ "$bdim" = none ] || [ "$adim" = none ]; then
-    exp_note "$(printf '   %s said: %s' "$name" \
-        "$(grep -aiE 'unable|error|cannot|fail' "$WORK/err.$name" 2>/dev/null \
-           | head -1 | cut -c1-120)")"
-  fi
+  for _a in A B; do
+    _f="$WORK/$_a.$name.err"
+    [ -s "$_f" ] || continue
+    _msg=$(grep -aiE 'unable|error|cannot|fail' "$_f" 2>/dev/null | head -1 | cut -c1-110)
+    [ -n "$_msg" ] && exp_note "$(printf '   %s arm %s: %s' "$name" "$_a" "$_msg")"
+  done
   [ "$rows" = 1 ] && { mv "$WORK/tr.A.$name" "$WORK/keep.tr.A.$name" 2>/dev/null || :
                        mv "$WORK/tr.B.$name" "$WORK/keep.tr.B.$name" 2>/dev/null || :; }
   rm -f "$WORK/tr.A.$name" "$WORK/tr.B.$name"

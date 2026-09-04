@@ -20,3 +20,4 @@ evidence     : /home/user/glibc-research/evidence/101-gtk-locale-prefix
   voidlinux-musl   43     0      0      0      34       1/1      0
   debian-11        43     0      0      0      33       1/1      0
   debian-12        43     0      0      0      34       1/1      0
+  ubuntu-20.04     43     0      0      0      33       1/1      0
