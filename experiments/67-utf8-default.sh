@@ -96,6 +96,17 @@ if command -v musl-gcc >/dev/null 2>&1; then
   fi
 fi
 
+# -- the build host, first ---------------------------------------------------
+#
+# ⛔ WITHOUT THIS ROW NOTHING BELOW MEANS ANYTHING. This machine HAS a compiled
+# C.UTF-8, so if the control still answers a non-UTF-8 codeset with the
+# environment scrubbed, the effect being measured is glibc's DEFAULT and not
+# the absence of locale data on the targets.
+HOST_A=$(env -u LC_ALL -u LC_CTYPE -u LANG -u LANGUAGE "$WORK/csA" 2>/dev/null | awk '{print $1}')
+exp_note "build host, control, env scrubbed: ${HOST_A:-<none>}"
+exp_check "the CONTROL reports a NON-UTF-8 codeset on a host that HAS C.UTF-8" \
+  "$(case "${HOST_A:-}" in UTF-8|utf8|UTF8) echo utf8 ;; *) echo other ;; esac)" other
+
 build_pgb() { # outname [pgb build flags...]
   _o=$1; shift
   _d="$WORK/$_o"; mkdir -p "$_d"; cp "$WORK/cs.c" "$_d/cs.c"
@@ -145,6 +156,9 @@ for name in $(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-imag
 done
 
 printf '\n'
+# ⛔ A RUN THAT MEASURED NOTHING MUST NOT SCORE GREEN: every check below
+# compares a count against $ROWS, and 0 == 0 passes.
+exp_check "environments measured"  "$([ "$ROWS" -gt 0 ] && echo some || echo none)" some
 exp_check "U1  A: a NON-UTF-8 codeset on every row"     "$A_NON" "$ROWS"
 if [ -n "$MUSL" ]; then
   exp_check "U2  M: native musl reports UTF-8"          "$M_UTF" "$MROWS"
