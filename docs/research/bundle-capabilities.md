@@ -50,10 +50,22 @@ must be re-derived with **three applications per category, simple to complex**
 (`experiments/65-`), because one subject measures a subject. ⚠ A row that still
 says *hypothesis* or *not measured* means exactly that.
 
+⭐ **Progress, 2026-09-04b** — `evidence/65-capability-corpus/rows/`, one file
+per subject, and a recorded row is never re-measured:
+
+| category | subjects in | verdict so far |
+|---|---|---|
+| **GTK 3** | ⭐ **3 of 3 — CLOSED** | `galculator`, `mousepad`, `geany`, all **11/11 pass and 11/11 clean** |
+| **X11 / XCB** | 1 of 3 | `xeyes` **11/11 / 11/11** |
+| the other seven categories | 0 | ⏳ running |
+
+⚠ **The count is `ls evidence/65-capability-corpus/rows/*.tsv`**, and each row
+is `<id> <pass> <rows> <clean> <store paths> <note>`.
+
 | capability | status **for our pipeline** | evidence |
 |---|---|---|
-| ⭐ **GTK 3** | ✅ **MEASURED, AND IT WORKS.** `mousepad` AND `galculator` each draw real toplevel windows on a real X server, on 11 of 11, with **zero host shared objects** | `64-` arms X and G |
-| ⭐ **XCB / X11 client stack** | ✅ **MEASURED.** The bundled GTK connects to a real X display on 11 of 11 — both subjects, including the one that then fails for another reason | `64-` |
+| ⭐ **GTK 3** | ✅ **CLOSED, THREE SUBJECTS, SIMPLE → COMPLEX.** `galculator` **11/11**, `mousepad` **11/11**, `geany` **11/11** — each a real toplevel window on a real X server, each with **zero host shared objects on 11 of 11**. ⭐ Store paths compiled in / resolving: 88/85, 104/101, 90/87 | `65-` `gtk3-1..3`; `64-` arms G and X |
+| ⭐ **XCB / X11 client stack** | ⏳ **1 of 3 subjects in.** `xeyes` **11/11**, clean **11/11**, 12 store paths compiled in and 11 resolving — ⭐ a pure Xlib/XCB client with no toolkit above it. `xclock` and `xterm` are still running; ⛔ **`xterm` is pre-registered to FAIL the host-object row** and the reason is the application, not the bundler: its job is to run the user's shell, which is a host program | `65-` `x11-1..3` |
 | **EGL** | ⚠ **offscreen only.** *"The closure produces a working EGL display offscreen"* — `pass=10 fail=0`, every row **`swrast` and surfaceless** | `85-` |
 | **OpenGL driver stack** | ⚠ same. The bundle carries mesa and points libglvnd at itself; the negative control (`--no-gl`) cannot produce a vendor string on any row | `85-` |
 | **Vulkan** | ⛔ **NOT MEASURED. NOT CLAIMED.** The ICD mechanism is relocatable by design (§1) and the bundler writes `VK_DRIVER_FILES`, but no Vulkan call has been made here | — |
