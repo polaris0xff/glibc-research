@@ -100,10 +100,17 @@ case "$ONLY" in *P*)
   # ⭐ THE PLANTED STORE PATH. It does NOT exist on this machine -- that is the
   # point. The only way a probe reads the file is if something rewrote the
   # path to the AppDir's own copy.
-  FAKE="/nix/store/00000000000000000000000000000000-data-1.0"
+  # ⛔ THE MAP'S TWO FIELDS ARE NOT WHAT THEY LOOK LIKE, and the first version
+  # of this file got both wrong. `internal/bundle/storefix.go` writes
+  # StoreMapEntry{Base, Dir} where Base is the BARE "<hash>-<name>" with no
+  # /nix/store/ prefix, and Dir is AppDir-RELATIVE ("store/<name>"). `fix()`
+  # strips the prefix before matching and then joins appdir + "/" + Dir + rest.
+  # Writing the full path and an absolute directory made every lookup a miss:
+  # ⭐ S1 caught it, which is the entire reason S1 is checked before S2 and S3.
+  FAKE_BASE="00000000000000000000000000000000-data-1.0"
+  FAKE="/nix/store/$FAKE_BASE"
   printf 'the-real-payload\n' > "$AD/store/data-1.0/hello.txt"
-  # <base><TAB><dir>, the format load_map() parses.
-  printf '%s\t%s\n' "$FAKE" "$AD/store/data-1.0" > "$AD/.storemap"
+  printf '%s\t%s\n' "$FAKE_BASE" "store/data-1.0" > "$AD/.storemap"
 
   SFX="$REPO_DIR/tool/runtime/pgb-storefix.c"
   [ -f "$SFX" ] || { exp_note "missing $SFX"; exit 2; }

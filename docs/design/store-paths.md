@@ -138,15 +138,42 @@ untouched.
 | modifies the application binary | **no** | yes |
 | handles a path **assembled at run time** from a shorter compiled-in prefix | **yes** | only if the prefix itself is a literal |
 | handles a store path inside a **script** or a data file | yes — and those are rewritten at build time as well | no |
-| works for a **static** binary, or one issuing raw syscalls | ⛔ **no** | yes |
+| works for a **STATIC** binary | ⛔ **no — measured** | yes |
+| works for one issuing **RAW SYSCALLS** | ⛔ **no — measured, and for a different reason** | yes |
 
-⛔ **The last row is the boundary and it is NOT MEASURED.** No subject in
-`experiments/64-` or `65-` is statically linked or issues raw syscalls, so this
-row is reasoning about a mechanism rather than a result. ⚠ What WOULD measure
-it: a Go program out of the closure, bundled and run with a store path
-compiled in — `pgb`'s own binary is exactly that shape. Until somebody runs
-it, the honest statement is that the interposer has no PLT to win there and
-that nothing has confirmed the consequence.
+## ⭐ The last row was NOT MEASURED, and measuring it split it in two
+
+⛔ **It was one row and it is two mechanisms.** `experiments/100-` arm P puts
+a planted store path — one that does **not** exist on this machine — behind the
+real interposer and a real `.storemap`, and runs the *same source* three ways.
+**Two runs, identical:**
+
+| probe | our object mapped in it | resolves the path |
+|---|---|---|
+| ⭐ dynamic, `fopen` through the PLT — **the positive control** | **yes** | ✅ **yes** |
+| ⛔ the same source built `-static` | **no** | ⛔ no |
+| ⛔ the same source calling `syscall(SYS_openat, …)` | **yes** | ⛔ no |
+| ⭐ dynamic with **no preload** — the negative control | no | ⛔ no |
+
+⭐ **So the two halves of the old row fail for different reasons, and only one
+of them is about linking.** A static payload defeats the interposer because
+there is no loader, so `LD_PRELOAD` never happens and **nothing of ours is in
+the process**. A raw-syscall payload defeats it **with our object loaded** —
+the call simply leaves through a path the PLT entry we replaced never sees.
+⛔ A subject can therefore be perfectly dynamic and still defeat this
+mechanism, which the single row could not say.
+
+⚠ **The `MAPPED` column is what makes that a finding rather than a story.**
+Both failing probes otherwise report the same thing — "it did not work" — and
+the two causes would be indistinguishable without asking each process whether
+`libpgb-storefix.so` is in its own `/proc/self/maps`.
+
+⛔ **What is still not measured, stated rather than left to be assumed**: a
+*real* application of either shape. A Go binary out of the closure is usually
+**both** at once, and a store path in its `.rodata` does not mean it ever opens
+one — so its passing or failing is not evidence either way about the rows
+above. That is `experiments/100-` arm G, and it is why arm G is reported and
+**not predicted**.
 
 ## 4. ⛔ What the interposer does NOT cover
 

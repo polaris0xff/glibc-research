@@ -79,7 +79,31 @@ is reasoning.
 build **reports** the compiled-in path and the program cannot resolve it. If it
 passes, the reasoning was wrong and the record says so.
 
-**Study.** `docs/design/store-paths.md` §3 and §4.
+⭐ **THE MECHANISM HALF IS NOW MEASURED — `experiments/100-` arm P, two runs
+identical — AND IT SPLIT THE ROW IN TWO.** A planted store path that does not
+exist on this machine, behind the real interposer and a real `.storemap`, with
+the *same source* built three ways:
+
+| probe | our object mapped in it | resolves |
+|---|---|---|
+| ⭐ dynamic through the PLT — **the positive control** | yes | ✅ **yes** |
+| ⛔ `-static` | **no** | ⛔ no |
+| ⛔ `syscall(SYS_openat, …)` | **yes** | ⛔ no |
+| ⭐ dynamic, no preload — the negative control | no | ⛔ no |
+
+⭐ **The two shapes fail for different reasons and only one is about linking**:
+static because there is no loader and **nothing of ours is in the process**;
+raw-syscall **with our object loaded**. So a subject can be fully dynamic and
+still defeat the interposer. ⚠ The positive control is what makes this a
+result — the first version of the harness wrote the `.storemap` in the wrong
+format, every lookup missed, and both predicted failures "passed" for entirely
+the wrong reason.
+
+⛔ **What is still open is the application half**, and it is arm G: a real Go
+subject is usually *both* shapes at once, and a store path in its `.rodata`
+does not mean it ever opens one. Its result is **reported, not predicted**.
+
+**Study.** `docs/design/store-paths.md` §3 and §4; `experiments/100-` arm P.
 
 ### Rung 3 · GTK's hardcoded prefix. ⭐ THE FIELD'S OWN "GARBAGE" ROW, AND OUR INTERPOSER IS THE ANSWER
 
