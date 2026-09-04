@@ -97,6 +97,29 @@ criterion fail *for the right reason*.
     different answer; either give an environment a real locale, or measure
     the mechanism the way `64-` arms G/N do (does the app DRAW).
 
+## ⭐ A PRE-REGISTERED PREDICTION FOR THE NEXT PASS — write the result down
+
+⛔ **Committed before the run that settles it.** Every corpus row at **11/11**
+is a subject whose entry point is a **plain ELF**. Of the zeros, four —
+`xterm`, `pdfarranger`, `virt-manager`, `neovim` — have a **script or
+shell-wrapper** entry point.
+
+⭐ **C37 fixed one of those** (`xterm`, which now draws in 2 s) by installing
+the dot-named wrapper target and pointing the farm's `bin` at the sharun
+hardlinks. ⛔ **The fix is NOT in `./pgb`** — it was not rebuilt while the
+corpus ran.
+
+| after `make`, re-measured | predicted |
+|---|---|
+| `x11-3` `xterm` | ⭐ **passes** — measured by hand at 1 window in 2 s |
+| `py-2` `pdfarranger` | ⚠ **still fails.** It dies with a Python **Traceback**, so it STARTED — C37's exec failure is not its problem |
+| `py-3` `virt-manager` | ⛔ **not predicted.** Nobody has read its error |
+| `field-2` `neovim` | ⛔ **still fails**, and not ours: the closure carries **glibc 2.26**, and `ld.so` learned `--argv0` in 2.33 |
+
+⚠ **If `pdfarranger` passes, the script-entry class was broken in a way C37
+describes and this table did not** — the more interesting outcome, which is
+why it is written down rather than left as an expectation.
+
     ⛔ FOUR NAMED UNKNOWNS THE CORPUS HAS ALREADY PRODUCED, each with its
     reproduction (`PGB_EXP65_ONLY='<id>'`):
         field-2  ⭐ SOLVED. The closure carries glibc 2.26; sharun passes
