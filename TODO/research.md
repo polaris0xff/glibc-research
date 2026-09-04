@@ -569,5 +569,31 @@ built without these variables.
 ⛔ **AND `media-1` AS THE CORPUS DEFINES IT CANNOT BE THAT ROW.** Its argument
 is `--version`, which never launches the scanner, so its host-object count
 cannot discriminate — the row would be green and mean nothing. ⚠ Fixing C39's
-assertion makes `media-1` a valid *corpus* row; it does not make it T-091's.
-This entry needs a subject that **decodes something**.
+assertion made `media-1` a valid *corpus* row — **11/11 pass, 11/11 clean,
+2026-09-04c** — and it did **not** make it T-091's.
+
+## ⭐ THE ROW IS WRITTEN AND PRE-REGISTERED — `experiments/103-`, 2026-09-04c
+
+⛔ **Committed before it runs**, delivery rule 1, and it answers the three
+questions `media-1` cannot:
+
+| | |
+|---|---|
+| **does it DECODE?** | a real round trip inside each rootfs: `audiotestsrc → vorbisenc → oggmux → file`, then `filesrc → oggdemux → vorbisdec → wavenc → file`. ⭐ The criterion is that the WAV is **larger** than the Ogg it was decoded from, because PCM is bigger than Vorbis — the application's own answer, which no broken bundle prints |
+| ⭐ **which PROCESS does the count describe?** | the same trace classified in **`payload`** and **`tree`** mode side by side, plus whether a `gst-plugin-scanner` `execve` appears at all. ⚠ **Reported, not predicted**: nobody has measured whether the scanner runs inside a bundle here |
+| ⛔ **the negative control** | ⭐ **`--no-plugin-env` is a SHIPPED FLAG**, for the same reason `--no-storefix` is: it builds the same closure with none of `GST_PLUGIN_PATH`, `GST_PLUGIN_SYSTEM_PATH`, `GST_PLUGIN_SYSTEM_PATH_1_0` or `GST_PLUGIN_SCANNER`, and says so in the log |
+
+⛔ **THE CONTROL'S OUTCOME IS NOT PREDICTED EITHER WAY, and both are written
+into the script before the run:**
+
+- the pipeline **fails** → the four variables are load-bearing and T-091's
+  mechanism is measured;
+- the pipeline **works** → ⭐ the variables are **redundant on this subject**,
+  because GStreamer's compiled-in default plugin directory is a `/nix/store`
+  path and `pgb-storefix.c` already answers it. That is a finding about the
+  interposer's reach, not a failure — and it would mean this entry should say
+  so rather than claim a mechanism nothing needed.
+
+⚠ **What it will not measure**: hardware decode. There is no `/dev/dri` here,
+so every codec path is software (the C3 limit again), and one container format
+on one codec pair is not *"media works"*.

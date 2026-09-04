@@ -300,7 +300,10 @@ func (b *Builder) writeEnv() error {
 	// and come out of carryBakedPaths; this one names a PROGRAM, so it is
 	// keyed on installGstScanner having put one in shared/bin -- and it points
 	// at bin/, the sharun hardlink, never at the raw payload beside it.
-	if have("shared/bin/" + gstScannerName) {
+	// ⛔ AND IT IS SUPPRESSED BY THE SAME CONTROL. The other three GStreamer
+	// variables come out of carryBakedPaths, which `--no-plugin-env` empties;
+	// leaving the fourth would make the control a different experiment.
+	if have("shared/bin/"+gstScannerName) && !b.O.NoPluginEnv {
 		add("GST_PLUGIN_SCANNER=${SHARUN_DIR}/bin/%s", gstScannerName)
 	}
 
@@ -431,6 +434,16 @@ func (b *Builder) liftWrapperEnv() []string {
 // only a directory the override table can redirect is carried — the rest are
 // lib/ trees whose objects are already flattened into the bundle's own lib/.
 func (b *Builder) carryBakedPaths() []string {
+	// ⭐ THE NEGATIVE CONTROL, AND IT IS A SHIPPED FLAG. `--no-plugin-env`
+	// builds the same bundle with none of the variables that point a plugin
+	// host at the bundled plugin tree. T-091 needs it for the same reason
+	// T-081 needed `--no-storefix`: a criterion that cannot be made to fail
+	// is not an instrument. ⚠ It says so in the log rather than silently
+	// producing a different artefact.
+	if b.O.NoPluginEnv {
+		logx.Say("plugin env  ⛔ SUPPRESSED (--no-plugin-env): the negative control")
+		return nil
+	}
 	logx.Say("scanning the packed binaries for compiled-in store paths")
 	files := []string{}
 	if entries, err := os.ReadDir(filepath.Join(b.AppDir, "shared", "bin")); err == nil {

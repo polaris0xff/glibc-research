@@ -89,7 +89,13 @@ type AppImageOptions struct {
 	// a comment: a criterion that cannot be made to fail is not an
 	// instrument. storefix.go, and PROGRESS.md delivery rule 6.
 	NoStorefix bool
-	Cache      string
+	// NoPluginEnv builds without the variables that point a plugin host at
+	// the bundled plugin tree — GStreamer's four, MLT's, frei0r, LADSPA, babl,
+	// GEGL. ⭐ It is the NEGATIVE CONTROL for T-091, and it is a shipped flag
+	// for the same reason `--no-storefix` is: a criterion that cannot be made
+	// to fail is not an instrument. sharun.go `bakedOverride`.
+	NoPluginEnv bool
+	Cache       string
 }
 
 // Builder assembles one AppImage.

@@ -239,6 +239,10 @@ func bundleAppImage(c *cfg.Config, args []string) error {
 			// ⭐ The negative control for T-081: the same bundle without the
 			// mechanism that resolves a compiled-in /nix/store path.
 			o.NoStorefix = true
+		case "--no-plugin-env":
+			// ⭐ The negative control for T-091: the same bundle without the
+			// variables that point a plugin host at the bundled plugin tree.
+			o.NoPluginEnv = true
 		case "--keep":
 			// accepted: the AppDir is always kept
 		default:
