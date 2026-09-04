@@ -187,26 +187,54 @@ NENV=$(printf '%s\n' "$ENVS" | wc -l | tr -d ' ')
 # ⭐ Anchoring on what the path is NOT survives a change of delivery mode: a
 # catalogue under the bundle is one that is neither the host's nor an
 # unrewritten store path.
-mo_opened() {   # trace -> .mo opens that SUCCEEDED and were NOT on the host
+# ⛔ AND IT MUST BE A **READ**, WHICH THE FIRST VERSION DID NOT REQUIRE. The
+# artefact EXTRACTS itself before it runs, and extracting writes every
+# catalogue it carries — `openat(..., O_WRONLY|O_CREAT) = 3` under the
+# extraction directory is a successful open of a `.mo` that is not on the host
+# and not an unrewritten store path, so it satisfied every clause above. ⚠ A
+# run whose subject never called gettext at all could therefore report exactly
+# as many catalogues as the bundle contains. `O_RDONLY` is what a reader does.
+mo_opened() {   # trace -> .mo opens READ successfully, NOT on the host
   grep -aE 'openat\(.*\.mo"' "$1" 2>/dev/null \
+    | grep -avE 'O_WRONLY|O_RDWR|O_CREAT' \
     | grep -avE '= -1' \
     | grep -aE '= [0-9]+' \
     | grep -avE '"(/usr/|/nix/store/|/etc/)' \
     | grep -ac . || true
 }
+# ⛔ THE HOST'S OWN CATALOGUES, WHICH THE FILTER ABOVE SILENTLY DROPS. debian-11
+# ships 15 German catalogues under /usr/share/locale/de, fedora-42 ships 33, and
+# an arm that read those would report the same 0 as an arm that read nothing.
+# ⭐ Same class as corrections.md C49 — "not under a known-bad prefix" used as a
+# proxy for "under the bundle" — but for DATA rather than shared objects, which
+# is why the host-object count cannot see it.
+mo_host() {     # trace -> .mo READS that succeeded under /usr
+  grep -aE 'openat\(.*"/usr/[^"]*\.mo"' "$1" 2>/dev/null \
+    | grep -avE 'O_WRONLY|O_RDWR|O_CREAT' \
+    | grep -avE '= -1' | grep -aE '= [0-9]+' | grep -ac . || true
+}
 mo_attempted() {  # trace prefix -> .mo opens naming that prefix, success or not
   grep -acE "openat\(.*\"$2[^\"]*\.mo\"" "$1" 2>/dev/null || true
 }
+# ⭐ THE CONTROL'S POSITIVE OBSERVATION, AT THE LAYER WHERE IT HAPPENS. L2 used
+# to demand the control be seen attempting an unrewritten `/nix/store/....mo`.
+# ⛔ MEASURED, IT NEVER IS: without the interposer the run fails FURTHER UP —
+# 33 of its 34 `/nix/store` opens fail, eight of them glibc's own locale data —
+# so gettext is never reached and no catalogue path is ever built. Requiring a
+# syscall the mechanism prevents is a criterion that cannot fire (C48, C50).
+store_failed() {  # trace -> unrewritten /nix/store opens that FAILED
+  grep -aE 'openat\(.*"/nix/store' "$1" 2>/dev/null | grep -ac '= -1' || true
+}
 
-printf '\n  %-16s %-8s %-8s %-9s %-8s %s\n' \
-  ENVIRONMENT 'T .mo' 'N .mo' 'N /nix' 'WINDOWS' 'T host .so'
+printf '\n  %-16s %-6s %-6s %-6s %-6s %-8s %-8s %s\n' \
+  ENVIRONMENT 'T .mo' 'N .mo' 'Thost' 'Nhost' 'N failed' 'WINDOWS' 'T host .so'
 
-okT=0; okN=0; winBoth=0; cleanT=0; rows=0
+okT=0; okN=0; winBoth=0; cleanT=0; rows=0; hostmo=0
 for name in $ENVS; do
   root=$(exp_rootfs "$name") || true
   [ -n "$root" ] || { exp_skip "$name" "rootfs not fetched"; continue; }
   rows=$((rows+1))
-  tmoT=0; tmoN=0; wT=0; wN=0; nhost=0
+  tmoT=0; tmoN=0; wT=0; wN=0; nhost=0; thost=0; nhostmo=0; nfail=0; nstore=0
   for arm in T N; do
     img=$IMG_T; [ "$arm" = N ] && img=$IMG_N
     _q=0; while [ "$_q" -lt 10 ] && [ "$(windows_real)" != 0 ]; do sleep 1; _q=$((_q+1)); done
@@ -229,40 +257,59 @@ for name in $ENVS; do
     wait "$_sp" 2>/dev/null
     # ⚠ reap BEFORE reading the trace: delivery rule 7.
     reap_in_root "$root"; rm -f "$root/subj101"
+    # ⛔ AND THE FIRST ENVIRONMENT'S TRACES ARE KEPT. This experiment deleted
+    # every trace it took, so the one question its own zeros raised — WHAT did
+    # the control do instead? — could not be answered without re-running the
+    # whole thing. ⚠ One pair is ~6 MiB; eleven pairs is not affordable here.
+    [ "$rows" = 1 ] && cp "$tr" "$WORK/keep.tr.$arm.$name" 2>/dev/null
     got=0; [ "$win" -gt "$base" ] && got=1
     if [ "$arm" = T ]; then
       # ⭐ the catalogue must be opened under the BUNDLE, not merely opened.
       tmoT=$(mo_opened "$tr"); wT=$got
+      thost=$(mo_host "$tr")
       nhost=$(exp_classify_trace "$tr" /subj101 | grep -c '^host ' || true)
     else
       tmoN=$(mo_opened "$tr"); wN=$got
-      # ⭐ L2's SECOND HALF, and the first version of this file computed it and
-      # never read it. "Opened nothing under the bundle" is also what a control
-      # that never started reports, so the control has to be seen ATTEMPTING
-      # the unrewritten /nix/store path -- a positive observation, not an
-      # absence. Delivery rule 4.
+      # ⛔ L2's SECOND HALF, AT THE LAYER WHERE THE MECHANISM ACTUALLY ACTS.
+      # This asked for a `.mo` open naming an unrewritten /nix/store path, and
+      # MEASURED, the control never makes one: without the interposer it fails
+      # FURTHER UP -- nearly every /nix/store open it attempts returns ENOENT,
+      # glibc's own locale data among them -- so gettext is never reached and
+      # no catalogue path is ever built. ⭐ A positive observation is still
+      # required (delivery rule 4); it is now "tried an unrewritten store path
+      # and was refused", which is the mechanism itself.
+      # ⚠ nstore is kept and REPORTED rather than checked: if a control ever
+      # does reach a catalogue path, that is worth seeing, not silently zero.
       nstore=$(mo_attempted "$tr" "/nix/store")
+      nfail=$(store_failed "$tr")
+      # ⭐ AND THE CONTROL'S HOST READS MATTER MORE THAN THE SUBJECT'S. If the
+      # control still finds catalogues on the HOST, then "it opened none under
+      # the bundle" is not the interposer's doing at all -- it fell back.
+      nhostmo=$(mo_host "$tr")
     fi
     rm -f "$tr"
   done
-  printf '  %-16s %-8s %-8s %-9s %-8s %s\n' \
-    "$name" "$tmoT" "$tmoN" "$nstore" "$wT/$wN" "$nhost"
+  printf '  %-16s %-6s %-6s %-6s %-6s %-8s %-8s %s\n' \
+    "$name" "$tmoT" "$tmoN" "$thost" "$nhostmo" "$nfail" "$wT/$wN" "$nhost"
+  [ "$nstore" != 0 ] && exp_note "$(printf '   %s control DID name a /nix/store catalogue path %s time(s)' "$name" "$nstore")"
   [ "$tmoT" -gt 0 ] && okT=$((okT+1))
   # ⛔ THREE CONDITIONS, AND THE FIRST VERSION HAD ONE. A control scores only
   # when it opened nothing under the bundle AND was seen trying /nix/store AND
   # actually drew -- otherwise a control that died at startup passes, which is
   # corrections.md C29's third defect wearing different clothes.
-  [ "$tmoN" = 0 ] && [ "$nstore" -gt 0 ] && [ "$wN" = 1 ] && okN=$((okN+1))
+  [ "$tmoN" = 0 ] && [ "$nfail" -gt 0 ] && [ "$wN" = 1 ] && okN=$((okN+1))
   [ "$wT" = 1 ] && [ "$wN" = 1 ] && winBoth=$((winBoth+1))
   # ⛔ Same rule as arm N above and as experiments/68- E11: zero host objects
   # is also what a subject that never started reports, so the row must have
   # DRAWN before its cleanliness counts for anything.
   [ "$wT" = 1 ] && [ "$nhost" = 0 ] && cleanT=$((cleanT+1))
+  { [ "$thost" != 0 ] || [ "$nhostmo" != 0 ]; } && hostmo=$((hostmo+1))
 done
 
 printf '\n'
 exp_check "L1  ⭐ arm T opens a catalogue INSIDE the bundle" "$okT" "$rows"
-exp_check "L2  ⭐ CONTROL: --no-storefix tries /nix/store, opens none" "$okN" "$rows"
+exp_check "L2  ⭐ CONTROL: --no-storefix FAILS on /nix/store, reads none" "$okN" "$rows"
+exp_check "L2b ⛔ NEITHER arm reads the HOST catalogues under /usr" "$hostmo" 0
 exp_check "L3  the window appears in BOTH arms"               "$winBoth" "$rows"
 exp_check "L4  arm T DREW and loaded zero host objects"       "$cleanT" "$rows"
 exp_note "⚠ L5 IS REPORTED, NOT CHECKED: whether a translated string is"

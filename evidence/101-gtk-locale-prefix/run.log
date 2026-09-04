@@ -2,7 +2,7 @@
 101 - rung 3: GTK's compiled-in locale prefix, with and without the interposer
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T15:54:14Z
+date (UTC)   : 2026-09-04T17:04:53Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -13,14 +13,5 @@ evidence     : /home/user/glibc-research/evidence/101-gtk-locale-prefix
 --------------------------------------------------------------
 
 
-  ENVIRONMENT      T .mo    N .mo    N /nix    WINDOWS  T host .so
-  alpine-3.22      43       0        0         1/1      0
-  alpine-3.20      43       0        0         1/1      0
-  alpine-3.10      43       0        0         1/1      0
-  voidlinux-musl   43       0        0         1/1      0
-  debian-11        43       0        0         1/1      0
-  debian-12        43       0        0         1/1      0
-  ubuntu-20.04     43       0        0         1/1      0
-  rockylinux-8     43       0        0         1/1      0
-  opensuse-leap-15.6 43       0        0         1/1      0
-  fedora-42        43       0        0         1/1      0
+  ENVIRONMENT      T .mo  N .mo  Thost  Nhost  N failed WINDOWS  T host .so
+  alpine-3.22      43     0      0      0      33       1/1      0

@@ -2019,6 +2019,105 @@ asking, of each skip, *what would have to be true for this to fire?*
 
 ---
 
+## C51 — `T .mo = 43` is 43 catalogue FILES read, not 43 translations, and the control is what makes it mean anything
+
+⚠ **This entry does not overturn a result. It corrects how one is READ**, and
+it is here because the number came within one step of being reported as
+something it is not.
+
+`experiments/101-` (rung 3's differentiator) reports `T .mo` — catalogues
+opened under the bundle — and every one of the eleven rows reads **43**. ⭐
+Three things about that number invited a wrong reading, and all three were
+chased down against a kept trace rather than argued:
+
+**1. ⛔ 43 is exactly the number of catalogues the bundle carries.** A count
+that equals the file count looks like an enumeration, not a lookup. It is:
+`AppDir/share/locale/de/LC_MESSAGES/` holds exactly 43 `.mo` files and all 43
+are read.
+
+**2. ⛔ The domains do not match the application.** Among the 43 are `acl.mo`,
+`elfutils.mo`, `gdbm.mo`, `attr.mo` and `aspell.mo`. **No GTK text editor binds
+those domains.** So "43 catalogues opened" is not "43 translations resolved for
+`mousepad`", and the docs must not say it is.
+
+**3. ⛔ The artefact also WRITES 43 `.mo` files, on both arms.** uruntime
+extracts before it runs, and the extractor creates every catalogue it carries:
+
+    open("share/locale/de/LC_MESSAGES/acl.mo", O_WRONLY|O_CREAT|O_EXCL|…) = 5
+
+⚠ **That write is a RELATIVE path through `open(2)`, not `openat(2)`**, so
+`mo_opened`'s `openat\(.*\.mo"` pattern never saw it — the instrument was
+correct by accident. ⭐ An explicit `O_WRONLY|O_RDWR|O_CREAT` exclusion is now
+in it anyway, because "correct by accident" is not a property to rely on.
+
+## ⭐ AND THE CONTROL IS WHAT SETTLES IT
+
+The worry worth having was the operator's bar: *a criterion must fail for the
+right reason, and must not be something a broken bundle also satisfies.* If
+the 43 were a directory walk, a bundle whose `gettext` was completely broken
+would still show 43. ⭐ **The control answers that directly**, measured on
+`alpine-3.22` with both traces kept:
+
+| | arm T (interposer) | arm N (`--no-storefix`) |
+|---|---|---|
+| trace lines | 244,968 | 72,954 |
+| **`openat` catalogue lookups** | ⭐ **258** | ⛔ **0** |
+| of those, succeeding | 43 | 0 |
+| extraction writes (relative `open`) | 43 | 43 |
+| unrewritten `/nix/store` opens that FAILED | — | ⭐ **33** |
+
+⛔ **Both arms extract identically. Only the subject ever LOOKS UP a
+catalogue.** The difference is not 43 versus 0 files on disk — it is 258
+lookups versus none, from the same artefact with one mechanism switched off.
+That is a one-directional difference the interposer causes, which is what
+rung 3 claims.
+
+⭐ **The correct sentence is therefore**: *with the interposer, the compiled-in
+locale prefix resolves and the catalogues under the bundle are read; without
+it, the process never reaches a catalogue path at all because it fails further
+up, on the store paths themselves.*
+
+---
+
+## C52 — L2 demanded a syscall its own mechanism prevents
+
+`experiments/101-`'s **L2** is the control's positive observation, and it asked
+for the control to be seen **attempting an unrewritten `/nix/store/….mo`**.
+It read **0 of 11** — a red row on every environment.
+
+⛔ **It cannot be anything else.** Measured on the kept traces: without the
+interposer the run fails *above* gettext. Nearly every `/nix/store` path it
+touches returns `ENOENT` — **33 of them on `alpine-3.22`**, glibc's own locale
+data among them — so no catalogue path is ever constructed and the syscall L2
+waits for is never issued.
+
+⚠ **This is the third criterion in this file that could not fire** (C48 the
+locale itself, C50 `102-`'s R1, and now this), and the family is one thing: *a
+criterion written from what the mechanism ought to look like rather than from
+what it does.*
+
+⭐ **THE FIX keeps delivery rule 4 and moves the layer.** A positive
+observation is still required; it is now *"tried an unrewritten store path and
+was refused"* — the mechanism itself — instead of *"tried a catalogue path"*,
+which the mechanism prevents.
+
+⭐ **AND TWO COLUMNS WERE ADDED WHILE THE TRACES WERE OPEN**, both for things
+the instrument had been blind to:
+
+* `Thost` / `Nhost` — catalogues read from the **host** under `/usr`.
+  `mo_opened` excludes `/usr/`, so an arm that fell back to the host's German
+  catalogues would report the same **0** as an arm that read nothing at all.
+  `debian-11` ships 15 of them and `fedora-42` ships 33, so the fallback was
+  available. ⭐ Measured: **0 on both arms** — it does not happen. Same family
+  as **C49**, "not under a known-bad prefix" standing in for "under the
+  bundle", but for DATA, which is why the host-object count cannot see it.
+* ⛔ **The first environment's traces are now KEPT.** This experiment deleted
+  every trace it took, so the one question its own zeros raised — *what did
+  the control do instead?* — could not be answered without re-running all
+  eleven. One pair is ~46 MiB; eleven pairs is not affordable here.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |
