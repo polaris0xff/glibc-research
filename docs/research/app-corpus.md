@@ -217,6 +217,22 @@ problem. ⛔ A distro-built binary with `/usr/share/…` in its `.rodata` is a c
 the farm does not cover, and `flatimage`'s portable root is the shape that
 would.
 
+## ⛔ AND THAT "NIXPKGS COMPILES IN ITS OWN STORE PATH" IS FALSIFIED — TWICE, 2026-09-04c
+
+⚠ **Both counter-examples came out of the corpus and neither was predicted**,
+and they matter because the sentence above is what makes this rung ours:
+
+| subject | the path it asked for | why the interposer cannot reach it |
+|---|---|---|
+| ⭐ `pdfarranger` (`65-` `py-2`) | `/usr/local/share/pdfarranger/pdfarranger.ui` | it is **not compiled in at all** — the program asks **Python** at run time and Python answers `/usr/local`. Re-measured against a `pgb` carrying C41: **still 0/11, same line**, which was pre-registered |
+| ⭐ `dbus-daemon` (out of `flameshot`'s closure) | `/etc/dbus-1/session.conf` | a compiled-in absolute path under `/etc`, put there by nixpkgs' `sysconfdir` |
+
+⭐ **So the honest statement of this rung's reach is narrower than the page
+carried**: `pgb-storefix.c` answers *a compiled-in `/nix/store` path*, and a
+nixpkgs closure contains absolute paths that are **neither** `/nix/store` **nor**
+compiled in. ⛔ Both are the class `flatimage`'s portable root serves and ours
+does not — reached from our own subjects rather than read off theirs.
+
 ⛔ **So this rung is the differentiator, and it should be measured as one**: a
 GNOME app under a non-English `LANG`, asserting a translated string, against the
 same bundle built `--no-storefix`. A window is not enough here — the window
@@ -566,6 +582,7 @@ emulated/dummy stubs for hw gaps."*
 | an unprivileged user namespace | ⭐ **the cause is `chroot`, not the bed** — `experiments/69-`: the same rootfs entered by `pivot_root` permits it. Until that change is taken and its isolation measured, a browser row measures `--no-sandbox`. Rung 5 |
 | ⛔ **a non-C locale** | **0 of 11** environments have one compiled — only `C.UTF-8`, and the three Alpines and Void have nothing at all. So `setlocale` fails, `LC_MESSAGES` stays `C`, and gettext opens no catalogue: rung 3's locale criterion cannot fire. ⚠ Six of the eleven *do* carry `share/locale/de` message catalogues, which is what makes the absence easy to miss |
 | ⛔ **a host program a subject shells out to** | `experiments/100-` arm L: `lilipod` needs `getsubids`, which **2 of 11** carry. Neither static linking nor bundling supplies another program — rungs 2 and 7 |
+| ⛔ **a session DBus** | ⭐ **Measured 2026-09-04c on `flameshot`**: no rootfs here runs a session bus, so a tray or notification application prints `Unable to connect via DBus` and puts up no UI. ⚠ It is **not** a hardware gap and the stub rule does not cover it — ⭐ but the bundle can supply it *itself*: `flameshot`'s own closure carries `dbus-daemon` and `dbus-run-session`, and `--with-program` puts them in the artefact (measured). ⛔ What stops that being a fix is a second compiled-in absolute path: `dbus-daemon` reads `/etc/dbus-1/session.conf`, which is **not** a `/nix/store` path, so the interposer returns it unchanged by construction |
 | a kernel module (`virtualbox`) | the bundle cannot supply one, ever |
 | Wayland-only behaviour | no compositor here; `Xvfb` is X11 |
 | a setuid helper (`newuidmap`) | a bundle cannot ship setuid — rung 7 |

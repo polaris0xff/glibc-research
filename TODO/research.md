@@ -315,9 +315,24 @@ not by an inference: `programs <prog> + N more`.
 
 ⚠ **The entry stays open, and the goalposts are not being moved.**
 
-1. **`--with-program` is NOT exercised.** It is the branch that searches the
-   *whole closure* rather than one `bin/`, and it is the one a helper living
-   in a dependency needs. Nothing has run it.
+1. ⭐ **`--with-program` IS EXERCISED — 2026-09-04c — and it works. ⚠ On ONE
+   environment, by hand, so it is a demonstration and not yet a row.**
+   The subject is `flameshot`, whose own closure carries `dbus-daemon` and
+   `dbus-run-session` in a **dependency** store path — exactly the case this
+   branch exists for, because they are not in the entry's `bin/`:
+
+       pgb bundle appimage flameshot --name flameshot \
+           --with-program dbus-daemon --with-program dbus-run-session
+       →  programs    flameshot + 2 more
+          apprun      pgb-apprun, static, 785704 bytes (no host interpreter)
+
+       ./flameshot.AppImage dbus-daemon --version    (debian-12, in the bed)
+       →  D-Bus Message Bus Daemon 1.16.2
+
+   ⭐ **The assertion discriminates**: `dbus-daemon` prints its OWN identity,
+   so a dispatch that quietly ran the default would print flameshot's banner
+   instead. ⛔ **What is still owed is the eleven** — one environment is a
+   demonstration, and this entry does not count it as the Prove line.
 2. **Two names, not N.** The bundle carried five programs and the run asserted
    two of them. A third name costs one more row and would catch a selector
    that only ever gets the first two right.
