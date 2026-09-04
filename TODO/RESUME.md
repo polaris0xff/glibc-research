@@ -6,16 +6,17 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-04c, at the START, refreshed as each piece lands.
-    TREE           main, began at 2ea02061 (== origin/main at session start)
-    BRANCH         ⛔ main. The harness named
-                   `claude/agents-corpus-work-nk8dj2` and THE OPERATOR SAID
-                   main, again. SIXTH session running.
-    SCOPE          C39 + the harness check that would have caught it, then
-                   finish experiments/65- (T-080), then T-084 step 2,
-                   T-091, the three unexplained rows, T-088, T-089.
-    CI             read after every push.
+    LAST WRITTEN   2026-09-04c, at the END, as the session checkpointed.
+    TREE           main. CI green through the session, read after every push.
+    BRANCH         ⛔ main. The harness names a `claude/*` branch and THE
+                   OPERATOR SAYS main. SEVENTH session running.
     GATES          both green at every commit.
+    STATE          ⭐ The capability corpus is COMPLETE (26/26) and all three
+                   of its unexplained rows are explained. ⛔ The session's
+                   yield was mostly INSTRUMENT defects: eight corrections,
+                   two of which (C49, C54) can move a committed number and
+                   one of which (C56) turned a claim that had never been
+                   measured into a measurement.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
 
@@ -58,156 +59,60 @@ group, so when the harness tore down an unrelated background task the whole
 group went with it — the experiment's parent shell was killed **47 minutes and
 seven rows in**, leaving an orphaned `strace` still writing:
 
-    ⛔ nohup sh scripts/common/run-experiment.sh 101 >/var/tmp/x.log 2>&1 &
-    ⭐ setsid nohup sh scripts/common/run-experiment.sh 101 \
-           >/var/tmp/x.log 2>&1 < /dev/null &
 
-⚠ **And two ways of checking on it are traps of the same family as `pkill -f`**:
-`pgrep -f '101-gtk-locale'` **matches the watching shell's own command line**,
-so a `while pgrep -f …; do sleep; done` waiter never exits; and a waiter that
-looks alive can be watching a **stale log path** while the run writes elsewhere.
-⭐ Check the experiment's own **pid** (`ps -ef | grep '[1]01-'`) and the log's
-**mtime**, not a name match.
+## ⭐⭐ THE WORK LIST, CONCRETE AND IN ORDER
 
-⛔ **AND A RUN THAT LOOKS DEAD MAY ONLY BE BLOCKED.** The same day, `101-`
-appeared dead — no matching process, log stalled for minutes — and was in fact
-waiting on one hung child in `rockylinux-8`. Killing that child let it carry
-on. ⚠ Cleaning up "leftovers" from a run that is merely blocked **destroys its
-in-flight evidence**: deleting `tr.*` mid-row cost four rows and the whole run
-had to be discarded. ⭐ Confirm death by **pid**, and only then clean.
+⛔ **Read `docs/history/corrections.md` C49–C56 before trusting any
+host-object count in this tree.** Two of them change what "clean" means.
 
-It also reports any process in **state D**, which is the `strace`-on-FUSE
-deadlock and cannot be killed. `docs/AGENTS.md` §6 has the rest, including why
-`LD_DEBUG=libs` is the first instrument for a bundle and `strace` the second.
+### 1. ⛔ FINISH WHAT IS IN FLIGHT — these are runs, not investigations
 
-## ⛔ THE INSTRUMENT LESSON THAT COST ELEVEN GREEN ROWS
+| # | what | why it is owed | cost |
+|---|---|---|---|
+| 1 | `sh scripts/common/run-experiment.sh 101` | ⛔ Its committed `RESULT.txt` is a **24-line truncated transcript with NO verdict** — the run was killed at row 8. A clean re-run was started as this was written; if `evidence/STALE-EVIDENCE.txt` still names it TRUNCATED, it did not finish. | ~90 min |
+| 2 | `sh scripts/common/run-experiment.sh 108` | flameshot's capture. **Pre-registered and never run.** The last *Untried* in the record. | ~50 min |
+| 3 | ⛔ `sh scripts/common/run-experiment.sh 65` | **ONE re-run clears TWO pinned debts**: **C49** (the host predicate missed `/usr/bin/ld.so` — the host loader) and **C54** (`clean` counted subjects that never started). Until it runs, every "clean" number in the tree means *clean under the old rules*. ⭐ Use the parallel recipe below. | hours |
+| 4 | `sh poc/run-all.sh --rebuild` | `tool/runtime/pgb-storefix.c` changed (**C53**) and the POC suite has not run since. `./pgb` is rebuilt and carries it. | ~1 h |
+| 5 | `sh scripts/common/run-experiment.sh 105` | pinned stale by the `0\n0` sweep; needs all eleven. | ~20 min |
+| 6 | `sh scripts/common/run-experiment.sh 103` | run 2, owed since T-091, plus the C54 start-guard on D3. | ~30 min |
 
-⛔ **`Gtk-WARNING: cannot open display` IS NOT A RESULT.** `experiments/64-`
-scored a bundle 11 of 11 green on it, reasoning that the message comes from the
-*bundled* libgtk-3 and so proves it loaded. The operator rejected it:
+### 2. ⭐ THE OPEN QUESTIONS, SHARPEST FIRST
 
-> *"previously nixappimage bundled apps showed the same error on real hw with
-> display, confirm it properly by feeding it a fake/emulated display"*
-
-⭐ **The message does not discriminate.** With a real `Xvfb` display and
-`xwininfo` asking the **X server** for a window from outside the process, those
-11 rows became **0**. ⛔ Before trusting any GUI row, ask what would make the
-criterion fail *for the right reason*.
-
-## ⭐ THE LOOP THAT LET THREE ZEROS THROUGH IS NOW CLOSED — read this before writing an assertion
-
-⛔ **Three of this corpus's five zeros were the CRITERION, not the subject**
-(C34, C36, C39), and the pattern in all three is one thing: *a `cli` assertion
-is written from what the program is expected to print and is never checked
-against what it does print.*
-
-⭐ **`experiments/65-` now interrogates its own assertion, on the FIRST
-environment and nowhere else**, and abandons the subject with an **INSTRUMENT**
-row rather than scoring it zero eleven times:
-
-| test | catches | how |
-|---|---|---|
-| does the pattern **compile**? | ⭐ **C36** | `grep -E` exits **2** on a malformed pattern and **1** on a valid one that matched nothing; empty input separates them |
-| did the program print the assertion's **literal prefix** while the pattern missed? | ⭐ **C39** | `assert_anchor` is the leading run before the first regex metacharacter — `mpv v[0-9]` → `mpv `, `(llvmpipe\|Mesa)` → empty |
-
-⛔ **It is deliberately NOT "the assertion matched nothing".** `neovim` really
-does score 0 of 11 — its closure's `ld.so` rejects `--argv0`, so the program
-never runs — and calling that an instrument error would throw a real result
-away. **The anchor is what separates *the program answered and we misread it*
-from *the program never spoke*.** Verified against all five historical cases
-before it was trusted; `docs/history/corrections.md` C39.
-
-⭐ **An INSTRUMENT subject writes NO row**, so it is re-measured once the
-pattern is fixed. **C7** is checked before C1 and C2 and fails the run.
-
-## In flight right now
-
-    ⭐ THE CORPUS IS COMPLETE — 26 of 26, 0 UNRESOLVED, 0 INSTRUMENT, 21
-      passing on all eleven and 24 clean on all eleven — ⛔ but see C54:
-      that 24 counted `neovim`, whose program NEVER STARTED, and the guard
-      (`bundled > 0 AND host == 0`) landed after the run. Nothing about
-      `experiments/65-` is owed. Its remaining non-eleven rows are named in
-      PROGRESS.md and only ONE of them is ours (pdfarranger's /usr/local).
-
-    ⭐ EVERYTHING ELSE THIS SESSION STARTED IS FINISHED, TWO RUNS EACH:
-      90-   T-084's owed re-run. ours 11/11 clean, competitor 4/11 — both
-            committed numbers stand, per-row counts are new.
-      102-  the classifier copies read back out of git. pass=20.
-      103-  T-091. encode AND decode on 11/11, zero host objects in payload
-            and tree, gst-plugin-scanner exec'd 11/11. pass=7.
-      104-  C46. our loader vs ld.so in both scopes. pass=8.
-      105-  file(1) with no MAGIC variable and no custom AppRun. pass=6.
-      106-  the two "unmeasurable" criteria, against a fixture. pass=8.
-      76-   pass=7, the regression suite for C46.
-      93-   887 of 1,532 host objects — C46 moved nothing.
-
-    ⛔ WHAT IS MID-RUN OR OWED AS THIS IS WRITTEN:
-      107-  RUNNING. qalculate-qt's 4-of-11. ⭐ Its own first prediction was
-            refuted before it ran (readelf: /bin/sh is a dynamic PIE on ALL
-            eleven, alpine's busybox included), and its second — that
-            --with-program dbus-launch closes the row — is FAILING on the
-            glibc rows, for a reason the trace names: qalculate-qt spawns
-            GNUPLOT through `/bin/sh -c -- /nix/store/…-gnuplot-6.0.5/…`.
-            ⭐ On musl that exec dies `+++ exited with 127 +++` having loaded
-            nothing; on glibc the shell RUNS and loads the host libc.so.6.
-            That, and not dbus, is the 4-versus-7 split.
-      101-  OWED A CLEAN RE-RUN. Its committed RESULT.txt is a FAIL (L2), and
-            L2 is fixed but unverified end-to-end: the fixed run reached 7 of
-            11 rows — all showing `N failed` 33-34, so L2 fires — and was then
-            lost (see the setsid note above).
-      108-  pre-registered, NOT YET RUN.
-      65-   ⛔ OWES A CORPUS RE-RUN for TWO reasons now, C49 and C54, both
-            pinned. One re-run clears both.
-      POCs  `sh poc/run-all.sh --rebuild` NOT run this session, and
-            tool/runtime/pgb-storefix.c changed (C53). ⚠ `make` is also owed:
-            ./pgb still embeds the pre-C53 interposer.
-
-## ⛔⛔ THE RULING THAT MATTERS MOST TO THE NEXT SESSION
-
-⛔ **Operator, 2026-09-04c** — and it overturned three recorded "limits" in
-one afternoon:
-
-> *"You keep deferring stuff as 'unmeasurable' on this host when you very well
-> could create a script that can create a less 'minimal' image. You will never
-> have access to real hw, so keep stalling and deferring — use fixtures,
-> seams, emulators, dummies whenever a 'real' hardware is required."*
-
-⭐ **`scripts/common/bed-fixtures.sh` is the answer**: `--install`, `--check`,
-`--remove`, `--selftest`. It compiles a `de_DE.UTF-8` locale, installs a GTK +
-icon theme called `PgbFixture`, and writes `/etc/dbus-1/session.conf`.
-
-| what was "not measurable" | now |
+| entry | the question, and what to measure |
 |---|---|
-| a non-C **locale** | ⭐ `setlocale` succeeds **7/7** glibc rows, in effect (`CODESET=UTF-8`, decimal `,`), control fails 7/7 |
-| a host **theme** | ⭐ a bundled GTK app opens the host's `gtk.css` **11/11** when told, **0/11** when not |
-| a session **DBus** | ⭐ the bundle carries `dbus-daemon` (`--with-program`), the bed carries the config file; the connect error is **gone** |
+| ⭐ **T-094** (new, P1) | **An application that shells out to the host loads the host's libc through that shell, and no path rewriting prevents it.** Measured on `qalculate-qt`, which probes for `gnuplot` via `/bin/sh -c --`. ⛔ **Measure this first and it is cheap**: how many of the twenty-six corpus subjects spawn a host program at all? The trace already shows it. If it is one, this is a footnote; if it is ten, it is the next real piece of work. **That count does not exist.** |
+| **T-093** (P2) | The **only** field objection left with no measurement: *"no more Vulkan layers like mangohud"*. A real layer is already in the mesa closure (`VkLayer_MESA_overlay`). ⚠ Runs on the RUNNER host, not the bed — a fixture may not add a shared object. |
+| **T-090** (P1) | The sandbox rung. ⚠ `unshare -U` succeeds on the host and that is **not** the answer; measure it **inside the chroot bed** with `lsns -t user`. |
+| **T-077** (P1) | The head-to-head was measured on the **retired** glibc pin and nobody re-ran it. |
+| **T-059** (P1) | Real GPU. Every GL and Vulkan row here is `llvmpipe`/`lavapipe`. ⭐ Per the operator's fixture ruling, ask what a *seam* could answer before recording it as a limit. |
 
-⛔ **A fixture may add DATA ONLY** — data cannot change a host-shared-object
-count, which is the number every experiment here depends on. The selftest
-asserts it adds no `.so`. ⛔ **Re-install after a bed re-fetch**: `pgb rootfs
-fetch` replaces the rootfs and the fixtures go with it.
+### 3. ⛔ WHAT IS **NOT** OWED, so nobody re-opens it
 
-## ⛔ THE THREE UNEXPLAINED ROWS — ⭐ ALL THREE ARE EXPLAINED NOW
+* **T-080** the corpus — 26/26, six categories closed. Retired.
+* **T-084** the six classifier copies — gone, `102-` reads them back out of git. Retired.
+* **T-088** `--with-program` — was being exercised by `90-` all along (**C45**). Retired.
+* **T-089** the `-static` row — **answered by a refusal**: a fully static closure has no loader, the bundler refuses it, and there is no artefact to ask the question of. The raw binary is already 11/11 with 0 host objects. Retired. ⚠ Only a **mixed** closure would move it, and none is known.
 
-    field-1  helix     ⭐ C43, a real bundler defect and a FOURTH entry-point
-             shape: a wrapper target that is an ABSOLUTE SYMLINK into another
-             store path, resolved by `os.Stat` against the HOST. It failed
-             SILENTLY — exit 255, no output. Now 11/11 pass, 11/11 clean.
-    field-3  flameshot ⭐ NOT the bundler: a tray application with no toplevel
-             by design (its only window is a 3x3 Qt Selection Owner). Its
-             session-bus half is FIXED by the fixture; what remains is that
-             `flameshot full` cannot capture under Xvfb — its closure carries
-             `grim`, which is Wayland-only. ⭐ The route: `--extra
-             xdg-desktop-portal` and a backend, run beside the bus. Untried.
-    field-4  gearlever ⭐ C42 makes it BUILD and C41 gets it past its own
-             Python imports. It now fails on all eleven with one reproducible
-             line — `RuntimeError: could not create new GType:
-             gearlever+preferences+Preferences (subclass of void)`, a
-             libadwaita question NOT established as ours. Clean 11/11.
-    qt-1     qalculate-qt 11/11 PASS but 4/11 CLEAN. ⛔ STILL UNEXPLAINED, and
-             it is the only one left. Which four environments, and which
-             object? The corpus deletes its traces, so this needs a hand run:
-             build the bundle, trace one dirty row, read the host paths.
+## ⛔⛔ THE ONE PATTERN THAT PRODUCED MOST OF THIS SESSION'S FINDINGS
+
+⭐ **A criterion that cannot fire, hidden by a SKIP or by a zero.** It happened
+five times, and no gate could see any of them:
+
+| | what looked fine | what was true |
+|---|---|---|
+| **C48** | rows read 0, "the bed has no locale" | the **artefact** had no catalogues — the build log said `kept: none` on every run |
+| **C50** | `102-` R1 read `skip` | it looked for a trace in the one directory `65-` **deletes** traces from |
+| **C52** | `101-` L2 read 0 of 11 | it demanded a syscall its own mechanism **prevents** |
+| **C54** | `clean 11/11` | the subject **never started**; zero host objects is also what that reports |
+| **C56** | `SKIP arm B` | the archive was in the **build env**, and the experiment looked on the **host** |
+
+⛔ **So: of every SKIP and every zero, ask what would have to be TRUE for this
+to fire.** A skip is not a failure, and neither gate can tell a structural one
+from an environmental one.
+
+⭐ **AND THE HABIT THAT CAUGHT THEM**: keep the trace. `101-` and `107-` now
+retain the first environment's transcripts on purpose, because the question a
+zero raises cannot be answered without them.
 
 ## ⭐ THE CORPUS CAN BE RUN IN PARALLEL, AND THIS IS THE RECIPE
 
@@ -287,6 +192,7 @@ they are not reclaimed by anything:
     FUSE mount from the picture entirely and is why every 65- subject sets
     it. The ordering fix also made every row ~10× faster, which means the
     slow version had been paying the same cost in a milder form all along.
+
 
 ## ⛔ Machine notes (carried forward, re-verify)
 
