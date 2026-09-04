@@ -11,8 +11,10 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
     BRANCH         ⛔ main. The harness names a `claude/*` branch and THE
                    OPERATOR SAYS main. SEVENTH session running.
     GATES          both green at every commit.
-    STATE          ⭐ The capability corpus is COMPLETE (26/26) and all three
-                   of its unexplained rows are explained. ⛔ The session's
+    STATE          ⭐ The capability corpus is COMPLETE (26/26), all three of
+                   its unexplained rows are explained, and `101-` closed
+                   GREEN (pass=5 fail=0, eleven rows) — rung 3's locale
+                   criterion fires at last. ⛔ The session's
                    yield was mostly INSTRUMENT defects: eight corrections,
                    two of which (C49, C54) can move a committed number and
                    one of which (C56) turned a claim that had never been
@@ -69,12 +71,11 @@ host-object count in this tree.** Two of them change what "clean" means.
 
 | # | what | why it is owed | cost |
 |---|---|---|---|
-| 1 | `sh scripts/common/run-experiment.sh 101` | ⛔ Its committed `RESULT.txt` is a **24-line truncated transcript with NO verdict** — the run was killed at row 8. A clean re-run was started as this was written; if `evidence/STALE-EVIDENCE.txt` still names it TRUNCATED, it did not finish. | ~90 min |
-| 2 | `sh scripts/common/run-experiment.sh 108` | flameshot's capture. **Pre-registered and never run.** The last *Untried* in the record. | ~50 min |
-| 3 | ⛔ `sh scripts/common/run-experiment.sh 65` | **ONE re-run clears TWO pinned debts**: **C49** (the host predicate missed `/usr/bin/ld.so` — the host loader) and **C54** (`clean` counted subjects that never started). Until it runs, every "clean" number in the tree means *clean under the old rules*. ⭐ Use the parallel recipe below. | hours |
-| 4 | `sh poc/run-all.sh --rebuild` | `tool/runtime/pgb-storefix.c` changed (**C53**) and the POC suite has not run since. `./pgb` is rebuilt and carries it. | ~1 h |
-| 5 | `sh scripts/common/run-experiment.sh 105` | pinned stale by the `0\n0` sweep; needs all eleven. | ~20 min |
-| 6 | `sh scripts/common/run-experiment.sh 103` | run 2, owed since T-091, plus the C54 start-guard on D3. | ~30 min |
+| 1 | `sh scripts/common/run-experiment.sh 108` | flameshot's capture. **Pre-registered and never run.** The last *Untried* in the record. | ~50 min |
+| 2 | ⛔ `sh scripts/common/run-experiment.sh 65` | **ONE re-run clears TWO pinned debts**: **C49** (the host predicate missed `/usr/bin/ld.so` — the host loader) and **C54** (`clean` counted subjects that never started). Until it runs, every "clean" number in the tree means *clean under the old rules*. ⭐ Use the parallel recipe below. | hours |
+| 3 | `sh poc/run-all.sh --rebuild` | `tool/runtime/pgb-storefix.c` changed (**C53**) and the POC suite has not run since. `./pgb` is rebuilt and carries it. | ~1 h |
+| 4 | `sh scripts/common/run-experiment.sh 105` | pinned stale by the `0\n0` sweep; needs all eleven. | ~20 min |
+| 5 | `sh scripts/common/run-experiment.sh 103` | run 2, owed since T-091, plus the C54 start-guard on D3. | ~30 min |
 
 ### 2. ⭐ THE OPEN QUESTIONS, SHARPEST FIRST
 

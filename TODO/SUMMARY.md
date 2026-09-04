@@ -42,7 +42,7 @@
 | `70-`, `83-` | ⭐ green | re-run rather than pinned after the `0\n0` sweep |
 | `lib.sh --selftest` | ⭐ 14 pass 0 fail | three new rows for `exp_count` |
 | `pgb selftest` | ⭐ 601 pass | with the C53 interposer embedded |
-| `101-` rung 3 | ⛔ **re-run in flight** | its committed `RESULT.txt` is a truncated transcript |
+| `101-` rung 3 | ⭐ `pass=5 fail=0 skip=0` | L1 **11/11**, L2 **11/11** (the fixed criterion fires), L2b **0**, L3 **11/11**, L4 **11/11** |
 | `108-` flameshot capture | ⛔ **pre-registered, never run** | the last *Untried* in the record |
 
 ## ⛔ THE MECHANISM BEHIND THE PATTERN, because a comment is not one

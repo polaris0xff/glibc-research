@@ -153,19 +153,9 @@
 # ⭐ ONE RE-RUN CLEARS BOTH THIS AND THE C49 BLOCK ABOVE.
 65-capability-corpus.sh 88be10cfe4850fd68c2363dc31f555cdd1cc30ab e48d88a811766af65ab50a79d82977a2303d7aac C54: clean now requires bundled>0; the committed 24 counted neovim, which never started
 
-# ⛔ 2026-09-04c — `101-`'s RESULT.txt IS A TRUNCATED TRANSCRIPT, NOT A RESULT.
-#
-# Deep review 5. The committed file is 24 lines: a conditions block, a column
-# header and seven rows, and NO verdict — no `ok`, no `FAIL`, no `pass=`. The
-# run that produced it was killed at row 8 (see TODO/RESUME.md on `setsid`),
-# and `run-experiment.sh` wrote the transcript it had.
-#
-# ⛔ THAT IS WORSE THAN A FAILING RESULT: it has the shape of evidence and
-# makes no claim, so a reader cannot tell it apart from a run that measured
-# nothing. ⚠ Gate 10 cannot see it — the gate compares COMMITS, and a
-# truncated transcript is as recent as a complete one.
-#
-# ⭐ A clean re-run was started the same session. If this line is still here,
-# it did not finish: re-run `sh scripts/common/run-experiment.sh 101` and the
-# line goes with it.
-101-gtk-locale-prefix.sh TRUNCATED TRUNCATED the committed RESULT.txt is a 24-line transcript with no verdict; the run was killed at row 8
+# ⭐ 2026-09-04c — AND THE `101-` TRUNCATED-TRANSCRIPT ENTRY IS GONE, which is
+# the point of this format. The committed RESULT.txt was a 24-line transcript
+# with NO verdict (the run was killed at row 8; see TODO/RESUME.md on setsid).
+# ⛔ That is worse than a failing result: it has the shape of evidence and
+# makes no claim, and gate 10 cannot see it because the gate compares COMMITS.
+# ⭐ The clean re-run finished: pass=5 fail=0 skip=0, eleven rows.
