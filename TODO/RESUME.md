@@ -104,6 +104,43 @@ criterion fail *for the right reason*.
     ⭐ T-084 step 1 now says `mode` goes LAST with a default, not first,
     precisely so that cannot happen.
 
+## ⭐ THE CORPUS CAN BE RUN IN PARALLEL, AND THIS IS THE RECIPE
+
+⭐ **Measured 2026-09-04b: the machine is 99% IDLE while `65-` runs** (load
+0.48 on 4 cores) — it is I/O- and poll-wait-bound, not CPU-bound. So the
+serial ~35 minutes per subject is not a CPU limit and more instances fit.
+
+⛔ **THE ONE REAL COLLISION IS `reap_in_root`, AND IT GOES BOTH WAYS**: it
+kills *every* process chrooted under a rootfs, so two runs sharing a bed
+destroy each other's rows. Give each instance its own of all three:
+
+    PGB_ROOTFS_DIR=/var/lib/pgb-rootfsN   ⭐ `cp -a` the bed: 2.1 GiB, 4 s
+    PGB_EXP65_WORK=/var/tmp/t065X         its own caches and artefacts
+    PGB_EXP65_DISPLAY=:97                 ⛔ never the same display as another
+                                          GUI run — a stray window is a false
+                                          positive nothing else catches
+
+⭐ **And give it a DISJOINT subject set**, because both instances otherwise
+start at the same first-unrecorded subject:
+
+    PGB_EXP65_ONLY='field-*'    sh experiments/65-capability-corpus.sh
+
+⛔ **`PGB_EXP65_ONLY` IS ONE GLOB, NOT AN ALTERNATION.** `'qt-*|py-*'` matches
+nothing: `case` alternation is syntax, and a pattern arriving from a variable
+expansion is a single pattern. That run exited immediately with
+`at least one subject produced an artefact = no`.
+
+⚠ **A filtered instance CANNOT satisfy C6** — the controls are not in its
+subject set, so its own verdict is meaningless and must not be quoted. ⭐ Its
+**rows** are still valid: they are written by the same code path, and the full
+instance reads them back and counts C6 from them (`note_control` runs on the
+recorded-row branch too). ⛔ So quote the FULL run's verdict, never a filtered
+one's.
+
+⚠ Disk is the binding constraint, not CPU: each instance holds a ~2.5 GiB
+cache and each bed copy is 2.1 GiB. Watch `df`, and the watchdog's floor is
+6 GiB.
+
     ⛔ WHILE 65- RUNS, THE MACHINE IS NOT FREE.
       - ⛔ Do not `make`: each subject's bundle is built by `$REPO_DIR/pgb`, so
         a rebuild mid-run puts rows from TWO tools in one table. It forced two
