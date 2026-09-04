@@ -436,3 +436,28 @@ integrates a broken launcher.
 **Prove.** Each of the four managers installs and launches a `pgb` bundle, with
 an icon and a working launcher, and the failure of any one named with its
 reason.
+
+---
+
+## T-092 — the `.env` names a farm directory the farm may not have created
+
+**Source** a deep review of the store-path patterns, 2026-09-04.
+**Category** toolchain · **Priority** P2 · **Effort** S · **Status** open
+
+`StoreRefToBundle` writes `${SHARUN_DIR}/store/<short name>` into a lifted
+`.env` value. `buildStoreFarm` creates `store/<shortStoreName(base)>` — **unless
+two closure entries share that short name**, in which case it falls back to the
+full `<hash>-<name>` to disambiguate. ⛔ The `.env` side has no such fallback,
+so on a closure with a short-name collision the value points at a directory
+that does not exist.
+
+⚠ **Not observed in a bundle**, and it is cheap to observe: a closure carrying
+two revisions of one package. ⭐ **And nothing would catch it** — `integrity()`
+walks `DT_NEEDED` and `manifestIntegrity()` reads the ICD manifests; **no check
+reads a `.env` value back against the tree.** That absence is the finding, and
+it is the same absence that let `${SHARUN_DIR}` expand to nothing for a whole
+session.
+
+**Prove.** A check that resolves every `${SHARUN_DIR}`-relative path in `.env`
+against the AppDir and fails on a miss, plus a selftest closure with a
+deliberate short-name collision.

@@ -172,7 +172,29 @@ var storeRefWithSub = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[A-Za-z0-9._+-
 
 // storeRefName matches a store path down to its name, which is the directory
 // the bundle's own store farm answers under.
-var storeRefName = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-([^/:; ]*)`)
+// ⚠ THIS ONE SUBSTITUTES WITHOUT ASKING THE CLOSURE — and a review expecting
+// that to be dangerous found it is not: the substitution is `"store/" + name`,
+// so an over-captured name is REPRODUCED verbatim and the text comes out
+// identical. The two cases written to prove otherwise passed under the planted
+// old class.
+//
+// ⛔ THE REAL COUPLING IS THE NAME, NOT THE TEXT. What this emits after
+// `store/` must be the directory `buildStoreFarm` created — `shortStoreName`,
+// the base with its 32-character hash and dash removed. A name bounded
+// differently from the farm's names a directory the farm does not have, and
+// NOTHING reads a .env value back against the bundle (`integrity()` walks
+// DT_NEEDED; `manifestIntegrity()` reads ICD manifests). So it shares
+// storeRefStop with every other pattern, plus `/` and `:` because this form
+// captures the NAME only and `:` separates path-list elements.
+// ⚠ One divergence survives and is T-092: when two closure entries share a
+// short name the farm falls back to the FULL `<hash>-<name>` and this still
+// emits the short one.
+var storeRefName = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-([^` + storeRefStop + `/:]*)`)
+
+// storeRefNoSep is the same boundary for a value that may carry a path tail:
+// ⚠ it was compiled INSIDE a loop over every wrapper record, which is both a
+// fourth character class and a recompile per iteration.
+var storeRefNoSep = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[^` + storeRefStop + `:]*`)
 
 // FinalEnvLines appends the lines that must be LAST whatever a wrapper said.
 //
@@ -292,7 +314,7 @@ func (b *Builder) liftWrapperEnv() []string {
 		for _, m := range storeRefWithSub.FindAllString(r.Value, -1) {
 			refs[m] = true
 		}
-		for _, m := range regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[^:; ]*`).FindAllString(r.Value, -1) {
+		for _, m := range storeRefNoSep.FindAllString(r.Value, -1) {
 			refs[m] = true
 		}
 	}

@@ -3,13 +3,13 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 64  OPEN 24  DONE 40
+    TOTAL 65  OPEN 25  DONE 40
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 7 | 1 | 6 |
 | P1 | a documented capability does not work, or a flag does nothing | 45 | 15 | 30 |
-| P2 | worth doing; nothing is wrong without it | 12 | 8 | 4 |
+| P2 | worth doing; nothing is wrong without it | 13 | 9 | 4 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
 Effort: S under a day · M a few days · L a week · XL almost always two entries
@@ -81,6 +81,7 @@ pretending to be one.
 | T-089 | P1 | S | open | research | ⛔ The interposer row marked NOT MEASURED: a static or raw-syscall payload |
 | T-090 | P1 | M | open | research | ⛔ The sandbox rung needs a BED change, not a bundler change |
 | T-091 | P2 | S | open | research | GStreamer needs four variables and a scanner; we emit one |
+| T-092 | P2 | S | open | toolchain | The `.env` names a farm directory the farm may not have created |
 
 ## The argument behind the ordering
 

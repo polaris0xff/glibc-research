@@ -1028,6 +1028,36 @@ which its comment says.
 
 ---
 
+## C28 — a review's own hypothesis, falsified by the plant it wrote
+
+⛔ **The review said**: `StoreRefToBundle` substitutes into `.env` **without**
+asking the closure, unlike `storeRefRe`'s callers, so its four-character class
+`[^/:; ]*` must be corrupting values — a quote or a comma captured into the
+name and written back.
+
+⭐ **The plant said otherwise.** With the old class restored, the two cases
+written to prove corruption **passed**. The substitution is `"store/" + name`,
+so an over-captured name is reproduced verbatim and the text comes out
+byte-identical. ⚠ A third case using `strings.Contains` also could not fail,
+for a second reason: the correct name is a **prefix** of the over-captured one.
+
+⭐ **What the review found instead is a real coupling nothing checks.** The
+name written after `store/` must be the directory `buildStoreFarm` created —
+`shortStoreName(base)`, the base minus its 32-character hash. Two patterns
+derive that name independently, and **no check reads a `.env` value back
+against the tree**: `integrity()` walks `DT_NEEDED`, `manifestIntegrity()`
+reads the ICD manifests. That absence is what let `${SHARUN_DIR}` expand to
+nothing for a whole session.
+
+**Landed**: one `storeRefStop` shared by every store-path pattern in the
+package — there were **four classes in four places**, which is the regex
+cascade T-081 said it was replacing — and three selftest cases asserting the
+two patterns agree **on the name**, which fail under the old class.
+⚠ One divergence survives as **T-092**: on a short-name collision the farm uses
+the full `<hash>-<name>` and the `.env` still emits the short one.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

@@ -163,6 +163,31 @@ func AppImageSelftest(c *cfg.Config) *selftest.Report {
 	r.Check("...and the BASE every caller looks up carries no markup",
 		xmlBase, "cccccccccccccccccccccccccccccccc-dejavu-fonts-minimal-2.37")
 
+	// ⭐ THE REAL COUPLING BETWEEN THE .env AND THE FARM IS A NAME.
+	// StoreRefToBundle writes `store/<name>` into a lifted value;
+	// buildStoreFarm creates the directory `store/<shortStoreName(base)>`. If
+	// the two derive the name differently, the value points at a directory the
+	// bundle does not have — and nothing reads a .env value back against the
+	// tree (`integrity()` walks DT_NEEDED; `manifestIntegrity()` reads ICD
+	// manifests). ⚠ A review expecting over-capture to CORRUPT the value found
+	// it does not: the substitution is `"store/" + name`, so junk in the name
+	// is reproduced verbatim and the text is unchanged. The coupling is what
+	// can actually break, so it is what is asserted.
+	for _, s := range []string{
+		`'/nix/store/cccccccccccccccccccccccccccccccc-gi-1.2'`,
+		"/nix/store/cccccccccccccccccccccccccccccccc-a-1,/x",
+		"<d>/nix/store/cccccccccccccccccccccccccccccccc-dejavu-2.37</d>",
+	} {
+		// ⛔ ASSERTED ON THE NAME, NOT ON THE TEXT. A `strings.Contains` of the
+		// rewritten value passes on an over-captured name too, because the
+		// correct name is a PREFIX of the wrong one — the first version of this
+		// case did that and could not fail.
+		base, _, _ := strings.Cut(strings.TrimPrefix(storeRefRe.FindString(s), "/nix/store/"), "/")
+		g := storeRefName.FindStringSubmatch(s)
+		r.Check("the lifted value names the farm directory the closure builds: "+shortStoreName(base),
+			g[1], shortStoreName(base))
+	}
+
 	// The wrapper reader, on both shapes.
 	shell := filepath.Join(dir, "shellwrap")
 	_ = os.WriteFile(shell, []byte("#!/bin/sh\nexport QT_PLUGIN_PATH='/nix/store/cccccccccccccccccccccccccccccccc-qt/plugins':$QT_PLUGIN_PATH\n"+

@@ -661,7 +661,13 @@ func (b *Builder) shebangInterpreter(script string) string {
 // So: exclude what cannot be in a path here — every control character and
 // space (a C string ends at NUL), quotes, and the XML and shell delimiters
 // that end a path in the file formats a bundle actually carries.
-var storeRefRe = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[^\x00-\x20"'` + "`" + `<>|;,()\\]*`)
+// storeRefStop is the ONE definition of where a store reference ends, shared
+// by every pattern in this package so the four that existed cannot drift apart
+// again. ⛔ FOUR PATTERNS WITH FOUR CHARACTER CLASSES IS THE "REGEX CASCADE"
+// T-081 SAID IT WAS REPLACING. docs/history/corrections.md C27, C28.
+const storeRefStop = `\x00-\x20"'` + "`" + `<>|;,()\\`
+
+var storeRefRe = regexp.MustCompile(`/nix/store/[a-z0-9]{32}-[^` + storeRefStop + `]*`)
 
 func lastExistingStorePath(file, root string) string {
 	b, err := os.ReadFile(file)
