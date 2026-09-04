@@ -90,9 +90,12 @@ criterion fail *for the right reason*.
     `gtk3-2` and `py-1` are `64-`'s arms G, X and P and must come back
     11 of 11 or the instrument, not the capability, is the finding.
 
-    ⏳ RUNNING NOW: `experiments/65-`, relaunched 02:16 UTC by
+    ⏳ RUNNING NOW: `experiments/65-`, relaunched **02:28 UTC** by
        `scratchpad/chain3.sh` (session scheduling, not evidence) with the
-       corrected instrument. 26 subjects × 11 environments. ⚠ HOURS.
+       corrected instrument AND the corrected `storeRefRe` (C27) — it was
+       started at 02:16 and stopped again nine minutes later, because
+       C27 changed the bundler and rows built by two different tools may
+       not sit in one table. 26 subjects × 11 environments. ⚠ HOURS.
        ⭐ RESUMABLE: a completed subject writes a TAB-separated row into
        `evidence/65-capability-corpus/rows/` and a recorded row is never
        re-measured, so `sh scripts/common/run-experiment.sh 65` picks up
@@ -121,6 +124,23 @@ criterion fail *for the right reason*.
     FUSE mount from the picture entirely and is why every 65- subject sets
     it. The ordering fix also made every row ~10× faster, which means the
     slow version had been paying the same cost in a milder form all along.
+
+## ⭐ WHAT LANDED THIS SESSION, IN ORDER (all pushed, gates green each time)
+
+    024c550f  T-081 CLOSED: arm G 0/11 -> 11/11 without the bind
+    357c0346  both runs of 64- agree, 11/11 on every arm
+    c4fa93cf  ⭐ T-085 /etc/services 11/11, T-086 the codeset axis 11/11
+    ef6a55f9  T-084 corrected: SIX hand copies, not nine; 77- has none
+    68c923e6  ⛔ C26: the corpus had no positive control
+    74d3f5e0  ⛔ C27: our own storeRefRe had the boundary defect we
+              accused the field of. 585 selftest cases; three of four new
+              ones fail under the planted old regex.
+    (this)    the C27 re-measurement written into the record
+
+⛔ **TWO CORRECTIONS IN ONE SESSION, BOTH ABOUT INSTRUMENTS, BOTH FOUND BY A
+DISAGREEMENT RATHER THAN BY READING.** C26 came from a corpus row that
+contradicted `experiments/64-`; C27 came from reading a build log. ⭐ Neither
+was found by re-reading the code that contained it.
 
 ## ⛔ Machine notes (carried forward, re-verify)
 

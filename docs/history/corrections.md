@@ -967,6 +967,67 @@ the right reason is not a datum to adjust.
 
 ---
 
+## C27 — "the field's regex does not stop at `<`", written by a scanner that did not stop at `<` either
+
+⛔ **T-081's "Prove" section said this, and it was published:**
+
+> ⭐ The one that is not is `…-dejavu-fonts-minimal-2.37<`. Its trailing `<` is
+> an **XML markup boundary**: the match is a path followed by the start of the
+> next tag, because the field's `[^ \"']*` does not stop at `<`.
+
+⛔ **`internal/bundle/appimage.go`'s own `storeRefRe` was
+`/nix/store/[a-z0-9]{32}-[^" ']*`.** The same three excluded characters. The
+sentence identified the defect precisely and attributed it to the other route.
+
+**Found by reading a build log rather than the code.** The galculator bundle
+reported six compiled-in store paths with no target, and three of the six were
+the scanner:
+
+    ...-python3-3.14.7\0\0\0\0\0\0Exception     NUL is not in the class, so the
+    ...-glibc-2.42-84\0\0\0\0\0\0\0             match ran into the next string
+    ...-dejavu-fonts-minimal-2.37<              nor is `<`
+
+⭐ **Why a wider match is not merely untidy.** Every caller cuts the match at
+the first `/` and looks the base up in the closure. A boundary error therefore
+does not widen a string — it manufactures a **base no closure can contain**,
+which is reported as "does not resolve" and left unrewritten. And for
+`…2.37</dir>` the cut lands *inside* the markup, so a rewrite that did fire
+would have eaten the `<`.
+
+**Re-measured on the same AppDir, both scanners:**
+
+| scanner | occurrences | distinct | in the closure | NOT in it |
+|---|---|---|---|---|
+| `[^" ']*` | 415 | 13 | 12 | 1 |
+| corrected | 425 | 13 | ⭐ **13** | ⭐ **0** |
+
+⭐ **`dejavu-fonts-minimal-2.37` was in the closure all along**, and the binary
+scan's residue fell from **6 to 3** — none of the three a missing dependency.
+`HISTORY/entries/toolchain.md` T-081 has the residue table.
+
+⛔ **The claim that survives, and it is the one that mattered.** The field's
+regex 5 **substitutes** on a mis-bounded match; this route never substitutes on
+a match it cannot resolve against the closure. With a boundary this bad the
+worst it could do was **report a path it should have rewritten** — the safe
+direction, arrived at for the wrong reason. ⭐ That is the difference between
+reporting and guessing, and it held while the instrument was wrong, which is
+the strongest thing that can be said for a design.
+
+⚠ **The class stays a blacklist and the direction is deliberate.** Nix does not
+constrain the names of files *inside* a store path, so a whitelist would
+TRUNCATE a legitimate tail — and truncation is the dangerous failure, because
+every rewrite substitutes the prefix and copies the tail verbatim: a short tail
+is written back and corrupts the file. Over-capture fails safe.
+
+⛔ **And one of the four new selftest cases could not fail.** The first draft
+asserted on `StoreRefToBundle`, which does not use this regex; it passed under
+the planted defect. It was replaced with an assertion on the **base** every
+caller looks up. ⚠ Three of the four now fail under the old regex; the fourth
+is a regression guard against the whitelist mistake and passes either way,
+which its comment says.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

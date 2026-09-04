@@ -1934,21 +1934,54 @@ HOST interpreter is refused rather than adopted.
 
 ## ⭐ The "Prove" line, paid on one bundle and measured
 
+⛔ **RE-MEASURED 2026-09-04, AND THE FIRST MEASUREMENT WAS TAKEN WITH A
+SCANNER THAT HAD THE SAME BOUNDARY DEFECT IT ACCUSED THE FIELD OF.** The
+numbers below are the second measurement.
+[`../../docs/history/corrections.md`](../../docs/history/corrections.md) C27
+has the defect; the paragraph it replaced is quoted there rather than deleted.
+
 Scanning a `galculator` AppDir's **text** files — `share/`, `etc/`, `.env`,
-the desktop entry — for store-shaped strings:
+the desktop entry, ELF skipped by magic — for store-shaped strings, with the
+old and corrected scanners on the **same** AppDir:
 
-| | |
+| scanner | occurrences | distinct | IN the closure | NOT in it |
+|---|---|---|---|---|
+| the old `[^" ']*` | 415 | 13 | 12 | ⛔ **1** — `…-dejavu-fonts-minimal-2.37<` |
+| ⭐ corrected | **425** | **13** | ⭐ **13 — all of them** | ⭐ **0** |
+
+⭐ **THE ONE THAT "WAS NOT IN THE CLOSURE" WAS IN THE CLOSURE.** Its trailing
+`<` is an XML markup boundary, and *our* class excluded three characters and
+did not stop at it either — so the base carried the markup, matched nothing,
+and was reported. ⚠ **The safe direction, for the wrong reason.**
+
+⛔ **What survives, and it is the actual argument, unchanged.** The field's
+regex 5 — `s|/nix/store[^ \"']*|/|g` — **substitutes** on that same
+mis-bounded match and eats `</dir>` with it, silently, in a data file. This
+route never substitutes on a match it cannot resolve against the closure: the
+worst it could do, with a boundary this bad, was to *report* a path it should
+have rewritten. That is the whole difference between reporting and guessing,
+and it held even while the instrument was wrong.
+
+**The binary scan, on the same bundle, before and after:**
+
+    old   89 compiled in: 83 resolve inside the bundle, 6 do not
+    ⭐ new  88 compiled in: 85 resolve inside the bundle, 3 do not
+
+⭐ **AND NONE OF THE THREE IS A MISSING DEPENDENCY**, which is worth more than
+the count:
+
+| reported | what it actually is |
 |---|---|
-| occurrences | **117** |
-| distinct store paths | **12** |
-| IN this bundle's closure | **11** — resolved |
-| NOT in it | ⭐ **1**, and it is the argument |
+| `a3hr…-glib-glib-2.88.3` | the **same hash** as the closure's `a3hr…-glib-2.88.3`. In `libglib`'s `.rodata` at offset 907,616, in a region with **no NUL**: the bytes read `…-glib-glib-2.88.3/lib` and run straight into `g_base64_decode_inplace`. No delimiter marks the end of that string |
+| `eeeeeeee…eeee-cups-2.4.19` | a hash of thirty-two `e`s is **nix's self-reference placeholder, not a hash**. In `AppDir/lib/libcups.so.2`. The closure carries `vjaz8yglcqmbihslm7qj5gkrdz7cd3hi-cups-2.4.19-lib` |
+| `eeeeeeee…eeee-libunistring-1.4.2` | the same, in `libunistring.so.5.2.1`. The closure carries `yh8rykx8wakl1ccn8rc351f6r2wbg4cn-libunistring-1.4.2` |
 
-⭐ The one that is not is `…-dejavu-fonts-minimal-2.37<`. Its trailing `<` is
-an **XML markup boundary**: the match is a path followed by the start of the
-next tag, because the field's `[^ \"']*` does not stop at `<`. ⛔ Regex 5
-rewrites it **and eats the boundary with it**, silently, in a data file. Exact
-match against the closure reports it and changes nothing.
+⛔ **AND THEY MUST STAY REPORTED RATHER THAN RESOLVED.** Matching
+`eeee…-cups-2.4.19` to `vjaz…-cups-2.4.19-lib` means matching **by name and
+ignoring the hash**, and two derivations can share a name — that is exactly
+the guess this entry exists to refuse. ⭐ The bundle draws on 11 of 11 with
+these three reported, which also settles what the report *is*: a **finding**,
+not a verdict.
 
 ⚠ **ONE SUBJECT**, not the thirteen `nixappimage` recipes the Prove line names.
 `experiments/65-`'s `field` rows pay four of the thirteen; the other nine are

@@ -90,6 +90,17 @@ the exact, finite set of store paths that are in the bundle. Every rewrite is
 an **exact match against that set**; a store path that is not in it is
 **reported as a finding**, never silently substituted.
 
+⚠ **A regex still says where a candidate BEGINS and ENDS, and ours got the end
+wrong** — `[^" ']*`, three excluded characters, so in a binary the match ran
+through the terminating NUL and in XML through the closing `<`.
+[`../history/corrections.md`](../history/corrections.md) C27 has the
+measurement. ⭐ **It is the difference between the two routes that contained
+the damage**: a mis-bounded match produced a base no closure contains, so the
+worst outcome was a path **reported** that should have been rewritten. A route
+that substitutes on the regex instead would have written the mis-bounded match
+into the file. ⛔ The lesson is not "the regex was fine"; it is that where the
+decision lives decides what a bad regex costs.
+
     tool/runtime/pgb-storefix.c   the interposer
     internal/bundle/storefix.go   the map, the farm, the ABI check, the report
     AppDir/lib/libpgb-storefix.so where it ships
@@ -187,6 +198,36 @@ mistake in miniature that `AGENTS.md` §4 and `limitations.md` §3 each carried:
    disagree about which files matter.
 
 ⛔ **And everything left over is a report.** `pgb bundle appimage` prints the
-store paths it found compiled in, which of them resolved, and which did not —
-so a bundle that will fail says so at build time instead of at the user's
-double-click.
+store paths it found compiled in, which of them resolved, and which did not.
+
+⚠ **A REPORT IS A FINDING, NOT A VERDICT, AND THIS PAGE USED TO SAY OTHERWISE**
+— *"so a bundle that will fail says so at build time"*. It does not follow, and
+the measurement says it does not: the `galculator` bundle reports **three**
+compiled-in paths with no target in it and draws on **11 of 11**. A reported
+path is one the program may never open.
+
+## 6. ⭐ What the report actually found, and why none of it is resolved by guessing
+
+On the `galculator` bundle, 2026-09-04, after
+[`../history/corrections.md`](../history/corrections.md) C27 fixed where a
+store reference **ends**:
+
+    88 compiled in: 85 resolve inside the bundle, 3 do not
+
+| reported | what it is |
+|---|---|
+| `a3hr…-glib-glib-2.88.3` | the **same hash** as the closure's `a3hr…-glib-2.88.3`. It sits in `libglib`'s `.rodata` in a region with **no NUL**: the bytes read `…-glib-glib-2.88.3/lib` and run straight into `g_base64_decode_inplace`. Nothing delimits the end of that string |
+| `eeee…eeee-cups-2.4.19` | a hash of thirty-two `e`s is **nix's self-reference placeholder, not a hash**. The closure carries `vjaz8yglcqmbihslm7qj5gkrdz7cd3hi-cups-2.4.19-lib` |
+| `eeee…eeee-libunistring-1.4.2` | the same shape. The closure carries `yh8rykx8wakl1ccn8rc351f6r2wbg4cn-libunistring-1.4.2` |
+
+⛔ **All three have a real target in the closure, and all three stay
+unresolved on purpose.** Matching `eeee…-cups-2.4.19` to
+`vjaz…-cups-2.4.19-lib` means matching **by name with the hash ignored**, and
+two derivations can share a name — a `cups` from another nixpkgs revision, or
+another output of the same one. ⭐ The whole route is *exact match against a
+known finite set*; a near-match that resolves to the wrong derivation is the
+failure mode this design exists to make impossible, and it would be silent.
+
+⭐ **In the bundle's TEXT files the corrected scanner leaves nothing at all**:
+425 occurrences, 13 distinct store paths, **13 of 13 in the closure**. The
+residue is entirely in binaries, and entirely in these two byte-level shapes.
