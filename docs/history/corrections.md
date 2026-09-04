@@ -1964,9 +1964,23 @@ to dirty — the same one-way direction as C25 — and never the reverse.
 
 ⛔ **WHAT IS AND IS NOT RE-MEASURED.** The committed corpus numbers were taken
 under the old predicate and have **not** been re-measured under the new one.
-The argument that none of them moves is not a measurement: it is that all
-thirteen files are reachable only by running `stdbuf`, `sudo`, or the host
-loader by that path, and no corpus subject does any of those. ⚠ Pinned in
+The argument that none of them moves is that all thirteen files are reachable
+only by running `stdbuf`, `sudo`, or the host loader by that path, and no
+corpus subject does any of those.
+
+⭐ **AND THE ARGUMENT NOW HAS THREE REAL TRACES UNDER IT.** Every distinct
+successfully-opened `.so` path was extracted from three captured `strace`
+transcripts — one taken inside the bed on `ubuntu-20.04`, two on the runner
+host — and classified under both predicates:
+
+| trace | distinct `.so` | host under the OLD predicate | ⭐ host under the NEW prefixes only |
+|---|---|---|---|
+| bed, `ubuntu-20.04`, mousepad `--no-storefix` | 437 | 33 | **0** |
+| runner host, mousepad arm T | 454 | 33 | **0** |
+| runner host, mousepad arm N | 437 | 33 | **0** |
+
+⚠ **Three traces and one subject is not the corpus.** It shows the change is
+inert where it has been looked at; it does not retire the debt. Pinned in
 `evidence/STALE-EVIDENCE.txt` until a corpus re-run says so directly.
 
 ⭐ Covered by two new rows in `sh experiments/lib.sh --selftest` (11 pass),

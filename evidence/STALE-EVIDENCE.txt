@@ -108,6 +108,12 @@
 # reachable only by running `stdbuf`, `sudo`, or the host loader by that path,
 # and no subject in the corpus does any of those.
 #
+# ⭐ THREE REAL TRACES SAY THE CHANGE IS INERT WHERE IT HAS BEEN LOOKED AT:
+# 437, 454 and 437 distinct .so paths (one bed trace on ubuntu-20.04, two on
+# the runner host), 33 host objects under the OLD predicate in each, and ZERO
+# under the newly added prefixes. ⚠ Three traces and one subject is not the
+# corpus, so the debt stands.
+#
 # ⭐ WHAT REMOVES THIS BLOCK: a `65-` corpus re-run under the fixed classifier.
 # Until then a zero in this tree means "clean under the OLD predicate", and
 # anyone quoting one should say so.
