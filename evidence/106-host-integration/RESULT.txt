@@ -2,7 +2,7 @@
 106 - the two criteria that were parked as unmeasurable, measured against a fixture
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T14:04:39Z
+date (UTC)   : 2026-09-04T14:25:16Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS

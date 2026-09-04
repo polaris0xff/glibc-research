@@ -22,10 +22,21 @@
 #   a session DBUS   0 of 11 run one, so a tray application prints
 #                    `Unable to connect via DBus` and draws nothing.
 #
-# ⭐ THIS SCRIPT BUILDS THE FIRST TWO. The third is different in kind and is
-# NOT here: a session bus is a running PROCESS, not a file, and the bundle can
-# carry the daemon itself (`--with-program dbus-daemon`, measured 2026-09-04c),
-# so it belongs to whichever experiment needs one rather than to the bed.
+# ⭐ ALL THREE ARE HERE NOW, and the third took one more step to see. A session
+# bus is a running PROCESS rather than a file, so at first it looked like it
+# belonged to an experiment and not to the bed — but measured by hand, the
+# thing that stops a bundle starting its OWN `dbus-daemon` is not the daemon:
+# it is a FILE.
+#
+#     dbus[…]: Failed to start message bus:
+#              Failed to open "/etc/dbus-1/session.conf": No such file
+#
+# ⛔ `dbus-daemon` reads an absolute `/etc` path with no search variable — the
+# same class as `pdfarranger`'s `/usr/local/share/…`, and one the interposer
+# does not reach because it is not `/nix/store`. ⭐ So the bed gets the config
+# file (DATA), and the bundle brings the daemon (`--with-program dbus-daemon`,
+# measured 2026-09-04c). Between them a subject that needs a session bus can
+# be measured.
 #
 # ⚠ WHAT A FIXTURE MAY AND MAY NOT BE.
 #   * It may add DATA — a locale, a theme, a catalogue. ⭐ Data cannot change
@@ -193,6 +204,43 @@ have_locale() { [ -f "$1/usr/lib/locale/$LOCALE/LC_CTYPE" ]; }
 remove_locale() { rm -rf "$1/usr/lib/locale/$LOCALE"; }
 
 # ---------------------------------------------------------------------------
+# The DBUS fixture: `/etc/dbus-1/session.conf`, and nothing else.
+#
+# ⛔ IT IS A CONFIG FILE, NOT A DAEMON. Nothing here installs a program: the
+# bundle carries `dbus-daemon` and `dbus-run-session` out of its own closure
+# (`--with-program`, measured). What the bed supplies is the file the daemon
+# insists on reading from an absolute `/etc` path.
+#
+# ⚠ nixpkgs' OWN `session.conf` is not usable as-is here: it delegates the
+# listening address to an `<include>` the bundle does not carry, and starting
+# the daemon with it answers
+#     Configuration file needs one or more <listen> elements giving addresses
+# ⭐ So this is a MINIMAL session bus config, written out rather than copied,
+# and its `<listen>` is a unix socket under /tmp — which every rootfs here
+# mounts as a fresh tmpfs, so no run can see another's socket.
+install_dbus() {  # rootfs-path
+  mkdir -p "$1/etc/dbus-1" || return 1
+  cat > "$1/etc/dbus-1/session.conf" <<'EOF'
+<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
+<busconfig>
+  <type>session</type>
+  <listen>unix:tmpdir=/tmp</listen>
+  <standard_session_servicedirs />
+  <policy context="default">
+    <allow send_destination="*" eavesdrop="true"/>
+    <allow eavesdrop="true"/>
+    <allow own="*"/>
+  </policy>
+</busconfig>
+EOF
+  have_dbus "$1"
+}
+
+have_dbus() { [ -f "$1/etc/dbus-1/session.conf" ]; }
+remove_dbus() { rm -f "$1/etc/dbus-1/session.conf"; }
+
+# ---------------------------------------------------------------------------
 # ⭐ THE SELFTEST, and it runs against a temporary tree rather than the bed:
 # a fixture installer that reports success without writing anything is exactly
 # the class of check `docs/AGENTS.md` §0b calls the worst answer here.
@@ -225,6 +273,14 @@ selftest() {
   rm -f "$_t/lib/ld-musl-x86_64.so.1"
   is_musl "$_t" && { echo "FAIL  non-musl reported as musl"; _fail=$((_fail+1)); } \
                 || echo "ok    a glibc tree is not reported as musl"
+  install_dbus "$_t" >/dev/null && echo "ok    the dbus config installs" \
+      || { echo "FAIL  dbus config not installed"; _fail=$((_fail+1)); }
+  grep -q '<listen>' "$_t/etc/dbus-1/session.conf" 2>/dev/null \
+      && echo "ok    the dbus config has a <listen> element" \
+      || { echo "FAIL  no <listen>; the daemon refuses such a file"; _fail=$((_fail+1)); }
+  remove_dbus "$_t"
+  have_dbus "$_t" && { echo "FAIL  dbus remove left the file"; _fail=$((_fail+1)); } \
+                  || echo "ok    dbus remove is complete"
   rm -rf "$_t"
   [ "$_fail" = 0 ] && { echo "VERDICT: the fixture installer works."; return 0; }
   echo "VERDICT: $_fail check(s) failed."; return 1
@@ -253,7 +309,11 @@ case "$what" in
           0) _l=ok ;; 3) _l='n/a (musl)' ;; *) _l=FAIL; rc=1 ;;
         esac
       fi
-      printf '  %-22s theme=%-6s locale=%s\n' "$e" "$_t" "$_l"
+      _b=-
+      if [ "$which" = dbus ] || [ "$which" = all ]; then
+        install_dbus "$d" && _b=ok || { _b=FAIL; rc=1; }
+      fi
+      printf '  %-22s theme=%-6s locale=%-11s dbus=%s\n' "$e" "$_t" "$_l" "$_b"
     done
     ;;
   --check)
@@ -263,18 +323,19 @@ case "$what" in
       have_theme  "$d" && _t=yes || _t=no
       if is_musl "$d"; then _l='n/a (musl)'
       else have_locale "$d" && _l=yes || _l=no; fi
-      printf '  %-22s theme=%-6s locale=%s\n' "$e" "$_t" "$_l"
+      have_dbus "$d" && _b=yes || _b=no
+      printf '  %-22s theme=%-6s locale=%-11s dbus=%s\n' "$e" "$_t" "$_l" "$_b"
     done
     ;;
   --remove)
     for e in $(envs); do
       d="$ROOTFS_DIR/$e"
       [ -d "$d" ] || continue
-      remove_theme "$d"; remove_locale "$d"
+      remove_theme "$d"; remove_locale "$d"; remove_dbus "$d"
       printf '  %-22s removed\n' "$e"
     done
     ;;
-  *) echo "usage: $0 --install|--check|--remove|--selftest [theme|locale|all]" >&2
+  *) echo "usage: $0 --install|--check|--remove|--selftest [theme|locale|dbus|all]" >&2
      exit 2 ;;
 esac
 exit $rc

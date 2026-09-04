@@ -50,3 +50,28 @@ evidence     : /home/user/glibc-research/evidence/106-host-integration
   ENVIRONMENT            GTK_THEME= unset (control)
   alpine-3.22            2 open(s)  0 open(s)
   alpine-3.20            2 open(s)  0 open(s)
+  alpine-3.10            2 open(s)  0 open(s)
+  voidlinux-musl         2 open(s)  0 open(s)
+  debian-11              2 open(s)  0 open(s)
+  debian-12              2 open(s)  0 open(s)
+  ubuntu-20.04           2 open(s)  0 open(s)
+  rockylinux-8           2 open(s)  0 open(s)
+  opensuse-leap-15.6     2 open(s)  0 open(s)
+  fedora-42              2 open(s)  0 open(s)
+  archlinux-latest       2 open(s)  0 open(s)
+
+  ok    T1  ⭐ the bundle READS the host theme when told to = 11
+  ok    T2  ⛔ and does NOT when it is not told to    = 11
+        ⛔ WHAT THIS DOES NOT SAY. T1 is that the bundle READS the host's
+           theme file, not that the window LOOKS different — that needs a
+           screenshot comparison and is a different experiment.
+        ⚠ And arm L is setlocale and nl_langinfo, not a translated string:
+           a .mo catalogue needs an application that ships one, which is
+           T-087 rung 3's own row.
+        ⭐ THE FIXTURE IS THE POINT. Both criteria were recorded as 'the bed
+           cannot answer it' and both were a script nobody had written.
+
+-- result ----------------------------------------------------
+pass=8 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------
