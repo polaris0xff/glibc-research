@@ -471,6 +471,113 @@ int __fxstatat(int ver, int dirfd, const char *path, struct stat *st, int flags)
     return real(ver, dirfd, _p, st, flags);
 }
 
+/* ⛔ AND THE `64` FAMILY IS NOT A DUPLICATE OF THE THREE ABOVE. IT IS THE SET
+ * A PYTHON PROGRAM ACTUALLY CALLS, and leaving it out cost a whole class of
+ * subject. Measured on `gearlever` 2026-09-04c: the bundle's own
+ * `libpython3.14.so` imports
+ *
+ *     U stat64@GLIBC_2.33   U lstat64@GLIBC_2.33   U fstatat64@GLIBC_2.33
+ *
+ * and not one of `stat`, `lstat` or `fstatat`. So every path a Python program
+ * STATS went straight past this object while every path it OPENED was
+ * rewritten -- which is why `Gio.Resource.load()` found the gresource at the
+ * compiled-in store path and the very next line, `sys.path.insert(1,
+ * pkgdatadir)` followed by `import gearlever`, failed with
+ * `ModuleNotFoundError`: Python's finder asks `stat` whether the directory
+ * exists, and the answer was the untranslated ENOENT.
+ *
+ * ⚠ THE BUFFER IS FORWARDED, NEVER READ, so these take `struct stat64` only
+ * because the header declares them that way. This object rewrites paths and
+ * touches nothing else.
+ *
+ * ⚠ `_GNU_SOURCE` above implies `_LARGEFILE64_SOURCE`, which is what puts
+ * `struct stat64` and these prototypes in scope. */
+int stat64(const char *path, struct stat64 *st)
+{
+    typedef int (*fn_t)(const char *, struct stat64 *);
+    static fn_t real;
+    FIXED(path);
+    if (!real)
+        real = (fn_t)dlsym(RTLD_NEXT, "stat64");
+    if (!real) {
+        errno = ENOSYS;
+        return -1;
+    }
+    return real(_p, st);
+}
+
+int lstat64(const char *path, struct stat64 *st)
+{
+    typedef int (*fn_t)(const char *, struct stat64 *);
+    static fn_t real;
+    FIXED(path);
+    if (!real)
+        real = (fn_t)dlsym(RTLD_NEXT, "lstat64");
+    if (!real) {
+        errno = ENOSYS;
+        return -1;
+    }
+    return real(_p, st);
+}
+
+int fstatat64(int dirfd, const char *path, struct stat64 *st, int flags)
+{
+    typedef int (*fn_t)(int, const char *, struct stat64 *, int);
+    static fn_t real;
+    FIXED(path);
+    if (!real)
+        real = (fn_t)dlsym(RTLD_NEXT, "fstatat64");
+    if (!real) {
+        errno = ENOSYS;
+        return -1;
+    }
+    return real(dirfd, _p, st, flags);
+}
+
+/* the pre-2.33 shape of the same three, for the same reason __xstat is here */
+int __xstat64(int ver, const char *path, struct stat64 *st)
+{
+    typedef int (*fn_t)(int, const char *, struct stat64 *);
+    static fn_t real;
+    FIXED(path);
+    if (!real)
+        real = (fn_t)dlsym(RTLD_NEXT, "__xstat64");
+    if (!real) {
+        errno = ENOSYS;
+        return -1;
+    }
+    return real(ver, _p, st);
+}
+
+int __lxstat64(int ver, const char *path, struct stat64 *st)
+{
+    typedef int (*fn_t)(int, const char *, struct stat64 *);
+    static fn_t real;
+    FIXED(path);
+    if (!real)
+        real = (fn_t)dlsym(RTLD_NEXT, "__lxstat64");
+    if (!real) {
+        errno = ENOSYS;
+        return -1;
+    }
+    return real(ver, _p, st);
+}
+
+int __fxstatat64(int ver, int dirfd, const char *path, struct stat64 *st,
+                 int flags)
+{
+    typedef int (*fn_t)(int, int, const char *, struct stat64 *, int);
+    static fn_t real;
+    FIXED(path);
+    if (!real)
+        real = (fn_t)dlsym(RTLD_NEXT, "__fxstatat64");
+    if (!real) {
+        errno = ENOSYS;
+        return -1;
+    }
+    return real(ver, dirfd, _p, st, flags);
+}
+
 int statx(int dirfd, const char *restrict path, int flags, unsigned int mask,
           struct statx *restrict stx)
 {
@@ -542,6 +649,23 @@ ssize_t readlink(const char *path, char *buf, size_t sz)
         return -1;
     }
     return real(_p, buf, sz);
+}
+
+/* ⚠ `readlinkat` is here for the same measured reason as the `64` family:
+ * `libpython3.14.so` imports it, and a bundle whose `readlink` is rewritten
+ * while its `readlinkat` is not answers two different things about one path. */
+ssize_t readlinkat(int dirfd, const char *path, char *buf, size_t sz)
+{
+    typedef ssize_t (*fn_t)(int, const char *, char *, size_t);
+    static fn_t real;
+    FIXED(path);
+    if (!real)
+        real = (fn_t)dlsym(RTLD_NEXT, "readlinkat");
+    if (!real) {
+        errno = ENOSYS;
+        return -1;
+    }
+    return real(dirfd, _p, buf, sz);
 }
 
 char *realpath(const char *path, char *out)

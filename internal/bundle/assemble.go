@@ -504,30 +504,64 @@ func resolveLink(p string) string {
 	return p
 }
 
+// findResolvable is findFile with the one condition a copy actually needs:
+// the name must reach a real file through `storeResolve`, which re-roots an
+// absolute `/nix/store/…` link at the fetched closure.
+//
+// ⛔ THE NAME IS NOT THE FILE, AND A CLOSURE CAN CARRY BOTH. Measured on
+// `gearlever` 2026-09-04c: its closure includes an `appimage-run-fhsenv-rootfs`
+// store path — an FHS SYMLINK FARM — whose `usr/lib64/ld-linux-x86-64.so.2`
+// points at an absolute `/nix/store/…-glibc-2.42-84/lib/…`. There is no
+// `/nix/store` on the machine doing the bundling, so that link reaches
+// nothing, and it sorts BEFORE the glibc store path that holds the real
+// loader. The build died with `open …: no such file or directory` and the
+// corpus recorded the subject as UNRESOLVED.
+//
+// It returns the found path (which carries the NAME the bundle must use) and
+// the resolved path (which carries the BYTES).
+func (b *Builder) findResolvable(match func(name string) bool) (found, real string) {
+	_ = filepath.Walk(b.Root, func(p string, fi os.FileInfo, err error) error {
+		if err != nil || fi.IsDir() || found != "" {
+			return nil
+		}
+		if !match(fi.Name()) {
+			return nil
+		}
+		if r := b.storeResolve(p); r != "" {
+			found, real = p, r
+		}
+		return nil
+	})
+	return found, real
+}
+
 func (b *Builder) copyLoader() error {
-	ld := b.findFile(func(name string) bool {
+	ld, ldReal := b.findResolvable(func(name string) bool {
 		return strings.HasPrefix(name, "ld-linux-") && strings.Contains(name, ".so.") ||
 			strings.HasPrefix(name, "ld-musl-") && strings.Contains(name, ".so.")
 	})
 	if ld == "" {
 		return fail.Ran("the closure carries no dynamic loader")
 	}
-	if err := copyResolved(ld, filepath.Join(b.AppDir, "lib", filepath.Base(ld)), 0o755); err != nil {
+	if err := copyResolved(ldReal, filepath.Join(b.AppDir, "lib", filepath.Base(ld)), 0o755); err != nil {
 		return err
 	}
 	logx.Say("loader      %s (the closure's own, never the host's)", filepath.Base(ld))
-	b.checkLoaderOptions(ld)
+	// ⚠ The RESOLVED path is what carries the version: an FHS farm's link is
+	// named `ld-linux-x86-64.so.2` under a store path with no glibc version in
+	// it, so reading the found name would silently answer "nothing to say".
+	b.checkLoaderOptions(ldReal)
 
 	if fi, err := os.Stat(filepath.Join(b.AppDir, "lib32")); err == nil && fi.IsDir() {
 		// The 32-bit half needs its own loader, and it is a different file
 		// with a different name.
-		ld32 := b.findFile(func(name string) bool {
+		ld32, ld32Real := b.findResolvable(func(name string) bool {
 			return name == "ld-linux.so.2" || name == "ld-linux-armhf.so.3"
 		})
 		if ld32 == "" {
 			logx.Warnf("the closure has 32-bit objects but no 32-bit loader; lib32 will not run")
 		} else {
-			_ = copyResolved(ld32, filepath.Join(b.AppDir, "lib32", filepath.Base(ld32)), 0o755)
+			_ = copyResolved(ld32Real, filepath.Join(b.AppDir, "lib32", filepath.Base(ld32)), 0o755)
 			logx.Say("loader32    %s", filepath.Base(ld32))
 		}
 		_ = os.Remove(filepath.Join(b.AppDir, "shared", "lib32"))
