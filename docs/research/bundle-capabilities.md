@@ -58,9 +58,19 @@ per subject, and a recorded row is never re-measured:
 | **GTK 3** | ⭐ **3 of 3 — CLOSED** | `galculator`, `mousepad`, `geany`, all **11/11 pass and 11/11 clean** |
 | **X11 / XCB** | ⭐ **3 of 3** | `xeyes` **11/11**, `xclock` **11/11**, ⛔ `xterm` **0/11** — see below |
 | ⭐ **OpenGL / EGL** | **3 of 3** | ⭐ `eglinfo` **11/11**, `glxgears` **11/11** — both clean 11/11. ⛔ `glmark2` **0/11** |
-| **Vulkan** | 1 of 3 | ⭐ `vulkaninfo` **11/11**, clean **11/11** |
+| ⭐ **Vulkan** | **2 of 3** | `vulkaninfo` **11/11**, `vkcube` **11/11** — both clean 11/11 |
+| **Python GUI** | 1 of 3 | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⛔ `pdfarranger` **0/11** |
 | **the field's recipes** | 3 of 4 | ⛔ `neovim` **0/11** (glibc 2.26, below), `flameshot` **0/11**, `gearlever` UNRESOLVED. `helix` re-queued |
-| SDL, Qt, Python GUI, media | 0 | ⏳ running |
+| SDL, Qt, media | 0 | ⏳ running |
+
+⛔ **A NOTE-FIELD DEFECT WORTH FIXING BEFORE THE NEXT PASS.** A row's note is
+the **first** line matching `Couldn't load|cannot open|Traceback|…`, cut to 70
+characters. For a Python subject that is `Traceback (most recent call last):` —
+⭐ **the one line of a traceback that carries no information**, since the
+exception is the *last* line. It cost a diagnosis on `pdfarranger`, and the
+same truncation hid `neovim`'s answer (`… cannot open sh` was
+`… cannot open shared object file`). ⚠ Prefer the **last** line of a traceback,
+and keep more than 70 characters.
 
 ⭐ **`eglinfo` and `vulkaninfo` each went `0/11` → `11/11` when C34 and C36
 were fixed.** ⚠ Their store-path counts moved too — `vulkan-1` from `12

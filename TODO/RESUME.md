@@ -138,6 +138,13 @@ criterion fail *for the right reason*.
                  ⛔ THE FIX IS NOT IN ./pgb: it was not rebuilt while 65- ran.
                  AFTER `make`, DELETE the x11-3 row and re-measure.
                  corrections.md C37.
+        py-2     pdfarranger 0/11. Its entry is a SCRIPT (python3.14 + the
+                 static trampoline) and it dies with a Python Traceback --
+                 ⛔ NOT the C37 exec failure. ⚠ The row's note is USELESS
+                 here: it takes the FIRST matching line, which for a
+                 traceback is "Traceback (most recent call last):". Fix the
+                 note to prefer the LAST line and keep >70 chars, then
+                 re-measure: PGB_EXP65_ONLY='py-2'.
         vulkan-1 ⛔ 0/11 AND THE CAPABILITY DEMONSTRABLY WORKS. Run by hand
                  out of the vulkan-2 artefact: `vulkaninfo --summary` exits
                  0 and enumerates GPU0 = llvmpipe, apiVersion 1.4.354 --
