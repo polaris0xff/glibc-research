@@ -1,0 +1,52 @@
+===============================================================
+70 - can a helper written in a real language be CARRIED IN?
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T18:11:05Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/70-carried-helper
+--------------------------------------------------------------
+
+-- building the arms -----------------------------------------
+  built    sh                 POSIX shell script
+  built    c-plain-static     785424 bytes
+  SKIP  build c-pgb                                    (see /home/user/glibc-research/evidence/70-carried-helper/build/c-pgb.log)
+  built    rust-gnu-static    4903520 bytes
+  built    rust-musl-static   4113880 bytes
+
+-- running -----------------------------------------------------
+TARGET                 LIBC   sh                c-plain-static    rust-gnu-static   rust-musl-static 
+alpine-3.22            musl   ok                ok                ok                ok               
+alpine-3.20            musl   ok                ok                ok                ok               
+alpine-3.10            musl   ok                ok                ok                ok               
+voidlinux-musl         musl   ok                ok                ok                ok               
+debian-11              glibc  ok                ok                ok                ok               
+debian-12              glibc  ok                ok                ok                ok               
+ubuntu-20.04           glibc  ok                ok                ok                ok               
+rockylinux-8           glibc  ok                ok                ok                ok               
+opensuse-leap-15.6     glibc  ok                ok                ok                ok               
+fedora-42              glibc  ok                ok                ok                ok               
+archlinux-latest       glibc  ok                ok                ok                ok               
+pgb-env-debian13       glibc  ok                ok                ok                ok               
+
+-- assertions --------------------------------------------------
+  ok    sh runs on every target (the baseline)         = 12
+  --    c-plain-static runs on (observed, not asserted) = 12 of 12
+  --    rust-gnu-static runs on (observed, not asserted) = 12 of 12
+  --    rust-musl-static runs on (observed, not asserted) = 12 of 12
+
+        The observed rows above are the answer to T-011. An arm matching sh's
+        count means a helper in that language can be carried in; anything less
+        means the constraint in docs/design/toolchain.md still binds.
+
+full table: /home/user/glibc-research/evidence/70-carried-helper/RESULT.txt
+
+-- result ----------------------------------------------------
+pass=1 fail=0 skip=1
+VERDICT: matched expectation.
+--------------------------------------------------------------

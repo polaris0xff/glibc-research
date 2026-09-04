@@ -2,7 +2,7 @@
 107 - qalculate-qt's 4-of-11 clean: Qt autolaunches a bus, and execs the host shell
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T17:49:47Z
+date (UTC)   : 2026-09-04T18:00:17Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -19,15 +19,16 @@ evidence     : /home/user/glibc-research/evidence/107-qt-session-bus
   ok    Q0  arm A built (stock, as the corpus built it) = yes
   ok    Q0  ⭐ arm B built (--extra dbus --with-program dbus-daemon dbus-launch) = yes
            arm B programs: programs    qalculate-qt + 2 more
-  FAIL  Q0  ⛔ arm B installed BOTH programs (no 'no such program') = 0
-0, expected 0
-           
+  ok    Q0  ⛔ arm B installed BOTH programs (no 'no such program') = 0
 
 -- the eleven -----------------------------------------------------
   ENVIRONMENT        LIBC   sh dyn  A win     A host    B win     B host
-  alpine-3.22        musl   dynamic no        0         no        0
-           alpine-3.22 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000258008 /* 139 vars
-           alpine-3.22 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001ce008 /* 139 vars
-  alpine-3.20        musl   dynamic no        0         no        0
-           alpine-3.20 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001d8008 /* 139 vars
-           alpine-3.20 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001e2008 /* 139 vars
+  alpine-3.22        musl   dynamic yes       0         yes       0
+           alpine-3.22 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc000240008 /* 139 vars
+           alpine-3.22 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001d8008 /* 139 vars
+  alpine-3.20        musl   dynamic yes       0         yes       0
+           alpine-3.20 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001d6008 /* 139 vars
+           alpine-3.20 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc00019e008 /* 139 vars
+  alpine-3.10        musl   dynamic yes       0         yes       0
+           alpine-3.10 arm A: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001a0008 /* 139 vars
+           alpine-3.10 arm B: 2 launcher/shell exec(s), e.g. execve("/bin/sh", ["/bin/sh", "-c", "DISPLAY=:107 APPIMAGE_EXTRACT_AN"...], 0xc0001dc008 /* 139 vars

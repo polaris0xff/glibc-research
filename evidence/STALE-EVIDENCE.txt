@@ -114,6 +114,24 @@
 # under the newly added prefixes. ⚠ Three traces and one subject is not the
 # corpus, so the debt stands.
 #
+# ⛔ AND C54 OWES THE SAME RE-RUN, for a second and independent reason: `65-`
+# counted a row CLEAN when it loaded zero host objects, which is also what a
+# subject that NEVER STARTED reports. `field-2` (neovim) is exactly that — its
+# closure's glibc 2.26 rejects the loader invocation, nothing of the artefact
+# is ever mapped, and it was counted toward "24 of 26 clean on all eleven".
+# The guard is now `bundled > 0 AND host == 0`.
+#
 # ⭐ WHAT REMOVES THIS BLOCK: a `65-` corpus re-run under the fixed classifier.
 # Until then a zero in this tree means "clean under the OLD predicate", and
 # anyone quoting one should say so.
+
+# ⚠ 2026-09-04c — the "0\n0" sweep. `105-` had one call site of
+# `$(grep -c … || echo 0)` replaced by lib.sh's `exp_count`, which the new
+# TODO/check.sh gate now forbids. ⭐ The change is BEHAVIOURALLY INERT on the
+# committed run: that call site feeds an `exp_note` counting the variables in
+# the bundle's `.env`, the count was NON-zero, and the two forms agree on every
+# non-zero count. ⛔ It is pinned rather than waved through because the rule is
+# the pair, not the judgement. `70-` and `83-` took the same change and were
+# simply re-run (neither touches the bed); `105-` needs all eleven, which
+# another experiment was holding.
+105-file-magic.sh 90ec8aaf7a65f38f38ab65c0e63bd3734a826489 ca5112a2e3bce2d1dede5366cde93c26fa134196 the 0\n0 sweep: one grep -c call site became exp_count; inert on a non-zero count, owed a re-run

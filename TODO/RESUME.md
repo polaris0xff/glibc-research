@@ -123,7 +123,9 @@ pattern is fixed. **C7** is checked before C1 and C2 and fails the run.
 ## In flight right now
 
     ⭐ THE CORPUS IS COMPLETE — 26 of 26, 0 UNRESOLVED, 0 INSTRUMENT, 21
-      passing on all eleven and 24 clean on all eleven. Nothing about
+      passing on all eleven and 24 clean on all eleven — ⛔ but see C54:
+      that 24 counted `neovim`, whose program NEVER STARTED, and the guard
+      (`bundled > 0 AND host == 0`) landed after the run. Nothing about
       `experiments/65-` is owed. Its remaining non-eleven rows are named in
       PROGRESS.md and only ONE of them is ours (pdfarranger's /usr/local).
 

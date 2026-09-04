@@ -333,7 +333,7 @@ assert_anchor() {   # the leading LITERAL run of a `grep -E` pattern
 ENVS=$(awk '!/^#/ && NF {print $2}' "$REPO_DIR/scripts/common/rootfs-images.txt")
 NENV=$(printf '%s\n' "$ENVS" | wc -l | tr -d ' ')
 
-TOTAL=0; BUILT=0; UNRESOLVED=0; FULL=0; CLEANALL=0; INSTRUMENT=0
+TOTAL=0; BUILT=0; UNRESOLVED=0; FULL=0; CLEANALL=0; INSTRUMENT=0; NOSTART=0
 
 # ⛔ C8'S COUNTER, AND IT IS THE HALF OF C44 THAT WOULD HAVE READ GREEN.
 # `pass/rows` says nothing about how many environments were reached: a subject
@@ -457,7 +457,7 @@ while IFS= read -r line <&3; do
     [ $? -gt 1 ] && instr="assertion '$assert' is not a valid grep -E pattern"
   fi
 
-  pass=0; clean=0; rows=0
+  pass=0; clean=0; rows=0; nostart=0
   for name in $ENVS; do
     [ -n "$instr" ] && break
     root=$(exp_rootfs "$name") || true
@@ -568,8 +568,38 @@ while IFS= read -r line <&3; do
       fi
     fi
 
+    # ⛔⛔ ZERO HOST OBJECTS IS ALSO WHAT A SUBJECT THAT NEVER STARTED
+    # REPORTS, AND THIS LINE USED TO COUNT THAT AS CLEAN.
+    #
+    # Five subjects in the completed corpus read `pass 0/11, clean 11/11`
+    # (field-2 neovim, field-3 flameshot, field-4 gearlever, py-2, vulkan-3),
+    # and they are not the same thing. `flameshot` RAN — it put a 3x3 Qt
+    # selection owner on the server — so its clean count means something.
+    # ⛔ `neovim` NEVER EXECUTED: its closure's own glibc 2.26 rejects the
+    # loader invocation, so nothing of the artefact was ever mapped. "It
+    # loaded no host object" is then not a cleanliness result, it is the
+    # ABSENCE of a measurement, and it was being counted toward the headline
+    # "clean on all eleven".
+    #
+    # ⭐ THE DISCRIMINATOR IS THE OTHER HALF OF THE CLASSIFIER'S OWN OUTPUT.
+    # A subject that started loaded at least one object OUT OF THE BUNDLE; one
+    # that never started loaded nothing at all, host or bundled. So a row is
+    # counted clean only when it is `bundled > 0 AND host == 0`.
+    #
+    # ⚠ The guard is one-way: it can only stop a row being counted clean,
+    # never add one, which is the safe direction. ⚠ And it would be wrong for
+    # a STATIC payload, which loads no shared object by construction — the
+    # bundler refuses those (no loader in the closure), so no row here is one.
     nhost=$(exp_classify_trace "$tr" /subj65 | grep -c '^host ' || true)
-    [ "$nhost" = 0 ] && clean=$((clean+1))
+    nbund=$(exp_classify_trace "$tr" /subj65 | grep -c '^bundled ' || true)
+    if [ "$nhost" = 0 ] && [ "$nbund" -gt 0 ]; then
+      clean=$((clean+1))
+    elif [ "$nhost" = 0 ]; then
+      # ⭐ SAID OUT LOUD rather than silently not counted, or the row simply
+      # looks less clean than it did and nobody knows why.
+      nostart=$((nostart+1))
+      exp_note "⛔ $id/$name: loaded NOTHING, host or bundled — the artefact never started, so this row is NOT counted clean"
+    fi
     rm -f "$tr"
   done
 
@@ -616,6 +646,13 @@ while IFS= read -r line <&3; do
   show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" "${paths:--}" "$note"
   [ "$pass" = "$rows" ] && [ "$rows" -gt 0 ] && FULL=$((FULL+1))
   [ "$clean" = "$rows" ] && [ "$rows" -gt 0 ] && CLEANALL=$((CLEANALL+1))
+  # ⭐ AND A SUBJECT THAT NEVER STARTED ON ANY ROW IS COUNTED AND NAMED. Its
+  # clean number is not a cleanliness result and the summary must not read as
+  # though it were.
+  if [ "$nostart" -gt 0 ]; then
+    NOSTART=$((NOSTART+1))
+    exp_note "⛔ $id: the artefact never started on $nostart of $rows rows; its clean count describes only the rows that ran"
+  fi
   note_control "$id" "$pass" "$rows"
   note_short "$id" "$rows"
 
@@ -638,6 +675,7 @@ printf '  %-40s %s\n' '⛔ UNRESOLVED (not a pass, not a fail)' "$UNRESOLVED"
 printf '  %-40s %s\n' '⛔ INSTRUMENT errors (criterion, not subject)' "$INSTRUMENT"
 printf '  %-40s %s\n' "⭐ subjects passing on all $NENV"     "$FULL"
 printf '  %-40s %s\n' "⭐ subjects clean on all $NENV"       "$CLEANALL"
+printf '  %-40s %s\n' "⛔ subjects with a row that NEVER STARTED" "$NOSTART"
 
 printf '\n'
 # ⛔ WITHOUT THIS ROW, A RUN WHERE NOTHING BUILT SCORES GREEN: C1 and C2 both

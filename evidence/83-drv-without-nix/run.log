@@ -1,0 +1,67 @@
+===============================================================
+83 - planning a nixpkgs package with no nix, from the .drv
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T18:11:09Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/83-drv-without-nix
+--------------------------------------------------------------
+
+-- arm 1: the ATerm reader ------------------------------------
+  ok    pgb nix drv selftest                           = pass
+        14 checks, including both nix escapes and two refusals
+
+-- arm 2: is the deriver .drv in the binary cache? -------------
+        channel index: 306442 store paths
+    POPULATION                                     SAMPLED HAS.DRV    PCT
+    any path in the index, sampled by stride           60      1     1%
+    paths with no output suffix (-dev, -doc, ...)      60      2     3%
+    twenty packages a person would name                19     10    52%
+  ok    the .drv route resolves some named packages    = yes
+  ok    and not all of them, so a fallback is required = required
+        named-package rate: 52% -- quote this WITH its population
+        ⚠ population A is 1% -- an order of magnitude lower. Quoting the
+          named-package rate as if it described the store is the mistake
+          this arm exists to prevent; it was made in this session first.
+        subject: gawk (its attribute's deriver .drv is in the cache)
+
+-- arm 3a: the SAME derivation through both routes -------------
+  ok    that exact store path plans with no nix        = built
+        same  pname              gawk
+        same  version            5.4.1
+        same  configureFlags     ['--without-readline']
+        same  patches            ['/nix/store/rbwlls4yc1l6169xzpf4nbyqgk7lzpx1-node-struct-wi
+        same  src                /nix/store/73dx55dqkx9c13x282rp1vdbs84fxbps-gawk-5.4.1.tar.x
+        same  buildSystemHooks   ['autoreconf']
+        same  buildInputs        []
+        same  outputs            ['out', 'info', 'man']
+      FIELDS same=8 diff=0
+  ok    reader and evaluator agree on every field      = 0
+
+-- arm 3b: does a NAME resolve to what an ATTRIBUTE does? ------
+        by name     : /nix/store/7g3xfllgmf6ndlpgdv63l0p8pbadk3fv-gawk-5.4.1
+        by attribute: ny5hzk3l36pldfsjkh56ia7y55xr23vd-gawk-5.4.1
+  ok    the name and the attribute name the same store path = different
+        ⛔ They differ, and there are TWO reasons, both real:
+          1. CHANNEL SKEW. The index is one channel snapshot; the nix on
+             this machine has another. Same package, different revision,
+             different store path -- which is what 'gawk' shows here.
+          2. THE ATTRIBUTE IS NOT THE NAME. nixpkgs' 'bash' attribute is
+             bash-interactive, and no name match can know that.
+          Either way an index lookup is not an evaluation, and a plan must
+          record which route produced it. Both do.
+
+-- arm 4: the same, with nix removed from PATH -----------------
+  ok    a plan with nix off PATH entirely              = built
+        pname: gawk
+        written: /home/user/glibc-research/evidence/83-drv-without-nix/RESULT.txt
+
+-- result ----------------------------------------------------
+pass=7 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

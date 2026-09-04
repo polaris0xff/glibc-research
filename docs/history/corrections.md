@@ -2176,6 +2176,61 @@ nothing here is reasoned from it.
 
 ---
 
+## C54 — "clean on all eleven" counted subjects whose program NEVER STARTED
+
+⛔ **This one reaches a headline number.** `docs/AGENTS.md` §9 and
+`TODO/PROGRESS.md` both quote the corpus as *24 of 26 subjects clean on all
+eleven*, and `experiments/65-` computed that with one line:
+
+```sh
+nhost=$(exp_classify_trace "$tr" /subj65 | grep -c '^host ')
+[ "$nhost" = 0 ] && clean=$((clean+1))
+```
+
+⭐ **Zero host shared objects is also what a subject that never started
+reports.** The tree knows this — `experiments/68-`'s E11 and `101-`'s L4 both
+require the subject to have *drawn* before its cleanliness counts — and the
+corpus, which produces the number everyone quotes, had no such guard.
+
+⭐ **MEASURED, off the committed rows.** Five of the twenty-six read
+`pass 0/11` and `clean 11/11`:
+
+| id | subject | did the program run? |
+|---|---|---|
+| `field-3` | `flameshot` | ⭐ **yes** — it put a 3×3 `Qt Selection Owner` on the server; it just has no toplevel, so a `gui` row cannot pass on it |
+| `field-4` | `gearlever` | ⭐ yes — it reaches a `RuntimeError` from libadwaita |
+| `py-2` | — | yes |
+| `vulkan-3` | `vkmark` | yes; the bed has no `/dev/dri` |
+| ⛔ `field-2` | `neovim` | ⛔ **NO.** Its closure's own glibc 2.26 rejects the loader invocation, so **nothing of the artefact was ever mapped** |
+
+⛔ **For `neovim`, "it loaded no host object" is not a cleanliness result — it
+is the ABSENCE of a measurement**, and it was counted toward the headline.
+
+⭐ **THE DISCRIMINATOR IS THE OTHER HALF OF THE CLASSIFIER'S OWN OUTPUT, which
+was already being computed and thrown away.** A subject that started loaded at
+least one object *out of the bundle*; one that never started loaded nothing at
+all. So a row now counts as clean only when
+
+    bundled > 0   AND   host == 0
+
+and a row with **both** at zero is reported by name —
+`⛔ <id>/<env>: loaded NOTHING, host or bundled — the artefact never started`
+— rather than silently not counted. A new `NOSTART` line appears in the
+summary.
+
+⚠ **The guard is one-way**: it can only stop a row being counted clean, never
+add one. ⚠ **And it would be wrong for a static payload**, which loads no
+shared object by construction — the bundler refuses those (no loader in the
+closure, see `store-paths.md` §3), so no row here is one.
+
+⛔ **THE COMMITTED NUMBER IS NOT RE-MEASURED.** `24 of 26` was taken under the
+old rule and stands in the record until the corpus is re-run; it is pinned in
+`evidence/STALE-EVIDENCE.txt` alongside **C49**, which owes the same re-run.
+⚠ At most one subject is affected on the evidence above, but "at most one" is
+an argument and the ledger takes measurements.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |
