@@ -406,13 +406,23 @@ field names four: `GST_PLUGIN_PATH`, `GST_PLUGIN_SYSTEM_PATH`,
 
 ## ⛔ THE ENTRY DESCRIBED THE WRONG LAYER, and reading the sources says so
 
-⚠ **"We emit one of the four" implied sharun supplies the rest. It does not,
-and it cannot.** `Anylinux-sharun`'s `set_appdir_env.rs` sets **all four**
-itself — but only for a directory named `gstreamer-*` that it finds under its
-own `shared/lib`, and `copyLibraries` **flattens every shared object into a
-single `lib/`**. ⭐ **There is no such directory in our layout, so that branch
-never fires and sharun sets none of them.** The one variable we emitted was the
-only one being set at all.
+⚠ **"We emit one of the four" implied sharun supplies the rest.** It sets all
+four itself (`set_appdir_env.rs`, `dir.starts_with("gstreamer-")`) for a
+directory under its own `shared/lib`.
+
+⛔ **A FIRST VERSION OF THIS ENTRY SAID THAT BRANCH CANNOT FIRE HERE, AND THAT
+WAS WRONG.** It reasoned that `copyLibraries` flattens every shared object into
+one `lib/`. It flattens loose objects, but it also carries **every directory
+under a store path's `lib/` whole** (`copyTreeNoClobber`, logged as
+`lib trees N directories under lib/ carried whole`), and `shared/lib` is a
+symlink to `../lib`. ⭐ **So `shared/lib/gstreamer-1.0` does exist and that
+branch CAN fire.** Whether it does is **not established** and the corpus row is
+what will say. Caught by a deep review of the change, before it was measured.
+
+⭐ **What survives, and it is the part that mattered**: `GST_PLUGIN_SCANNER` is
+**definitely** not set. sharun sets it only when the scanner sits **beside** the
+plugins, and nixpkgs puts it in `libexec/gstreamer-*/` — so that test cannot
+succeed on a nixpkgs closure however the plugin directory is laid out.
 
 ⭐ **And the fourth is a different kind of thing from the first three.** Three
 are directories, and the store farm already holds the original tree they point
@@ -430,7 +440,9 @@ field reaches the same conclusion from the other side: `quick-sharun`'s
 it in the gstreamer libdir.
 
 **Landed** (⛔ **UNMEASURED — see Prove**): `bakedOverride` emits the three
-path variables; `installGstScanner` installs the scanner as a bundle *program*,
+path variables, ⚠ **possibly redundantly with sharun's own and deliberately
+so** — a duplicate entry in a path list is harmless where a missing one is
+not, and ours name the store farm, which resolves to the same tree; `installGstScanner` installs the scanner as a bundle *program*,
 so `bin/gst-plugin-scanner` is a sharun hardlink; `writeEnv` names it, keyed on
 that program existing, exactly as every other line there is keyed. The name is
 one constant, `gstScannerName`, because two literals are two things that have

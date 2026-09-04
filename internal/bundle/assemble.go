@@ -166,9 +166,9 @@ func (b *Builder) assemble() error {
 // ⛔ WHY THE SEARCH IS libexec/ AND NOT lib/. Anylinux-sharun sets this
 // variable itself, but only for `<library_path>/gstreamer-*/gst-plugin-scanner`
 // — the scanner sitting BESIDE the plugins. nixpkgs puts it in
-// `libexec/gstreamer-1.0/`, and `copyLibraries` flattens every shared object
-// into `lib/` anyway, so no such directory exists here for sharun's branch to
-// find. Nothing sets it unless this does.
+// `libexec/gstreamer-1.0/` instead, so that test cannot succeed on a nixpkgs
+// closure however the plugin directory is laid out. Nothing sets it unless
+// this does.
 //
 // ⚠ THE VALUE POINTS AT bin/, NOT shared/bin/. `bin/<name>` is the sharun
 // hardlink that sets the library path and runs the bundled loader;

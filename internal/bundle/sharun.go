@@ -164,25 +164,27 @@ func bakedOverride(storeName, sub string) []string {
 	case strings.HasPrefix(sub, "lib/ladspa"):
 		return []string{fmt.Sprintf("LADSPA_PATH=${SHARUN_DIR}/store/%s/%s", storeName, sub)}
 	case strings.HasPrefix(sub, "lib/gstreamer-"):
-		// ⛔ GStreamer NEEDS FOUR VARIABLES AND WE EMITTED ONE. The other
-		// three are not decoration: which of the first three a plugin
-		// consults varies by GStreamer version, and the fourth names the
-		// scanner binary.
+		// ⛔ GStreamer NEEDS FOUR VARIABLES AND WE EMITTED ONE. Which of the
+		// first three a plugin consults varies by GStreamer version; the
+		// fourth names the scanner binary.
 		//
-		// ⚠ AND sharun CANNOT SUPPLY THEM FOR US, which is why they are here
-		// rather than left to it. Anylinux-sharun sets all four itself
-		// (`set_appdir_env.rs`, `dir.starts_with("gstreamer-")`) — but only
-		// for a directory it finds under its own `shared/lib`, and
-		// `copyLibraries` FLATTENS every shared object into `lib/`. There is
-		// no `gstreamer-1.0` directory in our layout for that branch to fire
-		// on, so it sets none of them. The store farm is what keeps the
-		// original tree, and these point at it.
+		// ⚠ THESE THREE MAY BE REDUNDANT WITH sharun's OWN, AND THAT IS
+		// DELIBERATE AND UNMEASURED. Anylinux-sharun sets all four itself
+		// (`set_appdir_env.rs`, `dir.starts_with("gstreamer-")`) for a
+		// directory under its `shared/lib`. Our layout DOES have one:
+		// `copyLibraries` carries every directory under a store path's `lib/`
+		// whole (`copyTreeNoClobber`), and `shared/lib` is a symlink to
+		// `../lib` — so that branch can fire. ⛔ WHETHER IT DOES is not
+		// established, and a duplicate entry in a path list is harmless where
+		// a missing one is not. These name the store farm, which resolves to
+		// the same tree. The corpus row is what will say.
 		//
-		// ⛔ GST_PLUGIN_SCANNER IS NOT HERE, and it is not an oversight: in
-		// nixpkgs the scanner is at `libexec/gstreamer-*/gst-plugin-scanner`,
-		// a different top-level directory from this `sub`, and running it
-		// straight out of the merged tree would start a dynamic ELF under the
-		// HOST loader. installGstScanner handles it as a program instead.
+		// ⭐ GST_PLUGIN_SCANNER IS THE ONE THAT IS DEFINITELY MISSING, and it
+		// is not here: sharun sets it only when the scanner sits BESIDE the
+		// plugins, and nixpkgs puts it in `libexec/gstreamer-*/` — a different
+		// top-level directory from this `sub`. Running it straight out of the
+		// merged tree would start a dynamic ELF under the HOST loader, so
+		// installGstScanner handles it as a program instead.
 		return []string{
 			fmt.Sprintf("GST_PLUGIN_PATH=${SHARUN_DIR}/store/%s/%s", storeName, sub),
 			fmt.Sprintf("GST_PLUGIN_SYSTEM_PATH=${SHARUN_DIR}/store/%s/%s", storeName, sub),
