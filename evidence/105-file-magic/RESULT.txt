@@ -1,0 +1,62 @@
+===============================================================
+105 - file(1) out of a bundle: a compiled-in data path, no AppRun, no env var
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T13:17:33Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /home/user/glibc-research/evidence/105-file-magic
+--------------------------------------------------------------
+
+-- building the subject and its control ---------------------------
+  ok    F0  the subject built                          = yes
+  ok    F2  ⭐ the bundle sets NO MAGIC variable      = 0
+           .env carries 5 variable(s): XDG_DATA_DIRS GCONV_PATH FONTCONFIG_PATH SHARUN_FALLBACK_LIBRARY_PATH VK_DRIVER_FILES 
+  ok    F3  ⭐ AppRun is the stock sharun, not a per-app script = yes
+           AppRun 226296 bytes, sharun 226296 bytes
+  ok    F0  ⭐ the control built (--no-storefix)      = yes
+
+-- the eleven -----------------------------------------------------
+  ENVIRONMENT            SUBJECT    CONTROL
+  alpine-3.22            yes        no
+           alpine-3.22 control said: 0%63%100%file: could not find any valid magic files! (No such file or directory)
+  alpine-3.20            yes        no
+           alpine-3.20 control said: 0%64%100%file: could not find any valid magic files! (No such file or directory)
+  alpine-3.10            yes        no
+           alpine-3.10 control said: 0%76%100%file: could not find any valid magic files! (No such file or directory)
+  voidlinux-musl         yes        no
+           voidlinux-musl control said: 0%73%100%file: could not find any valid magic files! (No such file or directory)
+  debian-11              yes        no
+           debian-11 control said: 0%60%100%WARNING: Cannot find CA Certificates in host!file: could not find any valid magic files! (No such file or di
+  debian-12              yes        no
+           debian-12 control said: 0%66%100%WARNING: Cannot find CA Certificates in host!file: could not find any valid magic files! (No such file or di
+  ubuntu-20.04           yes        no
+           ubuntu-20.04 control said: 0%60%100%WARNING: Cannot find CA Certificates in host!file: could not find any valid magic files! (No such file or di
+  rockylinux-8           yes        no
+           rockylinux-8 control said: 0%53%100%file: could not find any valid magic files! (No such file or directory)
+  opensuse-leap-15.6     yes        no
+           opensuse-leap-15.6 control said: 0%69%100%file: could not find any valid magic files! (No such file or directory)
+  fedora-42              yes        no
+           fedora-42 control said: 0%72%100%file: could not find any valid magic files! (No such file or directory)
+  archlinux-latest       yes        no
+           archlinux-latest control said: 0%71%100%file: could not find any valid magic files! (No such file or directory)
+
+  ok    F1  ⭐ the bundle identifies a PNG on all 11  = 11
+  ok    F4  ⛔ the --no-storefix control FAILS on all 11 = 11
+        ⭐ SO THE ANSWER TO THE QUESTION IS YES, AND F2/F3 ARE WHY IT MEANS
+           SOMETHING: the artefact carries no MAGIC variable and no
+           per-application AppRun, and the same bundle with the mechanism
+           switched off cannot read its own magic database.
+        ⚠ ONE program and ONE data file. It says the mechanism reaches a
+           compiled-in absolute STORE path with no search variable. It says
+           nothing about a path in a config file, and a /usr-prefixed path
+           it would NOT reach — pgb-storefix.c's fix() by construction.
+
+-- result ----------------------------------------------------
+pass=6 fail=0 skip=0
+VERDICT: matched expectation.
+--------------------------------------------------------------

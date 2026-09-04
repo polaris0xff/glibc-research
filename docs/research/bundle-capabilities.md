@@ -620,12 +620,25 @@ under `GTK_THEME=HighContrast` asserting an `openat` of a host
 
 **2. Can it pack `file`(1) without patching — no custom AppRun, no env var?**
 
-⭐ **`experiments/105-` is written and pre-registered for exactly this**, and
-`file` is the sharpest possible subject: with no magic database it does not
-degrade, it says `could not find any valid magic files!` and exits non-zero.
-Four rows — the artefact identifies a PNG on all eleven; the `.env` carries
-**no `MAGIC`**; the `AppRun` is byte-identical to the stock `sharun`; and the
-same closure built `--no-storefix` **fails**. ⛔ Not run yet.
+⭐⭐ **YES, AND IT IS MEASURED — `experiments/105-`, `pass=6 fail=0 skip=0`,
+two runs identical.** `file` is the sharpest possible subject: with no magic
+database it does not degrade, it says `could not find any valid magic files!`
+and exits non-zero, so there is no "it printed something" answer to mistake for
+a pass.
+
+| | |
+|---|---|
+| **F1** the artefact identifies a PNG | ⭐ **11 / 11** |
+| **F2** `MAGIC` or `MAGIC_PATH` in the bundle's `.env` | ⭐ **0.** The five variables it does carry are `XDG_DATA_DIRS`, `GCONV_PATH`, `FONTCONFIG_PATH`, `SHARUN_FALLBACK_LIBRARY_PATH`, `VK_DRIVER_FILES` |
+| **F3** a per-application `AppRun` | ⭐ **none** — `AppRun` is byte-identical to the stock `sharun`, 226,296 bytes each |
+| **F4** ⛔ the same closure built `--no-storefix` | ⭐ **fails on 11 / 11**, with `file: could not find any valid magic files! (No such file or directory)` |
+
+⭐ **F4 is why F1 means anything**: the mechanism can be switched off with a
+shipped flag and the subject then cannot read its own data. ⚠ **One program and
+one data file.** It says the mechanism reaches a compiled-in absolute **store**
+path with no search variable. It says nothing about a path in a config file
+(which the interposer would also reach — see the grid below) and a `/usr`
+path it would **not** reach, by construction.
 
 **3. Can it bundle something like `rpcs3` — anything nixpkgs builds?**
 
