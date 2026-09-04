@@ -1697,6 +1697,46 @@ existed in the same file.
 
 ---
 
+## C44 — a failed `cp` was scored as a failed subject, on four environments out of eleven
+
+**Found** 2026-09-04c. `field-4` `gearlever` came back as
+
+    field-4  gearlever  gui  0/4  4/4  221 compiled in: 208 res
+             /bin/sh: /subj65: not found
+
+⛔ **Two things in that line are wrong and neither is the subject.** The
+denominator is **4**, not 11; and the note is the shell failing to find a file
+the harness was supposed to have put there.
+
+`experiments/65-` staged each subject with
+
+    rm -f "$root/subj65"; cp "$img" "$root/subj65" 2>/dev/null; chmod +x …
+
+⛔ **`2>/dev/null` on the copy.** gearlever's artefact is **907 MiB**, the
+machine was under disk pressure with two corpus instances holding multi-GiB
+closure caches, and `cp` failed with ENOSPC into a discarded stderr. The row
+then ran the subject that was not there, `/bin/sh` said `not found`, and the
+harness recorded a capability result.
+
+⚠ **AND THE DENOMINATOR IS THE WORSE HALF.** `rows` counts environments the
+loop reached, so a subject measured on four scores `pass/4`. ⛔ **A subject that
+passed all four would have been recorded as passing — `4/4` — and read as a
+green row.** Nothing in the verdict compared `rows` against the eleven.
+
+⭐ **Both fixed:**
+
+- staging happens **before** the row is counted, and a failed copy is a
+  **SKIP with the copy's own error text**, not a zero;
+- ⭐ **C8**: every subject that was measured must have been measured on all
+  eleven environments. A short row now fails the run instead of being read as
+  a small green one.
+
+⛔ **The row was DELETED and re-measured**, which is the rule that makes a
+resumable corpus safe. ⚠ And the general shape is the one this file keeps
+recording: *a discarded error is a wrong answer waiting to be believed.*
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

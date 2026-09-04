@@ -399,8 +399,29 @@ func (b *Builder) liftWrapperEnv() []string {
 	// ⭐ ReplaceAllStringFunc does no template expansion at all, which is why
 	// it is used instead of escaping the `$`.
 	var out []string
+	nUnportable := 0
 	for _, r := range b.wrapEnv {
 		if r.Var == "" {
+			continue
+		}
+		// ⛔ A WRAPPER VALUE IS NOT ALWAYS A VALUE. nixpkgs' GStreamer
+		// setup-hook puts a SHELL FRAGMENT in the wrapper:
+		//
+		//   GST_PLUGIN_SYSTEM_PATH_1_0=$(unset _tmp; for profile in
+		//     $NIX_PROFILES; do _tmp="$profile/lib/gstreamer-1.0…"; done; …)
+		//
+		// ⛔ Lifted verbatim into `.env` it is worse than absent: there is no
+		// `$NIX_PROFILES` in a bundle and nothing runs `$( )`, so the variable
+		// holds literal garbage and SHADOWS whatever else would have set it.
+		// Measured on `gst_all_1.gstreamer`, 2026-09-04c — the bundle's only
+		// GStreamer variable was that fragment.
+		//
+		// ⚠ The test is deliberately narrow — command substitution, or a
+		// name only the nix ENVIRONMENT defines — because a `$` on its own is
+		// ordinary in a path list and `${VAR}` is how OpPrefix composes.
+		if strings.Contains(r.Value, "$(") || strings.Contains(r.Value, "$NIX_PROFILES") {
+			logx.Warnf("wrapper %s: value is a shell fragment, not a path; NOT lifted", r.Var)
+			nUnportable++
 			continue
 		}
 		v := StoreRefToBundle(r.Value)
@@ -419,6 +440,10 @@ func (b *Builder) liftWrapperEnv() []string {
 	}
 	if len(out) > 0 {
 		logx.Say("wrapper env %d variable(s) lifted out of the wrapper into .env", len(out))
+	}
+	if nUnportable > 0 {
+		logx.Warnf("   %d value(s) were shell fragments and were dropped; the"+
+			" plugin path must come from carryBakedPaths or sharun", nUnportable)
 	}
 	return out
 }

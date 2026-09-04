@@ -1,0 +1,57 @@
+===============================================================
+103 - a bundled GStreamer application decoding, and which process the host count describes
+===============================================================
+-- conditions ------------------------------------------------
+date (UTC)   : 2026-09-04T11:45:56Z
+host kernel  : Linux 6.18.44-fc-v24
+host arch    : x86_64
+host distro  : Ubuntu 24.04.4 LTS
+host libc    : ldd (Ubuntu GLIBC 2.39-0ubuntu8.7) 2.39
+cc           : cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+ld           : GNU ld (GNU Binutils for Ubuntu) 2.42
+evidence     : /var/tmp/t103-evidence/103-gstreamer-decode
+--------------------------------------------------------------
+
+-- building the subject and its control ---------------------------
+  ok    B1  the subject built                          = yes
+  ok    B2  ⭐ the control built (--no-plugin-env)    = yes
+        GST_* variables in the subject .env: 1
+
+-- the eleven ------------------------------------------------------
+  ENVIRONMENT            ENC    DEC    HOST(pay) HOST(tree) SCANNER
+  alpine-3.22            yes    no     0         0         yes
+  alpine-3.20            yes    no     0         0         yes
+  alpine-3.10            yes    no     0         0         yes
+  voidlinux-musl         yes    no     0         0         yes
+  debian-11              yes    no     0         0         yes
+  debian-12              yes    no     0         0         yes
+  ubuntu-20.04           yes    no     0         0         yes
+  rockylinux-8           yes    no     0         0         yes
+  opensuse-leap-15.6     yes    no     0         0         yes
+  fedora-42              yes    no     0         0         yes
+  archlinux-latest       yes    no     0         0         yes
+
+  ok    D1  the ENCODE leg runs on all 11              = 11
+  FAIL  D2  ⭐ the DECODE leg produces MORE bytes than it read = 0, expected 11
+  ok    D3  zero HOST shared objects in the PAYLOAD    = 11
+        D4  ⭐ gst-plugin-scanner exec seen on 11 of 11 environments
+        ⛔ SO THE TREE COUNT IS NOT THE APPLICATION'S. The field's own
+           note is that the scanner opens every plugin it can find, so a
+           host-object count taken over the whole process tree describes
+           the SCANNER. The payload column is the application's.
+  ok    C0  ⭐ the control ran on every environment   = 11
+        C1  ⭐ the control FAILED to encode on 0 of 11 environments
+        ⛔ THE VARIABLES ARE REDUNDANT ON THIS SUBJECT, and that is a
+           finding rather than a failure: GStreamer's compiled-in default
+           plugin directory is a /nix/store path, and pgb-storefix.c
+           already answers it. T-091 should say so instead of claiming a
+           mechanism nothing needed.
+        ⛔ C3-CLASS LIMIT: every codec path here is SOFTWARE. There is no
+           /dev/dri on this machine, so this says nothing about VAAPI,
+           NVDEC or any hardware decoder. T-059 owns hardware.
+        ⚠ And one container on one codec pair is not "media works".
+
+-- result ----------------------------------------------------
+pass=5 fail=1 skip=0
+VERDICT: the measurement ran and did NOT match expectation.
+--------------------------------------------------------------

@@ -2,7 +2,7 @@
 65 - the capability corpus: three applications per category, simple to complex
 ===============================================================
 -- conditions ------------------------------------------------
-date (UTC)   : 2026-09-04T09:54:25Z
+date (UTC)   : 2026-09-04T11:04:02Z
 host kernel  : Linux 6.18.44-fc-v24
 host arch    : x86_64
 host distro  : Ubuntu 24.04.4 LTS
@@ -28,33 +28,33 @@ evidence     : /home/user/glibc-research/evidence/65-capability-corpus
   vulkan-3   Vulkan           vkmark         gui  0/11    11/11   43 compiled in: 42 resol Error: filesystem error: directory iterator cannot open directory: No  (recorded)
   sdl-1      SDL              dosbox         gui  11/11   11/11   181 compiled in: 169 res  (recorded)
   sdl-2      SDL              stella         gui  11/11   11/11   179 compiled in: 167 res  (recorded)
-  sdl-3      SDL              scummvm        gui  11/11   11/11   180 compiled in: 168 res 
+  sdl-3      SDL              scummvm        gui  11/11   11/11   180 compiled in: 168 res  (recorded)
   qt-1       Qt               qalculate-qt   gui  11/11   4/11    127 compiled in: 124 res  (recorded)
   qt-2       Qt               keepassxc      gui  11/11   11/11   101 compiled in: 98 reso  (recorded)
   qt-3       Qt               qbittorrent    gui  11/11   11/11   120 compiled in: 117 res  (recorded)
   py-1       Python GUI       meld           gui  11/11   11/11   89 compiled in: 86 resol  (recorded)
   py-2       Python GUI       pdfarranger    gui  0/11    11/11   113 compiled in: 109 res FileNotFoundError: [Errno 2] No such file or directory: '/usr/local/share/pdfarranger/pdfarranger.ui'
-  py-3       Python GUI       virt-manager   gui  0/11    11/11   239 compiled in: 226 res ModuleNotFoundError: No module named 'virtManager'
-  media-1    media / codecs   mpv            cli  11/11   11/11   151 compiled in: 142 res 
+  py-3       Python GUI       virt-manager   gui  11/11   11/11   239 compiled in: 226 res 
+  media-1    media / codecs   mpv            cli  11/11   11/11   151 compiled in: 142 res  (recorded)
   field-1    the field's own recipes helix          cli  0/11    11/11   8 compiled in: 7 resolve  (recorded)
   field-2    the field's own recipes neovim         cli  0/11    11/11   28 compiled in: 27 resol --argv0: error while loading shared libraries: --argv0: cannot open shared object file: No such file or directory (recorded)
   field-3    the field's own recipes flameshot      gui  0/11    11/11   124 compiled in: 121 res  (recorded)
-  field-4    the field's own recipes gearlever      gui  -       -       -         UNRESOLVED: see /var/tmp/t065b/build-field-4.log (recorded)
+  field-4    the field's own recipes gearlever      gui  0/4     4/4     221 compiled in: 208 res /bin/sh: /subj65: not found (recorded)
 
 -- summary ---------------------------------------------------------
   subjects in the corpus                   26
-  subjects that produced an artefact       25
-  ⛔ UNRESOLVED (not a pass, not a fail)  1
+  subjects that produced an artefact       26
+  ⛔ UNRESOLVED (not a pass, not a fail)  0
   ⛔ INSTRUMENT errors (criterion, not subject) 0
-  ⭐ subjects passing on all 11           19
-  ⭐ subjects clean on all 11             23
+  ⭐ subjects passing on all 11           20
+  ⭐ subjects clean on all 11             24
 
   ok    at least one subject produced an artefact      = yes
   ok    C6  ⭐ control subjects MEASURED (gtk3-1 gtk3-2 py-1) = 3
   ok    C6  ⭐ control subjects at 11 of 11, as 64- measured them = 3
   ok    C7  ⭐ no subject failed its criterion's sanity check = 0
-  FAIL  C1  every subject MEASURED passes on all 11    = 19, expected 25
-  FAIL  C2  every subject MEASURED is clean on all 11  = 23, expected 25
+  FAIL  C1  every subject MEASURED passes on all 11    = 20, expected 26
+  FAIL  C2  every subject MEASURED is clean on all 11  = 24, expected 26
         ⛔ C3 IS A LIMIT AND IT IS NOT MEASURED AWAY BY A GREEN TABLE.
            Every OpenGL and Vulkan row here is a SOFTWARE rasteriser —
            llvmpipe and lavapipe — on a machine with no GPU. This experiment

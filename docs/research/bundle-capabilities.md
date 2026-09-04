@@ -77,7 +77,7 @@ reason it is not.
 | ⭐ **Qt** | ⭐ **3 of 3 — CLOSED** | `qalculate-qt` **11/11** (clean **4/11**, unexplained and recorded as such), `keepassxc` **11/11** clean **11/11**, `qbittorrent` **11/11** clean **11/11** — 127, 101 and 120 store paths compiled in |
 | ⭐ **SDL** | ⭐ **3 of 3 — CLOSED, all clean** | `dosbox` **11/11** (**181** store paths compiled in, 169 resolving — the largest closure in the corpus), `stella` **11/11** (179/167), `scummvm` **11/11** (180/168) |
 | ⭐ **media / codecs** | **1 of 3 in, and it passes** | ⭐ `mpv` **11/11, clean 11/11**, 151 store paths compiled in — the row that read **0/11** until **C39**, a subject that had answered completely against an assertion that could not match it. ⛔ The row runs `--version`, so it does **not** close T-091: nothing decodes |
-| **Python GUI** | 1 of 3 passing | ⭐ `meld` **11/11**, clean 11/11 — the third C6 control. ⛔ `pdfarranger` **0/11** and `virt-manager` **0/11**, and ⭐ **the two are NOT the same failure** — see the row-note table below |
+| ⭐ **Python GUI** | ⭐ **2 of 3 passing**, and the third is not ours | `meld` **11/11** clean 11/11 — the third C6 control. ⭐ `virt-manager` **11/11, clean 11/11**, 239 store paths compiled in — **0/11 → 11/11 by C41**, exactly as pre-registered. ⛔ `pdfarranger` **0/11**, and re-measured against the same fixed tool it does **not move**, also as pre-registered |
 | **the field's recipes** | ⛔ 0 of 4 passing as recorded, and ⭐ **ALL FOUR are now explained, two of them by a shipped fix** | `neovim` **0/11** — the closure's own glibc 2.26 (C35), not ours. `flameshot` **0/11** — ⭐ **not a bundler failure**: a tray application with no toplevel, and no session bus in this bed. `gearlever` — was UNRESOLVED, ⭐ **C42 makes it build**. ⭐ `helix` **0/11** — **C43, a real bundler defect and a FOURTH entry-point shape**: by hand, `hx --version` now answers `helix 25.07.1` and exits 0 |
 
 ⭐ **THE THREE ZEROS THAT ARE NOT OURS, each measured rather than argued:**
@@ -100,14 +100,15 @@ characters, which for a Python traceback is always that sentence and never the
 cause (**C40**). The note is now the LAST matching line at 180 characters, and
 the two rows stop looking alike:
 
-| row | the note | what it is |
-|---|---|---|
-| `py-3` `virt-manager` | `ModuleNotFoundError: No module named 'virtManager'` | ⭐ **C41**, byte for byte: the interposer defined `stat`/`lstat`/`fstatat` and not the `64` names a nixpkgs Python imports, so a compiled-in store path was rewritten when OPENED and not when STATTED — and Python's import finder stats before it imports |
-| `py-2` `pdfarranger` | `FileNotFoundError: … '/usr/local/share/pdfarranger/pdfarranger.ui'` | ⛔ **a different class, and it is the field's own "Garbage — GTK" row arriving on OUR pipeline.** `/usr/local`, not `/nix/store` — so `pgb-storefix.c`'s `fix()` returns it unchanged by construction, and no interposer change can reach it. ⚠ [`app-corpus.md`](app-corpus.md) rung 3 says a nixpkgs-built application compiles in *its own store path* rather than `/usr/share`; this one compiles in **neither** — it asks Python at run time and Python answers `/usr/local` |
+| row | the note | what it is | predicted | ⭐ measured |
+|---|---|---|---|---|
+| `py-3` `virt-manager` | `ModuleNotFoundError: No module named 'virtManager'` | ⭐ **C41**, byte for byte: the interposer defined `stat`/`lstat`/`fstatat` and not the `64` names a nixpkgs Python imports, so a compiled-in store path was rewritten when OPENED and not when STATTED — and Python's import finder stats before it imports | **moves** | ⭐ **11/11, clean 11/11** |
+| `py-2` `pdfarranger` | `FileNotFoundError: … '/usr/local/share/pdfarranger/pdfarranger.ui'` | ⛔ **a different class, and it is the field's own "Garbage — GTK" row arriving on OUR pipeline.** `/usr/local`, not `/nix/store` — so `pgb-storefix.c`'s `fix()` returns it unchanged by construction, and no interposer change can reach it | **does not move** | ⛔ **0/11, same line** |
 
-⛔ **Both rows were measured by a `pgb` without C41 and are being re-measured.**
-The prediction — `py-3` moves, `py-2` does not — was committed before the run
-that settles it.
+⭐ **BOTH HALVES OF THE PREDICTION HELD**, and it was committed before the run
+that settled it. ⚠ The point is not that the guesses were right — it is that
+until the note was fixed the two rows were *indistinguishable*, so no
+prediction about either was possible at all.
 
 ⭐ **THE THREE C6 POSITIVE CONTROLS ARE ALL IN AND ALL GREEN** — `galculator`,
 `mousepad` and `meld`, each **11/11**, each agreeing with `experiments/64-`,
