@@ -48,3 +48,11 @@
 61-libc-throughput.sh 8ce829252d942b05a25a484b780148d427b1890e 0e56e62962e7d461dca7b57ebc9534476b0a4941 T-077: measured on pgb-env-debian12/glibc-2.36; benchmark matrix, needs an idle machine for the clock
 62-anylinux-appimage.sh 2e66b0ce248e9fc8dcc16fcbc2ec37d7ecce15ab 894bfaec26de04327d143a913f4a39bafbd567d8 T-077 and T-084: measured on pgb-env-debian12/glibc-2.36; builds an anylinux AppImage on an Arch bed
 88-nonix-end-to-end.sh 8ce829252d942b05a25a484b780148d427b1890e 25a86348fced4718085f9ef5997e103f7de82299 T-077: measured on pgb-env-debian12/glibc-2.36; five arms, plans and builds jq inside a rootfs
+
+# ⚠ AND ONE THAT IS NOT A DEBT AT ALL, which is why it says so.
+# `evidence/65-capability-corpus/` holds ONLY the README describing the row
+# format; the experiment has not been run yet. The gate compares the script's
+# last commit against that directory's and sees the script as newer, which is
+# true and means nothing here. ⛔ The line goes inert the moment the corpus
+# runs and writes a row, which is the first thing the next session should do.
+65-capability-corpus.sh 92ce27b1b1ab8d6fc044389e3c82a66c9fefc518 7f56ed65ad3c257c5da222eb1b4855978155840c NOT A DEBT: the experiment has never been run; the directory holds only its README

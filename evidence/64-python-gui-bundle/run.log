@@ -24,3 +24,65 @@ evidence     : /home/user/glibc-research/evidence/64-python-gui-bundle
       out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
   alpine-3.20          musl   yes   1        0        yes      3409
       out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
+  alpine-3.10          musl   yes   1        0        yes      3409
+      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
+  voidlinux-musl       musl   yes   1        0        yes      3409
+      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
+  debian-11            glibc  yes   1        0        yes      3409
+      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
+  debian-12            glibc  yes   1        0        yes      3409
+      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
+  ubuntu-20.04         glibc  yes   1        0        yes      3409
+      out: WARNING: Cannot find CA Certificates in host!  [exit 124]
+  rockylinux-8         glibc  yes   1        0        yes      3409
+      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
+  opensuse-leap-15.6   glibc  yes   1        0        yes      3409
+      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
+  fedora-42            glibc  yes   1        0        yes      3409
+      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
+  archlinux-latest     glibc  yes   1        0        yes      3409
+      out: [galculator] configuration file: Failed to create directory /root/.config/galculator.  [exit 124]
+
+
+-- arm N: galculator with --no-storefix (the NEGATIVE CONTROL) -----
+        building nofix — several minutes
+
+  ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
+  alpine-3.22          musl   yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+  alpine-3.20          musl   yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+  alpine-3.10          musl   yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+  voidlinux-musl       musl   yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+  debian-11            glibc  yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+  debian-12            glibc  yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+  ubuntu-20.04         glibc  yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+  rockylinux-8         glibc  yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+  opensuse-leap-15.6   glibc  yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+  fedora-42            glibc  yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+  archlinux-latest     glibc  yes   0        0        yes      93
+      out: [galculator] Couldn't load /nix/store/ls8wzmc3wrwwi01czkihav804jgr68zq-galculator-2.1.4/share/galculator/ui/main_frame.ui. This file is necessary     to build galculator's user interface. Make sure you did a make install and the file     is accessible!  [exit 1]
+
+
+-- arm X: mousepad (UI compiled into the binary as a GResource) ----
+        building mousepad — several minutes
+
+  ENVIRONMENT          LIBC   CONN  WINDOW HOST.so  libgtk3 BUNDLED .so
+  alpine-3.22          musl   yes   1        0        yes      3822
+      out: <none>  [exit 124]
+  alpine-3.20          musl   yes   1        0        yes      3822
+      out: <none>  [exit 124]
+  alpine-3.10          musl   yes   1        0        yes      3822
+      out: <none>  [exit 124]
+  voidlinux-musl       musl   yes   1        0        yes      3822
+      out: <none>  [exit 124]
+  debian-11            glibc  yes   1        0        yes      3822
+      out: WARNING: Cannot find CA Certificates in host!  [exit 124]

@@ -119,7 +119,14 @@ criterion fail *for the right reason*.
   way to tell which without reading them.
 - ⚠ **`RESULT.txt` IS OVERWRITTEN BY EACH RUN.** If a document quotes two runs,
   only the second is re-derivable from the tree — say so, or quote the second.
-- ⛔ **read the CI run; a local gate does not speak for it.**
+- ⛔ **read the CI run; a local gate does not speak for it.** ⭐ The cheap way,
+  and it is the route `RULES.md` prescribes anyway:
+
+      curl -s "https://api.gh.pkgforge.dev/repos/polaris0xff/glibc-research/actions/runs?per_page=8"
+
+  piped through `python3 -c` for `run_number status conclusion head_sha`.
+  ⚠ The MCP listing returns every commit MESSAGE in full, which is tens of
+  thousands of characters for this repository's commits.
 - ⚠ **`scratchpad/` is NOT a path in the repo.**
 
 ## ⛔ THE RULE ABOUT THE SHARED RESOURCE
