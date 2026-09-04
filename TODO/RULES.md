@@ -201,7 +201,7 @@ as a proxy defect and go hunting for another route.
   is the reference implementation; ⛔ **do not write a second fetcher** —
   `../docs/AGENTS.md` §14.
 
-⭐ **And keep what you fetched.** The branch this session read
+⭐ **And keep what you fetched.** The branch a session reads
 `references/Aseem0xff__alloc-tests/tree/docs/containers.md` from was **gone
 within the hour** — 404 on both routes. The mined copy at a pinned commit is
 what survived, which is `../docs/methodology/references.md`'s "keep the tree"

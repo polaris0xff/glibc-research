@@ -160,18 +160,19 @@ later."* Every other rule holds everywhere, T-087 included.
 
     1. ⛔ PRE-REGISTER the expectation before the run, and COMMIT it
        before the run so the git log shows it was not written after.
-       Done three times this session; TWO predictions were falsified and
-       both are recorded rather than rewritten.
+       Predictions HAVE been falsified this way and were recorded rather
+       than rewritten -- that is the rule working, not failing.
     2. ⛔ A SKIP IS NOT A PASS. Read the skip count on every run.
     3. ⛔ TWO RUNS OR IT IS NOT A NUMBER. This caught a counter that
        moved 0 -> 7 between two runs with no change to the subject.
     4. ⛔ AN ABSENCE IS NOT A ZERO. Say where you looked, AND where you
        could not: T-079's search cannot see runtime-assembled paths or
        other libraries' host data, and says so.
-    5. ⛔ VERIFY YOUR OWN WRITE-UP AGAINST THE SOURCE. Two claims failed
-       this check this session — "SIGABRT on 3" was SIGABRT on two and
-       SIGFPE on one, and a quoted figure came from a run whose
-       RESULT.txt the next run had overwritten.
+    5. ⛔ VERIFY YOUR OWN WRITE-UP AGAINST THE SOURCE. Claims that have
+       failed this check: "SIGABRT on 3" (it was SIGABRT on two, SIGFPE on
+       one); a figure quoted from a run whose RESULT.txt the next run had
+       overwritten; a list of eight wrapped symbols that named one not
+       wrapped.
     6. ⛔ CHECK THAT YOUR SUCCESS CRITERION CAN FAIL FOR THE RIGHT
        REASON. `Gtk-WARNING: cannot open display` is emitted by the
        BUNDLED library, so it looked like proof the bundle worked -- and

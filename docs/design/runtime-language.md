@@ -27,9 +27,9 @@ produces.
 | `pgb-iconv.c` | 81 | the `iconv` wrappers |
 
 ⭐ **The loader is over half of it and it is the honest candidate**, which is
-what makes the question answerable now rather than in the abstract: it was
-written this session, it is the hairiest C in the tree, and it is the one piece
-where a safer language could plausibly have paid.
+what makes the question answerable now rather than in the abstract: it is the
+hairiest C in the tree, and the one piece where a safer language could
+plausibly have paid.
 
 ## Question 1 — is any of it measurably slow?
 

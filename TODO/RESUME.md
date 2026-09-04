@@ -102,6 +102,13 @@ criterion fail *for the right reason*.
     `gtk3-2` and `py-1` are `64-`'s arms G, X and P and must come back
     11 of 11 or the instrument, not the capability, is the finding.
 
+    ⭐ FIRST ROW IN, AND IT IS THE C6 CONTROL: `gtk3-1` (galculator)
+       **11/11 pass, 11/11 clean, 88 store paths compiled in, 85 resolve.**
+       It agrees exactly with `experiments/64-` arm G, which measured the
+       same subject at 11/11 twice — so the instrument that scored it 0/11
+       yesterday is fixed, and the corrected `storeRefRe` (C27) is what
+       moved the residue from 6 to 3.
+
     ⏳ RUNNING NOW: `experiments/65-`, relaunched **02:53 UTC** at commit
        b46c4334 by `scratchpad/chain3.sh` (session scheduling, not
        evidence). 26 subjects × 11 environments. ⚠ HOURS.
