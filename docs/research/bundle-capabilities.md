@@ -56,8 +56,24 @@ per subject, and a recorded row is never re-measured:
 | category | subjects in | verdict so far |
 |---|---|---|
 | **GTK 3** | ⭐ **3 of 3 — CLOSED** | `galculator`, `mousepad`, `geany`, all **11/11 pass and 11/11 clean** |
-| **X11 / XCB** | 1 of 3 | `xeyes` **11/11 / 11/11** |
-| the other seven categories | 0 | ⏳ running |
+| **X11 / XCB** | ⭐ **3 of 3** | `xeyes` **11/11**, `xclock` **11/11**, ⛔ `xterm` **0/11** — and see below |
+| **OpenGL / EGL** | 1 of 3 | ⛔ `eglinfo` (`mesa-demos`) **0/11**, clean 11/11 |
+| **the field's recipes** | 2 of 4 | ⛔ `helix` **0/11**, `neovim` **0/11** — both clean 11/11 |
+| Vulkan, SDL, Qt, Python GUI, media | 0 | ⏳ running |
+
+⛔ **THE ZEROS ARE REAL ROWS AND THEY ARE NOT AN INSTRUMENT DEFECT.** Every
+`cli` subject has failed and every `gui` subject except `xterm` has passed,
+which looks exactly like a broken CLI mode. ⭐ It was checked rather than
+assumed: the command shape `65-` uses for a `cli` subject was reproduced by
+hand against a real artefact and returned **exit 0 with correct output**. The
+failures are subject-specific and each needs its own reading.
+
+| row | what is known | ⛔ what is NOT yet known |
+|---|---|---|
+| `xterm` **0/11**, clean **11/11** | ⭐ **C5 predicted it would fail the HOST-OBJECT row and it did not** — it is clean on 11 of 11. ⚠ It also never drew, so the prediction is not so much falsified as **unevaluable**: a subject that does not start its shell never loads the shell's libc | why it does not draw |
+| `neovim` **0/11** | its entry is a **script**: `bin/nvim is a SCRIPT; its entry point is bash + the script itself`, laid out as `nvim = bash + shared/script/nvim (static trampoline)`. It fails with `--argv0: error while loading shared libraries: --argv0: cannot open sh` | ⛔ where `--argv0` is exec'd. `ReadWrapper` parses `--argv0` at BUILD time, so this is a RUN-time path. Read the extracted `shared/script/nvim`. Reproduce with `PGB_EXP65_ONLY='field-2'` |
+| `helix` **0/11** | ⚠ the build warns that this closure's store paths carry **top-level `.so` files** (its ~200 tree-sitter grammars: `rust.so`, `python.so`, …), and `mergedFor` maps only `bin`/`lib`/`share`/`etc`/`libexec` — so the farm has nowhere to put them | whether that is the cause of the failure or an unrelated warning |
+| `eglinfo` **0/11** | — | ⛔ nothing; no error line matched. It needs one row run by hand with the output kept |
 
 ⚠ **The count is `ls evidence/65-capability-corpus/rows/*.tsv`**, and each row
 is `<id> <pass> <rows> <clean> <store paths> <note>`.
