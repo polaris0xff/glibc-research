@@ -3,12 +3,12 @@
 Counts are derived. ⛔ Do not edit them by hand — `sh TODO/check.sh` re-derives
 them from the rows and fails if they disagree.
 
-    TOTAL 67  OPEN 27  DONE 40
+    TOTAL 67  OPEN 23  DONE 44
 
 | priority | means | total | open | done |
 |---|---|---|---|---|
 | P0 | breaks correctness, loses data, or takes the process down | 7 | 1 | 6 |
-| P1 | a documented capability does not work, or a flag does nothing | 46 | 16 | 30 |
+| P1 | a documented capability does not work, or a flag does nothing | 46 | 12 | 34 |
 | P2 | worth doing; nothing is wrong without it | 14 | 10 | 4 |
 | P3 | worth recording so it is not rediscovered | 0 | 0 | 0 |
 
@@ -69,16 +69,16 @@ pretending to be one.
 | T-077 | P1 | M | open | ci | ⛔ The head-to-head was measured on the RETIRED glibc pin, and nobody re-ran it |
 | T-078 | P1 | L | done | runtime | ⭐ The three-way parity matrix, and TWO of its seven predictions were wrong |
 | T-079 | P1 | M | done | runtime | ⭐ The list was TEN and it is ELEVEN: `/etc/services`, found by a search |
-| T-080 | P1 | L | open | research | ⛔ REOPENED: the capability guarantee, on THREE applications per category |
+| T-080 | P1 | L | done | research | ⛔ REOPENED: the capability guarantee, on THREE applications per category |
 | T-081 | P1 | L | done | toolchain | ⭐ Every store path, without the regex cascade: the bundle DRAWS, and Python bundles |
 | T-082 | P2 | XL | open | toolchain | Vendor and patch the third-party runtime and tooling, with drift detection |
 | T-083 | P2 | M | open | toolchain | Native desktop integration: our bundles as ordinary AppImages |
-| T-084 | P1 | M | open | ci | ⛔ The trace classifier is SIX hand copies — measured: 3 texts, **2 behaviours**, and they differ from the shared one in **two** ways, not one |
+| T-084 | P1 | M | done | ci | ⛔ The trace classifier is SIX hand copies — measured: 3 texts, **2 behaviours**, and they differ from the shared one in **two** ways, not one |
 | T-085 | P1 | S | done | runtime | ⭐ The ELEVENTH quirk CLOSED: `--embed-netdb`, and the boundary `--wrap` cannot cross |
 | T-086 | P1 | S | done | runtime | ⭐ The one axis where native musl beat both glibc columns, closed: `--utf8-default` |
 | T-087 | P1 | XL | open | research | ⭐ The battle-test corpus: 40+ applications, ordered by MECHANISM |
-| T-088 | P1 | S | open | research | ⛔ Multi-entry dispatch is SHIPPED and has never been run |
-| T-089 | P1 | S | open | research | ⛔ The interposer row marked NOT MEASURED: a static or raw-syscall payload |
+| T-088 | P1 | S | done | research | ⛔ Multi-entry dispatch is SHIPPED and has never been run |
+| T-089 | P1 | S | done | research | ⛔ The interposer row marked NOT MEASURED: a static or raw-syscall payload |
 | T-090 | P1 | M | open | research | ⛔ The sandbox rung needs a BED change, not a bundler change |
 | T-091 | P2 | S | open | research | GStreamer needs four variables and a scanner; NOTHING was setting them |
 | T-093 | P2 | M | open | research | "no more Vulkan layers like mangohud" is the one field objection still marked NOT MEASURED |
