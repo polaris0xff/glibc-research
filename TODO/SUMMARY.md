@@ -7,10 +7,13 @@
     SCOPE     Finish experiments/65- (T-080), then BY MECHANISM: T-088
               rung 1, T-089 rung 2, T-087 rungs 3+, T-090 rung 5, then
               T-084 / T-091 / T-092.
-    RESULT    ⭐ FIVE of the seven moved, four of them with numbers.
+    RESULT    ⭐ FIVE of the seven moved, four with numbers, and the
+              corpus turned into a defect-finding instrument: FOUR of its
+              zeros were run down to root cause and TWO of them were
+              BUNDLER BUGS with shipped fixes.
               ⛔ T-080 IS STILL RUNNING and that is the honest state.
-              ⛔ SEVEN corrections, five of them about instruments, and
-              THREE were defects in work written this same session.
+              ⛔ NINE corrections. Five about instruments; three were
+              defects in work written this same session.
 
 ## ⭐ What moved
 
@@ -87,6 +90,21 @@ those are things this project refuses in writing.
   silently: a resumed `65-` calling the old way would report **every row zero
   host objects**. It goes last, with a default.
 
+## ⭐ The corpus stopped being a scoreboard and became an instrument
+
+⛔ **Four rows read `0 of 11`. Not one was what it looked like.**
+
+| row | what the zero actually was |
+|---|---|
+| ⭐ `eglinfo` | **TWO instrument defects.** C34: the `cli` criterion was `exit 0 AND the assertion`, and `eglinfo` exits 3 headless while answering completely. Fixed — and it **still read 0**, which forced the real search: C36, the corpus was `\|`-separated and this assertion **alternates**, so `cut` handed `grep` an unmatched `(`, gave `--extra` the word `Mesa`, and passed `softpipe)` as an argument. ⭐ **0/11 → 11/11** |
+| ⭐ `vulkaninfo` | the same separator collision. ⭐ **0/11 → 11/11**, and its store paths went **12 → 42** because `--extra mesa` had been failing to resolve |
+| ⭐ `xterm` | ⛔ **a real bundler bug, and a whole class.** Its nixpkgs `bin/xterm` is a **shell** wrapper that execs a dot-named target by store path; the target was never installed, and the farm's `bin` resolved to the **raw payloads**, whose `PT_INTERP` names a loader the bundle lacks. `execve` returned ENOENT **for the interpreter** and the shell printed it against the program. ⭐ **Fixed: xterm now DRAWS in 2 s** |
+| ⭐ `neovim` | ⛔ **real, and not ours.** The closure carries **glibc 2.26**; sharun passes `--argv0`, which `ld.so` learned in **2.33**. The same old glibc explains the interposer's `dladdr/dlsym` warning — they lived in `libdl.so` until 2.34. Now detected at build time with the exact runtime string |
+
+⭐ **EGL, OpenGL and Vulkan all reach 11 of 11**, and §0 had marked Vulkan
+*"NOT MEASURED. NOT CLAIMED."* that morning. ⛔ C3's limit is untouched: every
+one of those rows is a **software rasteriser**.
+
 ## ⚠ What the next session inherits
 
 ⭐ **The corpus is the unfinished half and it is resumable.** Two categories
@@ -95,8 +113,13 @@ and that was checked rather than assumed.
 
     T-080  finish 65-. ⭐ It can be run in PARALLEL -- RESUME.md has the
            recipe, and the machine is 99% idle while it runs.
-    T-087  four named unknowns: neovim's `--argv0`, helix's top-level
-           `.so` grammars, eglinfo's silent failure, xterm not drawing.
+    T-087  ⭐ all four named unknowns are RUN DOWN. Two were the
+           instrument (C34, C36), one was a bundler bug with a shipped fix
+           (C37, xterm), one is the closure's own glibc (C35, neovim).
+           ⛔ helix and flameshot and glmark2 are still open.
+    ⛔ AND `make` IS OWED. C37's fix is committed and NOT in ./pgb, because
+       the corpus was running. After `make`: delete the `x11-3` row and
+       re-measure it, and any other shell-wrapped subject.
     T-091  landed and UNMEASURED. A media subject whose host-object count
            says WHICH PROCESS it counted.
     T-084  now unblocked reasoning, still blocked on 65- finishing.
