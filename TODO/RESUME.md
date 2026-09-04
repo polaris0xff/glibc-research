@@ -51,6 +51,18 @@ will repeat the 2026-09-03e mistake:
     apt-get install -y xvfb x11-utils        # ⛔ T-080/T-081's ONLY honest
                                              # GUI criterion
 
+⛔ **AND START THE WATCHDOG BEFORE ANY LONG BUNDLE RUN.** Both ways these runs
+die are silent — a fixed writable allowance that makes `df` read `Avail 0` at a
+low `Used`, and a `dwarfs` daemon that outlives its AppImage and holds its
+extraction directory:
+
+    nohup sh scripts/common/watchdog.sh --watch --interval 120 --floor 6 \
+          --reap --log /var/tmp/watchdog.log >/dev/null 2>&1 &
+
+It also reports any process in **state D**, which is the `strace`-on-FUSE
+deadlock and cannot be killed. `docs/AGENTS.md` §6 has the rest, including why
+`LD_DEBUG=libs` is the first instrument for a bundle and `strace` the second.
+
 ## ⛔ THE INSTRUMENT LESSON THAT COST ELEVEN GREEN ROWS
 
 ⛔ **`Gtk-WARNING: cannot open display` IS NOT A RESULT.** `experiments/64-`

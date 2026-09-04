@@ -362,6 +362,48 @@ Requires root + `CAP_SYS_ADMIN` (the bed is `unshare --mount` + `chroot`),
 `curl`, `tar`, `xz` and **about 10 GiB free**; `pgb verify` additionally needs
 `strace`, and the environment builds meson with the `python3` inside it.
 
+⛔ **BEFORE ANY LONG BUNDLE RUN, START THE WATCHDOG.** A bundle run fetches
+multi-GB closures and mounts FUSE filesystems, and both ways it dies are
+silent — the writable allowance is a fixed budget, so `df` reads `Avail 0`
+with a low `Used` and every later write fails; and a `dwarfs` daemon that
+outlives its AppImage holds its extraction directory, so disk is not reclaimed
+and `strace` on the next row can deadlock against it.
+
+```sh
+sh scripts/common/watchdog.sh                    # one report, then exit
+sh scripts/common/watchdog.sh --selftest         # assert its mountinfo parser
+nohup sh scripts/common/watchdog.sh --watch \
+      --interval 120 --floor 6 --reap \
+      --log /var/tmp/watchdog.log >/dev/null 2>&1 &
+```
+
+It reports free space (naming the big directories only when under the floor),
+every FUSE mount with its age and its users, and any process in **state D** —
+the signature of the `strace`-on-FUSE deadlock, which `kill` cannot end.
+⚠ `--reap` unmounts only a mount with **no users** whose daemon is older than
+`--min-age` (900s), so a live run's own mount is never pulled out from under
+it. ⛔ Its `mountinfo` parser has a `--selftest` because the first version read
+the fstype from field 3, which is `major:minor` — it matched nothing, ever, and
+a mount check that reports "no stray mounts" on a machine full of them is worse
+than no check.
+
+⭐ **AND FOR "WHY DID IT NOT LOAD MY LIBRARY", `strace` IS THE WRONG TOOL
+FIRST.** `strace` says which paths were opened; it does not say which the
+loader *chose*, or why one was rejected. The loader will say both:
+
+```sh
+LD_DEBUG=libs    ./app 2>&1 | head -60   # search paths tried, in order
+LD_DEBUG=files   ./app 2>&1 | head -60   # each object as it is loaded
+LD_DEBUG=bindings ./app 2>&1             # which definition won each symbol
+LD_DEBUG_OUTPUT=/tmp/ld ./app            # ...per-pid files, for a forking app
+```
+
+⚠ **A `pgb` static binary has no loader, so `LD_DEBUG` says nothing about it**
+— that is the point of the artefact, and `experiments/75-` already records the
+consequence: the subject cannot be asked, so the CONTROL is what gets traced.
+For a **bundle**, whose payload is dynamic and runs under the bundled loader,
+`LD_DEBUG` is the primary instrument and `strace` is the cross-check.
+
 ⚠ **`pgb bootstrap` preflights only what it can act on** — `curl`, `tar`, `xz`,
 the images file, root, `unshare` and the free-space floor — and refuses with the
 number rather than failing halfway through a 2.3 GiB download. It does **not**

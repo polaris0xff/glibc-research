@@ -216,3 +216,160 @@ hardware, and a green corpus is not a GPU claim.
 [`../docs/research/bundle-capabilities.md`](../docs/research/bundle-capabilities.md)
 §0 carrying a count out of eleven and the subject that produced it, with the
 UNRESOLVED subjects listed by name and reason rather than dropped.
+
+---
+
+## T-087 — ⭐ the battle-test corpus: 40+ applications, ordered by MECHANISM
+
+**Source** ⭐ **operator, 2026-09-04**, with a list of applications *"to
+battletest and prove our bundler is best in class"* and an explicit ordering
+rule: *"sort the tasks for next session based on completing/fixing what will
+auto fix/complete what, not easy first"*.
+**Category** research · **Priority** P1 · **Effort** XL · **Status** open
+
+⛔ **The classification is done and it is
+[`../docs/research/app-corpus.md`](../docs/research/app-corpus.md).** This entry
+is the work; that page is the argument for its order. Read the page first — the
+eight rungs are the task list, and each names what it unblocks.
+
+**Why the order is not "easy first".** A subject is neither hard nor easy; a
+**mechanism** is present or missing, and ordering by app re-measures the same
+mechanism five times. Rungs 1–3 are three mechanisms that between them decide
+about twenty of the subjects.
+
+⭐ **Rung 1 and rung 2 are each a day and each closes a claim now made from
+source rather than from a run** — T-088 and T-089. Do them first for that
+reason, not because they are small.
+
+**⚠ THE MEASURE-TWICE RULE IS SUSPENDED FOR THIS ENTRY**, by the operator:
+*"Use cached/prebuilt fetches to make the install/build fast, and get rid of
+the measure twice rule; we need to cover more cases for now, we can refine
+later."* ⛔ Delivery rules 1, 2, 4, 5, 6 and 7 all still hold — only rule 3
+is lifted, and only here.
+
+**Prove.** *"All three apps open, run and work, use emulated/dummy stubs for
+hw gaps."* Open = a toplevel ≥50×50 on a real X server seen with `xwininfo`.
+Work = an assertion the application answers, never a log line a broken bundle
+also prints. Stubs are for **hardware only** and each is a stated limit.
+
+**Study, in this order.** `docs/research/app-corpus.md`; then, in the tree,
+`references/pkgforge-dev__Anylinux-AppImages/tree/HALL-OF-FAME.md` (per-toolkit
+grades), `tree/useful-tools/demo/*` (eleven minimal per-toolkit recipes — the
+fastest way to see what a toolkit needs), `tree/useful-tools/hooks/*` (fifteen
+named workarounds), and ⭐ `api/issues.json` + `api/comments.json`, **825
+issues and 1,000 comments**, which is where the per-application knowledge is.
+⚠ `ivan-hc/*`, `pkgforge-dev/distrobox-AppImage`, `flatimage`, `flatroot`,
+`gameimage`, `VHSgunzo/{lux-wine,lw-runtime,Run-wrapper,runimage-nvidia-drivers}`
+are named by the operator and are **NOT vendored** — fetch before relying on
+them.
+
+---
+
+## T-088 — ⛔ multi-entry dispatch is SHIPPED and has never been run
+
+**Source** the operator's question, 2026-09-04: *"Can we handle and are we
+handling apps that provide multiple binaries like busybox … does simply
+renaming or symlinking the bundle with the app we want to enter work?"*
+**Category** research · **Priority** P1 · **Effort** S · **Status** open
+
+⭐ **The answer read off the source is YES, and that is the problem.**
+`assemble.go` installs every non-dot program in the entry store path's `bin/`
+automatically; `--with-program` adds one from anywhere in the closure; and
+`tool/runtime/pgb-apprun.c` is a **static** selector dispatching on `ARGV0`,
+then `argv[0]`'s basename, then `$1`, then the default — the AppImage
+convention. ⛔ **No experiment has ever run a second program out of a bundle.**
+
+**What to do.** An `experiments/65-` row per extra entry point on `rnote`
+(`rnote-cli`), `nicotine-plus` (`nicotine`), `imagemagick` (`convert`,
+`identify`) and `mkvtoolnix` (`mkvtoolnix-cli`): symlink the artefact to the
+program's name, run it, assert the program's **own** output.
+
+⚠ **And answer the second half of the operator's question with a number**:
+the build already prints `programs <prog> + N more`, so "how many entry points
+does this app have" is a build-log field, not an inference. Put it in the
+corpus table as a column.
+
+**Prove.** One artefact, N names, N assertions, on all eleven — and the
+`--with-program` path exercised at least once, because it is the branch that
+searches the whole closure rather than one `bin/`.
+
+**Study.** `tool/runtime/pgb-apprun.c` (130 lines, and it is the answer);
+`internal/bundle/assemble.go` `installProgram` and the `bin/` walk above it.
+
+---
+
+## T-089 — ⛔ the interposer row marked NOT MEASURED: a static or raw-syscall payload
+
+**Source** [`../docs/design/store-paths.md`](../docs/design/store-paths.md) §3,
+which marks exactly one row of its own comparison table as **NOT MEASURED**.
+**Category** research · **Priority** P1 · **Effort** S · **Status** open
+
+The interposer wins calls that go **through the PLT**. A statically linked
+program, or one issuing raw syscalls — a Go binary is the common case — has no
+PLT, so the mechanism cannot see its `open`. ⛔ That row is reasoning about a
+mechanism, not a result, and it sits in a shipped design document.
+
+**The subject is named and it is in the corpus**: `syncthing`, a Go program
+from the closure. `lilipod` and `powershell` are the same shape.
+
+⛔ **PRE-REGISTER THE FAILURE.** The expected outcome is that the build
+**reports** the compiled-in store path and the program cannot resolve it at run
+time. If it passes, the reasoning was wrong and the record says so rather than
+being quietly corrected.
+
+**Prove.** One Go subject bundled and run on all eleven, with the build's own
+`store paths … compiled in` line quoted beside the result, and
+`docs/design/store-paths.md` §3's row changed from NOT MEASURED to whatever
+came out.
+
+---
+
+## T-090 — ⛔ the sandbox rung needs a BED change, not a bundler change
+
+**Source** the operator's browser list, 2026-09-04, and its link to the
+field's `fix-namespaces` hook.
+**Category** research · **Priority** P1 · **Effort** M · **Status** open
+
+`unshare(CLONE_NEWUSER|CLONE_NEWNS)` is `EPERM` in the chroot bed — already the
+recorded reason every `onelf` row in [`../docs/comparison.md`](../docs/comparison.md)
+runs in its last-resort mode. A Chromium sandbox needs exactly that call, so a
+browser row run in this bed measures `--no-sandbox`, which is a different
+program.
+
+⛔ **Two questions, and merging them is the error to avoid.**
+1. *Does the bundle carry a working browser?* — answerable today with
+   `--no-sandbox`, and worth having.
+2. *Does the sandbox work?* — needs a bed that allows user namespaces, and a
+   check that is not a guess: `lsns -t user` from inside the sandboxed process,
+   or `ip netns list`.
+
+⚠ **And a target-side condition that is not ours**: Ubuntu ≥ 23.10 sets
+`kernel.apparmor_restrict_unprivileged_userns=1`, so the same bundle fails
+there for a reason unrelated to bundling. The field ships a `pkexec` hook that
+asks the user to disable it. ⛔ **Do not copy that hook** — it asks for a root
+password — but **detect and report** the condition instead of showing a crash.
+
+**Study.**
+`references/pkgforge-dev__Anylinux-AppImages/tree/useful-tools/hooks/fix-namespaces.md`
+and `fix-namespaces.hook` beside it, both vendored;
+`HALL-OF-FAME.md` "Excellent - Chromium/Electron", which grades the toolkit
+easy and says nothing about the sandbox.
+
+---
+
+## T-091 — GStreamer needs four variables and a scanner; we emit one
+
+**Source** `HALL-OF-FAME.md` "Bad - GStreamer", read against
+`internal/bundle/sharun.go` `bakedOverride`.
+**Category** research · **Priority** P2 · **Effort** S · **Status** open
+
+`bakedOverride` emits `GST_PLUGIN_SYSTEM_PATH_1_0` and nothing else. The field
+names four plus the scanner: `GST_PLUGIN_PATH`, `GST_PLUGIN_SYSTEM_PATH`,
+`GST_PLUGIN_SYSTEM_PATH_1_0`, `GST_PLUGIN_SCANNER`.
+
+⚠ **And it changes how a GStreamer subject may be measured at all**:
+`gst-plugin-scanner` *"opens every single gstreamer plugin on the system"*, so
+a host-object count taken on such a subject is counting the scanner, not the
+application. Any row for `lmms`, `handbrake` or `gnome-music` has to say which.
+
+**Prove.** A media subject that plays, with its host-object count explained.

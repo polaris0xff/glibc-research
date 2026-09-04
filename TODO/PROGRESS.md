@@ -4,7 +4,7 @@
 the entries, and [`../HISTORY/`](../HISTORY/).
 
     STATE     2026-09-03e  ✅ COMPLETE
-    COUNTS    59 entries, 19 open, 40 done
+    COUNTS    64 entries, 24 open, 40 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)
               musl-gcc INSTALLED — the blocker the last session recorded
@@ -97,18 +97,43 @@ exists. ⛔ A program's own output is not evidence that it drew something.
        THE SENTENCE: every GL and Vulkan row here is a SOFTWARE
        rasteriser, and NVIDIA is not bundled by design. T-059.
 
-    ---- then, in order ----
+    ---- then, in order. ⛔ THE ORDER IS BY MECHANISM, NOT BY EASE ----
 
-    T-084  ⛔ NEW: the trace classifier is nine hand copies and one of
-        them counted FAILED opens as loads. Two are converted; seven are
-        not, and the competitor's "4 of 11" in comparison.md may be
-        inflated. corrections.md C25.
+    ⭐ OPERATOR, 2026-09-04, and it decides the four entries below:
+       "sort the tasks for next session based on completing/fixing what
+       will auto fix/complete what, not easy first". The classification
+       is docs/research/app-corpus.md and its EIGHT RUNGS are the task
+       list; rungs 1-3 decide about twenty of the forty subjects.
+
+    T-088  ⛔ RUNG 1. Multi-entry dispatch is SHIPPED and has NEVER been
+        run. pgb-apprun.c is a static ARGV0/argv[0]/$1 selector and
+        assemble.go installs every program in the entry bin/, so
+        rnote/rnote-cli works by construction -- and no experiment has
+        ever run a second program out of a bundle. One day, and it turns
+        a source reading into a result.
+    T-089  ⛔ RUNG 2. store-paths.md §3 marks ONE row NOT MEASURED: a
+        static or raw-syscall payload has no PLT for the interposer to
+        win. `syncthing` is that subject. PRE-REGISTER THE FAILURE.
+    T-087  ⭐ RUNG 3 ONWARD: the battle-test corpus, 40+ applications.
+        ⚠ THE MEASURE-TWICE RULE IS SUSPENDED FOR THIS ENTRY, by the
+        operator; every other delivery rule holds.
+    T-090  ⛔ RUNG 5 is a BED problem: unshare(CLONE_NEWUSER) is EPERM
+        here, so a browser row measures --no-sandbox unless the bed
+        changes. Do not merge "carries a browser" with "the sandbox
+        works".
+    T-084  ⛔ the trace classifier is SIX hand copies and one counted
+        FAILED opens as loads. lib.sh's shared version needs the `mode`
+        argument first -- it is not the deletion the entry first said.
+        The competitor's "4 of 11" in comparison.md may be inflated.
+    T-091  GStreamer: four variables and a scanner; bakedOverride emits
+        one. Also decides whether a media subject's host-object count is
+        measuring the app or the plugin scanner.
     T-059  a real GPU. ⛔ Every GL row is still swrast and surfaceless.
     T-066  ⛔ still the only open P0, and its remaining column is SIZE,
         which the operator struck on 2026-09-03c and deferred on
         2026-09-03d. ⚠ The priority ordering points here; this work
         order does not. This page decides.
-    T-082  vendor + patch + drift detection. XL — start early, finish late.
+    T-082  vendor + patch + drift detection. XL -- start early, finish late.
     T-083  desktop integration. ⭐ Its two named gaps are already closed
         (X-AppImage-Version and a dangling Icon=), and the bundle now
         carries a usr/ tree; what is left is the managers themselves.
@@ -127,10 +152,15 @@ exists. ⛔ A program's own output is not evidence that it drew something.
 
     T-013  T-015  T-021  T-031  T-041
 
-## ⭐ Delivery rules — kept, and one is NEW
+## ⭐ Delivery rules — EIGHT, and rule 3 is suspended for T-087
 
-⚠ **Five came from the session that wrote T-078/079/080. The sixth is from
-this one, and it cost eleven green rows.**
+⚠ **Five came from the session that wrote T-078/079/080. Rules 6, 7 and 8 were
+each paid for by a discarded run.**
+
+⛔ **RULE 3 IS SUSPENDED FOR T-087 ONLY**, by the operator, 2026-09-04:
+*"Use cached/prebuilt fetches to make the install/build fast, and get rid of
+the measure twice rule; we need to cover more cases for now, we can refine
+later."* Every other rule holds everywhere, T-087 included.
 
     1. ⛔ PRE-REGISTER the expectation before the run, and COMMIT it
        before the run so the git log shows it was not written after.
@@ -146,12 +176,71 @@ this one, and it cost eleven green rows.**
        this check this session — "SIGABRT on 3" was SIGABRT on two and
        SIGFPE on one, and a quoted figure came from a run whose
        RESULT.txt the next run had overwritten.
-    6. ⭐ **NEW — CHECK THAT YOUR SUCCESS CRITERION CAN FAIL FOR THE
-       RIGHT REASON.** `Gtk-WARNING: cannot open display` is emitted by
-       the bundled library, so it looked like proof the bundle worked.
-       It is printed on real hardware WITH a display too. ⛔ An
-       instrument that cannot tell a working subject from a broken one
-       is worse than no instrument, because it reports green.
+    6. ⛔ CHECK THAT YOUR SUCCESS CRITERION CAN FAIL FOR THE RIGHT
+       REASON. `Gtk-WARNING: cannot open display` is emitted by the
+       BUNDLED library, so it looked like proof the bundle worked -- and
+       it prints on real hardware WITH a display too. An instrument that
+       cannot tell a working subject from a broken one is worse than no
+       instrument, because it reports green.
+    7. ⛔ AND CHECK THAT IT CAN FINISH. `strace` on a program reading
+       through a FUSE mount deadlocks in state D; `kill` cannot end a
+       process in D, so `wait` never returns. The fix was an ORDERING --
+       reap the FUSE daemon BEFORE waiting -- and it also made every row
+       ten times faster, which means the slow version had been paying
+       the same cost in a milder form all along.
+    8. ⭐ **NEW, 2026-09-04 — CARRY A POSITIVE CONTROL, AND NEVER CARRY A
+       CONSTANT ACROSS A CHANGE OF MODE.** experiments/65- scored
+       galculator 0 of 11 on a subject experiments/64- had measured at
+       11 of 11 twice, because it copied 64-'s 25-second window budget
+       while switching every subject from MOUNT to EXTRACT delivery --
+       and 64- itself uses 150s for the one arm it extracts.
+       ⛔ The budget was the symptom. THE DEFECT WAS THAT NOTHING IN THE
+       EXPERIMENT COULD TELL A BROKEN SUBJECT FROM A BROKEN INSTRUMENT:
+       five pre-registered expectations and not one control.
+       corrections.md C26.
+
+## ⭐ THE OPERATOR'S FOUR QUESTIONS, 2026-09-04 — ANSWERED HERE
+
+**1. Has the GLIBC-STATIC work really fully completed?** ⛔ **No, and the
+number is countable.** `REQUIREMENTS.md` enumerates **eleven** issues; **ten
+are closed** on all eleven environments and **one is open** — `dlopen` of a
+HOST shared object, which stays open because the row says *host-dependent* and
+it still is. ⚠ Three further reasons not to call it complete:
+  - closing the eleventh exposed a **boundary inside it**: `getaddrinfo` with a
+    service name is 8 of 11 and no flag closes it (T-085);
+  - four of the ten are closed by an **opt-in flag** a developer must pass, not
+    by the default build;
+  - ⛔ the list went **nine → ten → eleven on three consecutive days**, each
+    time because somebody searched rather than assuming. "Ten of eleven" is a
+    snapshot of a search, never a distance to done.
+
+**2. Multiple binaries, busybox-style — and does renaming or symlinking the
+bundle work?** ⭐ **Yes, by construction, and it is unmeasured.** `assemble.go`
+installs the entry point and then **every other non-dot program in the same
+store path's `bin/`**; `--with-program NAME` adds one found anywhere in the
+closure. `tool/runtime/pgb-apprun.c` is a **static** selector — no shell, no
+host interpreter — dispatching on `ARGV0` (what uruntime sets), then `argv[0]`'s
+basename, then `$1`, then the default. So a symlink or a rename selects the
+program exactly as an AppImage does, and `./app.AppImage rnote-cli` works too.
+⛔ **No experiment has ever run a second program out of a bundle.** T-088.
+
+**3. Can the walker say how many entry points an app has?** ⭐ **Yes, and it
+already prints it**: the build log line `programs <prog> + N more`, and
+`--name X` failing lists what IS in `bin/`. That count is the multi-call
+dispatch table — the same set the selector chooses from. ⚠ It counts the entry
+store path's `bin/` only, so a helper in a dependency needs `--with-program`
+and is not in the number. T-088 puts the count in the corpus table.
+
+**4. Feature parity with anylinux AppImages?** ⚠ **Close, and two rows are
+theirs.** Level or ahead: coverage 11/11 both, payload clean 11/11 both, a
+static delivery path (no shell in ours), nothing written to the filesystem,
+`dlopen` of our own plugins, the compiled-in store path (T-081), a Python GUI
+(T-081), the seven host-data dependencies. ⛔ **Where they are ahead today**:
+  - **the sandbox** — they ship a namespaces hook and browsers; we cannot even
+    measure it in this bed (T-090);
+  - **breadth** — they have shipped hundreds of applications and have a graded
+    per-toolkit record; our corpus is 26 subjects and running.
+  ⚠ Not parity questions: size and speed, which the operator has deferred.
 
 ## Open questions for the operator
 
@@ -160,13 +249,8 @@ this one, and it cost eleven green rows.**
 1. ⚠ **A GPU** — **T-059**. Every GL row is `swrast` and surfaceless.
    T-080's guarantee claims *"the closure produces a working EGL display
    offscreen"* and explicitly does **not** claim Vulkan or NVIDIA.
-2. ⛔ **The `/tmp/.pgbs/` route for T-081 has a security question**, and it
-   should be answered before it is built rather than after: a fixed,
-   predictable path under a world-writable directory is a symlink-attack
-   surface. The same-length property that makes it attractive
-   (`/nix/store/` and `/tmp/.pgbs/` are both 11 bytes) does not make it safe.
-3. ⚠ **kdenlive's warm row is 3.45× against us and unexplained.** First
+2. ⚠ **kdenlive's warm row is 3.45× against us and unexplained.** First
    candidate: at 565 MB it is over uruntime's 350 MB `MAX_EXTRACT_SELF_SIZE`,
    so it **extracts** where `jq` **mounts**.
-4. ⚠ **Docker Hub rate-limits anonymous pulls here.** `pgb rootfs pull` does
+3. ⚠ **Docker Hub rate-limits anonymous pulls here.** `pgb rootfs pull` does
    the anonymous-token dance and succeeds where `docker pull` 429s.
