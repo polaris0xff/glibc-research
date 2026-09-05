@@ -33,7 +33,16 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
     2. ⛔ `make` — the tree carries an UNINSTALLED Go change (atomic `--out`,
        commit 3b5fe7aa). `./pgb` does not have it yet. Forbidden until now
        because a rebuild mid-run mixes two tools in one table.
-    3. `sh poc/run-all.sh --rebuild`   (C53, and it now also exercises step 2)
+    3. `sh poc/run-all.sh --rebuild`   (C53)
+       ⛔ AND IT DOES **NOT** EXERCISE THE ATOMIC `--out` OF STEP 2. Measured:
+       **no POC bundles** (only `poc/92-miniflux`, which is in progress and
+       not one of the ten), and **CI does not pack either** — its jobs are
+       toolchain / matrix / build / run-matrix / verify-docker / probe-host,
+       and `bundle appimage --selftest` is unit-level and never runs
+       `mkdwarfs`. ⭐ **NINETEEN EXPERIMENTS call `bundle appimage`**, so the
+       first real exercise of `pack()`'s rename is the next bundle
+       experiment — `105-` or `108-` below. Watch for `built <path>` naming
+       the FINAL name and no `.part` left behind.
     4. ⛔ `sh scripts/common/bed-fixtures.sh --install all` — THIS CONTAINER
        HAS NO FIXTURES AND A FRESH ONE NEVER WILL. Checked 2026-09-05:
        `theme=no` on 11 of 11, `locale=no` on all 7 glibc rows, `dbus=no` on
