@@ -137,9 +137,17 @@ That is your behaviour baseline. It must stay green at every commit.
 
 ### 5.1 The old repository is frozen
 
-Do the work in a local clone. Do not push the refactor to
-`polaris0xff/glibc-research`; its history is the archive and the operator wants
-it intact. The new repository receives the finished tree.
+Do the work in a full local clone of `polaris0xff/glibc-research`. Clone it
+deep - a shallow clone cannot produce the commit corpus of section 7.5, and the
+default clone in some harnesses is shallow:
+
+```sh
+git clone https://github.com/polaris0xff/glibc-research
+cd glibc-research && git rev-list --count HEAD    # expect 491 or more
+```
+
+Do not push the refactor to that repository; its history is the archive and the
+operator wants it intact. The new repository receives the finished tree.
 
 **This file does not travel.** `MIGRATION.md` names the old repository on every
 other page, so it cannot be in the `Init Project` commit without breaking section 5.3.
@@ -727,9 +735,14 @@ It found 8 stale pairs on 2026-09-05 that had previously been invisible
 (`T-096`).
 
 ```sh
-grep -vcE '^[[:space:]]*(#|$)' evidence/STALE-EVIDENCE.txt   # 15 active pins, 30 hashes
-grep -roE '\b[0-9a-f]{7,40}\b' docs/history/corrections.md | wc -l   # 16 more
+grep -vcE '^[[:space:]]*(#|$)' evidence/STALE-EVIDENCE.txt          # 15 lines, 30 hashes
+sh scripts/common/check-docs.sh | grep 'pinned stale'               # 13 still match
+grep -roE '\b[0-9a-f]{7,40}\b' docs/history/corrections.md | wc -l  # 16 more
 ```
+
+**Two of the 15 listed lines have already gone inert** - their pair no longer
+matches anything, so they are dead exemptions the gate silently carries. That is
+the mechanism failing in miniature on an ordinary history, before any rewrite.
 
 **A squash to one commit destroys all 46 hashes, and there is no repair.** With
 a single commit there is no pair to pin to: every file in the tree shares one
