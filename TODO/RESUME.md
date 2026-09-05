@@ -6,24 +6,32 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-05, refreshed at 03:50Z while the corpus runs.
-    TREE           main. ⛔ EIGHTH session running.
+    LAST WRITTEN   2026-09-05, after the ninth session.
+    TREE           main. ⛔ NINTH session complete.
     BRANCH         ⛔ main. The harness names a `claude/*` branch and THE
                    OPERATOR SAYS main.
-    GATES          both green at every commit. CI green (444).
-    STATE          ⛔⛔ THE CORPUS RE-RUN IS IN FLIGHT AND IT IS THE SESSION'S
-                   MAIN DELIVERABLE. Two instances, started 03:14Z, ~28 min
-                   per subject, 13 subjects each -> expect ~09:15Z.
-                     A  pgid 8573  /var/tmp/evidence-65a  :99  rootfs
-                        PGB_EXP65_ONLY='gtk3-*|x11-*|gl-*|vulkan-*|sdl-1'
-                     B  pgid 8673  /var/tmp/evidence-65b  :98  rootfs2
-                        PGB_EXP65_ONLY='sdl-2|sdl-3|qt-*|py-*|media-*|field-*'
-                   ⭐ FIRST ROW IS GREEN AND IT IS THE C6 CONTROL:
-                   gtk3-1 galculator 11/11 pass, 11/11 clean, 0 spawns.
-                   ⛔ IT WAS KILLED AND RESTARTED TWICE before this, for two
-                   real defects — C57 and C58. Both are fixed and committed.
+    GATES          go build green. No experiment was run this session.
+    STATE          ⭐ THE REFACTOR IS THE WORK, AND ITS BRIEF IS
+                   [`../MIGRATION.md`](../MIGRATION.md) — READ THAT FIRST.
+                   The corpus run was KILLED by the operator at 4 of 26
+                   subjects, 2026-09-05 04:20Z. Do not restart it.
 
-## ⛔⛔ WHAT TO DO WHEN THE CORPUS FINISHES — IN THIS ORDER
+## ⭐ WHERE THE WORK IS
+
+⛔ **[`../MIGRATION.md`](../MIGRATION.md) supersedes the work order below.** It
+is standalone, it carries the measured state of the tree as of 2026-09-05, the
+keep/delete rule for the comb, and the task list M-01 to M-29. It is written
+for a fresh agent on a Windows dev machine with WSL and podman.
+
+⚠ **The ninth session did surface research only.** It vendored
+`references/Azathothas__TEMPLATE` (commit `62061663…`), measured the seven
+problems, and wrote `MIGRATION.md`. It changed no code and ran no experiment.
+
+⚠ **What is below this line is the PAUSED measurement work.** It is not
+cancelled and its debts are real, but it resumes only after the migration
+lands. `MIGRATION.md` Phase 5 is what comes first.
+
+## ⛔ THE PAUSED WORK — WHAT WAS OWED WHEN THE CORPUS WAS KILLED
 
     1. ⭐ A FINAL UNFILTERED READ-BACK PASS WRITES THE VERDICT. Both running
        instances are FILTERED, so neither may be quoted (C6's controls are
