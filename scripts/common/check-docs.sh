@@ -548,19 +548,48 @@ for s in experiments/[0-9]*.sh; do
   [ -n "$d" ] || continue
   n=$((n + 1))
   sc=$(git log -1 --format=%H -- "$s" 2>/dev/null)
-  ec=$(git log -1 --format=%H -- "$d" 2>/dev/null)
-  [ -n "$sc" ] && [ -n "$ec" ] || continue
   st=$(git log -1 --format=%ct -- "$s" 2>/dev/null)
-  et=$(git log -1 --format=%ct -- "$d" 2>/dev/null)
+  # ⛔⛔ THE KEY IS THE RESULT FILE, NOT THE DIRECTORY, AND THAT WAS A HOLE BIG
+  # ENOUGH TO DRIVE THIS GATE THROUGH.
+  #
+  # `git log -1 -- evidence/<name>` takes the newest commit touching ANY file
+  # under that directory. So committing a README, a note, or a new sub-store
+  # beside the results REFRESHES the date the gate compares against, and the
+  # gate goes quiet over a `RESULT.txt` that still describes the old
+  # instrument. ⚠ It is not hypothetical: it was done here by accident on
+  # 2026-09-05, adding `evidence/65-capability-corpus/spawns/README.md` in the
+  # same commit as a change to `65-` itself.
+  #
+  # ⭐ MEASURED ACROSS THE TREE, not argued: EIGHT evidence directories had
+  # their newest commit on a NON-RESULT file, and for FOUR of them the script
+  # had changed in a non-comment way since the result was written — all four
+  # the same change, the shell-to-Go port (`sh scripts/common/rootfs-run.sh`
+  # -> `pgb rootfs run`). Their committed numbers were produced by the shell
+  # predecessor while the scripts now drive the Go tool, and this gate could
+  # not see it.
+  #
+  # ⚠ A directory that carries no RESULT file at all falls back to the
+  # directory, which is the old behaviour and is better than not checking.
+  ec=$(git log -1 --format=%H -- "$d/RESULT"* 2>/dev/null)
+  et=$(git log -1 --format=%ct -- "$d/RESULT"* 2>/dev/null)
+  if [ -z "$ec" ]; then
+    ec=$(git log -1 --format=%H -- "$d" 2>/dev/null)
+    et=$(git log -1 --format=%ct -- "$d" 2>/dev/null)
+  fi
+  [ -n "$sc" ] && [ -n "$ec" ] || continue
   [ "${st:-0}" -gt "${et:-0}" ] || continue
   # ⛔ EVIDENCE BEING RE-RUN RIGHT NOW IS NOT STALE, and the first version of
   # this gate could not be satisfied before the commit it was demanding: you
   # re-run the experiment, the working tree holds the fresh result, `git log`
   # still points at the old commit, the gate fails, and the gate has to be
   # green BEFORE you may commit. A check that can only pass after the commit it
-  # blocks is a check people delete. An uncommitted change under the evidence
-  # directory means the answer is being replaced in this very commit.
-  [ -z "$(git status --porcelain -- "$d" 2>/dev/null)" ] || continue
+  # blocks is a check people delete. An uncommitted change to the RESULT means
+  # the answer is being replaced in this very commit.
+  #
+  # ⚠ NARROWED TO THE RESULT FILES for the same reason the key above was: an
+  # uncommitted README beside the results is not a re-run and must not read
+  # like one.
+  [ -z "$(git status --porcelain -- "$d/RESULT"* 2>/dev/null)" ] || continue
   # Did the script change in a way that could change what it measures?
   real=$(git diff "$ec".."$sc" -- "$s" 2>/dev/null \
          | grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' \

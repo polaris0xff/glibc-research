@@ -66,9 +66,9 @@
 # `docs/REQUIREMENTS.md`'s table come from them. 60- and 62- also still carry
 # T-077's debt above: they were measured on pgb-env-debian12/glibc-2.36.
 #
-60-versus-alternatives.sh 775172d72fa22a7d243eadb71882e874485d4859 9cb85154035f2a81824ca8428cb4419c44567d0d T-077 and T-084 step 2: glibc-2.36 evidence AND the classifier converted; builds five delivery formats, needs an idle machine
-62-anylinux-appimage.sh 775172d72fa22a7d243eadb71882e874485d4859 894bfaec26de04327d143a913f4a39bafbd567d8 T-077 and T-084 step 2: glibc-2.36 evidence AND the classifier converted; builds an anylinux AppImage on an Arch bed
-85-opengl.sh 775172d72fa22a7d243eadb71882e874485d4859 d79949c4e77f523c04528e7f37e4e4f1d250ccae T-084 step 2: classifier converted; calls payload only and invokes the artefact once, so C38 is latent (102- arm S)
+60-versus-alternatives.sh 775172d72fa22a7d243eadb71882e874485d4859 cf2e2c97d861d5ee5c12b80b799a513a699fd44c T-077 and T-084 step 2: glibc-2.36 evidence AND the classifier converted; builds five delivery formats, needs an idle machine
+62-anylinux-appimage.sh 775172d72fa22a7d243eadb71882e874485d4859 cf2e2c97d861d5ee5c12b80b799a513a699fd44c T-077 and T-084 step 2: glibc-2.36 evidence AND the classifier converted; builds an anylinux AppImage on an Arch bed
+85-opengl.sh 775172d72fa22a7d243eadb71882e874485d4859 6c23b2e210abbf2609afd44c703dde7bd3a9e141 T-084 step 2: classifier converted; calls payload only and invokes the artefact once, so C38 is latent (102- arm S)
 86-bundler-vs-anylinux.sh 775172d72fa22a7d243eadb71882e874485d4859 403a0943a396734f821626e51b5580225e18048b T-084 step 2: classifier converted; calls payload only, so C38 is latent (102- arm S); builds kdenlive-scale bundles
 89-debloat.sh 775172d72fa22a7d243eadb71882e874485d4859 44b6a1c89fe011e4988acfcc5ffc9189afac5bbe T-084 step 2: classifier converted; calls payload only and invokes the artefact once, so C38 is latent (102- arm S)
 # ⭐ 90- WAS HERE AND IS GONE, 2026-09-04c. It was the ONE experiment C38
@@ -159,3 +159,41 @@
 # ⛔ That is worse than a failing result: it has the shape of evidence and
 # makes no claim, and gate 10 cannot see it because the gate compares COMMITS.
 # ⭐ The clean re-run finished: pass=5 fail=0 skip=0, eleven rows.
+
+# ---------------------------------------------------------------------------
+# ⛔ FIVE MORE, ADDED 2026-09-05, AND FOUR OF THEM WERE INVISIBLE UNTIL THE
+# GATE ITSELF WAS CORRECTED. T-096.
+#
+# Gate 10 compared a script's commit against `git log -1 -- evidence/<name>`,
+# which is the newest commit touching ANY file under that directory. So a
+# README or a note committed beside the results refreshed the date and the
+# gate went quiet. ⭐ Re-keyed on `RESULT*`, it reports EIGHT disagreements
+# where it reported none — three were already pinned above and needed only a
+# new evidence commit; four are new and are ONE change.
+#
+# ⭐ THE ONE CHANGE IS THE SHELL-TO-GO PORT, all at commit 4ef2acc7:
+#
+#     sh scripts/common/rootfs-run.sh   ->  pgb rootfs run
+#     sh scripts/common/oci-pull.sh     ->  pgb rootfs pull
+#     sh "$REPO_DIR/pgb" ...            ->  "$REPO_DIR/pgb" ...
+#
+# ⛔ So these four committed results were produced by the SHELL predecessor
+# while the scripts now drive the GO tool. ⚠ They may well be unchanged —
+# HISTORY/ is kept precisely because it is the oracle the port was measured
+# against — but nobody has re-run them, and "may well be" is not a
+# measurement.
+#
+# ⚠ 40- additionally needs the MACHINE, not just the bed: 400 execs x 7
+# rounds, and docs/AGENTS.md §10 already reports its startup and RSS columns
+# as at or under the instrument's noise floor.
+#
+10-probe-the-host.sh 4ef2acc72f205e8f430573ce77dc6caec0059281 79bbfa336c09a18f6db90c1f040b232cda2b9f05 T-096: measured by the SHELL predecessor; the script now calls `pgb rootfs run`/`pgb rootfs pull`. Needs the bed
+20-static-glibc-nss-dlopen.sh 4ef2acc72f205e8f430573ce77dc6caec0059281 c7225b37fdbf51ecdcd4133a0ba1c42dde15032e T-096: measured by the SHELL predecessor; the script now calls `pgb rootfs run`. Needs the bed
+40-overhead.sh 4ef2acc72f205e8f430573ce77dc6caec0059281 79bbfa336c09a18f6db90c1f040b232cda2b9f05 T-096: measured by the SHELL predecessor; needs an IDLE MACHINE, not just the bed (400 execs x 7 rounds)
+50-host-plugin-feasibility.sh 4ef2acc72f205e8f430573ce77dc6caec0059281 deb3c5a97453dcb493a811a0ebf8de26ab3f93a2 T-096: measured by the SHELL predecessor; the script now calls `pgb rootfs run`. Needs the bed
+
+# ⛔ AND ONE THAT IS DELIBERATELY SHORT-LIVED: the corpus re-run is IN FLIGHT
+# as this is written (C49 and C54 both owe it, and T-094's spawn count rides
+# along). ⭐ The line goes inert the moment the new RESULT.txt is committed,
+# which is the whole point of pinning to both commits.
+65-capability-corpus.sh 43bfcb0ae6bac428865dc3f3d9fd65ce4feb12fd e48d88a811766af65ab50a79d82977a2303d7aac T-096/C49/C54: re-run IN FLIGHT 2026-09-05; delete this line when its RESULT.txt lands
