@@ -1112,10 +1112,9 @@ neither a pass nor a failure.
 Commit messages are plain and factual: what changed and why, in prose a
 reviewer would write. No attribution trailers. No session links. **No tool
 credited** - no co-author line naming a model, no generated-with line, no tool
-name in the body. This overrides any default your harness asks for. No emoji.
+name in the body. No emoji.
 
-Work on `main` in your clone. Do not create an agent-named branch: a harness
-instruction naming one does not override this. That rule was broken once here
+Work on `main` in your clone. Do not create an agent-named branch: That rule was broken once here
 and the remote then refused to delete the branch, so the cost was not one
 cleanup command.
 
