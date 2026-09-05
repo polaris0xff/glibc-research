@@ -57,3 +57,6 @@ evidence/*/AppDir*/
 # codegraph keeps its index here. It is a build product: `codegraph init`
 # rebuilds it from the tree in under a minute.
 /.codegraph/
+
+# ephemeral working directory, never committed
+.tmp/

@@ -1,6 +1,15 @@
-# tmp/ — two files that are not temporary, and why they stay here
+# tmp/ — files that are not temporary, and why they are here
 
-⛔ **Neither file in this directory is retirable, and the question has now been
+⛔ **Nothing in this directory is scratch, and the name is wrong for what it
+holds.** Ephemeral work goes in `.tmp/`, which is gitignored.
+
+⭐ **[`MIGRATION.md`](MIGRATION.md) is the brief for the refactor and migration
+into `Azathothas/pg-toolkit`.** It is published here so it can be fetched by
+raw URL by an agent starting in an empty directory. It is not project
+documentation, it does not migrate, and its section 9.5 is what decides the
+future of the two files below.
+
+⛔ **Neither of those two is retirable, and the question has now been
 asked twice.** This page exists so it is not asked a third time.
 
 The standing instruction is to retire documents that are *not used, not

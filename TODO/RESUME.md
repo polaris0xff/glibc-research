@@ -12,15 +12,15 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
                    OPERATOR SAYS main.
     GATES          go build green. No experiment was run this session.
     STATE          ⭐ THE REFACTOR IS THE WORK, AND ITS BRIEF IS
-                   [`../MIGRATION.md`](../MIGRATION.md) — READ THAT FIRST.
+                   [`../tmp/MIGRATION.md`](../tmp/MIGRATION.md) — READ THAT FIRST.
                    The corpus run was KILLED by the operator at 4 of 26
                    subjects, 2026-09-05 04:20Z. Do not restart it.
 
 ## ⭐ WHERE THE WORK IS
 
-⛔ **[`../MIGRATION.md`](../MIGRATION.md) supersedes the work order below.** It
+⛔ **[`../tmp/MIGRATION.md`](../tmp/MIGRATION.md) supersedes the work order below.** It
 is standalone, it carries the measured state of the tree as of 2026-09-05, the
-keep/delete rule for the comb, and the task list M-01 to M-29. It is written
+keep/delete rule for the comb, and the task list M-01 to M-35. It is written
 for a fresh agent on a Windows dev machine with WSL and podman.
 
 ⚠ **The ninth session did surface research only.** It vendored
@@ -114,8 +114,8 @@ holds; this is the durable copy so it cannot be lost.**
 0. The overhaul follows **`https://github.com/Azathothas/TEMPLATE`**, adopting
    its docs, conventions, rules and scripts where applicable. Relicense to
    **0BSD**. ⚠ *Already 0BSD as of 2026-09-05 — `LICENSE` is the BSD Zero
-   Clause text; what is owed is consistency, not a change.* ⚠ TEMPLATE is
-   **not** vendored under `references/`; only `docs/methodology/` came from it.
+   Clause text; what is owed is consistency, not a change.* ⭐ TEMPLATE was vendored on
+   2026-09-05 at `references/Azathothas__TEMPLATE`, commit `62061663`.
 1. **Every comment in every code file and script** is extracted and read line
    by line, then cleared of history / changelog / narrative lore. ⭐ **Only
    genuine GOTCHAS and LESSONS are preserved.**
