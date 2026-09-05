@@ -243,6 +243,33 @@ plus one traced row would separate them.
   win. For those the bundle reports the compiled-in path as a finding and the
   application is expected to fail — which is the honest outcome, and it is
   visible rather than silent.
+- ⛔⛔ **Not covered, and MEASURED 2026-09-05: the rest of the `exec` family and
+  `posix_spawn`.** The list above stops at `execve`/`execv`, and the reason
+  given two bullets up — *glibc reaches its own entry points without going
+  through the PLT, so they are interposed by name* — applies to these
+  identically. They are not interposed, so they are not rewritten:
+
+  | call | a `/nix/store/…` path passed to it |
+  |---|---|
+  | `open`, `execve`, `execv` | ⭐ rewritten |
+  | `system` | ⭐ rewritten, transitively — the child shell inherits the preload and its own `execve` is hooked |
+  | ⛔ `execvp`, `execl` (and `execlp`, `execle`, `execvpe`) | **not rewritten** |
+  | ⛔ `posix_spawn`, `posix_spawnp` | **not rewritten** |
+
+  ⭐ **Measured with a control**, against a real build of the interposer and a
+  real `.storemap`: without the preload all seven read *not rewritten*, so the
+  probe discriminates. ⛔ **And it is not theoretical.** Counting `UND` imports
+  across the shared libraries on one ordinary host: **21** import `execvp`,
+  **15** `posix_spawn`, **14** `posix_spawnp`, **5** `execl`. Among the 25
+  libraries are **`libglib-2.0.so.0`** — which is in every GTK subject of the
+  corpus — **all four `libpython3.*`**, `libdbus-1`, `libarchive`, `libmagic`
+  and `libsystemd`.
+
+  ⚠ **The bound**: it bites only when the path passed is an **absolute store
+  path**. A bare program name goes to a `PATH` search, where the bundle's own
+  `PATH` already points inside it and there is nothing to rewrite.
+  `docs/history/corrections.md` **C60**; the fix is **T-097**.
+
 - ⛔ **Not covered: a path the program derives by string arithmetic** that does
   not begin with a store path (none observed; not searched for exhaustively).
 

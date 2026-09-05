@@ -2552,6 +2552,76 @@ way `docs/AGENTS.md` §12 already states the `references/` count as
 
 ---
 
+## C60 — the interposer stops at `execve`, and `posix_spawn` is what GLib and CPython actually use
+
+⚠ **This corrects a claim of coverage, not a measured number.** `TODO/research.md`
+T-094 says *"`pgb-storefix.c` rewrites the paths a process passes to `open`,
+`stat`, `execve` **and friends**"*, and `design/store-paths.md`'s interposed
+list ends at `execve`/`execv`. ⛔ The rest of the `exec` family is not
+interposed, and neither is `posix_spawn`.
+
+⭐ **The tree had already written down the reason it must be**, two bullets
+above its own list: *glibc reaches its own entry points without going through
+the PLT, so `fopen`, `opendir`, `realpath` and friends are interposed BY
+NAME.* `execvp`, `execl`, `execlp`, `execle`, `execvpe`, `posix_spawn` and
+`posix_spawnp` are the same shape — each resolves the path itself and then
+calls glibc's internal exec — and each was left out.
+
+## ⭐ MEASURED, WITH A CONTROL
+
+A real build of `tool/runtime/pgb-storefix.c`, a real `.storemap`, an `APPDIR`
+holding the target, and a probe that hands the same absolute store path to
+seven different calls:
+
+| call | with the interposer | ⛔ control, no preload |
+|---|---|---|
+| `open()` | ⭐ rewritten (opened) | not rewritten |
+| `execve()` | ⭐ rewritten (helper ran) | not rewritten |
+| `execv()` | ⭐ rewritten — it forwards to our own `execve` | not rewritten |
+| `system()` | ⭐ rewritten, **transitively**: the child shell inherits the preload and its own `execve` is hooked | not rewritten |
+| ⛔ `execvp()` | **not rewritten** | not rewritten |
+| ⛔ `execl()` | **not rewritten** | not rewritten |
+| ⛔ `posix_spawn()` | **not rewritten** | not rewritten |
+
+⭐ **The control is what makes the four greens mean anything**: without the
+preload all seven read *not rewritten*, so the probe can tell the two apart.
+
+## ⛔ AND IT IS NOT THEORETICAL — THE IMPORTS WERE COUNTED
+
+`UND` imports across the shared libraries of one ordinary host:
+
+| symbol | libraries importing it |
+|---|---|
+| `execvp` | **21** |
+| `posix_spawn` | **15** |
+| `posix_spawnp` | **14** |
+| `execl` | 5 · `execlp` 4 · `execle` 2 |
+
+⛔ **Twenty-five distinct libraries**, and the names are the point:
+**`libglib-2.0.so.0`** imports `execvp`, `posix_spawn` **and** `posix_spawnp`
+— GLib is in every GTK subject of the corpus — as do **all four
+`libpython3.*`**, `libdbus-1`, `libarchive`, `libmagic`, `libsystemd`,
+`libperl`, `libapt-pkg` and `libedit`.
+
+## ⚠ THE BOUND, WHICH KEEPS THIS HONEST
+
+It bites only when the path handed to one of these is an **absolute store
+path**. A bare program name goes to a `PATH` search, and the bundle's own
+`PATH` already points inside it, so there is nothing to rewrite. ⛔ No corpus
+row is currently attributed to this — it is a gap found by reading the source
+against its own stated principle and then measured, **not** a diagnosis of an
+observed failure.
+
+⭐ **AND IT IS T-094's SIBLING.** T-094 is *the application spawned a HOST
+program, so the host's libc entered*. This is *the application spawned its OWN
+bundled helper and the path was never rewritten*. Both are about spawning, and
+neither is reachable by rewriting a data path.
+
+**The fix is T-097**: interpose the seven by name, exactly as `fopen` and
+`opendir` already are.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |
