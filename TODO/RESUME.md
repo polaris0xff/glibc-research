@@ -6,12 +6,45 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-05, at the START. Refreshed as work lands.
+    LAST WRITTEN   2026-09-05, refreshed at 03:50Z while the corpus runs.
     TREE           main. ⛔ EIGHTH session running.
     BRANCH         ⛔ main. The harness names a `claude/*` branch and THE
                    OPERATOR SAYS main.
-    GATES          both green at every commit.
-    STATE          ⭐ IN FLIGHT: the corpus re-run that clears C49 and C54.
+    GATES          both green at every commit. CI green (444).
+    STATE          ⛔⛔ THE CORPUS RE-RUN IS IN FLIGHT AND IT IS THE SESSION'S
+                   MAIN DELIVERABLE. Two instances, started 03:14Z, ~28 min
+                   per subject, 13 subjects each -> expect ~09:15Z.
+                     A  pgid 8573  /var/tmp/evidence-65a  :99  rootfs
+                        PGB_EXP65_ONLY='gtk3-*|x11-*|gl-*|vulkan-*|sdl-1'
+                     B  pgid 8673  /var/tmp/evidence-65b  :98  rootfs2
+                        PGB_EXP65_ONLY='sdl-2|sdl-3|qt-*|py-*|media-*|field-*'
+                   ⭐ FIRST ROW IS GREEN AND IT IS THE C6 CONTROL:
+                   gtk3-1 galculator 11/11 pass, 11/11 clean, 0 spawns.
+                   ⛔ IT WAS KILLED AND RESTARTED TWICE before this, for two
+                   real defects — C57 and C58. Both are fixed and committed.
+
+## ⛔⛔ WHAT TO DO WHEN THE CORPUS FINISHES — IN THIS ORDER
+
+    1. ⭐ A FINAL UNFILTERED READ-BACK PASS WRITES THE VERDICT. Both running
+       instances are FILTERED, so neither may be quoted (C6's controls are
+       split across them). The read-back recomputes C1/C2/C6/C8/C9 from the
+       recorded rows in SECONDS -- it re-runs nothing:
+           sh scripts/common/run-experiment.sh 65
+    2. ⛔ `make` — the tree carries an UNINSTALLED Go change (atomic `--out`,
+       commit 3b5fe7aa). `./pgb` does not have it yet. Forbidden until now
+       because a rebuild mid-run mixes two tools in one table.
+    3. `sh poc/run-all.sh --rebuild`   (C53, and it now also exercises step 2)
+    4. `sh scripts/common/run-experiment.sh 108`   (needs `make` first)
+    5. `105-`, then `103-` run 2.
+    6. `10-`, `20-`, `50-` (bed) and `40-` (IDLE MACHINE) — T-096's four.
+
+⚠ **AND ONE EDIT IS DRAFTED BUT NOT APPLIED**, because `65-` must never be
+edited while it executes: **C1 and C2 compare against `MEASURED` while C5
+pre-registers `xterm` as an exception**, so the corpus can never exit 0 and its
+pass/fail bit carries no information — only the number moves. ⭐ The fix is the
+pattern this tree already uses twice (`STALE-EVIDENCE.txt`, `criteria-audit.sh`):
+a NAMED exception list, so an UNLISTED failure flips the bit. ⚠ Apply it AFTER
+the run, then re-run step 1 — which costs seconds, because it reads the rows.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
 
