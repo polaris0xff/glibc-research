@@ -141,8 +141,25 @@ holds; this is the durable copy so it cannot be lost.**
    their whims. ⚠ The plausible exception is the `mkdwarfs` binaries, and those
    can be bundled anyway.
 
+6. ⛔ **THE DEV ENVIRONMENT IS NO LONGER ASSUMED.** Work may happen on a
+   remote Linux container like the one this was written on, **or on a Windows
+   dev machine with WSL and podman**. ⭐ There is a sanctioned way to work and
+   **the TEMPLATE will guide it**. ⚠ So nothing may hardcode this container's
+   assumptions — uid 0, `chroot`, `/var/lib/pgb-rootfs`, `unshare --mount`,
+   dockerd. Podman is currently marked **untested** in `docs/AGENTS.md` §9 and
+   that becomes a first-class target rather than a footnote.
+
 ⛔ **All of the above must be turned into proper TODO entries**, not left as
 prose.
+
+## ⭐ THE OPERATOR'S FOUR DECISIONS, 2026-09-05 — asked and answered
+
+| question | ruling |
+|---|---|
+| **git history** | ⭐ **REWRITE IT.** Strip the AI attribution and session trailers from all 488 commits. ⛔ Everything that is not needed — **after it has been combed and its useful parts mined into the core docs, scripts and tools** — is discarded straight into a dedicated directory under the docs history tree. **The TEMPLATE provides the further instructions.** ⚠ Consequence to plan for: `evidence/STALE-EVIDENCE.txt` pins commit PAIRS and `docs/history/corrections.md` quotes hashes; every one of them breaks on a rewrite and must be repaired or replaced. |
+| **emoji and markers** | ⭐ **Any and all HUMAN-facing docs must be written for a human reader**: concise, containing exactly what is current and true, reading like a **technical manual**. ⛔ **There is no place for emoji in human-facing docs.** ⚠ **AGENT-facing docs are the exception** — the TEMPLATE allows a *minimal, not excessive* use. |
+| **the corpus run** | ⭐ **KILLED**, 2026-09-05 04:20Z, at 4 of 26 subjects. See `evidence/65-capability-corpus/spawns/README.md` for exactly what landed and what it validated. |
+| **`pg-toolkit`** | ⭐ **P0, and one of the FIRST tasks after the docs and repo refactor** — not during it. ⛔ It must be done **in steps**: vendoring, patching and reimplementing the dependencies FIRST, then the toolkit on top. |
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
 
