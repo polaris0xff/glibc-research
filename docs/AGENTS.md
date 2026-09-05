@@ -301,6 +301,11 @@ scripts/common/
                           a GTK theme, a session-bus config. DATA ONLY, and
                           the selftest asserts it adds no shared object.
                           §8; the ruling it answers is in §0b   (--selftest)
+  criteria-audit.sh       ⭐ which PRE-REGISTERED criteria never reach an
+                          assertion. ⛔ ADVISORY, not a gate, and it carries
+                          its own triage: of 15 files it raised, 14 were
+                          correct code and one — `108-` — was a real
+                          criterion the run would have scored wrong (--selftest)
   install-codegraph.sh    ⭐ the code-reading index, pinned and sha256-checked
 codegraph.json            what that index excludes and deprioritises
 experiments/lib.sh        conditions block, assertions, pid-attributed tracing
