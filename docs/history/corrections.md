@@ -2334,6 +2334,151 @@ what this file exists to catch.
 
 ---
 
+## C57 — a synthetic fixture cannot show a real trace's interleaving, and the instrument missed the one spawn it was built to find
+
+⚠ **This entry overturns no published number.** The defect was caught **before**
+the run it was written for, by the one step that separates it from C34, C36,
+C39, C48, C50, C52 and C56: the instrument was checked **against real output**
+as well as against its fixture. It is here because the *class* is new — the
+fixture was not wrong, it was **unrepresentative** — and no gate in this tree
+can see that.
+
+`exp_host_spawns` is T-094's counter: which HOST programs does the artefact's
+process set `execve`? It followed the fork family exactly as
+`exp_classify_trace` does — one pass, adding a child pid to the set when the
+parent's `clone`/`vfork` line reports it. Its fixture passed, eight rows of it.
+
+⛔ **THEN IT WAS RUN ON A REAL `strace -f` TRANSCRIPT.**
+
+    8217  vfork( <unfinished ...>
+    8218  execve("/bin/sh", ["/bin/sh", "-c", "--", …] <unfinished ...>
+    8217  <... vfork resumed>)              = 8218
+    8218  <... execve resumed>)             = 0
+
+⭐ **`vfork` SUSPENDS THE PARENT UNTIL THE CHILD EXECS.** So the child's
+`execve` is written to the transcript **before** the line that first names the
+child's pid. A single pass has not learned that 8218 belongs to the artefact
+when it reads 8218's `execve`, and drops it.
+
+⛔ **AND THE RESIDUE IS WORSE THAN A ZERO.** The probe did not go quiet — it
+reported the child's **second** exec, the one that failed:
+
+| | one pass | ⭐ two passes |
+|---|---|---|
+| `/bin/sh` — the mechanism **C55** is entirely about | ⛔ **missed** | ⭐ `ok` |
+| `/usr/bin/gnuplot` — the failed follow-up | `fail` | `fail` |
+| `/bin/echo` — a second, unrelated spawn | ⛔ **missed** | ⭐ `ok` |
+
+⚠ **So C9's own positive control would have PASSED.** `qt-1` was required to
+register *a* host spawn, and it would have — the wrong one. A count wrong in
+the direction of its own thesis, under a control that could not tell.
+
+⭐ **THE FIX** is a first pass that builds the fork graph and the artefact's
+pid, a descendant closure computed before any line is scored, and a second pass
+that attributes. The same file, read twice.
+
+⭐ **AND `exp_classify_trace` IS NOT AFFECTED — CHECKED, NOT ASSUMED.** It
+counts `openat`, and a child's library opens happen *after* its exec completes,
+by which time the parent has resumed and the pid is known. In the real trace
+above, 8218's `libc.so.6` open is three lines below the `vfork resumed`.
+⛔ `execve` is the uniquely dangerous line because it is the syscall the child
+makes **while the parent is still blocked**.
+
+## ⛔ AND THE FIX TRADED THE DEFECT FOR ITS MIRROR IMAGE, WHICH THE RUN CAUGHT
+
+The first two-pass version armed the artefact's pid in **pass 1** and then
+scored every `execve` that pid ever made — including the ones from **before**
+it became the artefact. ⭐ The launcher is exactly that shape, and one pid does
+all of it: `pgb rootfs run` clones a child, the child execs **`pgb` again** as
+its own re-entry point, then `/bin/sh`, then `/subj65`. The instrument's own
+output said so on the first subject of the restarted run:
+
+    gtk3-1: spawns a HOST program on 7 row(s) — /bin/sh /home/user/…/pgb
+
+⛔ **Every subject would have reported the launcher**, so T-094's count would
+have read **26 of 26** — the maximum, and meaningless.
+
+⭐ **THE SHAPE THAT IS ACTUALLY RIGHT** is both halves at once: pass 1 builds
+the fork graph **and arms nothing**; pass 2 arms in **time order**, a pid by
+the artefact's own `execve` and a descendant through the graph. So a child is
+recognised however its `execve` interleaves, and a pid's earlier life is not
+the artefact's.
+
+⚠ **It was caught in minutes rather than in seven hours because this function
+prints host programs BY NAME.** A bare count would have read `7/2` and looked
+like a finding.
+
+## ⛔ WHAT THIS COSTS THE NEXT SESSION
+
+The corpus re-run had already started with the one-pass version and was
+**killed six minutes in**, before any row was recorded. ⚠ Had it not been
+checked, seven hours would have produced a T-094 count that was confidently
+wrong and internally consistent — first too low, then, after the obvious fix,
+too high.
+
+⭐ **THE RULE**: a fixture is written from what the syscall log is *believed* to
+look like. ⛔ **Before trusting a trace reader, run it on a trace `strace`
+actually produced** — and on one where the answer is known in **both**
+directions. Both were done here: a subject that shells out returned
+`ok /bin/sh`, `ok /bin/echo`, `fail /usr/bin/gnuplot`, and a subject that
+spawns nothing returned **0 lines**.
+
+---
+
+## C58 — a resumable experiment poisoned by its own interruption: `[ -s ]` is NON-EMPTY, not COMPLETE
+
+⛔ **`experiments/65-` is resumable by design** — a subject with a recorded row
+is not re-run, because a corpus run is hours of closure fetches and a session
+that stops halfway must not lose the half it paid for. ⚠ **Being poisoned by
+its own interruption is the one failure mode a resumable runner must not
+have**, and it had it.
+
+The artefact was built straight to its final name, and the reuse guard was:
+
+```sh
+if [ ! -s "$img" ]; then
+    ...
+    PGB_APPIMAGE_CACHE="$cache" "$REPO_DIR/pgb" "$@" >"$blog" 2>&1 || true
+fi
+```
+
+⭐ **MEASURED 2026-09-05.** A run was killed while `mkdwarfs` was packing
+`galculator`; its build log ends
+
+    packing with uruntime-appimage-dwarfs-lite-x86_64 + dwarfs-universal-0.15.6
+    Terminated
+
+leaving a **fragment** of the AppImage on disk. The next run found a non-empty
+file, **skipped the rebuild**, and ran the fragment on all eleven:
+
+    dwarfs::runtime_error: [filesystem_v2.cpp:220] no metadata schema found
+    AppRun not found: "/tmp/appimage_extracted_subj6…/AppRun"
+
+| | |
+|---|---|
+| `gtk3-1` galculator | ⛔ **0 of 11**, and it is a **C6 POSITIVE CONTROL** measured at 11 of 11 twice by `experiments/64-` |
+| `sdl-2` stella | ⛔ 0 of 11, same cause |
+| `gtk3-2` mousepad, built cleanly in the same run | ⭐ **ran, drew, and loaded zero host objects** |
+
+⭐ **C6 DID ITS JOB.** The control failing is what said *the instrument, not
+the capability* — and the third row is what proves the bed and the bundler
+were fine all along.
+
+## ⭐ THE FIX, AND WHY BOTH HALVES ARE NEEDED
+
+Build to `$img.part` and `mv` on success, so a killed build leaves nothing
+reusable — **and read the exit status**, which `|| true` was swallowing.
+⛔ Neither half is sufficient alone: a SIGTERM'd `pgb` exits non-zero **and**
+leaves a non-empty file, so the status is the only thing that separates a
+fragment from an artefact, and the rename is what stops the fragment being
+seen at all. ⚠ A build that fails while still producing something is now
+reported by name and discarded, rather than silently used.
+
+⚠ **The same shape is worth looking for elsewhere**: any `[ -s "$f" ]` used as
+"this is already built" is a truncation waiting for an interruption.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

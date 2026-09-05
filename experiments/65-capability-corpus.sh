@@ -492,10 +492,40 @@ while IFS= read -r line <&3; do
   # and `glxgears`; keying on the id fetched each of those closures twice.
   cache="$WORK/cache-$(printf '%s' "$attr" | tr '/.' '__')"
   blog="$WORK/build-$id.log"
+  # ⛔⛔ BUILD TO `.part` AND RENAME, BECAUSE A KILLED RUN POISONS THE NEXT ONE.
+  #
+  # This block used to write straight to `$img` and the reuse guard was
+  # `[ ! -s "$img" ]` — NON-EMPTY, not COMPLETE. ⭐ Measured 2026-09-05: a run
+  # interrupted while `mkdwarfs` was packing left a 30 MB fragment of
+  # galculator's artefact on disk (its build log ends `Terminated`). The next
+  # run found a non-empty file, SKIPPED the rebuild, and ran the fragment on
+  # all eleven environments:
+  #
+  #     dwarfs::runtime_error: [filesystem_v2.cpp:220] no metadata schema found
+  #     AppRun not found: "/tmp/appimage_extracted_subj6…/AppRun"
+  #
+  # ⛔ ELEVEN ZEROS ON A SUBJECT THAT WORKS, and `gtk3-1` is a C6 POSITIVE
+  # CONTROL — so the whole run's verdict was unreadable, which is exactly what
+  # C6 is for. ⚠ This experiment is RESUMABLE by design; being poisoned by its
+  # own interruption is the one failure mode a resumable runner must not have.
+  #
+  # ⭐ `.part` + `mv` makes the artefact atomic: a killed build leaves nothing
+  # reusable. ⛔ And the exit status is now READ rather than swallowed by
+  # `|| true` — a SIGTERM'd `pgb` exits non-zero AND leaves a non-empty file,
+  # so the status is the only thing that separates the two.
   if [ ! -s "$img" ]; then
-    set -- bundle appimage "$attr" --out "$img" --name "$prog"
+    rm -f "$img.part"
+    set -- bundle appimage "$attr" --out "$img.part" --name "$prog"
     [ -n "$extras" ] && set -- "$@" --extra "$extras"
-    PGB_APPIMAGE_CACHE="$cache" "$REPO_DIR/pgb" "$@" >"$blog" 2>&1 || true
+    if PGB_APPIMAGE_CACHE="$cache" "$REPO_DIR/pgb" "$@" >"$blog" 2>&1; then
+      [ -s "$img.part" ] && mv -f "$img.part" "$img"
+    else
+      # ⚠ SAID OUT LOUD when a failing build still produced something: the old
+      # code would have used it, and the difference must not be silent.
+      [ -s "$img.part" ] && exp_note \
+        "⚠ $id: pgb exited non-zero but left a $(wc -c < "$img.part") byte artefact; DISCARDED (see $blog)"
+      rm -f "$img.part"
+    fi
   fi
   if [ ! -s "$img" ]; then
     # ⛔ C4: UNRESOLVED IS NOT A FAILURE OF THE CAPABILITY and is not a pass.

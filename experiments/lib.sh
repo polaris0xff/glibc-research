@@ -444,11 +444,26 @@ exp_classify_trace() {
 # The `execve` line is the uniquely dangerous one because it is the syscall the
 # child makes while the parent is still blocked.
 #
-# ⚠ The fork closure is by PID and carries no line-order constraint, so a pid
-# the LAUNCHER cloned before the artefact exec'd would be attributed to the
-# artefact. `pgb rootfs run` execs the artefact's shell in place and clones
-# nothing before it, and the error runs in the over-reporting direction, which
-# is the one this function is allowed to make.
+# ⛔⛔ AND THE FIRST TWO-PASS VERSION TRADED THAT DEFECT FOR THE OPPOSITE ONE.
+# It armed the artefact's pid in pass 1 and then scored every `execve` that pid
+# ever made — including the ones BEFORE it became the artefact. ⭐ The launcher
+# is exactly that shape, and the instrument's own output said so on the first
+# subject of the first run:
+#
+#     gtk3-1: spawns a HOST program on 7 row(s) — /bin/sh /home/user/…/pgb
+#
+# ⭐ ONE PID does all of it: `pgb rootfs run` clones a child, that child execs
+# `pgb` again as its own re-entry point, then `/bin/sh`, then `/subj65`. A pass
+# that has already decided the pid is the artefact attributes the two earlier
+# execs to the application. ⛔ Every subject would have reported the launcher
+# as a host spawn — the count would have read 26 of 26.
+#
+# ⭐ SO PASS 1 BUILDS THE FORK GRAPH AND NOTHING ELSE, and pass 2 arms pids IN
+# TIME ORDER: a pid is armed by the artefact's own `execve`, a descendant is
+# recognised through the graph, and an exec before either is not counted.
+# ⚠ It was caught in minutes rather than in seven hours because this function
+# prints host programs BY NAME. A bare count would have read `7/2` and looked
+# like a finding.
 exp_host_spawns() {
   awk -v want="$2" '
     function spawn(p, st) {
@@ -466,24 +481,30 @@ exp_host_spawns() {
       if (p ~ /^\/nix\/store\//)  return       # an unrewritten store path
       out[st " " p] = 1
     }
-    # pass 1 -- the fork graph, and which pid became the artefact
-    FNR == NR {
-      if ($0 ~ ("execve\\(\"" want "\"")) { inset[$1] = 1; next }
-      if (($0 ~ /(clone|clone3|vfork|fork)\(/ \
-           || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) && /= [0-9]+$/) {
-        nk++; kid[nk] = $NF; par[nk] = $1
+    # ⭐ is this pid the artefact, or descended from it? Walks the fork graph
+    # pass 1 built, so a child is recognised even when its own `execve` was
+    # written before the parent vfork return.
+    function descends(p,   n) {
+      while (p != "" && n++ < 256) {
+        if (armed[p]) return 1
+        p = par[p]
       }
+      return 0
+    }
+    # pass 1 -- the fork graph ONLY. ⛔ Nothing is scored here and no pid is
+    # armed here: arming in pass 1 is what leaked the launcher (see above).
+    FNR == NR {
+      if (($0 ~ /(clone|clone3|vfork|fork)\(/ \
+           || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) && /= [0-9]+$/)
+        par[$NF] = $1
       next
     }
-    # ⭐ the descendant closure, computed once, before a single line is scored
-    FNR == 1 {
-      do {
-        again = 0
-        for (i = 1; i <= nk; i++)
-          if (inset[par[i]] && !inset[kid[i]]) { inset[kid[i]] = 1; again = 1 }
-      } while (again)
-    }
-    inset[$1] && /execve\(/ {
+    # pass 2 -- IN TIME ORDER. A pid is armed by the artefact own execve and
+    # never before it.
+    $0 ~ ("execve\\(\"" want "\"") { armed[$1] = 1; next }
+    /execve\(/ {
+      if (!descends($1)) next
+      armed[$1] = 1
       if (match($0, /"[^"]*"/) == 0) next
       spawn(substr($0, RSTART + 1, RLENGTH - 2), (/= -1/ ? "fail" : "ok"))
     }
@@ -555,6 +576,8 @@ _ct_selftest() {
   cat > "$_t" <<'TRACE'
 99 execve("/usr/bin/pgb", ["pgb", "rootfs", "run"], 0x7ffd) = 0
 99 clone(child_stack=NULL) = 100
+100 execve("/usr/bin/pgb", ["pgb", "__inner-run"], 0x7ffd) = 0
+100 execve("/bin/dash", ["sh", "-c", "DISPLAY=:99 /subj"], 0x7ffd) = 0
 100 execve("/subj", ["/subj"], 0x7ffd) = 0
 100 openat(AT_FDCWD, "/usr/lib/x86_64-linux-gnu/libhost.so.6", O_RDONLY) = 3
 100 clone(child_stack=NULL) = 200
@@ -628,11 +651,13 @@ TRACE
       "$(_s 'appimage_extracted')" 0
   _ck "⛔ an unrewritten /nix/store exec is NOT a host spawn" \
       "$(_s 'nix/store')" 0
-  # ⛔ THE LAUNCHER IS NOT THE SUBJECT. `pgb rootfs run` execs before the
-  # artefact does, from a pid that is not in the set, and counting it would
-  # score EVERY subject as spawning a host program.
-  _ck "⛔ an exec BEFORE the artefact's own is not counted" \
-      "$(_s 'pgb')" 0
+  # ⛔⛔ THE LAUNCHER IS NOT THE SUBJECT, AND IT IS THE SAME PID. `pgb rootfs
+  # run` clones a child; that child execs `pgb` again as its re-entry point,
+  # then the shell, then the artefact. A version that armed the pid in pass 1
+  # scored all three and reported the launcher as a host spawn on EVERY
+  # subject — measured, on the first row of the first run.
+  _ck "⛔ the launcher's own re-exec is not a spawn" "$(_s 'pgb')" 0
+  _ck "⛔ nor the shell that exec'd the artefact in place" "$(_s '/bin/dash')" 0
   _ck "⛔ the artefact re-execing itself is not a spawn" "$(_s '/subj')" 0
   _ck "⭐ two host spawns in total, and no more"  "$(exp_host_spawns "$_t" /subj | wc -l | tr -d ' ')" 2
   # ⛔ AND IT MUST BE ABLE TO REPORT ZERO. A counter that cannot say "none"

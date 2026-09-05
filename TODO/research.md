@@ -550,8 +550,38 @@ none resolved:
 3. The cost is real: `bash` plus `libtinfo` in every bundle that might shell
    out.
 
-⭐ **WHAT TO MEASURE FIRST, and it is cheap**: how many of the twenty-six
-corpus subjects spawn a host program at all? The trace already shows it
-(`execve` of a path outside the bundle). ⛔ If it is one subject, this is a
-footnote; if it is ten, it is the next real piece of work. **That count does
-not exist yet.**
+## ⭐ WHAT TO MEASURE FIRST — INSTRUMENTED 2026-09-05
+
+How many of the twenty-six corpus subjects spawn a host program at all? ⛔ **If
+it is one subject this is a footnote; if it is ten it is the next real piece of
+work.**
+
+⚠ **"The trace already shows it" was true and not sufficient.** `experiments/65-`
+**deletes** each trace as soon as it has counted the shared objects — disk is
+that experiment's binding constraint — so the count could not be taken after
+the fact from anything on disk. It has to be taken *in* the corpus run.
+
+⭐ **THE INSTRUMENT**: `exp_host_spawns` in `experiments/lib.sh`, reporting by
+name every host program the artefact's own process set `execve`s, `ok` or
+`fail`. `65-` records it per subject to
+[`../evidence/65-capability-corpus/spawns/`](../evidence/65-capability-corpus/spawns/),
+where an **empty** file means *measured, spawned nothing* and an **absent** one
+means *not measured* and prints `-`.
+
+⛔ **TWO THINGS ABOUT IT THAT ARE NOT OBVIOUS, both paid for:**
+
+1. Its host test is the **complement of the artefact's own locations**, which
+   is deliberately the opposite of the prefix list **C49** corrected. A prefix
+   list errs toward looking clean; this errs toward reporting a spawn that is
+   really the artefact's, and every path is printed so an over-count is
+   visible. ⛔ Do not "fix" it into a prefix list.
+2. ⛔ It reads the trace **twice**, and the one-pass version missed the very
+   spawn it exists to find — `vfork` suspends the parent, so a child's
+   `execve` is written before the line that first names its pid.
+   `docs/history/corrections.md` **C57**.
+
+⭐ **C9a/C9b are its positive control and they are somebody else's
+measurement**: `qt-1` must register a host spawn (C55 read the `execve` off its
+trace) and `x11-3` must too (C5 predicts xterm fails C2 *for running the user's
+shell*). ⚠ **C9c, the count itself, is pre-registered as a RANGE — 2 to 10 of
+26** — because the honest state is that it is unknown.
