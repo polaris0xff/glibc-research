@@ -460,7 +460,16 @@ experiment; none has been shown to be unreachable.
    (including `DT_RELR`), honours symbol versioning, runs the initialisers, and
    binds every undefined symbol to the static glibc already in the executable.
    A `DT_NEEDED` naming a library the image already contains is **answered, not
-   opened**, which is what keeps a second libc out. 1,093 code lines.
+   opened**, which is what keeps a second libc out. 1,398 code lines.
+
+   ⚠ **That count is `grep -cvE '^[[:space:]]*(//|/\*|\*|$)'` over
+   `tool/runtime/pgb-elfload.c`, and it MOVES.** It read **1,088** when the
+   comparison against `solo` was first written on 2026-09-02 and five
+   documents carried **1,093** until 2026-09-05, by which time T-068's fixes
+   and C46's reordering had taken it to 1,398. ⭐ The comparison's direction
+   is unaffected — solo's loader alone is ~2,3xx and needs a ~5,9xx-line
+   glibc shim this needs none of — but the number was stale in five places
+   and no gate could see it. `history/corrections.md` C59.
 
    | `experiments/76-` | |
    |---|---|
@@ -725,7 +734,7 @@ classes and the entry that owns each; it is not a second work order.
 | class | owner | where it stands |
 |---|---|---|
 | **`pgb build <url-or-package>`** — the toolchain the project is for | T-012 | the design and the static-first/bundle-last rule are in [`design/toolchain.md`](design/toolchain.md) |
-| ⭐ **host `dlopen`** — §7 item 1 | ✅ **T-064 CLOSED**, and ✅ **T-068 CLOSED** with it | `pgb build --host-dlopen`. `experiments/76-`: 11 of 11 carried, zero host objects, a real host `.so` on 7 of 7 glibc rows, control 0 of 11. 1,093 code lines against solo's 2,332 |
+| ⭐ **host `dlopen`** — §7 item 1 | ✅ **T-064 CLOSED**, and ✅ **T-068 CLOSED** with it | `pgb build --host-dlopen`. `experiments/76-`: 11 of 11 carried, zero host objects, a real host `.so` on 7 of 7 glibc rows, control 0 of 11. **1,398** code lines against solo's 2,332 |
 | ⭐ **the glibc pin, and future-proofing** | ✅ **T-070 CLOSED** | 2.36 → **2.41**, `debian:13`, gcc 14.2.0. Four measured costs at zero, class B **20 → 5**, ten of ten POCs, CI green 16 of 16. ⚠ The ceiling regrows: [`design/glibc-versions.md`](design/glibc-versions.md) rule 6 says re-cost it periodically |
 | ⭐ **EGL out of a nixpkgs closure** | ✅ **T-071 CLOSED**, and ⭐ **corroborated at 11 of 11** | `experiments/85-`, `pass=10 fail=0`; and `experiments/65-` `gl-1`, where `eglinfo` enumerates EGL configs naming `llvmpipe` on **11 of 11**, clean on 11 of 11. ⚠ Every row is `swrast` and surfaceless — T-059 owns the GPU |
 | ⚠ **the bundle is bigger than the field** | ⭐ **T-066 (P0): the SPEED half is MET, on a CLI and on a GUI, 2026-09-03d** | ⛔ Still the last open P0, on **size**: 1.70× on `jq` and 2.95× on kdenlive, both worse than before because `-S18` costs +17.8%. ⚠ Size is struck by the 2026-09-03c ruling but goal 3 still names *smaller* for kdenlive. ⭐ `experiments/84-` measured image size at **0.024–0.031 ms/MiB**, so the debloat levers cannot buy it back on the clock |

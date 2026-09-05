@@ -250,11 +250,11 @@ there:
 not larger.** `pg83/solo` needs 2,056 code lines of `elf_loader.cpp` plus 276
 of `dlfcn.cpp`, and on top of that 5,948 lines of `glibc_shim.cpp` translating
 glibc's ABI onto musl. A static **glibc** host has no translation to write, so
-ours is **1,093 code lines** and there is no shim at all.
+ours is **1,398 code lines** and there is no shim at all.
 
 | | measured |
 |---|---|
-| lines | ours 1,093 code lines; solo's loader alone 2,332, plus a 5,948-line shim we need none of |
+| lines | ours **1,398** code lines; solo's loader alone 2,332, plus a 5,948-line shim we need none of |
 | time to first symbol, debian-12 | ours **147,543 ns**; the same static binary reaching the host loader **711,066 ns** |
 | size | the provider table is a dial, not a constant — 946,752 B with no `-u` list and 2,621,872 B with a complete one |
 

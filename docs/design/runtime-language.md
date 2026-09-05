@@ -168,7 +168,7 @@ prohibition:
    53.7 MB fetch and the second-toolchain problem both disappear and only
    questions 1 and 2 remain.
 4. ⭐ **A component that cannot be written correctly in C at all.** The loader
-   was the candidate for this and it came out at 1,093 code lines with zero
+   was the candidate for this and it came out at 1,398 code lines with zero
    UBSan findings over 904 real objects — smaller than `pg83/solo`'s 2,332 for
    the same job in C++. If something harder than an ELF loader turns up, it
    gets to re-ask.

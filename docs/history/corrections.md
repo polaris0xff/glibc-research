@@ -2499,6 +2499,59 @@ matter.
 
 ---
 
+## C59 — a code-size number in prose drifted for three days, in five documents at once
+
+⚠ **The conclusion it supports is unaffected.** This entry is here because the
+*number* was wrong everywhere it appeared, nothing could see it, and it is the
+one class `docs/AGENTS.md` §0b names but no gate covers: **a claim whose
+measurement is not attached to it.**
+
+`tool/runtime/pgb-elfload.c` is the compiled-in ELF loader, and the argument
+for it is partly a size argument — *ours is small, `pg83/solo`'s is not, and
+solo additionally needs a glibc→musl shim we need none of.* The number was
+**1,093 code lines**, and it appeared in **five** places:
+
+    docs/AGENTS.md            §7 and §13
+    docs/limitations.md       twice, one of them the comparison table
+    docs/research/one-libc.md the comparison table
+    docs/design/runtime-language.md   the T-067 ruling
+
+⭐ **MEASURED 2026-09-05, and the file has GROWN:**
+
+| | `grep -cvE '^[[:space:]]*(//|/\*|\*|$)'` |
+|---|---|
+| at `28e451ad`, 2026-09-02, when the claim was written | **1,088** |
+| today | ⭐ **1,398** |
+
+⛔ **So the documents were 305 lines out of date**, and the growth is real work
+rather than churn: **T-068**'s loader defects and **C46**'s symbol-resolution
+reordering both landed in this file afterwards.
+
+## ⭐ WHY THE ARGUMENT STILL STANDS, WHICH IS THE PART THAT MATTERS
+
+Re-derived from the vendored tree at its pinned commit, the same way:
+
+| | code lines |
+|---|---|
+| ours, `pgb-elfload.c` | ⭐ **1,398** |
+| solo, `lib/elf_loader.{cpp,S,h}` | 2,381 (the record says 2,332; the method differed slightly and their tree is pinned, so it does not drift) |
+| solo, the glibc shim we need **none** of | `glibc_shim.cpp` alone is **4,605** |
+
+⭐ **The direction is unchanged and the margin is still large.** ⛔ But "the
+conclusion survived" is luck, not method: a number that drifts 28% in three
+days could as easily have crossed the line it was being compared against.
+
+## ⚠ AND DELIBERATELY NO GATE
+
+A gate would have to know which prose sentences quote which file's size, and
+the general class — *any* number in *any* document drifting from the code —
+has no mechanical form. ⭐ What is done instead is the tree's own convention,
+applied here: **the count is stated WITH the command that produces it**, the
+way `docs/AGENTS.md` §12 already states the `references/` count as
+`ls references/ | wc -l`. A reader can now re-derive it in one line.
+
+---
+
 ## Approaches evaluated and refused
 
 | approach | why refused |

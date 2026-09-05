@@ -117,7 +117,7 @@ is not written at all:
 
 | | |
 |---|---|
-| `pgb-elfload.c` | **1,093 code lines**, no ABI bridge |
+| `pgb-elfload.c` | **1,398 code lines**, no ABI bridge |
 | `solo` at `79451211` | 2,332 code lines of loader **plus** 5,948 of glibc→musl shim |
 
 ⚠ So on the paper's own scorecard (§9.1) this tree adds a **fifth row**: *native
