@@ -6,45 +6,45 @@ first anyway. This file exists only so a session that ends badly still hands
 over something.
 Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
 
-    LAST WRITTEN   2026-09-04c, at the END, as the session checkpointed.
-    TREE           main. CI green through the session, read after every push.
+    LAST WRITTEN   2026-09-05, at the START. Refreshed as work lands.
+    TREE           main. ⛔ EIGHTH session running.
     BRANCH         ⛔ main. The harness names a `claude/*` branch and THE
-                   OPERATOR SAYS main. SEVENTH session running.
+                   OPERATOR SAYS main.
     GATES          both green at every commit.
-    STATE          ⭐ The capability corpus is COMPLETE (26/26), all three of
-                   its unexplained rows are explained, and `101-` closed
-                   GREEN (pass=5 fail=0, eleven rows) — rung 3's locale
-                   criterion fires at last. ⛔ The session's
-                   yield was mostly INSTRUMENT defects: eight corrections,
-                   two of which (C49, C54) can move a committed number and
-                   one of which (C56) turned a claim that had never been
-                   measured into a measurement.
+    STATE          ⭐ IN FLIGHT: the corpus re-run that clears C49 and C54.
 
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
 
-⚠ **The clone comes up SHALLOW.** ⭐ **`main` came up CURRENT this time** —
-`git rev-list --count HEAD..origin/main` read **0 after the checkout**, where
-the last five sessions read 267, 311, 321, 358, 338. ⛔ **Check it anyway, and
-check it AFTER the checkout**: on the harness branch the count reads 0 because
-that branch points at the same head, not because the tree is current.
+⚠ **The clone comes up SHALLOW.** ⭐ `main` came up CURRENT again on
+2026-09-05 — `git rev-list --count HEAD..origin/main` read **0 after the
+checkout**. ⛔ **Check it anyway, and check it AFTER the checkout**: on the
+harness branch the count reads 0 because that branch points at the same head,
+not because the tree is current.
 
     git fetch --unshallow
     git checkout main
     git rev-list --count HEAD..origin/main     ⛔ check it AFTER the checkout
     git merge --ff-only origin/main
 
-⚠ **The container is fresh: nothing is bootstrapped.**
+⚠ **The container is fresh: nothing is bootstrapped.** Timed 2026-09-05 on a
+4-core / 15 GiB machine: `make` 13 s, `bootstrap --detach` **~6 minutes wall**
+for nix + chroot env + bed + docker env in parallel.
 
-    make                                     builds ./pgb, ~13 s
+    make                                     builds ./pgb
     ./pgb bootstrap --detach                 nix + env + bed, parallel
     ./pgb bootstrap --check                  is it ready
     sh scripts/common/install-codegraph.sh   v1.6.0
 
-⭐ **AND FOR ANY GUI WORK, TWO MORE PACKAGES**, without which the session will
-repeat the 2026-09-03e mistake:
+⭐ **AND FOR ANY GUI WORK, THREE PACKAGES, NOT TWO.**
 
     apt-get install -y musl-tools musl-dev   # the musl arm of 61-/63-/67-
-    apt-get install -y xvfb x11-utils        # ⛔ the ONLY honest GUI criterion
+    apt-get install -y xvfb x11-utils        # Xvfb, xwininfo, xdpyinfo
+    apt-get update && apt-get install -y x11-apps   # ⛔ xwd — see below
+
+⛔ **`xwd` IS IN `x11-apps`, NOT `x11-utils`, and `experiments/108-` needs it**
+as its instrument control. ⚠ And `apt-get install x11-apps` fails **404** on a
+container whose package lists predate the last Ubuntu point release —
+`apt-get update` first, always.
 
 ⛔ **AND START THE WATCHDOG BEFORE ANY LONG BUNDLE RUN.** Both ways these runs
 die are silent — a fixed writable allowance that makes `df` read `Avail 0` at a
@@ -59,8 +59,9 @@ extraction directory:
 2026-09-04c.** A job backgrounded from a tool call shares the harness's process
 group, so when the harness tore down an unrelated background task the whole
 group went with it — the experiment's parent shell was killed **47 minutes and
-seven rows in**, leaving an orphaned `strace` still writing:
-
+seven rows in**, leaving an orphaned `strace` still writing. ⛔ Confirm a run is
+dead by **PID and log mtime**, never by `pgrep -f` (it matches the watching
+shell).
 
 ## ⭐⭐ THE WORK LIST, CONCRETE AND IN ORDER
 
@@ -71,9 +72,9 @@ host-object count in this tree.** Two of them change what "clean" means.
 
 | # | what | why it is owed | cost |
 |---|---|---|---|
-| 1 | `sh scripts/common/run-experiment.sh 108` | flameshot's capture. **Pre-registered and never run.** The last *Untried* in the record. | ~50 min |
-| 2 | ⛔ `sh scripts/common/run-experiment.sh 65` | **ONE re-run clears TWO pinned debts**: **C49** (the host predicate missed `/usr/bin/ld.so` — the host loader) and **C54** (`clean` counted subjects that never started). Until it runs, every "clean" number in the tree means *clean under the old rules*. ⭐ Use the parallel recipe below. | hours |
-| 3 | `sh poc/run-all.sh --rebuild` | `tool/runtime/pgb-storefix.c` changed (**C53**) and the POC suite has not run since. `./pgb` is rebuilt and carries it. | ~1 h |
+| 1 | ⛔ `sh scripts/common/run-experiment.sh 65` | **ONE re-run clears TWO pinned debts**: **C49** (the host predicate missed `/usr/bin/ld.so` — the host loader) and **C54** (`clean` counted subjects that never started). ⭐ **AND SINCE 2026-09-05 IT ALSO ANSWERS T-094's COUNT** — the spawn instrument is in the same run. Use the parallel recipe below. | hours |
+| 2 | `sh scripts/common/run-experiment.sh 108` | flameshot's capture. **Pre-registered and never run.** The last *Untried* in the record. | ~50 min |
+| 3 | `sh poc/run-all.sh --rebuild` | `tool/runtime/pgb-storefix.c` changed (**C53**) and the POC suite has not run since. | ~1 h |
 | 4 | `sh scripts/common/run-experiment.sh 105` | pinned stale by the `0\n0` sweep; needs all eleven. | ~20 min |
 | 5 | `sh scripts/common/run-experiment.sh 103` | run 2, owed since T-091, plus the C54 start-guard on D3. | ~30 min |
 
@@ -81,21 +82,21 @@ host-object count in this tree.** Two of them change what "clean" means.
 
 | entry | the question, and what to measure |
 |---|---|
-| ⭐ **T-094** (new, P1) | **An application that shells out to the host loads the host's libc through that shell, and no path rewriting prevents it.** Measured on `qalculate-qt`, which probes for `gnuplot` via `/bin/sh -c --`. ⛔ **Measure this first and it is cheap**: how many of the twenty-six corpus subjects spawn a host program at all? The trace already shows it. If it is one, this is a footnote; if it is ten, it is the next real piece of work. **That count does not exist.** |
+| ⭐ **T-094** (P1) | **An application that shells out to the host loads the host's libc through that shell, and no path rewriting prevents it.** ⭐ **THE CHEAP HALF IS NOW INSTRUMENTED**: `exp_host_spawns` in `experiments/lib.sh` counts, per subject, every host program the artefact's own process set `execve`s, **by name**. `65-` records it to `evidence/65-capability-corpus/spawns/<id>.tsv`. ⛔ Until that run lands the count does not exist — an old row carries **no** spawns file and is reported `-` (not measured), never 0. |
 | **T-093** (P2) | The **only** field objection left with no measurement: *"no more Vulkan layers like mangohud"*. A real layer is already in the mesa closure (`VkLayer_MESA_overlay`). ⚠ Runs on the RUNNER host, not the bed — a fixture may not add a shared object. |
 | **T-090** (P1) | The sandbox rung. ⚠ `unshare -U` succeeds on the host and that is **not** the answer; measure it **inside the chroot bed** with `lsns -t user`. |
 | **T-077** (P1) | The head-to-head was measured on the **retired** glibc pin and nobody re-ran it. |
-| **T-095** (P2, new) | ⛔ **CI is fragile in a way that costs whole runs**: the libiconv fetch is ONE host (`ftp.gnu.org`) with no mirror and no retry, and it sits in the `build` job — so an upstream timeout skips `run-matrix` and `verify-docker` and turns a green tree red. Seen on a documentation-only commit (run 437). ⚠ A retry alone is not the fix: the failure was a **two-minute connect timeout**. |
-| **T-059** (P1) | Real GPU. Every GL and Vulkan row here is `llvmpipe`/`lavapipe`. ⭐ Per the operator's fixture ruling, ask what a *seam* could answer before recording it as a limit. |
+| **T-095** (P2) | ⛔ **CI is fragile in a way that costs whole runs**: the libiconv fetch is ONE host (`ftp.gnu.org`) with no mirror and no retry, in the `build` job. ⚠ A retry alone is not the fix: the failure was a **two-minute connect timeout**. |
+| **T-059** (P1) | Real GPU. Every GL and Vulkan row here is `llvmpipe`/`lavapipe`. |
 
 ### 3. ⛔ WHAT IS **NOT** OWED, so nobody re-opens it
 
 * **T-080** the corpus — 26/26, six categories closed. Retired.
 * **T-084** the six classifier copies — gone, `102-` reads them back out of git. Retired.
 * **T-088** `--with-program` — was being exercised by `90-` all along (**C45**). Retired.
-* **T-089** the `-static` row — **answered by a refusal**: a fully static closure has no loader, the bundler refuses it, and there is no artefact to ask the question of. The raw binary is already 11/11 with 0 host objects. Retired. ⚠ Only a **mixed** closure would move it, and none is known.
+* **T-089** the `-static` row — **answered by a refusal**: a fully static closure has no loader, the bundler refuses it, and there is no artefact to ask the question of. Retired.
 
-## ⛔⛔ THE ONE PATTERN THAT PRODUCED MOST OF THIS SESSION'S FINDINGS
+## ⛔⛔ THE ONE PATTERN THAT PRODUCED MOST OF LAST SESSION'S FINDINGS
 
 ⭐ **A criterion that cannot fire, hidden by a SKIP or by a zero.** It happened
 five times, and no gate could see any of them:
@@ -112,9 +113,9 @@ five times, and no gate could see any of them:
 to fire.** A skip is not a failure, and neither gate can tell a structural one
 from an environmental one.
 
-⭐ **AND THE HABIT THAT CAUGHT THEM**: keep the trace. `101-` and `107-` now
-retain the first environment's transcripts on purpose, because the question a
-zero raises cannot be answered without them.
+⭐ **AND THE HABIT THAT CAUGHT THEM**: keep the trace. `101-` and `107-` retain
+the first environment's transcripts on purpose, because the question a zero
+raises cannot be answered without them.
 
 ## ⭐ THE CORPUS CAN BE RUN IN PARALLEL, AND THIS IS THE RECIPE
 
@@ -139,8 +140,9 @@ start at the same first-unrecorded subject:
 
 ⛔ **`PGB_EXP65_ONLY` IS ONE GLOB, NOT AN ALTERNATION.** `'qt-*|py-*'` matches
 nothing: `case` alternation is syntax, and a pattern arriving from a variable
-expansion is a single pattern. That run exited immediately with
-`at least one subject produced an artefact = no`.
+expansion is a single pattern. ⭐ **THE FIX SHIPPED 2026-09-05**: the matcher
+now splits on `|` and tries each pattern, so `'qt-*|py-*'` works and is
+covered by `lib.sh --selftest`. ⚠ A space-separated list works too.
 
 ⚠ **A filtered instance CANNOT satisfy C6** — the controls are not in its
 subject set, so its own verdict is meaningless and must not be quoted. ⭐ Its
@@ -195,13 +197,12 @@ they are not reclaimed by anything:
     it. The ordering fix also made every row ~10× faster, which means the
     slow version had been paying the same cost in a milder form all along.
 
-
 ## ⛔ Machine notes (carried forward, re-verify)
 
-- 4 cores, uid 0, 15 GiB RAM. Kernel `6.18.44-fc-v24`. ~22 GiB free after
-  bootstrap and one bed copy.
-- ⭐ **musl-gcc, Xvfb and x11-utils were installed this session** — a fresh
-  container has none of them.
+- 4 cores, uid 0, 15 GiB RAM. Kernel `6.18.44-fc-v24`. ~23 GiB free after
+  bootstrap, before any bed copy.
+- ⭐ **musl-gcc, Xvfb, x11-utils and x11-apps were installed this session** — a
+  fresh container has none of them.
 - ⚠ **`unshare -U` SUCCEEDS on the HOST here** (`/proc/sys/user/max_user_namespaces`
   = 64230). The `EPERM` T-090 is about is **inside the chroot bed**, which is a
   different question — measure it there with `lsns -t user`, do not carry the
@@ -215,11 +216,9 @@ they are not reclaimed by anything:
 - ⛔ **`make` depends on `tool/runtime/*.c`.** Rebuild after touching the loader.
 - ⛔ **`make` does NOT compile `tool/runtime/*.c`** — they are embedded as
   strings and compiled by `cc` at build or bundle time, so a C file that cannot
-  compile still builds a green `./pgb`. `TODO/check.sh` check 10 is what
-  catches that now; `history/corrections.md` C31 is what it cost.
+  compile still builds a green `./pgb`. `TODO/check.sh` check 10 catches that.
 - ⚠ **`codegraph status` reports the index STALE right after a Go edit**, and
-  the record gate fails on it. Run `codegraph sync .` before the gate, not
-  after reading the failure.
+  the record gate fails on it. Run `codegraph sync .` before the gate.
 - ⛔ **DISK IS BINDING.** Safe to reclaim, in this order:
   `/root/.local/state/pgb/nix-deps/<hash>` (biggest, one per option set — `ls`
   it first), `nix-build`, `nix-prefix`, `/var/tmp/pgb-appimage-*`,
@@ -227,22 +226,18 @@ they are not reclaimed by anything:
 - ⛔ **Do not rebuild `./pgb` while the POC suite is running.**
 - ⛔ **`$?` after a pipeline is the PIPELINE's status.**
 - ⛔ **`chmod 000` is not a control when you are root.** Move the file away.
-- ⛔ **Never edit a shell script while it is running** — measured 2026-09-04b,
-  and the failure is worse than "it changes": the shell re-entered the
-  rewritten file at a **shifted byte offset**, executed a garbage line, and
-  then **ran the tail a second time**. Statements executed twice.
-- ⭐ **But editing a SOURCED library is SAFE**, measured the same way: the
-  function is in memory once `.` has read it and the file is never re-read.
-  ⛔ The hazard for `experiments/lib.sh` is a different one and it is real —
-  a **resumable** experiment re-sources it, so a changed signature makes an
-  un-updated caller silently wrong. `TODO/ci.md` T-084 step 1.
+- ⛔ **Never edit a shell script while it is running** — the shell re-enters the
+  rewritten file at a **shifted byte offset**, executes a garbage line, and
+  then **runs the tail a second time**.
+- ⭐ **But editing a SOURCED library is SAFE** — the function is in memory once
+  `.` has read it. ⛔ The hazard for `experiments/lib.sh` is a different one and
+  it is real — a **resumable** experiment re-sources it, so a changed signature
+  makes an un-updated caller silently wrong.
 - ⛔ **USE `sh scripts/common/run-experiment.sh <NN>`**, not the script directly:
-  19 experiments write their own `RESULT.txt` and 13 do not, and there is no
-  way to tell which without reading them.
+  19 experiments write their own `RESULT.txt` and 13 do not.
 - ⚠ **`RESULT.txt` IS OVERWRITTEN BY EACH RUN.** If a document quotes two runs,
-  only the second is re-derivable from the tree — say so, or quote the second.
-- ⛔ **read the CI run; a local gate does not speak for it.** ⭐ The cheap way,
-  and it is the route `RULES.md` prescribes anyway:
+  only the second is re-derivable from the tree.
+- ⛔ **read the CI run; a local gate does not speak for it.** ⭐ The cheap way:
 
       curl -s "https://api.gh.pkgforge.dev/repos/polaris0xff/glibc-research/actions/runs?per_page=8"
 

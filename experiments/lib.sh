@@ -376,6 +376,105 @@ exp_classify_trace() {
   ' "$1" | sort -u
 }
 
+# ---------------------------------------------------------------------------
+# exp_host_spawns reads the same `strace -f` transcript and says which HOST
+# PROGRAMS the artefact's own process set execve'd, by name.
+#
+# ⭐ WHY THIS IS A SEPARATE QUESTION FROM `exp_classify_trace`, and it is the
+# whole of T-094. `exp_classify_trace` counts shared objects the artefact
+# LOADED. It cannot see the mechanism `docs/history/corrections.md` C55 found:
+#
+#     execve("/bin/sh", ["sh", "-c", "--", "/nix/store/…-gnuplot-6.0.5/…"])
+#
+# `qalculate-qt` probes for gnuplot through the HOST's shell. The shell then
+# loads the host's libc, and the host objects show up in the object count with
+# nothing to say WHERE they came from. ⛔ No amount of path rewriting prevents
+# that — the bundle would have to carry a shell — so the first thing anybody
+# needs is the COUNT: how many subjects do this at all?
+#
+# Usage: exp_host_spawns <tracefile> <in-root artefact path>
+# Output: one line per distinct host program, `ok <path>` or `fail <path>`.
+#
+# ⛔ THE HOST TEST HERE IS THE COMPLEMENT OF THE ARTEFACT'S OWN LOCATIONS, AND
+# THAT IS DELIBERATE — IT IS **NOT** THE PREFIX LIST C49 CORRECTED.
+#
+# C49's defect was a host PREFIX LIST whose complement was scored `bundled`, so
+# a host object in an unlisted directory read CLEAN. That errs toward looking
+# clean, which is the direction a committed zero cannot survive. ⭐ Here the
+# test is inverted: an artefact's own program can only be in three places, all
+# fixed by construction —
+#
+#     the staged artefact itself            $want   (/subj65)
+#     uruntime's extraction root            /tmp/…  (appimage_extracted_*,
+#                                                    .mount_*, and the AppDir
+#                                                    the bundler stages there)
+#     an unrewritten store path             /nix/store/…
+#
+# — and EVERYTHING ELSE is host. So an unanticipated location errs toward
+# reporting a spawn that is really the artefact's own: it can only OVER-count,
+# and every path is printed by name so an over-count is visible rather than
+# inferred. ⛔ Do not "fix" this into a prefix list; the two functions err in
+# opposite directions on purpose, because a missed host object hides a defect
+# and a missed host spawn hides the whole finding.
+#
+# ⚠ A relative path is not host: `./AppRun` and `squashfs-root/…` are the
+# artefact's, and an execve with no leading `/` is resolved against a cwd
+# inside it.
+exp_host_spawns() {
+  awk -v want="$2" '
+    function spawn(p, st) {
+      # ⛔ THE ARTEFACT IS A PREFIX, NOT ONE PATH, AND THE SELFTEST CAUGHT IT.
+      # The first version compared `p == want` and scored a second stage of the
+      # artefact -- `/subj-stage2` beside `/subj` -- as a HOST SPAWN, which
+      # would have reported every multi-stage subject as shelling out.
+      # ⚠ This is the one exemption that runs in the under-counting direction,
+      # so it is bounded rather than general: `want` is a path THIS HARNESS
+      # creates at the rootfs root (`/subj65`, `/subjA`), and no pinned rootfs
+      # ships anything under it. A host program cannot be there.
+      if (index(p, want) == 1)    return       # the artefact, or a stage of it
+      if (p !~ /^\//)             return       # relative: inside the artefact
+      if (p ~ /^\/tmp\//)         return       # uruntime extraction root
+      if (p ~ /^\/nix\/store\//)  return       # an unrewritten store path
+      out[st " " p] = 1
+    }
+    { pid = $1 }
+    $0 ~ ("execve\\(\"" want "\"") { inset[pid] = 1; next }
+    ($0 ~ /(clone|clone3|vfork|fork)\(/ || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) \
+      && /= [0-9]+$/ { if (inset[pid]) inset[$NF] = 1; next }
+    inset[pid] && /execve\(/ {
+      if (match($0, /"[^"]*"/) == 0) next
+      spawn(substr($0, RSTART + 1, RLENGTH - 2), (/= -1/ ? "fail" : "ok"))
+    }
+    END { for (k in out) print k }
+  ' "$1" | sort -u
+}
+
+# ---------------------------------------------------------------------------
+# exp_id_match says whether an id is selected by a subject filter.
+#
+# ⛔ THE FILTER USED TO BE ONE `case` PATTERN AND `'qt-*|py-*'` MATCHED NOTHING.
+# `case` alternation is SYNTAX: a `|` that arrives through a variable expansion
+# is an ordinary character in a single pattern, so a run filtered that way exited
+# immediately with `at least one subject produced an artefact = no`. It cost a
+# parallel instance on 2026-09-04c and the recipe in TODO/RESUME.md had to carry
+# a warning instead.
+#
+# ⭐ So the list is SPLIT here — on `|`, on whitespace, or both — and each part
+# is tried as its own pattern. An empty filter selects everything.
+exp_id_match() {   # id filter
+  [ -n "${2:-}" ] || return 0
+  _im_old=$IFS
+  IFS='|
+	 '
+  for _im_p in $2; do
+    [ -n "$_im_p" ] || continue
+    # shellcheck disable=SC2254  # the pattern is meant to glob
+    case "$1" in $_im_p) IFS=$_im_old; return 0 ;; esac
+  done
+  IFS=$_im_old
+  return 1
+}
+
 exp_finish() {
   printf '\n'
   printf -- '-- result ----------------------------------------------------\n'
@@ -412,6 +511,8 @@ _ct_selftest() {
   _d=$(mktemp -d) || return 2
   _t="$_d/trace"
   cat > "$_t" <<'TRACE'
+99 execve("/usr/bin/pgb", ["pgb", "rootfs", "run"], 0x7ffd) = 0
+99 clone(child_stack=NULL) = 100
 100 execve("/subj", ["/subj"], 0x7ffd) = 0
 100 openat(AT_FDCWD, "/usr/lib/x86_64-linux-gnu/libhost.so.6", O_RDONLY) = 3
 100 clone(child_stack=NULL) = 200
@@ -421,6 +522,10 @@ _ct_selftest() {
 100 openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY) = 6
 100 openat(AT_FDCWD, "/usr/bin/ld.so", O_RDONLY) = 8
 100 openat(AT_FDCWD, "/usr/libexec/coreutils/libstdbuf.so", O_RDONLY) = 9
+200 execve("/tmp/appimage_extracted_ab/AppRun", ["AppRun"], 0x7ffd) = 0
+200 execve("/bin/sh", ["sh", "-c", "--", "/nix/store/zz-gnuplot-6.0.5/bin/gnuplot"], 0x7ffd) = 0
+200 execve("/usr/bin/gnuplot", ["gnuplot"], 0x7ffd) = -1 ENOENT (No such file or directory)
+200 execve("/nix/store/zz-gnuplot-6.0.5/bin/gnuplot", ["gnuplot"], 0x7ffd) = -1 ENOENT (No such file or directory)
 100 execve("/subj-stage2", ["/subj-stage2"], 0x7ffd) = 0
 100 openat(AT_FDCWD, "/usr/lib/libafter.so.2", O_RDONLY) = 7
 TRACE
@@ -460,6 +565,40 @@ TRACE
   # ⛔ an unknown mode is an error, never a silent fallback
   exp_classify_trace "$_t" /subj nonsense >/dev/null 2>&1
   _ck "⛔ an unknown mode returns 2, not a fallback" "$?" 2
+
+  # ⭐ exp_host_spawns — T-094's instrument, and the fixture carries C55's own
+  # shape: a `/bin/sh -c --` probe for gnuplot from a pid the artefact cloned.
+  printf '\n-- exp_host_spawns --selftest ------------------------------------\n'
+  _s() { exp_host_spawns "$_t" /subj | grep -c "$1" || true; }
+  _ck "⭐ the host shell C55 found is a spawn" "$(_s '^ok /bin/sh$')" 1
+  _ck "⭐ a FAILED host exec is reported, not dropped" \
+      "$(_s '^fail /usr/bin/gnuplot$')" 1
+  _ck "⛔ uruntime's /tmp extraction root is NOT a host spawn" \
+      "$(_s 'appimage_extracted')" 0
+  _ck "⛔ an unrewritten /nix/store exec is NOT a host spawn" \
+      "$(_s 'nix/store')" 0
+  # ⛔ THE LAUNCHER IS NOT THE SUBJECT. `pgb rootfs run` execs before the
+  # artefact does, from a pid that is not in the set, and counting it would
+  # score EVERY subject as spawning a host program.
+  _ck "⛔ an exec BEFORE the artefact's own is not counted" \
+      "$(_s 'pgb')" 0
+  _ck "⛔ the artefact re-execing itself is not a spawn" "$(_s '/subj')" 0
+  _ck "⭐ two host spawns in total, and no more"  "$(exp_host_spawns "$_t" /subj | wc -l | tr -d ' ')" 2
+  # ⛔ AND IT MUST BE ABLE TO REPORT ZERO. A counter that cannot say "none"
+  # measures nothing -- docs/AGENTS.md §0b.
+  printf '100 execve("/subj", ["/subj"], 0x7ffd) = 0\n' > "$_d/quiet"
+  _ck "⛔ a subject that spawns nothing reports 0" \
+      "$(exp_host_spawns "$_d/quiet" /subj | wc -l | tr -d ' ')" 0
+
+  # ⭐ exp_id_match — the alternation the old one-`case` filter could not do
+  printf '\n-- exp_id_match --selftest ---------------------------------------\n'
+  _m() { exp_id_match "$1" "$2" && echo yes || echo no; }
+  _ck "⛔ 'qt-*|py-*' selects qt-1 (a bare case could not)" "$(_m qt-1 'qt-*|py-*')" yes
+  _ck "⛔ ...and py-3"                          "$(_m py-3 'qt-*|py-*')" yes
+  _ck "⛔ ...and NOT gtk3-1"                    "$(_m gtk3-1 'qt-*|py-*')" no
+  _ck "⭐ a space-separated list works too"     "$(_m sdl-2 'qt-* sdl-*')" yes
+  _ck "⭐ one plain glob still works"           "$(_m field-4 'field-*')" yes
+  _ck "⭐ an empty filter selects everything"   "$(_m anything '')" yes
 
   # ⛔ exp_count: the "0\n0" defect, which has bitten this tree four times
   printf 'alpha\nbeta\n' > "$_d/c"

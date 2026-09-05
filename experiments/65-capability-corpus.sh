@@ -79,6 +79,29 @@
 #       construction. It is in the corpus BECAUSE of that — it is what
 #       "complex" means on the X11 row. ⚠ If it passes, the prediction was
 #       wrong and the record says so rather than quietly dropping it.
+#   C9  ⭐ T-094's COUNT, AND IT IS THE CHEAP HALF OF A QUESTION THAT HAS NO
+#       ANSWER AT ALL. docs/history/corrections.md C55 found that
+#       `qalculate-qt` probes for gnuplot through the HOST's `/bin/sh`, which
+#       loads the host libc — and no path rewriting prevents that, because the
+#       bundle would have to carry a shell. ⛔ The obvious next question is HOW
+#       MANY subjects do it, and nobody could answer it: the trace shows every
+#       `execve`, and this experiment DELETES each trace as soon as it has
+#       counted the objects. So the count is taken here, in the same run.
+#
+#       ⭐ C9a IS THE POSITIVE CONTROL FOR THE NEW INSTRUMENT, and it is a
+#       measurement somebody else already took: `qt-1` MUST report a host spawn
+#       on the seven glibc rows, because `experiments/107-` read the exact
+#       `execve("/bin/sh", ["sh", "-c", "--", …])` off its trace. ⛔ If `qt-1`
+#       reads zero the instrument is broken and no other row's zero means
+#       anything — the same shape as C6.
+#       ⭐ C9b is an INDEPENDENT prediction: `x11-3` (xterm) must spawn a host
+#       program too. C5 below already predicts xterm fails C2 *because its
+#       whole job is to run the user's SHELL*; if that reasoning is right, the
+#       spawn instrument has to see it. Two mechanisms, one row.
+#       ⚠ C9c is the count itself, pre-registered as a RANGE — 2 to 10 of 26 —
+#       because the honest state is that it is unknown. It is recorded and
+#       reported, never checked: a count outside the range is the finding.
+#
 #   C6  ⭐ THE POSITIVE CONTROL, AND THE FIRST VERSION OF THIS FILE HAD NONE.
 #       THREE of the twenty-six subjects have already been measured at 11 of
 #       11 by a DIFFERENT experiment, twice each: `gtk3-1` (galculator) and
@@ -143,7 +166,13 @@ exp_begin "65 - the capability corpus: three applications per category, simple t
 
 WORK="${PGB_EXP65_WORK:-/var/tmp/t065}"
 ROWS="${PGB_EXP65_ROWS:-$REPO_DIR/evidence/65-capability-corpus/rows}"
-mkdir -p "$WORK" "$ROWS" || exit 2
+# ⭐ C9's STORE, AND IT IS A SIBLING OF `rows` RATHER THAN A SEVENTH FIELD IN
+# ONE. ⛔ A row recorded before 2026-09-05 has no spawn measurement, and the
+# difference between "measured zero host spawns" and "never measured" is the
+# whole of delivery rule 4. A separate file makes the absence VISIBLE — the
+# table prints `-` — where a widened row would have printed `0`.
+SPAWNS="${PGB_EXP65_SPAWNS:-$(dirname "$ROWS")/spawns}"
+mkdir -p "$WORK" "$ROWS" "$SPAWNS" || exit 2
 # ⚠ THE TIMEOUT IS A BOUND, NOT A GUESS AT HOW LONG A PROGRAM TAKES. A `cli`
 # subject is waited for rather than killed, so a hanging one costs this many
 # seconds ELEVEN times; a `gui` subject is killed as soon as a window appears.
@@ -335,6 +364,32 @@ NENV=$(printf '%s\n' "$ENVS" | wc -l | tr -d ' ')
 
 TOTAL=0; BUILT=0; UNRESOLVED=0; FULL=0; CLEANALL=0; INSTRUMENT=0; NOSTART=0
 
+# ⭐ C9's COUNTERS. SPAWNERS is the number T-094 asks for; SPAWN_UNMEASURED is
+# the number of subjects whose row predates the instrument, and it is reported
+# separately so the two can never be added together by accident.
+SPAWNERS=0; SPAWN_UNMEASURED=0; SPAWN_CTRL_OK=0
+# ⭐ C9a/C9b: the two subjects an EARLIER measurement says must spawn.
+SPAWN_CONTROLS="qt-1 x11-3"
+spawn_summary() {   # id -> "<envs-with-a-spawn>/<distinct programs>" or "-"
+  _sf="$SPAWNS/$1.tsv"
+  [ -s "$_sf" ] || { [ -f "$_sf" ] && printf '0/0' || printf -- '-'; return; }
+  printf '%s/%s' \
+    "$(cut -f1 < "$_sf" | sort -u | wc -l | tr -d ' ')" \
+    "$(cut -f3 < "$_sf" | sort -u | wc -l | tr -d ' ')"
+}
+note_spawn() {   # id
+  _ss=$(spawn_summary "$1")
+  case "$_ss" in
+    -)    SPAWN_UNMEASURED=$((SPAWN_UNMEASURED+1)); return ;;
+    0/0)  return ;;
+  esac
+  SPAWNERS=$((SPAWNERS+1))
+  case " $SPAWN_CONTROLS " in
+    *" $1 "*) SPAWN_CTRL_OK=$((SPAWN_CTRL_OK+1)) ;;
+  esac
+  exp_note "⭐ $1: spawns a HOST program on $(cut -f1 < "$SPAWNS/$1.tsv" | sort -u | wc -l | tr -d ' ') row(s) — $(cut -f3 < "$SPAWNS/$1.tsv" | sort -u | tr '\n' ' ')"
+}
+
 # ⛔ C8'S COUNTER, AND IT IS THE HALF OF C44 THAT WOULD HAVE READ GREEN.
 # `pass/rows` says nothing about how many environments were reached: a subject
 # staged on four of eleven and passing all four records `4/4`, which C1 accepts
@@ -364,13 +419,15 @@ note_control() {   # id pass rows
   return 0
 }
 
-show_row() { # id category subject mode pass clean paths note
-  printf '  %-10s %-16s %-14s %-4s %-7s %-7s %-9s %s\n' \
-    "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8"
+show_row() { # id category subject mode pass clean spawn paths note
+  printf '  %-10s %-16s %-14s %-4s %-7s %-7s %-6s %-9s %s\n' \
+    "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9"
 }
 
 printf '\n'
-show_row ID CATEGORY SUBJECT MODE 'PASS/N' 'CLEAN/N' 'PATHS' NOTE
+# ⭐ SPAWN is `<environments that spawned a host program>/<distinct programs>`,
+# and `-` means NOT MEASURED — a row recorded before the instrument existed.
+show_row ID CATEGORY SUBJECT MODE 'PASS/N' 'CLEAN/N' 'SPAWN' 'PATHS' NOTE
 
 # ⛔ `for line in $CORPUS` WORD-SPLITS ON SPACES and a category is
 # "OpenGL / EGL". Read line by line from a FILE on fd 3 instead: a pipeline
@@ -387,7 +444,11 @@ while IFS= read -r line <&3; do
   assert=$(printf '%s' "$line" | cut -d';' -f6)
   extras=$(printf '%s' "$line" | cut -d';' -f7)
   args=$(printf '%s' "$line" | cut -d';' -f8)
-  [ -n "$ONLY" ] && { case "$id" in $ONLY) ;; *) continue ;; esac; }
+  # ⛔ `case "$id" in $ONLY)` COULD NOT DO AN ALTERNATION — `'qt-*|py-*'`
+  # matched nothing, because `case` alternation is syntax and a `|` arriving
+  # through a variable expansion is an ordinary character. It cost a parallel
+  # instance. `exp_id_match` splits the list; experiments/lib.sh --selftest.
+  exp_id_match "$id" "$ONLY" || continue
   TOTAL=$((TOTAL+1))
   # every line AFTER this one, so the reclaim step below can ask whether the
   # closure is still wanted
@@ -411,14 +472,16 @@ while IFS= read -r line <&3; do
     clean=$(cut -f4 < "$row"); paths=$(cut -f5 < "$row"); note=$(cut -f6 < "$row")
     if [ "$pass" = "-1" ]; then
       UNRESOLVED=$((UNRESOLVED+1))
-      show_row "$id" "$cat_" "$attr" "$mode" "-" "-" "-" "$note (recorded)"
+      show_row "$id" "$cat_" "$attr" "$mode" "-" "-" "-" "-" "$note (recorded)"
     else
       BUILT=$((BUILT+1))
       [ "$pass" = "$rows" ] && [ "$rows" -gt 0 ] && FULL=$((FULL+1))
       [ "$clean" = "$rows" ] && [ "$rows" -gt 0 ] && CLEANALL=$((CLEANALL+1))
       note_control "$id" "$pass" "$rows"
       note_short "$id" "$rows"
-      show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" "$paths" "$note (recorded)"
+      note_spawn "$id"
+      show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" \
+        "$(spawn_summary "$id")" "$paths" "$note (recorded)"
     fi
     continue
   fi
@@ -439,7 +502,7 @@ while IFS= read -r line <&3; do
     why=$(grep -aoE "nixpkgs has no attribute [^ ]*|no entry point in [^ ]*|could not fetch the closure[^\"]*|--name [^ ]* names no program" "$blog" 2>/dev/null | head -1)
     note="UNRESOLVED: ${why:-see $blog}"
     printf '%s\t-1\t0\t0\t-\t%s\n' "$id" "$note" > "$row"
-    show_row "$id" "$cat_" "$attr" "$mode" "-" "-" "-" "$note"
+    show_row "$id" "$cat_" "$attr" "$mode" "-" "-" "-" "-" "$note"
     UNRESOLVED=$((UNRESOLVED+1))
     rm -rf "$cache"
     continue
@@ -458,6 +521,11 @@ while IFS= read -r line <&3; do
   fi
 
   pass=0; clean=0; rows=0; nostart=0
+  # ⭐ C9: TRUNCATE, DO NOT APPEND. The file's EXISTENCE is what separates
+  # "measured, and it spawned nothing" from "never measured", so an empty file
+  # is a result and a missing one is not. ⛔ A re-run of one subject must not
+  # inherit the previous run's spawns.
+  : > "$SPAWNS/$id.tsv"
   for name in $ENVS; do
     [ -n "$instr" ] && break
     root=$(exp_rootfs "$name") || true
@@ -600,6 +668,16 @@ while IFS= read -r line <&3; do
       nostart=$((nostart+1))
       exp_note "⛔ $id/$name: loaded NOTHING, host or bundled — the artefact never started, so this row is NOT counted clean"
     fi
+
+    # ⭐ C9, AND IT MUST HAPPEN BEFORE THE TRACE IS DELETED. `exp_host_spawns`
+    # answers a question the object count cannot: WHERE a host object came
+    # from. A host libc that entered through `/bin/sh` is the application
+    # asking for a host program, not the bundler leaking one — C55 — and the
+    # two are indistinguishable in the `nhost` column.
+    exp_host_spawns "$tr" /subj65 | while IFS=' ' read -r _st _sp; do
+      printf '%s\t%s\t%s\n' "$name" "$_st" "$_sp"
+    done >> "$SPAWNS/$id.tsv"
+
     rm -f "$tr"
   done
 
@@ -608,7 +686,11 @@ while IFS= read -r line <&3; do
   # than carrying a zero somebody has to disbelieve later.
   if [ -n "$instr" ]; then
     INSTRUMENT=$((INSTRUMENT+1))
-    show_row "$id" "$cat_" "$attr" "$mode" INSTR "-" "${paths:--}" "⛔ $instr"
+    show_row "$id" "$cat_" "$attr" "$mode" INSTR "-" "-" "${paths:--}" "⛔ $instr"
+    # ⛔ AN INSTRUMENT ERROR WRITES NO ROW, so it must leave no spawns file
+    # either — a half-measured subject that reads back as `0/0` next run is
+    # exactly the "absence recorded as a zero" this file keeps correcting.
+    rm -f "$SPAWNS/$id.tsv"
     exp_note "⛔ $id: INSTRUMENT ERROR — the criterion, not the subject."
     exp_note "   $instr"
     exp_note "   No row was written. Fix the assertion in this script's CORPUS"
@@ -643,7 +725,8 @@ while IFS= read -r line <&3; do
   fi
   printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
     "$id" "$pass" "$rows" "$clean" "${paths:--}" "$note" > "$row"
-  show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" "${paths:--}" "$note"
+  show_row "$id" "$cat_" "$attr" "$mode" "$pass/$rows" "$clean/$rows" \
+    "$(spawn_summary "$id")" "${paths:--}" "$note"
   [ "$pass" = "$rows" ] && [ "$rows" -gt 0 ] && FULL=$((FULL+1))
   [ "$clean" = "$rows" ] && [ "$rows" -gt 0 ] && CLEANALL=$((CLEANALL+1))
   # ⭐ AND A SUBJECT THAT NEVER STARTED ON ANY ROW IS COUNTED AND NAMED. Its
@@ -655,6 +738,7 @@ while IFS= read -r line <&3; do
   fi
   note_control "$id" "$pass" "$rows"
   note_short "$id" "$rows"
+  note_spawn "$id"
 
   # ⛔ RECLAIM IMMEDIATELY. A cache is ~2.3 GiB; twenty-six of them is far
   # more disk than this machine has, and a run that dies on ENOSPC halfway
@@ -676,6 +760,8 @@ printf '  %-40s %s\n' '⛔ INSTRUMENT errors (criterion, not subject)' "$INSTRUM
 printf '  %-40s %s\n' "⭐ subjects passing on all $NENV"     "$FULL"
 printf '  %-40s %s\n' "⭐ subjects clean on all $NENV"       "$CLEANALL"
 printf '  %-40s %s\n' "⛔ subjects with a row that NEVER STARTED" "$NOSTART"
+printf '  %-40s %s\n' "⭐ T-094: subjects that SPAWN a host program" "$SPAWNERS"
+printf '  %-40s %s\n' "⚠ ...and subjects NOT MEASURED for it"       "$SPAWN_UNMEASURED"
 
 printf '\n'
 # ⛔ WITHOUT THIS ROW, A RUN WHERE NOTHING BUILT SCORES GREEN: C1 and C2 both
@@ -718,6 +804,35 @@ exp_check "C8  ⭐ every subject measured on all $NENV environments" "$SHORT" 0
 MEASURED=$((BUILT-INSTRUMENT))
 exp_check "C1  every subject MEASURED passes on all $NENV"    "$FULL"     "$MEASURED"
 exp_check "C2  every subject MEASURED is clean on all $NENV"  "$CLEANALL" "$MEASURED"
+# ⭐ C9a/C9b — THE NEW INSTRUMENT'S POSITIVE CONTROL, and it is checked for
+# exactly the reason C6 is: a spawn counter that reads zero everywhere is
+# indistinguishable from a spawn counter that is broken. ⛔ `qt-1` was measured
+# spawning `/bin/sh` by `experiments/107-` and `x11-3` runs the user's shell by
+# construction (C5), so both MUST register. A run where they do not is a run
+# whose other zeros say nothing.
+#
+# ⚠ Checked only when both were actually measured in this run — a FILTERED
+# instance does not carry them, the same caveat C6 has.
+SPAWN_CTRL_N=0
+for _sc in $SPAWN_CONTROLS; do
+  [ -f "$SPAWNS/$_sc.tsv" ] && SPAWN_CTRL_N=$((SPAWN_CTRL_N+1))
+done
+if [ "$SPAWN_CTRL_N" = 2 ]; then
+  exp_check "C9  ⭐ both spawn controls register a host spawn ($SPAWN_CONTROLS)" \
+    "$SPAWN_CTRL_OK" 2
+else
+  exp_note "⚠ C9's controls ($SPAWN_CONTROLS) were not both measured in this"
+  exp_note "   run ($SPAWN_CTRL_N of 2 have a spawns file), so the spawn"
+  exp_note "   instrument is UNVALIDATED here and its count must be quoted"
+  exp_note "   from the full run, not from this one."
+fi
+exp_note "⭐ C9c IS A COUNT, NOT A CHECK. T-094 asks how many of the corpus"
+exp_note "   shell out to the host at all; pre-registered at 2-10 of 26. This"
+exp_note "   run measured $SPAWNERS, with $SPAWN_UNMEASURED subject(s) carrying no"
+exp_note "   spawns file at all (rows recorded before the instrument existed —"
+exp_note "   an absence, never a zero). Per-subject detail:"
+exp_note "   evidence/65-capability-corpus/spawns/<id>.tsv"
+
 exp_note "⛔ C3 IS A LIMIT AND IT IS NOT MEASURED AWAY BY A GREEN TABLE."
 exp_note "   Every OpenGL and Vulkan row here is a SOFTWARE rasteriser —"
 exp_note "   llvmpipe and lavapipe — on a machine with no GPU. This experiment"
