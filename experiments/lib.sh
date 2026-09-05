@@ -420,6 +420,35 @@ exp_classify_trace() {
 # ⚠ A relative path is not host: `./AppRun` and `squashfs-root/…` are the
 # artefact's, and an execve with no leading `/` is resolved against a cwd
 # inside it.
+#
+# ⛔⛔ IT READS THE TRACE TWICE, AND A ONE-PASS VERSION SILENTLY MISSED THE ONE
+# SPAWN IT EXISTS TO FIND. Measured against a REAL `strace -f` transcript on
+# 2026-09-05, not against the fixture — the fixture could not show it:
+#
+#     8217  vfork( <unfinished ...>
+#     8218  execve("/bin/sh", ["/bin/sh", "-c", "--", …] <unfinished ...>
+#     8217  <... vfork resumed>)              = 8218
+#     8218  <... execve resumed>)             = 0
+#
+# ⭐ `vfork` SUSPENDS THE PARENT UNTIL THE CHILD EXECS, so the child's `execve`
+# is written BEFORE the line that first names the child's pid. A single pass
+# has not learned 8218 belongs to the artefact yet and drops the spawn. ⛔ The
+# probe then reported only the child's SECOND exec — the one that failed — so
+# the row read `fail /usr/bin/gnuplot` and the `/bin/sh` that C55 is entirely
+# about was invisible. A count that is wrong in the direction of its own
+# thesis is the worst shape this instrument could have had.
+#
+# ⚠ `exp_classify_trace` is NOT affected and it is worth saying why rather than
+# assuming: it counts `openat`, and a child's library opens happen AFTER its
+# exec completes, by which time the parent has resumed and the pid is known.
+# The `execve` line is the uniquely dangerous one because it is the syscall the
+# child makes while the parent is still blocked.
+#
+# ⚠ The fork closure is by PID and carries no line-order constraint, so a pid
+# the LAUNCHER cloned before the artefact exec'd would be attributed to the
+# artefact. `pgb rootfs run` execs the artefact's shell in place and clones
+# nothing before it, and the error runs in the over-reporting direction, which
+# is the one this function is allowed to make.
 exp_host_spawns() {
   awk -v want="$2" '
     function spawn(p, st) {
@@ -437,16 +466,29 @@ exp_host_spawns() {
       if (p ~ /^\/nix\/store\//)  return       # an unrewritten store path
       out[st " " p] = 1
     }
-    { pid = $1 }
-    $0 ~ ("execve\\(\"" want "\"") { inset[pid] = 1; next }
-    ($0 ~ /(clone|clone3|vfork|fork)\(/ || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) \
-      && /= [0-9]+$/ { if (inset[pid]) inset[$NF] = 1; next }
-    inset[pid] && /execve\(/ {
+    # pass 1 -- the fork graph, and which pid became the artefact
+    FNR == NR {
+      if ($0 ~ ("execve\\(\"" want "\"")) { inset[$1] = 1; next }
+      if (($0 ~ /(clone|clone3|vfork|fork)\(/ \
+           || $0 ~ /<\.\.\. (clone|clone3|vfork|fork) resumed>/) && /= [0-9]+$/) {
+        nk++; kid[nk] = $NF; par[nk] = $1
+      }
+      next
+    }
+    # ⭐ the descendant closure, computed once, before a single line is scored
+    FNR == 1 {
+      do {
+        again = 0
+        for (i = 1; i <= nk; i++)
+          if (inset[par[i]] && !inset[kid[i]]) { inset[kid[i]] = 1; again = 1 }
+      } while (again)
+    }
+    inset[$1] && /execve\(/ {
       if (match($0, /"[^"]*"/) == 0) next
       spawn(substr($0, RSTART + 1, RLENGTH - 2), (/= -1/ ? "fail" : "ok"))
     }
     END { for (k in out) print k }
-  ' "$1" | sort -u
+  ' "$1" "$1" | sort -u
 }
 
 # ---------------------------------------------------------------------------
@@ -523,9 +565,12 @@ _ct_selftest() {
 100 openat(AT_FDCWD, "/usr/bin/ld.so", O_RDONLY) = 8
 100 openat(AT_FDCWD, "/usr/libexec/coreutils/libstdbuf.so", O_RDONLY) = 9
 200 execve("/tmp/appimage_extracted_ab/AppRun", ["AppRun"], 0x7ffd) = 0
-200 execve("/bin/sh", ["sh", "-c", "--", "/nix/store/zz-gnuplot-6.0.5/bin/gnuplot"], 0x7ffd) = 0
-200 execve("/usr/bin/gnuplot", ["gnuplot"], 0x7ffd) = -1 ENOENT (No such file or directory)
-200 execve("/nix/store/zz-gnuplot-6.0.5/bin/gnuplot", ["gnuplot"], 0x7ffd) = -1 ENOENT (No such file or directory)
+200 vfork( <unfinished ...>
+300 execve("/bin/sh", ["sh", "-c", "--", "/nix/store/zz-gnuplot-6.0.5/bin/gnuplot"], 0x7ffd <unfinished ...>
+200 <... vfork resumed>)              = 300
+300 <... execve resumed>)             = 0
+300 execve("/usr/bin/gnuplot", ["gnuplot"], 0x7ffd) = -1 ENOENT (No such file or directory)
+300 execve("/nix/store/zz-gnuplot-6.0.5/bin/gnuplot", ["gnuplot"], 0x7ffd) = -1 ENOENT (No such file or directory)
 100 execve("/subj-stage2", ["/subj-stage2"], 0x7ffd) = 0
 100 openat(AT_FDCWD, "/usr/lib/libafter.so.2", O_RDONLY) = 7
 TRACE
@@ -570,6 +615,12 @@ TRACE
   # shape: a `/bin/sh -c --` probe for gnuplot from a pid the artefact cloned.
   printf '\n-- exp_host_spawns --selftest ------------------------------------\n'
   _s() { exp_host_spawns "$_t" /subj | grep -c "$1" || true; }
+  # ⛔⛔ THE REGRESSION ROW. The fixture reproduces a REAL trace's ordering:
+  # vfork suspends the parent, so pid 300's `execve("/bin/sh", …)` is written
+  # BEFORE the `<... vfork resumed>) = 300` line that first names it. A
+  # single-pass version had not learned 300 was the artefact's yet, dropped the
+  # spawn, and reported only the child's SECOND (failed) exec — missing the one
+  # mechanism C55 is about.
   _ck "⭐ the host shell C55 found is a spawn" "$(_s '^ok /bin/sh$')" 1
   _ck "⭐ a FAILED host exec is reported, not dropped" \
       "$(_s '^fail /usr/bin/gnuplot$')" 1
