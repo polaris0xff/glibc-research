@@ -118,6 +118,21 @@ build() {  # out-image extra-flag...
 
 start_x || { exp_note "no X server on $XDISP"; exit 2; }
 
+# ⛔ THE SERVER'S SIZE IS ASKED FOR, NOT ASSUMED, AND THE TWO CAN DIFFER.
+# `start_x` returns early when a server is ALREADY up on this display — it does
+# not create one, so it cannot know its geometry — and `SCRW`/`SCRH` above are
+# only the size it would have requested. ⭐ S2 compares a capture against the
+# server, so the number it compares against has to come FROM the server.
+_dim=$(DISPLAY="$XDISP" xdpyinfo 2>/dev/null \
+       | sed -n 's/^ *dimensions: *\([0-9]*x[0-9]*\) pixels.*/\1/p' | head -1)
+if [ -n "$_dim" ]; then
+  SCRW=${_dim%x*}; SCRH=${_dim#*x}
+else
+  exp_note "⚠ xdpyinfo did not report dimensions; using the requested ${SCRW}x${SCRH}"
+fi
+SCREEN="${SCRW}x${SCRH}"
+exp_note "the X server on $XDISP is $SCREEN"
+
 # -- S0: can this display be captured AT ALL? --------------------------------
 printf -- '-- S0: the instrument control, from OUTSIDE ----------------------\n'
 cap=no
@@ -258,8 +273,24 @@ for name in $ENVS; do
   rm -f "$root/subjA" "$root/subjB" "$root/tmp/shotA.png" "$root/tmp/shotB.png"
 
   printf '  %-18s %-14s %-14s %s\n' "$name" "$adim" "$bdim" "$bhost"
-  [ "$adim" != none ] && a_cap=$((a_cap+1))
-  [ "$bdim" != none ] && [ "$bdim" != - ] && b_cap=$((b_cap+1))
+  # ⛔⛔ A CAPTURE IS A PNG WHOSE IHDR MATCHES THE SERVER, AND THE CODE USED TO
+  # ACCEPT ANY PNG WITH w>0,h>0.
+  #
+  # The pre-registered S2 at the top of this file says the dimensions must
+  # "match the server's" — and the counter below said only `!= none`. ⭐ That
+  # gap matters here more than it usually would: a portal that returns a
+  # placeholder, an icon, or a single monitor of a larger root would all be
+  # valid PNGs, and every one of them would have scored a capture. ⚠ Found by
+  # reading the code against its own header before the first run
+  # (delivery rule 5), not after.
+  if [ "$adim" != none ] && [ "$adim" != "$SCREEN" ]; then
+    exp_note "$(printf '   ⛔ %s arm A: PNG is %s, the server is %s — NOT a full capture' "$name" "$adim" "$SCREEN")"
+  fi
+  if [ "$bdim" != none ] && [ "$bdim" != - ] && [ "$bdim" != "$SCREEN" ]; then
+    exp_note "$(printf '   ⛔ %s arm B: PNG is %s, the server is %s — NOT a full capture' "$name" "$bdim" "$SCREEN")"
+  fi
+  [ "$adim" = "$SCREEN" ] && a_cap=$((a_cap+1))
+  [ "$bdim" = "$SCREEN" ] && b_cap=$((b_cap+1))
   # ⛔ AND THE REASON IS KEPT WHEN THERE IS NO CAPTURE, or S1/S2 are numbers
   # with nothing behind them.
   for _a in A B; do
