@@ -71,6 +71,79 @@ pattern this tree already uses twice (`STALE-EVIDENCE.txt`, `criteria-audit.sh`)
 a NAMED exception list, so an UNLISTED failure flips the bit. ⚠ Apply it AFTER
 the run, then re-run step 1 — which costs seconds, because it reads the rows.
 
+## ⛔⛔ THE PIVOT — OPERATOR INSTRUCTION, 2026-09-05, AND IT OUTRANKS THE WORK ORDER
+
+⛔ **The operator stopped the session mid-run and called a REFACTOR.** The
+measurement work below is not cancelled, but it is no longer what a new session
+should start on. ⭐ **The full instruction is in the kickoff prompt the operator
+holds; this is the durable copy so it cannot be lost.**
+
+**The diagnosis, in the operator's own terms — seven problems:**
+
+1. ⛔ **Code comments are history, changelog-in-a-manual and narrative lore.**
+   An agent has to shift through the slop before it can read, understand or
+   change anything. Measured 2026-09-05: **4,744 comment lines in 24,945 lines
+   of Go (19%)**, and **142 non-doc files** carry the `⭐/⛔/⚠` markers.
+2. ⛔ **The docs are the same** — bloated, full of narrative about problems
+   already solved, and they MISGUIDE agents.
+3. ⛔ **Scripts scattered everywhere** that should be proper functions or
+   builtins.
+4. ⛔ **The codebase only grows.** Instead of cleanly separating
+   functions / features / utils into components and libraries, more is piled on
+   top.
+5. ⛔ **Reliance on third parties that are THEMSELVES forks**, so we patch forks
+   or work around them.
+6. ⛔ **AI commit attributions, `Co-Authored-By`, and excessive emoji** —
+   *"anyone that takes a look at this project has a repulsive reaction and
+   refuses to look or even consider its merits."* Measured: **476 of 488
+   commits** carry the attribution trailer.
+7. ⛔ **References mined and studied, then forgotten** — by the time an agent
+   reaches `references/` its context is already polluted and exhausted by
+   problems 1-4.
+
+**The shape of the fix — six items, in order:**
+
+0. The overhaul follows **`https://github.com/Azathothas/TEMPLATE`**, adopting
+   its docs, conventions, rules and scripts where applicable. Relicense to
+   **0BSD**. ⚠ *Already 0BSD as of 2026-09-05 — `LICENSE` is the BSD Zero
+   Clause text; what is owed is consistency, not a change.* ⚠ TEMPLATE is
+   **not** vendored under `references/`; only `docs/methodology/` came from it.
+1. **Every comment in every code file and script** is extracted and read line
+   by line, then cleared of history / changelog / narrative lore. ⭐ **Only
+   genuine GOTCHAS and LESSONS are preserved.**
+2. **Every doc** gets the same review.
+3. **The whole `docs` tree is completely overhauled** into topic-by-topic
+   files. All **current** facts (not narrative history, not hallucinated, not
+   contradicting) rewritten so they cannot drift again. ⚠ The shape the
+   operator gave, as an EXAMPLE and not as a literal path list — none of these
+   exist yet, which is why they are not written as links: a *nix* overview
+   README routing to a *bundler* README, which documents the bundler's current
+   features, behaviours and limitations and links onward to a per-topic page
+   such as a Qt one carrying all current Qt-relevant information. Every leaf is
+   referenced by a sub-parent, which is referenced by a parent.
+4. ⭐ **`pgb` IS EVOLVING INTO A FAMILY**, with `pg-toolkit` as the single
+   entry point that bundles everything:
+   - **`pga`** — *Portable GLIBC AppImage*: the current nix bundler (nixappimage).
+   - **`pgb`** — *Portable GLIBC Binary*: the current glibc STATIC builder.
+   - **`pgc`** — *Portable GLIBC Container* (future): behaves like `runimage` or
+     `flatimage`, packing a tiny container/distro itself. Probably required to
+     make genuinely complex applications — `podman`, `docker` — portable.
+   - **`pgd`** — *Portable GLIBC Distro* (final): a live, relocatable, full
+     Linux distro that still behaves like a native AppImage or binary.
+   ⭐ **In automode `pg-toolkit` tries `pgb` first**, with as much versatility
+   as possible — prefer the host where it does not interfere, or be completely
+   standalone, smartly — **then `pga`, then `pgc`**. ⛔ `pgd` should never be
+   needed except for something like a portable Alpine that beats
+   containers/chroot.
+5. ⭐ **Vendor / patch / reimplement / iterate on everything we depend on** —
+   `sharun`, the `uruntime`, and the rest. ⛔ The runtime and tooling must be
+   adapted and capable for OUR needs; never wait on upstream or be subject to
+   their whims. ⚠ The plausible exception is the `mkdwarfs` binaries, and those
+   can be bundled anyway.
+
+⛔ **All of the above must be turned into proper TODO entries**, not left as
+prose.
+
 ## ⛔ WHAT A FRESH SESSION CANNOT INFER
 
 ⚠ **The clone comes up SHALLOW.** ⭐ `main` came up CURRENT again on

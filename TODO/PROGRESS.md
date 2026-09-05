@@ -3,71 +3,43 @@
 ⛔ **Carries no history.** Rewritten every session. The history is the git log,
 the entries, and [`../HISTORY/`](../HISTORY/).
 
-    STATE     2026-09-04c, at the END. ⭐ The capability corpus is COMPLETE
-              (26 of 26) and all three of its unexplained rows are explained
-              — the last, `qalculate-qt`, by `experiments/107-`: it spawns
-              GNUPLOT through the host's /bin/sh, so the residue is a shell
-              the application asked for and the bundle never carried (C55).
-              ⛔ THE SESSION'S REAL YIELD WAS INSTRUMENT DEFECTS. Five
-              separate criteria in this tree COULD NOT FIRE and no gate could
-              see any of them, because a SKIP is not a failure and a ZERO
-              looks like a result: C48, C50, C52, C54, C56.
-              ⭐ Two of the corrections can move a committed number (C49, C54)
-              and ONE re-run of `65-` clears both. ⭐ One (C56) turned a claim
-              that had never been measured — `--wrap=iconv` — into a
-              measurement: 1 encoding of 12 and a crash, against 12 of 12
-              with a byte-exact round trip on all eleven.
+    STATE     2026-09-05, at a CHECKPOINT — the session did not end, the
+              operator called a pivot (see RESUME.md "THE PIVOT").
+              ⛔ THE CORPUS RE-RUN IS IN FLIGHT: 2 of 26 subjects, started
+              03:14Z, two instances, ~28 min per subject. It clears C49 and
+              C54 and answers T-094's count. EVERYTHING ELSE IN THE WORK
+              ORDER IS BLOCKED BEHIND IT — the machine cannot host a third
+              GUI instance and `make` is forbidden mid-run.
+              ⭐ THE YIELD SO FAR IS SIX DEFECTS, four of which would have
+              made that run worthless, and every one was caught by RUNNING
+              something rather than by reading:
+                C57 the spawn instrument MISSED the spawn it exists to find
+                    (vfork writes the child's execve before the line naming
+                    its pid), and the obvious fix then counted the LAUNCHER.
+                C58 65-'s reuse guard is `[ -s ]` — non-empty, not COMPLETE —
+                    so a killed run left a fragment the next run executed on
+                    all eleven, scoring the C6 CONTROL 0/11.
+                C59 the loader's line count drifted 28% in FIVE documents.
+                C60 the interposer stops at execve: execvp, execl and
+                    posix_spawn are NOT rewritten, and libglib imports all
+                    three. T-097.
+                T-096 gate 10 keyed on the evidence DIRECTORY, so a README
+                    beside a result silenced it — 8 stale pairs where it
+                    reported 0, four of them measured by the SHELL
+                    predecessor.
+                + 108-'s criterion did not match its own pre-registration.
     COUNTS    70 entries, 26 open, 44 done
     BASELINE  pgb: 11/11 run, 11/11 no host object, TEN POCs
               CI: green through the session (read after every push)
               throughput: glibc 8.40 ns/op vs musl 704.79 (malloc, 4 threads)
-    NEW       ⭐ FOUR BUNDLER DEFECTS FOUND AND FIXED, each by running a
-              recorded zero down instead of believing it:
-                C41 the interposer answered `open` and not `stat64` — which
-                    is the whole of Python. virt-manager 0/11 → 11/11.
-                C42 an FHS symlink farm's dangling loader link aborted the
-                    build. gearlever UNRESOLVED → builds.
-                C43 a wrapper target that is an ABSOLUTE SYMLINK into
-                    another store path. helix 0/11 → 11/11, and it had been
-                    failing SILENTLY: exit 255, not one byte of output.
-                +   a nixpkgs SHELL FRAGMENT lifted into `.env` as if it
-                    were a value, shadowing the real plugin path.
-              ⭐ T-084 step 2: the six hand copies of the trace classifier
-              are GONE; `102-` rewritten to read them back out of git so the
-              before/after outlives them.
-              ⭐ T-091 MEASURED: a bundled GStreamer pipeline runs on 11/11
-              with ZERO host objects in payload AND tree, and
-              gst-plugin-scanner is exec'd on 11/11.
-              ⛔ THREE CORRECTIONS TO OUR OWN INSTRUMENTS: C39 (the
-              assertion), C40 (the row note), C44 (a silent `cp`).
-              ⭐⭐ AND FIVE MORE FROM THE DEEP-REVIEW PASS, of which C49 and
-              C53 are the two that could have moved a committed number:
-                C49 ⛔ "host" was a PREFIX LIST and `bundled` was its
-                    complement, so a host object outside /lib and /usr/lib
-                    read CLEAN. Measured across all eleven: 13 such files,
-                    and one of them is `/usr/bin/ld.so` — THE HOST LOADER,
-                    on arch, fedora-42 and both Debians. Runs in the
-                    DANGEROUS direction (dirty → clean), unlike C25.
-                C50 `102-`'s R1 looked for a trace only in the directory
-                    `65-` deletes traces from, so it could never fire — and
-                    a SKIP is not a failure, so both gates stayed green over
-                    a check that did not exist. It fires now: 20/0/0.
-                C51 `T .mo = 43` is 43 catalogue FILES read, not 43
-                    translations. The CONTROL is what makes it a result:
-                    258 lookups against 0, from the same artefact.
-                C52 `101-`'s L2 demanded a syscall its own mechanism
-                    prevents — the third criterion that could not fire.
-                C53 ⛔ `pgb-storefix.c` had a LOADED AND INERT state that
-                    looked exactly like working: no AppDir or no `.storemap`
-                    meant it rewrote nothing and said NOTHING. One line,
-                    once, unconditionally — verified four ways.
-              ⭐ THE `-static` ROW IS ANSWERED, from evidence already in the
-              tree: a fully static closure carries no loader, so the bundler
-              REFUSES it and there is no artefact to ask the question of —
-              and the refusal is correct (arm L: the raw binary, no bundle,
-              11/11 with 0 host objects).
-              ⭐ RUNG 3'S LOCALE CRITERION FIRES AT LAST — 11/11 — after two
-              recorded causes that were both wrong (C48).
+    NEW       ⭐ The bundler's `--out` is ATOMIC — `<out>.part` + rename —
+              which fixes C58's class at the producer for ~20 call sites.
+              ⭐ `scripts/common/criteria-audit.sh`: which pre-registered
+              criteria never reach an assertion. ADVISORY, not a gate, and it
+              carries its own triage (of 15 files it raised, 14 were correct
+              code and one was real).
+              ⭐ `pgb selftest` is 602 cases with ZERO skips — `zstd` was
+              simply not installed on this machine.
 
 ## ⛔ READ THIS FIRST
 

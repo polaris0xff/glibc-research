@@ -1,54 +1,51 @@
-# SUMMARY.md — the session of 2026-09-04c
+# SUMMARY.md — the session of 2026-09-05
 
 ⛔ **Overwritten every session.** The work order is
 [`PROGRESS.md`](PROGRESS.md); the closed entries are
 [`../HISTORY/entries/`](../HISTORY/entries/).
 
-    SCOPE     Fix C39 and the defect class behind it, finish experiments/65-
-              (T-080), then BY MECHANISM: T-084 step 2, T-091, the three
-              unexplained rows, T-088, T-089.
-    RESULT    ⭐ ALL OF IT LANDED, and then the session turned into something
-              else: ⭐ FOUR BUNDLER DEFECTS in the morning (C41-C44, each
-              found by running a recorded zero down), and ⛔ EIGHT INSTRUMENT
-              CORRECTIONS in the afternoon (C49-C56), of which TWO can move a
-              committed number and ONE turned a claim that had never been
-              measured into a measurement.
-    ⛔ THE    Five separate criteria in this tree COULD NOT FIRE, and no gate
-    PATTERN   could see any of them, because a SKIP is not a failure and a
-              ZERO looks like a result. C48, C50, C52, C54, C56.
+    SCOPE     Re-run the corpus (C49 + C54), 108-, T-094's count, the POC
+              suite, 105-, 103-, T-093.
+    RESULT    ⛔ THE CORPUS RE-RUN IS STILL IN FLIGHT — 2 of 26 subjects at
+              the checkpoint, started 03:14Z, ~28 min per subject. Everything
+              else in the scope is blocked behind it (the machine cannot host
+              a third GUI instance, and `make` is forbidden mid-run).
+              ⭐ THE SESSION'S YIELD IS FOUR DEFECTS THAT WOULD HAVE MADE THAT
+              RUN WORTHLESS, plus two found by review afterwards. Every one
+              was caught by RUNNING something, never by reading alone.
+    ⛔ THE    An instrument validated only against its own FIXTURE. C57 and
+    PATTERN   C60 are both "the code was checked against what the author
+              believed the input looks like". A real trace and a real build
+              disagreed with both.
 
 ## ⭐ What moved
 
 | | before | after |
 |---|---|---|
-| **T-080** the corpus | 20 of 26 rows, five zeros unexplained | ✅ **26 of 26**, every zero named, six categories closed. **Retired** |
-| **T-084** the classifier | six hand copies | ✅ **zero**; `102-` reads them back out of git. **Retired** |
-| **T-088** `--with-program` | *"never been run"* | ✅ **false** — `90-` was exercising it all along (C45). **Retired** |
-| **T-089** the `-static` row | *"a static application is still owed"* | ✅ **answered by a refusal** — a fully static closure has no loader, so there is no artefact to ask. **Retired** |
-| ⭐ **`qt-1` qalculate-qt** | pass 11/11, clean 4/11, unexplained | ⭐ **explained**: it spawns `gnuplot` through the host's `/bin/sh`. **C55**, and **two of my own predictions fell** |
-| ⭐ **the `--wrap=iconv` claim** | *"structurally better than theirs"* — reasoning | ⭐ **MEASURED**: 1-of-12 encodings and a crash → **12 of 12 with a byte-exact round trip on all eleven**. **C56** |
-| ⭐ **rung 3's locale criterion** | *"not measurable in this bed"* | ⭐ **11/11**, after **two** recorded causes that were both wrong. **C48** |
-| ⛔ **"clean on all eleven"** | 24 of 26 | ⛔ **counted `neovim`, whose program never starts**. Guard added; the number owes a re-run. **C54** |
-| ⛔ **"host" objects** | a prefix list | ⛔ **missed `/usr/bin/ld.so` — the host LOADER**, on four of eleven. **C49** |
-| ⛔ **the interposer** | works or does not | ⛔ had a **LOADED AND INERT** state that looked exactly like working, and said nothing. **C53** |
+| **T-094's count** | *"that count does not exist"* | ⭐ **instrumented and in flight**: `exp_host_spawns`, a spawns store beside the rows, and C9a/C9b as its positive control |
+| ⛔ **the spawn instrument** | — | **C57**: one pass MISSED the spawn it exists to find (`vfork` writes the child's `execve` before the line naming its pid); the obvious fix then counted the LAUNCHER, which would have read 26 of 26 |
+| ⛔ **`65-`'s resume** | resumable by design | **C58**: the reuse guard is `[ -s ]` — non-empty, not COMPLETE — so a killed run left a fragment the next run ran on all eleven, scoring the **C6 control 0/11** |
+| ⛔ **the bundler's `--out`** | written in place | ⭐ **atomic**: `<out>.part` + rename, fixing the C58 class at the producer for ~20 call sites |
+| ⛔ **gate 10** | green | **T-096**: it keyed on the evidence **DIRECTORY**, so a README beside a result silenced it. Re-keyed: **8 stale pairs where it reported 0**, four of them evidence produced by the **shell predecessor** |
+| ⛔ **`108-`'s criterion** | *"a PNG matching the server"* in the header | the code accepted any PNG with `w>0,h>0`; now it compares against the size read back from `xdpyinfo` |
+| ⛔ **the interposer** | *"`open`, `stat`, `execve` and friends"* | **C60**: `execvp`, `execl`, `posix_spawn` are **not rewritten**, and `libglib-2.0.so.0` imports all three. **T-097** |
+| ⛔ **the loader's size** | *"1,093 code lines"* in five documents | **C59**: **1,398**, measured. It had drifted 28% in three days and no gate could see it |
+| **`pgb selftest`** | 601 pass, 1 skip | ⭐ **602, zero skips** — `zstd` was simply not installed |
 
 ## ⭐ The measurements, each with its verdict line
 
 | | verdict | note |
 |---|---|---|
-| `107-` qalculate-qt's 4-of-11 | ⭐ `pass=9 fail=1` | the **fail is the finding**: arm B carries `dbus-launch` and changes nothing |
-| `30-` gconv and locale | ⭐ `pass=24 fail=0 skip=0` | arm B ran **for the first time**; zero skips now remain in the whole tree |
-| `102-` classifier equivalence | ⭐ `pass=20 fail=0 skip=0` | R1 fires for the first time (**C50**) |
-| `70-`, `83-` | ⭐ green | re-run rather than pinned after the `0\n0` sweep |
-| `lib.sh --selftest` | ⭐ 14 pass 0 fail | three new rows for `exp_count` |
-| `pgb selftest` | ⭐ 601 pass | with the C53 interposer embedded |
-| `101-` rung 3 | ⭐ `pass=5 fail=0 skip=0` | L1 **11/11**, L2 **11/11** (the fixed criterion fires), L2b **0**, L3 **11/11**, L4 **11/11** |
-| `108-` flameshot capture | ⛔ **pre-registered, never run** | the last *Untried* in the record |
+| `lib.sh --selftest` | ⭐ **29 pass, 0 fail** | 15 new rows |
+| `criteria-audit.sh --selftest` | ⭐ 4 pass, 0 fail | and it found `108-` on the real tree |
+| `pgb selftest` | ⭐ **602 cases, all pass** | zero skips for the first time here |
+| `65-` `gtk3-1` galculator | ⭐ **11/11 pass, 11/11 clean, 0 spawns** | the C6 positive control, agreeing with `64-` |
+| `65-` `sdl-2` stella | ⭐ 11/11 pass, 11/11 clean, 0 spawns | |
+| gate 10, re-keyed | ⛔ **8 disagreements** | was 0 |
+| the interposer probe | ⛔ **3 of 7 exec paths not rewritten** | with a control that reads 0 of 7 |
 
-## ⛔ THE MECHANISM BEHIND THE PATTERN, because a comment is not one
+## ⛔ WHAT IS OWED, AND IT IS ALL BLOCKED ON ONE RUN
 
-The `$(grep -c … || echo 0)` defect had been **diagnosed three times in
-comments** (`79-`, `91-`, `95-`) and reintroduced in **five more files**. It
-now has `exp_count` in `lib.sh` and a **gate** in `TODO/check.sh`. ⭐ That is
-the shape every one of this session's instrument findings wants: not a note
-beside the call site, but something that fails.
+`RESUME.md` carries the ordered list. In short: the corpus finishes → the
+unfiltered read-back writes the verdict → `make` → the POC suite → the bed
+fixtures → `108-` → `105-` → `103-` → T-096's four re-runs.
