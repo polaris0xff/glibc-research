@@ -34,9 +34,25 @@ Spec: [`../docs/methodology/sessions.md`](../docs/methodology/sessions.md).
        commit 3b5fe7aa). `./pgb` does not have it yet. Forbidden until now
        because a rebuild mid-run mixes two tools in one table.
     3. `sh poc/run-all.sh --rebuild`   (C53, and it now also exercises step 2)
-    4. `sh scripts/common/run-experiment.sh 108`   (needs `make` first)
-    5. `105-`, then `103-` run 2.
-    6. `10-`, `20-`, `50-` (bed) and `40-` (IDLE MACHINE) — T-096's four.
+    4. ⛔ `sh scripts/common/bed-fixtures.sh --install all` — THIS CONTAINER
+       HAS NO FIXTURES AND A FRESH ONE NEVER WILL. Checked 2026-09-05:
+       `theme=no` on 11 of 11, `locale=no` on all 7 glibc rows, `dbus=no` on
+       10 of 11 (rockylinux-8 ships one natively). ⛔ `108-` NEEDS THE DBUS
+       ONE — its own header says so — so running it first would reproduce a
+       failure that is the BED's and score it against the bundle, which is
+       C48's exact trap. `101-` and `106-` need theme and locale.
+       ⚠ A fixture does not survive `pgb rootfs fetch`; re-install after one.
+    5. `sh scripts/common/run-experiment.sh 108`   (needs `make` AND the
+       dbus fixture)
+    6. `105-`, then `103-` run 2.
+    7. `10-`, `20-`, `50-` (bed) and `40-` (IDLE MACHINE) — T-096's four.
+
+⭐ **AND THE TWO CORPUS RUNS ARE DIRECTLY COMPARABLE, which was checked rather
+than assumed.** `docs/AGENTS.md` §8 says a result must state which bed it
+describes, and this bed carries no fixtures. ⛔ Neither did the previous one:
+`bed-fixtures.sh` landed at **2026-09-04 14:29** and the corpus it is being
+compared against finished at **12:22** the same day. So no bed difference
+confounds the before/after.
 
 ⚠ **AND ONE EDIT IS DRAFTED BUT NOT APPLIED**, because `65-` must never be
 edited while it executes: **C1 and C2 compare against `MEASURED` while C5
