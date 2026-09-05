@@ -2474,6 +2474,26 @@ fragment from an artefact, and the rename is what stops the fragment being
 seen at all. ⚠ A build that fails while still producing something is now
 reported by name and discarded, rather than silently used.
 
+## ⛔ AND IT IS A CLASS, SO THE FIX MOVED TO THE PRODUCER
+
+⭐ **Measured, not guessed: `[ ! -s "$IMG" ]` guards a bundle build in TWENTY-ODD
+places** — `64- 68- 85- 86- 89- 90- 100- 103- 106- 108-` among them — and every
+one of them is the same truncation waiting for an interruption.
+
+⚠ **`90-` had already been burned twice by neighbouring variants of this class
+and fixed both locally**: a re-run that reused a cached artefact after a
+*bundler* fix and reported the same byte count to the digit, and a re-run that
+reused a `safe` artefact for an `aggressive` row. ⛔ Three variants, three local
+fixes, one class — which is the shape `docs/AGENTS.md` §0b says to replace with
+a mechanism.
+
+⭐ **SO THE FIX IS IN `internal/bundle/appimage.go`, NOT IN THE EXPERIMENTS.**
+`pack()` writes to `<out>.part` and renames only on success, so `--out` is
+**either absent or complete** for every caller that exists and every one that
+will. The experiment-side `.part` in `65-` stays as well, because it also
+carries the exit-status check, and `pgb` being killed is exactly when both
+matter.
+
 ⚠ **The same shape is worth looking for elsewhere**: any `[ -s "$f" ]` used as
 "this is already built" is a truncation waiting for an interruption.
 

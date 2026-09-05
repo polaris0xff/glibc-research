@@ -772,6 +772,32 @@ func (b *Builder) pack() error {
 	if out == "" {
 		out = filepath.Join(b.Work, fmt.Sprintf("%s-anylinux-%s.AppImage", b.Prog, b.Arch))
 	}
+	// ⛔⛔ PACK TO `.part` AND RENAME, SO `--out` IS EITHER ABSENT OR COMPLETE.
+	//
+	// mkdwarfs wrote straight to the destination, so a run killed while it
+	// packed left a FRAGMENT at the final name. ⭐ Every experiment that
+	// bundles guards reuse with `[ ! -s "$IMG" ]` -- NON-EMPTY, not COMPLETE --
+	// so the next run skips the rebuild and runs the fragment:
+	//
+	//	dwarfs::runtime_error: [filesystem_v2.cpp:220] no metadata schema found
+	//	AppRun not found: "/tmp/appimage_extracted_.../AppRun"
+	//
+	// ⛔ Measured 2026-09-05: it scored `galculator` 0 of 11, and galculator is
+	// `experiments/65-`'s POSITIVE CONTROL, so the whole run was unreadable.
+	// docs/history/corrections.md C58.
+	//
+	// ⚠ THE FIX IS HERE RATHER THAN IN THE EXPERIMENTS because the guard is in
+	// TWENTY-ODD call sites and every one of them reaches the bytes through
+	// this function. Fixing the producer makes the guarantee structural, and
+	// a future call site inherits it. `90-` had already been burned twice by
+	// neighbouring variants of the same class -- a stale bundler and stale
+	// build options -- and fixed both locally.
+	//
+	// ⚠ Same directory, so the rename cannot cross a filesystem.
+	final := out
+	out += ".part"
+	_ = os.Remove(out)
+	defer os.Remove(out) // a failed pack leaves nothing reusable
 	logx.Say("")
 	// ⛔ THE RUNTIME IS NAMED, NOT JUST MENTIONED, AND THAT IS A GATE THIS
 	// PROJECT DOES NOT OTHERWISE HAVE. Moving the pins above silently
@@ -844,8 +870,12 @@ func (b *Builder) pack() error {
 	if err != nil {
 		return err
 	}
+	// ⭐ THE LAST STEP, AND THE ONLY ONE THAT PUBLISHES THE NAME.
+	if err := os.Rename(out, final); err != nil {
+		return fail.Cannot("could not put the artefact at %s: %v", final, err)
+	}
 	logx.Say("")
-	logx.Say("built  %s  (%s)", out, humanBytes(fi.Size()))
+	logx.Say("built  %s  (%s)", final, humanBytes(fi.Size()))
 	logx.Say("AppDir kept at %s", b.AppDir)
 	return nil
 }
